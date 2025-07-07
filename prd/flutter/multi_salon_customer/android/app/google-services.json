@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "146071533101",
+    "project_id": "slot-pr-sa",
+    "storage_bucket": "slot-pr-sa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:146071533101:android:2aaaecd38d64f509c7eaa4",
+        "android_client_info": {
+          "package_name": "com.multisalon.expert"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "146071533101-m0m8ddo6ub7l5h72mkth5mh1dmpeg3e6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.multisalon.expert",
+            "certificate_hash": "570a146742cb743a057990eced480cd7199a7b43"
+          }
+        },
+        {
+          "client_id": "146071533101-bej7oionfeotlq9i87jsl37mq6r69bo3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAs5wSw7eSnrbdUIPTu5mASHG5wuoZl8sM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "146071533101-bej7oionfeotlq9i87jsl37mq6r69bo3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "146071533101-s7a5mm5l0itmcp6v9s7f8p7frfimnh0u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.multisalon.customer"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:146071533101:android:3d964a627257d8c4c7eaa4",
+        "android_client_info": {
+          "package_name": "com.multisalon.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "146071533101-7kd62tnp8t8hrjt1aa3r69goj7tokfuq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.multisalon.user",
+            "certificate_hash": "570a146742cb743a057990eced480cd7199a7b43"
+          }
+        },
+        {
+          "client_id": "146071533101-bej7oionfeotlq9i87jsl37mq6r69bo3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAs5wSw7eSnrbdUIPTu5mASHG5wuoZl8sM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "146071533101-bej7oionfeotlq9i87jsl37mq6r69bo3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "146071533101-s7a5mm5l0itmcp6v9s7f8p7frfimnh0u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.multisalon.customer"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

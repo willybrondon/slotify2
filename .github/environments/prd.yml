@@ -1,0 +1,8 @@
+name: prd
+url: http://46.101.229.176:5000
+protection_rules:
+  - required_reviewers: 2
+  - wait_timer: 10
+  - deployment_branch_policy:
+      protected_branches: true
+      custom_branch_policies: false 

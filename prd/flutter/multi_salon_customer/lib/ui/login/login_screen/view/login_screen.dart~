@@ -1,0 +1,402 @@
+// ignore_for_file: must_be_immutable
+
+import 'dart:developer';
+
+import 'package:get/get.dart';
+import 'package:pinput/pinput.dart';
+import 'package:flutter/material.dart';
+import 'package:salon_2/main.dart';
+import 'package:salon_2/routes/app_routes.dart';
+import 'package:salon_2/ui/edit_profile/controller/edit_profile_controller.dart';
+import 'package:salon_2/ui/login/login_screen/controller/login_screen_controller.dart';
+import 'package:salon_2/ui/profile/controller/profile_screen_controller.dart';
+import 'package:salon_2/utils/asset.dart';
+import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/constant.dart';
+import 'package:salon_2/utils/font_family.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:salon_2/custom/app_button/app_button.dart';
+import 'package:salon_2/custom/dialog/progress_dialog.dart';
+import 'package:salon_2/utils/utils.dart';
+
+class LoginScreen extends StatelessWidget {
+  LoginScreen({super.key});
+
+  final LoginScreenController loginScreenController = Get.put(LoginScreenController());
+  ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
+
+  double? statusBarHeight;
+
+  final defaultPinTheme = PinTheme(
+    width: 56,
+    height: 56,
+    textStyle: TextStyle(
+      fontSize: 20,
+      color: AppColors.primaryAppColor,
+      fontWeight: FontWeight.w600,
+    ),
+    decoration: BoxDecoration(
+      border: Border.all(color: AppColors.darkGrey.withOpacity(0.1)),
+      borderRadius: BorderRadius.circular(10),
+    ),
+  );
+
+  loginScreen() {
+    return Scaffold(
+      backgroundColor: AppColors.backGround,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100 + statusBarHeight!),
+        child: Container(
+          padding: EdgeInsets.only(top: statusBarHeight!),
+          height: 100 + statusBarHeight!,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.primaryAppColor,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "${"txtHello".tr}, ${"txtGuest".tr}👋",
+                style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 18, color: AppColors.whiteColor),
+              ),
+              Text(
+                "txtWelcomeService".tr,
+                style: TextStyle(fontFamily: FontFamily.sfProDisplayRegular, fontSize: 13, color: AppColors.whiteColor),
+              ),
+            ],
+          ).paddingOnly(left: 18, bottom: 13),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Image.asset(
+                AppAsset.imMobile,
+                height: 300,
+                width: 300,
+              ).paddingOnly(top: 20),
+            ),
+            Center(
+              child: Text("txtMobileNumberVerification".tr,
+                  style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 21.5)),
+            ),
+            Center(
+              child: Text("desUnderRequirement".tr,
+                  style: TextStyle(fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.email, fontSize: 16)),
+            ),
+            Text("txtEnterMobileNumber".tr,
+                    style: TextStyle(fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.darkGrey3, fontSize: 15))
+                .paddingOnly(top: 30, left: 20, bottom: 5),
+            IntlPhoneField(
+              flagsButtonPadding: const EdgeInsets.all(8),
+              dropdownIconPosition: IconPosition.trailing,
+              controller: loginScreenController.mobileEditingController,
+              obscureText: false,
+              style: TextStyle(color: AppColors.primaryTextColor, fontSize: 15, fontFamily: FontFamily.sfProDisplayMedium),
+              cursorColor: AppColors.primaryTextColor,
+              dropdownTextStyle:
+                  TextStyle(color: AppColors.primaryTextColor, fontSize: 15, fontFamily: FontFamily.sfProDisplayMedium),
+              keyboardType: TextInputType.number,
+              showCountryFlag: false,
+              decoration: InputDecoration(
+                hintStyle: TextStyle(
+                    color: AppColors.darkGrey.withOpacity(0.7), fontSize: 13.8, fontFamily: FontFamily.sfProDisplayMedium),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.transparent),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.bgColor,
+                    ),
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+              initialCountryCode: countryCode ?? "IN",
+              onChanged: (phone) {
+                log("Phone :: ${phone.completeNumber}");
+              },
+            ).paddingOnly(left: 15, right: 15, bottom: 15),
+            GetBuilder<LoginScreenController>(
+              id: Constant.idCheckMobile,
+              builder: (logic) {
+                return AppButton(
+                  height: 55,
+                  width: Get.width,
+                  fontFamily: FontFamily.sfProDisplayBold,
+                  color: AppColors.whiteColor,
+                  fontSize: 18,
+                  buttonColor: AppColors.primaryAppColor,
+                  buttonText: "txtVerification".tr,
+                  onTap: () {
+                    logic.onCheckMobile();
+                    logic.timer?.isActive != true
+                        ? logic.secondsRemaining == 0
+                            ? logic.resetTimer()
+                            : logic.startTimer()
+                        : null;
+                  },
+                ).paddingAll(10);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  otpScreen() {
+    return Scaffold(
+      backgroundColor: AppColors.backGround,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100 + statusBarHeight!),
+        child: Container(
+          padding: EdgeInsets.only(top: statusBarHeight!),
+          height: 100 + statusBarHeight!,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.primaryAppColor,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "${"txtHello".tr}, ${"txtGuest".tr}👋",
+                style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 18, color: AppColors.whiteColor),
+              ),
+              Text(
+                "txtWelcomeService".tr,
+                style: TextStyle(fontFamily: FontFamily.sfProDisplayRegular, fontSize: 13, color: AppColors.whiteColor),
+              ),
+            ],
+          ).paddingOnly(left: 18, bottom: 13),
+        ),
+      ),
+      body: GetBuilder<LoginScreenController>(
+        id: Constant.idProgressView,
+        builder: (logic) {
+          return ProgressDialog(
+            inAsyncCall: logic.isLoading.value,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      "txtOTPVerification".tr,
+                      style: TextStyle(
+                        fontFamily: FontFamily.sfProDisplayBold,
+                        color: AppColors.primaryTextColor,
+                        fontSize: 20,
+                      ),
+                    ).paddingOnly(top: 20),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("txtVerificationCode".tr,
+                          style: TextStyle(fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.email, fontSize: 16)),
+                      Text(" +91 ${Constant.storage.read<String>('mobileNumber')}",
+                          style: TextStyle(fontFamily: FontFamily.sfProDisplay, color: AppColors.primaryAppColor, fontSize: 17)),
+                    ],
+                  ).paddingOnly(bottom: 5),
+                  GetBuilder<LoginScreenController>(
+                    id: Constant.idTimer,
+                    builder: (logic) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("txtOTPSent".tr,
+                              style: TextStyle(fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.email, fontSize: 16)),
+                          Text(
+                            ' ${loginScreenController.secondsRemaining ~/ 60}:${(loginScreenController.secondsRemaining % 60).toString().padLeft(2, '0')}',
+                            style: TextStyle(
+                                fontFamily: FontFamily.sfProDisplayMedium, color: AppColors.primaryAppColor, fontSize: 18),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  GetBuilder<LoginScreenController>(
+                    id: Constant.idProgressView,
+                    builder: (logic) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 30, right: 15, left: 15, bottom: 15),
+                        child: Pinput(
+                          length: 6,
+                          defaultPinTheme: defaultPinTheme,
+                          controller: loginScreenController.otpEditingController,
+                          pinAnimationType: PinAnimationType.fade,
+                        ),
+                      );
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GetBuilder<LoginScreenController>(
+                        id: Constant.idChangeNumber,
+                        builder: (logic) {
+                          return InkWell(
+                            splashColor: AppColors.blackColor.withOpacity(0.1),
+                            highlightColor: AppColors.blackColor.withOpacity(0.1),
+                            onTap: () {
+                              logic.onChangeNumber();
+                              logic.otpEditingController.clear();
+                            },
+                            child: Text(
+                              "txtChangePhoneNumber".tr,
+                              style: TextStyle(
+                                fontFamily: FontFamily.sfProDisplay,
+                                decoration: TextDecoration.underline,
+                                decorationColor: AppColors.redColor,
+                                color: AppColors.redColor,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ).paddingOnly(left: 15);
+                        },
+                      ),
+                      InkWell(
+                        splashColor: AppColors.blackColor.withOpacity(0.1),
+                        highlightColor: AppColors.blackColor.withOpacity(0.1),
+                        onTap: () {
+                          logic.otpEditingController.clear();
+                          logic.verifyPhone();
+                        },
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 20),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "txtResendOTP".tr,
+                                  style: TextStyle(
+                                    fontFamily: FontFamily.sfProDisplay,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: AppColors.primaryAppColor,
+                                    fontSize: 12.5,
+                                    color: AppColors.primaryAppColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    margin: const EdgeInsets.only(top: 70),
+                    height: 65,
+                    width: double.infinity,
+                    child: AppButton(
+                      height: 57,
+                      width: Get.width,
+                      fontFamily: FontFamily.sfProDisplay,
+                      fontSize: 18,
+                      color: AppColors.whiteColor,
+                      buttonColor: AppColors.primaryAppColor,
+                      buttonText: "txtVerify".tr,
+                      onTap: () async {
+                        await logic.verifyOTP(mobileNumber: Constant.storage.read('mobileNumber'));
+
+                        await logic.onLoginApiCall(
+                            loginType: "3", mobile: Constant.storage.read('mobileNumber'), fcmToken: fcmToken!);
+                        log("isLogin :: ${logic.loginCategory?.user?.isUpdate}");
+
+                        if (logic.loginCategory!.status == true) {
+                          Utils.showToast(Get.context!, "User Login SuccessFully..!");
+                          Constant.storage.write('isLogIn', true);
+                          Constant.storage.write('isMobile', true);
+                          Constant.storage.write('UserId', logic.loginCategory?.user?.id);
+                          Constant.storage.write('mobileNumber', logic.loginCategory?.user?.mobile.toString());
+                          Constant.storage.write('isUpdate', logic.loginCategory?.user?.isUpdate);
+
+                          log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
+                          log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
+                          log("is isMobile Controller :: ${Constant.storage.read<bool>('isMobile')}");
+
+                          await profileScreenController.onGetUserApiCall(loginType: 3);
+                          if (profileScreenController.getUserCategory?.status == true) {
+                            Constant.storage.write('isGetUserId', profileScreenController.getUserCategory?.user?.id);
+
+                            Constant.storage.write('userImage', profileScreenController.getUserCategory?.user?.image);
+                            Constant.storage.write('fName', profileScreenController.getUserCategory?.user?.fname);
+                            Constant.storage.write('lName', profileScreenController.getUserCategory?.user?.lname);
+
+                            logic.isLogIn = true;
+
+                            if (logic.isDataSelected == true) {
+                              Get.back();
+                              Constant.storage.write('isUpdate', true);
+                            } else {
+                              Get.offAllNamed(AppRoutes.bottom);
+                              Constant.storage.write('isUpdate', true);
+                            }
+                            logic.update([Constant.idBookingAndLogin]);
+                          } else {
+                            Utils.showToast(Get.context!, profileScreenController.getUserCategory?.message ?? "");
+                          }
+                          if (logic.loginCategory?.user?.isUpdate == false) {
+                            log("profileScreenController.getUserCategory?.user?.fname::${profileScreenController.getUserCategory?.user?.fname}");
+                            log("profileScreenController.getUserCategory?.user?.lname::${profileScreenController.getUserCategory?.user?.lname}");
+                            log("profileScreenController.getUserCategory?.user?.email::${profileScreenController.getUserCategory?.user?.email}");
+                            log("profileScreenController.getUserCategory?.user?.mobile::${profileScreenController.getUserCategory?.user?.mobile}");
+                            log("profileScreenController.getUserCategory?.user?.bio::${profileScreenController.getUserCategory?.user?.bio}");
+                            log("profileScreenController.getUserCategory?.user?.loginType::${profileScreenController.getUserCategory?.user?.loginType}");
+                            log("logic.isDataSelected::${logic.isDataSelected}");
+
+                            Get.toNamed(AppRoutes.editProfile, arguments: [
+                              profileScreenController.getUserCategory?.user?.fname,
+                              profileScreenController.getUserCategory?.user?.lname,
+                              profileScreenController.getUserCategory?.user?.email,
+                              profileScreenController.getUserCategory?.user?.mobile,
+                              0,
+                              profileScreenController.getUserCategory?.user?.bio,
+                              profileScreenController.getUserCategory?.user?.loginType,
+                              logic.isDataSelected
+                            ]);
+                            await Get.put<EditProfileScreenController>(EditProfileScreenController()).getDataFromArgs();
+                            await Get.put<EditProfileScreenController>(EditProfileScreenController()).getArgumentsData();
+                          } else {
+                            if (logic.isDataSelected == true) {
+                              Constant.storage.write('isUpdate', true);
+                              Get.back();
+                            } else {
+                              Get.offAllNamed(AppRoutes.bottom);
+                            }
+                          }
+                        } else {
+                          Utils.showToast(Get.context!, logic.loginCategory?.message ?? "");
+                        }
+                        log("Log in Successfully");
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    statusBarHeight = MediaQuery.of(context).padding.top;
+    return GetBuilder<LoginScreenController>(
+        id: Constant.idVerification,
+        builder: (logic) {
+          return logic.verification != true ? loginScreen() : otpScreen();
+        });
+  }
+}

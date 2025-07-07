@@ -1,0 +1,33 @@
+module.exports = {
+  "_id": "65268c530489a584a41b35d9",
+  "tnc": "https://www.google.com/",
+  "privacyPolicyLink": "https://www.google.com/",
+  "createdAt": "2023-10-11T11:51:47.941Z",
+  "updatedAt": "2024-06-19T09:16:05.140Z",
+  "tax": 18,
+  "isRazorPay": true,
+  "isStripePay": true,
+  "razorPayId": "rzp_test_SjZz9HC7RGCfCb",
+  "razorSecretKey": "## SECRET KEY ##",
+  "stripePublishableKey": "pk_test_51OFsHfSEMYOcpDHW9N2WeARWsZWPsnWR9reSE7shbyqUPbQpCmLv113AULXO9w6tLN1EbAmxUp3mcuCBHfJkHQJd00Qwe8Wq8v",
+  "stripeSecretKey": "sk_test_51OFsHfSEMYOcpDHWKU0EJzlAUaoU7q3f8aI8wDdOjsRP0VER1nK0Jo0Q625NaLrSztqFvc5k40yN8iEGLczHKCdD00p2Fnyzm8",
+  "maintenanceMode": false,
+  "cashAfterService": true,
+  "currencyName": "INR",
+  "currencySymbol": "₹",
+  "flutterWaveKey": "FLWPUBK_TEST-cdc51a4df113a91fe33a914eaf8d1c75-X",
+  "isFlutterWave": true,
+  "firebaseKey": {
+    "type": "service_account",
+    "project_id": "multi-salon-aae5f",
+    "private_key_id": "e3d4b48bf47a36f7a81957d56cd19f4a3934c9b3",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCFjNHmipmQAE2Z\nl1IB62m7sKqW2r7912vjpVVTynCD7YFvrIRUj8eJZZc0LYb6PAQX4qLpc82kkHAW\nWqRqNB4bYvMip/2vFu8jvwhdMFHD4/yUD3jbwLJOmDzgYwqYmayGK2z40fqL3TPU\nUMpn71+RT5fCotnhLujrm58nXPc9uXhH7Dc1FYzroJT9Mdh48Wy8BlPihXy4Z9lg\nlN6BG6/WfHSWnJTAV8Pw687tIm+Xp+22TsDJwxQkawMUCB35g1WYdsTQJiUgpahB\nh42tIETWRBj+5o4vsS3Jtoay91ICLoENXXPmMdMP5h9/sYES5GU0h3t13feQtdsp\ncvDWfuGtAgMBAAECggEADu9VleOQEsOF6hQ7Do3mECBMo3wo+bg6j4WwyiMMfCR2\nYie30MEXfm0HAMXKn3dQud8VeugBalLgxg8y7dGQQF3LdOe2ffshmSzG4a0Cp9Z6\nK5CjYmflSNbLkAhjafddjM+UaysIStXc8vRp/j+Nv3FYNmMB3KXjVF3d6YgC+jr3\nNbYW2Gnm2+rCsvKpgoKdIM+VVQ3Nd9aZ55jeE4bthP59xV0zFEd+47UvIsDk/vtE\n03EHihQJcSn8O3XUxWfz9hSgGYOmHYKLeTBbBQ+2VolneW7BR/puSjANnskqbAad\nXBAlPX6PQaW2ahGEGe3GUWG/h3IKyeRLK23U2lV0wQKBgQC7GfqNdh9yjw01HyKJ\na17e5xG66wkeDwZ4gomyKNbEz09DpwQtLOXH3YTIUKGLPBY+qIuJKiR4+IXXO/4Z\nlo40XoGVKHVWRG8fsoo73sXnIa8UoM+x2palVEAkWjxqTCrTsQX3iL+AVH66R82i\ncFtTB1HKYwKG8e1xjZtBqakRUQKBgQC2uo+GqK9cWaelqs4mG/5/4Uu1EBtIJP6J\nRi1YjVPL6IrzZRCm9On/UTDJETzSniLJ49EnqCg+/CGe6/tWrDb+ky7Ha3sHecr8\nQU/Q+HzT5h8YCeaQFxQYu2E5NHsC6iDUfkaaqWQLrYDAkTU3D7roOHRtuO2YX2Ht\nMuDuSZJTnQKBgDeKw71Axp8cZkBRyM/ght5G3BWP9jntHe+iWLwBsZflLtOXff7n\nKCNH2EYa4YnSwYvCPwHt97vNkvXNAmaYMgjL0U31H7gHQrG3L6AMRtWRQ0ctYdqb\nWEMmGpBwFSU9DS2gjHPqLWcsLh6geCPzlLi2IIqjD7n9kY43ClLYya6xAoGBAIAJ\nLwJa9i0OgSLbEQGxAd3XHnYraAJgMZ48dw+iT4IEWkB7o3RpDgEhgb6Rfn3R4mx2\nXhqcgD7J6kDx9zXfC9XLia6gCB/P3kRs+yFgzA6qI0VzwoNaOHGv8krkFAGRzhk2\ntgAvCvQHybykwpXnRr7qt+Id/xWSWAqdaPBuysIdAoGAKa5YG95PFSjfg59XAK1/\nf7MM4RCpsNwd4xY9MnS6+LRXmvVKYVt42ojM+R1vMt9A4is69GkHNQxV5Jorlt/z\navYvtPGqmxrufb2IiItE5YtVptCTRs/0t3RMe7zny/i9l8Ws147q+Fyw/ZARBQJa\nT3p7GgLot7FVm1z/AQPptiI=\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-y05pu@multi-salon-aae5f.iam.gserviceaccount.com",
+    "client_id": "106172067344362283919",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-y05pu%40multi-salon-aae5f.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+};

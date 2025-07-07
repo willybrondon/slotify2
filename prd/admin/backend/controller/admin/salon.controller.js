@@ -1,0 +1,471 @@
+const Salon = require("../../models/salon.model");
+const Expert = require("../../models/expert.model");
+const { deleteFile, deleteFiles } = require("../../middleware/deleteFile");
+const fs = require("fs");
+const moment = require('moment')
+
+exports.create = async (req, res) => {
+  try {
+    if (
+      !req.body.name ||
+      !req.body.address ||
+      !req.body.landMark ||
+      !req.body.city ||
+      !req.body.state ||
+      !req.body.country ||
+      !req.body.mobile ||
+      !req.body.email ||
+      !req.body.password ||
+      !req.body.platformFee ||
+      !req.body.latitude ||
+      !req.body.about ||
+      req.files?.image?.length === 0
+    ) {
+      if (req.files) deleteFiles(req.files);
+      return res.status(200).send({
+        status: false,
+        message: "Oops ! Invalid details!!",
+      });
+    }
+    const capitalizeFirstLetter = (str) => {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+
+    const salon = new Salon();
+    salon.name = req.body.name;
+    salon.email = req.body.email;
+    salon.addressDetails = {
+      addressLine1: capitalizeFirstLetter(req.body.address),
+      landMark: req.body.landMark,
+      city: capitalizeFirstLetter(req.body.city),
+      state: capitalizeFirstLetter(req.body.state),
+      country: capitalizeFirstLetter(req.body.country),
+    };
+    salon.mobile = req.body.mobile;
+    salon.password = req.body.password;
+    salon.platformFee = req.body.platformFee;
+    salon.locationCoordinates = {
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+    };
+    salon.about = req.body.about;
+    salon.flag ? salon.flag : true;
+
+    let uniqueId;
+    let isUniqueId = false;
+    while (!isUniqueId) {
+      uniqueId = Math.floor(Math.random() * 10000000);
+      const existingSalon = await Salon.findOne({ id: uniqueId });
+      isUniqueId = !existingSalon;
+    }
+    salon.uniqueId = uniqueId;
+
+    const imagePaths = req.files?.image?.map((file) => file.path);
+    salon.image = process.env.baseURL + imagePaths;
+    salon.mainImage = process.env.baseURL + imagePaths[0];
+
+    const defaultSalonTime = {
+      openTime: "09:00 AM",
+      closedTime: "09:00 PM",
+      isActive: true,
+      breakStartTime: "01:30 PM",
+      breakEndTime: "02:30 PM",
+      time: 15,
+    };
+
+    salon.salonTime = [
+      { day: "Monday", ...defaultSalonTime },
+      { day: "Tuesday", ...defaultSalonTime },
+      { day: "Wednesday", ...defaultSalonTime },
+      { day: "Thursday", ...defaultSalonTime },
+      { day: "Friday", ...defaultSalonTime },
+      { day: "Saturday", ...defaultSalonTime },
+      { day: "Sunday", ...defaultSalonTime },
+    ];
+
+    await salon.save();
+    return res.status(200).send({
+      status: true,
+      message: "Salon Created Successfully!!",
+      data: salon,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+exports.update = async (req, res) => {
+  try {
+    if (!req.query.salonId) {
+      if (req.files) deleteFiles(req.files);
+      return res
+        .status(200)
+        .send({ status: false, message: "Oops ! Invalid details!!" });
+    }
+    const salon = await Salon.findById(req.query.salonId);
+    if (!salon) {
+      return res
+        .status(200)
+        .send({ status: false, message: "Oops ! Salon Not Found!!" });
+    }
+    const capitalizeFirstLetter = (str) => {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+    salon.name = req.body.name ? req.body.name : salon.name;
+    salon.email = req.body.email ? req.body.email : salon.email;
+    salon.addressDetails = {
+      addressLine1: req.body.address
+        ? capitalizeFirstLetter(req.body.address)
+        : salon.addressDetails.addressLine1,
+      landMark: req.body.landMark
+        ? req.body.landMark
+        : salon.addressDetails.landMark,
+      city: req.body.city ? req.body.city : salon.addressDetails.city,
+      state: req.body.state ? req.body.state : salon.addressDetails.state,
+      country: req.body.country
+        ? req.body.country
+        : salon.addressDetails.country,
+    };
+    salon.about = req.body.about ? req.body.about : salon.about;
+    salon.mobile = req.body.mobile ? req.body.mobile : salon.mobile;
+    salon.locationCoordinates = {
+      latitude: req.body.latitude
+        ? req.body.latitude
+        : salon.locationCoordinates.latitude,
+      longitude: req.body.longitude
+        ? req.body.longitude
+        : salon.locationCoordinates.longitude,
+    };
+    salon.platformFee = req.body.platformFee
+      ? req.body.platformFee
+      : salon.platformFee;
+    salon.password = req.body.password ? req.body.password : salon.password;
+    if (req.files.mainImage) {
+      const image = salon?.mainImage.split("storage");
+      if (image) {
+        if (fs.existsSync("storage" + image[1])) {
+          fs.unlinkSync("storage" + image[1]);
+        }
+      }
+
+      salon.mainImage = process.env.baseURL + req.files.mainImage[0].path;
+    }
+
+    if (req.files.image) {
+      var imagesData = [];
+
+      if (salon.image.length > 0) {
+        for (var i = 0; i < salon.image.length; i++) {
+          const images = salon.image[i].split("storage");
+          if (images) {
+            if (fs.existsSync("storage" + images[1])) {
+              fs.unlinkSync("storage" + images[1]);
+            }
+          }
+        }
+      }
+
+      await req.files.image.map((data) => {
+        imagesData.push(process.env.baseURL + data.path);
+      });
+
+      salon.image = imagesData;
+    }
+    await salon.save();
+    return res.status(200).send({
+      status: true,
+      message: "Salon Created Successfully!!",
+      data: salon,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+exports.getAll = async (req, res) => {
+  try {
+    const searchQuery = req.query.search;
+    const regex = new RegExp(searchQuery, "i");
+
+    let searchFilter = {};
+
+    if (searchQuery !== "" && searchQuery !== "ALL") {
+      searchFilter = {
+        $or: [
+          { "salon.name": { $regex: regex } },
+          { mobile: { $regex: regex } },
+          { email: { $regex: regex } },
+          { "address.landmark": { $regex: regex } },
+        ],
+      };
+    }
+
+    const data = await Salon.aggregate([
+      {
+        $match: searchFilter,
+      },
+      {
+        $project: {
+          salonTime: 0,
+        },
+      },
+    ]);
+
+    return res.status(200).send({ status: true, message: "Success", data });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+exports.getSalon = async (req, res) => {
+  try {
+    if (!req.query.salonId) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid Details" });
+    }
+    const salon = await Salon.findById(req.query.salonId).populate({
+      path: "serviceIds",
+      populate: {
+        path: "id",
+      },
+    });
+
+    if (!salon) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Salon does not Exist" });
+    }
+    return res.status(200).json({ status: true, message: "success", salon });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.updateSalonTime = async (req, res) => {
+  try {
+    if (!req.query.salonId || !req.query.day) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid Details" });
+    }
+    const salon = await Salon.findById(req.query.salonId);
+
+    if (!salon) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Salon does not Exist" });
+    }
+
+    const salonDay = salon.salonTime.find((time) => time.day === req.query.day);
+    const convertTo24HourFormat = (time) => moment(time, ["hh:mm A"]).format("HH:mm");
+
+    const openTime = req.body.openTime ? convertTo24HourFormat(req.body.openTime) : convertTo24HourFormat(salonDay.openTime);
+    const closedTime = req.body.closedTime ? convertTo24HourFormat(req.body.closedTime) : convertTo24HourFormat(salonDay.closedTime);
+    const breakStartTime = req.body.breakStartTime ? convertTo24HourFormat(req.body.breakStartTime) : convertTo24HourFormat(salonDay.breakStartTime);
+    const breakEndTime = req.body.breakEndTime ? convertTo24HourFormat(req.body.breakEndTime) : convertTo24HourFormat(salonDay.breakEndTime);
+
+    salonDay.openTime = req.body.openTime ? req.body.openTime : salonDay.openTime;
+    salonDay.closedTime = req.body.closedTime ? req.body.closedTime : salonDay.closedTime;
+
+
+    if (salonDay.isBreak === false) {
+
+
+      if (closedTime < openTime) {
+        return res.status(200).send({
+          status: false,
+          message: "End time cannot be before start time.",
+        });
+      }
+    } else {
+      salonDay.breakStartTime = req.body.breakStartTime ? req.body.breakStartTime : salonDay.breakStartTime;
+      salonDay.breakEndTime = req.body.breakEndTime ? req.body.breakEndTime : salonDay.breakEndTime;
+
+      if (breakStartTime < openTime) {
+        return res.status(200).send({
+          status: false,
+          message: "Break start time cannot be before start time.",
+        });
+      }
+
+      if (breakEndTime < breakStartTime) {
+        return res.status(200).send({
+          status: false,
+          message: "Break end time cannot be before break start time.",
+        });
+      }
+
+      if (breakEndTime > closedTime) {
+        return res.status(200).send({
+          status: false,
+          message: "Break end time cannot be after end time.",
+        });
+      }
+
+      if (closedTime < openTime) {
+        return res.status(200).send({
+          status: false,
+          message: "End time cannot be before start time.",
+        });
+      }
+    }
+
+    await salon.save();
+    return res.status(200).json({
+      status: true,
+      message: "Salon time updated successfully",
+      salonTime: salon.salonTime,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.getSalonTime = async (req, res) => {
+  try {
+    if (!req.query.salonId) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid Details" });
+    }
+    const salon = await Salon.findById(req.query.salonId);
+
+    if (!salon) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Salon does not Exist" });
+    }
+
+    const salonTIme = salon.salonTime;
+
+    return res.status(200).json({
+      status: true,
+      message: "Salon time updated successfully",
+      salonTIme,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.isActive = async (req, res) => {
+  try {
+    if (!req.query.salonId) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid Details" });
+    }
+    const salon = await Salon.findById(req.query.salonId);
+
+    if (!salon) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Salon does not Exist" });
+    }
+
+    salon.isActive = !salon.isActive;
+    await salon.save();
+    return res.status(200).json({ status: true, message: "success", salon });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.delete = async (req, res) => {
+  try {
+    if (!req.query.salonId) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid Details" });
+    }
+    const salon = await Salon.findById(req.query.salonId);
+
+    if (!salon) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Salon does not Exist" });
+    }
+
+    salon.isDelete = true;
+    await Expert.updateMany(
+      { salonId: salon._id, isDelete: false },
+      { $set: { isDelete: true } }
+    );
+    return res.status(200).json({ status: true, message: "success", salon });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.manageBreak = async (req, res) => {
+  try {
+    const { salonId, day } = req.query;
+
+    if (!salonId || !day) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid Details" });
+    }
+
+    const salon = await Salon.findById(salonId);
+
+    if (!salon) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Salon does not exist" });
+    }
+
+    const salonDay = salon.salonTime.find((time) => time.day === day);
+
+    if (!salonDay) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Day not found in salon schedule" });
+    }
+
+    salonDay.isBreak = !salonDay.isBreak;
+
+
+
+    await salon.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Salon time updated successfully",
+      salonDay,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ status: false, error: error.message || "Server Error" });
+  }
+};

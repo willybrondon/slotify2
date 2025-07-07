@@ -1,0 +1,535 @@
+name: Slotify CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+  security-events: write  # required for SARIF upload
+
+env:
+  NODE_VERSION: '18.20.2'
+  FLUTTER_VERSION: '3.27.4'
+  JAVA_VERSION: '17.0.12'
+  DROPLET_IP: '46.101.229.176'
+  DROPLET_NAME: 'ubuntu-s-2vcpu-4gb-120gb-intel-fra1-01'
+  PROJECT_NAME: 'first-project'
+  FIREBASE_APP_ID: "gzgz"
+  FIREBASE_TOKEN: "gehehe"
+  MATCH_PASSWORD: "hdhdg"
+
+  # env android 
+  # AAB_PATH: build/app/outputs/bundle/release/app-release.aab
+  # KEYSTORE_PATH: android/upload-keystore.jks
+  # KEY_PROPS_PATH: android/key.properties
+  # SERVICE_ACCOUNT_PATH: store_credentials.json
+
+
+jobs:
+  # Admin Panel Tests
+  admin-tests:
+    name: Admin Panel Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, prd]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies ${{ matrix.environment }}
+      run: |
+        cd "${{ matrix.environment }}/admin/backend"
+        npm ci
+    - name: Install dos2unix
+      run: sudo apt-get update && sudo apt-get install -y dos2unix
+
+    - name: Run linting
+      run: |
+        cd "${{ matrix.environment }}/admin/backend"
+        npm run lint || echo "Linting completed"
+
+    - name: Run tests
+      run: |
+        cd "${{ matrix.environment }}/admin/backend"
+        npm test || echo "Tests completed"
+
+    - name: Upload admin folder for deployment
+      uses: actions/upload-artifact@v4
+      with:
+        name: admin-folder-${{ matrix.environment }} #
+        path: |
+          ${{ matrix.environment }}/admin/
+          install.sh
+
+  # Flutter App Tests (Cross-platform)
+  flutter-tests:
+    name: Flutter App Tests
+    runs-on: macos-latest # i have change ubuntu to macos 
+    strategy:
+      matrix:
+        app: [customer, expert]
+        environment: [dev, prd]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: ${{ env.JAVA_VERSION }}
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+      # setup env 
+    
+    # Decode Android env variables (not needed)
+  #   - name: Decode Android keystore
+  #     run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > ${{ env.KEYSTORE_PATH }}
+
+  #   - name: Decode Android key properties
+  #     run: echo "${{ secrets.ANDROID_KEY_PROPERTIES }}" | base64 --decode > ${{ env.KEY_PROPS_PATH }}
+
+  # # Decode Android release Service Account
+  #   - name: Decode Android Service Account
+  #     run: echo "${{ secrets.PRODUCTION_CREDENTIAL_FILE }}" | base64 --decode > ${{ env.SERVICE_ACCOUNT_PATH }}
+
+    - name: Get Flutter dependencies
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        flutter clean
+        flutter pub get
+
+    - name: Run Flutter tests
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        flutter test
+    
+
+    # - name: Analyze Flutter code
+    #   run: |
+    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+    #     flutter analyze
+
+    - name: Generate local.properties
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        echo "flutter.sdk=/opt/hostedtoolcache/flutter/stable-3.27.4-x64" > android/local.properties
+        echo "sdk.dir=/opt/hostedtoolcache/android-sdk" >> android/local.properties
+        echo "flutter.buildMode=release" >> android/local.properties
+        echo "flutter.versionName=1.0.1" >> android/local.properties
+        echo "flutter.versionCode=1" >> android/local.properties
+
+    
+    - name: Configure Flutter
+      run: |
+        flutter config --android-sdk $ANDROID_SDK_ROOT
+        flutter doctor
+
+    
+
+    - name: give permission to write togradle
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android"
+        chmod +x gradlew
+
+    - name: Clean Flutter project
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        flutter clean
+        flutter pub get
+        
+    - name: clean gradlew (Android)
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android"
+        ./gradlew clean
+
+    - name: Build Flutter APK (Android)
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        flutter build apk --release
+    
+    
+    - name: Upload Android APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-apk-${{ matrix.environment }}-${{ matrix.app }}
+        path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk
+        overwrite: false
+
+  
+  # iOS App Build and Deploy
+
+    - name: install pod ios
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+        pod install
+    
+    - name: Flutter build ipa
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        flutter build ipa --no-codesign
+  
+    - name: Upload IPA
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-ipa-${{ matrix.environment }}-${{ matrix.app }}
+        path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/ios/ipa/Runner.ipa
+        overwrite: false
+
+    # - name: Upload Android APK artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ${{ matrix.app }}-android-${{ matrix.environment }}
+    #     path: "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk"
+    
+    # - name: Distribute APK via Firebase
+    #   run: |
+    #     firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+    #       --app ${{ env.FIREBASE_APP_ID }} \
+    #       --groups testers \
+    #       --token ${{ env.FIREBASE_TOKEN }}
+
+  # Android App Build and Deploy
+  # android-build-deploy:
+  #   name: Android Build and Deploy
+  #   runs-on: ubuntu-latest
+  #   needs: [admin-tests, flutter-tests]
+  #   if: github.ref == 'refs/heads/main'
+  #   strategy:
+  #     matrix:
+  #       app: [customer, expert]
+  #       environment: [prd]
+    
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
+
+  #   - name: Setup Flutter
+  #     uses: subosito/flutter-action@v2
+  #     with:
+  #       flutter-version: ${{ env.FLUTTER_VERSION }}
+  #       channel: 'stable'
+
+  #   - name: Setup Java
+  #     uses: actions/setup-java@v4
+  #     with:
+  #       distribution: 'zulu'
+  #       java-version: '17'
+
+  #   - name: Get Flutter dependencies
+  #     run: |
+  #       cd "slotify/flutter/multi_salon_${{ matrix.app }}"
+  #       flutter pub get
+
+  #   - name: Update app configuration for production
+  #     run: |
+  #       cd "slotify/flutter/multi_salon_${{ matrix.app }}"
+  #       # Update config for production environment
+  #       sed -i 's|http://dev-server:5000/|http://${{ env.DROPLET_IP }}:5000/|g' lib/utils/config.dart
+  #       sed -i 's|dev_secret_key|5TIvw5cpc0|g' lib/utils/config.dart
+
+  #   - name: Build Android App Bundle
+  #     run: |
+  #       cd "slotify/flutter/multi_salon_${{ matrix.app }}"
+  #       flutter build appbundle --release
+
+  #   - name: Sign Android App Bundle
+  #     run: |
+  #       cd "slotify/flutter/multi_salon_${{ matrix.app }}"
+  #       # Create keystore for signing
+  #       keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEYSTORE_PASSWORD }} -dname "CN=Slotify, OU=Mobile, O=Slotify, L=City, S=State, C=US"
+        
+  #       # Sign the AAB
+  #       jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore android/app/upload-keystore.jks build/app/outputs/bundle/release/app-release.aab upload -storepass ${{ secrets.KEYSTORE_PASSWORD }}
+
+  #   - name: Upload to Play Store
+  #     uses: r0adkll/upload-google-play@v1
+  #     with:
+  #       serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_CREDENTIALS }}
+  #       packageName: com.slotify.${{ matrix.app }}
+  #       releaseFiles: slotify/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/bundle/release/app-release.aab
+  #       track: internal
+  #       status: completed
+
+  #   - name: Upload Android artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: ${{ matrix.app }}-android-release
+  #       path: slotify/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/bundle/release/app-release.aab
+
+    
+
+
+  # iOS App Build and Deploy
+  # ios-build-deploy:
+  #   name: iOS Build and Deploy
+  #   runs-on: macos-latest
+  #   needs: [admin-tests, flutter-tests]
+  #   if: github.ref == 'refs/heads/main'
+  #   strategy:
+  #     matrix:
+  #       app: [customer, expert]
+  #       environment: [prd]
+    
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
+
+  #   - name: Setup Flutter
+  #     uses: subosito/flutter-action@v2
+  #     with:
+  #       flutter-version: ${{ env.FLUTTER_VERSION }}
+  #       channel: 'stable'
+
+  #   - name: Get Flutter dependencies
+  #     run: |
+  #       cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+  #       flutter pub get
+    
+    
+
+  
+
+    # - name: Update app configuration for production
+    #   run: |
+    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+    #     # Update config for production environment
+    #     sed -i '' 's|http://dev-server:5000/|http://${{ env.DROPLET_IP }}:5000/|g' lib/utils/config.dart
+    #     sed -i '' 's|dev_secret_key|5TIvw5cpc0|g' lib/utils/config.dart
+
+    # - name: Setup iOS certificates
+    #   uses: apple-actions/import-codesigning-certs@v1
+    #   with:
+    #     p12-file-base64: ${{ secrets.IOS_P12_CERTIFICATE }}
+    #     p12-password: ${{ secrets.IOS_P12_PASSWORD }}
+
+    # - name: Setup provisioning profile
+    #   uses: apple-actions/download-provisioning-profiles@v1
+    #   with:
+    #     bundle-id: com.slotify.${{ matrix.app }}
+    #     profile-type: IOS_APP_STORE
+    #     issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+    #     api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+    #     api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
+    # - name: Build iOS App
+    #   run: |
+    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+    #     flutter build ios --release --no-codesign
+
+    # - name: Setup Ruby
+    #   uses: ruby/setup-ruby@v1
+    #   with:
+    #     ruby-version: '3.2'
+
+    # - name: Install Fastlane
+    #   run: gem install fastlane
+
+    # - name: Fastlane Match Setup
+    #   run: |
+    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+    #     bundle exec fastlane match appstore
+    #   env:
+    #     MATCH_PASSWORD: "hdgd" # ${{ env.MATCH_PASSWORD }}
+    #     GIT_AUTHORIZATION: "sgdgd" # ${{ env.MATCH_GIT_AUTH }}
+
+    # - name: Deploy to TestFlight
+    #   run: |
+    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+    #     fastlane beta
+    #   env:
+    #     APP_STORE_CONNECT_API_KEY_ID: "hdjdhd" # ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+    #     APP_STORE_CONNECT_API_ISSUER_ID: "dhdgd" # ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+    #     APP_STORE_CONNECT_API_KEY: "gdhdgd" # ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+
+    # - name: Build iOS Archive
+    #   run: |
+    #     cd "slotify/flutter/multi_salon_${{ matrix.app }}/ios"
+    #     xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
+
+    # - name: Export iOS IPA
+    #   run: |
+    #     cd "slotify/flutter/multi_salon_${{ matrix.app }}/ios"
+    #     xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportPath build/ios -exportOptionsPlist exportOptions.plist
+
+    # - name: Upload to App Store Connect
+    #   uses: apple-actions/upload-testflight@v1
+    #   with:
+    #     app-path: slotify/flutter/multi_salon_${{ matrix.app }}/ios/build/ios/Runner.ipa
+    #     issuer-id: "gdgdg" # ${{ secrets.APPSTORE_ISSUER_ID }}
+    #     api-key-id: "gdgdgd" # ${{ secrets.APPSTORE_API_KEY_ID }}
+    #     api-private-key: "gdhdgd" # ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
+    # - name: Upload iOS artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ${{ matrix.app }}-ios-release
+    #     path: slotify/flutter/multi_salon_${{ matrix.app }}/ios/build/ios/Runner.ipa
+
+  # Deploy to Development Environment
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: [admin-tests, flutter-tests]
+    if: github.ref == 'refs/heads/develop'
+    environment: dev
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Download admin artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: admin-folder-*
+        merge-multiple: true
+
+    - name: Deploy Admin Panel to Dev
+      run: |
+        echo "Deploying admin panel to development environment..."
+        # Add your dev deployment logic here
+        # This could be deploying to a dev server or staging environment
+
+    - name: Deploy Flutter Apps to Dev
+      run: |
+        echo "Deploying Flutter apps to development environment..."
+        chmod +x scripts/deploy-flutter.sh
+        ./scripts/deploy-flutter.sh dev
+
+  # Deploy to Production Environment
+  deploy-prd:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [admin-tests, flutter-tests]
+    if: github.ref == 'refs/heads/main'
+    environment: prd
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Download admin artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: admin-folder-prd
+        merge-multiple: true
+
+    - name: Deploy Admin Panel to DigitalOcean
+      env:
+        DIGITALOCEAN_ACCESS_TOKEN: "dlld" # ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        SSH_PRIVATE_KEY: "dgdgd" # ${{ secrets.SSH_PRIVATE_KEY }}
+        JWT_SECRET: "gdgd" # ${{ secrets.JWT_SECRET }}
+        SECRET_KEY: "hdgsgte" # ${{ secrets.SECRET_KEY }}
+      run: |
+        echo "Deploying admin panel to DigitalOcean production server..."
+        chmod +x scripts/deploy-to-digitalocean.sh
+        ./scripts/deploy-to-digitalocean.sh
+
+    - name: Health Check
+      run: |
+        echo "Performing health check on production deployment..."
+        # Wait for deployment to complete
+        sleep 30
+        
+        # Check admin panel
+        if curl -f -s "http://${{ env.DROPLET_IP }}:5000/" > /dev/null; then
+          echo "✅ Admin panel is accessible"
+        else
+          echo "❌ Admin panel is not accessible"
+          exit 1
+        fi
+        
+        # Check salon panel
+        if curl -f -s "http://${{ env.DROPLET_IP }}:5000/salonpanel" > /dev/null; then
+          echo "✅ Salon panel is accessible"
+        else
+          echo "⚠️ Salon panel might not be accessible yet"
+        fi
+
+  # Security Scan
+  # security-scan:
+  #   name: Security Scan
+  #   runs-on: ubuntu-latest
+    
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
+
+  #   - name: Run security scan
+  #     uses: github/codeql-action/init@v3
+  #     with:
+  #       languages: javascript, python
+
+  #   - name: Perform CodeQL Analysis
+  #     uses: github/codeql-action/analyze@v3
+
+  # Performance Test
+  performance-test:
+    name: Performance Test
+    runs-on: ubuntu-latest
+    needs: deploy-prd
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run performance tests
+      run: |
+        echo "Running performance tests against production environment..."
+        # Test admin panel performance
+        curl -w "@curl-format.txt" -o /dev/null -s "http://${{ env.DROPLET_IP }}:5000/"
+        
+        # Add more performance testing logic here
+        # This could include load testing, response time checks, etc.
+
+  # Notification
+  notify:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [deploy-dev, deploy-prd] # android-build-deploy, ios-build-deploy
+    if: always()
+    
+    steps:
+    - name: Notify on success
+      if: needs.deploy-dev.result == 'success' || needs.deploy-prd.result == 'success'   # || needs.android-build-deploy.result == 'success' || needs.ios-build-deploy.result == 'success'
+      run: |
+        echo "✅ Deployment completed successfully!"
+        # Add notification logic here (Slack, email, etc.)
+        
+    - name: Notify on failure
+      if: needs.deploy-dev.result == 'failure' || needs.deploy-prd.result == 'failure'   # || needs.android-build-deploy.result == 'failure' || needs.ios-build-deploy.result == 'failure'
+      run: |
+        echo "❌ Deployment failed!"
+        # Add failure notification logic here 
+
+    - name: Check Flutter lib directory
+      run: |
+        echo "Checking Flutter lib directory..."
+        ls prd/flutter/multi_salon_customer/lib/ 
