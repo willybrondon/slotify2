@@ -1,0 +1,5 @@
+name: dev
+url: http://dev-server:5000
+protection_rules:
+  - required_reviewers: 1
+  - wait_timer: 5 

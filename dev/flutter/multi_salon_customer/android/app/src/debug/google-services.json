@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "146071533101",
+    "project_id": "slot-pr-sa",
+    "storage_bucket": "slot-pr-sa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:146071533101:android:3d964a627257d8c4c7eaa4",
+        "android_client_info": {
+          "package_name": "com.multisalon.user"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAs5wSw7eSnrbdUIPTu5mASHG5wuoZl8sM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

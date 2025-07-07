@@ -1,0 +1,33 @@
+class AppRoutes {
+  static const String initial = '/';
+  static const String bottom = '/bottom';
+  static const String home = '/home';
+  static const String search = '/search';
+  static const String category = '/category';
+  static const String branch = '/branch';
+  static const String branchDetail = '/branchDetail';
+  static const String selectBranch = '/selectBranch';
+  static const String categoryDetail = '/categoryDetail';
+  static const String booking = '/booking';
+  static const String bookingInformation = '/bookingInformation';
+  static const String expertDetail = '/expertDetail';
+  static const String expertReview = '/expertReview';
+  static const String bookingDetail = '/bookingDetail';
+  static const String bookingAppointment = '/bookingAppointment';
+  static const String login = '/login';
+  static const String signIn = '/signIn';
+  static const String signUp = '/signUp';
+  static const String forgotPassword = '/forgotPassword';
+  static const String verifyOtp = '/verifyOtp';
+  static const String resetPassword = '/resetPassword';
+  static const String signUpVerifyOtp = '/signUpVerifyOtp';
+  static const String salonRegistration = '/salonRegistration';
+  static const String notification = '/notification';
+  static const String profile = '/profile';
+  static const String aboutApp = "/aboutApp";
+  static const String help = "/help";
+  static const String raiseComplain = "/complain";
+  static const String editProfile = '/editProfile';
+  static const String setting = '/setting';
+  static const String language = '/language';
+}

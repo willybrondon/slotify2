@@ -1,0 +1,261 @@
+// ignore_for_file: must_be_immutable
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:salon_2/custom/app_bar/app_bar.dart';
+import 'package:salon_2/main.dart';
+import 'package:salon_2/routes/app_routes.dart';
+import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
+import 'package:salon_2/utils/asset.dart';
+import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/constant.dart';
+import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/shimmer.dart';
+
+class BranchScreen extends StatelessWidget {
+  BranchScreen({super.key});
+
+  HomeScreenController homeScreenController = Get.find<HomeScreenController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        homeScreenController.onGetAllSalonApiCall(
+          latitude: latitude ?? 0.0,
+          longitude: longitude ?? 0.0,
+          userId: Constant.storage.read<String>('UserId') ?? "",
+        );
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          flexibleSpace: GetBuilder<HomeScreenController>(
+            id: Constant.idProgressView,
+            builder: (logic) {
+              return AppBarCustom(
+                title: "txtNearbyBranches".tr,
+                method: InkWell(
+                  overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                  onTap: () {
+                    Get.back();
+                    logic.onGetAllSalonApiCall(
+                      latitude: latitude ?? 0.0,
+                      longitude: longitude ?? 0.0,
+                      userId: Constant.storage.read<String>('UserId') ?? "",
+                    );
+                  },
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: AppColors.whiteColor,
+                  ),
+                ),
+                method1: [
+                  ((latitude ?? 0.0) != 0.0 && (longitude ?? 0.0) != 0.0)
+                      ? const SizedBox()
+                      : GetBuilder<HomeScreenController>(
+                          id: Constant.idProgressView,
+                          builder: (logic) {
+                            return InkWell(
+                              overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                              onTap: () async {
+                                await logic.getLocation();
+                              },
+                              child: Image.asset(
+                                AppAsset.icNearBy,
+                                color: AppColors.whiteColor,
+                                height: 25,
+                                width: 25,
+                              ).paddingOnly(right: 13),
+                            );
+                          },
+                        )
+                ],
+              );
+            },
+          ),
+        ),
+        body: GetBuilder<HomeScreenController>(
+          id: Constant.idProgressView,
+          builder: (logic) {
+            return RefreshIndicator(
+                onRefresh: () async {
+                  return await logic.onGetAllSalonApiCall(
+                    latitude: latitude ?? 0.0,
+                    longitude: longitude ?? 0.0,
+                    userId: Constant.storage.read<String>('UserId') ?? "",
+                  );
+                },
+                color: AppColors.primaryAppColor,
+                child: logic.isLoading.value
+                    ? Shimmers.nearByBranchesWithLocationShimmer()
+                    : logic.getAllSalonCategory?.data?.isEmpty == true
+                        ? Align(
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  AppAsset.icNoService,
+                                  height: 150,
+                                  width: 150,
+                                ),
+                                Text(
+                                  "txtNotSalon".tr,
+                                  style: TextStyle(
+                                    fontFamily: FontFamily.sfProDisplayMedium,
+                                    fontSize: 17,
+                                    color: AppColors.primaryTextColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: logic.getAllSalonCategory?.data?.length,
+                            physics: const BouncingScrollPhysics(),
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Get.toNamed(AppRoutes.branchDetail, arguments: [logic.getAllSalonCategory?.data?[index].id]);
+                                },
+                                child: Container(
+                                  width: Get.width * 0.93,
+                                  padding: const EdgeInsets.all(5),
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.whiteColor,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: AppColors.textFiledBg,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        height: Get.height * 0.22,
+                                        width: Get.width * 0.93,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: AppColors.grey.withOpacity(0.2),
+                                        ),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: CachedNetworkImage(
+                                          imageUrl: logic.getAllSalonCategory?.data?[index].mainImage ?? "",
+                                          fit: BoxFit.cover,
+                                          errorWidget: (context, url, error) {
+                                            return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                          },
+                                          placeholder: (context, url) {
+                                            return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                          },
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            logic.getAllSalonCategory?.data?[index].name ?? "",
+                                            style: TextStyle(
+                                              color: AppColors.primaryTextColor,
+                                              fontFamily: FontFamily.sfProDisplayBold,
+                                              fontSize: 15.5,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Container(
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(17),
+                                              color: AppColors.yellow1,
+                                            ),
+                                            padding: const EdgeInsets.symmetric(horizontal: 13),
+                                            margin: const EdgeInsets.only(left: 5),
+                                            child: Row(
+                                              children: [
+                                                Image.asset(
+                                                  AppAsset.icStarFilled,
+                                                  height: 15,
+                                                  width: 15,
+                                                  color: AppColors.yellow3,
+                                                ).paddingOnly(right: 5),
+                                                Text(
+                                                  logic.getAllSalonCategory?.data?[index].review?.toStringAsFixed(1) ?? "",
+                                                  style: TextStyle(
+                                                    color: AppColors.yellow3,
+                                                    fontFamily: FontFamily.sfProDisplayBold,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ).paddingOnly(top: 10, left: 3, right: 3),
+                                      Row(
+                                        children: [
+                                          Image.asset(
+                                            AppAsset.icLocation,
+                                            height: 20,
+                                            width: 20,
+                                          ).paddingOnly(right: 8),
+                                          SizedBox(
+                                            width: Get.width * 0.798,
+                                            child: Text(
+                                              "${logic.getAllSalonCategory?.data?[index].addressDetails?.addressLine1}, ${logic.getAllSalonCategory?.data?[index].addressDetails?.landMark}, ${logic.getAllSalonCategory?.data?[index].addressDetails?.city}, ${logic.getAllSalonCategory?.data?[index].addressDetails?.country}",
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: AppColors.locationText,
+                                                fontFamily: FontFamily.sfProDisplay,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ).paddingOnly(bottom: 8),
+                                      Row(
+                                        children: [
+                                          Image.asset(
+                                            AppAsset.icDirection,
+                                            height: 20,
+                                            width: 20,
+                                          ).paddingOnly(right: 8),
+                                          RichText(
+                                            text: TextSpan(
+                                              text: logic.getAllSalonCategory?.data?[index].distance == null
+                                                  ? ""
+                                                  : "${logic.getAllSalonCategory?.data?[index].distance?.toStringAsFixed(2)} ${"txtKMs".tr}  ",
+                                              style: TextStyle(
+                                                color: AppColors.locationText,
+                                                fontSize: 14,
+                                                fontFamily: FontFamily.sfProDisplayBold,
+                                              ),
+                                              children: <TextSpan>[
+                                                TextSpan(
+                                                  text: "txtFromLocation".tr,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: FontFamily.sfProDisplayRegular,
+                                                    color: AppColors.locationText,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ).paddingAll(15));
+          },
+        ),
+      ),
+    );
+  }
+}
