@@ -178,8 +178,8 @@ jobs:
     - name: install pod ios
       run: |
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-        pod repo update
-        pod install --repo-update
+        rm -rf Podfile.lock Pods
+        pod install
     
     - name: Flutter build ipa
       run: |
