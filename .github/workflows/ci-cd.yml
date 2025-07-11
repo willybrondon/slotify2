@@ -188,12 +188,20 @@ jobs:
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
         flutter build ipa --no-codesign
   
-    - name: Upload IPA
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-release-ipa-${{ matrix.environment }}-${{ matrix.app }}
-        path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/ios/ipa/Runner.ipa
-        overwrite: false
+    # - name: Upload IPA
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: app-release-ipa-${{ matrix.environment }}-${{ matrix.app }}
+    #     path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/ios/ipa/Runner.ipa
+    #     overwrite: false
+
+    - name: Export IPA from Xcode archive
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        xcodebuild -exportArchive \
+          -archivePath build/ios/archive/Runner.xcarchive \
+          -exportPath build/ios/ipa \
+          -exportOptionsPlist ios/exportOptions.plist
 
     # - name: Upload Android APK artifact
     #   uses: actions/upload-artifact@v4
