@@ -35,7 +35,6 @@ class Preference {
   }
 
   String? getString(String key) {
-    if (_pref == null) return null;
     return _pref!.read(key);
   }
 
@@ -44,7 +43,6 @@ class Preference {
   }
 
   int? getInt(String key) {
-    if (_pref == null) return null;
     return _pref!.read(key);
   }
 
@@ -53,7 +51,6 @@ class Preference {
   }
 
   bool? getBool(String key) {
-    if (_pref == null) return null;
     return _pref!.read(key);
   }
 
@@ -62,7 +59,6 @@ class Preference {
   }
 
   double? getDouble(String key) {
-    if (_pref == null) return null;
     return _pref!.read(key);
   }
 
@@ -71,7 +67,6 @@ class Preference {
   }
 
   List<String>? getStringList(String key) {
-    if (_pref == null) return null;
     return _pref!.read(key);
   }
 
