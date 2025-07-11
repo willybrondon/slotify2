@@ -178,6 +178,8 @@ jobs:
     - name: install pod ios
       run: |
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+        rm -rf ~/Library/Developer/Xcode/DerivedData
+        pod cache clean --all
         rm -rf Podfile.lock Pods
         pod install --repo-update
     
