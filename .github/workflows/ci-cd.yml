@@ -194,6 +194,18 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        run: |
+          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+          flutter clean
+          flutter pub get
+
       - name: Install the Apple certificate and provisioning profile
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
@@ -221,7 +233,15 @@ jobs:
 
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles          
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles  
+      
+      - name: install pod ios
+        run: |
+          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          pod cache clean --all
+          rm -rf Podfile.lock Pods
+          pod install --repo-update
 
       - name: build archive
         run: |
