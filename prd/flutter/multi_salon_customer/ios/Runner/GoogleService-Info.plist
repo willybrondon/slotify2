@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.multisalon.user</string>
+	<string>com.multisalon.customer</string>
 	<key>PROJECT_ID</key>
 	<string>multi-salon-aae5f</string>
 	<key>STORAGE_BUCKET</key>

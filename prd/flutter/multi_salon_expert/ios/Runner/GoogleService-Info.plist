@@ -3,23 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1020867592920-bknh97i0u3sjnf7dsra97n458fms2snh.apps.googleusercontent.com</string>
+	<string>146071533101-afkgbrcakutp63sodukjankjsm2msbjl.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1020867592920-bknh97i0u3sjnf7dsra97n458fms2snh</string>
+	<string>com.googleusercontent.apps.146071533101-afkgbrcakutp63sodukjankjsm2msbjl</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>1020867592920-5g1q91ej7spj85mcimukeuc1qiovomot.apps.googleusercontent.com</string>
+	<string>146071533101-7kd62tnp8t8hrjt1aa3r69goj7tokfuq.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDune9tM_etKNBdlK2BRjPPBGCFT4E3nhI</string>
+	<string>AIzaSyCjN9hhlkrPl5uqJkl_d2OIHZfT2IcGEQw</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1020867592920</string>
+	<string>146071533101</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.multisalon.user</string>
+	<string>com.multisalon.experts</string>
 	<key>PROJECT_ID</key>
-	<string>multi-salon-aae5f</string>
+	<string>slot-pr-sa</string>
 	<key>STORAGE_BUCKET</key>
-	<string>multi-salon-aae5f.appspot.com</string>
+	<string>slot-pr-sa.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1020867592920:ios:f824684725a77817064dad</string>
+	<string>1:146071533101:ios:c3f4abfa509d7b37c7eaa4</string>
 </dict>
 </plist>
