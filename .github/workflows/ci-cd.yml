@@ -250,7 +250,11 @@ jobs:
           #   --team-id "$TEAM_ID"
 
       - name: Install codesigndoc
-        run: brew install codesigndoc
+        run: |
+          # Download codesigndoc from GitHub releases
+          curl -L -o codesigndoc https://github.com/bitrise-tools/codesigndoc/releases/latest/download/codesigndoc-darwin-amd64
+          chmod +x codesigndoc
+          sudo mv codesigndoc /usr/local/bin/
 
       - name: Run codesigndoc scan
         run: |
