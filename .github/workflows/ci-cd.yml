@@ -256,9 +256,11 @@ jobs:
           pod cache clean --all
           rm -rf Podfile.lock Pods
           pod install --repo-update
-          - name: Install codesigndoc
-          run: |
-            brew install codesigndoc
+
+          
+      - name: Install codesigndoc
+        run: |
+          brew install codesigndoc
         
       - name: Run codesigndoc scan
         run: |
