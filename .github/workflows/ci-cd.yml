@@ -183,7 +183,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        app: [customer, expert]
+        app: [customer]
         environment: [dev, prd]
     steps:
       # this was more debug as was curious what came pre-installed
