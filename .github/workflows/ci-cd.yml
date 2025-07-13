@@ -238,8 +238,11 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles  
           
-          # Add Apple Developer account
-          xcrun altool --signin-account "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD"
+          # Store credentials for notarytool
+          xcrun notarytool store-credentials "AC_PASSWORD" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --team-id "$TEAM_ID"
 
       - name: install pod ios
         run: |
