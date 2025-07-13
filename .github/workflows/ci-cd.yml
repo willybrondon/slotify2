@@ -262,7 +262,7 @@ jobs:
           -destination generic/platform=iOS \
           -allowProvisioningUpdates \
           -allowProvisioningDeviceRegistration \
-          -teamId "$TEAM_ID" \
+          DEVELOPMENT_TEAM="${{ secrets.TEAM_ID }}" \
           clean archive          
 
       - name: export ipa
