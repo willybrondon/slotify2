@@ -243,6 +243,9 @@ jobs:
             --apple-id "$APPLE_ID" \
             --password "$APPLE_APP_SPECIFIC_PASSWORD" \
             --team-id "$TEAM_ID"
+            
+          # Add account to Xcode preferences
+          xcrun altool --signin-account "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD"
 
       - name: install pod ios
         run: |
@@ -262,7 +265,6 @@ jobs:
           -destination generic/platform=iOS \
           -allowProvisioningUpdates \
           -allowProvisioningDeviceRegistration \
-          DEVELOPMENT_TEAM="${{ secrets.TEAM_ID }}" \
           clean archive          
 
       - name: export ipa
