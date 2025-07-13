@@ -238,7 +238,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles  
           
-          # Store credentials for notarytool
+          # Store credentials for notarytool create_s
           xcrun notarytool store-credentials "AC_PASSWORD" \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_APP_SPECIFIC_PASSWORD" \
