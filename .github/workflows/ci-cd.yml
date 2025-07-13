@@ -256,6 +256,20 @@ jobs:
           pod cache clean --all
           rm -rf Podfile.lock Pods
           pod install --repo-update
+          - name: Install codesigndoc
+          run: |
+            brew install codesigndoc
+        
+      - name: Run codesigndoc scan
+        run: |
+          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+          codesigndoc scan --non-interactive --scheme Runner || true
+      
+      - name: List Provisioning Profiles
+        run: ls -l ~/Library/MobileDevice/Provisioning\ Profiles/
+      
+      - name: List Code Signing Identities
+        run: security find-identity -v -p codesigning
 
       - name: build archive
         run: |
