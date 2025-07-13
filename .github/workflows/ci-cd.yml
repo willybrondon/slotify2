@@ -257,21 +257,6 @@ jobs:
           rm -rf Podfile.lock Pods
           pod install --repo-update
 
-          
-      - name: Install codesigndoc
-        run: |
-          brew install codesigndoc
-        
-      - name: Run codesigndoc scan
-        run: |
-          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-          codesigndoc scan --non-interactive --scheme Runner || true
-      
-      - name: List Provisioning Profiles
-        run: ls -l ~/Library/MobileDevice/Provisioning\ Profiles/
-      
-      - name: List Code Signing Identities
-        run: security find-identity -v -p codesigning
 
       - name: build archive
         run: |
@@ -284,6 +269,9 @@ jobs:
           # -allowProvisioningUpdates \
           # -allowProvisioningDeviceRegistration \
           # DEVELOPMENT_TEAM="${{ secrets.TEAM_ID }}" \
+          PROVISIONING_PROFILE=92d03192-8b89-4fb4-b11f-36c68adc79a1 \
+          DEVELOPMENT_TEAM=7B755FRMAM \
+          CODE_SIGN_IDENTITY="Apple Development" \
           clean archive          
 
       - name: export ipa
