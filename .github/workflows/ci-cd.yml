@@ -269,10 +269,17 @@ jobs:
           # -allowProvisioningUpdates \
           # -allowProvisioningDeviceRegistration \
           # DEVELOPMENT_TEAM="${{ secrets.TEAM_ID }}" \
-          PROVISIONING_PROFILE=92d03192-8b89-4fb4-b11f-36c68adc79a1 \
-          DEVELOPMENT_TEAM=7B755FRMAM \
-          CODE_SIGN_IDENTITY="Apple Development" \
-          clean archive          
+          clean archive 
+          
+          
+      - name: Configure iOS Signing Settings
+        run: |
+          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+          sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = 'pslot';/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "'"$CODE_SIGN_IDENTITY"'";/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/PROVISIONING_PROFILE = [^;]*;/PROVISIONING_PROFILE = '92d03192-8b89-4fb4-b11f-36c68adc79a1';/g' Runner.xcodeproj/project.pbxproj 
 
       - name: export ipa
         env:
