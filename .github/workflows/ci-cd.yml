@@ -249,6 +249,44 @@ jobs:
           #   --password "$APPLE_APP_SPECIFIC_PASSWORD" \
           #   --team-id "$TEAM_ID"
 
+      - name: Install codesigndoc
+        run: brew install codesigndoc
+
+      - name: Run codesigndoc scan
+        run: |
+          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+          codesigndoc scan --non-interactive --scheme Runner || true
+
+      - name: List Provisioning Profiles
+        run: ls -l ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: List Code Signing Identities
+        run: security find-identity -v -p codesigning
+
+      - name: Check Provisioning Profile Content
+        run: |
+          ls ~/Library/MobileDevice/Provisioning\ Profiles/
+          echo "=== Profile Details ==="
+          for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
+            echo "Profile: $profile"
+            security cms -D -i "$profile" | grep -E "(application-identifier|TeamIdentifier|Name|UUID)" || true
+            echo "---"
+          done
+
+      - name: Configure iOS Signing Settings
+        env:
+          CODE_SIGN_IDENTITY: ${{ matrix.environment == 'prd' && 'Apple Distribution' || 'Apple Development' }}
+          PROVISIONING_PROFILE_SPECIFIER: ${{ matrix.environment == 'prd' && 'pslot_distribution' || 'pslot' }}
+          PROVISIONING_PROFILE_UUID: ${{ matrix.environment == 'prd' && 'your_distribution_profile_uuid' || '92d03192-8b89-4fb4-b11f-36c68adc79a1' }}
+        run: |
+          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+          
+          sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = '"$PROVISIONING_PROFILE_SPECIFIER"';/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "'"$CODE_SIGN_IDENTITY"'";/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/PROVISIONING_PROFILE = [^;]*;/PROVISIONING_PROFILE = '"$PROVISIONING_PROFILE_UUID"';/g' Runner.xcodeproj/project.pbxproj
+
       - name: install pod ios
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
@@ -256,7 +294,6 @@ jobs:
           pod cache clean --all
           rm -rf Podfile.lock Pods
           pod install --repo-update
-
 
       - name: build archive
         run: |
@@ -266,20 +303,7 @@ jobs:
           -sdk iphoneos \
           -configuration Debug \
           -destination generic/platform=iOS \
-          # -allowProvisioningUpdates \
-          # -allowProvisioningDeviceRegistration \
-          # DEVELOPMENT_TEAM="${{ secrets.TEAM_ID }}" \
-          clean archive 
-          
-          
-      - name: Configure iOS Signing Settings
-        run: |
-          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-          sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
-          sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
-          sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = 'pslot';/g' Runner.xcodeproj/project.pbxproj
-          sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "'"$CODE_SIGN_IDENTITY"'";/g' Runner.xcodeproj/project.pbxproj
-          sed -i.bak 's/PROVISIONING_PROFILE = [^;]*;/PROVISIONING_PROFILE = '92d03192-8b89-4fb4-b11f-36c68adc79a1';/g' Runner.xcodeproj/project.pbxproj 
+          clean archive          
 
       - name: export ipa
         env:
