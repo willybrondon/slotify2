@@ -244,9 +244,6 @@ jobs:
             --password "$APPLE_APP_SPECIFIC_PASSWORD" \
             --team-id "$TEAM_ID"
 
-          # Add account to Xcode preferences
-          # Add account using xcrun
-          xcrun xcodebuild -resolvePackageDependencies
       - name: install pod ios
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
@@ -265,6 +262,7 @@ jobs:
           -destination generic/platform=iOS \
           -allowProvisioningUpdates \
           -allowProvisioningDeviceRegistration \
+          DEVELOPMENT_TEAM="${{ secrets.TEAM_ID }}" \
           clean archive          
 
       - name: export ipa
