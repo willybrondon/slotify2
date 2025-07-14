@@ -274,11 +274,16 @@ jobs:
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
           
+          # Force all signing settings to Manual and set the correct values
           sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
+          sed -i.bak 's/CODE_SIGN_STYLE = "Automatic";/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
           sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
           sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = '"$PROVISIONING_PROFILE_SPECIFIER"';/g' Runner.xcodeproj/project.pbxproj
           sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "'"$CODE_SIGN_IDENTITY"'";/g' Runner.xcodeproj/project.pbxproj
           sed -i.bak 's/PROVISIONING_PROFILE = [^;]*;/PROVISIONING_PROFILE = '"$PROVISIONING_PROFILE_UUID"';/g' Runner.xcodeproj/project.pbxproj
+          
+          # Also ensure no "Automatic" values remain
+          sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = "Automatic";/PROVISIONING_PROFILE_SPECIFIER = '"$PROVISIONING_PROFILE_SPECIFIER"';/g' Runner.xcodeproj/project.pbxproj
 
       - name: install pod ios
         run: |
