@@ -298,6 +298,7 @@ jobs:
           rm -rf ~/Library/Developer/Xcode/DerivedData
           pod cache clean --all
           rm -rf Podfile.lock Pods
+          pod deintegrate
           pod install --repo-update
 
       - name: run for build log

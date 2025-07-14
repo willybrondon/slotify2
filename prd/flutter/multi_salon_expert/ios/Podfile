@@ -32,6 +32,8 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  # Add this line:
+  pod 'FirebaseCore', :modular_headers => true
   target 'RunnerTests' do
     inherit! :search_paths
   end
