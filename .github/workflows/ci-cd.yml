@@ -202,9 +202,9 @@ jobs:
       - name: Install CocoaPods
         run: brew install cocoapods || sudo gem install cocoapods
       
-      - name: Clean Derived Data
-        run: |
-          rm -rf ~/Library/Developer/Xcode/DerivedData
+      # - name: Clean Derived Data
+      #   run: |
+      #     rm -rf ~/Library/Developer/Xcode/DerivedData
 
       - name: Get Flutter dependencies
         run: |
@@ -301,11 +301,11 @@ jobs:
           pod deintegrate
           pod install --repo-update
 
-      - name: run for build log
-        run: |
-          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -destination 'generic/platform=iOS' clean build | tee xcodebuild.log
-          tail -n 100 xcodebuild.log
+      # - name: run for build log
+      #   run: |
+      #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+      #     xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -destination 'generic/platform=iOS' clean build | tee xcodebuild.log
+      #     tail -n 100 xcodebuild.log
       - name: build archive
         env:
           DEVELOPMENT_TEAM: 7B755FRMAM
