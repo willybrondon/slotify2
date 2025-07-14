@@ -281,7 +281,7 @@ jobs:
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
           
-          # Force all signing settings to Manual and set the correct values
+          # Force all signing settings to Manual and set the correct valuesA
           # sed -i.bak 's/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
           
           sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
