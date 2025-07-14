@@ -299,11 +299,11 @@ jobs:
           pod cache clean --all
           rm -rf Podfile.lock Pods
           pod install --repo-update
-          
+
       - name: run for build log
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release -destination 'generic/platform=iOS' clean build | tee xcodebuild.log
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -destination 'generic/platform=iOS' clean build | tee xcodebuild.log
           tail -n 100 xcodebuild.log
       - name: build archive
         env:
