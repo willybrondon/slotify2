@@ -249,18 +249,6 @@ jobs:
           #   --password "$APPLE_APP_SPECIFIC_PASSWORD" \
           #   --team-id "$TEAM_ID"
 
-      - name: Install codesigndoc
-        run: |
-          # Download codesigndoc from GitHub releases
-          curl -L -o codesigndoc https://github.com/bitrise-tools/codesigndoc/releases/latest/download/codesigndoc-darwin-amd64
-          chmod +x codesigndoc
-          sudo mv codesigndoc /usr/local/bin/
-
-      - name: Run codesigndoc scan
-        run: |
-          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-          codesigndoc scan --non-interactive --scheme Runner || true
-
       - name: List Provisioning Profiles
         run: ls -l ~/Library/MobileDevice/Provisioning\ Profiles/
 
@@ -273,7 +261,8 @@ jobs:
           echo "=== Profile Details ==="
           for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
             echo "Profile: $profile"
-            security cms -D -i "$profile" | grep -E "(application-identifier|TeamIdentifier|Name|UUID)" || true
+            echo "--- Content ---"
+            security cms -D -i "$profile" | grep -A1 -B1 -E "(application-identifier|TeamIdentifier|Name|UUID|Entitlements)" || true
             echo "---"
           done
 
