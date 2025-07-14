@@ -32,10 +32,11 @@ target 'Runner' do
 
   # Add modular headers for Firebase pods
   pod 'FirebaseCore', :modular_headers => true
-  pod 'FirebaseAuth', :modular_headers => true
-  pod 'FirebaseMessaging', :modular_headers => true
-  pod 'FirebaseCrashlytics', :modular_headers => true
-  pod 'FirebaseAnalytics', :modular_headers => true
+  # Main Firebase pods (do NOT add :modular_headers => true here)
+  pod 'FirebaseAuth'
+  pod 'FirebaseMessaging'
+  pod 'FirebaseCrashlytics'
+  pod 'FirebaseAnalytics'
   # Add any other Firebase pods you use, with :modular_headers => true
 
    # Dependencies that need modular headers
