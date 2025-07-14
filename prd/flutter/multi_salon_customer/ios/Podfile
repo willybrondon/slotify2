@@ -36,6 +36,16 @@ target 'Runner' do
   pod 'FirebaseMessaging', :modular_headers => true
   pod 'FirebaseCrashlytics', :modular_headers => true
   pod 'FirebaseAnalytics', :modular_headers => true
+
+   # Dependencies that need modular headers
+   pod 'FirebaseAuthInterop', :modular_headers => true
+   pod 'FirebaseAppCheckInterop', :modular_headers => true
+   pod 'FirebaseCoreExtension', :modular_headers => true
+   pod 'GoogleUtilities', :modular_headers => true
+   pod 'RecaptchaInterop', :modular_headers => true
+   pod 'FirebaseInstallations', :modular_headers => true
+   pod 'GoogleDataTransport', :modular_headers => true
+   pod 'nanopb', :modular_headers => true
   target 'RunnerTests' do
     inherit! :search_paths
   end
