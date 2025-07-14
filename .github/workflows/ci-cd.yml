@@ -277,7 +277,7 @@ jobs:
         env:
           CODE_SIGN_IDENTITY: 'Apple Development'
           PROVISIONING_PROFILE_SPECIFIER: pslot
-          PROVISIONING_PROFILE_UUID: 4fb46d0b-d6e3-4ee9-ab1f-08d9587429eb
+          PROVISIONING_PROFILE_UUID: cf5e456e-5f78-44cb-9b64-0a4b946a4be0
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
           
@@ -301,7 +301,7 @@ jobs:
       - name: build archive
         env:
           DEVELOPMENT_TEAM: 7B755FRMAM
-          PROVISIONING_PROFILE: 4fb46d0b-d6e3-4ee9-ab1f-08d9587429eb
+          PROVISIONING_PROFILE: cf5e456e-5f78-44cb-9b64-0a4b946a4be0
           CODE_SIGN_IDENTITY: "Apple Development"
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
@@ -311,7 +311,7 @@ jobs:
           -configuration Debug \
           -destination generic/platform=iOS \
           DEVELOPMENT_TEAM=7B755FRMAM \
-          PROVISIONING_PROFILE=4fb46d0b-d6e3-4ee9-ab1f-08d9587429eb \
+          PROVISIONING_PROFILE=cf5e456e-5f78-44cb-9b64-0a4b946a4be0 \
           CODE_SIGN_IDENTITY="Apple Development" \
           clean archive
 
