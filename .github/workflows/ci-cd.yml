@@ -275,9 +275,9 @@ jobs:
 
       - name: Configure iOS Signing Settings
         env:
-          CODE_SIGN_IDENTITY: ${{ matrix.environment == 'prd' && 'Apple Distribution' || 'Apple Development' }}
-          PROVISIONING_PROFILE_SPECIFIER: ${{ matrix.environment == 'prd' && 'pslot_distribution' || 'pslot' }}
-          PROVISIONING_PROFILE_UUID: ${{ matrix.environment == 'prd' && 'your_distribution_profile_uuid' || '92d03192-8b89-4fb4-b11f-36c68adc79a1' }}
+          CODE_SIGN_IDENTITY: 'Apple Development'
+          PROVISIONING_PROFILE_SPECIFIER: pslot
+          PROVISIONING_PROFILE_UUID: 92d03192-8b89-4fb4-b11f-36c68adc79a1
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
           
