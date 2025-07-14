@@ -38,7 +38,7 @@ target 'Runner' do
 end
 
 post_install do |installer|
-  // arm64 simulator EXCLUDED_ARCHS setting:
+  
   installer.pods_project.build_configurations.each do |config|
     config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
   end
