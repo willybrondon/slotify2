@@ -288,18 +288,6 @@ jobs:
           rm -rf Podfile.lock Pods
           pod install --repo-update
 
-      - name: Force Xcode to Use Specific Profile
-        run: |
-          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-          
-          # Set environment variables for xcodebuild
-          export DEVELOPMENT_TEAM=7B755FRMAM
-          export PROVISIONING_PROFILE=92d03192-8b89-4fb4-b11f-36c68adc79a1
-          export CODE_SIGN_IDENTITY="Apple Development"
-          
-          # Also try setting the profile specifier
-          export PROVISIONING_PROFILE_SPECIFIER=pslot
-
       - name: build archive
         env:
           DEVELOPMENT_TEAM: 7B755FRMAM
@@ -312,7 +300,10 @@ jobs:
           -sdk iphoneos \
           -configuration Debug \
           -destination generic/platform=iOS \
-          clean archive          
+          DEVELOPMENT_TEAM=7B755FRMAM \
+          PROVISIONING_PROFILE=92d03192-8b89-4fb4-b11f-36c68adc79a1 \
+          CODE_SIGN_IDENTITY="Apple Development" \
+          clean archive
 
       - name: export ipa
         env:
