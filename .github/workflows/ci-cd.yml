@@ -199,6 +199,8 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
+      - name: Install CocoaPods
+        run: brew install cocoapods || sudo gem install cocoapods
       
       - name: Clean Derived Data
         run: |
