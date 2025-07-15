@@ -318,8 +318,6 @@ jobs:
           -configuration Debug \
           -destination generic/platform=iOS \
           DEVELOPMENT_TEAM=7B755FRMAM \
-          PROVISIONING_PROFILE=cf5e456e-5f78-44cb-9b64-0a4b946a4be0 \
-          CODE_SIGN_IDENTITY="Apple Development" \
           clean archive
 
       - name: export ipa
