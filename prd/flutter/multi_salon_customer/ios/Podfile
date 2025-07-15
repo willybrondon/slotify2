@@ -32,7 +32,7 @@ target 'Runner' do
   # Add this line:
   pod 'FirebaseCore', :modular_headers => true
   # Main Firebase pods (do NOT add :modular_headers => true here)
-  pod 'FirebaseAuth'
+  pod 'FirebaseAuth', :modular_headers => true
   pod 'FirebaseMessaging'
   pod 'FirebaseCrashlytics'
   pod 'FirebaseAnalytics'
