@@ -28,27 +28,10 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 target 'Runner' do
+  use_frameworks! :linkage => :static
+  
+
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-
-  # Add modular headers for Firebase pods
-  pod 'FirebaseCore', :modular_headers => true
-  # Main Firebase pods (do NOT add :modular_headers => true here)
-  pod 'FirebaseAuth', :modular_headers => true
-  pod 'FirebaseMessaging'
-  pod 'FirebaseCrashlytics'
-  pod 'FirebaseAnalytics'
-  # Add any other Firebase pods you use, with :modular_headers => true
-
-   # Dependencies that need modular headers
-   pod 'FirebaseAuthInterop', :modular_headers => true
-   pod 'FirebaseAppCheckInterop', :modular_headers => true
-   pod 'FirebaseCoreExtension', :modular_headers => true
-   pod 'GoogleUtilities', :modular_headers => true
-   pod 'RecaptchaInterop', :modular_headers => true
-   pod 'FirebaseInstallations', :modular_headers => true
-   pod 'GoogleDataTransport', :modular_headers => true
-   pod 'nanopb', :modular_headers => true
-
   target 'RunnerTests' do
     inherit! :search_paths
   end
