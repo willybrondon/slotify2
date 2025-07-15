@@ -336,7 +336,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ matrix.environment }}-${{ matrix.app }}
-          path: ${{ runner.temp }}/build/Runner.ipa
+          path: ${{ runner.temp }}/build/multi_saloon_customer.ipa
           # you can also archive the entire directory oka 
           # path: ${{ runner.temp }}/build
           retention-days: 3
