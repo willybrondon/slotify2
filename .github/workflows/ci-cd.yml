@@ -199,8 +199,6 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
-      - name: Install CocoaPods
-        run: brew install cocoapods -v '=1.5.0' || sudo gem install cocoapods -v '=1.5.0'
       
       # - name: Clean Derived Data
       #   run: |
@@ -299,6 +297,7 @@ jobs:
           pod cache clean --all
           rm -rf Podfile.lock Pods
           pod deintegrate
+          brew install cocoapods -v '=1.5.0' || sudo gem install cocoapods -v '=1.5.0'
           pod install --repo-update
 
       # - name: run for build log
