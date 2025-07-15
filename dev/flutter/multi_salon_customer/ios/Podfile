@@ -28,44 +28,12 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 
-static_frameworks = [
-  'FirebaseAuthInterop',
-  'FirebaseAppCheckInterop',
-  'FirebaseCore',
-  'FirebaseCoreExtension',
-  'GoogleUtilities',
-  'RecaptchaInterop',
-  'FirebaseCoreInternal',
-  'FirebaseInstallations',
-  'GoogleDataTransport',
-  'nanopb',
-  'FirebaseABTesting',
-  'FirebaseAuth'
-]
-
-pre_install do |installer|
-  installer.pod_targets.each do |pod|
-    if static_frameworks.include?(pod.name)
-      puts "Configuring #{pod.name} as static framework"
-      def pod.build_type
-        Pod::BuildType.new(:linkage => :static, :packaging => :framework)
-      end
-    end
-  end
-end
-
+right after use_frameworks! :linkage => :static
+$RNFirebaseAsStaticFramework = true
 target 'Runner' do
   
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  pod 'FirebaseCore', :modular_headers => true
-  pod 'FirebaseAuthInterop', :modular_headers => true
-  pod 'FirebaseAppCheckInterop', :modular_headers => true
-  pod 'FirebaseCoreExtension', :modular_headers => true
-  pod 'GoogleUtilities', :modular_headers => true
-  pod 'RecaptchaInterop', :modular_headers => true
-  pod 'FirebaseInstallations', :modular_headers => true
-  pod 'GoogleDataTransport', :modular_headers => true
-  pod 'nanopb', :modular_headers => true
+  
   target 'RunnerTests' do
     inherit! :search_paths
   end
