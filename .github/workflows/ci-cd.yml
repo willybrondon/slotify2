@@ -312,7 +312,7 @@ jobs:
           CODE_SIGN_IDENTITY: "Apple Development"
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-          xcodebuild -scheme "Runner" \
+          xcodebuild -workspace Runner.xcworkspace -scheme "Runner" \
           -archivePath $RUNNER_TEMP/Runner.xcarchive \
           -sdk iphoneos \
           -configuration Debug \
