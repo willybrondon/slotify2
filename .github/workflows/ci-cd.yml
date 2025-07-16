@@ -272,12 +272,12 @@ jobs:
             echo "---"
           done
 
-      - name: Check Certificate in Profile
-        run: |
-          echo "=== Certificate Fingerprint ==="
-          security find-certificate -c "Apple Development: BRONDON WILLY (6Y8CH5T373)" -p | openssl x509 -noout -fingerprint -sha1
-          echo "=== Profile Certificates ==="
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/mobile_pp.tgz | grep -A 20 "DeveloperCertificates" || true
+      # - name: Check Certificate in Profile
+      #   run: |
+      #     echo "=== Certificate Fingerprint ==="
+      #     security find-certificate -c "Apple Development: BRONDON WILLY (6Y8CH5T373)" -p | openssl x509 -noout -fingerprint -sha1
+      #     echo "=== Profile Certificates ==="
+      #     security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/mobile_pp.tgz | grep -A 20 "DeveloperCertificates" || true
 
       # - name: Configure iOS Signing Settings
       #   env:
@@ -349,7 +349,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ matrix.environment }}-${{ matrix.app }}
-          path: ${{ runner.temp }}/build/multi_saloon_${{ matrix.app }}.ipa
+          path: ${{ runner.temp }}/build/multi_salon_${{ matrix.app }}.ipa
           # you can also archive the entire directory oka 
           # path: ${{ runner.temp }}/build
           retention-days: 3
