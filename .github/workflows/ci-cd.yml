@@ -277,7 +277,7 @@ jobs:
           echo "=== Certificate Fingerprint ==="
           security find-certificate -c "Apple Development: BRONDON WILLY (6Y8CH5T373)" -p | openssl x509 -noout -fingerprint -sha1
           echo "=== Profile Certificates ==="
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision | grep -A 20 "DeveloperCertificates" || true
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/mobile_pp.tgz | grep -A 20 "DeveloperCertificates" || true
 
       # - name: Configure iOS Signing Settings
       #   env:
