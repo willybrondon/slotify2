@@ -159,23 +159,24 @@ jobs:
         flutter clean
         flutter pub get
         
-    # - name: clean gradlew (Android)
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android"
-    #     ./gradlew clean
+    - name: clean gradlew (Android)
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android"
+        ./gradlew clean
 
-    # - name: Build Flutter APK (Android)
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-    #     flutter build apk --release
+    - name: Build Flutter APK (Android)
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        flutter build apk --release
     
     
-    # - name: Upload Android APK artifact
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: app-release-apk-${{ matrix.environment }}-${{ matrix.app }}
-    #     path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk
-    #     overwrite: false
+    - name: Upload Android APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-app-release-apk-${{ matrix.environment }}-${{ matrix.app }}
+        path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk
+        overwrite: false
+        retention-days: 3
 
   
 # iOS App Build and Deploy just to rerun
@@ -348,7 +349,7 @@ jobs:
       - name: Upload application
         uses: actions/upload-artifact@v4
         with:
-          name: app-${{ matrix.environment }}-${{ matrix.app }}
+          name: ios-app-${{ matrix.environment }}-${{ matrix.app }}
           path: ${{ runner.temp }}/build/multi_salon_${{ matrix.app }}.ipa
           # you can also archive the entire directory oka 
           # path: ${{ runner.temp }}/build
