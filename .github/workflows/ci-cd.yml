@@ -79,7 +79,7 @@ jobs:
     - name: start the ssh  key and add the key
       uses: webfactory/ssh-agent@v0.8.0
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-private-key: ${{ secrets.ssh-private-key }}
 
     - name: set up SSH key 
       run: |
