@@ -76,7 +76,7 @@ jobs:
     #     path: |
     #       ${{ matrix.environment }}/admin/
     #       install.sh
-    - name: start the ssh  key and add the key
+    - name: start the ssh  key and add the key okay
       uses: webfactory/ssh-agent@v0.8.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
