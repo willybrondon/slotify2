@@ -69,13 +69,35 @@ jobs:
         cd "${{ matrix.environment }}/admin/backend"
         npm test || echo "Tests completed"
 
-    - name: Upload admin folder for deployment
-      uses: actions/upload-artifact@v4
-      with:
-        name: admin-folder-${{ matrix.environment }} #
-        path: |
-          ${{ matrix.environment }}/admin/
-          install.sh
+    # - name: Upload admin folder for deployment
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: admin-folder-${{ matrix.environment }} #
+    #     path: |
+    #       ${{ matrix.environment }}/admin/
+    #       install.sh
+    - name: start the ssh  key and add the key
+      uses: webfactory/ssh-agent@0.9.0
+      with: 
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: set up SSH key 
+      run: |
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 46.101.229.176 >> ~/.ssh/known_hosts
+
+    - name: copy file to vps 
+      run: |
+        scp -r dev/admin root@46.101.229.176:/home/
+        scp -r dev/install.sh root@46.101.229.176:/
+
+    - name: Run and install dependencies
+      run: |
+        ssh root@46.101.229.176 "sudo apt install dos2unix"
+        ssh root@46.101.229.176 "cd / && chmod +x install.sh"
+        ssh root@46.101.229.176 "cd / && ./install.sh"
+
 
   # Flutter App Tests (Cross-platform)
   flutter-tests:
