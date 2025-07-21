@@ -182,8 +182,8 @@ echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm install node
+npm install react-scripts --save
 npm run build
-mkdir -p /home/admin/backend/public
 sudo mv /home/admin/frontend/build/* /home/admin/backend/public
 
 # Install salon dependencies and build
@@ -207,8 +207,8 @@ echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm install node
+npm install react-scripts --save
 npm run build
-mkdir -p /home/admin/backend/salon
 sudo mv /home/admin/salon/build/* /home/admin/backend/salon
 
 # Configure Nginx

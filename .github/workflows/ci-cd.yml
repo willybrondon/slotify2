@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, prd]
+        environment: [dev]
     
     steps:
     - name: Checkout code
