@@ -87,14 +87,19 @@ jobs:
 
     - name: copy file to vps 
       run: |
-        # scp -r dev/admin root@46.101.229.176:/home/
-        scp -r dev/install.sh root@46.101.229.176:/home/
+        scp -r dev/admin root@46.101.229.176:/home/
+        scp -r install.sh root@46.101.229.176:/
 
     - name: Run and install dependencies
+      env:
+        DB_NAME: ${{ secrets.DB_NAME }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
       run: |
         ssh root@46.101.229.176 "sudo apt install dos2unix"
         ssh root@46.101.229.176 "cd / && chmod +x install.sh"
-        ssh root@46.101.229.176 "cd / && ./install.sh"
+        ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DB_NAME='$DB_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' bash -c 'cd / && ./install.sh'"
 
 
   # Flutter App Tests (Cross-platform)
