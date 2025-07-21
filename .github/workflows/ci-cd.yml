@@ -88,8 +88,8 @@ jobs:
     - name: copy file to vps 
       run: |
         sudo apt-get update && sudo apt-get install -y zip unzip
-        cd dev && zip -r ../admin.zip admin 
-        scp -r admin.zip root@46.101.229.176:/home/
+        (cd dev && zip -r ../admin.zip admin)
+        scp admin.zip root@46.101.229.176:/home/
         ssh root@46.101.229.176 "unzip -o /home/admin.zip -d /home/"
         scp install.sh root@46.101.229.176:/
 
