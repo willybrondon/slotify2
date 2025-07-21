@@ -88,7 +88,7 @@ jobs:
     - name: copy file to vps 
       run: |
         tar czf dev/admin.tar.gz dev/admin 
-        scp -r dev/admin.tar.gz root@46.101.229.176:/home/
+        scp -r admin.tar.gz root@46.101.229.176:/home/
         ssh root@46.101.229.176 "tar xzf /home/admin.tar.gz -C /home/"
         scp -r install.sh root@46.101.229.176:/
 
