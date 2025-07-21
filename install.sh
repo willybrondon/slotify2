@@ -120,8 +120,8 @@ exit
 EOF
 
 # Enable authentication in MongoDB
-sudo sed -i '/#security:/a\security:\n  authorization: enabled' /etc/mongod.conf
-sudo sed -i "s/bindIp: 127.0.0.1/bindIp: 127.0.0.1,$public_ip/" /etc/mongod.conf
+# sudo sed -i '/#security:/a\security:\n  authorization: enabled' /etc/mongod.conf
+# sudo sed -i "s/bindIp: 127.0.0.1/bindIp: 127.0.0.1,$public_ip/" /etc/mongod.conf
 sudo systemctl restart mongod
 
 # Install backend dependencies
@@ -182,7 +182,6 @@ echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm install node
-npm install react-scripts --save
 npm run build
 sudo mv /home/admin/frontend/build/* /home/admin/backend/public
 
@@ -207,7 +206,6 @@ echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm install node
-npm install react-scripts --save
 npm run build
 sudo mv /home/admin/salon/build/* /home/admin/backend/salon
 
