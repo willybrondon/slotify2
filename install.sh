@@ -79,7 +79,7 @@ fi
 
 echo "DB_NAME: $DB_NAME"
 
-if [-n "$JWT_SECRET"]; then
+if [ -n "$JWT_SECRET" ]; then
     shared_jwt_secret="$JWT_SECRET"
     echo "the jwt_secret from environment is: $shared_jwt_secret"
 else
@@ -87,7 +87,6 @@ else
     read -p "Shared Jwt Secret [2FhKmINItB]: " shared_jwt_secret
     [[ -z "$shared_jwt_secret" ]] && shared_jwt_secret="$get_shared_jwt_secret"
 fi
-echo "JWT_SECRET: $JWT_SECRET"
 
 
 # Install MongoDB
