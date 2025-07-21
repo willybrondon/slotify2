@@ -317,7 +317,7 @@ jobs:
       #     sed -i.bak 's/PROVISIONING_PROFILE = [^;]*;/PROVISIONING_PROFILE = '"$PROVISIONING_PROFILE_UUID"';/g' Runner.xcodeproj/project.pbxproj
           
          
-      - name: install pod ios
+      - name: install pod ios for testting 
         run: |
           cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
           rm -rf ~/Library/Developer/Xcode/DerivedData
