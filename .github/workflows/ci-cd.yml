@@ -87,8 +87,8 @@ jobs:
 
     - name: copy file to vps 
       run: |
-        scp -r dev/admin root@46.101.229.176:/home/
-        scp -r dev/install.sh root@46.101.229.176:/
+        # scp -r dev/admin root@46.101.229.176:/home/
+        scp -r dev/install.sh root@46.101.229.176:/home/
 
     - name: Run and install dependencies
       run: |
