@@ -87,10 +87,11 @@ jobs:
 # we compress the admin file to be light when copy
     - name: copy file to vps 
       run: |
-        tar czf admin.tar.gz -C dev admin 
-        scp -r admin.tar.gz root@46.101.229.176:/home/
-        ssh root@46.101.229.176 "tar xzf /home/admin.tar.gz -C /home/"
-        scp -r install.sh root@46.101.229.176:/
+        sudo apt-get update && apt-get install -y zip unzip
+        cd dev && zip -r ../admin.zip admin 
+        scp -r admin.zip root@46.101.229.176:/home/
+        ssh root@46.101.229.176 "unzip -o /home/admin.zip -d /home/"
+        scp install.sh root@46.101.229.176:/
 
     - name: Run and install dependencies
       env:
