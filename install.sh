@@ -16,7 +16,7 @@ else
     done
     [[ -z "$public_ip" ]] && public_ip="$get_public_ip"
 fi
-clear
+echo "PUBLIC_IP: $PUBLIC_IP"
 
 # Update and clear screen
 sudo apt update
@@ -66,6 +66,8 @@ else
     read -p "Shared Secret key [5TIvw5cpc0]: " shared_secret_key
     [[ -z "$shared_secret_key" ]] && shared_secret_key="$get_shared_secret_key"
 fi
+  
+echo "SECRET_KEY: $SECRET_KEY"  
 
 # Use DB_NAME from environment if set, otherwise prompt the user
 if [ -n "$DB_NAME" ]; then
@@ -75,6 +77,8 @@ else
     read -p "Your app name: " app_name
 fi
 
+echo "DB_NAME: $DB_NAME"
+
 if [-n "$JWT_SECRET"]; then
     shared_jwt_secret="$JWT_SECRET"
     echo "the jwt_secret from environment is: $shared_jwt_secret"
@@ -83,7 +87,8 @@ else
     read -p "Shared Jwt Secret [2FhKmINItB]: " shared_jwt_secret
     [[ -z "$shared_jwt_secret" ]] && shared_jwt_secret="$get_shared_jwt_secret"
 fi
-clear
+echo "JWT_SECRET: $JWT_SECRET"
+
 
 # Install MongoDB
 echo "
