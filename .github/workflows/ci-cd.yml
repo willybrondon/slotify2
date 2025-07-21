@@ -81,7 +81,7 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: set up SSH key 
+    - name: set up SSH key for test
       run: |
         ssh-keyscan -H 46.101.229.176 >> ~/.ssh/known_hosts
 
