@@ -3,15 +3,20 @@
 # Update and clear screen
 sudo apt update && clear
 
-# Get public IP address
-get_public_ip=$(wget -T 10 -t 1 -4qO- "http://ip1.dynupdate.no-ip.com/" || curl -m 10 -4Ls "http://ip1.dynupdate.no-ip.com/" | grep -m 1 -oE '^[0-9]{1,3}(\.[0-9]{1,3}){3}$')
-read -p "Public IPv4 address / hostname [$get_public_ip]: " public_ip
-until [[ -n "$get_public_ip" || -n "$public_ip" ]]; do
-    echo "Invalid input."
-    read -p "Public IPv4 address / hostname: " public_ip
-done
-[[ -z "$public_ip" ]] && public_ip="$get_public_ip"
-clear
+# Use PUBLIC_IP from environment if set, otherwise prompt the user
+if [ -n "$PUBLIC_IP" ]; then
+    public_ip="$PUBLIC_IP"
+    echo "Using PUBLIC_IP from environment: $public_ip"
+else
+    get_public_ip=$(wget -T 10 -t 1 -4qO- "http://ip1.dynupdate.no-ip.com/" || curl -m 10 -4Ls "http://ip1.dynupdate.no-ip.com/" | grep -m 1 -oE '^[0-9]{1,3}(\.[0-9]{1,3}){3}$')
+    read -p "Public IPv4 address / hostname [$get_public_ip]: " public_ip
+    until [[ -n "$get_public_ip" || -n "$public_ip" ]]; do
+        echo "Invalid input."
+        read -p "Public IPv4 address / hostname: " public_ip
+    done
+    [[ -z "$public_ip" ]] && public_ip="$get_public_ip"
+fi
+echo "PUBLIC_IP: $PUBLIC_IP"
 
 # Update and clear screen
 sudo apt update
@@ -52,17 +57,37 @@ npm install pm2 -g
 clear
 
 # Set up application configuration
-get_shared_secret_key="5TIvw5cpc0"
-read -p "Shared Secret key [5TIvw5cpc0]: " shared_secret_key
-[[ -z "$shared_secret_key" ]] && shared_secret_key="$get_shared_secret_key"
+# Use SECRET_KEY from environment if set, otherwise prompt the user
+if [ -n "$SECRET_KEY" ]; then
+    shared_secret_key="$SECRET_KEY"
+    echo "Using SECRET_KEY from environment: $shared_secret_key"
+else
+    get_shared_secret_key="5TIvw5cpc0"
+    read -p "Shared Secret key [5TIvw5cpc0]: " shared_secret_key
+    [[ -z "$shared_secret_key" ]] && shared_secret_key="$get_shared_secret_key"
+fi
+  
+echo "SECRET_KEY: $SECRET_KEY"  
 
-read -p "Your app name: " app_name
+# Use DB_NAME from environment if set, otherwise prompt the user
+if [ -n "$DB_NAME" ]; then
+    app_name="$DB_NAME"
+    echo "Using DB_NAME from environment as app_name: $app_name"
+else
+    read -p "Your app name: " app_name
+fi
 
-get_shared_jwt_secret="2FhKmINItB"
-read -p "Shared Jwt Secret [2FhKmINItB]: " shared_jwt_secret
-[[ -z "$shared_jwt_secret" ]] && shared_jwt_secret="$get_shared_jwt_secret"
+echo "DB_NAME: $DB_NAME"
 
-clear
+if [ -n "$JWT_SECRET" ]; then
+    shared_jwt_secret="$JWT_SECRET"
+    echo "the jwt_secret from environment is: $shared_jwt_secret"
+else
+    get_shared_jwt_secret="2FhKmINItB"
+    read -p "Shared Jwt Secret [2FhKmINItB]: " shared_jwt_secret
+    [[ -z "$shared_jwt_secret" ]] && shared_jwt_secret="$get_shared_jwt_secret"
+fi
+
 
 # Install MongoDB
 echo "
@@ -97,7 +122,6 @@ EOF
 # Enable authentication in MongoDB
 # sudo sed -i '/#security:/a\security:\n  authorization: enabled' /etc/mongod.conf
 # sudo sed -i "s/bindIp: 127.0.0.1/bindIp: 127.0.0.1,$public_ip/" /etc/mongod.conf
-
 sudo systemctl restart mongod
 
 # Install backend dependencies
