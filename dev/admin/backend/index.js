@@ -297,7 +297,7 @@ app.post('/api/send-demo-request', express.json(), async (req, res) => {
   });
 
   let mailOptions = {
-    from: 'your_email@gmail.com', // Replace with your sender email
+    from: 'brondonwilly@gmail.com', // Replace with your sender email
     to: 'brondonwilly@gmail.com',
     subject: 'New Salon Demo Request',
     text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\nSalon Type: ${salonType}`
