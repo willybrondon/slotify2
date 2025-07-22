@@ -112,7 +112,7 @@ jobs:
     - name: backup storage file 
       run: |
         ssh root@46.101.229.176 "mkdir -p /home/admin/backend/storage"
-        ssh root@46.101.229.176 "scp -r /home/home/storage_backup/storage/* /home/admin/backend/storage"
+        ssh root@46.101.229.176 "scp -r /home/storage_backup/storage/* /home/admin/backend/storage"
         
 
   # Flutter App Tests (Cross-platform)
