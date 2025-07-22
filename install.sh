@@ -213,6 +213,18 @@ sudo rm -rf /home/admin/backend/salon
 mkdir -p /home/admin/backend/salon
 sudo mv /home/admin/salon/build/* /home/admin/backend/salon
 
+
+# Deploy salonportal static files
+echo "
+################################################
+#                DEPLOY SALONPORTAL            #
+################################################
+"
+sudo rm -rf /home/admin/backend/salonportal
+mkdir -p /home/admin/backend/salonportal
+sudo cp /home/admin/salonportal/* /home/admin/backend/salonportal
+
+
 # Configure Nginx
 echo "
 ################################################
