@@ -256,9 +256,28 @@ cron.schedule("55 23 28-31 * *", async () => {
   }
 });
 
-// send re
-app.listen(port, () => {
-  console.log(`magic happen on ${port}`);
+
+
+//schedule session for create demo user's booking with status "pending"
+
+app.use("/storage", express.static(path.join(__dirname, "storage")));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "salon")));
+
+// Serve static files for salonportal : for solon portal new edited 22/07/2025
+app.use("/salonportal", express.static(path.join(__dirname, "salonportal")));
+
+// Direct route for salonportal index.html edited 22/07/2025
+app.get("/salonportal/:param?", function (req, res) {
+  res.status(200).sendFile(path.join(__dirname, "salonportal", "index.html"));
+});
+
+app.get("/SalonPanel/:param?", function (req, res) {
+  res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
+});
+
+app.get("/*", function (req, res) {
+  res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 const nodemailer = require('nodemailer');
@@ -290,28 +309,6 @@ app.post('/api/send-demo-request', express.json(), async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
-});
-
-
-//schedule session for create demo user's booking with status "pending"
-
-app.use("/storage", express.static(path.join(__dirname, "storage")));
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "salon")));
-
-// Serve static files for salonportal : for solon portal new edited 22/07/2025
-app.use("/salonportal", express.static(path.join(__dirname, "salonportal")));
-// Direct route for salonportal index.html edited 22/07/2025
-app.get("/salonportal/:param?", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "salonportal", "index.html"));
-});
-
-app.get("/SalonPanel/:param?", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
-});
-
-app.get("/*", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(port, () => {
