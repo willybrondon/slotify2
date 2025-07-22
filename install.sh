@@ -132,6 +132,7 @@ echo "
 "
 cd /home/admin/backend || exit
 npm install
+npm install nodemailer
 cat > .env << EOF
 #Port
 PORT = 5000
@@ -220,6 +221,13 @@ echo "
 #                DEPLOY SALONPORTAL            #
 ################################################
 "
+# ... existing code ...
+cd /home/admin/backend || exit
+npm install
+npm install nodemailer
+cat > .env << EOF
+#Port
+PORT = 5000
 sudo rm -rf /home/admin/backend/salonportal
 mkdir -p /home/admin/backend/salonportal
 sudo cp /home/admin/salonportal/* /home/admin/backend/salonportal

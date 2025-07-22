@@ -280,10 +280,6 @@ app.get("/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.listen(port, () => {
-  console.log(`magic happen on ${port}`);
-});
-
 const nodemailer = require('nodemailer');
 
 app.post('/api/send-demo-request', express.json(), async (req, res) => {
@@ -313,4 +309,8 @@ app.post('/api/send-demo-request', express.json(), async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
+});
+
+app.listen(port, () => {
+  console.log(`magic happen on ${port}`);
 });
