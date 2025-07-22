@@ -283,3 +283,34 @@ app.get("/*", function (req, res) {
 app.listen(port, () => {
   console.log(`magic happen on ${port}`);
 });
+
+const nodemailer = require('nodemailer');
+
+app.post('/api/send-demo-request', express.json(), async (req, res) => {
+  const { name, phone, email, salonType } = req.body;
+  if (!name || !phone || !email) {
+    return res.status(400).json({ success: false, error: 'Missing required fields.' });
+  }
+
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'your_email@gmail.com', // Replace with your sender email
+      pass: 'your_email_password'   // Replace with your sender email password or app password
+    }
+  });
+
+  let mailOptions = {
+    from: 'your_email@gmail.com', // Replace with your sender email
+    to: 'brondonwilly@gmail.com',
+    subject: 'New Salon Demo Request',
+    text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\nSalon Type: ${salonType}`
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
