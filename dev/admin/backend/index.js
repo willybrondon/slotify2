@@ -291,8 +291,8 @@ app.post('/api/send-demo-request', express.json(), async (req, res) => {
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'your_email@gmail.com', // Replace with your sender email
-      pass: 'your_email_password'   // Replace with your sender email password or app password
+      user: 'brondonwilly@gmail.com', // Replace with your sender email
+      pass: 'fpyr wvzf hije wlkg'   // Replace with your sender email password or app password
     }
   });
 
