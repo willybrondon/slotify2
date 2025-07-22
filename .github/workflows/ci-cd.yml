@@ -85,6 +85,11 @@ jobs:
       run: |
         ssh-keyscan -H 46.101.229.176 >> ~/.ssh/known_hosts
 # we compress the admin file to be light when copy
+    - name: backup storage file 
+      run: |
+        ssh root@46.101.229.176 "mkdir -p /home/storage_backup"
+        ssh root@46.101.229.176 "scp -r /home/admin/backend/storage /home/storage_backup"
+        
     - name: copy file to vps 
       run: |
         sudo apt-get update && sudo apt-get install -y zip unzip
@@ -103,7 +108,12 @@ jobs:
         ssh root@46.101.229.176 "sudo apt install dos2unix"
         ssh root@46.101.229.176 "cd / && chmod +x install.sh"
         ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DB_NAME='$DB_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' bash -c 'cd / && ./install.sh'"
-
+      
+    - name: backup storage file 
+      run: |
+        ssh root@46.101.229.176 "mkdir -p /home/admin/backend/storage"
+        ssh root@46.101.229.176 "scp -r /home/home/storage_backup/storage/* /home/admin/backend/storage"
+        
 
   # Flutter App Tests (Cross-platform)
   flutter-tests:
