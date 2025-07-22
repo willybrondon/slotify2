@@ -3,6 +3,40 @@
 ## Overview
 Slotify is a comprehensive salon management platform that includes an admin panel and mobile applications for customers and salon experts. This guide provides detailed installation instructions for both the admin panel and Flutter mobile applications.
 
+## General Architecture
+
+The Slotify platform is organized as follows:
+
+```
+[admin]
+│
+├── backend/         # Node.js/Express API, MongoDB, business logic
+│
+├── frontend/        # Main web frontend (React or similar)
+│
+├── salon/           # Salon admin/owner panel (React or similar)
+│
+├── salonportal/     # Static landing/marketing site for demo requests
+│
+[flutter]
+│
+├── multi_salon_expert/    # Flutter app for salon staff/experts
+│
+├── multi_salon_customer/  # Flutter app for salon customers/clients
+│
+[install.sh]
+│
+└── Automates setup, build, deployment, and Nginx config
+```
+
+- **Backend** serves API endpoints, handles authentication, business logic, and serves static files for frontend, salon, and salonportal.
+- **Frontend** and **salon** are built and their static files are served by the backend (and proxied by Nginx).
+- **salonportal** is a static site for marketing and demo requests, also served by the backend.
+- **Flutter apps** are for mobile users (experts and customers), communicating with the backend API.
+- **Nginx** acts as a reverse proxy, forwarding HTTP requests to the backend and serving static files.
+
+---
+
 ## Environment 
 - **DEV** - Development environment
 - **PRD** - Production environment
