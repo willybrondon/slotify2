@@ -97,7 +97,16 @@ jobs:
         scp admin.zip root@46.101.229.176:/home/
         ssh root@46.101.229.176 "unzip -o /home/admin.zip -d /home/"
         scp install.sh root@46.101.229.176:/
-
+    
+    - name: create .env file
+      env:
+        EMAIL: ${{ secrets.EMAIL }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+      run: |
+        echo "EMAIL=$EMAIL" >> .env
+        echo "PASSWORD=$PASSWORD" >> .env
+        scp .env root@46.101.229.176:/home/admin/backend/.env
+        
     - name: Run and install dependencies
       env:
         DB_NAME: ${{ secrets.DB_NAME }}
