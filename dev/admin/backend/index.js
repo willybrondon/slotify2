@@ -266,7 +266,6 @@ app.use(express.static(path.join(__dirname, "salon")));
 
 // Serve static files for salonportal : for solon portal new edited 22/07/2025
 app.use("/salonportal", express.static(path.join(__dirname, "salonportal")));
-
 // Direct route for salonportal index.html edited 22/07/2025
 app.get("/salonportal/:param?", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "salonportal", "index.html"));
@@ -278,37 +277,6 @@ app.get("/SalonPanel/:param?", function (req, res) {
 
 app.get("/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-const nodemailer = require('nodemailer');
-
-app.post('/api/send-demo-request', express.json(), async (req, res) => {
-  const { name, phone, email, salonType } = req.body;
-  if (!name || !phone || !email) {
-    return res.status(400).json({ success: false, error: 'Missing required fields.' });
-  }
-
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'brondonwilly@gmail.com', // Replace with your sender email
-      pass: 'fpyr wvzf hije wlkg'   // Replace with your sender email password or app password
-    }
-  });
-
-  let mailOptions = {
-    from: 'brondonwilly@gmail.com', // Replace with your sender email
-    to: 'brondonwilly@gmail.com',
-    subject: 'New Salon Demo Request',
-    text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\nSalon Type: ${salonType}`
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
 });
 
 app.listen(port, () => {

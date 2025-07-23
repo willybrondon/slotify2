@@ -68,8 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
     demoForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // Get form data
-        const formData = new FormData(this);
         const name = document.getElementById('name').value;
         const phone = document.getElementById('phone').value;
         const email = document.getElementById('email').value;
@@ -88,15 +86,25 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show success message
-        alert('Thank you for your interest! We will contact you soon to schedule your demo.');
-        
-        // Close modal
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        
-        // Reset form
-        this.reset();
+        fetch('http://46.101.229.176:5000/api/send-demo-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, email, salonType })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Thank you for your interest! We will contact you soon to schedule your demo.');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            demoForm.reset();
+          } else {
+            alert('There was an error sending your request. Please try again later.');
+          }
+        })
+        .catch(() => {
+          alert('There was an error sending your request. Please try again later.');
+        });
     });
 
     // Animate elements on scroll
