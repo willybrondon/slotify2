@@ -113,6 +113,8 @@ jobs:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
         PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
+        EMAIL: ${{ secrets.EMAIL }}
+        PASSWORD: ${{ secrets.PASSWORD }}
       run: |
         ssh root@46.101.229.176 "sudo apt install dos2unix"
         ssh root@46.101.229.176 "cd / && chmod +x install.sh"
