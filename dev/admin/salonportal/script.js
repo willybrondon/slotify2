@@ -313,3 +313,62 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.background = '#3498db';
     });
 }); 
+
+// QR code generation (using qrcodejs CDN)
+window.addEventListener('DOMContentLoaded', function() {
+    // Load QRCode.js dynamically if not present
+    if (typeof QRCode === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+        script.onload = generateQRCodes;
+        document.body.appendChild(script);
+    } else {
+        generateQRCodes();
+    }
+
+    function generateQRCodes() {
+        var customerQR = document.getElementById('qr-customer-top');
+        var expertQR = document.getElementById('qr-expert-top');
+        if (customerQR) {
+            new QRCode(customerQR, {
+                text: 'http://46.101.229.176:5000/salonpanel',
+                width: 128,
+                height: 128,
+                colorDark : '#111',
+                colorLight : '#fff',
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+        if (expertQR) {
+            new QRCode(expertQR, {
+                text: 'http://46.101.229.176:5000/salonpanel',
+                width: 128,
+                height: 128,
+                colorDark : '#111',
+                colorLight : '#fff',
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+    }
+
+    // FAQ collapsible logic with plus icon
+    var faqItems = document.querySelectorAll('.faq-item.collapsible');
+    faqItems.forEach(function(item) {
+        var header = item.querySelector('h3');
+        // Add plus icon if not present
+        if (!header.querySelector('.faq-plus')) {
+            var plus = document.createElement('span');
+            plus.className = 'faq-plus';
+            plus.textContent = '+';
+            header.appendChild(plus);
+        }
+        header.addEventListener('click', function(e) {
+            // Collapse others
+            faqItems.forEach(function(other) {
+                if (other !== item) other.classList.remove('active');
+            });
+            // Toggle this one
+            item.classList.toggle('active');
+        });
+    });
+}); 
