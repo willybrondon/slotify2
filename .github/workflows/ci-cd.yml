@@ -98,14 +98,14 @@ jobs:
         ssh root@46.101.229.176 "unzip -o /home/admin.zip -d /home/"
         scp install.sh root@46.101.229.176:/
     
-    - name: create .env file
-      env:
-        EMAIL: ${{ secrets.EMAIL }}
-        PASSWORD: ${{ secrets.PASSWORD }}
-      run: |
-        echo "EMAIL=$EMAIL" >> .env
-        echo "PASSWORD=$PASSWORD" >> .env
-        scp .env root@46.101.229.176:/home/admin/backend/.env
+    # - name: create .env file
+    #   env:
+    #     EMAIL: ${{ secrets.EMAIL }}
+    #     PASSWORD: ${{ secrets.PASSWORD }}
+    #   run: |
+    #     echo "EMAIL=$EMAIL" >> .env
+    #     echo "PASSWORD=$PASSWORD" >> .env
+    #     scp .env root@46.101.229.176:/home/admin/backend/.env
         
     - name: Run and install dependencies
       env:
@@ -116,7 +116,7 @@ jobs:
       run: |
         ssh root@46.101.229.176 "sudo apt install dos2unix"
         ssh root@46.101.229.176 "cd / && chmod +x install.sh"
-        ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DB_NAME='$DB_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' bash -c 'cd / && ./install.sh'"
+        ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DB_NAME='$DB_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' EMAIL='$EMAIL' PASSWORD='$PASSWORD' bash -c 'cd / && ./install.sh'"
       
     - name: backup storage file 
       run: |

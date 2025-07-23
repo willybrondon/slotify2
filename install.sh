@@ -144,8 +144,8 @@ projectName = ${app_name}
 JWT_SECRET = ${shared_jwt_secret}
 
 #Gmail credentials for send email
-EMAIL = kodebookapp@gmail.com
-PASSWORD = nohwrpybgiuhqjfy
+EMAIL = $EMAIL
+PASSWORD = $PASSWORD
 
 #Server URL
 baseURL = http://${public_ip}:5000/
@@ -221,10 +221,6 @@ echo "
 #                DEPLOY SALONPORTAL            #
 ################################################
 "
-# ... existing code ...
-cd /home/admin/backend || exit
-npm install
-npm install nodemailer
 sudo rm -rf /home/admin/backend/salonportal
 mkdir -p /home/admin/backend/salonportal
 sudo cp /home/admin/salonportal/* /home/admin/backend/salonportal
