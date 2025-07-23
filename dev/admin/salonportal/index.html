@@ -9,17 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- QR Code Top Right Floating -->
+    <div class="qr-topright">
+        <div class="qr-top-flex">
+            <div class="qr-top-block">
+                <div id="qr-customer-top"></div>
+                <div class="qr-label">Download Customer App</div>
+            </div>
+            <div class="qr-top-block">
+                <div id="qr-expert-top"></div>
+                <div class="qr-label">Download the Expert App</div>
+            </div>
+        </div>
+    </div>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
                 <h2>SalonPortal Pro</h2>
             </div>
-            <div class="nav-menu">
-                <a href="#features">Features</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#testimonials">Testimonials</a>
-                <a href="#contact">Contact</a>
+            <div class="nav-menu nav-menu-center">
                 <a href="http://46.101.229.176:5000/salonpanel" class="btn-login">Login</a>
             </div>
             <div class="hamburger">
@@ -84,43 +93,16 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="container">
-            <div class="section-header">
-                <h2>Grant Three Wishes at Once</h2>
-                <p>Hours saved. New clients. Simplified business management. Here's the all-in-one SalonPortal Pro solution.</p>
-                <a href="#demo" class="btn-secondary">Discover for Free</a>
+    <!-- New Features Inspired by Planity -->
+    <section class="planity-features">
+        <div class="container planity-features-flex">
+            <div class="planity-feature-block">
+                <h2>Book Your Appointment Online</h2>
+                <p>Find your favorite salon and book your beauty appointment 24/7, instantly and easily. No more waiting on the phone—just a few clicks and your spot is reserved!</p>
             </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-number">01</div>
-                    <h3>Booking Platform</h3>
-                    <ul>
-                        <li>24/7 client self-booking</li>
-                        <li>Listing on platform and mobile app</li>
-                        <li>Configurable booking slots</li>
-                    </ul>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number">02</div>
-                    <h3>Connected Calendar</h3>
-                    <ul>
-                        <li>Calendar accessible on all tools</li>
-                        <li>Synchronized staff scheduling</li>
-                        <li>Appointment security tools</li>
-                    </ul>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number">03</div>
-                    <h3>Point of Sale</h3>
-                    <ul>
-                        <li>Certified POS system</li>
-                        <li>Flexible payment options</li>
-                        <li>Simplified accounting transmission</li>
-                    </ul>
-                </div>
+            <div class="planity-feature-block">
+                <h2>Manage Your Salon Effortlessly</h2>
+                <p>Salon owners can manage bookings, staff, and schedules from anywhere. Simplify your daily operations and focus on what matters most: your clients.</p>
             </div>
         </div>
     </section>
@@ -144,142 +126,51 @@
         </div>
     </section>
 
-    <!-- Benefits Section -->
-    <section class="benefits">
-        <div class="container">
-            <div class="benefit-item">
-                <div class="benefit-content">
-                    <h2>Oh joy!<br>The calendar fills itself.</h2>
-                    <p>No more phone calls needed, let clients book their appointments and reserve time with you autonomously.</p>
-                    <ul>
-                        <li>24/7 booking</li>
-                        <li>Off-peak hour optimization</li>
-                        <li>Social media booking</li>
-                        <li>Automatic waitlist management</li>
-                    </ul>
-                    <a href="#demo" class="btn-secondary">Discover for Free</a>
-                </div>
-                <div class="benefit-image">
-                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Calendar Management">
-                </div>
-            </div>
-
-            <div class="benefit-item reverse">
-                <div class="benefit-content">
-                    <h2>50% fewer calls to the salon</h2>
-                    <p>Less constant requests to reschedule appointments, fewer rings... You're fully focused on your clients and give them all your attention. So much serenity at the salon feels so good.</p>
-                    <ul>
-                        <li>Automatic appointment repetition</li>
-                        <li>Staff schedule management</li>
-                        <li>Staff choice during booking</li>
-                    </ul>
-                    <a href="#demo" class="btn-secondary">Discover for Free</a>
-                </div>
-                <div class="benefit-image">
-                    <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Stylist at Work">
-                </div>
-            </div>
-
-            <div class="benefit-item">
-                <div class="benefit-content">
-                    <h2>+75% saved appointments</h2>
-                    <h3>Clients who show up to appointments.</h3>
-                    <p>You can finally forget... those who forget. With automatic SMS reminders and advance payments, your clients are happy to honor their appointments.</p>
-                    <ul>
-                        <li>Automatic SMS reminders</li>
-                        <li>Service advance payments</li>
-                        <li>Personalized cancellation policy</li>
-                    </ul>
-                    <a href="#demo" class="btn-secondary">Discover for Free</a>
-                </div>
-                <div class="benefit-image">
-                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Mobile Notifications">
+    <!-- Professional Stats Section -->
+    <section class="pro-stats-section">
+        <div class="container pro-stats-flex no-img">
+            <div class="pro-stats-content">
+                <h2 class="pro-stats-title">Vous êtes un professionnel de la beauté ?<br>Découvrez la prise de RDV en ligne !</h2>
+                <div class="pro-stats-grid">
+                    <div class="pro-stats-cell"><span class="pro-stats-main">+ 50%</span><br><span class="pro-stats-desc">de fréquence sur les rdv pris en ligne</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">4x</span><br><span class="pro-stats-desc">moins d'oublis avec les rappels sms des rendez-vous</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">50%</span><br><span class="pro-stats-desc">des rdv en ligne pris en dehors des horaires d'ouverture</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">+50 000</span><br><span class="pro-stats-desc">Salons & instituts</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">5 RDV</span><br><span class="pro-stats-desc">Pris toutes les secondes</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">&gt; 5 milliards €</span><br><span class="pro-stats-desc">De rendez-vous vendus</span></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Payment Section -->
-    <section class="payment">
-        <div class="container">
-            <div class="payment-content">
-                <h2>Collect from your clients. Child's play.</h2>
-                <p>A simple and intuitive collection system for hours of productivity gained. Fast and secure payment solutions for more peace of mind.</p>
-                <ul>
-                    <li>Online prepayment</li>
-                    <li>WiFi terminal and automatic tips</li>
-                    <li>Email and SMS receipts</li>
-                    <li>Simplified accounting transmission</li>
-                </ul>
-                <a href="#demo" class="btn-secondary">Discover for Free</a>
+    <!-- All-in-One Platform Features Section -->
+    <section class="platform-features-section">
+        <div class="container platform-features-flex">
+            <div class="platform-feature-card">
+                <div class="platform-feature-icon">📅</div>
+                <h3>Manage</h3>
+                <p>Control every aspect of your business: bookings, sales, clients, locations, and team members. Analyze your business with detailed reports and statistics.</p>
             </div>
-            <div class="payment-demo">
-                <div class="payment-interface">
-                    <div class="payment-header">
-                        <h4>SalonPortal Dashboard</h4>
-                    </div>
-                    <div class="payment-body">
-                        <div class="payment-total">
-                            <span>Total to pay</span>
-                            <h3>€50</h3>
-                        </div>
-                        <div class="payment-options">
-                            <div class="option">
-                                <span>Payment Method</span>
-                                <div class="method-icons">
-                                    <i class="fas fa-credit-card"></i>
-                                    <i class="fas fa-money-bill"></i>
-                                </div>
-                            </div>
-                            <button class="btn-validate">Validate</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="platform-feature-card">
+                <div class="platform-feature-icon">🚀</div>
+                <h3>Grow</h3>
+                <p>Attract new clients on the world’s largest beauty & wellness marketplace and keep them coming back with built-in marketing tools.</p>
+            </div>
+            <div class="platform-feature-card">
+                <div class="platform-feature-icon">💳</div>
+                <h3>Get Paid</h3>
+                <p>Get paid quickly and securely with integrated payments, reduce no-shows with deposits, and simplify your checkout process.</p>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="testimonials">
-        <div class="container">
-            <h2>Join all wellness professionals.</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"As I always say, I'm not alone. I have an assistant and his name is SalonPortal"</p>
-                        <div class="testimonial-author">
-                            <h4>Thierry Deschemin</h4>
-                            <span>Stylist - Thiedesarts</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"SalonPortal allows me to maintain the connection with my two salons, even when I'm not there"</p>
-                        <div class="testimonial-author">
-                            <h4>Aline Legoupil</h4>
-                            <span>Stylist - Atmosph'hair</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"SalonPortal brought us ease, new clientele and above all modernity"</p>
-                        <div class="testimonial-author">
-                            <h4>Éric Zemmour</h4>
-                            <span>Stylist - Salon Eric Zemmour</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"You can't open a salon today without SalonPortal"</p>
-                        <div class="testimonial-author">
-                            <h4>Mehdi Bouzghaia</h4>
-                            <span>Barber - Le barbier de Marseille</span>
-                        </div>
-                    </div>
-                </div>
+    <!-- Call to Action Section -->
+    <section class="cta-section">
+        <div class="container cta-flex">
+            <div class="cta-content">
+                <h2>Ready to grow your business?</h2>
+                <p>Join thousands of professionals who trust SalonPortal to manage and grow their business. Start for free today!</p>
+                <a href="#" class="btn-primary cta-btn">Get Started</a>
             </div>
         </div>
     </section>
@@ -289,21 +180,60 @@
         <div class="container">
             <h2>Frequently Asked Questions</h2>
             <div class="faq-grid">
-                <div class="faq-item">
-                    <h3>How does SalonPortal work for my clients?</h3>
-                    <p>After creating your personalized salon page on the booking portal, your clients can book your services in a few clicks, according to your available slots. No more phone interruptions, appointments are managed autonomously, always according to your constraints.</p>
+                <div class="faq-item collapsible">
+                    <h3>How to create a customer account on Slotify?</h3>
+                    <div class="faq-content">
+                        <ol>
+                            <li>Download the Slotify Customer App by scanning the QR code above.</li>
+                            <li>Open the app and tap <b>Sign Up</b>.</li>
+                            <li>Fill in your details and follow the on-screen instructions.</li>
+                            <li>Verify your phone number or email as prompted.</li>
+                        </ol>
+                        <img src="customer_signup.png" alt="Customer Signup Screenshot" class="faq-img">
+                    </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item collapsible">
+                    <h3>How to create a salon owner account?</h3>
+                    <div class="faq-content">
+                        <ol>
+                            <li>Download the Slotify Customer App and sign up as a customer first.</li>
+                            <li>Go to the Profile section and select <b>Register your salon</b>.</li>
+                            <li>Fill in your salon details and specify the number of experts (staff) you want to add.</li>
+                            <li>Once approved, you will receive credentials for your expert(s).</li>
+                        </ol>
+                        <img src="salon_register.png" alt="Salon Register Screenshot" class="faq-img">
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3>How does an expert get their credentials?</h3>
+                    <div class="faq-content">
+                        <p>The salon owner creates expert accounts during salon registration. Each expert receives their login credentials from the salon owner.</p>
+                        <img src="expert_credentials.png" alt="Expert Credentials Screenshot" class="faq-img">
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3>How to download the app?</h3>
+                    <div class="faq-content">
+                        <p>Simply scan the QR code above with your phone’s camera. You will be redirected to the download page for the app.</p>
+                        <img src="qr_scan.png" alt="QR Scan Screenshot" class="faq-img">
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3>What is the difference between the Customer and Expert app?</h3>
+                    <div class="faq-content">
+                        <ul>
+                            <li><b>Customer App:</b> For booking appointments, managing your profile, and accessing salon services.</li>
+                            <li><b>Expert App:</b> For salon staff/owners to manage bookings, schedules, and client information.</li>
+                        </ul>
+                        <img src="app_difference.png" alt="App Difference Screenshot" class="faq-img">
+                    </div>
+                </div>
+                <!-- Keep a couple of the original FAQ items for completeness -->
+                <div class="faq-item collapsible">
                     <h3>Will SalonPortal bring me new clients?</h3>
-                    <p>Your salon will be visible to our 10 million monthly users and listed on search networks like Google to easily find your establishment. Verified reviews from your previous appointments will encourage visitors to book simply, without fees.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>How much does the SalonPortal subscription cost?</h3>
-                    <p>SalonPortal offers no-commitment subscriptions at fixed and transparent prices: no commission on your appointments, no installation or maintenance fees. Contact one of our advisors who will guide you to the offer best suited to your needs.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>Will the SalonPortal subscription be profitable for my salon?</h3>
-                    <p>SalonPortal features increase client returns by 60% monthly while reducing missed appointments by 75%. Your salon page will attract 5 new clients monthly on average. Your schedule is filled to maximize your revenue.</p>
+                    <div class="faq-content">
+                        <p>Your salon will be visible to our 10 million monthly users and listed on search networks like Google to easily find your establishment. Verified reviews from your previous appointments will encourage visitors to book simply, without fees.</p>
+                    </div>
                 </div>
             </div>
         </div>
