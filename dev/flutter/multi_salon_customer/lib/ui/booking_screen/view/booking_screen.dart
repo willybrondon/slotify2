@@ -1658,35 +1658,35 @@ class BookingScreen extends StatelessWidget {
       ],
     );
   }
-}
 
-List<Widget> _buildSlotWidgets(BookingScreenController logic) {
-  final hasAnySlots = logic.morningSlots.isNotEmpty ||
-      logic.afternoonSlots.isNotEmpty ||
-      logic.eveningSlots.isNotEmpty;
-  if (hasAnySlots) {
-    return [
-      if (logic.morningSlots.isNotEmpty)
-        buildSlotCategory("txtMorning".tr, logic.morningSlots,
-            logic.formattedDate.toString()),
-      if (logic.afternoonSlots.isNotEmpty)
-        buildSlotCategory("txtAfternoon".tr, logic.afternoonSlots,
-            logic.formattedDate.toString()),
-      if (logic.eveningSlots.isNotEmpty)
-        buildSlotCategory("txtEvening".tr, logic.eveningSlots,
-            logic.formattedDate.toString()),
-    ];
-  } else {
-    return [
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Text(
-            "No slots available",
-            style: TextStyle(fontSize: 18, color: Colors.grey),
+  List<Widget> _buildSlotWidgets(BookingScreenController logic) {
+    final hasAnySlots = logic.morningSlots.isNotEmpty ||
+        logic.afternoonSlots.isNotEmpty ||
+        logic.eveningSlots.isNotEmpty;
+    if (hasAnySlots) {
+      return [
+        if (logic.morningSlots.isNotEmpty)
+          buildSlotCategory("txtMorning".tr, logic.morningSlots,
+              logic.formattedDate.toString()),
+        if (logic.afternoonSlots.isNotEmpty)
+          buildSlotCategory("txtAfternoon".tr, logic.afternoonSlots,
+              logic.formattedDate.toString()),
+        if (logic.eveningSlots.isNotEmpty)
+          buildSlotCategory("txtEvening".tr, logic.eveningSlots,
+              logic.formattedDate.toString()),
+      ];
+    } else {
+      return [
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Text(
+              "No slots available",
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
           ),
         ),
-      ),
-    ];
+      ];
+    }
   }
 }
