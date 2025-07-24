@@ -262,56 +262,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
         progressBar.style.width = scrolled + '%';
     });
-
-    // Add back to top button
-    const backToTop = document.createElement('button');
-    backToTop.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    backToTop.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: #3498db;
-        color: white;
-        border: none;
-        cursor: pointer;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-    `;
-    document.body.appendChild(backToTop);
-
-    backToTop.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 300) {
-            backToTop.style.opacity = '1';
-            backToTop.style.visibility = 'visible';
-        } else {
-            backToTop.style.opacity = '0';
-            backToTop.style.visibility = 'hidden';
-        }
-    });
-
-    // Add hover effect for back to top button
-    backToTop.addEventListener('mouseenter', function() {
-        this.style.transform = 'scale(1.1)';
-        this.style.background = '#2980b9';
-    });
-
-    backToTop.addEventListener('mouseleave', function() {
-        this.style.transform = 'scale(1)';
-        this.style.background = '#3498db';
-    });
 }); 
 
 // QR code generation (using qrcodejs CDN)
