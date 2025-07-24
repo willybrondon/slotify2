@@ -154,7 +154,6 @@ EMAIL = $EMAIL
 # no need to use password for sendgrid
 PASSWORD = $PASSWORD
 
-
 #Server URL
 baseURL = http://${public_ip}:5000/
 
