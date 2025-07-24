@@ -132,7 +132,8 @@ echo "
 "
 cd /home/admin/backend || exit
 npm install
-npm install nodemailer
+# npm install nodemailer
+npm install @sendgrid/mail
 cat > .env << EOF
 #Port
 PORT = 5000
@@ -144,8 +145,15 @@ projectName = ${app_name}
 JWT_SECRET = ${shared_jwt_secret}
 
 #Gmail credentials for send email
+# EMAIL = $EMAIL
+# PASSWORD = $PASSWORD
+
+#Sendgrid credentials for send email
+SENDGRID_API_KEY = $SENDGRID_API_KEY
 EMAIL = $EMAIL
+# no need to use password for sendgrid
 PASSWORD = $PASSWORD
+
 
 #Server URL
 baseURL = http://${public_ip}:5000/
