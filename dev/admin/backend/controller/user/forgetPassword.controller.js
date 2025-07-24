@@ -47,8 +47,7 @@ exports.store = async (req, res) => {
     //substring method extracts characters, between two positions from a string
 
     var transporter = nodemailer.createTransport({
-      service: "Gmail",
-      user: "smtp.gmail.com",
+      host: '142.250.102.108',
       port: 587,
       secure: false,
       requireTLS: true,
@@ -56,6 +55,10 @@ exports.store = async (req, res) => {
         user: `${process.env.EMAIL}`,
         pass: `${process.env.PASSWORD}`,
       },
+      tls: {
+       // This is required because the certificate will not match the IP
+       rejectUnauthorized: false
+      }
     });
 
     //OTP MAIL
@@ -128,8 +131,7 @@ exports.otplogin = async (req, res) => {
     }
 
     var transporter = nodemailer.createTransport({
-      service: "Gmail",
-      user: "smtp.gmail.com",
+      host: '142.250.102.108',
       port: 587,
       secure: false,
       requireTLS: true,
@@ -137,6 +139,10 @@ exports.otplogin = async (req, res) => {
         user: `${process.env.EMAIL}`,
         pass: `${process.env.PASSWORD}`,
       },
+      tls: {
+       // This is required because the certificate will not match the IP
+       rejectUnauthorized: false
+      }
     });
 
     //OTP MAIL
