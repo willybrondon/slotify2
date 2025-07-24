@@ -1678,4 +1678,71 @@ body {
     text-decoration: none;
 } 
 
+/* Mobile fixed download buttons */
+.mobile-download-btns {
+  display: none;
+}
+@media (max-width: 600px) {
+  .mobile-download-btns {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 3000;
+    gap: 10px;
+    width: 160px;
+    align-items: flex-end;
+  }
+  .mobile-download-btn {
+    background: #fff;
+    color: #111;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 8px 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    text-decoration: none;
+    text-align: right;
+    transition: background 0.2s;
+    width: 100%;
+  }
+  .mobile-download-btn:active {
+    background: #f0f0f0;
+  }
+  .mobile-download-btn.customer {
+    margin-bottom: 0;
+  }
+  .mobile-download-btn.expert {
+    margin-bottom: 0;
+  }
+  .qr-topright, .login-above-qr, #download-app-btn {
+    display: none !important;
+  }
+  .hamburger {
+    display: none !important;
+  }
+  .btn-login-mobile {
+    display: inline-block !important;
+    background: none;
+    color: #111;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    box-shadow: none;
+    padding: 8px 16px;
+    text-decoration: none;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    border-radius: 8px;
+    margin-left: auto;
+  }
+}
+@media (min-width: 601px) {
+  .btn-login-mobile {
+    display: none !important;
+  }
+} 
+
  
