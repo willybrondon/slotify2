@@ -1,31 +1,24 @@
 const OTP = require("../../models/otp.model");
 
-//nodemailer
-const nodemailer = require("nodemailer");
-
 //import model
 const User = require("../../models/user.model");
+
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 
 //create OTP and send the email for password security
 exports.store = async (req, res) => {
   try {
     if (!req.body.email) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Email must be requried!!" });
+      return res.status(200).json({ status: false, message: "Email must be requried!!" });
     }
 
     var newOtp = Math.floor(Math.random() * 8999) + 1000;
 
     const userEmail = await User.findOne({ email: req.body.email });
     if (!userEmail) {
-      return res
-        .status(200)
-        .json({
-          status: false,
-          message: "User does not found with that email.",
-        });
+      return res.status(200).json({ status: false, message: "User does not found with that email." });
     }
 
     const existOTP = await OTP.findOne({ email: req.body.email });
@@ -34,34 +27,12 @@ exports.store = async (req, res) => {
       await existOTP.save();
     } else {
       const otp = new OTP();
-
       otp.email = req.body.email;
       otp.otp = newOtp;
       await otp.save();
     }
 
-    const userName = req.body.email.substring(
-      0,
-      req.body.email.lastIndexOf("@")
-    );
-    //substring method extracts characters, between two positions from a string
-
-    var transporter = nodemailer.createTransport({
-      host: '142.250.102.108',
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      auth: {
-        user: `${process.env.EMAIL}`,
-        pass: `${process.env.PASSWORD}`,
-      },
-      tls: {
-       // This is required because the certificate will not match the IP
-       rejectUnauthorized: false
-      }
-    });
-
-    //OTP MAIL
+    const userName = req.body.email.substring(0, req.body.email.lastIndexOf("@"));
     var tab = ``;
     tab += `<!DOCTYPE html><html lang="en"><head>`;
     tab += `<meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -76,29 +47,20 @@ exports.store = async (req, res) => {
     tab += ` <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">`;
     tab += `  </div></div></div></body></html>`;
 
-    //mail details
-    var mailOptions = {
-      from: `${process.env.EMAIL}`,
+    const msg = {
       to: req.body.email,
+      from: process.env.EMAIL,
       subject: "Sending Email from Salon for Password Security",
       html: tab,
     };
 
-    transporter.sendMail(mailOptions, (error, result) => {
-      if (error) {
-        console.log(error);
-        return res
-          .status(200)
-          .json({ status: false, error: error.message || "Email send error" });
-      } else {
-        return res
-          .status(200)
-          .json({
-            status: true,
-            message: "Email Send Successfully for Password Security.",
-          });
-      }
-    });
+    try {
+      await sgMail.send(msg);
+      return res.status(200).json({ status: true, message: "Email Send Successfully for Password Security." });
+    } catch (error) {
+      console.log(error);
+      return res.status(200).json({ status: false, error: error.message || "Email send error" });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -112,9 +74,7 @@ exports.store = async (req, res) => {
 exports.otplogin = async (req, res) => {
   try {
     if (!req.body.email) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Email must be requried!!" });
+      return res.status(200).json({ status: false, message: "Email must be requried!!" });
     }
 
     var newOtp = Math.floor(Math.random() * 8999) + 1000;
@@ -130,63 +90,19 @@ exports.otplogin = async (req, res) => {
       await otp.save();
     }
 
-    var transporter = nodemailer.createTransport({
-      host: '142.250.102.108',
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      auth: {
-        user: `${process.env.EMAIL}`,
-        pass: `${process.env.PASSWORD}`,
-      },
-      tls: {
-       // This is required because the certificate will not match the IP
-       rejectUnauthorized: false
-      }
-    });
-
-    //OTP MAIL
     var tab = `<!DOCTYPE html>
     <html lang="en">
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-      }
-      .container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
-      h2 {
-        color: #333;
-      }
-      p {
-        color: #666;
-      }
-      .otp {
-        margin: 20px 0;
-        padding: 10px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 17px
-      }
-      .support {
-        color: #007bff;
-        text-decoration: none;
-      }
+      body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+      .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+      h2 { color: #333; }
+      p { color: #666; }
+      .otp { margin: 20px 0; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; font-size: 17px }
+      .support { color: #007bff; text-decoration: none; }
     </style>
-
     </head>
     <body>
       <div class="container">
@@ -195,33 +111,25 @@ exports.otplogin = async (req, res) => {
           <b>OTP: ${newOtp}</b>
           <p>(Note: This OTP is valid for a limited time, so make sure to use it promptly.)</p>
         </div>
-
         <p>If you encounter any issues during the verification process or have any questions, feel free to <a class="support" href="#">reach out to our support team</a>.</p>
       </div>
     </body>
     </html>`;
 
-    //mail details
-    var mailOptions = {
-      from: `${process.env.EMAIL}`,
+    const msg = {
       to: req.body.email,
+      from: process.env.EMAIL,
       subject: "Sending Email from Salon",
       html: tab,
     };
 
-    transporter.sendMail(mailOptions, (error, result) => {
-      if (error) {
-        console.log(error);
-        return res
-          .status(200)
-          .json({ status: false, error: error.message || "Email Send Error" });
-      } else {
-        //console.log(result);
-        return res
-          .status(200)
-          .json({ status: true, message: "Email Send Successfully to User!" });
-      }
-    });
+    try {
+      await sgMail.send(msg);
+      return res.status(200).json({ status: true, message: "Email Send Successfully to User!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(200).json({ status: false, error: error.message || "Email Send Error" });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({

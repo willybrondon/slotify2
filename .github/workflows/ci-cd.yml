@@ -115,10 +115,11 @@ jobs:
         PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
         EMAIL: ${{ secrets.EMAIL }}
         PASSWORD: ${{ secrets.PASSWORD }}
+        SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
       run: |
         ssh root@46.101.229.176 "sudo apt install dos2unix"
         ssh root@46.101.229.176 "cd / && chmod +x install.sh"
-        ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DB_NAME='$DB_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' EMAIL='$EMAIL' PASSWORD='$PASSWORD' bash -c 'cd / && ./install.sh'"
+        ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DB_NAME='$DB_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' EMAIL='$EMAIL' PASSWORD='$PASSWORD' SENDGRID_API_KEY='$SENDGRID_API_KEY' bash -c 'cd / && ./install.sh'"
       
     - name: backup storage file 
       run: |
