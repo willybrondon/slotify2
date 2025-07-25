@@ -72,6 +72,7 @@ dependencies:
   cached_network_image: ^3.4.1
   country_code_picker: ^3.3.0
   firebase_crashlytics: ^4.3.5
+  shared_preferences: ^2.2.2
 
 
 dev_dependencies:
