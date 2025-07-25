@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:salon_2/utils/language/italian_language.dart';
+import 'package:salon_2/utils/language/Italian_language.dart';
 import 'package:salon_2/utils/language/arabic_language.dart';
 import 'package:salon_2/utils/language/bangali_language.dart';
 import 'package:salon_2/utils/language/chinese_language.dart';

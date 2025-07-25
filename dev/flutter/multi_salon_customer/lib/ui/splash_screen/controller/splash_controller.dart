@@ -73,10 +73,7 @@ class SplashController extends GetxController {
 
       log("Setting Url :: $url");
 
-      final headers = {
-        "key": ApiConstant.SECRET_KEY,
-        'Content-Type': 'application/json'
-      };
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
       log("Setting Headers :: $headers");
 
       final response = await http.get(url, headers: headers);

@@ -1,4 +1,4 @@
-# salon_2
+# salon2
 
 A new Flutter project.
 
@@ -14,3 +14,11 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+## Environment
+
+- **Flutter Version**: 3.27.4
+- **Dart Version**: 3.6.2
+- **Android Studio**: meerkat Patch 1
+- **Java Version**: 21.0.6

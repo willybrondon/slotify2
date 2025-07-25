@@ -1,61 +1,31 @@
-# Keep Stripe classes
--keep class com.stripe.android.** { *; }
--keep class com.stripe.android.pushProvisioning.** { *; }
--keep class com.reactnativestripesdk.** { *; }
+# Prevent R8 from failing on missing annotations used by Razorpay
+-dontwarn proguard.annotation.Keep
+-dontwarn proguard.annotation.KeepClassMembers
 
-# Keep Razorpay classes
--keep class com.razorpay.** { *; }
--keepclassmembers class com.razorpay.** { *; }
+# Flutter
+-keep class io.flutter.** { *; }
+-dontwarn io.flutter.embedding.**
 
-# Keep Google Pay classes
--keep class com.google.android.apps.nbu.paisa.inapp.client.api.** { *; }
+# Kotlin
+-keep class kotlin.Metadata { *; }
 
-# Keep ProGuard annotations
--keep @interface proguard.annotation.Keep
--keep @interface proguard.annotation.KeepClassMembers
--keep @proguard.annotation.Keep class *
--keepclassmembers class * {
-    @proguard.annotation.Keep *;
-}
+# Firebase
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
 
-# Keep native methods
--keepclasseswithmembernames class * {
-    native <methods>;
-}
+# Stripe
+-keep class com.stripe.** { *; }
+-dontwarn com.stripe.**
 
-# Keep Parcelable classes
--keep class * implements android.os.Parcelable {
+# Branch SDK
+-keep class io.branch.** { *; }
+-dontwarn io.branch.**
+
+# React Native (in case used via packages)
+-keep class com.facebook.** { *; }
+-dontwarn com.facebook.**
+
+# Keep Parcelable implementations
+-keepclassmembers class * implements android.os.Parcelable {
     public static final android.os.Parcelable$Creator *;
 }
-
-# Keep Serializable classes
--keepnames class * implements java.io.Serializable
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    private static final java.io.ObjectStreamField[] serialPersistentFields;
-    !static !transient <fields>;
-    !private <fields>;
-    !private <methods>;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-    java.lang.Object writeReplace();
-    java.lang.Object readResolve();
-}
-
-# Keep Stripe push provisioning classes
--keep class com.stripe.android.pushProvisioning.** { *; }
--keep class com.stripe.android.pushProvisioning.PushProvisioningActivityStarter { *; }
--keep class com.stripe.android.pushProvisioning.PushProvisioningActivityStarter$Args { *; }
--keep class com.stripe.android.pushProvisioning.PushProvisioningActivityStarter$Error { *; }
--keep class com.stripe.android.pushProvisioning.EphemeralKeyUpdateListener { *; }
--keep class com.stripe.android.pushProvisioning.PushProvisioningEphemeralKeyProvider { *; }
-
-# Suppress warnings for missing Google Pay classes (Razorpay)
--dontwarn com.google.android.apps.nbu.paisa.inapp.client.api.**
-
-# Suppress warnings for missing Stripe push provisioning classes
--dontwarn com.stripe.android.pushProvisioning.**
-
-# Suppress warnings for missing ProGuard annotation classes
--dontwarn proguard.annotation.Keep
--dontwarn proguard.annotation.KeepClassMembers 
