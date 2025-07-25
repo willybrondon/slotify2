@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,6 @@ import 'package:salon_2/ui/expert/expert_detail/controller/expert_detail_control
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/payment/Razor_Pay/razor_pay_service.dart';
 import 'package:salon_2/ui/payment/Stripe_Payment/stripe_service.dart';
-import 'package:salon_2/ui/payment/flutter_wave/flutter_wave_service.dart';
 import 'package:salon_2/ui/search/controller/search_screen_controller.dart';
 import 'package:salon_2/ui/select_branch_screen/controller/select_branch_controller.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
@@ -80,14 +80,10 @@ class BookingScreenController extends GetxController {
   dynamic args = Get.arguments;
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
   SplashController splashController = Get.find<SplashController>();
-  CategoryDetailController categoryDetailController =
-      Get.put(CategoryDetailController());
-  BranchDetailController branchDetailController =
-      Get.put(BranchDetailController());
-  SelectBranchController selectBranchController =
-      Get.put(SelectBranchController());
-  SearchScreenController searchScreenController =
-      Get.put(SearchScreenController());
+  CategoryDetailController categoryDetailController = Get.put(CategoryDetailController());
+  BranchDetailController branchDetailController = Get.put(BranchDetailController());
+  SelectBranchController selectBranchController = Get.put(SelectBranchController());
+  SearchScreenController searchScreenController = Get.put(SearchScreenController());
 
   //------ Split Break Time Variables ------//
   String? str;
@@ -109,15 +105,12 @@ class BookingScreenController extends GetxController {
   void onInit() async {
     log("Enter booking screen controller");
     await getDataFromArgs();
-    await onGetExpertServiceBasedSalonApiCall(
-        serviceId: serviceId.join(","), salonId: salonId.toString());
+    await onGetExpertServiceBasedSalonApiCall(serviceId: serviceId.join(","), salonId: salonId.toString());
 
     onCheckBoxClick();
-    update(
-        [Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
+    update([Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
 
-    Stripe.publishableKey =
-        splashController.settingCategory?.setting?.stripePublishableKey ?? "";
+    Stripe.publishableKey = splashController.settingCategory?.setting?.stripePublishableKey ?? "";
     log("Stripe Publishable Key: ${splashController.settingCategory?.setting?.stripeSecretKey ?? ""}");
     log("Stripe Publishable Key:Stripe.publishableKey ${Stripe.publishableKey}");
 
@@ -176,14 +169,10 @@ class BookingScreenController extends GetxController {
     totalPrice = 0.0;
     finalTaxRupee = 0.0;
 
-    double taxPercentage =
-        getExpertServiceBaseSalonCategory?.tax?.toDouble() ?? 0.0;
+    double taxPercentage = getExpertServiceBaseSalonCategory?.tax?.toDouble() ?? 0.0;
 
-    for (int i = 0;
-        i < (getExpertServiceBaseSalonCategory?.matchedServices?.length ?? 0);
-        i++) {
-      num servicePrice =
-          getExpertServiceBaseSalonCategory?.matchedServices?[i].price ?? 0.0;
+    for (int i = 0; i < (getExpertServiceBaseSalonCategory?.matchedServices?.length ?? 0); i++) {
+      num servicePrice = getExpertServiceBaseSalonCategory?.matchedServices?[i].price ?? 0.0;
       double withTaxRupee = (servicePrice * taxPercentage) / 100;
 
       withOutTaxRupee += servicePrice;
@@ -195,8 +184,7 @@ class BookingScreenController extends GetxController {
     log("Booking add Total Price :: $totalPrice");
     log("Booking add FinalTaxRupee :: $finalTaxRupee");
 
-    update(
-        [Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
+    update([Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
   }
 
   onConfirmButton() {
@@ -219,12 +207,7 @@ class BookingScreenController extends GetxController {
       stepCount++;
       currentStep += 1;
     }
-    update([
-      Constant.idConfirm,
-      Constant.idCurrentStep,
-      Constant.idStep1,
-      Constant.idStep3
-    ]);
+    update([Constant.idConfirm, Constant.idCurrentStep, Constant.idStep1, Constant.idStep3]);
   }
 
   onStep1(int index) {
@@ -242,24 +225,16 @@ class BookingScreenController extends GetxController {
     expertDetail = Constant.storage.read("expertDetail");
 
     if (expertDetail != null) {
-      for (int i = 0;
-          i < (getExpertServiceBaseSalonCategory?.data?.length ?? 0);
-          i++) {
+      for (int i = 0; i < (getExpertServiceBaseSalonCategory?.data?.length ?? 0); i++) {
         if (getExpertServiceBaseSalonCategory?.data?[i].id == expertDetail) {
           selectExpert = i;
           selectExpert = 0;
-          selectedExpertDataList
-              .add(getExpertServiceBaseSalonCategory?.data?[i].id);
-          selectedExpertDataList
-              .add(getExpertServiceBaseSalonCategory?.data?[i].fname);
-          selectedExpertDataList
-              .add(getExpertServiceBaseSalonCategory?.data?[i].lname);
-          selectedExpertDataList
-              .add(getExpertServiceBaseSalonCategory?.data?[i].image);
-          selectedExpertDataList
-              .add(getExpertServiceBaseSalonCategory?.data?[i].review);
-          selectedExpertDataList
-              .add(getExpertServiceBaseSalonCategory?.data?[i].reviewCount);
+          selectedExpertDataList.add(getExpertServiceBaseSalonCategory?.data?[i].id);
+          selectedExpertDataList.add(getExpertServiceBaseSalonCategory?.data?[i].fname);
+          selectedExpertDataList.add(getExpertServiceBaseSalonCategory?.data?[i].lname);
+          selectedExpertDataList.add(getExpertServiceBaseSalonCategory?.data?[i].image);
+          selectedExpertDataList.add(getExpertServiceBaseSalonCategory?.data?[i].review);
+          selectedExpertDataList.add(getExpertServiceBaseSalonCategory?.data?[i].reviewCount);
 
           log("selectedExpertIndices :: $selectedExpertDataList");
           break;
@@ -283,15 +258,11 @@ class BookingScreenController extends GetxController {
     breakStartTimes = breakStartTime ?? "";
     breakEndTimes = breakEndTime ?? "";
 
-    for (var i = 0;
-        i < (getBookingModel?.allSlots?.morning?.length ?? 0);
-        i++) {
+    for (var i = 0; i < (getBookingModel?.allSlots?.morning?.length ?? 0); i++) {
       morningSlots.add(getBookingModel?.allSlots?.morning?[i] ?? "");
     }
 
-    for (var i = 0;
-        i < (getBookingModel?.allSlots?.evening?.length ?? 0);
-        i++) {
+    for (var i = 0; i < (getBookingModel?.allSlots?.evening?.length ?? 0); i++) {
       afternoonSlots.add(getBookingModel?.allSlots?.evening?[i] ?? "");
     }
 
@@ -356,14 +327,12 @@ class BookingScreenController extends GetxController {
 
     selectedSlotsList.add(selectedSlot);
 
-    int iterations = ((targetTime.hour * 60 + targetTime.minute) -
-            (selectedSlotTime.hour * 60 + selectedSlotTime.minute)) ~/
-        totalDuration!;
+    int iterations =
+        ((targetTime.hour * 60 + targetTime.minute) - (selectedSlotTime.hour * 60 + selectedSlotTime.minute)) ~/ totalDuration!;
     log("iterations :: $iterations");
 
     for (int i = 0; i < iterations; i++) {
-      selectedSlotTime =
-          selectedSlotTime.add(Duration(minutes: totalDuration!.toInt()));
+      selectedSlotTime = selectedSlotTime.add(Duration(minutes: totalDuration!.toInt()));
 
       if (isBreakTime(DateFormat('hh:mm a').format(selectedSlotTime))) {
         continue;
@@ -402,15 +371,13 @@ class BookingScreenController extends GetxController {
   selectSlot(String slot) {
     selectedSlot = slot;
     DateTime selectedDateTime = DateFormat('hh:mm a').parse(selectedSlot);
-    DateTime targetTime =
-        selectedDateTime.add(Duration(minutes: totalMinute?.toInt() ?? 0));
+    DateTime targetTime = selectedDateTime.add(Duration(minutes: totalMinute?.toInt() ?? 0));
     addSlotsUntilTime(targetTime);
 
     slotsString = selectedSlotsList.join(',');
     log("Slots String :: $slotsString");
     log("Slots String :: $selectedSlotsList");
-    update(
-        [Constant.idUpdateSlots0, Constant.idConfirm, Constant.idUpdateSlots]);
+    update([Constant.idUpdateSlots0, Constant.idConfirm, Constant.idUpdateSlots]);
   }
 
   onStep3(String value) {
@@ -422,29 +389,20 @@ class BookingScreenController extends GetxController {
 
   onBackStep() {
     currentStep == 0 ? Get.back() : currentStep--;
-    update([
-      Constant.idConfirm,
-      Constant.idCurrentStep,
-      Constant.idStep1,
-      Constant.idStep2
-    ]);
+    update([Constant.idConfirm, Constant.idCurrentStep, Constant.idStep1, Constant.idStep2]);
   }
 
-  onGetExpertServiceBasedSalonApiCall(
-      {required String serviceId, required String salonId}) async {
+  onGetExpertServiceBasedSalonApiCall({required String serviceId, required String salonId}) async {
     try {
       isLoading1(true);
       update([Constant.idProgressView, Constant.idSelectBranch]);
 
-      final url = Uri.parse(
-          '${ApiConstant.BASE_URL}${ApiConstant.getExpertServiceBasedSalon}?serviceId=$serviceId&salonId=$salonId');
+      final url =
+          Uri.parse('${ApiConstant.BASE_URL}${ApiConstant.getExpertServiceBasedSalon}?serviceId=$serviceId&salonId=$salonId');
 
       log("Get Expert Service Based Salon Url :: $url");
 
-      final headers = {
-        "key": ApiConstant.SECRET_KEY,
-        'Content-Type': 'application/json'
-      };
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
       log("Get Expert Service Based Salon Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -454,8 +412,7 @@ class BookingScreenController extends GetxController {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        getExpertServiceBaseSalonCategory =
-            GetExpertServiceBaseSalonModel.fromJson(jsonResponse);
+        getExpertServiceBaseSalonCategory = GetExpertServiceBaseSalonModel.fromJson(jsonResponse);
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
@@ -467,30 +424,18 @@ class BookingScreenController extends GetxController {
     }
   }
 
-  onGetBookingApiCall(
-      {required String selectedDate,
-      required String expertId,
-      required String salonId}) async {
+  onGetBookingApiCall({required String selectedDate, required String expertId, required String salonId}) async {
     try {
       isLoading1(true);
-      update([
-        Constant.idProgressView,
-        Constant.idUpdateSlots,
-        Constant.idUpdateSlots0
-      ]);
+      update([Constant.idProgressView, Constant.idUpdateSlots, Constant.idUpdateSlots0]);
 
-      final queryParameters = {
-        "date": selectedDate,
-        "expertId": expertId,
-        "salonId": salonId
-      };
+      final queryParameters = {"date": selectedDate, "expertId": expertId, "salonId": salonId};
 
       log("Get Booking Params :: $queryParameters");
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(
-          ApiConstant.BASE_URL + ApiConstant.getBooking + queryString);
+      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getBooking + queryString);
 
       log("Get Booking Url :: $url");
 
@@ -513,11 +458,7 @@ class BookingScreenController extends GetxController {
       Utils.showToast(Get.context!, getBookingModel?.message.toString() ?? "");
     } finally {
       isLoading1(false);
-      update([
-        Constant.idProgressView,
-        Constant.idUpdateSlots,
-        Constant.idUpdateSlots0
-      ]);
+      update([Constant.idProgressView, Constant.idUpdateSlots, Constant.idUpdateSlots0]);
     }
   }
 
@@ -535,10 +476,7 @@ class BookingScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      final headers = {
-        "key": ApiConstant.SECRET_KEY,
-        'Content-Type': 'application/json'
-      };
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
       log("Get Check Booking Headers :: $headers");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.checkBooking);
@@ -569,15 +507,13 @@ class BookingScreenController extends GetxController {
         final String bookingCategory = await response.stream.bytesToString();
 
         log("Get Check Booking Response :: $bookingCategory");
-        getCheckBookingCategory =
-            GetCheckBookingModel.fromJson(json.decode(bookingCategory));
+        getCheckBookingCategory = GetCheckBookingModel.fromJson(json.decode(bookingCategory));
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get Check Booking Api :: $e");
-      Utils.showToast(
-          Get.context!, getCheckBookingCategory?.status?.toString() ?? "");
+      Utils.showToast(Get.context!, getCheckBookingCategory?.status?.toString() ?? "");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
@@ -616,10 +552,7 @@ class BookingScreenController extends GetxController {
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.createBooking);
       log("Create Booking Url :: $url");
 
-      final headers = {
-        "key": ApiConstant.SECRET_KEY,
-        'Content-Type': 'application/json'
-      };
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
 
       final response = await http.post(url, headers: headers, body: body);
 
@@ -631,8 +564,7 @@ class BookingScreenController extends GetxController {
         createBookingCategory = CreateBookingModel.fromJson(jsonResponse);
       }
 
-      Utils.showToast(
-          Get.context!, createBookingCategory?.message.toString() ?? "");
+      Utils.showToast(Get.context!, createBookingCategory?.message.toString() ?? "");
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
@@ -669,39 +601,19 @@ class BookingScreenController extends GetxController {
           withOutTaxRupee = 0.0;
           totalPrice = 0.0;
 
-          for (var i = 0;
-              i <
-                  (categoryDetailController
-                          .getServiceCategory?.services?.length ??
-                      0);
-              i++) {
+          for (var i = 0; i < (categoryDetailController.getServiceCategory?.services?.length ?? 0); i++) {
             categoryDetailController.onCheckBoxClick(false, i);
           }
 
-          for (var i = 0;
-              i <
-                  (homeScreenController
-                          .getAllServiceCategory?.services?.length ??
-                      0);
-              i++) {
+          for (var i = 0; i < (homeScreenController.getAllServiceCategory?.services?.length ?? 0); i++) {
             homeScreenController.onServiceCheckBoxClick(false, i);
           }
 
-          for (var i = 0;
-              i <
-                  (homeScreenController
-                          .getExpertCategory?.data?.services?.length ??
-                      0);
-              i++) {
+          for (var i = 0; i < (homeScreenController.getExpertCategory?.data?.services?.length ?? 0); i++) {
             homeScreenController.onCheckBoxClick(false, i);
           }
 
-          for (var i = 0;
-              i <
-                  (branchDetailController
-                          .getSalonDetailCategory?.salon?.serviceIds?.length ??
-                      0);
-              i++) {
+          for (var i = 0; i < (branchDetailController.getSalonDetailCategory?.salon?.serviceIds?.length ?? 0); i++) {
             branchDetailController.onCheckBoxClick(false, i);
           }
 
@@ -758,8 +670,7 @@ class BookingScreenController extends GetxController {
 
           Get.offAndToNamed(AppRoutes.bottom);
 
-          homeScreenController.onGetAllExpertApiCall(
-              start: "0", limit: homeScreenController.limitExpert.toString());
+          homeScreenController.onGetAllExpertApiCall(start: "0", limit: homeScreenController.limitExpert.toString());
 
           Get.dialog(
             barrierColor: AppColors.blackColor.withOpacity(0.8),
@@ -804,12 +715,9 @@ class BookingScreenController extends GetxController {
           time: slotsString.toString(),
           rupee: rupee ?? 0,
           withoutTaxRupee: totalPrice.toInt(),
-          stripePaymentPublishKey:
-              splashController.settingCategory?.setting?.stripePublishableKey ??
-                  "",
+          stripePaymentPublishKey: splashController.settingCategory?.setting?.stripePublishableKey ?? "",
           stripeURL: Constant.stripeUrl,
-          stripePaymentKey:
-              splashController.settingCategory?.setting?.stripeSecretKey ?? "",
+          stripePaymentKey: splashController.settingCategory?.setting?.stripeSecretKey ?? "",
           isTest: true,
           discountAmount: 0,
           discountPercentage: 0,
@@ -834,22 +742,22 @@ class BookingScreenController extends GetxController {
           Utils.showToast(context, e.toString());
         });
       } else if (selectedPayment == "flutterWave") {
-        FlutterWaveService().init(
-            flutterWavePublishKey:
-                splashController.settingCategory?.setting?.flutterWaveKey ?? "",
-            date: formattedDateNow,
-            time: slotsString.toString(),
-            rupee: rupee ?? 0,
-            withoutTaxRupee: totalPrice.toInt(),
-            serviceId: serviceId.join(","),
-            expertId: Constant.storage.read<String>('expertId').toString(),
-            userId: userId,
-            paymentType: selectedPayment);
-
-        1.seconds.delay;
-        isLoading(false);
-
-        FlutterWaveService().handlePaymentInitialization(context);
+        // FlutterWaveService().init(
+        //     flutterWavePublishKey: splashController.settingCategory?.setting?.flutterWaveKey ?? "",
+        //     date: formattedDateNow,
+        //     time: slotsString.toString(),
+        //     rupee: rupee ?? 0,
+        //     withoutTaxRupee: totalPrice.toInt(),
+        //     serviceId: serviceId.join(","),
+        //     expertId: Constant.storage.read<String>('expertId').toString(),
+        //     userId: userId,
+        //     paymentType: selectedPayment);
+        //
+        // 1.seconds.delay;
+        // isLoading(false);
+        //
+        // FlutterWaveService().handlePaymentInitialization();
+        Fluttertoast.showToast(msg: "Flutter Wave Payment is undermaintaince");
       }
 
       /// In App Purchase Method

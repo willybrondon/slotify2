@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -26,88 +26,56 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late final HomeScreenController homeScreenController;
-  late final SearchScreenController searchScreenController;
-  late final LoginScreenController loginScreenController;
-  late final ProfileScreenController profileScreenController;
-  late final SplashController splashController;
-  late final BookingDetailScreenController bookingDetailScreenController;
+  final HomeScreenController homeScreenController = Get.find<HomeScreenController>();
+  final SearchScreenController searchScreenController = Get.find<SearchScreenController>();
+  final LoginScreenController loginScreenController = Get.find<LoginScreenController>();
+  final ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
+  final SplashController splashController = Get.find<SplashController>();
+  final BookingDetailScreenController bookingDetailScreenController = Get.find<BookingDetailScreenController>();
   FirebaseMessaging? messaging;
   FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
   bool notificationVisit = false;
 
   @override
   void initState() {
-    super.initState();
-    _initializeControllers();
-  }
+    Future.delayed(const Duration(seconds: 3), () async {
+      await splashController.onSettingApiCall();
 
-  void _initializeControllers() {
-    try {
-      homeScreenController = Get.put(HomeScreenController());
-      searchScreenController = Get.put(SearchScreenController());
-      loginScreenController = Get.put(LoginScreenController());
-      profileScreenController = Get.put(ProfileScreenController());
-      splashController = Get.find<SplashController>();
-      bookingDetailScreenController = Get.put(BookingDetailScreenController());
+      initFirebase();
 
-      Future.delayed(const Duration(seconds: 3), () async {
-        await splashController.onSettingApiCall();
-
-        if (!kIsWeb) {
-          initFirebase();
-        }
-
-        log("Setting Category Status: ${splashController.settingCategory?.status}");
-        log("Maintenance Mode: ${splashController.settingCategory?.setting?.maintenanceMode}");
-        log("isLogIn from storage: ${Constant.storage.read<bool>('isLogIn')}");
-        log("isUpdate from storage: ${Constant.storage.read<bool>('isUpdate')}");
-
-        if (splashController.settingCategory?.status == true) {
-          if (splashController.settingCategory?.setting?.maintenanceMode ==
-              true) {
-            Get.dialog(
-              barrierColor: AppColors.blackColor.withOpacity(0.8),
-              Dialog(
-                backgroundColor: AppColors.transparent,
-                shadowColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                elevation: 0,
-                child: const AppActiveDialog(),
-              ),
-            );
-          } else {
-            log("is LogIn Splash :: ${Constant.storage.read<bool>('isLogIn')}");
-            log("is Update Splash :: ${Constant.storage.read<bool>('isUpdate')}");
-            loginScreenController.isLogIn == true &&
-                    loginScreenController.isUpdate == false
-                ? Get.offAllNamed(AppRoutes.editProfile, arguments: [
-                    profileScreenController.getUserCategory?.user?.fname,
-                    profileScreenController.getUserCategory?.user?.lname,
-                    profileScreenController.getUserCategory?.user?.email,
-                    profileScreenController.getUserCategory?.user?.mobile,
-                    0,
-                    profileScreenController.getUserCategory?.user?.bio,
-                    profileScreenController.getUserCategory?.user?.loginType,
-                    false
-                  ])
-                : Get.offAllNamed(AppRoutes.bottom);
-          }
+      if (splashController.settingCategory?.status == true) {
+        if (splashController.settingCategory?.setting?.maintenanceMode == true) {
+          Get.dialog(
+            barrierColor: AppColors.blackColor.withOpacity(0.8),
+            Dialog(
+              backgroundColor: AppColors.transparent,
+              shadowColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              child: const AppActiveDialog(),
+            ),
+          );
         } else {
-          // Fallback navigation if settingCategory is null or status is not true
-          Get.offAllNamed(AppRoutes.bottom);
-          Utils.showToast(
-              Get.context!, splashController.settingCategory?.message ?? "");
+          log("is LogIn Splash :: ${Constant.storage.read<bool>('isLogIn')}");
+          log("is Update Splash :: ${Constant.storage.read<bool>('isUpdate')}");
+          loginScreenController.isLogIn == true && loginScreenController.isUpdate == false
+              ? Get.offAllNamed(AppRoutes.editProfile, arguments: [
+                  profileScreenController.getUserCategory?.user?.fname,
+                  profileScreenController.getUserCategory?.user?.lname,
+                  profileScreenController.getUserCategory?.user?.email,
+                  profileScreenController.getUserCategory?.user?.mobile,
+                  0,
+                  profileScreenController.getUserCategory?.user?.bio,
+                  profileScreenController.getUserCategory?.user?.loginType,
+                  false
+                ])
+              : Get.offAllNamed(AppRoutes.bottom);
         }
-      });
-    } catch (e, stackTrace) {
-      log("Error initializing controllers: $e");
-      log("Stack trace: $stackTrace");
-      // Still try to navigate to bottom bar if controllers fail
-      Future.delayed(const Duration(seconds: 3), () {
-        Get.offAllNamed(AppRoutes.bottom);
-      });
-    }
+      } else {
+        Utils.showToast(Get.context!, splashController.settingCategory?.message ?? "");
+      }
+    });
+    super.initState();
   }
 
   initFirebase() async {
@@ -128,8 +96,7 @@ class _SplashScreenState extends State<SplashScreen> {
       log("this is fcm token = $value");
     });
 
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
       setState(() {
@@ -153,12 +120,9 @@ class _SplashScreenState extends State<SplashScreen> {
         if (message.notification != null) {
           log('Message also contained a notification: ${message.notification}');
         }
-        const AndroidInitializationSettings initializationSettingsAndroid =
-            AndroidInitializationSettings('@mipmap/ic_launcher');
+        const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
         flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-        flutterLocalNotificationsPlugin?.initialize(
-            const InitializationSettings(
-                android: initializationSettingsAndroid),
+        flutterLocalNotificationsPlugin?.initialize(const InitializationSettings(android: initializationSettingsAndroid),
             onDidReceiveNotificationResponse: (payload) {
           log("payload is:- $payload");
           handleMessage(message);

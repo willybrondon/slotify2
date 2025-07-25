@@ -1,85 +1,193 @@
-// To parse this JSON data, do
-//
-//     final getAllServiceModel = getAllServiceModelFromJson(jsonString);
-
 import 'dart:convert';
 
 GetAllServiceModel getAllServiceModelFromJson(String str) => GetAllServiceModel.fromJson(json.decode(str));
-
 String getAllServiceModelToJson(GetAllServiceModel data) => json.encode(data.toJson());
 
 class GetAllServiceModel {
-  bool? status;
-  String? message;
-  int? total;
-  List<Service>? services;
-  int? tax;
-
   GetAllServiceModel({
-    this.status,
-    this.message,
-    this.total,
-    this.services,
-    this.tax,
-  });
+    bool? status,
+    String? message,
+    num? total,
+    List<Services>? services,
+    Tax? tax,
+  }) {
+    _status = status;
+    _message = message;
+    _total = total;
+    _services = services;
+    _tax = tax;
+  }
 
-  factory GetAllServiceModel.fromJson(Map<String, dynamic> json) => GetAllServiceModel(
-        status: json["status"],
-        message: json["message"],
-        total: json["total"],
-        services: json["services"] == null ? [] : List<Service>.from(json["services"]!.map((x) => Service.fromJson(x))),
-        tax: json["tax"],
+  GetAllServiceModel.fromJson(dynamic json) {
+    _status = json['status'];
+    _message = json['message'];
+    _total = json['total'];
+    if (json['services'] != null) {
+      _services = [];
+      json['services'].forEach((v) {
+        _services?.add(Services.fromJson(v));
+      });
+    }
+    _tax = json['tax'] != null ? Tax.fromJson(json['tax']) : null;
+  }
+  bool? _status;
+  String? _message;
+  num? _total;
+  List<Services>? _services;
+  Tax? _tax;
+  GetAllServiceModel copyWith({
+    bool? status,
+    String? message,
+    num? total,
+    List<Services>? services,
+    Tax? tax,
+  }) =>
+      GetAllServiceModel(
+        status: status ?? _status,
+        message: message ?? _message,
+        total: total ?? _total,
+        services: services ?? _services,
+        tax: tax ?? _tax,
       );
+  bool? get status => _status;
+  String? get message => _message;
+  num? get total => _total;
+  List<Services>? get services => _services;
+  Tax? get tax => _tax;
 
-  Map<String, dynamic> toJson() => {
-        "status": status,
-        "message": message,
-        "total": total,
-        "services": services == null ? [] : List<dynamic>.from(services!.map((x) => x.toJson())),
-        "tax": tax,
-      };
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['status'] = _status;
+    map['message'] = _message;
+    map['total'] = _total;
+    if (_services != null) {
+      map['services'] = _services?.map((v) => v.toJson()).toList();
+    }
+    if (_tax != null) {
+      map['tax'] = _tax?.toJson();
+    }
+    return map;
+  }
 }
 
-class Service {
-  String? id;
-  bool? status;
-  String? name;
-  int? duration;
-  String? image;
-  DateTime? createdAt;
-  String? categoryId;
-  String? categoryname;
+Tax taxFromJson(String str) => Tax.fromJson(json.decode(str));
+String taxToJson(Tax data) => json.encode(data.toJson());
 
-  Service({
-    this.id,
-    this.status,
-    this.name,
-    this.duration,
-    this.image,
-    this.createdAt,
-    this.categoryId,
-    this.categoryname,
-  });
+class Tax {
+  Tax({
+    String? id,
+    num? tax,
+  }) {
+    _id = id;
+    _tax = tax;
+  }
 
-  factory Service.fromJson(Map<String, dynamic> json) => Service(
-        id: json["_id"],
-        status: json["status"],
-        name: json["name"],
-        duration: json["duration"],
-        image: json["image"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        categoryId: json["categoryId"],
-        categoryname: json["categoryname"],
+  Tax.fromJson(dynamic json) {
+    _id = json['_id'];
+    _tax = json['tax'];
+  }
+  String? _id;
+  num? _tax;
+  Tax copyWith({
+    String? id,
+    num? tax,
+  }) =>
+      Tax(
+        id: id ?? _id,
+        tax: tax ?? _tax,
       );
+  String? get id => _id;
+  num? get tax => _tax;
 
-  Map<String, dynamic> toJson() => {
-        "_id": id,
-        "status": status,
-        "name": name,
-        "duration": duration,
-        "image": image,
-        "createdAt": createdAt?.toIso8601String(),
-        "categoryId": categoryId,
-        "categoryname": categoryname,
-      };
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['_id'] = _id;
+    map['tax'] = _tax;
+    return map;
+  }
+}
+
+Services servicesFromJson(String str) => Services.fromJson(json.decode(str));
+String servicesToJson(Services data) => json.encode(data.toJson());
+
+class Services {
+  Services({
+    String? id,
+    bool? status,
+    String? name,
+    int? duration,
+    String? image,
+    String? createdAt,
+    String? categoryId,
+    String? categoryname,
+  }) {
+    _id = id;
+    _status = status;
+    _name = name;
+    _duration = duration;
+    _image = image;
+    _createdAt = createdAt;
+    _categoryId = categoryId;
+    _categoryname = categoryname;
+  }
+
+  Services.fromJson(dynamic json) {
+    _id = json['_id'];
+    _status = json['status'];
+    _name = json['name'];
+    _duration = json['duration'];
+    _image = json['image'];
+    _createdAt = json['createdAt'];
+    _categoryId = json['categoryId'];
+    _categoryname = json['categoryname'];
+  }
+  String? _id;
+  bool? _status;
+  String? _name;
+  int? _duration;
+  String? _image;
+  String? _createdAt;
+  String? _categoryId;
+  String? _categoryname;
+  Services copyWith({
+    String? id,
+    bool? status,
+    String? name,
+    int? duration,
+    String? image,
+    String? createdAt,
+    String? categoryId,
+    String? categoryname,
+  }) =>
+      Services(
+        id: id ?? _id,
+        status: status ?? _status,
+        name: name ?? _name,
+        duration: duration ?? _duration,
+        image: image ?? _image,
+        createdAt: createdAt ?? _createdAt,
+        categoryId: categoryId ?? _categoryId,
+        categoryname: categoryname ?? _categoryname,
+      );
+  String? get id => _id;
+  bool? get status => _status;
+  String? get name => _name;
+  int? get duration => _duration;
+  String? get image => _image;
+  String? get createdAt => _createdAt;
+  String? get categoryId => _categoryId;
+  String? get categoryname => _categoryname;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['_id'] = _id;
+    map['status'] = _status;
+    map['name'] = _name;
+    map['duration'] = _duration;
+    map['image'] = _image;
+    map['createdAt'] = _createdAt;
+    map['categoryId'] = _categoryId;
+    map['categoryname'] = _categoryname;
+    return map;
+  }
 }

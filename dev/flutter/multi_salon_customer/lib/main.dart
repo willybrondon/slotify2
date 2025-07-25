@@ -72,11 +72,9 @@ Future<void> backgroundNotification(RemoteMessage message) async {
   if (message.notification != null) {
     log('Message also contained a notification: ${message.notification}');
   }
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  flutterLocalNotificationsPlugin?.initialize(
-      const InitializationSettings(android: initializationSettingsAndroid),
+  flutterLocalNotificationsPlugin?.initialize(const InitializationSettings(android: initializationSettingsAndroid),
       onDidReceiveBackgroundNotificationResponse: (message) {});
   var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
     '0',
@@ -148,8 +146,7 @@ Future<void> main() async {
 
   /// Currency
   await splashController.onSettingApiCall();
-  currency =
-      splashController.settingCategory?.setting?.currencySymbol.toString();
+  currency = splashController.settingCategory?.setting?.currencySymbol.toString();
 
   ///************** FCM token ************************\\\
   try {
@@ -173,8 +170,7 @@ Future<void> main() async {
   position = await getDeviceLocation();
 
   /// For Cover Safe Area
-  SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent));
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent));
 
   /// Preference
   await Preference().instance();
@@ -198,8 +194,7 @@ Future<void> main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  static final StreamController purchaseStreamController =
-      StreamController<PurchaseDetails>.broadcast();
+  static final StreamController purchaseStreamController = StreamController<PurchaseDetails>.broadcast();
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -223,8 +218,7 @@ class _MyAppState extends State<MyApp> {
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus &&
-            currentFocus.focusedChild != null) {
+        if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
           currentFocus.focusedChild?.unfocus();
         }
       },
@@ -236,8 +230,7 @@ class _MyAppState extends State<MyApp> {
         getPages: AppPages.list,
         title: "Salon",
         defaultTransition: Transition.fade,
-        fallbackLocale:
-            const Locale(Constant.languageEn, Constant.countryCodeEn),
+        fallbackLocale: const Locale(Constant.languageEn, Constant.countryCodeEn),
         transitionDuration: const Duration(milliseconds: 200),
       ),
     );
