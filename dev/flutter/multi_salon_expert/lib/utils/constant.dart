@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class Constant {
-  // // ----- CURRENCY ----- //
-  // static const currency = "\$";
-
   static const languageEn = "en";
   static const countryCodeEn = "US";
 
@@ -39,17 +35,16 @@ class Constant {
   static var idUpdateSlots0 = 'idUpdateSlots0';
   static var idSelectPayment = 'idSelectPayment';
   static var idAttendanceDetails = 'idAttendanceDetails';
+  static var idSwitchOn = 'idSwitchOn';
+  static var idGetWithdrawMethods = 'idGetWithdrawMethods';
+  static var idChangePaymentMethod = 'idChangePaymentMethod';
+  static var idSwitchWithdrawMethod = 'idSwitchWithdrawMethod';
+  static var idSelectMonth = 'idSelectMonth';
 
   // ----- GET STORAGE ----- //
   static final storage = GetStorage();
 
   //-----------------------------
-
-  static List paymentList = [
-    {"payment": "txtBank".tr, "image": AppAsset.icBankPay},
-    {"payment": "txtUPI".tr, "image": AppAsset.icUpiPay},
-  ];
-
   static List countryList = [
     {"country": "Arabic (العربية)", "image": AppAsset.imPakistan, "id": "1"},
     {"country": "Bengali (বাংলা)", "image": AppAsset.imIndia, "id": "2"},

@@ -8,15 +8,15 @@ import 'package:salon_2/ui/booking_screen/model/cancel_confirm_booking_model.dar
 import 'package:salon_2/ui/booking_screen/model/complete_booking_model.dart';
 import 'package:salon_2/ui/booking_screen/model/status_wise_booking_model.dart';
 import 'package:salon_2/ui/booking_screen/model/update_payment_status_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/services/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class BookingScreenController extends GetxController with GetTickerProviderStateMixin {
   bool isPaymentReceive = false;
-  bool isCheckOut = false;
   bool isPendingApiCalling = false;
+  bool isSwitchOn = false;
 
   int startPending = 0;
   int limitPending = 20;
@@ -110,6 +110,14 @@ class BookingScreenController extends GetxController with GetTickerProviderState
     }
   }
 
+  onSwitch(value) {
+    isPaymentReceive = !isPaymentReceive;
+    isSwitchOn = value;
+    log("Payment Receive :: $isPaymentReceive");
+    log("Check Out Button :: $isSwitchOn");
+    update([Constant.idSwitchOn]);
+  }
+
   //----------- API Variables -----------//
   StatusWiseBookingModel? statusWiseBookingCategory;
   CancelConfirmBookingModel? cancelConfirmBookingCategory;
@@ -152,14 +160,6 @@ class BookingScreenController extends GetxController with GetTickerProviderState
       }
     });
     super.onInit();
-  }
-
-  onPaymentReceive() {
-    isPaymentReceive = !isPaymentReceive;
-    isCheckOut = !isCheckOut;
-    log("Payment Receive :: $isPaymentReceive");
-    log("Check Out Button :: $isCheckOut");
-    update([Constant.idPaymentReceive]);
   }
 
   onStatusWiseBookingApiCall({

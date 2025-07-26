@@ -7,14 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/custom/dialog/progress_dialog.dart';
-import 'package:salon_2/custom/text_field/text_field_custom.dart';
-import 'package:salon_2/custom/text_field/text_form_field_custom.dart';
+import 'package:salon_2/custom/text_field/address_text_field.dart';
 import 'package:salon_2/ui/edit_profile/controller/edit_profile_controller.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class EditProfileScreen extends GetView<EditProfileController> {
@@ -43,7 +42,7 @@ class EditProfileScreen extends GetView<EditProfileController> {
     return Form(
       key: formKey,
       child: Scaffold(
-        backgroundColor: AppColors.bgColor,
+        backgroundColor: AppColors.whiteColor,
         bottomNavigationBar: GetBuilder<EditProfileController>(
           builder: (logic) {
             return Container(
@@ -53,7 +52,7 @@ class EditProfileScreen extends GetView<EditProfileController> {
               child: AppButton(
                 buttonColor: AppColors.primaryAppColor,
                 buttonText: "txtUpdate".tr,
-                fontFamily: FontFamily.sfProDisplay,
+                fontFamily: AppFontFamily.sfProDisplay,
                 fontSize: 17.5,
                 onTap: () async {
                   submit();
@@ -106,7 +105,7 @@ class EditProfileScreen extends GetView<EditProfileController> {
                               ),
                               Positioned(
                                 top: 88,
-                                left: Get.width * 0.55,
+                                left: Get.width * 0.52,
                                 child: GestureDetector(
                                   onTap: () {
                                     logic.onPickImage();
@@ -124,9 +123,10 @@ class EditProfileScreen extends GetView<EditProfileController> {
                                       height: 34,
                                       width: 34,
                                       decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: AppColors.primaryAppColor,
-                                          border: Border.all(color: AppColors.whiteColor, width: 1)),
+                                        shape: BoxShape.circle,
+                                        color: AppColors.primaryAppColor,
+                                        border: Border.all(color: AppColors.whiteColor, width: 1),
+                                      ),
                                       child: Image.asset(
                                         AppAsset.icAddProfileImage,
                                         height: 18,
@@ -143,33 +143,30 @@ class EditProfileScreen extends GetView<EditProfileController> {
                       ),
                       GetBuilder<EditProfileController>(
                         builder: (logic) {
-                          return TextFormFieldCustom(
-                            method: TextFieldCustom(
-                              hintText: "txtEnterFirstName".tr,
-                              obscureText: false,
-                              controller: logic.fNameEditingController,
-                              textInputAction: TextInputAction.next,
-                              validator: (value) {
-                                return logic.fNameEditingController.text.isEmpty ? "First name is required" : null;
-                              },
-                            ),
-                            title: "txtFirstName".tr,
-                          );
+                          return  AddressTextField(
+                            labelText:  "txtEnterFirstName".tr,
+                            controller: logic.fNameEditingController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "desPleaseEnterFirstName".tr;
+                              }
+                              return null;
+                            },
+                          ).paddingOnly(bottom: 25,top: 25);
                         },
                       ),
                       GetBuilder<EditProfileController>(
                         builder: (logic) {
-                          return TextFormFieldCustom(
-                              method: TextFieldCustom(
-                                hintText: "txtEnterLastName".tr,
-                                obscureText: false,
-                                controller: logic.lNameEditingController,
-                                textInputAction: TextInputAction.next,
-                                validator: (value) {
-                                  return logic.lNameEditingController.text.isEmpty ? "Last name is required" : null;
-                                },
-                              ),
-                              title: "txtLastName".tr);
+                          return  AddressTextField(
+                            labelText: "txtEnterLastName".tr,
+                            controller: logic.lNameEditingController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "desPleaseEnterLastName".tr;
+                              }
+                              return null;
+                            },
+                          ).paddingOnly(bottom: 25);
                         },
                       ),
                     ],

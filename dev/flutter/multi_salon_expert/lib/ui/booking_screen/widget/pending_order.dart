@@ -15,10 +15,10 @@ import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -57,7 +57,10 @@ class PendingOrder extends StatelessWidget {
                           Text(
                             "txtNotPendingOrder".tr,
                             style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayMedium, fontSize: 20, color: AppColors.primaryTextColor),
+                              fontFamily: AppFontFamily.sfProDisplayMedium,
+                              fontSize: 20,
+                              color: AppColors.primaryTextColor,
+                            ),
                           ),
                         ],
                       ),
@@ -87,12 +90,12 @@ class PendingOrder extends StatelessWidget {
                                   child: SlideAnimation(
                                     child: FadeInAnimation(
                                       child: InkWell(
-                                        overlayColor: MaterialStatePropertyAll(AppColors.transparent),
+                                        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
                                         onTap: () {
                                           Get.toNamed(AppRoutes.bookingInformation, arguments: [logic.getPending[index].id]);
                                         },
                                         child: Container(
-                                          margin: const EdgeInsets.only(top: 10),
+                                          margin: const EdgeInsets.only(top: 10, left: 12, right: 12),
                                           width: double.infinity,
                                           decoration: BoxDecoration(
                                             color: AppColors.whiteColor,
@@ -122,14 +125,14 @@ class PendingOrder extends StatelessWidget {
                                                         bottomLeft: Radius.circular(15),
                                                         topRight: Radius.circular(12),
                                                       ),
-                                                      color: AppColors.tabUnSelect,
+                                                      color: AppColors.primaryAppColor,
                                                     ),
                                                     child: Text(
                                                       "#${logic.getPending[index].bookingId}",
                                                       style: TextStyle(
                                                         fontSize: 12,
-                                                        fontFamily: FontFamily.sfProDisplay,
-                                                        color: AppColors.buttonText,
+                                                        fontFamily: AppFontFamily.heeBo700,
+                                                        color: AppColors.whiteColor,
                                                       ),
                                                     ),
                                                   ),
@@ -176,7 +179,7 @@ class PendingOrder extends StatelessWidget {
                                                                   style: TextStyle(
                                                                       fontSize: 18,
                                                                       overflow: TextOverflow.ellipsis,
-                                                                      fontFamily: FontFamily.sfProDisplayBold,
+                                                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                                                       color: AppColors.primaryTextColor),
                                                                 ),
                                                               ),
@@ -184,7 +187,7 @@ class PendingOrder extends StatelessWidget {
                                                                 logic.getPending[index].category?.first.name ?? "",
                                                                 style: TextStyle(
                                                                     fontSize: 14,
-                                                                    fontFamily: FontFamily.sfProDisplayRegular,
+                                                                    fontFamily: AppFontFamily.sfProDisplayRegular,
                                                                     color: AppColors.service),
                                                               ),
                                                               Row(
@@ -192,30 +195,30 @@ class PendingOrder extends StatelessWidget {
                                                                   Container(
                                                                     decoration: BoxDecoration(
                                                                       borderRadius: BorderRadius.circular(6),
-                                                                      color: AppColors.green,
+                                                                      color: AppColors.currencyBoxBg,
                                                                     ),
                                                                     child: Padding(
                                                                       padding:
-                                                                          const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                                                          const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                                                       child: Text(
                                                                         '$currency ${logic.getPending[index].expertEarning?.toStringAsFixed(2)}',
                                                                         style: TextStyle(
                                                                           fontSize: 16,
-                                                                          fontFamily: FontFamily.sfProDisplayBold,
-                                                                          color: AppColors.currency,
+                                                                          fontFamily: AppFontFamily.heeBo800,
+                                                                          color: AppColors.primaryAppColor,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                   ),
                                                                   logic.getPending[index].paymentType == 'cashAfterService'
-                                                                      ? Image.asset(AppAsset.icPoint, height: 16, width: 16)
+                                                                      ? Image.asset(AppAsset.icGreenPoint, height: 16, width: 16)
                                                                           .paddingOnly(left: 5, right: 5)
                                                                       : const SizedBox.shrink(),
                                                                   logic.getPending[index].paymentType == 'cashAfterService'
                                                                       ? Text(
                                                                           "Cash After Service",
                                                                           style: TextStyle(
-                                                                            fontFamily: FontFamily.sfProDisplayMedium,
+                                                                            fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                             fontSize: 13,
                                                                             color: AppColors.greenColor,
                                                                           ),
@@ -249,7 +252,7 @@ class PendingOrder extends StatelessWidget {
                                                                     "  ${logic.getPending[index].user?.fname} ${logic.getPending[index].user?.lname}",
                                                                     style: TextStyle(
                                                                       fontSize: 11,
-                                                                      fontFamily: FontFamily.sfProDisplayMedium,
+                                                                      fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                       color: AppColors.service,
                                                                     ),
                                                                   )
@@ -260,48 +263,87 @@ class PendingOrder extends StatelessWidget {
                                                         )
                                                       ],
                                                     ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                      child: Divider(
-                                                        color: AppColors.greyColor.withOpacity(0.15),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        color: AppColors.bgTime,
+                                                        borderRadius: BorderRadius.circular(12),
                                                       ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
                                                       child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
-                                                          Row(
+                                                          Container(
+                                                            height: 40,
+                                                            width: 40,
+                                                            decoration: BoxDecoration(
+                                                              shape: BoxShape.circle,
+                                                              color: AppColors.bgCircle,
+                                                            ),
+                                                            child: Image.asset(AppAsset.icBooking).paddingAll(10),
+                                                          ).paddingOnly(right: 12),
+                                                          Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: [
-                                                              Image.asset(AppAsset.icBooking, height: 20, width: 20),
-                                                              SizedBox(width: Get.width * 0.015),
                                                               Text(
-                                                                logic.getPending[index].date ?? "",
+                                                                logic.getPending[index].date.toString(),
                                                                 style: TextStyle(
-                                                                  fontFamily: FontFamily.sfProDisplayMedium,
-                                                                  fontSize: 13,
-                                                                  color: AppColors.service,
+                                                                  fontFamily: AppFontFamily.heeBo700,
+                                                                  fontSize: 14,
+                                                                  color: AppColors.primaryTextColor,
                                                                 ),
                                                               ),
+                                                              Text(
+                                                                "Booking Date",
+                                                                style: TextStyle(
+                                                                  fontFamily: AppFontFamily.heeBo500,
+                                                                  fontSize: 12,
+                                                                  color: AppColors.service,
+                                                                ),
+                                                              )
                                                             ],
                                                           ),
-                                                          Row(
+                                                          const Spacer(),
+                                                          Container(
+                                                            height: 36,
+                                                            width: 2,
+                                                            color: AppColors.serviceBorder,
+                                                          ),
+                                                          const Spacer(),
+                                                          Container(
+                                                            height: 40,
+                                                            width: 40,
+                                                            decoration: BoxDecoration(
+                                                              shape: BoxShape.circle,
+                                                              color: AppColors.bgCircle,
+                                                            ),
+                                                            child: Image.asset(
+                                                              AppAsset.icClock,
+                                                            ).paddingAll(10),
+                                                          ).paddingOnly(right: 12),
+                                                          Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: [
-                                                              Image.asset(AppAsset.icClock, height: 20, width: 20),
-                                                              SizedBox(width: Get.width * 0.015),
                                                               Text(
                                                                 logic.getPending[index].time?[0] ?? "",
                                                                 style: TextStyle(
-                                                                  fontFamily: FontFamily.sfProDisplayMedium,
-                                                                  fontSize: 13,
-                                                                  color: AppColors.service,
+                                                                  fontFamily: AppFontFamily.heeBo700,
+                                                                  fontSize: 14,
+                                                                  color: AppColors.primaryTextColor,
                                                                 ),
                                                               ),
+                                                              Text(
+                                                                "Booking Timing",
+                                                                style: TextStyle(
+                                                                  fontFamily: AppFontFamily.heeBo500,
+                                                                  fontSize: 12,
+                                                                  color: AppColors.service,
+                                                                ),
+                                                              )
                                                             ],
-                                                          )
+                                                          ),
+                                                          const Spacer(),
                                                         ],
                                                       ),
-                                                    ),
+                                                    ).paddingOnly(top: 12),
                                                     GetBuilder<BookingScreenController>(
                                                       id: Constant.idCheckInUpdate,
                                                       builder: (logic) {
@@ -317,12 +359,13 @@ class PendingOrder extends StatelessWidget {
                                                                           return AppButton(
                                                                             height: 43,
                                                                             buttonColor: AppColors.tabUnSelect,
-                                                                            fontFamily: FontFamily.sfProDisplayBold,
+                                                                            fontFamily: AppFontFamily.heeBo600,
                                                                             fontSize: 15,
                                                                             buttonText: "txtCheckIn".tr,
                                                                             icon: AppAsset.icCheckIn,
                                                                             iconColor: AppColors.buttonText,
                                                                             textColor: AppColors.buttonText,
+                                                                            borderRadius: 10,
                                                                           );
                                                                         },
                                                                       ),
@@ -333,12 +376,13 @@ class PendingOrder extends StatelessWidget {
                                                                         builder: (logic) {
                                                                           return AppButton(
                                                                             height: 43,
-                                                                            buttonColor: AppColors.greenColor,
+                                                                            buttonColor: AppColors.checkInBooking,
                                                                             textColor: AppColors.whiteColor,
-                                                                            fontFamily: FontFamily.sfProDisplayBold,
+                                                                            fontFamily: AppFontFamily.heeBo600,
                                                                             fontSize: 15,
                                                                             buttonText: "txtCheckOut".tr,
                                                                             iconColor: AppColors.whiteColor,
+                                                                            borderRadius: 10,
                                                                             onTap: () {
                                                                               Get.dialog(
                                                                                 GetBuilder<BookingScreenController>(
@@ -376,6 +420,11 @@ class PendingOrder extends StatelessWidget {
                                                                                           paymentType: logic.getPending[index]
                                                                                                   .paymentType ??
                                                                                               "",
+                                                                                          date:
+                                                                                              logic.getPending[index].date ?? "",
+                                                                                          time:
+                                                                                              logic.getPending[index].time?[0] ??
+                                                                                                  "",
                                                                                           userName:
                                                                                               "${logic.getPending[index].user?.fname} ${logic.getPending[index].user?.lname}",
                                                                                         ),
@@ -399,11 +448,12 @@ class PendingOrder extends StatelessWidget {
                                                                         builder: (logic) {
                                                                           return AppButton(
                                                                             height: 42,
-                                                                            buttonColor: AppColors.greenColor,
+                                                                            buttonColor: AppColors.checkInBooking,
                                                                             buttonText: "txtCheckIn".tr,
-                                                                            fontFamily: FontFamily.sfProDisplayBold,
                                                                             textColor: AppColors.whiteColor,
-                                                                            fontSize: 14,
+                                                                            fontFamily: AppFontFamily.heeBo600,
+                                                                            fontSize: 15,
+                                                                            borderRadius: 10,
                                                                             onTap: () {
                                                                               if (logic.getPending[index].status == "confirm") {
                                                                                 Utils.showToast(
@@ -448,6 +498,11 @@ class PendingOrder extends StatelessWidget {
                                                                                                 "",
                                                                                             expertName:
                                                                                                 "${logic.getPending[index].expert?.fname} ${logic.getPending[index].expert?.lname}",
+                                                                                            date: logic.getPending[index].date
+                                                                                                .toString(),
+                                                                                            time: logic
+                                                                                                    .getPending[index].time?[0] ??
+                                                                                                "",
                                                                                             index: index,
                                                                                           ),
                                                                                         ),
@@ -466,11 +521,12 @@ class PendingOrder extends StatelessWidget {
                                                                         builder: (logic) {
                                                                           return AppButton(
                                                                             height: 42,
-                                                                            textColor: AppColors.redColor,
-                                                                            buttonColor: AppColors.lightRedColor,
+                                                                            textColor: AppColors.whiteColor,
+                                                                            buttonColor: AppColors.cancelBooking,
                                                                             buttonText: "txtCancel".tr,
-                                                                            fontFamily: FontFamily.sfProDisplayBold,
-                                                                            fontSize: 14,
+                                                                            fontFamily: AppFontFamily.heeBo600,
+                                                                            fontSize: 15,
+                                                                            borderRadius: 10,
                                                                             onTap: () {
                                                                               Get.dialog(
                                                                                 GetBuilder<BookingScreenController>(
@@ -504,6 +560,11 @@ class PendingOrder extends StatelessWidget {
                                                                                               "",
                                                                                           expertName:
                                                                                               "${logic.getPending[index].expert?.fname} ${logic.getPending[index].expert?.lname}",
+                                                                                          date: logic.getPending[index].date
+                                                                                              .toString(),
+                                                                                          time:
+                                                                                              logic.getPending[index].time?[0] ??
+                                                                                                  "",
                                                                                           index: index,
                                                                                         ),
                                                                                       ),

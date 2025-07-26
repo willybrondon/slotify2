@@ -16,6 +16,8 @@ import 'package:salon_2/ui/edit_profile/binding/edit_profile_binding.dart';
 import 'package:salon_2/ui/edit_profile/view/edit_profile_screen.dart';
 import 'package:salon_2/ui/help_screen/binding/help_binidng.dart';
 import 'package:salon_2/ui/help_screen/view/help_screen.dart';
+import 'package:salon_2/ui/history_screen/binding/history_screen_binding.dart';
+import 'package:salon_2/ui/history_screen/view/history_screen.dart';
 import 'package:salon_2/ui/language_screen/binding/language_binding.dart';
 import 'package:salon_2/ui/language_screen/view/language_screen.dart';
 import 'package:salon_2/ui/login_screen/binding/login_screen_binding.dart';
@@ -26,8 +28,6 @@ import 'package:salon_2/ui/order_report/view_detail/binding/view_detail_binding.
 import 'package:salon_2/ui/order_report/view_detail/view/view_detail_screen.dart';
 import 'package:salon_2/ui/order_summary/binding/order_summary_binding.dart';
 import 'package:salon_2/ui/order_summary/view/order_summary.dart';
-import 'package:salon_2/ui/payment_history_screen/binding/payment_history_binding.dart';
-import 'package:salon_2/ui/payment_history_screen/view/payment_history_screen.dart';
 import 'package:salon_2/ui/payment_method/binding/payment_method_binding.dart';
 import 'package:salon_2/ui/payment_method/view/payment_method_view.dart';
 import 'package:salon_2/ui/profile_screen/binding/profile_screen_binding.dart';
@@ -95,17 +95,17 @@ class AppPages {
     GetPage(
       name: AppRoutes.wallet,
       page: () => const WalletScreen(),
-      binding: WalletBinding(),
+      binding: WalletScreenBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.history,
+      page: () => const HistoryScreen(),
+      binding: HistoryScreenBinding(),
     ),
     GetPage(
       name: AppRoutes.revenueDetail,
       page: () => const RevenueDetailScreen(),
       binding: RevenueDetailBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.paymentHistory,
-      page: () => const PaymentHistoryScreen(),
-      binding: PaymentHistoryBinding(),
     ),
     GetPage(
       name: AppRoutes.orderSummary,
@@ -149,7 +149,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.paymentMethod,
-      page: () => PaymentMethodScreen(),
+      page: () => const PaymentMethodScreen(),
       binding: PaymentMethodBinding(),
     ),
     GetPage(

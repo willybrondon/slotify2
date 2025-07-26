@@ -10,10 +10,10 @@ import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/order_summary/controller/order_summary_controller.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -63,7 +63,7 @@ class CancelBooking extends StatelessWidget {
                             Text(
                               "txtNotCompletedOrder".tr,
                               style: TextStyle(
-                                  fontFamily: FontFamily.sfProDisplayMedium, fontSize: 20, color: AppColors.primaryTextColor),
+                                  fontFamily: AppFontFamily.sfProDisplayMedium, fontSize: 20, color: AppColors.primaryTextColor),
                             ),
                           ],
                         ),
@@ -138,7 +138,7 @@ class CancelBooking extends StatelessWidget {
                                                       "#${logic.getOrderSummaryData?.bookingStats?.cancelledBookingsArray?[index].bookingId}",
                                                       style: TextStyle(
                                                         fontSize: 12,
-                                                        fontFamily: FontFamily.sfProDisplay,
+                                                        fontFamily: AppFontFamily.sfProDisplay,
                                                         color: AppColors.buttonText,
                                                       ),
                                                     ),
@@ -179,7 +179,7 @@ class CancelBooking extends StatelessWidget {
                                                                   style: TextStyle(
                                                                       fontSize: 18,
                                                                       overflow: TextOverflow.ellipsis,
-                                                                      fontFamily: FontFamily.sfProDisplayBold,
+                                                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                                                       color: AppColors.primaryTextColor),
                                                                 ),
                                                               ),
@@ -189,7 +189,7 @@ class CancelBooking extends StatelessWidget {
                                                                     "",
                                                                 style: TextStyle(
                                                                     fontSize: 14,
-                                                                    fontFamily: FontFamily.sfProDisplayRegular,
+                                                                    fontFamily: AppFontFamily.sfProDisplayRegular,
                                                                     color: AppColors.service),
                                                               ),
                                                               Container(
@@ -204,7 +204,7 @@ class CancelBooking extends StatelessWidget {
                                                                     '$currency ${logic.getOrderSummaryData?.bookingStats?.cancelledBookingsArray?[index].rupee}',
                                                                     style: TextStyle(
                                                                         fontSize: 16,
-                                                                        fontFamily: FontFamily.sfProDisplayBold,
+                                                                        fontFamily: AppFontFamily.sfProDisplayBold,
                                                                         color: AppColors.currency),
                                                                   ),
                                                                 ),
@@ -232,7 +232,7 @@ class CancelBooking extends StatelessWidget {
                                                                     "  ${logic.getOrderSummaryData?.bookingStats?.cancelledBookingsArray?[index].user?.fname}  ${logic.getOrderSummaryData?.bookingStats?.cancelledBookingsArray?[index].user?.lname}",
                                                                     style: TextStyle(
                                                                         fontSize: 12,
-                                                                        fontFamily: FontFamily.sfProDisplayMedium,
+                                                                        fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                         color: AppColors.service),
                                                                   )
                                                                 ],
@@ -258,7 +258,7 @@ class CancelBooking extends StatelessWidget {
                                                               Text(
                                                                 logic.date.toString(),
                                                                 style: TextStyle(
-                                                                  fontFamily: FontFamily.sfProDisplayMedium,
+                                                                  fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                   fontSize: 13,
                                                                   color: AppColors.service,
                                                                 ),
@@ -274,7 +274,7 @@ class CancelBooking extends StatelessWidget {
                                                                         ?.cancelledBookingsArray?[index].time?[0] ??
                                                                     "",
                                                                 style: TextStyle(
-                                                                  fontFamily: FontFamily.sfProDisplayMedium,
+                                                                  fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                   fontSize: 13,
                                                                   color: AppColors.service,
                                                                 ),
@@ -292,7 +292,7 @@ class CancelBooking extends StatelessWidget {
                                                         width: Get.width,
                                                         buttonColor: AppColors.lightRedColor,
                                                         buttonText: "txtOrderCancel".tr,
-                                                        fontFamily: FontFamily.sfProDisplay,
+                                                        fontFamily: AppFontFamily.sfProDisplay,
                                                         fontSize: 13.5,
                                                         textColor: AppColors.redColor,
                                                       ),

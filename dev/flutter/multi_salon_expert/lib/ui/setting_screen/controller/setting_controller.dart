@@ -1,20 +1,21 @@
 import 'package:get/get.dart';
-import 'package:salon_2/localization/localizations_delegate.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/preference.dart';
 
 class SettingController extends GetxController {
-  LanguageModel? languagesChosenValue;
-  String? prefLanguageCode;
-  String? prefCountryCode;
+  bool? isSwitchOn;
 
-  getLanguageData() {
-    prefLanguageCode = Preference.shared.getString(Preference.selectedLanguage) ?? 'en';
-    prefCountryCode = Preference.shared.getString(Preference.selectedCountryCode) ?? 'US';
-    languagesChosenValue = languages
-        .where(
-            (element) => (element.languageCode == prefLanguageCode && element.countryCode == prefCountryCode))
-        .toList()[0];
-    update([Constant.idChangeLanguage]);
+  @override
+  void onInit() {
+    Constant.storage.read("notification") == false
+        ? Constant.storage.write("notification", false)
+        : Constant.storage.write("notification", true);
+
+    isSwitchOn = Constant.storage.read("notification");
+    super.onInit();
+  }
+
+  onSwitch(value) {
+    isSwitchOn = value;
+    update([Constant.idSwitchOn]);
   }
 }

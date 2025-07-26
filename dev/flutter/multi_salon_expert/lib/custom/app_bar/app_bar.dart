@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class AppBarCustom extends StatelessWidget {
   final String title;
@@ -24,7 +24,7 @@ class AppBarCustom extends StatelessWidget {
         title: Text(
           title,
           style:
-              TextStyle(fontFamily: FontFamily.sfProDisplayBold, fontSize: 20, color: AppColors.whiteColor),
+              TextStyle(fontFamily: AppFontFamily.sfProDisplayBold, fontSize: 20, color: AppColors.whiteColor),
         ).paddingOnly(top: 7),
       ),
     );

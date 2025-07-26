@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/custom/profile_menu/profile_menu.dart';
 import 'package:salon_2/routes/app_routes.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
@@ -56,7 +56,7 @@ class WalletScreen extends StatelessWidget {
           ),
           CustomMenu(
             leadingImage: AppAsset.icPaymentMethod,
-            title: "txtPaymentMethod".tr,
+            title: "txtWithdrawMethod".tr,
             textColor: AppColors.countBooking,
             onTap: () {
               Get.toNamed(AppRoutes.paymentMethod);

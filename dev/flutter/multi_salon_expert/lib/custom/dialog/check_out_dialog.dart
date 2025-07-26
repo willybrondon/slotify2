@@ -6,10 +6,10 @@ import 'package:get/get.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
+import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class CheckOutDialog extends StatelessWidget {
@@ -23,21 +23,26 @@ class CheckOutDialog extends StatelessWidget {
   final String userName;
   final int index;
   final String id;
+  final String date;
+  final String time;
   final String paymentType;
 
-  CheckOutDialog(
-      {super.key,
-      required this.serviceImage,
-      required this.serviceName,
-      required this.subCategoryName,
-      required this.bookingId,
-      required this.rupee,
-      required this.expertImage,
-      required this.expertName,
-      required this.index,
-      required this.id,
-      required this.paymentType,
-      required this.userName});
+  CheckOutDialog({
+    super.key,
+    required this.serviceImage,
+    required this.serviceName,
+    required this.subCategoryName,
+    required this.bookingId,
+    required this.rupee,
+    required this.expertImage,
+    required this.expertName,
+    required this.index,
+    required this.id,
+    required this.paymentType,
+    required this.userName,
+    required this.date,
+    required this.time,
+  });
 
   final BookingScreenController bookingScreenController = Get.find<BookingScreenController>();
 
@@ -45,7 +50,7 @@ class CheckOutDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return paymentType == 'cashAfterService'
         ? Container(
-            height: Get.height * 0.49,
+            height: 410,
             padding: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               color: AppColors.dialogBg,
@@ -53,6 +58,7 @@ class CheckOutDialog extends StatelessWidget {
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   height: 55,
@@ -69,35 +75,33 @@ class CheckOutDialog extends StatelessWidget {
                       style: TextStyle(
                         color: AppColors.whiteColor,
                         fontSize: 18,
-                        fontFamily: FontFamily.sfProDisplayBold,
+                        fontFamily: AppFontFamily.sfProDisplayBold,
                       ),
                     ),
                   ),
                 ),
                 Row(
                   children: [
-                    Container(
-                      height: 90,
-                      width: 90,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1)),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
                         child: CachedNetworkImage(
                           imageUrl: serviceImage,
                           fit: BoxFit.cover,
                           placeholder: (context, url) {
-                            return Image.asset(AppAsset.icPlaceholder);
+                            return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
                           },
                           errorWidget: (context, url, error) {
-                            return Image.asset(AppAsset.icPlaceholder);
+                            return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
                           },
                         ),
                       ),
                     ).paddingOnly(top: 10, left: 15, right: 10),
                     Container(
-                      height: 90,
+                      height: 105,
                       margin: const EdgeInsets.only(top: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,47 +110,64 @@ class CheckOutDialog extends StatelessWidget {
                           Row(
                             children: [
                               SizedBox(
-                                height: 20,
-                                width: 90,
-                                child: Text(
-                                  serviceName,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: FontFamily.sfProDisplayBold,
-                                    color: AppColors.blackColor,
+                                width: Get.width * 0.27,
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    serviceName,
                                     overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: AppFontFamily.heeBo700,
+                                      color: AppColors.primaryTextColor,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ),
                               ).paddingOnly(right: 8),
-                              Text(
-                                "#$id",
-                                style:
-                                    TextStyle(fontSize: 12.5, fontFamily: FontFamily.sfProDisplay, color: AppColors.blackColor),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  color: AppColors.currencyBoxBg,
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                child: Text(
+                                  "#$id",
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontFamily: AppFontFamily.heeBo600,
+                                    color: AppColors.primaryAppColor,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                           Text(
                             subCategoryName,
-                            style:
-                                TextStyle(fontSize: 15, fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.greyColor2),
-                          ).paddingOnly(top: 8),
-                          // Container(
-                          //   height: 28,
-                          //   width: 78,
-                          //   decoration: BoxDecoration(
-                          //     borderRadius: BorderRadius.circular(6),
-                          //     color: AppColors.green,
-                          //   ),
-                          //   child: Center(
-                          //     child: Text(
-                          //       "$currency $rupee",
-                          //       style:
-                          //           TextStyle(fontSize: 16, fontFamily: FontFamily.sfProDisplayBold, color: AppColors.currency),
-                          //     ),
-                          //   ),
-                          // ),
-                          Spacer(),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: AppFontFamily.sfProDisplayRegular,
+                              color: AppColors.service,
+                            ),
+                          ).paddingOnly(bottom: 3),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              color: AppColors.currencyBoxBg,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                              child: Text(
+                                "$currency $rupee",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: AppFontFamily.heeBo800,
+                                  color: AppColors.primaryAppColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
                           Row(
                             children: [
                               Container(
@@ -162,8 +183,11 @@ class CheckOutDialog extends StatelessWidget {
                               ),
                               Text(
                                 "  $expertName",
-                                style:
-                                    TextStyle(fontSize: 12, fontFamily: FontFamily.sfProDisplayMedium, color: AppColors.service),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: AppFontFamily.sfProDisplayMedium,
+                                  color: AppColors.service,
+                                ),
                               )
                             ],
                           )
@@ -172,164 +196,204 @@ class CheckOutDialog extends StatelessWidget {
                     )
                   ],
                 ),
-                SizedBox(height: Get.height * 0.03),
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    text: 'Reminder that ',
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontFamily: FontFamily.sfProDisplayMedium,
-                      color: AppColors.captionDialog,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: userName,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: FontFamily.sfProDisplay,
-                          color: AppColors.primaryTextColor.withOpacity(0.9),
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' selected the\n',
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          fontFamily: FontFamily.sfProDisplay,
-                          color: AppColors.captionDialog,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' Cash After Service',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontFamily: FontFamily.sfProDisplay,
-                          color: AppColors.primaryTextColor,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' \npayment option for this service',
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          fontFamily: FontFamily.sfProDisplayMedium,
-                          color: AppColors.captionDialog,
-                        ),
-                      ),
-                    ],
+                Text(
+                  "Payment Confirmation",
+                  style: TextStyle(
+                    color: AppColors.primaryAppColor,
+                    fontSize: 15,
+                    fontFamily: AppFontFamily.heeBo700,
                   ),
-                ).paddingOnly(left: 30, right: 30),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-                  child: Divider(color: AppColors.greyColor.withOpacity(0.2)),
-                ),
-                GetBuilder<BookingScreenController>(
-                  id: Constant.idPaymentReceive,
-                  builder: (logic) {
-                    return InkWell(
-                      onTap: () {
-                        logic.onPaymentReceive();
-                      },
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 20,
-                            width: 20,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.primaryAppColor, width: 1),
-                              borderRadius: BorderRadius.circular(5),
-                              color: logic.isPaymentReceive == true ? AppColors.primaryAppColor : AppColors.transparent,
-                            ),
-                            padding: const EdgeInsets.all(5),
-                            margin: const EdgeInsets.only(right: 8),
-                            child: logic.isPaymentReceive == true
-                                ? Image.asset(
-                                    AppAsset.icCheck,
-                                    color: Colors.white,
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                          Text(
-                            "Receive Payment",
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontFamily: FontFamily.sfProDisplayMedium,
-                              color: AppColors.captionDialog,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ).paddingOnly(left: 20);
-                  },
-                ),
-                SizedBox(height: Get.height * 0.02),
+                ).paddingOnly(left: 15, top: 15, bottom: 7),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppButton(
-                      height: 50,
-                      width: Get.width * 0.31,
-                      buttonColor: AppColors.whiteColor,
-                      buttonText: "txtCancel".tr,
-                      fontSize: 16.5,
-                      borderColor: AppColors.greyColor.withOpacity(0.2),
-                      borderWidth: 1,
-                      fontFamily: FontFamily.sfProDisplay,
-                      textColor: AppColors.currency,
-                      boxShadow: Constant.boxShadow,
-                      onTap: () {
-                        Get.back();
-                      },
+                    SizedBox(
+                      width: Get.width * 0.55,
+                      child: Text(
+                        "Do You Receive Payment Confirmation?",
+                        style: TextStyle(
+                          color: AppColors.greyText,
+                          fontSize: 13,
+                          fontFamily: AppFontFamily.heeBo600,
+                        ),
+                      ),
                     ),
                     GetBuilder<BookingScreenController>(
-                      id: Constant.idPaymentReceive,
+                      id: Constant.idSwitchOn,
                       builder: (logic) {
-                        return AppButton(
-                          height: 50,
-                          width: Get.width * 0.31,
-                          buttonColor: logic.isCheckOut == true ? AppColors.primaryAppColor : AppColors.grey.withOpacity(0.5),
-                          buttonText: "txtCheckOut".tr,
-                          textColor: AppColors.whiteColor,
-                          fontFamily: FontFamily.sfProDisplay,
-                          fontSize: 16.5,
-                          onTap: () async {
-                            if (logic.isCheckOut == true) {
-                              await logic.onUpdatePaymentStatusApiCall(bookingId: bookingId);
-
-                              if (logic.updatePaymentStatusCategory?.status == true) {
-                                await logic.onCompleteBookingApiCall(bookingId: bookingId);
-                                if (logic.completeBookingCategory?.status == true) {
-                                  logic.startPending = 0;
-                                  logic.getPending = [];
-
-                                  await logic.onStatusWiseBookingApiCall(
-                                    expertId: Constant.storage.read<String>("expertId").toString(),
-                                    status: "pending",
-                                    start: logic.startPending.toString(),
-                                    limit: logic.limitPending.toString(),
-                                  );
-                                  logic.isPaymentReceive = false;
-                                  logic.isCheckOut = false;
-                                  Get.back();
-                                } else {
-                                  Get.back();
-                                  Utils.showToast(Get.context!, logic.completeBookingCategory?.message.toString() ?? "");
-                                }
-                              } else {
-                                Get.back();
-                                Utils.showToast(Get.context!, logic.statusWiseBookingCategory?.message ?? "");
-                              }
-                            }
-                          },
+                        return SizedBox(
+                          height: 30,
+                          child: Switch(
+                            value: logic.isSwitchOn,
+                            activeColor: AppColors.greenColor,
+                            activeTrackColor: AppColors.whiteColor,
+                            inactiveThumbColor: AppColors.redColor,
+                            inactiveTrackColor: AppColors.whiteColor,
+                            trackOutlineColor: WidgetStatePropertyAll(AppColors.grey.withOpacity(0.15)),
+                            trackColor: WidgetStatePropertyAll(AppColors.switchBox),
+                            onChanged: (value) {
+                              logic.onSwitch(value);
+                            },
+                          ),
                         );
                       },
+                    ),
+                  ],
+                ).paddingOnly(left: 15, right: 15),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.bgTime,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.grey.withOpacity(0.15),
+                      width: 1,
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.bgCircle,
+                        ),
+                        child: Image.asset(AppAsset.icBooking).paddingAll(10),
+                      ).paddingOnly(right: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            date,
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo700,
+                              fontSize: 14,
+                              color: AppColors.primaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            "Booking Date",
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo500,
+                              fontSize: 12,
+                              color: AppColors.service,
+                            ),
+                          )
+                        ],
+                      ),
+                      const Spacer(),
+                      Container(
+                        height: 36,
+                        width: 2,
+                        color: AppColors.serviceBorder,
+                      ),
+                      const Spacer(),
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.bgCircle,
+                        ),
+                        child: Image.asset(
+                          AppAsset.icClock,
+                        ).paddingAll(10),
+                      ).paddingOnly(right: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            time,
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo700,
+                              fontSize: 14,
+                              color: AppColors.primaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            "Booking Timing",
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo500,
+                              fontSize: 12,
+                              color: AppColors.service,
+                            ),
+                          )
+                        ],
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                ).paddingOnly(top: 12, left: 12, right: 12, bottom: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: AppButton(
+                        height: 50,
+                        buttonColor: AppColors.redColor,
+                        buttonText: "txtCancel".tr,
+                        fontSize: 17,
+                        fontFamily: AppFontFamily.heeBo700,
+                        textColor: AppColors.whiteColor,
+                        borderRadius: 10,
+                        onTap: () {
+                          Get.back();
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: GetBuilder<BookingScreenController>(
+                        id: Constant.idSwitchOn,
+                        builder: (logic) {
+                          return AppButton(
+                            height: 50,
+                            buttonColor: logic.isSwitchOn == true ? AppColors.primaryAppColor : AppColors.grey.withOpacity(0.5),
+                            buttonText: "txtCheckOut".tr,
+                            textColor: AppColors.whiteColor,
+                            fontFamily: AppFontFamily.heeBo700,
+                            fontSize: 17,
+                            borderRadius: 10,
+                            onTap: () async {
+                              if (logic.isSwitchOn == true) {
+                                await logic.onUpdatePaymentStatusApiCall(bookingId: bookingId);
+
+                                if (logic.updatePaymentStatusCategory?.status == true) {
+                                  await logic.onCompleteBookingApiCall(bookingId: bookingId);
+                                  if (logic.completeBookingCategory?.status == true) {
+                                    logic.startPending = 0;
+                                    logic.getPending = [];
+
+                                    await logic.onStatusWiseBookingApiCall(
+                                      expertId: Constant.storage.read<String>("expertId").toString(),
+                                      status: "pending",
+                                      start: logic.startPending.toString(),
+                                      limit: logic.limitPending.toString(),
+                                    );
+                                    logic.isPaymentReceive = false;
+                                    logic.isSwitchOn = false;
+                                    Get.back();
+                                  } else {
+                                    Get.back();
+                                    Utils.showToast(Get.context!, logic.completeBookingCategory?.message.toString() ?? "");
+                                  }
+                                } else {
+                                  Get.back();
+                                  Utils.showToast(Get.context!, logic.statusWiseBookingCategory?.message ?? "");
+                                }
+                              }
+                            },
+                          );
+                        },
+                      ),
                     )
                   ],
                 ).paddingOnly(left: 15, right: 15)
               ],
-            ))
+            ),
+          )
         : Container(
-            height: Get.height * 0.43,
+            height: 350,
             padding: const EdgeInsets.only(bottom: 25),
             decoration: BoxDecoration(
               color: AppColors.dialogBg,
@@ -348,22 +412,38 @@ class CheckOutDialog extends StatelessWidget {
                       ),
                       color: AppColors.iconColor),
                   child: Center(
-                    child: Text("txtCheckOut".tr,
-                        style: TextStyle(color: AppColors.whiteColor, fontSize: 18, fontFamily: FontFamily.sfProDisplayBold)),
+                    child: Text(
+                      "txtCheckOut".tr,
+                      style: TextStyle(
+                        color: AppColors.whiteColor,
+                        fontSize: 18,
+                        fontFamily: AppFontFamily.sfProDisplayBold,
+                      ),
+                    ),
                   ),
                 ),
                 Row(
                   children: [
                     ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          serviceImage,
-                          height: 100,
-                          width: 100,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+                        child: CachedNetworkImage(
+                          imageUrl: serviceImage,
                           fit: BoxFit.cover,
-                        )).paddingOnly(top: 10, left: 15, right: 10),
+                          placeholder: (context, url) {
+                            return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
+                          },
+                          errorWidget: (context, url, error) {
+                            return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
+                          },
+                        ),
+                      ),
+                    ).paddingOnly(top: 10, left: 15, right: 10),
                     Container(
-                      height: 100,
+                      height: 105,
                       margin: const EdgeInsets.only(top: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,45 +452,64 @@ class CheckOutDialog extends StatelessWidget {
                           Row(
                             children: [
                               SizedBox(
-                                height: 20,
-                                width: 90,
-                                child: Text(
-                                  serviceName,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: FontFamily.sfProDisplayBold,
-                                    color: AppColors.blackColor,
+                                width: Get.width * 0.27,
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    serviceName,
                                     overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: AppFontFamily.heeBo700,
+                                      color: AppColors.primaryTextColor,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Text(
-                                "#$id",
-                                style: TextStyle(fontSize: 15, fontFamily: FontFamily.sfProDisplay, color: AppColors.blackColor),
+                              ).paddingOnly(right: 8),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  color: AppColors.currencyBoxBg,
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                child: Text(
+                                  "#$id",
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontFamily: AppFontFamily.heeBo600,
+                                    color: AppColors.primaryAppColor,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                           Text(
                             subCategoryName,
-                            style:
-                                TextStyle(fontSize: 15, fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.greyColor2),
-                          ),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: AppFontFamily.sfProDisplayRegular,
+                              color: AppColors.service,
+                            ),
+                          ).paddingOnly(bottom: 3),
                           Container(
-                            height: 28,
-                            width: 78,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(6),
-                              color: AppColors.green,
+                              color: AppColors.currencyBoxBg,
                             ),
-                            child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                               child: Text(
                                 "$currency $rupee",
-                                style:
-                                    TextStyle(fontSize: 16, fontFamily: FontFamily.sfProDisplayBold, color: AppColors.currency),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: AppFontFamily.heeBo800,
+                                  color: AppColors.primaryAppColor,
+                                ),
                               ),
                             ),
                           ),
+                          const Spacer(),
                           Row(
                             children: [
                               Container(
@@ -426,8 +525,11 @@ class CheckOutDialog extends StatelessWidget {
                               ),
                               Text(
                                 "  $expertName",
-                                style:
-                                    TextStyle(fontSize: 12, fontFamily: FontFamily.sfProDisplayMedium, color: AppColors.service),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: AppFontFamily.sfProDisplayMedium,
+                                  color: AppColors.service,
+                                ),
                               )
                             ],
                           )
@@ -436,63 +538,140 @@ class CheckOutDialog extends StatelessWidget {
                     )
                   ],
                 ),
-                SizedBox(height: Get.height * 0.03),
-                Text(
-                  "txtCheckOutOrder".tr,
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontFamily: FontFamily.sfProDisplayMedium,
-                    color: AppColors.captionDialog,
+                const Spacer(),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.bgTime,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.grey.withOpacity(0.15),
+                      width: 1,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ).paddingOnly(left: 40, right: 40),
-                SizedBox(height: Get.height * 0.03),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.bgCircle,
+                        ),
+                        child: Image.asset(AppAsset.icBooking).paddingAll(10),
+                      ).paddingOnly(right: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            date,
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo700,
+                              fontSize: 14,
+                              color: AppColors.primaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            "Booking Date",
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo500,
+                              fontSize: 12,
+                              color: AppColors.service,
+                            ),
+                          )
+                        ],
+                      ),
+                      const Spacer(),
+                      Container(
+                        height: 36,
+                        width: 2,
+                        color: AppColors.serviceBorder,
+                      ),
+                      const Spacer(),
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.bgCircle,
+                        ),
+                        child: Image.asset(
+                          AppAsset.icClock,
+                        ).paddingAll(10),
+                      ).paddingOnly(right: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            time,
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo700,
+                              fontSize: 14,
+                              color: AppColors.primaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            "Booking Timing",
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo500,
+                              fontSize: 12,
+                              color: AppColors.service,
+                            ),
+                          )
+                        ],
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                ).paddingOnly(top: 12, left: 12, right: 12),
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppButton(
-                      height: 50,
-                      width: Get.width * 0.31,
-                      buttonColor: AppColors.whiteColor,
-                      buttonText: "txtCancel".tr,
-                      fontSize: 16.5,
-                      borderColor: AppColors.greyColor.withOpacity(0.2),
-                      borderWidth: 1,
-                      fontFamily: FontFamily.sfProDisplay,
-                      textColor: AppColors.currency,
-                      boxShadow: Constant.boxShadow,
-                      onTap: () {
-                        Get.back();
-                      },
+                    Expanded(
+                      child: AppButton(
+                        height: 50,
+                        buttonColor: AppColors.redColor,
+                        buttonText: "txtCancel".tr,
+                        fontSize: 17,
+                        fontFamily: AppFontFamily.heeBo700,
+                        textColor: AppColors.whiteColor,
+                        borderRadius: 10,
+                        onTap: () {
+                          Get.back();
+                        },
+                      ),
                     ),
-                    AppButton(
-                      height: 50,
-                      width: Get.width * 0.31,
-                      buttonColor: AppColors.primaryAppColor,
-                      buttonText: "txtCheckOut".tr,
-                      textColor: AppColors.whiteColor,
-                      fontFamily: FontFamily.sfProDisplay,
-                      fontSize: 16.5,
-                      onTap: () async {
-                        await bookingScreenController.onCompleteBookingApiCall(bookingId: bookingId);
+                    Expanded(
+                      child: AppButton(
+                        height: 50,
+                        buttonColor: AppColors.primaryAppColor,
+                        buttonText: "txtCheckOut".tr,
+                        textColor: AppColors.whiteColor,
+                        fontFamily: AppFontFamily.heeBo700,
+                        fontSize: 17,
+                        borderRadius: 10,
+                        onTap: () async {
+                          await bookingScreenController.onCompleteBookingApiCall(bookingId: bookingId);
 
-                        if (bookingScreenController.completeBookingCategory?.status == true) {
-                          bookingScreenController.startPending = 0;
-                          bookingScreenController.getPending = [];
+                          if (bookingScreenController.completeBookingCategory?.status == true) {
+                            bookingScreenController.startPending = 0;
+                            bookingScreenController.getPending = [];
 
-                          Get.back();
-                          await bookingScreenController.onStatusWiseBookingApiCall(
-                            expertId: Constant.storage.read<String>("expertId").toString(),
-                            status: "pending",
-                            start: bookingScreenController.startPending.toString(),
-                            limit: bookingScreenController.limitPending.toString(),
-                          );
-                        } else {
-                          Get.back();
-                          Utils.showToast(
-                              Get.context!, bookingScreenController.completeBookingCategory?.message.toString() ?? "");
-                        }
-                      },
+                            Get.back();
+                            await bookingScreenController.onStatusWiseBookingApiCall(
+                              expertId: Constant.storage.read<String>("expertId").toString(),
+                              status: "pending",
+                              start: bookingScreenController.startPending.toString(),
+                              limit: bookingScreenController.limitPending.toString(),
+                            );
+                          } else {
+                            Get.back();
+                            Utils.showToast(
+                                Get.context!, bookingScreenController.completeBookingCategory?.message.toString() ?? "");
+                          }
+                        },
+                      ),
                     )
                   ],
                 ).paddingOnly(left: 15, right: 15)

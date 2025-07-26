@@ -3,9 +3,8 @@ import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/localization/localizations_delegate.dart';
 import 'package:salon_2/ui/language_screen/controller/language_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 
 class LanguageScreen extends StatelessWidget {
@@ -18,33 +17,17 @@ class LanguageScreen extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         flexibleSpace: AppBarCustom(
-            title: "txtLanguage".tr,
-            method1: [
-              GetBuilder<LanguageController>(
-                id: Constant.idChangeLanguage,
-                builder: (logic) {
-                  return InkWell(
-                    onTap: () {
-                      logic.onLanguageSave();
-                    },
-                    child: Image.asset(
-                      AppAsset.icCheck,
-                      height: 18,
-                      width: 18,
-                      color: AppColors.whiteColor,
-                    ),
-                  );
-                },
-              ).paddingOnly(right: 15)
-            ],
-            method: InkWell(
-                onTap: () {
-                  Get.back();
-                },
-                child: Icon(
-                  Icons.arrow_back,
-                  color: AppColors.whiteColor,
-                ))),
+          title: "txtLanguage".tr,
+          method: InkWell(
+            onTap: () {
+              Get.back();
+            },
+            child: Icon(
+              Icons.arrow_back,
+              color: AppColors.whiteColor,
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<LanguageController>(
         id: Constant.idChangeLanguage,
@@ -60,6 +43,7 @@ class LanguageScreen extends StatelessWidget {
                   return InkWell(
                     onTap: () {
                       logic.onChangeLanguage(languages[index], index);
+                      logic.onLanguageSave();
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -85,7 +69,7 @@ class LanguageScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 color: AppColors.blackColor,
-                                fontFamily: FontFamily.sfProDisplayMedium,
+                                fontFamily: AppFontFamily.sfProDisplayMedium,
                               ),
                             ),
                           ],
@@ -94,6 +78,7 @@ class LanguageScreen extends StatelessWidget {
                             ? GestureDetector(
                                 onTap: () {
                                   logic.onChangeLanguage(languages[index], index);
+                                  logic.onLanguageSave();
                                 },
                                 child: Container(
                                   height: 22,
@@ -109,6 +94,7 @@ class LanguageScreen extends StatelessWidget {
                             : GestureDetector(
                                 onTap: () {
                                   logic.onChangeLanguage(languages[index], index);
+                                  logic.onLanguageSave();
                                 },
                                 child: Container(
                                     height: 22,

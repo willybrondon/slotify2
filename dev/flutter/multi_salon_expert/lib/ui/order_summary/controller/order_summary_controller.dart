@@ -6,14 +6,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
-import 'package:salon_2/utils/api.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/revenue_screen/model/get_expert_earning_model.dart';
+import 'package:salon_2/utils/api_constant.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/services/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:http/http.dart' as http;
-
-import '../../revenue_screen/model/get_expert_earning_model.dart';
 
 class OrderSummaryController extends GetxController with GetTickerProviderStateMixin {
   TabController? tabController;
@@ -47,18 +46,23 @@ class OrderSummaryController extends GetxController with GetTickerProviderStateM
   onClickMonth() {
     showMonthPicker(
       context: Get.context!,
-      backgroundColor: AppColors.whiteColor,
-      headerColor: AppColors.primaryAppColor,
-      roundedCornersRadius: 16,
-      unselectedMonthTextColor: AppColors.primaryAppColor,
-      selectedMonthBackgroundColor: AppColors.primaryAppColor,
-      confirmWidget: Text(
-        "Confirm",
-        style: TextStyle(color: AppColors.primaryAppColor),
-      ),
-      cancelWidget: Text(
-        "Cancel",
-        style: TextStyle(color: AppColors.primaryAppColor),
+      monthPickerDialogSettings: MonthPickerDialogSettings(
+        dateButtonsSettings: PickerDateButtonsSettings(
+          currentMonthTextColor: AppColors.primaryAppColor,
+          unselectedMonthsTextColor: AppColors.primaryAppColor,
+          selectedMonthBackgroundColor: AppColors.primaryAppColor,
+        ),
+        headerSettings: PickerHeaderSettings(
+          headerBackgroundColor: AppColors.primaryAppColor,
+        ),
+        dialogSettings: PickerDialogSettings(
+          dialogBackgroundColor: AppColors.whiteColor,
+          dialogRoundedCornersRadius: 16,
+        ),
+        actionBarSettings: PickerActionBarSettings(
+          confirmWidget: Text("Confirm", style: TextStyle(color: AppColors.primaryAppColor)),
+          cancelWidget: Text("Cancel", style: TextStyle(color: AppColors.primaryAppColor)),
+        ),
       ),
       initialDate: DateTime.now(),
       lastDate: DateTime.now(),

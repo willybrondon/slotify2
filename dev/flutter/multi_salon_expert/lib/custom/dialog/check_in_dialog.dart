@@ -3,14 +3,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
+import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class CheckInDialog extends StatelessWidget {
@@ -22,180 +23,288 @@ class CheckInDialog extends StatelessWidget {
   final String expertImage;
   final String expertName;
   final String id;
+  final String date;
+  final String time;
   final int index;
 
-  CheckInDialog(
-      {super.key,
-      required this.serviceImage,
-      required this.serviceName,
-      required this.subCategoryName,
-      required this.bookingId,
-      required this.rupee,
-      required this.expertImage,
-      required this.expertName,
-      required this.id,
-      required this.index});
+  CheckInDialog({
+    super.key,
+    required this.serviceImage,
+    required this.serviceName,
+    required this.subCategoryName,
+    required this.bookingId,
+    required this.rupee,
+    required this.expertImage,
+    required this.expertName,
+    required this.id,
+    required this.index,
+    required this.date,
+    required this.time,
+  });
 
   final BookingScreenController bookingScreenController = Get.find<BookingScreenController>();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: Get.height * 0.43,
-        padding: const EdgeInsets.only(bottom: 25),
-        decoration: BoxDecoration(
-          color: AppColors.dialogBg,
-          borderRadius: BorderRadius.circular(45),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              height: 55,
-              width: Get.width,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(45),
-                    topRight: Radius.circular(45),
-                  ),
-                  color: AppColors.iconColor),
-              child: Center(
-                child: Text("txtCheckIn".tr,
-                    style: TextStyle(color: AppColors.whiteColor, fontSize: 18, fontFamily: FontFamily.sfProDisplayBold)),
+      height: 350,
+      padding: const EdgeInsets.only(bottom: 25),
+      decoration: BoxDecoration(
+        color: AppColors.whiteColor,
+        borderRadius: BorderRadius.circular(45),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            height: 55,
+            width: Get.width,
+            decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(45),
+                  topRight: Radius.circular(45),
+                ),
+                color: AppColors.iconColor),
+            child: Center(
+              child: Text(
+                "txtCheckIn".tr,
+                style: TextStyle(
+                  color: AppColors.whiteColor,
+                  fontSize: 18,
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                ),
               ),
             ),
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 90,
-                    width: 90,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-                    child: CachedNetworkImage(
-                      imageUrl: serviceImage,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) {
-                        return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
-                      },
-                      errorWidget: (context, url, error) {
-                        return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
-                      },
-                    ),
+          ),
+          Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+                  child: CachedNetworkImage(
+                    imageUrl: serviceImage,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) {
+                      return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
+                    },
+                    errorWidget: (context, url, error) {
+                      return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
+                    },
                   ),
-                ).paddingOnly(top: 10, left: 15, right: 10),
-                Container(
-                  height: 90,
-                  margin: const EdgeInsets.only(top: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            height: 20,
-                            width: 90,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                serviceName,
+                ),
+              ).paddingOnly(top: 10, left: 15, right: 10),
+              Container(
+                height: 105,
+                margin: const EdgeInsets.only(top: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: Get.width * 0.27,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              serviceName,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: AppFontFamily.heeBo700,
+                                color: AppColors.primaryTextColor,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: FontFamily.sfProDisplayBold,
-                                  color: AppColors.primaryTextColor,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
                               ),
                             ),
-                          ).paddingOnly(right: 8),
-                          Text(
+                          ),
+                        ).paddingOnly(right: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            color: AppColors.currencyBoxBg,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          child: Text(
                             "#$id",
-                            style: TextStyle(fontSize: 12.5, fontFamily: FontFamily.sfProDisplay, color: AppColors.blackColor),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        subCategoryName,
-                        style: TextStyle(fontSize: 14, fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.service),
-                      ).paddingOnly(top: 8),
-                      // Container(
-                      //   height: 28,
-                      //   width: 78,
-                      //   decoration: BoxDecoration(
-                      //     borderRadius: BorderRadius.circular(6),
-                      //     color: AppColors.green,
-                      //   ),
-                      //   child: Center(
-                      //     child: Text(
-                      //       "$currency $rupee",
-                      //       style: TextStyle(fontSize: 16, fontFamily: FontFamily.sfProDisplayBold, color: AppColors.currency),
-                      //     ),
-                      //   ),
-                      // ),
-                      Spacer(),
-                      Row(
-                        children: [
-                          Container(
-                            height: 19,
-                            width: 19,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(expertImage),
-                                fit: BoxFit.cover,
-                              ),
-                              shape: BoxShape.circle,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontFamily: AppFontFamily.heeBo600,
+                              color: AppColors.primaryAppColor,
                             ),
                           ),
-                          Text(
-                            "  $expertName",
-                            style: TextStyle(fontSize: 12, fontFamily: FontFamily.sfProDisplayMedium, color: AppColors.service),
-                          )
-                        ],
-                      )
-                    ],
+                        ),
+                      ],
+                    ),
+                    Text(
+                      subCategoryName,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: AppFontFamily.sfProDisplayRegular,
+                        color: AppColors.service,
+                      ),
+                    ).paddingOnly(bottom: 3),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        color: AppColors.currencyBoxBg,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        child: Text(
+                          "$currency $rupee",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: AppFontFamily.heeBo800,
+                            color: AppColors.primaryAppColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Container(
+                          height: 19,
+                          width: 19,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(expertImage),
+                              fit: BoxFit.cover,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        Text(
+                          "  $expertName",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
+                            color: AppColors.service,
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+          const Spacer(),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.bgTime,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppColors.grey.withOpacity(0.15),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
+            child: Row(
+              children: [
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.bgCircle,
                   ),
-                )
+                  child: Image.asset(AppAsset.icBooking).paddingAll(10),
+                ).paddingOnly(right: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      date,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.heeBo700,
+                        fontSize: 14,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                    Text(
+                      "Booking Date",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.heeBo500,
+                        fontSize: 12,
+                        color: AppColors.service,
+                      ),
+                    )
+                  ],
+                ),
+                const Spacer(),
+                Container(
+                  height: 36,
+                  width: 2,
+                  color: AppColors.serviceBorder,
+                ),
+                const Spacer(),
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.bgCircle,
+                  ),
+                  child: Image.asset(
+                    AppAsset.icClock,
+                  ).paddingAll(10),
+                ).paddingOnly(right: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      time,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.heeBo700,
+                        fontSize: 14,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                    Text(
+                      "Booking Timing",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.heeBo500,
+                        fontSize: 12,
+                        color: AppColors.service,
+                      ),
+                    )
+                  ],
+                ),
+                const Spacer(),
               ],
             ),
-            SizedBox(height: Get.height * 0.03),
-            Text(
-              "txtCheckInOrder".tr,
-              style: TextStyle(
-                fontSize: 17,
-                fontFamily: FontFamily.sfProDisplayMedium,
-                color: AppColors.captionDialog,
-              ),
-              textAlign: TextAlign.center,
-            ).paddingOnly(left: 40, right: 40),
-            SizedBox(height: Get.height * 0.03),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                AppButton(
+          ).paddingOnly(top: 12, left: 12, right: 12),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: AppButton(
                   height: 50,
-                  width: Get.width * 0.31,
-                  buttonColor: AppColors.whiteColor,
+                  buttonColor: AppColors.redColor,
                   buttonText: "txtCancel".tr,
-                  fontSize: 16.5,
-                  borderColor: AppColors.greyColor.withOpacity(0.2),
-                  borderWidth: 1,
-                  fontFamily: FontFamily.sfProDisplay,
-                  textColor: AppColors.currency,
-                  boxShadow: Constant.boxShadow,
+                  fontSize: 17,
+                  fontFamily: AppFontFamily.heeBo700,
+                  textColor: AppColors.whiteColor,
+                  borderRadius: 10,
                   onTap: () {
                     Get.back();
                   },
                 ),
-                AppButton(
+              ),
+              Expanded(
+                child: AppButton(
                   height: 50,
-                  width: Get.width * 0.31,
                   buttonColor: AppColors.primaryAppColor,
                   buttonText: "txtCheckIn".tr,
                   textColor: AppColors.whiteColor,
-                  fontFamily: FontFamily.sfProDisplay,
-                  fontSize: 16.5,
+                  fontFamily: AppFontFamily.heeBo700,
+                  fontSize: 17,
+                  borderRadius: 10,
                   onTap: () async {
                     await bookingScreenController.onUpdateBookingStatusApiCall(
                         bookingId: bookingId, status: "confirm", person: "expert", reason: "");
@@ -217,10 +326,12 @@ class CheckInDialog extends StatelessWidget {
                           Get.context!, bookingScreenController.cancelConfirmBookingCategory?.message.toString() ?? "");
                     }
                   },
-                )
-              ],
-            ).paddingOnly(left: 15, right: 15)
-          ],
-        ));
+                ),
+              )
+            ],
+          ).paddingOnly(left: 15, right: 15)
+        ],
+      ),
+    );
   }
 }

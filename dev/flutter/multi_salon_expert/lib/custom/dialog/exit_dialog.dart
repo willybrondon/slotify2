@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class ExitDialog extends StatelessWidget {
   const ExitDialog({super.key});
@@ -30,7 +30,7 @@ class ExitDialog extends StatelessWidget {
                 child: Text(
                   "txtConfirmExit".tr,
                   style: TextStyle(
-                      color: AppColors.whiteColor, fontSize: 16.5, fontFamily: FontFamily.sfProDisplay),
+                      color: AppColors.whiteColor, fontSize: 16.5, fontFamily: AppFontFamily.sfProDisplay),
                 ),
               ),
             ),
@@ -43,7 +43,7 @@ class ExitDialog extends StatelessWidget {
               "desExit".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
-                  fontFamily: FontFamily.sfProDisplayMedium, fontSize: 20, color: AppColors.primaryTextColor),
+                  fontFamily: AppFontFamily.sfProDisplayMedium, fontSize: 20, color: AppColors.primaryTextColor),
             ).paddingOnly(left: 15, right: 15),
             const Spacer(),
             Row(
@@ -54,7 +54,7 @@ class ExitDialog extends StatelessWidget {
                   buttonColor: AppColors.whiteColor,
                   buttonText: "txtCancel".tr,
                   textColor: AppColors.primaryAppColor,
-                  fontFamily: FontFamily.sfProDisplay,
+                  fontFamily: AppFontFamily.sfProDisplay,
                   fontSize: 16.5,
                   height: 48,
                   width: Get.width * 0.31,
@@ -67,7 +67,7 @@ class ExitDialog extends StatelessWidget {
                   buttonColor: AppColors.primaryAppColor,
                   buttonText: "txtExit".tr,
                   textColor: AppColors.whiteColor,
-                  fontFamily: FontFamily.sfProDisplay,
+                  fontFamily: AppFontFamily.sfProDisplay,
                   fontSize: 16.5,
                   height: 48,
                   width: Get.width * 0.31,

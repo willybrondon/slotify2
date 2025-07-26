@@ -9,8 +9,8 @@ import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_screen_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -51,30 +51,14 @@ class _SplashScreenState extends State<SplashScreen> {
             await loginScreenController.onGetExpertApiCall(expertId: Constant.storage.read<String>("expertId").toString());
 
             if (loginScreenController.getExpertCategory?.status == true) {
-              currentEarning = loginScreenController.getExpertCategory?.data?.currentEarning?.toStringAsFixed(2);
+              earning = loginScreenController.getExpertCategory?.data?.earning?.toStringAsFixed(2);
 
               Constant.storage.write('fName', loginScreenController.getExpertCategory?.data?.fname.toString());
               Constant.storage.write('lName', loginScreenController.getExpertCategory?.data?.lname.toString());
               Constant.storage.write('hostImage', loginScreenController.getExpertCategory?.data?.image.toString());
-
               Constant.storage.write('uniqueID', loginScreenController.getExpertCategory?.data?.uniqueId.toString());
               Constant.storage.write("salonId", loginScreenController.getExpertCategory?.data?.salonId?.id.toString());
 
-              Constant.storage.write('paymentType', loginScreenController.getExpertCategory?.data?.paymentType);
-
-              Constant.storage.write("bankName", loginScreenController.getExpertCategory?.data?.bankDetails?.bankName.toString());
-              Constant.storage
-                  .write("accountNumber", loginScreenController.getExpertCategory?.data?.bankDetails?.accountNumber.toString());
-              Constant.storage.write("IFSCCode", loginScreenController.getExpertCategory?.data?.bankDetails?.ifscCode.toString());
-              Constant.storage
-                  .write("branchName", loginScreenController.getExpertCategory?.data?.bankDetails?.branchName.toString());
-              Constant.storage.write("upiId", loginScreenController.getExpertCategory?.data?.upiId.toString());
-
-              log("Bank Name :: ${Constant.storage.read<String>("bankName")}");
-              log("Account Number :: ${Constant.storage.read<String>("accountNumber")}");
-              log("IFSC Code :: ${Constant.storage.read<String>("IFSCCode")}");
-              log("Branch Name :: ${Constant.storage.read<String>("branchName")}");
-              log("UPI Id :: ${Constant.storage.read<String>("upiId")}");
               log("salon Id :: ${Constant.storage.read<String>("salonId")}");
               log("Unique ID :: ${Constant.storage.read<String>("uniqueID")}");
               log("salon Id df:: ${loginScreenController.getExpertCategory?.data?.salonId.toString()}");
@@ -108,53 +92,82 @@ class _SplashScreenState extends State<SplashScreen> {
 
     log("Setting :: $settings");
     await messaging.getToken().then((value) {
-      log("this is fcm token = $value");
+      log("This is FCM token :: $value");
     });
 
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
-      setState(() {
-        log("notificationVisit with start :- $notificationVisit");
-        notificationVisit = !notificationVisit;
-        log("notificationVisit with SetState :- $notificationVisit");
-      });
-      handleMessage(initialMessage);
+      log("NotificationVisit with start :: $notificationVisit");
+      notificationVisit = !notificationVisit;
+      log("NotificationVisit with SetState :: $notificationVisit");
+
+      if (Constant.storage.read("notification") == true) {
+        handleMessage(initialMessage);
+
+      } else {
+        log("Notification Permission not allowed");
+      }
+
     }
 
     FirebaseMessaging.onMessageOpenedApp.listen((event) {
-      log("this is event log :- $event");
-      handleMessage(event);
+      log("This is event log :: $event");
+      if (Constant.storage.read("notification") == true) {
+        handleMessage(event);
+      } else {
+        log("Notification Permission not allowed");
+      }
     });
 
     FirebaseMessaging.onMessage.listen(
-      (RemoteMessage message) {
+          (RemoteMessage message) {
         log('Got a message whilst in the foreground!');
-        log('Message data: ${message.data}');
+        log('Message data :: ${message.data}');
 
         if (message.notification != null) {
-          log('Message also contained a notification: ${message.notification}');
+          log('Message also contained a notification :: ${message.notification}');
         }
-        const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+        const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@drawable/ic_launcher');
         flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
         flutterLocalNotificationsPlugin?.initialize(const InitializationSettings(android: initializationSettingsAndroid),
             onDidReceiveNotificationResponse: (payload) {
-          log("payload is:- $payload");
-          handleMessage(message);
-        });
-        _showNotificationWithSound(message);
+              log("payload is:- $payload");
+
+              if (Constant.storage.read("notification") == true) {
+                handleMessage(message);
+              } else {
+                log("Notification Permission not allowed");
+              }
+            });
+
+        if (Constant.storage.read("notification") == true) {
+          showNotificationWithSound(message);
+        } else {
+          log("Notification Permission not allowed");
+        }
       },
     );
   }
 
-  Future<void> handleMessage(RemoteMessage message) async {}
+  Future<void> handleMessage(RemoteMessage message) async {
+    if (message.data.isEmpty) {
+      // Get.toNamed(AppRoutes.notification);
+    }
+  }
 
-  Future _showNotificationWithSound(RemoteMessage message) async {
+  Future showNotificationWithSound(RemoteMessage message) async {
+    log("Enter showNotificationWithSound");
+
+    log("message.notification?.title :: ${message.notification?.title}");
+    log("message.notification?.body :: ${message.notification?.body}");
+
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
       '0',
-      'Salon',
+      "Multi Salon Expert",
       channelDescription: 'hello',
-      icon: 'mipmap/ic_launcher',
+      icon: 'drawable/ic_launcher',
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -164,8 +177,8 @@ class _SplashScreenState extends State<SplashScreen> {
     );
     await flutterLocalNotificationsPlugin?.show(
       message.hashCode,
-      message.notification!.title.toString(),
-      message.notification!.body.toString(),
+      message.notification?.title.toString(),
+      message.notification?.body.toString(),
       platformChannelSpecifics,
       payload: 'Custom_Sound',
     );
@@ -176,18 +189,12 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: AppColors.backGround,
       body: Container(
+        height: Get.height,
+        width: Get.width,
         color: AppColors.backGround,
-        child: Container(
-          alignment: Alignment.bottomCenter,
-          margin: const EdgeInsets.only(bottom: 40),
-          decoration: BoxDecoration(color: AppColors.backGround),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(AppAsset.icLogo, height: 150, width: 150),
-            ],
-          ),
+        child: Image.asset(
+          AppAsset.icSplash,
+          fit: BoxFit.cover,
         ),
       ),
     );

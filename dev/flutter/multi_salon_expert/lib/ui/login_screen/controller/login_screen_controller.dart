@@ -8,7 +8,7 @@ import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/login_screen/model/get_profile_model.dart';
 import 'package:salon_2/ui/login_screen/model/login_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/services/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
@@ -27,7 +27,7 @@ class LoginScreenController extends GetxController {
   RxBool isLoading = false.obs;
 
   bool isEmailValid(String email) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email);
   }
 
@@ -71,8 +71,9 @@ class LoginScreenController extends GetxController {
               await onGetExpertApiCall(expertId: Constant.storage.read<String>("expertId").toString());
 
               if (getExpertCategory?.status == true) {
-                currentEarning = getExpertCategory?.data?.currentEarning?.toStringAsFixed(2);
+                earning = getExpertCategory?.data?.earning?.toStringAsFixed(2);
 
+                Constant.storage.write('isDemoLogin', false);
                 Constant.storage.write('fName', loginCategory?.expert?.fname.toString());
                 Constant.storage.write('lName', loginCategory?.expert?.lname.toString());
                 Constant.storage.write('uniqueID', loginCategory?.expert?.uniqueId.toString());
@@ -80,21 +81,10 @@ class LoginScreenController extends GetxController {
                 Constant.storage.write('paymentType', loginCategory?.expert?.paymentType);
                 Constant.storage.write("salonId", getExpertCategory?.data?.salonId?.id);
 
-                Constant.storage.write("bankName", getExpertCategory?.data?.bankDetails?.bankName.toString());
-                Constant.storage.write("accountNumber", getExpertCategory?.data?.bankDetails?.accountNumber.toString());
-                Constant.storage.write("IFSCCode", getExpertCategory?.data?.bankDetails?.ifscCode.toString());
-                Constant.storage.write("branchName", getExpertCategory?.data?.bankDetails?.branchName.toString());
-                Constant.storage.write("upiId", getExpertCategory?.data?.upiId.toString());
-
                 log("First Name :: ${Constant.storage.read("fName")}");
                 log("Last Name :: ${Constant.storage.read("lName")}");
                 log("Payment Type :: ${Constant.storage.read("paymentType")}");
                 log("Host Image :: ${Constant.storage.read("hostImage")}");
-                log("Bank Name :: ${Constant.storage.read<String>("bankName")}");
-                log("Account Number :: ${Constant.storage.read<String>("accountNumber")}");
-                log("IFSC Code :: ${Constant.storage.read<String>("IFSCCode")}");
-                log("Branch Name :: ${Constant.storage.read<String>("branchName")}");
-                log("UPI Id :: ${Constant.storage.read<String>("upiId")}");
 
                 Get.offAndToNamed(AppRoutes.bottom);
               } else {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:shimmer/shimmer.dart';
 
 class Shimmers {
@@ -109,7 +109,7 @@ class Shimmers {
                         Text(
                           "txtBookingDetails".tr,
                           style:
-                              TextStyle(fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 19),
+                              TextStyle(fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 19),
                         ),
                         Container(
                           margin: const EdgeInsets.only(top: 18, right: 5, bottom: 10),
@@ -762,7 +762,7 @@ class Shimmers {
                 Text(
                   "txtReceivePayment".tr,
                   style: TextStyle(
-                    fontFamily: FontFamily.sfProDisplayMedium,
+                    fontFamily: AppFontFamily.sfProDisplayMedium,
                     color: AppColors.title,
                     fontSize: 15,
                   ),
@@ -1039,7 +1039,7 @@ class Shimmers {
                 children: [
                   Text(
                     "Subtotal",
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
+                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
                   ),
                   const Spacer(),
                   Container(
@@ -1058,7 +1058,7 @@ class Shimmers {
                 children: [
                   Text(
                     "Tax",
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
+                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
                   ),
                   const Spacer(),
                   Container(
@@ -1083,7 +1083,7 @@ class Shimmers {
                 children: [
                   Text(
                     "Total Amount",
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
+                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
                   ),
                   const Spacer(),
                   Container(

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_2/ui/slot_manager_screen/model/expert_busy_schedule_model.dart';
 import 'package:salon_2/ui/slot_manager_screen/model/get_booking_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/services/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
@@ -25,6 +25,7 @@ class SlotManagerController extends GetxController {
   String? formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
   int? totalMinute;
   bool currentIndex = false;
+  bool isSwitchOn = false;
   bool isFirstTap = false;
   bool isFirstClick = false;
   String? breakStartTimes;
@@ -42,6 +43,7 @@ class SlotManagerController extends GetxController {
 
   GetBookingModel? getBookingModel;
   ExpertBusyScheduleModel? expertBusyScheduleCategory;
+
 
   //------ Split Break Time Variables ------//
   String? str;
@@ -65,24 +67,8 @@ class SlotManagerController extends GetxController {
     super.onInit();
   }
 
-  selectedAndBookSlot() {
-    DateTime currentTime = DateTime.now();
-    DateTime currentDate = DateTime.now();
-    DateTime slotDateTime = DateFormat('yyyy-MM-dd').parse(formattedDate.toString());
-
-    DateTime currentTimeWithDate =
-        DateTime(currentDate.year, currentDate.month, currentDate.day, currentTime.hour, currentTime.minute);
-
-    DateTime slotTime = DateFormat('hh:mm a').parse(morningSlots[0]);
-
-    DateTime slotTimeWithDate = DateTime(slotDateTime.year, slotDateTime.month, slotDateTime.day, slotTime.hour, slotTime.minute);
-
-    isSlotTimePassed = currentDate.isAfter(slotDateTime) && currentTimeWithDate.isAfter(slotTimeWithDate);
-
-    update([Constant.idUpdateSlots0]);
-  }
-
-  void onClickFullDayNot() {
+  onSwitch(value) {
+    isSwitchOn = value;
     log("Formatted Date :: $formattedDate");
     log("DateTime now :: ${DateFormat('yyyy-MM-dd').format(DateTime.now())}");
     if (formattedDate == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
@@ -101,8 +87,25 @@ class SlotManagerController extends GetxController {
         slotsString = "";
         log("Selected Slots List in else :: $selectedSlotsList");
       }
-      update([Constant.idProgressView, Constant.idFullDayNotAvailable, Constant.idUpdateSlots, Constant.idUpdateSlots0]);
+      update([Constant.idProgressView, Constant.idSwitchOn, Constant.idUpdateSlots, Constant.idUpdateSlots0]);
     }
+  }
+
+  selectedAndBookSlot() {
+    DateTime currentTime = DateTime.now();
+    DateTime currentDate = DateTime.now();
+    DateTime slotDateTime = DateFormat('yyyy-MM-dd').parse(formattedDate.toString());
+
+    DateTime currentTimeWithDate =
+        DateTime(currentDate.year, currentDate.month, currentDate.day, currentTime.hour, currentTime.minute);
+
+    DateTime slotTime = DateFormat('hh:mm a').parse(morningSlots[0]);
+
+    DateTime slotTimeWithDate = DateTime(slotDateTime.year, slotDateTime.month, slotDateTime.day, slotTime.hour, slotTime.minute);
+
+    isSlotTimePassed = currentDate.isAfter(slotDateTime) && currentTimeWithDate.isAfter(slotTimeWithDate);
+
+    update([Constant.idUpdateSlots0]);
   }
 
   List<String> getAllAvailableSlots() {

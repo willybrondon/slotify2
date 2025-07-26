@@ -5,17 +5,16 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/dialog/log_out_dialog.dart';
-import 'package:salon_2/custom/dialog/progress_dialog.dart';
 import 'package:salon_2/custom/profile_menu/profile_menu.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/bottom_bar/controller/bottom_bar_controller.dart';
 import 'package:salon_2/ui/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
-import 'package:salon_2/utils/api.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/api_constant.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -30,13 +29,16 @@ class ProfileScreen extends StatelessWidget {
     final ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
     log("profileScreenController.bookingIdController.text${profileScreenController.bookingIdController.text}");
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
         Get.find<BottomBarController>().onClick(0);
-        return false;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
-        backgroundColor: AppColors.backGround,
+        backgroundColor: AppColors.whiteColor,
         body: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: GetBuilder<LoginScreenController>(
@@ -56,7 +58,7 @@ class ProfileScreen extends StatelessWidget {
                           child: Text(
                             "txtProfile".tr,
                             style: TextStyle(
-                              fontFamily: FontFamily.sfProDisplayBold,
+                              fontFamily: AppFontFamily.sfProDisplayBold,
                               fontSize: 20,
                               color: AppColors.whiteColor,
                             ),
@@ -65,56 +67,17 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: Get.height * 0.13),
-                        child: Stack(
-                          children: [
-                            Center(
-                              child: CircleAvatar(
-                                radius: 63,
-                                backgroundColor: AppColors.whiteColor,
-                                child: CircleAvatar(
-                                  backgroundColor: AppColors.whiteColor,
-                                  radius: 60,
-                                  backgroundImage: NetworkImage(Constant.storage.read("hostImage") ??
-                                      '${ApiConstant.BASE_URL}static/media/male.459a8699b07b4b9bf3d6.png'),
-                                ),
-                              ),
+                        child: Center(
+                          child: CircleAvatar(
+                            radius: 63,
+                            backgroundColor: AppColors.whiteColor,
+                            child: CircleAvatar(
+                              backgroundColor: AppColors.whiteColor,
+                              radius: 60,
+                              backgroundImage: NetworkImage(Constant.storage.read("hostImage") ??
+                                  '${ApiConstant.BASE_URL}static/media/male.459a8699b07b4b9bf3d6.png'),
                             ),
-                            Positioned(
-                              top: 88,
-                              left: Get.width * 0.55,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Get.toNamed(
-                                    AppRoutes.editProfile,
-                                    arguments: logic.loginCategory?.expert,
-                                  );
-                                },
-                                child: Container(
-                                  height: 35,
-                                  width: 35,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.whiteColor,
-                                  ),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    height: 32,
-                                    width: 32,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.primaryAppColor,
-                                    ),
-                                    child: Image.asset(
-                                      AppAsset.icEditProfile,
-                                      height: 18,
-                                      width: 18,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
+                          ),
                         ),
                       )
                     ],
@@ -122,13 +85,36 @@ class ProfileScreen extends StatelessWidget {
                   SizedBox(height: Get.height * 0.01),
                   Text(
                     "${Constant.storage.read("fName")} ${Constant.storage.read("lName")}",
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, fontSize: 20, color: AppColors.primaryTextColor),
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 20,
+                      color: AppColors.primaryTextColor,
+                    ),
                   ),
-                  Text(
-                    "ID :- ${Constant.storage.read("uniqueID")}",
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplayMedium, fontSize: 16, color: AppColors.profileID),
+                  Container(
+                    decoration: BoxDecoration(color: AppColors.idBg, borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    child: Text(
+                      "ID :- ${Constant.storage.read("uniqueID")}",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.heeBo600,
+                        fontSize: 15,
+                        color: AppColors.primaryAppColor,
+                      ),
+                    ),
                   ),
-                  SizedBox(height: Get.height * 0.025),
+                  Divider(color: AppColors.greyColor.withOpacity(0.1)).paddingOnly(top: 10,bottom: 10,left: 15,right: 15),
+                  CustomMenu(
+                    leadingImage: AppAsset.icProfile,
+                    title: "txtMyAccount".tr,
+                    subtitle: "txtAccountDetails".tr,
+                    onTap: () {
+                      Get.toNamed(
+                        AppRoutes.editProfile,
+                        arguments: logic.loginCategory?.expert,
+                      );
+                    },
+                  ),
                   CustomMenu(
                     leadingImage: AppAsset.icWallet,
                     title: "txtWallet".tr,
@@ -140,7 +126,7 @@ class ProfileScreen extends StatelessWidget {
                   CustomMenu(
                     leadingImage: AppAsset.icSetting,
                     title: "txtSetting".tr,
-                    subtitle: "txtAppLanguage".tr,
+                    subtitle: "txtNotificationLanguages".tr,
                     onTap: () {
                       Get.toNamed(AppRoutes.setting);
                     },
@@ -148,35 +134,27 @@ class ProfileScreen extends StatelessWidget {
                   CustomMenu(
                     leadingImage: AppAsset.icAboutApp,
                     title: "txtAboutApp".tr,
-                    subtitle: "txtRateUs".tr,
+                    subtitle: "txtPrivacyPolicyTC".tr,
                     onTap: () {
                       Get.toNamed(AppRoutes.aboutApp);
                     },
                   ),
                   CustomMenu(
-                    leadingImage: AppAsset.icHelp,
-                    title: "txtHelp".tr,
-                    subtitle: "txtTermsAndCondition".tr,
-                    onTap: () {
-                      Get.toNamed(AppRoutes.help);
-                    },
-                  ),
-                  CustomMenu(
                     leadingImage: AppAsset.icRaiseComplain,
                     title: "txtComplain".tr,
-                    subtitle: "txtComplainSection".tr,
+                    subtitle: "txtComplainComplainHistory".tr,
                     onTap: () {
                       Get.toNamed(AppRoutes.raiseComplain);
                     },
                   ),
-                  CustomMenu(
-                    leadingImage: AppAsset.icMenu,
-                    title: "txtOtherInfo".tr,
-                    subtitle: "${"txtSalonDetails".tr}, ${"txtServicesDetails".tr}",
-                    onTap: () {
-                      Get.toNamed(AppRoutes.salonService);
-                    },
-                  ),
+                  // CustomMenu(
+                  //   leadingImage: AppAsset.icMenu,
+                  //   title: "txtOtherInfo".tr,
+                  //   subtitle: "${"txtSalonDetails".tr}, ${"txtServicesDetails".tr}",
+                  //   onTap: () {
+                  //     Get.toNamed(AppRoutes.salonService);
+                  //   },
+                  // ),
                   CustomMenu(
                     leadingImage: AppAsset.icLogOut,
                     title: "txtLogOut".tr,

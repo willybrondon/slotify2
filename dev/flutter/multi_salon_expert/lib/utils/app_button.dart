@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class AppButton extends StatelessWidget {
   Function()? onTap;
@@ -17,23 +17,26 @@ class AppButton extends StatelessWidget {
   Color? iconColor;
   Color? borderColor;
   double? borderWidth;
+  double? borderRadius;
   List<BoxShadow>? boxShadow;
 
-  AppButton(
-      {super.key,
-      this.onTap,
-      this.buttonText,
-      this.width,
-      this.height,
-      this.fontSize,
-      this.icon,
-      this.iconColor,
-      this.textColor,
-      this.boxShadow,
-      this.borderWidth,
-      this.borderColor,
-      this.fontFamily,
-      this.buttonColor});
+  AppButton({
+    super.key,
+    this.onTap,
+    this.buttonText,
+    this.width,
+    this.height,
+    this.fontSize,
+    this.icon,
+    this.iconColor,
+    this.textColor,
+    this.boxShadow,
+    this.borderWidth,
+    this.borderColor,
+    this.fontFamily,
+    this.buttonColor,
+    this.borderRadius,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +46,7 @@ class AppButton extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(48),
+            borderRadius: BorderRadius.circular(borderRadius ?? 48),
             border: Border.all(
               color: borderColor ?? AppColors.transparent,
               width: borderWidth ?? 0,
@@ -55,19 +58,26 @@ class AppButton extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: Get.height * 0.01),
           child: Center(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null && icon!.isNotEmpty)
-                Container(
-                  margin: const EdgeInsets.only(right: 5),
-                  child: Image.asset(icon!, color: iconColor, height: 17, width: 17),
-                ),
-              Text(buttonText!,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (icon != null && icon!.isNotEmpty)
+                  Container(
+                    margin: const EdgeInsets.only(right: 5),
+                    child: Image.asset(icon!, color: iconColor, height: 17, width: 17),
+                  ),
+                Text(
+                  buttonText!,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: textColor ?? AppColors.whiteColor, fontFamily: fontFamily, fontSize: fontSize)),
-            ],
-          )),
+                  style: TextStyle(
+                    color: textColor ?? AppColors.whiteColor,
+                    fontFamily: fontFamily,
+                    fontSize: fontSize,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

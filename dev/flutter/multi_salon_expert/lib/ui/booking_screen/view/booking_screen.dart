@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable
 
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -11,10 +10,9 @@ import 'package:salon_2/ui/booking_screen/widget/complete_order.dart';
 import 'package:salon_2/ui/booking_screen/widget/pending_order.dart';
 import 'package:salon_2/ui/bottom_bar/controller/bottom_bar_controller.dart';
 import 'package:salon_2/ui/login_screen/controller/login_screen_controller.dart';
-import 'package:salon_2/utils/api.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class BookingScreen extends StatelessWidget {
   BookingScreen({super.key});
@@ -25,59 +23,43 @@ class BookingScreen extends StatelessWidget {
     LoginScreenController loginScreenController = Get.put(LoginScreenController());
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
-    log("bookingScreenController.isCheckOut${bookingScreenController.isCheckOut}");
+    log("bookingScreenController.isCheckOut${bookingScreenController.isSwitchOn}");
     log("loginScreenController.emailController.text${loginScreenController.emailController.text}");
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
         Get.find<BottomBarController>().onClick(0);
-        return false;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(100),
-            child: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: AppColors.transparent,
-              flexibleSpace: Container(
-                height: 90 + statusBarHeight,
-                width: double.infinity,
-                color: AppColors.primaryAppColor,
-                padding: EdgeInsets.only(top: statusBarHeight),
-                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(100),
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: AppColors.transparent,
+            flexibleSpace: Container(
+              height: 90 + statusBarHeight,
+              width: double.infinity,
+              color: AppColors.primaryAppColor,
+              padding: EdgeInsets.only(top: statusBarHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GetBuilder<LoginScreenController>(
-                        id: Constant.idProgressView,
-                        builder: (logic) {
-                          return Container(
-                            margin: const EdgeInsets.only(left: 15, right: 10),
-                            height: 55,
-                            width: 55,
-                            decoration: BoxDecoration(
-                              border: Border.all(width: 0.8, color: AppColors.whiteColor),
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(2),
-                            child: CircleAvatar(
-                              radius: 35,
-                              backgroundImage: NetworkImage(
-                                Constant.storage.read("hostImage") ??
-                                    "${ApiConstant.BASE_URL}static/media/male.459a8699b07b4b9bf3d6.png",
-                              ),
-                            ),
-                          );
-                        },
-                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "${"txtHello".tr}, ${Constant.storage.read<String>('fName').toString()} 👋",
+                            "${"txtHello".tr}, ${Constant.storage.read<String>('fName').toString()}",
                             style: TextStyle(
-                              fontFamily: FontFamily.sfProDisplayBold,
-                              fontSize: 18,
+                              fontFamily: AppFontFamily.heeBo800,
+                              fontSize: 23,
                               color: AppColors.whiteColor,
                             ),
                           ),
@@ -86,59 +68,67 @@ class BookingScreen extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(
-                              fontFamily: FontFamily.sfProDisplayRegular,
+                              fontFamily: AppFontFamily.heeBo400,
                               fontSize: 15,
                               color: AppColors.whiteColor,
                             ),
                           ),
                         ],
-                      )
+                      ),
+                      // Image.asset(AppAsset.icNotificationFilled, height: 40)
                     ],
-                  ).paddingOnly(bottom: 13)
-                ]),
-              ),
+                  ).paddingOnly(bottom: 8)
+                ],
+              ).paddingOnly(left: 18, right: 18),
             ),
           ),
-          backgroundColor: AppColors.backGround,
-          body: Container(
-            color: AppColors.whiteColor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                    margin: const EdgeInsets.only(left: 13),
-                    child: Text(
-                      "txtBookingDetails".tr,
-                      style: TextStyle(
-                          fontFamily: FontFamily.sfProDisplayBold,
-                          color: AppColors.primaryTextColor,
-                          fontSize: 22),
-                    )),
-                GetBuilder<BookingScreenController>(
-                  builder: (logic) {
-                    return TabBar(
-                      tabAlignment: TabAlignment.start,
-                      controller: logic.tabController,
-                      tabs: tabs,
-                      labelStyle: const TextStyle(
-                        fontSize: 13,
-                        fontFamily: FontFamily.sfProDisplayMedium,
-                      ),
-                      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
-                      indicator: BoxDecoration(
-                          borderRadius: BorderRadius.circular(45), color: AppColors.primaryAppColor),
-                      indicatorPadding: const EdgeInsets.all(5),
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      labelColor: AppColors.whiteColor,
-                      isScrollable: true,
-                      unselectedLabelColor: AppColors.service,
-                      dividerColor: Colors.transparent,
-                    );
-                  },
+        ),
+        backgroundColor: AppColors.backGround,
+        body: Container(
+          color: AppColors.whiteColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 13),
+                child: Text(
+                  "txtBookingDetails".tr,
+                  style: TextStyle(
+                    fontFamily: AppFontFamily.heeBo800,
+                    color: AppColors.primaryTextColor,
+                    fontSize: 22,
+                  ),
                 ),
-                Expanded(child: GetBuilder<BookingScreenController>(
+              ),
+              GetBuilder<BookingScreenController>(
+                builder: (logic) {
+                  return TabBar(
+                    tabAlignment: TabAlignment.start,
+                    controller: logic.tabController,
+                    tabs: tabs,
+                    labelStyle: const TextStyle(
+                      fontSize: 15,
+                      fontFamily: AppFontFamily.heeBo500,
+                    ),
+                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: AppColors.primaryAppColor,
+                    ),
+                    indicatorPadding: const EdgeInsets.all(5),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    labelColor: AppColors.whiteColor,
+                    isScrollable: true,
+                    unselectedLabelColor: AppColors.service,
+                    dividerColor: Colors.transparent,
+                  );
+                },
+              ),
+              Divider(color: AppColors.greyColor.withOpacity(0.2)),
+              Expanded(
+                child: GetBuilder<BookingScreenController>(
                   builder: (logic) {
                     return TabBarView(
                       controller: logic.tabController,
@@ -150,16 +140,18 @@ class BookingScreen extends StatelessWidget {
                       ],
                     );
                   },
-                ))
-              ],
-            ),
-          )),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   var tabs = [
-    Tab(text: "    ${"txtPendingOrder".tr}    "),
-    Tab(text: "    ${"txtCancelOrder".tr}    "),
-    Tab(text: "    ${"txtCompletedOrder".tr}    "),
+    Tab(text: "txtPendingOrder".tr),
+    Tab(text: "txtCancelOrder".tr),
+    Tab(text: "txtCompletedOrder".tr),
   ];
 }

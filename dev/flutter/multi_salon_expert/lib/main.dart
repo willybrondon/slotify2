@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,7 @@ import 'package:salon_2/localization/locale_constant.dart';
 import 'package:salon_2/localization/localizations_delegate.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_screen_controller.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/preference.dart';
 import 'routes/app_pages.dart';
@@ -24,7 +23,7 @@ FirebaseMessaging? messaging;
 FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
 String? fcmToken;
 String? currency;
-String? currentEarning;
+String? earning;
 
 Future<void> backgroundNotification(RemoteMessage message) async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -40,14 +39,13 @@ Future<void> backgroundNotification(RemoteMessage message) async {
 
   log("Setting :: $settings");
   log('Got a message!');
-  log('Message data: ${message.data}');
+  log('Message data :: ${message.data}');
 
   if (message.notification != null) {
-    log('Message also contained a notification: ${message.notification}');
+    log('Message Contained a Notification :: ${message.notification?.body}');
   }
 
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@drawable/ic_launcher');
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin?.initialize(
     const InitializationSettings(android: initializationSettingsAndroid),
@@ -55,10 +53,10 @@ Future<void> backgroundNotification(RemoteMessage message) async {
 
   var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
     '0',
-    'Salon',
+    'Multi Salon Expert',
     channelDescription: 'hello',
     importance: Importance.max,
-    icon: '@mipmap/ic_launcher',
+    icon: '@drawable/ic_launcher',
     priority: Priority.high,
   );
 
@@ -67,15 +65,19 @@ Future<void> backgroundNotification(RemoteMessage message) async {
   );
 
   if (message.notification != null && !kIsWeb) {
-    await flutterLocalNotificationsPlugin?.show(
-      message.hashCode,
-      message.notification!.title.toString(),
-      message.notification!.body.toString(),
-      platformChannelSpecifics,
-      payload: 'Custom_Sound',
-    );
+    if (Constant.storage.read("notification") == true) {
+      await flutterLocalNotificationsPlugin?.show(
+        message.hashCode,
+        message.notification!.title.toString(),
+        message.notification!.body.toString(),
+        platformChannelSpecifics,
+        payload: 'Custom_Sound',
+      );
+    } else {
+      log("Notification Permission not allowed");
+    }
   } else {
-    log('Handling background notification: ${message.data}');
+    log('Handling background notification :: ${message.data}');
   }
 }
 
@@ -83,8 +85,7 @@ Future<void> main() async {
   RenderErrorBox.backgroundColor = Colors.transparent;
   RenderErrorBox.textStyle = ui.TextStyle(color: Colors.transparent);
 
-  SplashScreenController splashScreenController =
-      Get.put(SplashScreenController());
+  SplashScreenController splashScreenController = Get.put(SplashScreenController());
 
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return Container();
@@ -92,10 +93,6 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-  FlutterError.onError = (errorDetails) {
-    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-  };
 
   /// Currency
   await splashScreenController.onSettingApiCall();
@@ -105,7 +102,7 @@ Future<void> main() async {
   try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     await messaging.getToken().then((value) {
-      fcmToken = value??'';
+      fcmToken = value ?? '';
       log("Fcm Token :: $fcmToken");
     });
   } catch (e) {
@@ -116,7 +113,7 @@ Future<void> main() async {
 
   /// For Cover Safe Area
   SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle.light.copyWith(statusBarColor: AppColors.primaryAppColor),
+    SystemUiOverlayStyle.light.copyWith(statusBarColor: AppColors.transparent),
   );
 
   /// Preference
@@ -154,8 +151,7 @@ class _MyAppState extends State<MyApp> {
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus &&
-            currentFocus.focusedChild != null) {
+        if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
           currentFocus.focusedChild?.unfocus();
         }
       },
@@ -164,8 +160,7 @@ class _MyAppState extends State<MyApp> {
         locale: const Locale("en"),
         translations: AppLanguages(),
         defaultTransition: Transition.fade,
-        fallbackLocale:
-            const Locale(Constant.languageEn, Constant.countryCodeEn),
+        fallbackLocale: const Locale(Constant.languageEn, Constant.countryCodeEn),
         transitionDuration: const Duration(milliseconds: 200),
         initialRoute: AppRoutes.initial,
         getPages: AppPages.list,

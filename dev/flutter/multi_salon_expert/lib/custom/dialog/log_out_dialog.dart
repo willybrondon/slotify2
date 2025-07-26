@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class LogOutDialog extends StatelessWidget {
   const LogOutDialog({super.key});
@@ -31,7 +31,7 @@ class LogOutDialog extends StatelessWidget {
             Text(
               "txtLogOut".tr,
               style: TextStyle(
-                  fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 24),
+                  fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 24),
             ),
             SizedBox(
               width: Get.width * 0.6,
@@ -39,7 +39,7 @@ class LogOutDialog extends StatelessWidget {
                 "desLogOut".tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.primaryTextColor, fontSize: 17),
+                    fontFamily: AppFontFamily.sfProDisplayRegular, color: AppColors.primaryTextColor, fontSize: 17),
               ),
             ),
             const Spacer(),
@@ -51,7 +51,7 @@ class LogOutDialog extends StatelessWidget {
                   buttonColor: AppColors.whiteColor,
                   buttonText: "txtClose".tr,
                   textColor: AppColors.primaryAppColor,
-                  fontFamily: FontFamily.sfProDisplay,
+                  fontFamily: AppFontFamily.sfProDisplay,
                   fontSize: 16.5,
                   height: 48,
                   width: Get.width * 0.31,
@@ -64,7 +64,7 @@ class LogOutDialog extends StatelessWidget {
                   buttonColor: AppColors.cancelButton,
                   buttonText: "txtLogOut".tr,
                   textColor: AppColors.whiteColor,
-                  fontFamily: FontFamily.sfProDisplay,
+                  fontFamily: AppFontFamily.sfProDisplay,
                   fontSize: 16.5,
                   height: 48,
                   width: Get.width * 0.31,

@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_2/ui/revenue_screen/model/expert_attendance_model.dart';
 import 'package:salon_2/ui/revenue_screen/model/get_expert_earning_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/services/app_exception.dart';
@@ -102,6 +102,7 @@ class RevenueScreenController extends GetxController {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Expert Attendance Api :: $e");
+      Utils.showToast(Get.context!, "$e");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);

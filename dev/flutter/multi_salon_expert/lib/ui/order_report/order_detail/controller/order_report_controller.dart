@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/ui/order_report/order_detail/model/get_booking_status_wise_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/services/app_exception.dart';
 
@@ -15,14 +15,8 @@ class OrderReportController extends GetxController with GetTickerProviderStateMi
   GetBookingStatusWiseModel? getBookingStatusWiseCategory;
   RxBool isLoading = false.obs;
 
-  String? str;
-  List? parts;
-  String? date;
-  String? time;
-
   @override
   Future<void> onInit() async {
-    // TODO: implement onInit
     tabController = TabController(length: 4, vsync: this);
     await onGetBookingStatusWiseApiCall(
         expertId: Constant.storage.read<String>("expertId").toString(), status: "ALL", type: "Today");

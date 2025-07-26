@@ -7,9 +7,9 @@ import 'package:salon_2/custom/text_field/text_field_custom.dart';
 import 'package:salon_2/custom/text_field/text_form_field_custom.dart';
 import 'package:salon_2/ui/complain_screen/controller/raise_complain_controller.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class RaiseComplainScreen extends StatelessWidget {
@@ -39,7 +39,7 @@ class RaiseComplainScreen extends StatelessWidget {
           return AppButton(
             height: 55,
             width: Get.width,
-            fontFamily: FontFamily.sfProDisplayBold,
+            fontFamily: AppFontFamily.sfProDisplayBold,
             fontSize: 20,
             buttonColor: AppColors.primaryAppColor,
             buttonText: "txtSubmit".tr,
@@ -78,7 +78,7 @@ class RaiseComplainScreen extends StatelessWidget {
                     Text(
                       "txtComplainOrSuggestion".tr,
                       style: TextStyle(
-                          color: AppColors.primaryTextColor, fontFamily: FontFamily.sfProDisplay, fontSize: 18),
+                          color: AppColors.primaryTextColor, fontFamily: AppFontFamily.sfProDisplay, fontSize: 18),
                     ).paddingOnly(left: 12, top: 15),
                     GetBuilder<RaiseComplainController>(
                       builder: (logic) {
@@ -99,7 +99,7 @@ class RaiseComplainScreen extends StatelessWidget {
                     Text(
                       "txtBookingId".tr,
                       style: TextStyle(
-                          color: AppColors.primaryTextColor, fontFamily: FontFamily.sfProDisplay, fontSize: 18),
+                          color: AppColors.primaryTextColor, fontFamily: AppFontFamily.sfProDisplay, fontSize: 18),
                     ).paddingOnly(left: 12, top: 15),
                     GetBuilder<RaiseComplainController>(
                       builder: (logic) {

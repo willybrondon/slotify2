@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class DeleteAccountDialog extends StatelessWidget {
   const DeleteAccountDialog({super.key});
@@ -28,7 +28,7 @@ class DeleteAccountDialog extends StatelessWidget {
             Text(
               "txtDeleteAccount".tr,
               style: TextStyle(
-                  fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 26),
+                  fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 26),
             ),
             const SizedBox(height: 15),
             SizedBox(
@@ -37,7 +37,7 @@ class DeleteAccountDialog extends StatelessWidget {
                 "desAccountDeleted".tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.primaryTextColor, fontSize: 18.5),
+                    fontFamily: AppFontFamily.sfProDisplayRegular, color: AppColors.primaryTextColor, fontSize: 18.5),
               ),
             ),
             const SizedBox(height: 20),
