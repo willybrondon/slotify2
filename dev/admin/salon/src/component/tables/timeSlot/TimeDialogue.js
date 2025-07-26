@@ -19,7 +19,6 @@ import ToggleSwitch from "../../extras/ToggleSwitch";
 
 const TimeDialogue = () => {
   const { dialogueData } = useSelector((state) => state.dialogue);
-  
   const { time } = useSelector((state) => state?.time);
 
   console.log("time", time);
@@ -58,7 +57,7 @@ const TimeDialogue = () => {
   }, [dialogueData]);
 
   const handleSubmit = async (e) => {
-    
+
     e.preventDefault();
 
     e.preventDefault();
@@ -129,11 +128,11 @@ const TimeDialogue = () => {
 
   return (
     <div className="dialog">
-      <div class="w-100">
-        <div class="row justify-content-center">
-          <div class="col-xl-5 col-md-8 col-11">
-            <div class="mainDiaogBox">
-              <div class="row justify-content-between align-items-center formHead">
+      <div className="w-100">
+        <div className="row justify-content-center">
+          <div className="col-xl-5 col-md-8 col-11">
+            <div className="mainDiaogBox">
+              <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
                   <h2 className="text-theme m0">Salon time dialog</h2>
                 </div>
@@ -236,7 +235,7 @@ const TimeDialogue = () => {
                     <ToggleSwitch
                       value={time[findIndex]?.isBreak}
                       onClick={() => {
-                        
+                    
 
                         const day = dialogueData?.day;
                         dispatch(activeBreak(day));

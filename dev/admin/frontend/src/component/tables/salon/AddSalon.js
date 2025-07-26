@@ -166,6 +166,8 @@ const AddSalon = () => {
       for (let index = 0; index < images?.length; index++) {
         formData.append("image", images[index]);
       }
+  
+    
       if (state?.row) {
         let payload = { salonId: state?.row?._id, formData: formData };
         dispatch(updateSalon(payload));
@@ -182,7 +184,7 @@ const AddSalon = () => {
       <Title name={`Add salon`} />
       <div className="card">
         <div className="card-body">
-          <div class="">
+          <div className="">
             <div className="row align-items-start formBody">
               <div className="col-12 col-md-6 col-lg-4">
                 <ExInput
@@ -289,7 +291,7 @@ const AddSalon = () => {
                       });
                     } else {
                       return setError({
-                        ...error,
+                        ...error, 
                         password: "",
                       });
                     }
@@ -567,8 +569,8 @@ const AddSalon = () => {
                 </div>
               )}
               <div className="col-12">
-                <div class="inputData text  flex-row justify-content-start text-start">
-                  <label for="latitude" class="false ">
+                <div className="inputData text  flex-row justify-content-start text-start">
+                  <label for="latitude" className="false ">
                     Select multiple image
                   </label>
 

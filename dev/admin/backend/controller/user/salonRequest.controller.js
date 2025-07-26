@@ -7,48 +7,25 @@ exports.createSalonRequest = async (req, res) => {
   const { name, email, address, mobile, about, expertCount, userId } = req.body;
   const image = process?.env?.baseURL + req?.file?.path;
 
-  console.log("image", image);
-
   try {
-    if (
-      !name ||
-      !email ||
-      !address ||
-      !mobile ||
-      !about ||
-      !expertCount ||
-      !req.file
-    ) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Details" });
+    if (!name || !email || !address || !mobile || !about || !expertCount || !req.file) {
+      return res.status(200).send({ status: false, message: "Invalid Details" });
     }
 
-    let user
-    if(userId){
-
-       user = await userModel.findById(userId);
-       if(user){
+    let user;
+    if (userId) {
+      user = await userModel.findById(userId);
+      if (user) {
         user.salonRequestSent = true;
         await user.save();
-       }
-  
-
+      }
     }
 
-
     const existingSalonRequest = await SalonRequest.findOne({
-      $or: [
-        { name: name },
-        { email: email },
-        { address: address },
-        { mobile: mobile },
-      ],
+      $or: [{ name: name }, { email: email }, { address: address }, { mobile: mobile }],
     });
     if (existingSalonRequest) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon request already exists" });
+      return res.status(200).send({ status: false, message: "Salon request already exists" });
     }
 
     const newSalonRequest = new SalonRequest({
@@ -70,8 +47,6 @@ exports.createSalonRequest = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .send({ status: false, message: "Internal server error" });
+    return res.status(500).send({ status: false, message: "Internal server error" });
   }
 };

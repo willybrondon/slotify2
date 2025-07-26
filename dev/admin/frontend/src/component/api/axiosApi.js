@@ -4,14 +4,14 @@ import { DangerRight } from "./toastServices";
 import { baseURL, secretKey } from "../../util/config";
 import { useEffect } from "react";
 
-const getTokenData = () => localStorage.getItem("token");
+const getTokenData = () => localStorage.getItem("adminToken");
 
 export const apiInstance = axios.create({
   baseURL: baseURL,
 });
 
 const cancelTokenSource = axios.CancelToken.source();
-const token = localStorage.getItem("token");
+const token = localStorage.getItem("adminToken");
 apiInstance.defaults.headers.common["Authorization"] = token;
 apiInstance.defaults.headers.common["key"] = secretKey;
 
@@ -32,7 +32,6 @@ apiInstance.interceptors.response.use(
   },
   function (error) {
     if (!error?.response?.data?.message) {
-      console.log("Error+++++:", error);
       DangerRight("Something went Wrong!");
     }
     if (

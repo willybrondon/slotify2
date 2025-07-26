@@ -35,6 +35,15 @@ export const handleSetting = createAsyncThunk(
     );
   }
 );
+export const addProductRequest = createAsyncThunk(
+  "admin/setting/addProductRequest",
+  async (payload) => {
+    return apiInstance.put(
+      `admin/setting/handleSwitch?type=${payload?.type}`,
+      payload.data
+    );
+  }
+);
 
 export const deleteReview = createAsyncThunk(
   "admin/review/delete",

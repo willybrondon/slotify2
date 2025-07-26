@@ -30,9 +30,7 @@ exports.allStats = async (req, res) => {
       totalAmount += data?.platformFee;
     });
 
-    const totalBookings = bookings.filter(
-      (booking) => booking.bookingId !== null
-    ).length;
+    const totalBookings = bookings.filter((booking) => booking.bookingId !== null).length;
 
     let totalRevenue = 0;
     bookings.forEach((booking) => {
@@ -55,9 +53,7 @@ exports.allStats = async (req, res) => {
     return res.status(200).json({ status: true, data });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ status: false, message: "Internal server error" });
+    return res.status(500).json({ status: false, message: "Internal server error" });
   }
 };
 
@@ -116,17 +112,12 @@ exports.chartApiForPenal = async (req, res) => {
       },
     ]);
 
-    return res
-      .status(200)
-      .send({ status: true, message: "success", appointments });
+    return res.status(200).send({ status: true, message: "success", appointments });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .send({ status: false, message: "Internal server error" });
+    return res.status(500).send({ status: false, message: "Internal server error" });
   }
 };
-
 
 exports.topSalons = async (req, res) => {
   try {
@@ -144,44 +135,43 @@ exports.topSalons = async (req, res) => {
     }
     const salon = await Booking.aggregate([
       {
-        $match: { status: "completed" ,...dateFilter}
+        $match: { status: "completed", ...dateFilter },
       },
       {
         $lookup: {
           from: "salons",
           localField: "salonId",
           foreignField: "_id",
-          as: "salonId"
-        }
+          as: "salonId",
+        },
       },
       {
-
         $group: {
           _id: "$salonId",
           amount: { $sum: "$amount" },
           salonCommission: { $sum: "$salonCommission" },
           platformFee: { $sum: "$platformFee" },
-          bookings: { $sum: 1 }
-        }
+          bookings: { $sum: 1 },
+        },
       },
       {
-        $project:{
+        $project: {
           salonId: { $arrayElemAt: ["$_id._id", 0] },
           salonName: { $arrayElemAt: ["$_id.name", 0] },
           salonImage: { $arrayElemAt: ["$_id.mainImage", 0] },
           salonCommission: 1,
           platformFee: 1,
           bookings: 1,
-          amount:1,
-          _id:0
-        }
+          amount: 1,
+          _id: 0,
+        },
       },
       {
-        $sort: { amount: -1 }
+        $sort: { amount: -1 },
       },
       {
-        $limit: 5
-      }
+        $limit: 5,
+      },
     ]);
     return res.status(200).json({ status: true, message: "success", topSalons: salon });
   } catch (error) {

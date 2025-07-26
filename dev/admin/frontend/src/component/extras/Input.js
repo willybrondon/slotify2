@@ -53,7 +53,6 @@ const Input = (props) => {
       setError("d-none");
     }
   };
-  console.log("validationError", validationError);
 
   return (
     <div
@@ -114,9 +113,9 @@ const Input = (props) => {
       {type === "password" && (
         <div className="passHideShow" onClick={hideShow}>
           {types === "password" ? (
-            <i class="ri-eye-line"></i>
+            <i className="ri-eye-line"></i>
           ) : (
-            <i class="ri-eye-close-line"></i>
+            <i className="ri-eye-close-line"></i>
           )}
         </div>
       )}
@@ -206,15 +205,15 @@ export const ExInput = (props) => {
         {type === "password" && (
           <div className="passHideShow" onClick={hideShow}>
             {types === "password" ? (
-              <i class="fa-solid fa-eye"></i>
+              <i className="fa-solid fa-eye"></i>
             ) : (
-              <i class="fa-solid fa-eye-slash"></i>
+              <i className="fa-solid fa-eye-slash"></i>
             )}
           </div>
         )}
         {type === "search" && !value && (
           <div className="searching">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <i className="fa-solid fa-magnifying-glass"></i>
           </div>
         )}
       </div>
@@ -300,7 +299,6 @@ export const Image = (props) => {
         // Old Path
         const addImage = document.getElementById(`${name}-multiImage`);
         for (let i = 0; i < newImagePaths.length; i++) {
-          console.log("e.target.files[i]", e.target.files[i].name);
 
           const imageTag = document.createElement("img");
           const divTag = document.createElement("div");
@@ -421,7 +419,6 @@ const ImageScript = ({ value, setMultiImagePath }) => {
         .siblings(".boxImage")
         .children();
       const pathImage = $(current).siblings();
-      console.log("mainImageTag", mainImageTag[0].files);
 
       if (mainImageTag[0]?.tagName === "INPUT") {
         const datas = pathImage.attr("data-new");
@@ -507,9 +504,6 @@ export const Select = (props) => {
   $(document).ready(function () {
     const editId = $(`#${id}`)[0]?.value;
     if (editId && option) {
-      console.log("typeof-option", typeof option[0]);
-      console.log("option", option[0]);
-
       if (typeof option[0] == "object") {
         const matchingItem = option.find((item) => item.value === editId);
         if (matchingItem) {
@@ -521,13 +515,8 @@ export const Select = (props) => {
     }
   });
 
-  console.log("value", value);
-  console.log("placeholder", placeholder);
-  console.log("name", name);
-  console.log("option", option);
-
   return (
-    <div class={`inputData text-start ${className}`}>
+    <div className={`inputData text-start ${className}`}>
       <SelectScript value={value} id={`toggle-${id}`} angle={angle} />
       <label htmlFor={id}>{label}</label>
       <div className={`selectMain`}>
@@ -566,7 +555,7 @@ export const Select = (props) => {
             />
           </p>
           <i
-            class={`ri-arrow-down-s-line ${
+            className={`ri-arrow-down-s-line ${
               value == placeholder ? "text-gray" : "text-dark"
             }`}
           ></i>
@@ -587,7 +576,6 @@ export const Select = (props) => {
           </li>
           {option?.map((res, i) => {
             const isObject = typeof res;
-            console.log("-----isObject", isObject);
             return isObject == "object" ? (
               <li
                 onClick={() => {
@@ -830,7 +818,6 @@ const SelectScript = ({ value, id, angle }) => {
   useEffect(() => {
     $(".dropMenu").hide();
     const handleDrop = () => {
-      console.log("angle", angle);
 
       if (angle) {
         let height = $(document).height();
@@ -848,11 +835,6 @@ const SelectScript = ({ value, id, angle }) => {
           $(`#${id} ~ .dropMenu`).removeClass("topSide");
           $(`#${id} ~ .dropMenu`).addClass("bottomSide");
         }
-
-        console.log("id", id);
-        console.log("height", height);
-        console.log("dropMenu", totalHeight);
-        console.log("$(`#${id} ~ .dropMenu`)", $(`#${id} ~ .dropMenu`));
       }
 
       $(`#${id} ~ .dropMenu`).slideToggle();

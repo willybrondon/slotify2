@@ -3,13 +3,12 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const app = express();
-const port = process.env.PORT || 6040;
+const port = process.env.PORT || 5037;
 const moment = require("moment");
 const mongoose = require("mongoose");
+
 require("./middleware/mongodb");
 const fs = require("fs");
-const iconv = require("iconv-lite");
-iconv.encodingExists("foo"); 
 
 var logger = require("morgan");
 app.use(express.json());
@@ -24,8 +23,11 @@ const SalonSettlement = require("./models/salonSettlement.model");
 const ExpertSettlement = require("./models/expertSettlement.model");
 const Attendance = require("./models/attendance.model");
 const Setting = require("./models/setting.model");
+const Service = require("./models/service.model");
+const User = require("./models/user.model");
 
 const settingJson = require("./setting");
+
 //Declare global variable
 global.settingJSON = {};
 
@@ -35,10 +37,6 @@ async function initializeSettings() {
     const setting = await Setting.findOne().sort({ createdAt: -1 });
     if (setting) {
       global.settingJSON = setting;
-      console.log(
-        "global-----------------------",
-        global.settingJSON.isFlutterWave
-      );
     } else {
       global.settingJSON = settingJson;
     }
@@ -83,9 +81,7 @@ async function updateAttendance(expertId, action) {
 
     if (action === "attend") {
       if (dateIndex !== -1) {
-        console.log(
-          `Attendance for today has already been marked for ${expertId}`
-        );
+        console.log(`Attendance for today has already been marked for ${expertId}`);
         return;
       }
 
@@ -98,9 +94,7 @@ async function updateAttendance(expertId, action) {
       attendanceRecord.attendDates.push(todayDate);
     } else if (action === "absent") {
       if (absentIndex !== -1 || dateIndex !== -1) {
-        console.log(
-          `Attendance for today has already been marked for ${expertId}`
-        );
+        console.log(`Attendance for today has already been marked for ${expertId}`);
         return;
       }
 
@@ -113,8 +107,7 @@ async function updateAttendance(expertId, action) {
       attendanceRecord.absentDates.push(todayDate);
     }
 
-    attendanceRecord.totalDays =
-      attendanceRecord.attendCount + attendanceRecord.absentCount;
+    attendanceRecord.totalDays = attendanceRecord.attendCount + attendanceRecord.absentCount;
 
     const expert = await Expert.findById(expertId);
     await expert.save();
@@ -122,11 +115,7 @@ async function updateAttendance(expertId, action) {
     attendanceRecord.salonId = expert.salonId;
     savedAttendance = await attendanceRecord.save();
 
-    console.log(
-      `${
-        action === "attend" ? "Attendance" : "Absent"
-      } marked successfully for ${expertId}`
-    );
+    console.log(`${action === "attend" ? "Attendance" : "Absent"} marked successfully for ${expertId}`);
   } catch (error) {
     console.log("error", error);
   }
@@ -137,19 +126,13 @@ cron.schedule("55 23 * * *", async () => {
   try {
     const allExperts = await Expert.find({ isDelete: false });
 
-    // Iterate through each expertId and call the API with action 'absent'
     for (const expert of allExperts) {
       const expertId = expert._id;
-
-      // Call the API for each expert with action 'absent'
       await updateAttendance(expertId, "absent");
     }
 
-    const expert = await Expert.updateMany(
-      { isDelete: false },
-      { isAttend: false, showDialog: false }
-    );
-    console.log("expert", expert);
+    const expert = await Expert.updateMany({ isDelete: false }, { isAttend: false, showDialog: false });
+
     console.log("Cron job executed successfully.");
   } catch (error) {
     console.error("Error executing cron job:", error);
@@ -161,18 +144,17 @@ cron.schedule("55 23 * * *", async () => {
   try {
     const todayDate = moment().format("YYYY-MM-DD");
     console.log("todayDate", todayDate);
+
     const bookingsToUpdate = await Booking.find({
       status: { $in: ["pending", "confirm"] },
       date: todayDate,
     });
 
-    console.log("bookingsToUpdate", bookingsToUpdate);
-
     for (const booking of bookingsToUpdate) {
       booking.status = "cancel";
       booking.cancel.reason = "autoCancel by system";
       booking.cancel.person = "admin";
-      booking.cancel.time = moment().format("hh:mm A");
+      booking.cancel.time = moment().format("HH:mm a");
       booking.cancel.date = moment().format("YYYY-MM-DD");
       await booking.save();
     }
@@ -185,7 +167,6 @@ cron.schedule("55 23 * * *", async () => {
 
 // Define a cron job to run monthly
 cron.schedule("55 23 28-31 * *", async () => {
-  // cron.schedule("* * * * *", async () => {
   try {
     const salons = await Salon.find();
     const today = moment().format("YYYY-MM-DD");
@@ -255,10 +236,6 @@ cron.schedule("55 23 28-31 * *", async () => {
     console.error("Error occurred during monthly settlement:", error);
   }
 });
-
-
-
-//schedule session for create demo user's booking with status "pending"
 
 app.use("/storage", express.static(path.join(__dirname, "storage")));
 app.use(express.static(path.join(__dirname, "public")));

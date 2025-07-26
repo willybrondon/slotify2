@@ -6,32 +6,34 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import { ToastContainer } from "react-toastify";
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor } from './redux/store';
 
-import { baseURL,  secretKey } from "./util/config";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import { baseURL, secretKey } from "./util/config";
 import Loader from "./util/Loader";
-import axios from "axios"
+import axios from "axios";
 import { CLOSE_LOADER, OPEN_LOADER } from "./redux/slice/loading.type";
 
 // Default Base URL Join In Axios
 axios.defaults.baseURL = baseURL;
 axios.defaults.headers.common["key"] = secretKey;
 
-
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
-    <BrowserRouter>
-      <Provider store={store}>
+  <BrowserRouter>
+    <ToastContainer />
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
         <App />
-        <ToastContainer style={{ zIndex: "999999" }} 
-        />
-        <Loader />
-      </Provider>
-    </BrowserRouter>,
-    // </React.StrictMode>  
-
+      </PersistGate>
+      <Loader />
+    </Provider>
+  </BrowserRouter>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

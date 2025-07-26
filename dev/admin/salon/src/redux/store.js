@@ -18,6 +18,11 @@ import attendanceSlice from "./slice/attendanceSlice";
 import complainSlice from "./slice/complainSlice";
 import notificationSlice from "./slice/notificationSlice";
 import holidaySlice from "./slice/holidaySlice";
+import productSlice from "./slice/productSlice"
+import orderSlice from "./slice/orderSlice"
+import withDrawSlice from "./slice/withDrawSlice"
+import citySlice from "./slice/citySlice";
+import attributeSlice from "./slice/attributeSlice";
 
 const store = configureStore({
     reducer: {
@@ -40,6 +45,11 @@ const store = configureStore({
         complain: complainSlice,
         notification: notificationSlice,
         holiday: holidaySlice,
+        product: productSlice,
+        order: orderSlice,
+        withDraw:withDrawSlice,
+        city: citySlice,
+        attribute: attributeSlice
     },
 
 });

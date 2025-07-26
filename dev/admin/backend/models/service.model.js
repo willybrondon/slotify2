@@ -9,7 +9,6 @@ const serviceSchema = new mongoose.Schema(
     status: { type: Boolean, default: true },
     categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
     isDelete: { type: Boolean, default: false },
-
   },
   {
     timestamps: true,

@@ -33,6 +33,14 @@ import ExpertBooking from "../tables/expert/ExpertBooking";
 import ParticularSalonSettlementInfo from "../tables/ParticularSalonSettlementInfo";
 import ParticularExpertSettlementInfo from "../tables/expert/ParticularExpertSettlementInfo";
 import { ExpertDialogue } from "../tables/expert/ExpertDialogue";
+import Products from "../tables/products/Products";
+import ProductDialogue from "../tables/products/ProductDialogue";
+import ProductDetails from "../tables/products/ProductDetails";
+import Order from "../tables/order/Order";
+import WithDrawMoney from "../tables/WithDrawMoney";
+import WalletHistory from "../WalletHistory";
+import OrderDetails from "../tables/order/OrderDetails";
+import Attribute from "../tables/attributes/Attribute";
 
 
 
@@ -41,14 +49,14 @@ const Admin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    
+
     if (
       location.pathname == "/" ||
       location.pathname == "/salonPanel" ||
       location.pathname == "/salonPanel/salonDashboard" ||
       location.pathname == ""
     ) {
-      
+
       navigate("/salonPanel/salonDashboard");
     }
   }, []);
@@ -67,16 +75,23 @@ const Admin = () => {
             <Route path="/profile" element={<AdminProfile />} />
             <Route path="/allExperts" element={<Expert />} />
             <Route path="/addExpert" element={<ExpertDialogue />} />
+            <Route path="/productsTable" element={<Products />} />
+            <Route path="/orderTable" element={<Order />} />
+            <Route path="/orderDetails" element={<OrderDetails />} />
+            <Route path="/addProduct" element={<ProductDialogue />} />
+            <Route path="/productDetails" element={<ProductDetails />} />
             <Route path="/expertBooking" element={<ExpertBooking />} />
             <Route path="/serviceTable" element={<Service />} />
             <Route path="/reviewTable" element={<Review />} />
             <Route
-              path="/getExpertProfile"
+              path="allExpert/getExpertProfile"
               element={<ExpertProfile />}
             />
             <Route path="/timeTable" element={<WeekTime />} />
             <Route path="/staffEarning" element={<StaffEarning />} />
             <Route path="/salonEarning" element={<SalonEarnings />} />
+            <Route path="/withdrawMoney" element={<WithDrawMoney />} />
+            <Route path="/walletHistory" element={<WalletHistory />} />
             <Route path="/holiday" element={<Holiday />} />
             <Route path="/futureBooking" element={<UpcomingBooking />} />
             <Route path="/attendance" element={<Attendance />} />
@@ -88,6 +103,7 @@ const Admin = () => {
             <Route path="/complainTable" element={<Complain />} />
             <Route path="/settlementInfo" element={<ParticularSalonSettlementInfo />} />
             <Route path="/expertSettlementInfo" element={<ParticularExpertSettlementInfo />} />
+            <Route path="/attribute" element={<Attribute />} />
           </Routes>
         </div>
       </div>

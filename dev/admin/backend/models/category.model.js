@@ -2,11 +2,10 @@ const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema(
   {
-    name: String,
-    image: String,
+    name: { type: String, trim: true },
+    image: { type: String, trim: true },
     status: { type: Boolean, default: true },
-    isDelete:{type: Boolean,default: false},
-
+    isDelete: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -14,6 +13,4 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
-
-
-module.exports =  mongoose.model("Category",categorySchema)
+module.exports = mongoose.model("Category", categorySchema);

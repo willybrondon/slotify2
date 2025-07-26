@@ -1,11 +1,9 @@
 const mongoose = require("mongoose");
 const { LOGIN_TYPE } = require("../types/constant");
+
 const userSchema = new mongoose.Schema(
   {
-    uniqueId: {
-      type: Number,
-      default: null,
-    },
+    uniqueId: { type: Number, default: null },
     fname: { type: String, default: "" },
     lname: { type: String, default: "" },
     image: { type: String, default: "" },
@@ -22,9 +20,10 @@ const userSchema = new mongoose.Schema(
     identity: { type: String },
     isDelete: { type: Boolean, default: false },
     isUpdate: { type: Boolean, default: false },
-    latitude:{ type: String, default: "" },
-    longitude:{ type: String, default: "" },
+    latitude: { type: String, default: "" },
+    longitude: { type: String, default: "" },
     salonRequestSent: { type: Boolean, default: false },
+    amount: { type: Number, default: 0 }, //wallet balance
   },
   {
     timestamps: true,

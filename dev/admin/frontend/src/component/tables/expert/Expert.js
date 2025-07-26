@@ -157,16 +157,14 @@ export const Expert = () => {
         <ToggleSwitch
           value={row?.isBlock}
           onClick={() => {
-           
-        
             dispatch(blockExpert(row?._id));
           }}
         />
       ),
     },
     {
-      Header: "Bookings",
-      body: "bookings",
+      Header: "Booking",
+      body: "booking",
       Cell: ({ row }) => (
         <button
           className="py-1"
@@ -313,6 +311,7 @@ export const Expert = () => {
   ];
 
   const handleNotify = (id) => {
+
     dispatch(
       openDialog({ type: "notification", data: { id, type: "expert" } })
     );
@@ -323,7 +322,6 @@ export const Expert = () => {
     try {
       const data = await warning("Delete");
       const yes = data.isConfirmed;
-      console.log("yes", yes);
       if (yes) {
         dispatch(expertDelete(id));
       }

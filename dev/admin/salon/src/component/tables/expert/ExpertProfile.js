@@ -18,7 +18,6 @@ import { ReactComponent as Call } from "../../../assets/images/call.svg";
 import { ReactComponent as Age } from "../../../assets/images/age.svg";
 import Male from "../../../assets/images/male.png";
 import { ExInput } from "../../extras/Input";
-
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { isLoading } from "../../../util/allSelector";
@@ -27,7 +26,6 @@ const ExpertProfile = () => {
   const { particularService } = useSelector((state) => state.service);
   const { oneExpert } = useSelector((state) => state.expert);
   const { setting } = useSelector((state) => state.setting);
-  
   const loader = useSelector(isLoading);
 
   const { state } = useLocation();
@@ -61,17 +59,17 @@ const ExpertProfile = () => {
   }));
 
   function onSelect(selectedList, selectedItem) {
-    
+
     setAllService((prev) => [...prev, selectedItem]);
   }
 
   function onRemove(selectedList, removedItem) {
-    
+
     setAllService(selectedList);
   }
 
   const handleSubmit = async (e) => {
-    
+
     const serviceIds = allService?.map((services) => services?.id).join(",");
     const payload = {
       formData: { serviceId: serviceIds },
@@ -320,76 +318,7 @@ const ExpertProfile = () => {
           </div>
         </div>
       </div>
-      <div className="row flex-wrap rounded border mt-3">
-        {loader === true ? (
-          <>
-            <SkeletonTheme baseColor="#e2e5e7" highlightColor="#fff">
-              {[1, 2, 3, 4, 5, 6].map((index) => (
-                <div key={index} className="col-12 col-md-6">
-                  <Skeleton height={40} />
-                </div>
-              ))}
-            </SkeletonTheme>
-          </>
-        ) : (
-          <>
-            <div className="col-12 col-md-6  ">
-              <ExInput
-                type={`text`}
-                value={data?.bankDetails?.bankName}
-                label={`Bank name`}
-                readOnly={true}
-                placeholder={`Bank Name`}
-              />
-            </div>
-            <div className="col-12 col-md-6">
-              <ExInput
-                type={`text`}
-                value={data?.bankDetails?.branchName}
-                label={`Branch name`}
-                placeholder={`Branch Name`}
-                readOnly={true}
-              />
-            </div>
-            <div className="col-12 col-md-6">
-              <ExInput
-                type={`text`}
-                value={data?.bankDetails?.accountNumber}
-                label={`Account number`}
-                placeholder={`Bank Account Name`}
-                readOnly={true}
-              />
-            </div>
-            <div className="col-12 col-md-6">
-              <ExInput
-                type={`text`}
-                value={data?.bankDetails?.IFSCCode}
-                label={`IFSC code`}
-                placeholder={`IFSC Code`}
-                readOnly={true}
-              />
-            </div>
-            <div className="col-12 col-md-6">
-              <ExInput
-                type={`text`}
-                value={data?.upiId}
-                label={`UPI Id`}
-                placeholder={`UPI id`}
-                readOnly={true}
-              />
-            </div>
-            <div className="col-12 col-md-6">
-              <ExInput
-                type={`text`}
-                value={data?.paymentType === 0 ? "Upi" : "Bank"}
-                label={`Preferred payment type`}
-                placeholder={`Payment Type`}
-                readOnly={true}
-              />
-            </div>
-          </>
-        )}
-      </div>
+     
     </div>
   );
 };

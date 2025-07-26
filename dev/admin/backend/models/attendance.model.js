@@ -25,7 +25,6 @@ const attendanceSchema = new mongoose.Schema(
     salonId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Salon",
-
     },
     attendDates: {
       type: [String],
@@ -50,6 +49,7 @@ const attendanceSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
+
 attendanceSchema.index({ expertId: 1 });
 
 module.exports = mongoose.model("Attendance", attendanceSchema);

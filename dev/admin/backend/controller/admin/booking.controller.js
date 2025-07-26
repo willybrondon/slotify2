@@ -8,14 +8,14 @@ const moment = require("moment");
 
 const Notification = require("../../models/notification.model");
 const UString = require("../../models/uniqueString.model");
+const UserWalletHistory = require("../../models/userWalletHistory.model");
 
 const admin = require("../../firebase");
+
 exports.getUserBookings = async (req, res) => {
   try {
     if (!req.query.userId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
     const user = await User.findById(req.query.userId);
     if (!user) {
@@ -28,17 +28,8 @@ exports.getUserBookings = async (req, res) => {
 
     let statusFilter = {};
     const type = req?.query?.type || "ALL";
-    if (
-      type &&
-      type !== "ALL" &&
-      type !== "cancel" &&
-      type !== "confirm" &&
-      type !== "completed" &&
-      type !== "pending"
-    ) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Booking Type" });
+    if (type && type !== "ALL" && type !== "cancel" && type !== "confirm" && type !== "completed" && type !== "pending") {
+      return res.status(200).send({ status: false, message: "Invalid Booking Type" });
     }
 
     if (type && type !== "ALL") {
@@ -323,17 +314,8 @@ exports.getAll = async (req, res) => {
 
     let statusFilter = {};
     const type = req?.query?.type || "ALL";
-    if (
-      type &&
-      type !== "ALL" &&
-      type !== "cancel" &&
-      type !== "confirm" &&
-      type !== "completed" &&
-      type !== "pending"
-    ) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Booking Type" });
+    if (type && type !== "ALL" && type !== "cancel" && type !== "confirm" && type !== "completed" && type !== "pending") {
+      return res.status(200).send({ status: false, message: "Invalid Booking Type" });
     }
 
     if (type && type !== "ALL") {
@@ -499,15 +481,11 @@ exports.getAll = async (req, res) => {
 exports.getExpertBookings = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
     const expert = await Expert.findById(req.query.expertId);
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not exist" });
+      return res.status(200).send({ status: false, message: "Expert not exist" });
     }
 
     const start = parseInt(req?.query?.start) || 0;
@@ -516,17 +494,8 @@ exports.getExpertBookings = async (req, res) => {
 
     let statusFilter = {};
     const type = req?.query?.type || "ALL";
-    if (
-      type &&
-      type !== "ALL" &&
-      type !== "cancel" &&
-      type !== "confirm" &&
-      type !== "completed" &&
-      type !== "pending"
-    ) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Booking Type" });
+    if (type && type !== "ALL" && type !== "cancel" && type !== "confirm" && type !== "completed" && type !== "pending") {
+      return res.status(200).send({ status: false, message: "Invalid Booking Type" });
     }
 
     if (type && type !== "ALL") {
@@ -698,15 +667,11 @@ exports.getExpertBookings = async (req, res) => {
 exports.getSalonBookings = async (req, res) => {
   try {
     if (!req.query.salonId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
     const salon = await Salon.findById(req.query.salonId);
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon not exist" });
+      return res.status(200).send({ status: false, message: "Salon not exist" });
     }
 
     const start = parseInt(req?.query?.start) || 0;
@@ -715,17 +680,8 @@ exports.getSalonBookings = async (req, res) => {
 
     let statusFilter = {};
     const type = req?.query?.type || "ALL";
-    if (
-      type &&
-      type !== "ALL" &&
-      type !== "cancel" &&
-      type !== "confirm" &&
-      type !== "completed" &&
-      type !== "pending"
-    ) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Booking Type" });
+    if (type && type !== "ALL" && type !== "cancel" && type !== "confirm" && type !== "completed" && type !== "pending") {
+      return res.status(200).send({ status: false, message: "Invalid Booking Type" });
     }
 
     if (type && type !== "ALL") {
@@ -908,6 +864,7 @@ exports.dailyBookings = async (req, res) => {
         },
       };
     }
+    
     const start = parseInt(req.query.start) || 0;
     const limit = parseInt(req.query.limit) || 200;
     const skip = start * limit;
@@ -958,10 +915,7 @@ exports.dailyBookings = async (req, res) => {
     res.status(200).json({
       status: true,
       message: "success",
-      total:
-        dailyData[0].totalCount.length > 0
-          ? dailyData[0].totalCount[0].totalRecord
-          : 0,
+      total: dailyData[0].totalCount.length > 0 ? dailyData[0].totalCount[0].totalRecord : 0,
       data: dailyData[0].data,
     });
   } catch (error) {
@@ -993,9 +947,7 @@ exports.upcomingBookings = async (req, res) => {
       bookings = futureBookings.slice(0, 5);
     } else bookings = futureBookings;
 
-    return res
-      .status(200)
-      .send({ status: true, message: "success", data: bookings });
+    return res.status(200).send({ status: true, message: "success", data: bookings });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -1098,87 +1050,83 @@ exports.monthlyState = async (req, res) => {
 exports.cancelBooking = async (req, res) => {
   try {
     if (!req?.body?.bookingId || !req.body.reason) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid details" });
+      return res.status(200).send({ status: false, message: "Invalid details" });
     }
+
     const booking = await Booking.findById(req?.body?.bookingId);
     if (!booking) {
       return res.status(200).send({ status: false, message: "data not found" });
     }
 
     if (booking.status !== "pending") {
-      return res
-        .status(200)
-        .send({
-          status: false,
-          message: "Only pending booking can be cancelled",
-        });
+      return res.status(200).send({
+        status: false,
+        message: "Only pending booking can be cancelled",
+      });
     }
 
-    const [user, expert] = await Promise.all([
-      User.findById(booking.userId),
-      Expert.findById(booking.expertId),
-    ]);
+    const [user, expert] = await Promise.all([User.findById(booking.userId), Expert.findById(booking.expertId)]);
 
     if (!user) {
       return res.status(200).send({ status: false, message: "User not found" });
     }
 
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not found of this booking" });
+      return res.status(200).send({ status: false, message: "Expert not found of this booking" });
     }
 
     booking.status = "cancel";
     booking.cancel.reason = req.body.reason;
-    booking.cancel.time = moment().format("hh:mm A");
+    booking.cancel.time = moment().format("HH:mm a");
     booking.cancel.date = moment().format("YYYY-MM-DD");
     booking.cancel.person = "admin";
+    await booking.save();
 
-    payload = {
+    res.status(200).send({ status: true, message: "success", booking });
+
+    const payload = {
       token: user.fcmToken,
       notification: {
-        body: `Your Booking with Id ${booking.bookingId}  is cancelled `,
+        body: `Your Booking with Id ${booking.bookingId} is cancelled `,
         title: "Booking Cancel",
         image: booking.serviceId[0].image,
       },
     };
-    console.log("payload", payload);
-    const notification = new Notification();
 
+    const notification = new Notification();
     notification.userId = user._id;
     notification.title = payload.notification.title;
     notification.image = booking.serviceId[0].image;
     notification.notificationType = 0;
-    notification.message =
-      payload.notification.body + " Reason : " + booking.cancel.reason;
-    notification.date = new Date().toLocaleString("en-US", {
-      timeZone: "Asia/Kolkata",
-    });
-    const adminPromise = await admin
+    notification.message = payload.notification.body + " Reason : " + booking.cancel.reason;
+    notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+
     await Promise.all([
-      booking.save,
+      notification.save(),
+      User.updateOne(
+        { _id: user._id, amount: { $gt: 0 } },
+        {
+          $inc: {
+            amount: booking.amount,
+          },
+        }
+      ),
       UString.deleteMany({ bookingId: booking._id }),
-      adminPromise
-        .messaging()
-        .send(payload)
-        .then(async (response) => {
-          console.log("Successfully sent with response: ", response);
-        })
-        .catch((error) => {
-          console.log("Error sending message:      ", error);
-        }),
+      UserWalletHistory.findOneAndDelete({ booking: booking._id }),
     ]);
 
-    return res
-      .status(200)
-      .send({ status: true, message: "success!!", booking });
+    const adminPromise = await admin;
+    await adminPromise
+      .messaging()
+      .send(payload)
+      .then(async (response) => {
+        console.log("Successfully sent with response: ", response);
+      })
+      .catch((error) => {
+        console.log("Error sending message:      ", error);
+      });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .send({ status: false, message: "Internal server error" });
+    return res.status(500).send({ status: false, message: "Internal server error" });
   }
 };

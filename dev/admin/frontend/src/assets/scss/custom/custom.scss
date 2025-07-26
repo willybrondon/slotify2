@@ -1141,23 +1141,39 @@ thead {
   backdrop-filter: blur(5px);
 
   & .mainDiaogBox {
+    display: flex;
+    flex-direction: column; // Add this to organize children vertically
+    justify-content: space-between; // Space out content to push buttons to the bottom
     background-color: #fff;
     padding: 20px;
     max-height: 98vh;
     overflow: auto;
     border-radius: 32px!important;
+    position: relative; // Make this element relative to position its children
 
     & .formBody {
-      max-height: 600px;
+      max-height: 500px; // Adjust max height to accommodate the form body
       overflow: auto;
+      margin-bottom: 20px; // Space between formBody and button footer
 
       & > div {
         margin-bottom: 10px;
       }
 
-      & .errorMessage{
+      & .errorMessage {
         color: red;
       }
+    }
+
+    & .formFooter {
+      position: sticky;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: flex-end; // Right-align buttons
+      padding-top: 20px;
+      background-color: #fff;
+      margin-top: auto; // Push the footer to the bottom
     }
 
     & .closeButton {
@@ -1187,6 +1203,7 @@ thead {
     }
   }
 }
+
 
 .mainMultiSelector {
   // background-color: #36212108;

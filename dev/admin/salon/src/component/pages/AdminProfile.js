@@ -15,9 +15,9 @@ import Button from "../extras/Button";
 import { adminProfile } from "../../redux/api";
 import { useQuery } from "@tanstack/react-query";
 import Male from "../../../src/assets/images/male.png";
-import male from "../../assets/images/male.png";
 import { ExInput, Textarea } from "../extras/Input";
 import ToggleSwitch from "../extras/ToggleSwitch";
+
 
 export const AdminProfile = () => {
   const dispatch = useDispatch();
@@ -106,6 +106,7 @@ export const AdminProfile = () => {
   };
 
   const handleChangePassword = () => {
+
     if (
       !newPassword ||
       !confirmPassword ||
@@ -132,6 +133,7 @@ export const AdminProfile = () => {
   };
 
   const updateProfile = () => {
+
     if (!imagePath || !name || image.length === 0) {
       let error = {};
       if (!name) error.name = "name is required";
@@ -204,16 +206,21 @@ export const AdminProfile = () => {
                     <img
                       className="image"
                       style={{
+                        height: "420px",
+                        width: "420px",
                         objectFit: "cover",
                         borderRadius: "30px",
                       }}
-                      src={imagePath ? imagePath : admin?.image}
+                      src={imagePath ? imagePath : admin?.mainImage}
                       onClick={() => handlePrevious(imagePath)}
-                      alt=""
+                      alt="profile"
+                      onError={(e) => {
+                        e.currentTarget.src = Male;
+                      }}
                     />
                     <div
                       className="position-absolute middle"
-                      style={{ bottom: "0", left: "0" ,maxWidth:"100%"}}
+                      style={{ bottom: "0", left: "0" }}
                     >
                       <div
                         style={{
@@ -222,7 +229,6 @@ export const AdminProfile = () => {
                           borderRadius: "0px 0px 30px 30px",
                           height: "50px",
                           width: "420px",
-                          maxWidth:"100%"
                         }}
                         className="d-flex align-items-center justify-content-center"
                       >
@@ -367,7 +373,7 @@ export const AdminProfile = () => {
                       }}
                     />
                     <p style={{ fontSize: "15px" }}>
-                      Get latitude and longitude in{" "}
+                      Get latitude and longitude from{" "}
                       <a href="https://www.latlong.net/" target="_blank">
                         https://www.latlong.net/
                       </a>
@@ -406,7 +412,7 @@ export const AdminProfile = () => {
             <div
               className="my-2"
               style={{
-                width: "235px",
+                width: "fit-content",
                 border: "1px solid #1c2b20",
                 padding: "4px",
                 borderRadius: "40px",
@@ -559,19 +565,7 @@ export const AdminProfile = () => {
                       }}
                     />
                   </div>
-                  <div className="col-md-4">
-                    <div className="inputData undefined  flex-row justify-content-start text-start">
-                      <label>Is Active</label>
-                    </div>
-                    <div className="mt-2">
-                      <ToggleSwitch
-                        value={admin?.isActive}
-                        onClick={() => {
-                          dispatch(activesalon(admin?._id));
-                        }}
-                      />
-                    </div>
-                  </div>
+              
                 </div>
               </>
             )}

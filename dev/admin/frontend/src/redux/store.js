@@ -1,4 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import authSlice from "./slice/authSlice";
 import expertSlice from "./slice/expertSlice";
 import dialogueSlice from "./slice/dialogueSlice";
@@ -19,10 +21,25 @@ import notificationSlice from "./slice/notificationSlice";
 import holidaySlice from "./slice/holidaySlice";
 import salonSlice from "./slice/salonSlice";
 import salonRequestSlice from "./slice/salonRequestSlice";
+import productCategorySlice from "./slice/productCategorySlice";
+import attributeSlice from "./slice/attributeSlice";
+import productSlice from "./slice/productSlice";
+import productRequestSlice from "./slice/productRequestSlice"
+import orderSlice from "./slice/orderSlice"
+import withDrawSlice from "./slice/withDrawSlice"
+import couponSlice from "./slice/couponSlice";
+
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['isAuth'], // Only persist the isAuth field
+};
+
+const persistedAuthReducer = persistReducer(persistConfig, authSlice);
 
 const store = configureStore({
   reducer: {
-    auth: authSlice,
+    auth: persistedAuthReducer,
     expert: expertSlice,
     dialogue: dialogueSlice,
     category: categorySlice,
@@ -42,8 +59,23 @@ const store = configureStore({
     holiday: holidaySlice,
     salon: salonSlice,
     salonRequest: salonRequestSlice,
+    productCategory: productCategorySlice,
+    attributes: attributeSlice,
+    product: productSlice,
+    productRequest: productRequestSlice,
+    ordersData: orderSlice,
+    withDraw:withDrawSlice,
+    coupon:couponSlice
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }),
   // devTools:false
 });
+
+export const persistor = persistStore(store);
 
 export default store;

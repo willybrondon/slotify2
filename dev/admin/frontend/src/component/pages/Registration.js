@@ -50,9 +50,7 @@ const Registration = () => {
       };
 
       let response = await dispatch(signUp(loginData)).unwrap();
-      console.log("response", response);
-      response?.status ? navigate("/") : DangerRight(response?.message);
-      window.location.reload();
+      response?.status ? window.location.reload() : DangerRight(response?.message);
     }
   };
   return (

@@ -1,7 +1,3 @@
-
-
-
-
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -18,7 +14,149 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
+  }
+}
+
+.bg-green {
+  background-color: #28a745;
+  /* You can use your preferred shade of green */
+}
+
+.bg-green:hover {
+  background-color: #218838;
+  /* A darker shade of green on hover */
+  cursor: pointer;
+  /* Makes it clear that the button is clickable */
+}
+
+.tableMain {
+  background-color: white;
+  border: 1px solid #1C2B20;
+  border-radius: 20px;
+  /* overflow: hidden !important;  */
+  /* margin: 0px 18px; */
+}
+
+/* .primeTable {} */
+
+/* .primeTable tbody tr:nth-child(even) {
+  background: #f2f2f2;
+} */
+/* .primeTable tr:hover {
+  background-color: #f1f5f9;
+} */
+.primeTable tr th {
+  /* background-color: #f0f0f0; */
+  border-bottom: 0.5px solid #f0f0f0;
+  padding: 12.8px;
+  font-family: var(--fontJakarta--);
+  white-space: nowrap;
+  /* font-size: 18px; */
+}
+
+.primeTable thead {
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #1C2B20 !important;
+  color: #1a1f3a;
+}
+
+.primeTable tr td {
+  padding: 12.8px;
+  border-bottom: 1px solid #e2e2e2;
+  font-family: var(--fontJakarta--);
+  color: #4d4d4d;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.tableBoldFont {
+  color: var(--TableColumnBold--);
+  /* font-size: 14px;  */
+  font-weight: 500;
+}
+
+/* pagination CSS */
+.paginationFooter {
+  position: sticky;
+  bottom: 0;
+}
+
+.pagination {
+  width: 100%;
+  /* background-color: var(--white--); */
+  padding: 14px 20px;
+  border-radius: 20px;
+}
+
+.paginationBtn:disabled {
+  opacity: 0.8;
+}
+
+/* ================================================Pagination CSS=========================================== */
+.pagination {
+  /* border-top: 1px solid var(--scrollColor--); */
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  overflow: auto;
+}
+
+.pageOption {
+  padding: 10px 15px;
+  border-radius: 15%;
+}
+
+.paginationSelect {
+  position: relative;
+  z-index: 1000;
+  /* Ensure the dropdown appears above the table */
+}
+
+.midBox .paginationSelect .dropdown-menu {
+  z-index: 2000;
+  /* Increase z-index to be higher than other elements */
+}
+
+.attribute-section {
+  margin-top: 12px;
+}
+
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  /* Wraps the items to the next line after 3 badges */
+}
+
+.badge-wrapper {
+  /* flex: 0 1 calc(33.33% - 10px); */
+  /* Adjusts the width to display 3 per row */
+  margin: 5px;
+}
+
+.badge-custom {
+  background-color: #1C2B20;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  text-align: center;
+  white-space: nowrap;
+  /* Prevents the text from breaking */
+}
+
+@media (max-width: 768px) {
+  .badge-wrapper {
+    flex: 0 1 calc(50% - 10px);
+    /* Show 2 per row on smaller screens */
+  }
+}
+
+@media (max-width: 576px) {
+  .badge-wrapper {
+    flex: 0 1 100%;
+    /* Full width on very small screens */
   }
 }

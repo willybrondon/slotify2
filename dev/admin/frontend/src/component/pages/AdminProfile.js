@@ -37,7 +37,7 @@ export const AdminProfile = () => {
   },[])
 
 ;
-  
+
   useEffect(() => {
       setData(admin);
   }, [admin]);
@@ -87,31 +87,17 @@ export const AdminProfile = () => {
   };
 
   const handleEditName = () => {
-    if ( ! name || !email) {
+    if ( !imagePath || ! name || !email) {
       
       let error= {}
       if(!email) error.email = "Email is required"
       if(!name) error.name = "Name is required"
-    } else {
-      let data ={
-        name,
-        email
-      }
-
-      dispatch(updateAdmin(data));
-    }
-  };
-
-
-  const handleUpdateImage = () => {
-    if ( !image) {
-      
-      let error= {}
       if(!image || imagePath?.length < 0) error.image = "Image is required"
     } else {
       const formData = new FormData();
       formData.append("image", image);
-
+      formData.append("name", name);
+      formData.append("email", email);
       dispatch(updateAdmin(formData));
     }
   };
@@ -123,7 +109,7 @@ export const AdminProfile = () => {
   return (
     <div className="mainAdminProfile">
       <Title name="Admin Profile" />
-      <div class="d-lg-flex d-md-block">
+      <div className="d-lg-flex d-md-block">
         <div className="col-12 col-sm-12 col-md-12 col-lg-3 mt-4 me-4">
           <div className="card" style={{minHeight:"500px"}}>
             <div className="card-body">
@@ -181,7 +167,7 @@ export const AdminProfile = () => {
                 <h2 className="text-capitalize">{data?.name}</h2>
                 <div className="mt-4">
                   <Button
-                    onClick={handleUpdateImage}
+                    onClick={handleEditName}
                     className={`text-end btn bg-theme text-white ml-2`}
                     text={`Upload Image`}
                   />

@@ -219,12 +219,12 @@ export const ExpertDialogue = ({ data, setData }) => {
       <Title name={`Add Expert`} />
       <div className="card">
         <div className="card-body">
-          <div class="">
+          <div className="">
             <div className="row align-items-start formBody">
               <div className="row my-4">
                 <div className="col-12">
-                  <div class="inputData text  flex-row justify-content-start text-start">
-                    <label for="fname" class="false text-capitalize">
+                  <div className="inputData text  flex-row justify-content-start text-start">
+                    <label for="fname" className="false text-capitalize">
                       Select Salon
                     </label>
                     <select
@@ -250,7 +250,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                   </div>
                 </div>
                 <div className="col-12">
-                  <label for="fname" class="false text-capitalize">
+                  <label for="fname" className="false text-capitalize">
                     Select Services
                   </label>
                   <Multiselect

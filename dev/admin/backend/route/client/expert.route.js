@@ -10,55 +10,20 @@ const multer = require("multer");
 const storage = require("./../../middleware/multer");
 const upload = multer({ storage });
 
-route.get(
-  "/getExpertServiceWise",
-  checkAccessWithSecretKey(),
-  expertForUserController.getExpertServiceWise
-);
+route.get("/getExpertServiceWise", checkAccessWithSecretKey(), expertForUserController.getExpertServiceWise);
 
-route.get(
-  "/getTopExperts",
-  checkAccessWithSecretKey(),
-  expertForUserController.getTopExperts
-);
+route.get("/getTopExperts", checkAccessWithSecretKey(), expertForUserController.getTopExperts);
 
-route.get(
-  "/expertWithService",
-  checkAccessWithSecretKey(),
-  expertForUserController.getExpertWithServiceForUser
-);
+route.get("/expertWithService", checkAccessWithSecretKey(), expertForUserController.getExpertWithServiceForUser);
 
-route.post(
-  "/busyExpert",
-  checkAccessWithSecretKey(),
-  expertController.busyExpert
-);
+route.post("/busyExpert", checkAccessWithSecretKey(), expertController.busyExpert);
 
 route.patch("/login", checkAccessWithSecretKey(), expertController.expertLogin);
 
-route.get(
-  "/profile",
-  checkAccessWithSecretKey(),
-  expertController.getExpertProfile
-);
+route.get("/profile", checkAccessWithSecretKey(), expertController.getExpertProfile);
 
-route.put(
-  "/payForCashAfterService",
-  checkAccessWithSecretKey(),
-  expertController.payForCashAfterService
-);
+route.patch("/updateProfile", checkAccessWithSecretKey(), upload.single("image"), expertController.updateExpert);
 
-route.patch(
-  "/updateProfile",
-  checkAccessWithSecretKey(),
-  upload.single("image"),
-  expertController.updateExpert
-);
-
-route.put(
-  "/selectPaymentMethod",
-  checkAccessWithSecretKey(),
-  expertController.selectPaymentMethod
-);
+route.get("/walletHistoryByExpert", checkAccessWithSecretKey(), expertController.walletHistoryByExpert);
 
 module.exports = route;

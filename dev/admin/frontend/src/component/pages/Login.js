@@ -36,7 +36,6 @@ const Login = (props) => {
       };
 
       let response = await dispatch(login(loginData)).unwrap();
-      console.log("response", response);
       response?.status && navigate("/admin");
     }
   };

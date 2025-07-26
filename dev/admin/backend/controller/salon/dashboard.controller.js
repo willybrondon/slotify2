@@ -1,21 +1,23 @@
 require("dotenv").config();
+
 const Booking = require("../../models/booking.model");
-const User = require("../../models/user.model");
 const Expert = require("../../models/expert.model");
 const Salon = require("../../models/salon.model");
+const Order = require("../../models/order.model");
+const User = require("../../models/user.model");
+
+const moment = require("moment");
 
 exports.allStats = async (req, res) => {
   try {
     const salon = await Salon.findById(req.salon._id);
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon not exist" });
+      return res.status(200).send({ status: false, message: "Salon not exist" });
     }
     let dateFilter = {};
 
     const startDate = req?.query?.startDate || "ALL";
-      const endDate = req?.query?.endDate || "ALL";
+    const endDate = req?.query?.endDate || "ALL";
 
     if (startDate != "ALL" && endDate != "ALL") {
       dateFilter = {
@@ -25,19 +27,14 @@ exports.allStats = async (req, res) => {
         },
       };
     }
-    const [bookings, experts] = await Promise.all([
-      Booking.find({ status: "completed", ...dateFilter, salonId: salon._id }),
-      Expert.find({ isBlock: false, salonId: salon._id }),
-    ]);
+    const [bookings, experts] = await Promise.all([Booking.find({ status: "completed", ...dateFilter, salonId: salon._id }), Expert.find({ isBlock: false, salonId: salon._id })]);
 
     let totalAmount = 0;
     bookings.forEach((data) => {
       totalAmount += data?.platformFee;
     });
 
-    const totalBookings = bookings.filter(
-      (booking) => booking.bookingId !== null
-    ).length;
+    const totalBookings = bookings.filter((booking) => booking.bookingId !== null).length;
 
     let totalRevenue = 0;
     bookings.forEach((booking) => {
@@ -56,9 +53,7 @@ exports.allStats = async (req, res) => {
     return res.status(200).json({ status: true, data });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ status: false, message: "Internal server error" });
+    return res.status(500).json({ status: false, message: "Internal server error" });
   }
 };
 
@@ -66,12 +61,9 @@ exports.chartApiForPenal = async (req, res) => {
   try {
     const salon = await Salon.findById(req.salon._id);
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon not exist" });
+      return res.status(200).send({ status: false, message: "Salon not exist" });
     }
     let dateFilter = {};
-
 
     const startDate = req?.query?.startDate || "ALL";
     const endDate = req?.query?.endDate || "ALL";
@@ -128,9 +120,7 @@ exports.chartApiForPenal = async (req, res) => {
     return res.status(200).send({ status: true, message: "success", data });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .send({ status: false, message: "Internal server error" });
+    return res.status(500).send({ status: false, message: "Internal server error" });
   }
 };
 
@@ -138,9 +128,7 @@ exports.topExperts = async (req, res) => {
   try {
     const salon = await Salon.findById(req.salon._id);
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon not exist" });
+      return res.status(200).send({ status: false, message: "Salon not exist" });
     }
     let dateFilter = {};
 
@@ -194,13 +182,35 @@ exports.topExperts = async (req, res) => {
         $limit: 5,
       },
     ]);
-    return res
-      .status(200)
-      .json({ status: true, message: "success", topExperts: expert });
+    return res.status(200).json({ status: true, message: "success", topExperts: expert });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ status: false, error: error.message || "Server Error" });
+    return res.status(500).json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.upcomingOrders = async (req, res) => {
+  try {
+    const startOfToday = moment().startOf("day").toISOString();
+    const endOfToday = moment().endOf("day").toISOString();
+
+    const orders = await Order.find({
+      createdAt: { $gte: new Date(startOfToday), $lt: new Date(endOfToday) },
+    })
+      .populate({
+        path: "userId",
+        select: "fname lname",
+      })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    return res.status(200).json({
+      status: true,
+      message: "Upcoming orders retrieved successfully",
+      data: orders,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: false, message: "Internal server error" });
   }
 };

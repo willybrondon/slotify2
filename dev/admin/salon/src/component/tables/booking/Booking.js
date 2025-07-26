@@ -21,12 +21,10 @@ import { openDialog } from "../../../redux/slice/dialogueSlice";
 import CancelBookingDialog from "./CancelBookingDialog";
 import CancleDetails from "./CancleDetails";
 
-
 const Booking = () => {
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
   const { booking, total } = useSelector((state) => state.booking);
   const { setting } = useSelector((state) => state.setting);
-  
 
   const dispatch = useDispatch();
   const [data, setData] = useState([]);
@@ -234,7 +232,7 @@ const Booking = () => {
   ];
 
   const handleCancel = (row) => {
-    
+
     dispatch(openDialog({ type: "cancelBooking", data: row }));
   };
 
@@ -247,6 +245,7 @@ const Booking = () => {
   ];
 
   const handleOpenDialogue = (row) => {
+
     dispatch(openDialog({ type: "cancel", data: row }));
   };
 

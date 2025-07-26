@@ -1,1 +1,1 @@
-# multiSalon-frontend
+# MultisalonEcommerce-frontend

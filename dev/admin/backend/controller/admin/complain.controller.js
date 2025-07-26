@@ -2,7 +2,7 @@ const Expert = require("../../models/expert.model");
 const User = require("../../models/user.model");
 const Complain = require("../../models/complain.model");
 const moment = require("moment");
-const admin = require('../../firebase.js')
+const admin = require("../../firebase.js");
 
 exports.pendingSolvedComplains = async (req, res) => {
   try {
@@ -16,9 +16,7 @@ exports.pendingSolvedComplains = async (req, res) => {
       return res.status(200).send({ status: false, message: "Invalid Type" });
     }
     if (person != 1 && person != 0 && person != 2) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Complain Person" });
+      return res.status(200).send({ status: false, message: "Invalid Complain Person" });
     }
     if (type == 0 && person == 0) {
       query = { type: 0, person: 0 };
@@ -34,18 +32,11 @@ exports.pendingSolvedComplains = async (req, res) => {
       query = { person: 1 };
     }
 
-    const result = await Complain.find(query)
-      .populate("expertId userId bookingData")
-      .sort({ createdAt: -1 })
-      .skip(skipAmount)
-      .limit(limit)
-      .exec();
+    const result = await Complain.find(query).populate("expertId userId bookingData").sort({ createdAt: -1 }).skip(skipAmount).limit(limit).exec();
 
     const total = await Complain.countDocuments(query);
 
-    return res
-      .status(200)
-      .send({ status: true, message: "success", total, data: result });
+    return res.status(200).send({ status: true, message: "success", total, data: result });
   } catch (error) {
     console.log(error);
     return res.status(500).send({
@@ -58,30 +49,22 @@ exports.pendingSolvedComplains = async (req, res) => {
 exports.solveComplain = async (req, res) => {
   try {
     if (!req.query.id) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Details!!" });
+      return res.status(200).send({ status: false, message: "Invalid Details!!" });
     }
 
     const complain = await Complain.findById(req.query.id);
     if (!complain) {
-      return res
-        .status(200)
-        .send({ status: false, message: "No Complain Found!!" });
+      return res.status(200).send({ status: false, message: "No Complain Found!!" });
     }
     if (complain.type == 1) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Complain is already Solved!" });
+      return res.status(200).send({ status: false, message: "Complain is already Solved!" });
     }
     complain.type = 1;
 
     complain.solvedDate = moment().format("YYYY-MM-DD");
 
     complain.save();
-    let user = complain.userId
-      ? await User.findById(complain.userId)
-      : await Expert.findById(complain.expertId);
+    let user = complain.userId ? await User.findById(complain.userId) : await Expert.findById(complain.expertId);
 
     if (complain.userId && !user) {
       console.log("User Not Found");
@@ -92,16 +75,13 @@ exports.solveComplain = async (req, res) => {
     const payload = {
       token: user.fcmToken,
       notification: {
-        body: `Dear ${
-          user?.fname ? user?.fname + " " + user?.lname : "Salon "
-        } Your Complain is Solve Successfully.Your feedback is crucial, and we're here to assist you.Thank you`,
+        body: `Dear ${user?.fname ? user?.fname + " " + user?.lname : "Salon "} Your Complain is Solve Successfully.Your feedback is crucial, and we're here to assist you.Thank you`,
         title: "Complain Solved",
       },
     };
 
-    const adminPromise = await admin
-    if(user && user.fcmToken !== null){
-
+    const adminPromise = await admin;
+    if (user && user.fcmToken !== null) {
       adminPromise
         .messaging()
         .send(payload)

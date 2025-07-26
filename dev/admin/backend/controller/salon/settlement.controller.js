@@ -2,19 +2,19 @@ const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const SalonSettlement = require("../../models/salonSettlement.model");
 const ExpertSettlement = require("../../models/expertSettlement.model");
+
 const moment = require("moment");
-const admin = require('../../firebase')
+const admin = require("../../firebase");
 
 exports.settlementForSalon = async (req, res) => {
   try {
     const start = parseInt(req?.query?.start) || 0;
     const limit = parseInt(req?.query?.limit) || 10;
     const skipAmount = start * limit;
+
     const salon = await Salon.findById(req.salon._id);
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon not exist" });
+      return res.status(200).send({ status: false, message: "Salon not exist" });
     }
 
     let dateFilter;
@@ -58,14 +58,14 @@ exports.settlementForSalon = async (req, res) => {
       },
       { $skip: skipAmount },
       { $limit: limit },
-    ]
-    const [settlement,total] = await Promise.all([
+    ];
+    const [settlement, total] = await Promise.all([
       SalonSettlement.aggregate(pipeline),
       SalonSettlement.countDocuments({
         salonId: salon._id,
         ...dateFilter,
-      })
-    ])
+      }),
+    ]);
 
     return res.status(200).json({
       status: true,
@@ -86,9 +86,7 @@ exports.getExpertSettlement = async (req, res) => {
   try {
     const salon = await Salon.findById(req.salon._id);
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon not exist" });
+      return res.status(200).send({ status: false, message: "Salon not exist" });
     }
     let dateFilter;
     const startDate = req.query.startDate || "ALL";
@@ -153,24 +151,18 @@ exports.getExpertSettlement = async (req, res) => {
 exports.expertPayment = async (req, res) => {
   try {
     if (!req.query.settlementId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const settlement = await ExpertSettlement.findById(req.query.settlementId);
     if (!settlement) {
-      return res
-        .status(200)
-        .send({ status: false, message: "settlement not found" });
+      return res.status(200).send({ status: false, message: "settlement not found" });
     }
 
     const expert = await Expert.findById(settlement.expertId);
 
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "expert not found" });
+      return res.status(200).send({ status: false, message: "expert not found" });
     }
 
     settlement.statusOfTransaction = 1;
@@ -184,8 +176,8 @@ exports.expertPayment = async (req, res) => {
     };
 
     await settlement.save();
-    const adminPromise = await admin
-    if(expert && expert.fcmToken !== null){
+    const adminPromise = await admin;
+    if (expert && expert.fcmToken !== null) {
       adminPromise
         .messaging()
         .send(payload)
@@ -214,28 +206,21 @@ exports.expertPayment = async (req, res) => {
 exports.bonusPenalty = async (req, res) => {
   try {
     if (!req.query.settlementId || !req.body.bonus) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const settlement = await ExpertSettlement.findById(req.query.settlementId);
     if (!settlement) {
-      return res
-        .status(200)
-        .send({ status: false, message: "settlement not found" });
+      return res.status(200).send({ status: false, message: "settlement not found" });
     }
 
     const expert = await Expert.findById(settlement.expertId);
 
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "expert not found" });
+      return res.status(200).send({ status: false, message: "expert not found" });
     }
     settlement.bonus = parseInt(req.body.bonus);
-    settlement.finalAmount =
-      settlement.expertEarning + parseInt(req.body.bonus);
+    settlement.finalAmount = settlement.expertEarning + parseInt(req.body.bonus);
 
     if (settlement.finalAmount < settlement.expertEarning) {
       return res.status(200).json({
@@ -262,17 +247,13 @@ exports.bonusPenalty = async (req, res) => {
 exports.getParticularExpertSettlement = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const expert = await Expert.findById(req.query.expertId);
 
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "expert not found" });
+      return res.status(200).send({ status: false, message: "expert not found" });
     }
     let dateFilter;
     const startDate = req.query.startDate || "ALL";
@@ -337,14 +318,10 @@ exports.getParticularExpertSettlement = async (req, res) => {
 exports.salonSettlementInfo = async (req, res) => {
   try {
     if (!req.query.settlementId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
-    const settlement = await SalonSettlement.findById(
-      req.query.settlementId
-    ).populate({
+    const settlement = await SalonSettlement.findById(req.query.settlementId).populate({
       path: "bookingId",
       populate: {
         path: "expertId",
@@ -368,9 +345,7 @@ exports.salonSettlementInfo = async (req, res) => {
 exports.expertSettlementInfo = async (req, res) => {
   try {
     if (!req.query.settlementId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const settlement = await ExpertSettlement.findById(req.query.settlementId)
@@ -388,8 +363,8 @@ exports.expertSettlementInfo = async (req, res) => {
       .populate({
         path: "salonId",
         select: "name",
-      })
-      
+      });
+
     return res.status(200).json({
       status: true,
       message: "data fetch Successfully",

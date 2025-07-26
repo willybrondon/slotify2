@@ -22,3 +22,9 @@
     transform: rotate(360deg);
   }
 }
+.react-select__control {
+  border: 1px solid #ddd;
+}
+.daterangepicker{
+    z-index: 9999999999 !important;
+}

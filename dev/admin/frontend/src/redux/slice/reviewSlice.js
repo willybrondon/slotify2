@@ -10,7 +10,7 @@ const initialState = {
 
 
 export const getAllReview = createAsyncThunk("admin/review/getAll", async (payload) => {
-    
+
     return apiInstanceFetch.get(`admin/review/getAll?start=${payload.start}&limit=${payload.limit}&search=${payload?.search}`)
 })
 
@@ -45,7 +45,7 @@ const reviewSlice = createSlice({
 
         builder.addCase(deleteReview.fulfilled, (state, action) => {
             if (action.payload.status) {
-                
+
                 state.review = state.review.filter((review) => review._id !== action.meta.arg);
                 Success("Review Deleted Successfully")
             }

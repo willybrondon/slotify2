@@ -65,7 +65,6 @@ const Appointment = () => {
   }));
 
   const handleDateClick = (arg) => {
-    console.log("arg.date", arg.date);
     if (
       window.confirm("Would you like to add an event to " + arg.dateStr + " ?")
     ) {
@@ -79,9 +78,7 @@ const Appointment = () => {
 
   const eventDrop = (info) => {
     const { start, end } = info.oldEvent._instance.range;
-    console.log(start, end);
     const { start: newStart, end: newEnd } = info.event._instance.range;
-    console.log(newStart, newEnd);
     if (new Date(start).getDate() === new Date(newStart).getDate()) {
       info.revert();
     }

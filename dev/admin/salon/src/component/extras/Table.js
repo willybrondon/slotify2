@@ -20,6 +20,7 @@ function Table(props) {
       setSortOrder("asc");
     }
   };
+  // console.log("sortColumn",sortColumn)
 
   const sortedData =
     data?.length > 0 &&
@@ -43,12 +44,12 @@ function Table(props) {
 
   return (
     <div className="mainTable" id={id}>
-      <table width="100%" border className={`primeTable  ${className}`}>
+      <table width="100%" className={`primeTable  ${className}`}>
         {roleSkeleton ? (
           <>
             <thead>
               <tr>
-                {mapData.map((res, i) => {
+                {mapData?.map((res, i) => {
                   return (
                     <th
                       className={` ${res.thClass}`}
@@ -92,7 +93,7 @@ function Table(props) {
           <>
             <thead>
               <tr>
-                {mapData.map((res, i) => {
+                {mapData?.map((res, i) => {
                   return (
                     <th
                       className={` ${res.thClass} text-uppercase`}

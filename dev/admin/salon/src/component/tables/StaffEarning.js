@@ -5,7 +5,7 @@
 
 import { openDialog } from "../../redux/slice/dialogueSlice";
 import { getExpertEarning, payment } from "../../redux/slice/payoutSlice";
-import { warning } from "../../util/Alert";
+import {  warning } from "../../util/Alert";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Title from "../extras/Title";
@@ -21,7 +21,6 @@ const StaffEarning = () => {
   const { payout, total } = useSelector((state) => state.payout);
   const { setting } = useSelector((state) => state.setting);
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
-  
 
   const [data, setData] = useState([]);
   const startOfMonth = moment().startOf("month").toDate();
@@ -289,7 +288,7 @@ const StaffEarning = () => {
   };
 
   const handlePayment = (row) => {
-    
+
     const payload = {
       settlementId: row._id,
     };

@@ -14,6 +14,7 @@ const Login = (props) => {
   const isAuth = useSelector((state) => state.auth.isAuth);
 
   useEffect(() => {
+    
     isAuth && navigate("/salonPanel/salonDashboard");
   }, [isAuth, navigate]);
 
@@ -40,6 +41,7 @@ const Login = (props) => {
       response?.status && navigate("/salonPanel/");
     }
   };
+
 
   return (
     <>
@@ -107,7 +109,7 @@ const Login = (props) => {
                   }}
                 />
               </div>
-              <div className="loginButton d-flex gx-2 justify-content-center">
+              <div className="loginButton d-flex gx-2 justify-content-center">            
                 <Button
                   type={`submit`}
                   className={`bg-theme text-light cursor m10-top col-6 mx-2`}

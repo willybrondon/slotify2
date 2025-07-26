@@ -5,7 +5,7 @@ export const warning = (confirm) => {
   return Swal.fire({
     title: "Are you sure?",
     text: "You won't be able to revert this!",
-    iconHtml: '<i class="ri-alert-line"></i>',
+    iconHtml: '<i className="ri-alert-line"></i>',
     showCancelButton: true,
     confirmButtonText: confirm,
     customClass: {
@@ -15,3 +15,5 @@ export const warning = (confirm) => {
     buttonsStyling: false,
   });
 };
+
+

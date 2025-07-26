@@ -15,11 +15,9 @@ const SalonSchedule = () => {
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
 ;
 
-  console.log("salonSchdule", salonSchedule);
 
   const state = useLocation();
 
-  console.log("first", state?.state?._id);
 
   const dispatch = useDispatch();
 

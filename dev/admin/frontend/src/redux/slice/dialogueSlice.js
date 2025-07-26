@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 const getDialogData = JSON.parse(localStorage.getItem("dialog"))
-console.log("dialog",getDialogData);
 const initialState = {
-  dialogue: getDialogData?.dialogue  ?  getDialogData?.dialogue : false ,
-  dialogueType:getDialogData?.type ? getDialogData?.type : "",
-  dialogueData: getDialogData?.data ? getDialogData?.data :null,
+  dialogue: getDialogData?.dialogue ? getDialogData?.dialogue : false,
+  dialogueType: getDialogData?.type ? getDialogData?.type : "",
+  dialogueData: getDialogData?.data ? getDialogData?.data : null,
+  dialogueMainData: getDialogData?.mainData ? getDialogData?.mainData : null,
   alertBox: false,
   isLoading: false,
 };
@@ -17,10 +17,10 @@ const dialogSlice = createSlice({
       return { ...state, ...action.payload };
     },
     openDialog(state, action) {
-        
       state.dialogue = true;
       state.dialogueType = action.payload.type || "";
       state.dialogueData = action.payload.data || null;
+      state.dialogueMainData = action.payload.mainData || null;
     },
     closeDialog(state, action) {
       state.dialogue = false;

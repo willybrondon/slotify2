@@ -1,199 +1,226 @@
 import { useEffect, useState } from "react";
-import Analytics from "../../extras/Analytics";
-import Pagination from "../../extras/Pagination";
-import Table from "../../extras/Table";
-import Title from "../../extras/Title";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import moment from "moment";
-import { getSalonHistory } from "../../../redux/slice/salonSlice";
+import Title from "../../extras/Title";
+import Analytics from "../../extras/Analytics";
+import Table from "../../extras/Table";
+import Pagination from "../../extras/Pagination";
+import { getSalonWalletData, getWalletData } from "../../../redux/slice/userSlice";
+import { useLocation } from "react-router-dom";
+import Sign from "../../../assets/images/sign.png"
+import With from "../../../assets/images/with.png"
+import { ReactComponent as Refund } from "../../../assets/icon/refund.svg"
 
 const SalonHistory = () => {
-  const { salary, total } = useSelector((state) => state.salon);
-  const [data, setData] = useState([]);
-
-  const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
-
-  const { setting } = useSelector((state) => state.setting);
-
-  const startOfMonth = moment().startOf("month").toDate();
-  const endOfMonth = moment().endOf("month").toDate();
-  const dDate = moment(startOfMonth).format("YYYY-MM-DD");
-  const d2Date = moment(endOfMonth).format("YYYY-MM-DD");
-  const [startDate, setStartDate] = useState(dDate);
-  const [endDate, setEndDate] = useState(d2Date);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [page, setPage] = useState(0);
-  const [type, setType] = useState("ALL");
-  const thisMonth = new Date();
-  thisMonth.setDate(1);
-  const [selectedDate, setSelectedDate] = useState(thisMonth);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { state } = useLocation();
-
-  const salonId = state?.row?.salon ? state?.row?.salon?._id : state?.row?._id;
-
-  useEffect(() => {
-    const formattedDate = moment(selectedDate, "YYYY-MM").format("YYYY-MM");
-    const payload = {
-      start: page,
-      limit: rowsPerPage,
-      startDate: startDate,
-      endDate: endDate,
-      salonId: salonId,
-    };
-    dispatch(getSalonHistory(payload));
-  }, [page, rowsPerPage, startDate, endDate, salonId]);
-
-  useEffect(() => {
-    setData(salary);
-  }, [salary]);
-
+  const transactionTypeData = [
+    { value: "3", label: "Credit" },
+    { value: "2", label: "Debit" }
+  ]
+  const { salonWalletData, total } = useSelector((state) => state.user);
+  const { admin } = useSelector((state) => state.auth);
+  const { setting } = useSelector((state) => state.setting)
+  const { state } = useLocation()
+  const [transactionType, setTransactionType] = useState("All");
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+  const dispatch = useDispatch()
 
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(0);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event, 10));
     setPage(0);
   };
 
-  function openHistory(id) {
-    navigate("/admin/expert/income", {
-      state: {
-        id,
-      },
-    });
-  }
+  const [startDate, setStartDate] = useState("ALL");
+  const [endDate, setEndDate] = useState("ALL");
+  useEffect(() => {
+    const payload = {
+      startDate: startDate,
+      endDate: endDate,
+      start: page,
+      limit: rowsPerPage,
+      type: transactionType,
+      salonId: state?.row?._id
+    }
+    dispatch(getSalonWalletData(payload))
+  }, [page, rowsPerPage, startDate, transactionType])
 
-  const mapData = [
+  const walletTable = [
     {
       Header: "No",
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
-
     {
-      Header: "Total Bookings",
+      Header: "UniqueId",
       Cell: ({ row }) => (
-        <span className="text-capitalize">
-          {row?.bookingId?.length == 0 ? 0 : row?.bookingId?.length}
+        <span
+          className="text-capitalize fw-bold cursor"
+
+        >
+          {row?.uniqueId || "-"}
         </span>
       ),
     },
     {
-      Header: `Salon Earnings `,
+      Header: `Amount (${setting.currencySymbol})`,
       Cell: ({ row }) => (
-        <span className="text-capitalize fw-bold">{row?.salonEarning+ " " + setting?.currencySymbol}</span>
-      ),
-    },
-    {
-      Header: `Admin Earnings`,
-      Cell: ({ row }) => (
-        <span className="text-capitalize fw-bold">{row?.salonCommission.toFixed(2)+ " " + setting?.currencySymbol}</span>
-      ),
-    },
+        <span
+          className="text-capitalize fw-bold cursor"
 
+        >
+          {row?.amount || "-"}
+        </span>
+      ),
+    },
     {
-      Header: "Note",
+      Header: "Date",
       Cell: ({ row }) => (
-        <span className="text-capitalize">
-          {row?.note
-            ? row?.note?.length > 25 && row?.note?.slice(0.25) + "..."
+        <span
+          className="text-capitalize fw-bold cursor"
+
+        >
+          {row?.date
+            ? row?.date
             : "-"}
         </span>
       ),
     },
     {
-      Header: `Bonus/Penalty `,
+      Header: "Time",
       Cell: ({ row }) => (
-        <span className="text-capitalize fw-bold">{row?.bonus+ " " + setting?.currencySymbol}</span>
+        <div>
+          {row?.time ? row?.time : "-"}
+        </div>
       ),
     },
     {
-      Header: `Final Amount `,
-      Cell: ({ row }) => (
-        <span className="text-capitalize fw-bold">{row?.finalAmount+ " " + setting?.currencySymbol}</span>
-      ),
+      Header: "Transaction Type",
+      Cell: ({ row }) =>
+        row?.type === 3 ? (
+          <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#14AF14" }}>
+            Credit
+          </button>
+        ) : row?.type === 4 ? (
+          <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#14AF14" }}>
+            Credit
+          </button>
+        ) : row?.type === 2 && row?.payoutStatus === 2 ? (
+          <button className="bg-danger text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#F23434" }}>
+            Debit
+          </button>
+        ) : (
+          <button className="m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#FFC7C6", color: "#FF1B1B", fontWeight:"700" }}>
+            Pending
+          </button>
+        ),
     },
     {
-      Header: "CreatedAt",
-      Cell: ({ row }) => (
-        <span className="text-capitalize">
-          {row?.createdAt && moment(row.createdAt).format("YYYY-MM-DD")}
-        </span>
-      ),
+      Header: "Transaction Completed",
+      Cell: ({ row }) =>
+        row?.type === 2 ? (
+          <>
+          {row?.payoutStatus === 1 ? (
+            <button className="d-flex align-items-center justify-content-center"
+              style={{ background: "#D8F0F9", color: "#17A7DB", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+              <Refund />
+              <span style={{ whiteSpace: "nowrap" }} className="ms-2">{
+                row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+              }</span>
+            </button>
+          ) : (
+            <button className="d-flex align-items-center justify-content-center"
+              style={{ background: "#F5DDC3", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+              <img src={With} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px", border: "none", borderRadius: "5px" }} />
+              <span style={{ whiteSpace: "nowrap" }}>{
+                row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+              }</span>
+            </button>
+          )
+          }
+        </>
+
+        ) : row?.type === 3 ? (
+          <button className="d-flex align-items-center justify-content-center"
+            style={{ background: "#C0E9C0", color: "#14AF14", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+            <img src={Sign} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px" }} />
+            <span style={{ whiteSpace: "nowrap" }}>Order confirmed</span>
+          </button>
+
+        ) : row?.type === 4 ? (
+          <button className="d-flex align-items-center justify-content-center"
+            style={{ background: "#D9F2E7", color: "#0EC070", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+            <img src={Sign} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px" }} />
+            <span style={{ whiteSpace: "nowrap" }}>Booking Completed</span>
+          </button>
+
+        ) : (
+          ""
+        ),
     },
-    {
-      Header: "Status",
-      Cell: ({ row }) => (
-        <span className="text-capitalize">
-          {row?.statusOfTransaction === 0 ? "Pending" : "Paid"}
-        </span>
-      ),
-    },
-  ];
-
-
-
-
-
-  const types = [
-    { name: "Pending", value: "unpaid" },
-    { name: "Paid", value: "paid" },
   ];
 
   return (
-    <div className="mainCategory">
-      <Title
-        name={`${
-          state?.row?.salon ? state?.row?.salon?.name : state?.row?.name
-        }'s Earnings`}
-      />
-      <div className="d-flex justify-between">
-        <div className="m40-bottom inputData col-lg-2 col-md-4 me-3">
-          <label>Select date</label>
-        
-          <Analytics
-            analyticsStartDate={startDate}
-            analyticsStartEnd={endDate}
-            analyticsStartDateSet={setStartDate}
-            analyticsStartEndSet={setEndDate}
-            allAllow={false}
-          />
+    <>
+      <div className="orderDetails mt-2">
+        <div className="row">
+          <Title name="Wallet History" className="mt-4" />
         </div>
-        <div className="col-md-3 col-lg-2 ms-4 mt-2">
-          <div className="inputData">
-            <label className="styleForTitle" htmlFor="settlement">
-              Settlement type
+        <div className="betBox">
+          <div className="inputData pb-2">
+            <label className="styleForTitle" htmlFor="transactionType">
+              Transaction Type
             </label>
             <select
-              name="types"
+              name="transactionType"
               className="rounded-2 fw-bold"
-              id="bookingType"
-              value={type}
+              id="transactionType"
+              value={transactionType}
               onChange={(e) => {
-                setType(e.target.value);
+                const selectedSalonId = e.target.value;
+                const payload = {
+                  startDate: startDate,
+                  endDate: endDate,
+                  start: page,
+                  limit: rowsPerPage,
+                  type: transactionType,
+                  salonId: state?.row?._id
+                }
+                dispatch(getSalonWalletData(payload))
+                setTransactionType(selectedSalonId);
               }}
             >
-              <option value="ALL" selected>
-                ALL
+              <option key="All" value="All">
+                All
               </option>
-              {types?.map((data) => {
-                return <option value={data?.value}>{data?.name}</option>;
-              })}
+              {transactionTypeData?.map((data) => (
+                <option key={data?.value} value={data?.value}>
+                  {data?.label}
+                </option>
+              ))}
             </select>
           </div>
+          <div className="col-md-9"  >
+            <div className="inputData">
+              <label>Analytic</label>
+            </div>
+            <Analytics
+              analyticsStartDate={startDate}
+              analyticsStartEnd={endDate}
+              placeholder="Wallet"
+              analyticsStartDateSet={setStartDate}
+              analyticsStartEndSet={setEndDate}
+            />
+          </div>
         </div>
-      </div>
-      <div>
+
         <Table
-          data={data}
-          mapData={mapData}
-          serverPerPage={rowsPerPage}
-          Page={page}
+          data={salonWalletData}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          mapData={walletTable}
         />
         <Pagination
           type={"server"}
@@ -205,7 +232,8 @@ const SalonHistory = () => {
           totalData={total}
         />
       </div>
-    </div>
+
+    </>
   );
 };
 

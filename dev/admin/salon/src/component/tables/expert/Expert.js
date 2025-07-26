@@ -16,7 +16,7 @@ import {
 } from "../../../redux/slice/expertSlice";
 import { openDialog } from "../../../redux/slice/dialogueSlice";
 import { ExpertDialogue } from "./ExpertDialogue";
-import { warning } from "../../../util/Alert";
+import {  warning } from "../../../util/Alert";
 import ToggleSwitch from "../../extras/ToggleSwitch";
 import { useNavigate } from "react-router-dom";
 import Searching from "../../extras/Searching";
@@ -28,7 +28,6 @@ export const Expert = () => {
 
   const { expert, total } = useSelector((state) => state.expert);
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
-  
 
 
   const dispatch = useDispatch();
@@ -72,7 +71,7 @@ export const Expert = () => {
   }
 
   const handleInfo = (id) => {
-    navigate("/salonPanel/getExpertProfile", {
+    navigate("/salonPanel/allExpert/getExpertProfile", {
       state: {
         id,
       },
@@ -154,14 +153,14 @@ export const Expert = () => {
         <ToggleSwitch
           value={row?.isBlock}
           onClick={() => {
-            
+        
             dispatch(blockExpert(row?._id));
           }}
         />
       ),
     },
     {
-      Header: "Bookings",
+      Header: "Booking",
       Cell: ({ row }) => (
         <span>
           <button
@@ -301,14 +300,14 @@ export const Expert = () => {
   };
 
   const handleNotify = (id) => {
-    
+
     dispatch(
       openDialog({ type: "notification", data: { id, type: "expert" } })
     );
   };
 
   const handleDelete = async (id) => {
-    
+
     try {
       const data = await warning("Delete");
       const yes = data.isConfirmed;
@@ -321,8 +320,6 @@ export const Expert = () => {
     }
   };
   const handleAddExpert = (row) => {
-    
-
     navigate("/salonPanel/addExpert", {
       state: {
         row,

@@ -4,13 +4,9 @@ module.exports = () => (req, res, next) => {
     if (token == process?.env?.secretKey) {
       next();
     } else {
-      return res
-        .status(400)
-        .json({ status: false, error: "Unauthorized Access" });
+      return res.status(400).json({ status: false, error: "Unauthorized Access" });
     }
   } else {
-    return res
-      .status(400)
-      .json({ status: false, error: "Unauthorized Access" });
+    return res.status(400).json({ status: false, error: "Unauthorized Access" });
   }
 };

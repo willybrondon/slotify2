@@ -1,38 +1,28 @@
 const Expert = require("../../models/expert.model");
 const Salon = require("../../models/salon.model");
-const Setting = require("../../models/setting.model");
-const Service = require("../../models/service.model");
 const mongoose = require("mongoose");
 
 exports.getExpertServiceWise = async (req, res) => {
   try {
     if (!req.query.serviceId || !req.query.salonId) {
-      return res
-        .status(201)
-        .json({ status: false, message: "Oops Invalid Detail" });
+      return res.status(201).json({ status: false, message: "Oops Invalid Detail" });
     }
 
-    let service = Array.isArray(req.query.serviceId)
-      ? req.query.serviceId
-      : [req.query.serviceId];
+    let service = Array.isArray(req.query.serviceId) ? req.query.serviceId : [req.query.serviceId];
 
-    let serviceIds = service[0]
-      .split(",")
-      .map((element) => new mongoose.Types.ObjectId(element));
-   
+    let serviceIds = service[0].split(",").map((element) => new mongoose.Types.ObjectId(element));
+
     const [salon, tax] = await Promise.all([
       Salon.findOne({
         _id: req.query.salonId,
         isActive: true,
         isDelete: false,
       }).populate("serviceIds.id"),
-      Setting.findOne().select("tax"),
+      global.settingJSON,
     ]);
 
     if (!salon) {
-      return res
-        .status(201)
-        .json({ status: false, message: "Oops! Salon Not Found!!" });
+      return res.status(201).json({ status: false, message: "Oops! Salon Not Found!!" });
     }
 
     const expert = await Expert.find({
@@ -76,21 +66,21 @@ exports.getTopExperts = async (req, res) => {
 
     const experts = await Expert.aggregate([
       {
-        $match: { isBlock: false, isDelete: false }
+        $match: { isBlock: false, isDelete: false },
       },
       {
         $lookup: {
-          from: 'salons', 
-          localField: 'salonId',
-          foreignField: '_id',
-          as: 'salonInfo'
-        }
+          from: "salons",
+          localField: "salonId",
+          foreignField: "_id",
+          as: "salonInfo",
+        },
       },
       {
         $match: {
-          'salonInfo.isActive': true,
-          'salonInfo.isDelete': false
-        }
+          "salonInfo.isActive": true,
+          "salonInfo.isDelete": false,
+        },
       },
       {
         $project: {
@@ -99,12 +89,12 @@ exports.getTopExperts = async (req, res) => {
           fname: 1,
           lname: 1,
           image: 1,
-          _id: 1
-        }
+          _id: 1,
+        },
       },
       { $skip: skipAmount },
       { $limit: limit },
-      { $sort: { review: -1 } }
+      { $sort: { review: -1 } },
     ]);
 
     return res.status(200).json({
@@ -121,25 +111,17 @@ exports.getTopExperts = async (req, res) => {
   }
 };
 
-
 exports.getExpertWithServiceForUser = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(201)
-        .send({ status: false, message: "Invalid Details" });
+      return res.status(201).send({ status: false, message: "Invalid Details" });
     }
 
     const expertId = req.query.expertId;
 
-    const expert = await Expert.findById(expertId).populate(
-      "salonId",
-      "name _id"
-    );
+    const expert = await Expert.findById(expertId).populate("salonId", "name _id");
     if (!expert) {
-      return res
-        .status(201)
-        .send({ status: false, message: "Expert not found" });
+      return res.status(201).send({ status: false, message: "Expert not found" });
     }
 
     const expertServiceIds = expert.serviceId;
@@ -150,7 +132,7 @@ exports.getExpertWithServiceForUser = async (req, res) => {
         isActive: true,
         isDelete: false,
       }).populate("serviceIds.id"),
-      Setting.findOne({}).select("tax"),
+      global.settingJSON,
     ]);
 
     // const salon = await Salon.findOne({
@@ -160,20 +142,14 @@ exports.getExpertWithServiceForUser = async (req, res) => {
     // }).populate("serviceIds.id");
 
     if (!salon) {
-      return res
-        .status(201)
-        .send({ status: false, message: "Salon not found" });
+      return res.status(201).send({ status: false, message: "Salon not found" });
     }
 
     if (!tax) {
-      return res
-        .status(201)
-        .send({ status: false, message: "Setting not found" });
+      return res.status(201).send({ status: false, message: "Setting not found" });
     }
 
-    const matchedServices = salon.serviceIds.filter((service) =>
-      expertServiceIds.includes(service.id?._id)
-    );
+    const matchedServices = salon.serviceIds.filter((service) => expertServiceIds.includes(service.id?._id));
 
     const servicesWithPrice = matchedServices.map((service) => {
       const { id, price } = service;

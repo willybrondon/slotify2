@@ -9,7 +9,6 @@ import ReactDatePicker from "react-datepicker";
 import moment from "moment";
 const HolidayDialog = () => {
   const dispatch = useDispatch();
-  
   const [reason, setReason] = useState("");
   const today = new Date();
   const [date, setDate] = useState(today);
@@ -17,7 +16,7 @@ const HolidayDialog = () => {
   const [error, setError] = useState("");
 
   const handleSubmit = () => {
-    
+
     if (!date || !endDate) {
       setError("Date is Require");
     } else {
@@ -45,11 +44,11 @@ const HolidayDialog = () => {
 
   return (
     <div className="dialog">
-      <div class="w-100">
-        <div class="row justify-content-center">
-          <div class="col-xl-4 col-md-6 col-11">
-            <div class="mainDiaogBox" style={{ minHeight: "400px" }}>
-              <div class="row justify-content-between align-items-center formHead">
+      <div className="w-100">
+        <div className="row justify-content-center">
+          <div className="col-xl-4 col-md-6 col-11">
+            <div className="mainDiaogBox" style={{ minHeight: "400px" }}>
+              <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
                   <h2 className="text-theme m0">Holiday Dialog</h2>
                 </div>

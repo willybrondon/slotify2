@@ -4,8 +4,9 @@ import Title from "../../extras/Title";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { blockUser, getUser } from "../../../redux/slice/userSlice";
+import { blockUser, getFetchWalletData, getUser } from "../../../redux/slice/userSlice";
 import { useState } from "react";
+import Female from "../../../assets/images/lum3n-ck3HFWw2OiM-unsplash.jpg";
 import { ExInput } from "../../extras/Input";
 import ToggleSwitch from "../../extras/ToggleSwitch";
 import Button from "../../extras/Button";
@@ -14,22 +15,85 @@ import Male from "../../../assets/images/male.png";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { isLoading } from "../../../util/allSelector";
+import Pagination from "../../extras/Pagination";
+import Table from "../../extras/Table";
+import { getAllExpert } from "../../../redux/slice/expertSlice";
+import Analytics from "../../extras/Analytics";
+import Sign from "../../../assets/images/sign.png"
+import { ReactComponent as Delievered } from "../../../assets/icon/deliever.svg"
+import { ReactComponent as Cancel } from "../../../assets/icon/cancel.svg"
+import { ReactComponent as Refund } from "../../../assets/icon/refund.svg"
+import { ReactComponent as WithDraw } from "../../../assets/icon/wit.svg"
 
 const UserProfile = () => {
-  const { userProfile } = useSelector((state) => state.user);
+  const { userProfile, fetchWalletData, totalWalletData } = useSelector((state) => state.user);
   const { state } = useLocation();
+  const { setting } = useSelector((state) => state.setting);
+
   const dispatch = useDispatch();
-  const [data, setData] = useState();
+  const [data, setData] = useState([]);
+  const [userData, setUserData] = useState([]);
   const navigate = useNavigate();
   const loader = useSelector(isLoading);
+  const [transactionType, setTransactionType] = useState("All");
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
+  const [startDate, setStartDate] = useState("ALL");
+  const [endDate, setEndDate] = useState("ALL");
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event, 10));
+    setPage(0);
+  };
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(0);
   useEffect(() => {
     dispatch(getUser(state?.id));
   }, [state]);
 
   useEffect(() => {
-    setData(userProfile);
+    // if (walletDetails) {
+    //   const payload = {
+    //     startDate: startDate,
+    //     endDate: endDate,
+    //     start: page,
+    //     limit: rowsPerPage,
+    //     type: transactionType
+    //   }
+    //   dispatch(getWalletData(payload))
+    // } else {
+    const payload = {
+      startDate: startDate === "ALL" ? "All" : startDate,
+      userId: state?.id,
+      endDate: endDate === "ALL" ? "All" : endDate,
+      start: page,
+      limit: rowsPerPage,
+      type: transactionType
+    }
+    dispatch(getFetchWalletData(payload))
+    // }
+  }, [startDate, page, rowsPerPage, transactionType])
+
+
+
+
+  useEffect(() => {
+    setUserData(userProfile);
   }, [userProfile]);
+  // useEffect(() => {
+  //   setData(walletData)
+  // }, [walletData])
+  useEffect(() => {
+    setData(fetchWalletData)
+  }, [fetchWalletData])
+
+  const transactionTypeData = [
+    { value: "1", label: "Credit" },
+    { value: "2", label: "Debit" }
+  ]
+
 
   const handelPreviousPage = () => {
     if (state) {
@@ -39,6 +103,121 @@ const UserProfile = () => {
       dispatch({ type: closeDialog });
     }
   };
+  const walletTable = [
+    {
+      Header: "No",
+      Cell: ({ index }) => (
+        <span>{page * rowsPerPage + parseInt(index) + 1}</span>
+      ),
+    },
+    {
+      Header: "UniqueId",
+      Cell: ({ row }) => (
+        <span
+          className="text-capitalize fw-bold cursor"
+        >
+          {row?.uniqueId}
+        </span>
+      ),
+    },
+    {
+      Header: `Amount (${setting?.currencySymbol})`,
+      Cell: ({ row }) => <span className="text-capitalize">{row?.amount || "-"}</span>,
+    },
+    {
+      Header: "Date",
+      Cell: ({ row }) => (
+        <span
+          className="text-capitalize fw-bold cursor"
+        >
+          {row?.date
+            ? row?.date
+            : "-"}
+        </span>
+      ),
+    },
+
+    {
+      Header: "Time",
+      Cell: ({ row }) => (
+        <div>
+          {row?.time ? row?.time : "-"}
+        </div>
+      ),
+    },
+    {
+      Header: "Transaction Type",
+      Cell: ({ row }) =>
+        row?.type === 1 ? (
+          <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#1ebc1e" }}>
+            Credit
+          </button>
+        ) : row?.type === 2 || row?.type === 3 ? (
+          <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#F23434" }}>
+            Debit
+          </button>
+        ) : row?.type === 4 ? (
+          <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#F23434" }}>
+            Debit
+          </button>
+        ) : row?.type === 5 ? (
+          <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#1ebc1e" }}>
+            Credit
+          </button>
+        ) : row?.type === "All" ? (
+          <button
+            className="bg-primary text-white m5-right p12-x p4-y fs-12 br-5 "
+            style={{ cursor: "pointer" }}
+          >
+            All
+          </button>
+        ) : (
+          ""
+        ),
+    },
+    {
+      Header: "Transaction Completed",
+      Cell: ({ row }) =>
+        row?.type === 1 ? (
+          <button className="d-flex align-items-center justify-content-center"
+            style={{ background: "#C0E9C0", color: "#14AF14", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+            <img src={Sign} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px" }} />
+            <span style={{ whiteSpace: "nowrap" }}>Wallet Deposit</span>
+          </button>
+        ) : row?.type === 2 ? (
+
+            <button
+              className="d-flex align-items-center justify-content-center"
+              style={{ backgroundColor: "#FFE7CF", borderRadius: "8px", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}
+            >
+              <WithDraw />
+              <span style={{ whiteSpace: "nowrap" }} className="ms-2">Booking Fee Deduction</span>
+            </button>
+        ) : row?.type === 3 ? (
+
+          <button className="d-flex align-items-center justify-content-center"
+            style={{ background: "#D9F2D9", color: "#14AF14", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+            <Delievered />
+            {/* <img src={Delieverd} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px" }} /> */}
+            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Product Purchase Deduction</span>
+          </button>
+        ) : row?.type === 4 ? (
+          <button className="d-flex align-items-center justify-content-center"
+            style={{ background: "#FFC7C6", color: "#FF1B1B", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+            <Cancel />
+            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Order Cancellation Fee</span>
+          </button>
+        ) : row?.type === 5 ? (
+          <button className="d-flex align-items-center justify-content-center"
+            style={{ background: "#D8F0F9", color: "#17A7DB", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+            <Refund />
+            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Order Refund</span>
+          </button>
+        ) : (
+          ""
+        ),
+    },
+  ];
   return (
     <div className="userProfile focusNone">
       {loader === true ? (
@@ -51,9 +230,8 @@ const UserProfile = () => {
         </>
       ) : (
         <Title
-          name={`${
-            data?.fname ? data?.fname + ` ` + data?.lname : "User"
-          }'s   Profile`}
+          name={`${data?.fname ? data?.fname + ` ` + data?.lname : "User"
+            }'s   Profile`}
         />
       )}
       <div className="col-7 my-auto ms-auto justify-content-end d-flex pe-3">
@@ -131,7 +309,7 @@ const UserProfile = () => {
               <div className="col-xl-4 col-md-6 col-sm-12">
                 <ExInput
                   type={`text`}
-                  value={data?.fname}
+                  value={userData?.fname}
                   label={`First name`}
                   readOnly={true}
                 />
@@ -139,7 +317,7 @@ const UserProfile = () => {
               <div className="col-xl-4 col-md-6 col-sm-12">
                 <ExInput
                   type={`text`}
-                  value={data?.lname ? data?.lname : "-"}
+                  value={userData?.lname ? userData?.lname : "-"}
                   label={`Last name`}
                   readOnly={true}
                 />
@@ -147,7 +325,7 @@ const UserProfile = () => {
               <div className="col-xl-4 col-md-6 col-sm-12">
                 <ExInput
                   type={`text`}
-                  value={data?.uniqueId}
+                  value={userData?.uniqueId}
                   label={`Unique id`}
                   readOnly={true}
                 />
@@ -155,7 +333,7 @@ const UserProfile = () => {
               <div className="col-xl-4 col-md-6 col-sm-12">
                 <ExInput
                   type={`text`}
-                  value={data?.mobile ? data?.mobile : "-"}
+                  value={userData?.mobile ? userData?.mobile : "-"}
                   label={`Mobile number`}
                   readOnly={true}
                 />
@@ -163,7 +341,7 @@ const UserProfile = () => {
               <div className="col-xl-4 col-md-6 col-sm-12">
                 <ExInput
                   type={`text`}
-                  value={data?.gender}
+                  value={userData?.gender}
                   label={`Gender`}
                   readOnly={true}
                 />
@@ -171,7 +349,7 @@ const UserProfile = () => {
               <div className="col-xl-4 col-md-6 col-sm-12">
                 <ExInput
                   type={`text`}
-                  value={data?.age ? data?.age : "-"}
+                  value={userData?.age ? userData?.age : "-"}
                   label={`Age`}
                   readOnly={true}
                 />
@@ -179,7 +357,7 @@ const UserProfile = () => {
               <div className="col-xl-4 col-md-6 col-sm-12">
                 <ExInput
                   type={`text`}
-                  value={data?.email ? data?.email : "-"}
+                  value={userData?.email ? userData?.email : "-"}
                   label={`Email id`}
                   readOnly={true}
                 />
@@ -188,11 +366,11 @@ const UserProfile = () => {
                 <ExInput
                   type={`text`}
                   value={
-                    data?.loginType == 1
+                    userData?.loginType == 1
                       ? "Email Login"
-                      : data?.loginType == 2
-                      ? "Google Login"
-                      : "Mobile Login"
+                      : userData?.loginType == 2
+                        ? "Google Login"
+                        : "Mobile Login"
                   }
                   label={`Login type`}
                   readOnly={true}
@@ -222,13 +400,90 @@ const UserProfile = () => {
                   readOnly
                   style={{ width: "100%", resize: "none" }}
                   cols="30"
-                  rows={5}
+                  rows={2}
                 />
               </>
             )}
           </div>
         </div>
+
+
+        <div className="orderDetails mt-2">
+          <div className="row">
+            <Title name="Wallet History" className="mt-4" onClick={(e) => {
+              // setOrderDetails(false);
+              // setWalletDetails(true);
+              setTransactionType("All");
+              setStartDate("All");
+              setEndDate("All");
+            }} />
+          </div>
+          <div className="betBox">
+            <div className="inputData pb-2 pt-2">
+              <label className="styleForTitle" htmlFor="transactionType">
+                Transaction Type
+              </label>
+              <select
+                name="transactionType"
+                className="rounded-2 fw-bold"
+                id="transactionType"
+                value={transactionType}
+                onChange={(e) => {
+                  const selectedSalonId = e.target.value;
+                  const payload = {
+                    startDate: startDate,
+                    endDate: endDate,
+                    start: page,
+                    limit: rowsPerPage,
+                    type: selectedSalonId
+                  }
+                  setTransactionType(selectedSalonId);
+                  // dispatch(getWalletData(payload))
+                }}
+              >
+                <option key="All" value="All">
+                  ALL
+                </option>
+                {transactionTypeData?.map((data) => (
+                  <option key={data?.value} value={data?.value}>
+                    {data?.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-9"  >
+              <div className="inputData">
+                <label>Analytic</label>
+              </div>
+              <Analytics
+                analyticsStartDate={startDate}
+                analyticsStartEnd={endDate}
+                placeholder="Wallet"
+                analyticsStartDateSet={setStartDate}
+                analyticsStartEndSet={setEndDate}
+              />
+            </div>
+          </div>
+
+          <Table
+            data={data}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            mapData={walletTable}
+          />
+          <Pagination
+            type={"server"}
+            serverPage={page}
+            setServerPage={setPage}
+            serverPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            totalData={totalWalletData}
+          />
+        </div>
+
       </div>
+
     </div>
   );
 };
