@@ -7,6 +7,8 @@ const initialState = {
   salon: [],
   booking: [],
   salonSchedule: [],
+  salonOrders: [],
+  salonProduct: [],
   isLoading: false,
   total: 0,
 };
@@ -23,6 +25,18 @@ export const getSalonDetail = createAsyncThunk(
   "admin/salon/getSalon",
   async (id) => {
     return apiInstanceFetch.get(`admin/salon/getSalon?salonId=${id}`);
+  }
+);
+export const getSalonProductDetails = createAsyncThunk(
+  "admin/getSalonProductDetails/getSalon",
+  async (payload) => {
+    return apiInstanceFetch.get(`admin/salon/getProductsOfParticularSalon?salonId=${payload?.salonId}&start=${payload?.start}&limit=${payload?.limit}`);
+  }
+);
+export const getSalonOrderDetails = createAsyncThunk(
+  "admin/getSalonOrderDetails/getSalon",
+  async (payload) => {
+    return apiInstanceFetch.get(`admin/order/fetchOrdersOfSalon?salonId=${payload?.salonId}&start=${payload?.start}&limit=${payload?.limit}&status=${payload?.status}`);
   }
 );
 export const getSalonReview = createAsyncThunk(
@@ -84,6 +98,12 @@ export const activesalon = createAsyncThunk(
     return apiInstance.put(`admin/salon/isActive?salonId=${id}`);
   }
 );
+export const handleBestSeller = createAsyncThunk(
+  "admin/handleBestSeller/update",
+  async (id) => {
+    return apiInstance.put(`admin/salon/isBestSeller?salonId=${id}`);
+  }
+);
 
 export const activeBreak = createAsyncThunk(
   "admin/salon/isBreak",
@@ -127,6 +147,32 @@ const salonSlice = createSlice({
     });
 
     builder.addCase(getAllSalons.rejected, (state, action) => {
+      state.isSkeleton = false;
+    });
+    builder.addCase(getSalonOrderDetails.pending, (state, action) => {
+      state.isSkeleton = true;
+    });
+
+    builder.addCase(getSalonOrderDetails.fulfilled, (state, action) => {
+      state.isSkeleton = false;
+      state.salonOrders = action?.payload?.orders;
+      state.total = action?.payload?.total
+    });
+
+    builder.addCase(getSalonOrderDetails.rejected, (state, action) => {
+      state.isSkeleton = false;
+    });
+    builder.addCase(getSalonProductDetails.pending, (state, action) => {
+      state.isSkeleton = true;
+    });
+
+    builder.addCase(getSalonProductDetails.fulfilled, (state, action) => {
+      state.isSkeleton = false;
+      state.salonProduct = action?.payload?.product;
+      state.total = action?.payload?.totalProducts;
+    });
+
+    builder.addCase(getSalonProductDetails.rejected, (state, action) => {
       state.isSkeleton = false;
     });
 
@@ -227,7 +273,6 @@ const salonSlice = createSlice({
           (salon) => salon?._id === activeSalonIndx?._id
         );
 
-        console.log('salonIndex', salonIndx)
 
         if (salonIndx !== -1) {
           state.salonSchedule[salonIndx].isBreak = activeSalonIndx.isBreak

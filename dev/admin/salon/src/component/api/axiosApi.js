@@ -5,13 +5,13 @@ import { baseURL, secretKey } from "../../util/config";
 import { useEffect } from "react";
 
 const getTokenData = () => sessionStorage.getItem("token");
-
 export const apiInstance = axios.create({
   baseURL: baseURL,
 });
 
 const cancelTokenSource = axios.CancelToken.source();
 const token = sessionStorage.getItem("token");
+
 apiInstance.defaults.headers.common["Authorization"] = token;
 apiInstance.defaults.headers.common["key"] = secretKey;
 
@@ -73,7 +73,7 @@ const handleErrors = async (response) => {
 
 const getHeaders = () => ({
   key: secretKey,
-  Authorization: getTokenData(),
+  Authorization: token,
   "Content-Type": "application/json",
 });
 

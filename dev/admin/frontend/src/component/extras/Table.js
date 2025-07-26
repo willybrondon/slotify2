@@ -11,7 +11,6 @@ function Table(props) {
   const location = useLocation();
   const [sortColumn, setSortColumn] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
-
   const handleColumnClick = (column) => {
     if (sortColumn === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -43,12 +42,12 @@ function Table(props) {
 
   return (
     <div className="mainTable" id={id}>
-      <table width="100%" border className={`primeTable  ${className}`}>
+      <table width="100%" className={`primeTable  ${className}`}>
         {roleSkeleton ? (
           <>
             <thead>
-              <tr>
-                {mapData.map((res, i) => {
+              <tr key={Math.random()}>
+                {mapData?.map((res, i) => {
                   return (
                     <th className={` ${res.thClass}`} key={i} width={res.width} style={{ minWidth: res.width ? res.width : "100px" }}>
                       <div className={`${res.thClass}`} style={{height:"20px"}}>
@@ -61,7 +60,7 @@ function Table(props) {
             <tbody>
               {Array(6)
                 .fill()
-                .map((res, i) => {
+                ?.map((res, i) => {
                   return (
                     <>
                       <tr key={i} style={{ height: "80px" }}>
@@ -85,7 +84,7 @@ function Table(props) {
           <>
             <thead>
               <tr>
-                {mapData.map((res, i) => {
+                {mapData?.map((res, i) => {
                   return (
                     <th
                       className={`text-uppercase ${res.thClass}`}
@@ -119,7 +118,7 @@ function Table(props) {
                   {(PerPage > 0
                     ? sortedData.slice(Page * PerPage, Page * PerPage + PerPage)
                     : sortedData
-                  ).map((i, k) => {
+                  )?.map((i, k) => {
                     return (
                       <>
                         <tr key={k}>

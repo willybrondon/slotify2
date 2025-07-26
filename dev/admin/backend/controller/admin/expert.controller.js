@@ -1,40 +1,21 @@
 const Expert = require("../../models/expert.model");
 const Salon = require("../../models/salon.model");
+const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
+
 const mongoose = require("mongoose");
 const fs = require("fs");
 
 exports.create = async (req, res) => {
   try {
-    if (
-      // !req.body ||
-      !req.body.fname ||
-      !req.body.lname ||
-      !req.body.email ||
-      !req.body.age ||
-      !req.body.gender ||
-      !req.body.mobile ||
-      !req.body.commission ||
-      !req.body.bankName ||
-      !req.body.accountNumber ||
-      !req.body.IFSCCode ||
-      !req.body.upiId ||
-      !req.body.branchName ||
-      !req.body.password || //
-      !req.body.salonId
-    ) {
+    if (!req.body.fname || !req.body.lname || !req.body.email || !req.body.age || !req.body.gender || !req.body.mobile || !req.body.commission || !req.body.password || !req.body.salonId) {
       if (req.files) deleteFile(req.files.image[0]);
-      return res
-        .status(200)
-        .json({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).json({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const capitalizeFirstLetter = (str) => {
       return str.charAt(0).toUpperCase() + str.slice(1);
     };
 
-    const capitalizeAllLetters = (str) => {
-      return str.toUpperCase();
-    };
     const expert = new Expert();
     expert.fname = capitalizeFirstLetter(req.body.fname);
     expert.lname = capitalizeFirstLetter(req.body.lname);
@@ -43,30 +24,20 @@ exports.create = async (req, res) => {
     expert.gender = req.body.gender;
     expert.mobile = req.body.mobile;
     expert.commission = req.body.commission;
-    expert.bankDetails.bankName = req.body.bankName;
-    expert.bankDetails.branchName = req.body.branchName;
-    expert.bankDetails.accountNumber = req.body.accountNumber;
-    expert.bankDetails.IFSCCode = capitalizeAllLetters(req.body.IFSCCode);
-    expert.upiId = capitalizeAllLetters(req.body.upiId);
     expert.password = req.body.password;
     expert.uniqueId = Math.floor(Math.random() * 1000000 + 999999);
 
     if (req.body.serviceId) {
-      let service = Array.isArray(req.body.serviceId)
-        ? req.body.serviceId
-        : [req.body.serviceId];
+      let service = Array.isArray(req.body.serviceId) ? req.body.serviceId : [req.body.serviceId];
 
       const serviceIdArray = service[0].split(",");
-      expert.serviceId = serviceIdArray.map(
-        (id) => new mongoose.Types.ObjectId(id)
-      );
+      expert.serviceId = serviceIdArray.map((id) => new mongoose.Types.ObjectId(id));
     }
+
     expert.image = req.file ? process?.env?.baseURL + req?.file?.path : "";
     const salon = await Salon.findById(req.body.salonId);
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Oops ! Salon not found !!" });
+      return res.status(200).json({ status: false, message: "Oops ! Salon not found !!" });
     }
 
     expert.salonId = req.body.salonId;
@@ -90,18 +61,14 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     if (!req.query.salonId) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).json({ status: false, message: "Oops ! Invalid details!!" });
     }
     let salonQuery;
 
     if (req.query.salonId !== "ALL" && req.query.salonId !== "") {
       let salon = await Salon.findById(req.query.salonId);
       if (!salon) {
-        return res
-          .status(200)
-          .json({ status: false, message: "Oops ! Salon not found !!" });
+        return res.status(200).json({ status: false, message: "Oops ! Salon not found !!" });
       }
       salonQuery = { salonId: salon._id };
     }
@@ -169,10 +136,7 @@ exports.getAll = async (req, res) => {
             {
               $match: {
                 $expr: {
-                  $and: [
-                    { $in: ["$_id", "$$serviceId"] },
-                    { $eq: ["$isDelete", false] },
-                  ],
+                  $and: [{ $in: ["$_id", "$$serviceId"] }, { $eq: ["$isDelete", false] }],
                 },
               },
             },
@@ -198,11 +162,8 @@ exports.getAll = async (req, res) => {
           commission: 1,
           image: 1,
           createdAt: 1,
-          paymentType: 1,
           isBlock: 1,
           serviceData: 1,
-          bankDetails: 1,
-          upiId: 1,
           password: 1,
           uniqueId: 1,
           review: 1,
@@ -229,7 +190,6 @@ exports.getAll = async (req, res) => {
       }),
     ]);
 
-
     return res.status(200).json({
       status: true,
       message: "Data found",
@@ -248,18 +208,14 @@ exports.getAll = async (req, res) => {
 exports.updateExpert = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Details" });
+      return res.status(200).send({ status: false, message: "Invalid Details" });
     }
 
     const expert = await Expert.findById(req.query.expertId);
 
     if (!expert) {
       if (req.files) deleteFile(req.files.image[0]);
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not found" });
+      return res.status(200).send({ status: false, message: "Expert not found" });
     }
 
     // Update expert properties based on request data
@@ -269,32 +225,17 @@ exports.updateExpert = async (req, res) => {
     expert.mobile = req.body.mobile ? req.body.mobile : expert.mobile;
     expert.age = req.body.age ? req.body.age : expert.age;
     expert.gender = req.body.gender ? req.body.gender : expert.gender;
-    expert.commission = req.body.commission
-      ? req.body.commission
-      : expert.commission;
+    expert.commission = req.body.commission ? req.body.commission : expert.commission;
 
-    expert.upiId = req.body.upiId || expert.upiId;
-    expert.bankDetails.bankName =
-      req.body.bankName || expert.bankDetails.bankName;
-    expert.bankDetails.accountNumber =
-      req.body.accountNumber || expert.bankDetails.accountNumber;
-    expert.bankDetails.IFSCCode =
-      req.body.IFSCCode || expert.bankDetails.IFSCCode;
-    expert.bankDetails.branchName =
-      req.body.branchName || expert.bankDetails.branchName;
-    // // Update serviceId if provided in the request
+    //Update serviceId if provided in the request
     if (req.body.serviceId) {
-      let service = Array.isArray(req.body.serviceId)
-        ? req.body.serviceId
-        : [req.body.serviceId];
+      let service = Array.isArray(req.body.serviceId) ? req.body.serviceId : [req.body.serviceId];
 
       const serviceIdArray = service[0].split(",");
-      expert.serviceId = serviceIdArray.map(
-        (id) => new mongoose.Types.ObjectId(id)
-      );
+      expert.serviceId = serviceIdArray.map((id) => new mongoose.Types.ObjectId(id));
     }
 
-    // Update the expert's image if a new file is uploaded
+    //Update the expert's image if a new file is uploaded
     if (req.file) {
       var image_ = expert.image.split("storage");
       if (image_[1] !== "/male.png" && image_[1] !== "/female.png") {
@@ -302,9 +243,7 @@ exports.updateExpert = async (req, res) => {
           fs.unlinkSync("storage" + image_[1]);
         }
       }
-      expert.image = req.file
-        ? process.env.baseURL + req.file.path
-        : expert.image;
+      expert.image = req.file ? process.env.baseURL + req.file.path : expert.image;
     }
 
     await expert.save();
@@ -312,9 +251,7 @@ exports.updateExpert = async (req, res) => {
     // Populate the updated expert data
     const data = await Expert.findById(expert._id).populate("serviceId");
 
-    return res
-      .status(200)
-      .send({ status: true, message: "Updated successfully", expert: data });
+    return res.status(200).send({ status: true, message: "Updated successfully", expert: data });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -327,15 +264,11 @@ exports.updateExpert = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "invalid details" });
+      return res.status(200).send({ status: false, message: "invalid details" });
     }
     const expert = await Expert.findById(req.query.expertId);
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not exists" });
+      return res.status(200).send({ status: false, message: "Expert not exists" });
     }
     const image = expert.image?.split("storage");
     if (image) {
@@ -359,22 +292,16 @@ exports.delete = async (req, res) => {
 exports.isBlock = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "invalid details" });
+      return res.status(200).send({ status: false, message: "invalid details" });
     }
     const expert = await Expert.findById(req.query.expertId);
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not exist" });
+      return res.status(200).send({ status: false, message: "Expert not exist" });
     }
     expert.isBlock = !expert.isBlock;
     await expert.save();
 
-    return res
-      .status(200)
-      .send({ status: true, message: "Status changed Successfully", expert });
+    return res.status(200).send({ status: true, message: "Status changed Successfully", expert });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -387,16 +314,12 @@ exports.isBlock = async (req, res) => {
 exports.getExpert = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const expert = await Expert.findById(req.query.expertId);
     if (!expert || expert.isDelete) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not exist" });
+      return res.status(200).send({ status: false, message: "Expert not exist" });
     }
     const experts = await Expert.aggregate([
       {
@@ -410,10 +333,7 @@ exports.getExpert = async (req, res) => {
             {
               $match: {
                 $expr: {
-                  $and: [
-                    { $in: ["$_id", "$$serviceId"] },
-                    { $eq: ["$isDelete", false] },
-                  ],
+                  $and: [{ $in: ["$_id", "$$serviceId"] }, { $eq: ["$isDelete", false] }],
                 },
               },
             },
@@ -440,20 +360,15 @@ exports.getExpert = async (req, res) => {
           image: 1,
           createdAt: 1,
           commission: 1,
-          currentEarning: 1,
           uniqueId: 1,
-          bankDetails: 1,
           earning: 1,
           bookingCount: 1,
           totalBookingCount: 1,
-          upiId: 1,
           review: 1,
           reviewCount: 1,
-          paymentType: 1,
         },
       },
     ]);
-
 
     return res.status(200).json({
       status: true,
@@ -466,5 +381,183 @@ exports.getExpert = async (req, res) => {
       status: false,
       error: error.message || "Internal Server Error",
     });
+  }
+};
+
+exports.fetchParExpertWalletHistoryByAdm = async (req, res) => {
+  try {
+    const { expertId, type } = req.query;
+
+    if (!expertId || !type) {
+      return res.status(200).json({ status: false, message: "Invalid request: Missing required fields." });
+    }
+
+    const startDate = req.query.startDate || "All";
+    const endDate = req.query.endDate || "All";
+
+    const start = parseInt(req.query.start) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    let dateFilterQuery = {};
+    if (startDate !== "All" && endDate !== "All") {
+      const formateStartDate = new Date(startDate);
+      const formateEndDate = new Date(endDate);
+      formateEndDate.setHours(23, 59, 59, 999);
+
+      dateFilterQuery = {
+        createdAt: {
+          $gte: formateStartDate,
+          $lte: formateEndDate,
+        },
+      };
+    }
+
+    let typeQuery = {}; //1.deposite Or 2.deduct
+    if (type !== "All") {
+      typeQuery.type = parseInt(type);
+    }
+
+    const expertObjId = new mongoose.Types.ObjectId(expertId);
+
+    const [expert, total, data] = await Promise.all([
+      Expert.findOne({ _id: expertObjId, isDelete: false }),
+      SalonExpertWalletHistory.countDocuments({ type: { $nin: [3, 4] }, expert: expertObjId, ...dateFilterQuery, ...typeQuery }),
+      SalonExpertWalletHistory.aggregate([
+        {
+          $match: {
+            type: { $nin: [3, 4] },
+            expert: expertObjId,
+            ...dateFilterQuery,
+            ...typeQuery,
+          },
+        },
+        {
+          $project: {
+            type: 1,
+            payoutStatus: 1,
+            uniqueId: 1,
+            amount: 1,
+            date: 1,
+            time: 1,
+          },
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: start * limit },
+        { $limit: limit },
+      ]),
+    ]);
+
+    if (!expert) {
+      return res.status(200).json({ status: false, message: "Expert does not found." });
+    }
+
+    if (expert.isBlock) {
+      return res.status(200).json({ status: false, message: "Your account is blocked by the admin." });
+    }
+
+    const totalAmount = expert.earning || 0;
+
+    return res.status(200).json({
+      status: true,
+      message: "Success",
+      totalEarning: totalAmount,
+      total: total,
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};
+
+exports.retriveExpertWalletHistory = async (req, res) => {
+  try {
+    const startDate = req.query.startDate || "All";
+    const endDate = req.query.endDate || "All";
+
+    const start = parseInt(req.query.start) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const type = req.query.type;
+
+    let dateFilterQuery = {};
+    if (startDate !== "All" && endDate !== "All") {
+      const formateStartDate = new Date(startDate);
+      const formateEndDate = new Date(endDate);
+      formateEndDate.setHours(23, 59, 59, 999);
+
+      dateFilterQuery = {
+        createdAt: {
+          $gte: formateStartDate,
+          $lte: formateEndDate,
+        },
+      };
+    }
+
+    let typeQuery = {}; //1.deposite Or 2.deduct
+    if (type !== "All") {
+      typeQuery.type = parseInt(type);
+    }
+
+    const [total, data] = await Promise.all([
+      SalonExpertWalletHistory.countDocuments({
+        type: { $nin: [3, 4] },
+        ...dateFilterQuery,
+        ...typeQuery,
+      }),
+      SalonExpertWalletHistory.aggregate([
+        {
+          $match: {
+            type: { $nin: [3, 4] },
+            ...dateFilterQuery,
+            ...typeQuery,
+          },
+        },
+        {
+          $lookup: {
+            from: "experts",
+            localField: "expert",
+            foreignField: "_id",
+            as: "expert",
+          },
+        },
+        {
+          $unwind: "$expert",
+        },
+        {
+          $match: {
+            "expert.isDelete": false,
+          },
+        },
+        {
+          $project: {
+            type: 1,
+            payoutStatus: 1,
+            uniqueId: 1,
+            amount: 1,
+            date: 1,
+            time: 1,
+            expert: {
+              name: { $concat: ["$expert.fname", " ", "$expert.lname"] },
+              _id: "$expert._id",
+              image: "$expert.image",
+            },
+          },
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: start * limit },
+        { $limit: limit },
+      ]),
+    ]);
+
+    return res.status(200).json({
+      status: true,
+      message: "Success",
+      total: total,
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
   }
 };

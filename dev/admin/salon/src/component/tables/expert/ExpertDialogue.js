@@ -12,7 +12,6 @@ import {
   getAllServices,
   getParticularSalonService,
 } from "../../../redux/slice/serviceSlice";
-
 import { useLocation, useNavigate } from "react-router-dom";
 import Title from "../../extras/Title";
 
@@ -81,9 +80,9 @@ export const ExpertDialogue = () => {
   });
 
   const isEmailValid = /\S+@\S+\.\S+/.test(email);
-  const   handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (
       !lname ||
       !fname ||
@@ -93,11 +92,6 @@ export const ExpertDialogue = () => {
       !email ||
       (!imagePath && (!image || image.length === 0)) ||
       !commission ||
-      !bankName ||
-      !accountNumber ||
-      !branchName ||
-      !IFSCCode ||
-      !upiId ||
       !password ||
       !allService?.length
     ) {
@@ -115,12 +109,7 @@ export const ExpertDialogue = () => {
       if (age < 18 || age > 100) error.age = "Invalid Age";
       if (commission < 0 || commission > 99)
         error.commission = "Invalid Commission";
-      if (!bankName) error.bankName = "Bank name is required";
       if (!commission) error.commission = "Commission is required";
-      if (!accountNumber) error.accountNumber = "Account number is required";
-      if (!branchName) error.branchName = "Branch name is required";
-      if (!IFSCCode) error.IFSCCode = "IFSC Code is required";
-      if (!upiId) error.upiId = "UPI ID is required";
       if (!password) error.password = "Password is required";
       if (!allService?.length)
         error.allService = "At least one service must be selected";
@@ -139,12 +128,7 @@ export const ExpertDialogue = () => {
       formData.append("age", age);
       formData.append("gender", gender);
       formData.append("commission", commission);
-      formData.append("IFSCCode", IFSCCode);
-      formData.append("accountNumber", accountNumber);
-      formData.append("branchName", branchName);
-      formData.append("upiId", upiId);
       formData.append("password", password);
-      formData.append("bankName", bankName);
       const serviceIds = allService?.map((service) => service.id)?.join(",");
       formData.append("serviceId", serviceIds);
 
@@ -172,26 +156,20 @@ export const ExpertDialogue = () => {
     setAllService(addData);
   }, [state]);
 
-
   const serviceList = particularService?.map((list) => ({
     name: list?.id?.name,
     id: list?.id?._id,
   }));
 
-
   const select = state?.row?.serviceData
     ? state?.row?.serviceData?.map((item) => ({
-        id: item?._id,
-        name: item?.name,
-      }))
+      id: item?._id,
+      name: item?.name,
+    }))
     : state?.row?.serviceId?.map((item) => ({
-        id: item?._id,
-        name: item?.name,
-      }));
-
-      console.log(select,"======select");
-      
-
+      id: item?._id,
+      name: item?.name,
+    }));
 
   function onSelect(selectedList, selectedItem) {
     const updatedServices =
@@ -205,7 +183,6 @@ export const ExpertDialogue = () => {
     );
     setAllService(updatedServices);
   }
-
   const handleImage = (e) => {
     setImage(e.target.files[0]);
     setImagePath(URL.createObjectURL(e.target.files[0]));
@@ -215,17 +192,19 @@ export const ExpertDialogue = () => {
     }));
   };
 
+ 
+
   return (
     <div className="p-3">
       <Title name={`Add expert`} />
       <div className="card">
         <div className="card-body">
-          <div class="">
+          <div className="">
             <div className="row align-items-start formBody">
               <div className="row my-2">
                 <div className="col-12">
                   <div className="inputData text  flex-row justify-content-start text-start">
-                    <label for="fname" class="false">
+                    <label for="fname" className="false">
                       Select services
                     </label>
                   </div>
@@ -236,10 +215,11 @@ export const ExpertDialogue = () => {
                     onSelect={onSelect}
                     onRemove={onRemove}
                     displayValue="name"
+                         className="cursor-pointer"
                   />
                 </div>
                 {error.allService && (
-                  <p className="errorMessage">{error?.allService}</p>
+                  <p className="errorMessage" style={{color:"red",fontSize:"16px"}}>{error?.allService}</p>
                 )}
               </div>
 
@@ -399,8 +379,8 @@ export const ExpertDialogue = () => {
                   id={`commission`}
                   name={`commission`}
                   value={commission}
-                  label={`Admin commission (%)`}
-                  placeholder={`Admin commission`}
+                  label={`Salon commission (%)`}
+                  placeholder={`Salon commission`}
                   errorMessage={error.commission && error.commission}
                   onChange={(e) => {
                     setCommission(e.target.value);
@@ -424,135 +404,6 @@ export const ExpertDialogue = () => {
                 />
               </div>
 
-              <div className="col-12 col-md-6">
-                <ExInput
-                  type={`string`}
-                  id={`bankName`}
-                  name={`bankName`}
-                  value={bankName}
-                  label={`Bank name`}
-                  placeholder={`Bank name`}
-                  errorMessage={error.bankName && error.bankName}
-                  onChange={(e) => {
-                    setBankName(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        bankName: `Bankname is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        bankName: "",
-                      });
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="col-12 col-md-6">
-                <ExInput
-                  type={`string`}
-                  id={`accountNumber`}
-                  name={`accountNumber`}
-                  value={accountNumber}
-                  label={`Account number`}
-                  placeholder={`Account number`}
-                  errorMessage={error.accountNumber && error.accountNumber}
-                  onChange={(e) => {
-                    setAccountNumber(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        accountNumber: `Account number is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        accountNumber: "",
-                      });
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="col-12 col-md-6">
-                <ExInput
-                  type={`string`}
-                  id={`branchName`}
-                  name={`branchName`}
-                  value={branchName}
-                  label={`Branch name`}
-                  placeholder={`Branch name`}
-                  errorMessage={error.branchName && error.branchName}
-                  onChange={(e) => {
-                    setBranchName(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        branchName: `Branch name is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        branchName: "",
-                      });
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="col-12 col-md-6">
-                <ExInput
-                  type={`string`}
-                  id={`IFSCCode`}
-                  name={`IFSCCode`}
-                  value={IFSCCode}
-                  label={`IFSC code`}
-                  placeholder={`IFSC code`}
-                  errorMessage={error.IFSCCode && error.IFSCCode}
-                  onChange={(e) => {
-                    setIFSCCode(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        IFSCCode: `IFSC Code is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        IFSCCode: "",
-                      });
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="col-12 col-md-6">
-                <ExInput
-                  type={`string`}
-                  id={`upiId`}
-                  name={`upiId`}
-                  value={upiId}
-                  label={`Upi id`}
-                  placeholder={`Upi id`}
-                  errorMessage={error.upiId && error.upiId}
-                  onChange={(e) => {
-                    setUpiId(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        upiId: `upiid is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        upiId: "",
-                      });
-                    }
-                  }}
-                />
-              </div>
 
               <div className="col-12 col-md-6">
                 <ExInput

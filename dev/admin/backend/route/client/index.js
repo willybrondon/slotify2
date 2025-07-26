@@ -1,9 +1,8 @@
 const express = require("express");
 const route = express.Router();
+module.exports = route;
 
 const user = require("./user.route");
-route.use("/", user);
-module.exports = route;
 const salon = require("./salon.route");
 const service = require("./service.route");
 const category = require("./category.route");
@@ -17,8 +16,25 @@ const attendance = require("./attendance.route");
 const forgetPassword = require("./forgetPassword.route");
 const expertSettlement = require("./expertSettlement.route");
 const otp = require("./otp.route");
-const salonRequest = require('./salonRequest.route')
+const salonRequest = require("./salonRequest.route");
+const address = require("./address.route");
+const product = require("./product.route");
+const favourite = require("./favourite.route");
+const productCategory = require("./productCategory.route");
+const cart = require("./cart.route");
+const order = require("./order.route");
+const withdrawMethod = require("./withdrawMethod.route");
+const expertWithdrawMethod = require("./expertWithdrawMethod.route");
+const expertWithdrawRequest = require("./expertWithdrawRequest.route");
+const couponRoute = require("./coupon.route");
 
+route.use("/order", order);
+route.use("/cart", cart);
+route.use("/", user);
+route.use("/productCategory", productCategory);
+route.use("/favourite", favourite);
+route.use("/product", product);
+route.use("/address", address);
 route.use("/expertSettlement", expertSettlement);
 route.use("/forgetPassword", forgetPassword);
 route.use("/attendance", attendance);
@@ -33,5 +49,7 @@ route.use("/category", category);
 route.use("/review", review);
 route.use("/otp", otp);
 route.use("/salonrequest", salonRequest);
-
-
+route.use("/withdrawMethod", withdrawMethod);
+route.use("/expertWithdrawMethod", expertWithdrawMethod);
+route.use("/expertWithdrawRequest", expertWithdrawRequest);
+route.use("/coupon", couponRoute);

@@ -6,18 +6,13 @@ const admin = require("../../firebase");
 
 exports.particularUserNotification = async (req, res) => {
   try {
-    console.log("req.body", req.body);
     if (!req.query.userId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops! Invalid details!!" });
     }
 
     const user = await User.findById(req.query.userId);
     if (!user) {
-      return res
-        .status(200)
-        .send({ status: false, message: "User does not exist" });
+      return res.status(200).send({ status: false, message: "User does not exist" });
     }
 
     const payload = {
@@ -29,7 +24,6 @@ exports.particularUserNotification = async (req, res) => {
       },
     };
 
-    console.log("payload", payload);
     const notification = new Notification();
 
     notification.userId = user._id;
@@ -37,9 +31,7 @@ exports.particularUserNotification = async (req, res) => {
     notification.image = req.file ? process?.env?.baseURL + req.file.path : "";
     notification.message = req.body.message;
     notification.notificationType = 0;
-    notification.date = new Date().toLocaleString("en-US", {
-      timeZone: "Asia/Kolkata",
-    });
+    notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
 
     await notification.save();
 
@@ -67,15 +59,11 @@ exports.particularUserNotification = async (req, res) => {
 exports.particularExpertNotification = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
     const expert = await Expert.findById(req.query.expertId);
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert does not exist" });
+      return res.status(200).send({ status: false, message: "Expert does not exist" });
     }
 
     if (!req.body.message || !req.body.title) {
@@ -167,7 +155,9 @@ exports.allUserNotification = async (req, res) => {
       },
     };
 
-    admin
+    const adminPromise = await admin;
+
+    adminPromise
       .messaging()
       .sendEachForMulticast(payload)
       .then(async (response) => {

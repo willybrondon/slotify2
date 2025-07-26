@@ -20,79 +20,82 @@ import Registration from "./component/pages/Registration";
 import UpdateCode from "./component/pages/UpdateCode";
 import { useCallback } from "react";
 function App() {
-  const dispatch = useDispatch();
-  const key = localStorage.getItem("key");
-  const token = localStorage.getItem("token");
-  const { isAuth } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const key = localStorage.getItem("key");
+    const token = localStorage.getItem("adminToken");
+    const { isAuth } = useSelector((state) => state.auth);
 
-  const [login, setLogin] = useState(false);
+    const [login, setLogin] = useState(false);
 
-  const sessionTimeout = 20 * 60 * 1000; // 5 minutes in milliseconds
-  let activityTimeout;
+    const sessionTimeout = 20 * 60 * 1000; // 5 minutes in milliseconds
+    let activityTimeout;
 
-  const resetTimeout = useCallback(() => {
-    if (activityTimeout) clearTimeout(activityTimeout);
-    activityTimeout = setTimeout(() => {
-      window.sessionStorage.clear();
-      window.sessionStorage.clear();
-      window.location.href = "/";
-    }, sessionTimeout);
-  }, [activityTimeout, sessionTimeout]);
+    const resetTimeout = useCallback(() => {
+        if (activityTimeout) clearTimeout(activityTimeout);
+        activityTimeout = setTimeout(() => {
+            window.sessionStorage.clear();
+            window.sessionStorage.clear();
+            window.location.href = "/";
+        }, sessionTimeout);
+    }, [activityTimeout, sessionTimeout]);
 
-  const handleActivity = () => {
-    resetTimeout();
-  };
-
-  useEffect(() => {
-    axios
-      .get("admin/login/login")
-      .then((res) => {
-        setLogin(res.data.login);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!token && !key) return;
-    dispatch(setOldAdmin(token));
-  }, [setToken, key, token, isAuth]);
-
-  useEffect(() => {
-    console.log("sessionTimeout", sessionTimeout);
-
-    // Set initial timeout
-    resetTimeout();
-
-    // Add event listeners to track user activity
-    window.addEventListener("mousemove", handleActivity);
-    window.addEventListener("keydown", handleActivity);
-    window.addEventListener("click", handleActivity);
-
-    // Cleanup event listeners on component unmount
-    return () => {
-      window.removeEventListener("mousemove", handleActivity);
-      window.removeEventListener("keydown", handleActivity);
-      window.removeEventListener("click", handleActivity);
-      if (activityTimeout) clearTimeout(activityTimeout);
+    const handleActivity = () => {
+        resetTimeout();
     };
-  }, [resetTimeout]);
-  return (
-    <>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={login ? <Login /> : <Registration />} />
-          <Route path="/" element={<Login />} />
-          <Route path="/code" element={<UpdateCode />} />
-          {login && <Route path="/login" element={<Login />} />}
-          <Route element={<AuthRoute />}>
-            <Route path="/admin/*" element={<Admin />} />
-          </Route>
-        </Routes>
-      </div>
-    </>
-  );
+
+    useEffect(() => {
+        axios
+            .get("admin/login/login")
+            .then((res) => {
+                setLogin(res.data.login);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, []);
+
+    useEffect(() => {
+        if (!token && !key) return;
+        dispatch(setOldAdmin(token));
+    }, [setToken, key, token, isAuth]);
+
+    useEffect(() => {
+        // Set initial timeout
+        resetTimeout();
+
+        // Add event listeners to track user activity
+        window.addEventListener("mousemove", handleActivity);
+        window.addEventListener("keydown", handleActivity);
+        window.addEventListener("click", handleActivity);
+
+        // Cleanup event listeners on component unmount
+        return () => {
+            window.removeEventListener("mousemove", handleActivity);
+            window.removeEventListener("keydown", handleActivity);
+            window.removeEventListener("click", handleActivity);
+            if (activityTimeout) clearTimeout(activityTimeout);
+        };
+    }, [resetTimeout]);
+    return (
+        <>
+            <div className="App">
+                <Routes>
+                    <Route path="/" element={login ? <Login /> : <Registration />} />
+                    <Route path="/" element={<Login />} />
+                    <Route path="/code" element={<UpdateCode />} />
+                    {login && <Route path="/login" element={<Login />} />}
+                    <Route
+                        path="/admin/*"
+                        element={
+                            <AuthRoute>
+                                <Admin />
+                            </AuthRoute>
+                        }
+                    />
+                </Routes>
+            </div>
+        </>
+    );
 }
 
 export default App;

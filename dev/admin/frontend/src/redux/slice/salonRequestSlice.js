@@ -42,7 +42,6 @@ const salonRequestSlice = createSlice({
     });
 
     builder.addCase(getSalonRequest.fulfilled, (state, action) => {
-      console.log('action?.payload?.data', action?.payload?.data)
       state.salonRequest = action?.payload?.data;
       state.isSkeleton = false;
     });

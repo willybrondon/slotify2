@@ -5,13 +5,17 @@ import { DangerRight,Success } from "../../component/api/toastServices";
 
 const initialState = {
     setting: {},
+    currency:"",
     isLoading: false,
     isSkeleton: false
 }
 
 
-export const getSetting = createAsyncThunk("salon/getCurrency", async (payload) => {
+export const getSetting = createAsyncThunk("salon/getSetting", async (payload) => {
     return apiInstanceFetch.get("salon/getCurrency")
+})
+export const getCurrency = createAsyncThunk("salon/getCurrency", async (payload) => {
+    return apiInstanceFetch.get("admin/setting")
 })
 
 
@@ -32,6 +36,19 @@ const settingSlice = createSlice({
         })
 
         builder.addCase(getSetting.rejected, (state, action) => {
+            state.isLoading = false;
+        })
+
+        builder.addCase(getCurrency.pending, (state, action) => {
+            state.isLoading = true;
+        })
+
+        builder.addCase(getCurrency.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.currency = action.payload.setting
+        })
+
+        builder.addCase(getCurrency.rejected, (state, action) => {
             state.isLoading = false;
         })
 

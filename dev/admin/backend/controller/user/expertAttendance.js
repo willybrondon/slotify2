@@ -8,17 +8,12 @@ exports.expertAttendance = async (req, res) => {
     const todayDate = moment().format("YYYY-MM-DD");
 
     if (!expertId || !action) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid details provided" });
+      return res.status(200).json({ status: false, message: "Invalid details provided" });
     }
 
     const expert = await Expert.findById(expertId);
-
     if (!expert) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Expert Not Found" });
+      return res.status(200).json({ status: false, message: "Expert Not Found" });
     }
 
     let attendanceRecord = await Attendance.findOne({
@@ -69,27 +64,22 @@ exports.expertAttendance = async (req, res) => {
       attendanceRecord.absentDates.push(todayDate);
     }
 
-    attendanceRecord.totalDays =
-      attendanceRecord.attendCount + attendanceRecord.absentCount;
+    res.status(200).json({
+      status: true,
+      message: `${action === "attend" ? "Attendance" : "Absent"} marked successfully`,
+    });
+
+    attendanceRecord.totalDays = attendanceRecord.attendCount + attendanceRecord.absentCount;
     attendanceRecord.salonId = expert.salonId;
+
     savedAttendance = await attendanceRecord.save();
+
     expert.isAttend = true;
     expert.showDialog = true;
     await expert.save();
-
-    res.status(200).json({
-      status: true,
-      message: `${
-        action === "attend" ? "Attendance" : "Absent"
-      } marked successfully`,
-      data: savedAttendance,
-    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      status: false,
-      message: "Internal Server Error",
-    });
+    res.status(500).json({ status: false, message: "Internal Server Error" });
   }
 };
 
@@ -99,16 +89,12 @@ exports.getAttendanceForExpert = async (req, res) => {
     const month = req.query.month;
 
     if (!expertId || !month) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid details provided" });
+      return res.status(200).json({ status: false, message: "Invalid details provided" });
     }
 
     const expert = await Expert.findById(req.query.expertId);
     if (!expert) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Expert Not Found" });
+      return res.status(200).json({ status: false, message: "Expert Not Found" });
     }
 
     const attendanceForExpert = await Attendance.find({

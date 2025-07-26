@@ -1,13 +1,11 @@
 import React from "react";
-
-//redux
 import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-const PrivateRoute = () => {
-  const isAuth = localStorage.getItem("isAuth");
+const PrivateRoute = ({ children }) => {
+    const { isAuth } = useSelector((state) => state.auth);
 
-  return isAuth ? <Outlet /> : <Navigate to="/login" />;
+    return isAuth ? children : <Navigate to="/" />;
 };
 
 export default PrivateRoute;

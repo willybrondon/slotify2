@@ -13,7 +13,7 @@ import {
   categoryDelete,
   categoryStatus,
 } from "../../../redux/slice/categorySlice";
-import { warning } from "../../../util/Alert";
+import {  warning } from "../../../util/Alert";
 import {
   getComplains,
   solveComplain,

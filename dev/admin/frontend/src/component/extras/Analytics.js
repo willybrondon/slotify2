@@ -19,9 +19,9 @@ const Analytics = (props) => {
   const handleApply = (event, picker) => {
     let start = dayjs(picker.startDate).format("YYYY-MM-DD");
     let end = dayjs(picker.endDate).format("YYYY-MM-DD");
-    analyticsStartDateSet(start);
-    analyticsStartEndSet(end);
-    if (picker.chosenLabel === "ALL") {
+
+    // Convert 'all' to 'ALL' when necessary
+    if (picker.chosenLabel.toLowerCase() === "Select Date") {
       start = "ALL";
       end = "ALL";
     }
@@ -47,7 +47,7 @@ const Analytics = (props) => {
   };
   const label = start.format("DD/MM/YYYY") + " - " + end.format("DD/MM/YYYY");
 
-  const { color, bgColor } = props;
+  const { color, bgcolor } = props;
 
   const startAllDate = "1970-01-01";
   const endAllDate = moment().format("YYYY-MM-DD");
@@ -61,7 +61,7 @@ const Analytics = (props) => {
   };
 
   return (
-    <div className="d-flex my-2" style={{ width: "285px",justifyContent : direction }}>
+    <div className="d-flex my-2" style={{ width: "285px", justifyContent: direction }}>
       <DateRangePicker
         initialSettings={{
           ranges: {
@@ -73,7 +73,6 @@ const Analytics = (props) => {
               moment().subtract(1, "days").toDate(),
               moment().subtract(1, "days").toDate(),
             ],
-
             "Last 7 Days": [
               moment().subtract(6, "days").toDate(),
               moment().toDate(),
@@ -97,22 +96,18 @@ const Analytics = (props) => {
       >
         <input
           type="text"
-          bgColor={bgColor}
+          bgcolor={bgcolor}
           color={color}
           readOnly
           onClick={handleInputClick}
-          className={`daterange float-right  mr-4  text-center ${bgColor} ${color}`}
+          className={`daterange float-right mr-4 text-center ${bgcolor} ${color}`}
           value={
-            (analyticsStartDate === startAllDate &&
-              analyticsStartEnd === endAllDate) ||
-            (analyticsStartDate === "ALL" && analyticsStartEnd === "ALL")
-              ? "Select Date Range"
-              : moment(analyticsStartDate).format("YYYY-MM-DD") &&
-                moment(analyticsStartEnd).format("YYYY-MM-DD")
-              ? `${moment(analyticsStartDate).format("YYYY-MM-DD")} To ${moment(
-                  analyticsStartEnd
-                ).format("YYYY-MM-DD")}`
-              : "Select Date Range"
+            (analyticsStartDate === startAllDate && analyticsStartEnd === endAllDate) ||
+              (analyticsStartDate.toUpperCase() === "ALL" && analyticsStartEnd.toUpperCase() === "ALL")
+              ? "ALL" // Display "ALL" in uppercase
+              : `${moment(analyticsStartDate).format("YYYY-MM-DD")} To ${moment(
+                analyticsStartEnd
+              ).format("YYYY-MM-DD")}`
           }
           style={{
             width: "85%",
@@ -125,7 +120,7 @@ const Analytics = (props) => {
             padding: "10px",
             borderRadius: "6px",
             height: "48px !important",
-            color : "#000"
+            color: "#000",
           }}
         />
       </DateRangePicker>

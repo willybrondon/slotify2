@@ -57,15 +57,15 @@ exports.allSalonSettlement = async (req, res) => {
       },
       { $skip: skipAmount },
       { $limit: limit },
-    ]
+    ];
 
-    const [settlement,total ] = await Promise.all([
+    const [settlement, total] = await Promise.all([
       SalonSettlement.aggregate(pipeline),
       SalonSettlement.countDocuments({
         ...typeFilter,
         ...dateFilter,
-      })
-    ]) 
+      }),
+    ]);
 
     return res.status(200).json({
       status: true,
@@ -85,9 +85,7 @@ exports.allSalonSettlement = async (req, res) => {
 exports.ParticularSalonSettlement = async (req, res) => {
   try {
     if (!req.query.salonId) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid Details" });
+      return res.status(200).json({ status: false, message: "Invalid Details" });
     }
     const salon = await Salon.findById(req.query.salonId);
     const start = parseInt(req?.query?.start) || 0;
@@ -101,9 +99,7 @@ exports.ParticularSalonSettlement = async (req, res) => {
     }
 
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Salon does not Exist" });
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
 
     let dateFilter;
@@ -118,7 +114,7 @@ exports.ParticularSalonSettlement = async (req, res) => {
       };
     }
 
-    const pipeline  = [
+    const pipeline = [
       {
         $match: {
           salonId: salon._id,
@@ -148,16 +144,16 @@ exports.ParticularSalonSettlement = async (req, res) => {
       },
       { $skip: skipAmount },
       { $limit: limit },
-    ]
+    ];
 
-    const [settlement,total ] = await Promise.all([
+    const [settlement, total] = await Promise.all([
       SalonSettlement.aggregate(pipeline),
       SalonSettlement.countDocuments({
         salonId: salon._id,
         ...typeFilter,
         ...dateFilter,
-      })
-    ])
+      }),
+    ]);
 
     return res.status(200).json({
       status: true,
@@ -177,17 +173,13 @@ exports.ParticularSalonSettlement = async (req, res) => {
 exports.getParticularExpertSettlement = async (req, res) => {
   try {
     if (!req.query.expertId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const expert = await Expert.findById(req.query.expertId);
 
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "expert not found" });
+      return res.status(200).send({ status: false, message: "expert not found" });
     }
     let dateFilter;
     const startDate = req.query.startDate || "ALL";
@@ -257,9 +249,7 @@ exports.salonExpertSettlement = async (req, res) => {
     const skipAmount = start * limit;
 
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Salon does not Exist" });
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
     let typeFilter;
     if (type !== "ALL") {
@@ -268,9 +258,7 @@ exports.salonExpertSettlement = async (req, res) => {
       };
     }
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Salon does not Exist" });
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
 
     let dateFilter;
@@ -285,7 +273,7 @@ exports.salonExpertSettlement = async (req, res) => {
       };
     }
 
-    const pipeline   = [
+    const pipeline = [
       {
         $match: {
           salonId: salon._id,
@@ -336,12 +324,9 @@ exports.salonExpertSettlement = async (req, res) => {
       },
       { $skip: skipAmount },
       { $limit: limit },
-    ]
+    ];
 
-    const [settlement ,total] =  await Promise.all([
-      ExpertSettlement.aggregate(pipeline),
-      ExpertSettlement.countDocuments({salonId: salon._id, ...typeFilter, ...dateFilter}),
-    ])
+    const [settlement, total] = await Promise.all([ExpertSettlement.aggregate(pipeline), ExpertSettlement.countDocuments({ salonId: salon._id, ...typeFilter, ...dateFilter })]);
 
     return res.status(200).json({
       status: true,
@@ -377,6 +362,7 @@ exports.getExpertSettlement = async (req, res) => {
     if (type !== "ALL") {
       typeFilter = { statusOfTransaction: type };
     }
+    
     const settlement = await ExpertSettlement.aggregate([
       {
         $match: {
@@ -449,24 +435,18 @@ exports.bonusPenalty = async (req, res) => {
   try {
     console.log("req.body", req.body);
     if (!req.query.settlementId || !req.body.bonus) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const settlement = await SalonSettlement.findById(req.query.settlementId);
     if (!settlement) {
-      return res
-        .status(200)
-        .send({ status: false, message: "settlement not found" });
+      return res.status(200).send({ status: false, message: "settlement not found" });
     }
 
     const salon = await Salon.findById(settlement.salonId);
 
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "salon not found" });
+      return res.status(200).send({ status: false, message: "salon not found" });
     }
 
     settlement.bonus = parseInt(req.body.bonus);
@@ -491,32 +471,24 @@ exports.bonusPenalty = async (req, res) => {
 exports.salonPayment = async (req, res) => {
   try {
     if (!req.query.settlementId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const settlement = await SalonSettlement.findById(req.query.settlementId);
     if (!settlement) {
-      return res
-        .status(200)
-        .send({ status: false, message: "settlement not found" });
+      return res.status(200).send({ status: false, message: "settlement not found" });
     }
 
     const salon = await Salon.findById(settlement.salonId);
 
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "salon not found" });
+      return res.status(200).send({ status: false, message: "salon not found" });
     }
 
     settlement.statusOfTransaction = 1;
 
     settlement.paymentDate = moment().format("YYYY-MM-DD");
     await settlement.save();
-    
-
 
     return res.status(200).json({
       status: true,
@@ -535,9 +507,7 @@ exports.salonPayment = async (req, res) => {
 exports.salonSettlementInfo = async (req, res) => {
   try {
     if (!req.query.settlementId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const settlement = await SalonSettlement.findById(req.query.settlementId)
@@ -574,9 +544,7 @@ exports.salonSettlementInfo = async (req, res) => {
 exports.expertSettlementInfo = async (req, res) => {
   try {
     if (!req.query.settlementId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
 
     const settlement = await ExpertSettlement.findById(req.query.settlementId)
@@ -609,4 +577,3 @@ exports.expertSettlementInfo = async (req, res) => {
     });
   }
 };
-

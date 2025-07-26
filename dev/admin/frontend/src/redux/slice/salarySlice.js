@@ -4,6 +4,8 @@ import { Success } from "../../component/api/toastServices";
 
 const initialState = {
   salary: [],
+  expertWallet:[],
+  allExpert:[],
   isLoading: false,
   isSkeleton: false,
   total: null,
@@ -63,6 +65,22 @@ export const particulareExpertHistory = createAsyncThunk(
     );
   }
 );
+export const getExpertWalletHistory = createAsyncThunk(
+  "admin/settlement/getExpertWalletHistory",
+  async (payload) => {
+    return apiInstanceFetch.get(
+      `admin/expert/fetchParExpertWalletHistoryByAdm?expertId=${payload?.expertId}&start=${payload?.start}&limit=${payload?.limit}&startDate=${payload?.startDate}&endDate=${payload?.endDate}&type=${payload?.type}`
+    );
+  }
+);
+export const getAllWalletHistory = createAsyncThunk(
+  "admin/settlement/getAllWalletHistory",
+  async (payload) => {
+    return apiInstanceFetch.get(
+      `admin/expert/retriveExpertWalletHistory?start=${payload?.start}&limit=${payload?.limit}&startDate=${payload?.startDate}&endDate=${payload?.endDate}&type=${payload?.type}`
+    );
+  }
+);
 export const particulareSalonEarningHistory = createAsyncThunk(
   "admin/settlement/salonSettlementInfo",
   async (id) => {
@@ -107,6 +125,32 @@ const salarySlice = createSlice({
     });
 
     builder.addCase(expertHistory.rejected, (state, action) => {
+      state.isSkeleton = false;
+    });
+    builder.addCase(getExpertWalletHistory.pending, (state, action) => {
+      state.isSkeleton = true;
+    });
+
+    builder.addCase(getExpertWalletHistory.fulfilled, (state, action) => {
+      state.expertWallet = action?.payload?.data;
+      state.total= action?.payload?.total
+      state.isSkeleton = false;
+    });
+
+    builder.addCase(getExpertWalletHistory.rejected, (state, action) => {
+      state.isSkeleton = false;
+    });
+    builder.addCase(getAllWalletHistory.pending, (state, action) => {
+      state.isSkeleton = true;
+    });
+
+    builder.addCase(getAllWalletHistory.fulfilled, (state, action) => {
+      state.allExpert = action?.payload?.data;
+      state.total= action?.payload?.total
+      state.isSkeleton = false;
+    });
+
+    builder.addCase(getAllWalletHistory.rejected, (state, action) => {
       state.isSkeleton = false;
     });
     builder.addCase(particulareExpertHistory.pending, (state, action) => {

@@ -10,16 +10,12 @@ exports.getAllAttendance = async (req, res) => {
     const todayDate = moment().format("YYYY-MM-DD");
 
     if (!expertId || !action) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid details provided" });
+      return res.status(200).json({ status: false, message: "Invalid details provided" });
     }
 
     const expert = await Expert.findById(expertId);
     if (!expert) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Expert Not Found" });
+      return res.status(200).json({ status: false, message: "Expert Not Found" });
     }
 
     let attendanceRecord = await Attendance.findOne({
@@ -75,10 +71,6 @@ exports.getAllAttendance = async (req, res) => {
 
       //Cancel all bookings for today if expert is absent
       try {
-        console.log(moment().format("hh:mm A"));
-        console.log(moment().format("YYYY-MM-DD HH:mm:ss"));
-        console.log("todayDate: ", todayDate);
-
         await Booking.updateMany(
           {
             expertId,
@@ -88,7 +80,7 @@ exports.getAllAttendance = async (req, res) => {
           {
             $set: {
               status: "cancel",
-              cancelTime: moment().format("hh:mm A"),
+              cancelTime: moment().format("HH:mm a"),
               reason: {
                 reason: "Expert is absent",
                 person: "expert",
@@ -105,16 +97,13 @@ exports.getAllAttendance = async (req, res) => {
       await expert.save();
     }
 
-    attendanceRecord.totalDays =
-      attendanceRecord.attendCount + attendanceRecord.absentCount;
+    attendanceRecord.totalDays = attendanceRecord.attendCount + attendanceRecord.absentCount;
 
     savedAttendance = await attendanceRecord.save();
 
     res.status(200).json({
       status: true,
-      message: `${
-        action === "attend" ? "Attendance" : "Absent"
-      } marked successfully`,
+      message: `${action === "attend" ? "Attendance" : "Absent"} marked successfully`,
       data: savedAttendance,
     });
   } catch (error) {
@@ -129,17 +118,13 @@ exports.getAllAttendance = async (req, res) => {
 exports.attendance = async (req, res) => {
   try {
     if (!req.query.month || !req.query.salonId) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid details" });
+      return res.status(200).json({ status: false, message: "Invalid details" });
     }
     let matchQuery;
     if (req.query.salonId !== "ALL") {
       const salon = await Salon.findById(req.query.salonId);
       if (!salon) {
-        return res
-          .status(200)
-          .json({ status: false, message: "Salon not Found" });
+        return res.status(200).json({ status: false, message: "Salon not Found" });
       }
       matchQuery = {
         salonId: salon._id,
@@ -153,7 +138,6 @@ exports.attendance = async (req, res) => {
           ...matchQuery,
         },
       },
-
       {
         $lookup: {
           from: "experts",

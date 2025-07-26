@@ -23,7 +23,6 @@ export const isLoading = createSelector(
       if (slice && typeof slice === 'object' && slice.isLoading === true) {
         return true;
       }
-      console.log('isLoadingggggggggggggggggggggggggggg:', isLoading);
       return false;
     });
   }

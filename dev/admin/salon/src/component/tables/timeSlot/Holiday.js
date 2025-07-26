@@ -17,11 +17,10 @@ import { openDialog } from "../../../redux/slice/dialogueSlice";
 import { deleteHoliday, getHoliday } from "../../../redux/slice/holidaySlice";
 import Button from "../../extras/Button";
 import HolidayDialog from "./HolidayDialog";
-import { warning } from "../../../util/Alert";
+import {  warning } from "../../../util/Alert";
 const Holiday = () => {
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
   const { holiday, total } = useSelector((state) => state.holiday);
-  
 
   const { admin } = useSelector((state) => state.auth);
 
@@ -107,7 +106,7 @@ const Holiday = () => {
   ];
 
   const handleDelete = (id) => {
-    
+
 
     const data = warning("Delete");
     data

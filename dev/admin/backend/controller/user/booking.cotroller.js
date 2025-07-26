@@ -1,30 +1,31 @@
 const Service = require("../../models/service.model");
 const Booking = require("../../models/booking.model");
 const Expert = require("../../models/expert.model");
-const moment = require("moment");
-const Setting = require("../../models/setting.model");
 const Salon = require("../../models/salon.model");
 const BusyExpert = require("../../models/busyExpert.model");
 const User = require("../../models/user.model");
 const Holiday = require("../../models/salonClose.model");
 const Notification = require("../../models/notification.model");
-const admin = require("../../firebase");
 const UString = require("../../models/uniqueString.model");
+const UserWalletHistory = require("../../models/userWalletHistory.model");
+const Coupon = require("../../models/coupon.model");
+
+const mongoose = require("mongoose");
+
+const admin = require("../../firebase");
+const moment = require("moment");
+const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
 
 exports.getBookingBasedDate = async (req, res) => {
   try {
     if (!req.query.date || !req.query.expertId || !req.query.salonId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops Invalid Details!!" });
+      return res.status(200).send({ status: false, message: "Oops Invalid Details!!" });
     }
 
     const dayOfWeek = moment(req.query.date).format("dddd");
     const salon = await Salon.findById(req.query.salonId);
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon Not Found!!!" });
+      return res.status(200).send({ status: false, message: "Salon Not Found!!!" });
     }
 
     const [holiday, salonTime, expert] = await Promise.all([
@@ -43,20 +44,16 @@ exports.getBookingBasedDate = async (req, res) => {
     }
 
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert Not Found!!!" });
+      return res.status(200).send({ status: false, message: "Expert Not Found!!!" });
     }
 
     if (!salonTime) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon Closed!!!" });
+      return res.status(200).send({ status: false, message: "Salon Closed!!!" });
     }
 
-    const bookingDate = req.query.date
+    const bookingDate = req.query.date;
 
-    console.log("bookingDate", bookingDate)
+    console.log("bookingDate", bookingDate);
     const bookings = await Booking.aggregate([
       {
         $match: {
@@ -66,7 +63,6 @@ exports.getBookingBasedDate = async (req, res) => {
         },
       },
     ]);
-
 
     const generateTimeSlots = (startTime, endTime, slotSize) => {
       const slots = [];
@@ -80,26 +76,11 @@ exports.getBookingBasedDate = async (req, res) => {
       return slots;
     };
 
-    const {
-      openTime,
-      closedTime,
-      breakStartTime,
-      breakEndTime,
-      time,
-      isBreak,
-    } = salonTime;
+    const { openTime, closedTime, breakStartTime, breakEndTime, time, isBreak } = salonTime;
 
-    console.log("breakStartTime", breakStartTime);
+    const morningSlots = isBreak === true ? generateTimeSlots(openTime, breakStartTime.trim(), time) : generateTimeSlots(openTime, closedTime.trim(), time);
 
-    const morningSlots =
-      isBreak === true
-        ? generateTimeSlots(openTime, breakStartTime.trim(), time)
-        : generateTimeSlots(openTime, closedTime.trim(), time);
-
-    const eveningSlots =
-      isBreak === true
-        ? generateTimeSlots(breakEndTime.trim(), closedTime, time)
-        : [];
+    const eveningSlots = isBreak === true ? generateTimeSlots(breakEndTime.trim(), closedTime, time) : [];
 
     const managedSlots = {
       morning: morningSlots,
@@ -113,11 +94,7 @@ exports.getBookingBasedDate = async (req, res) => {
       date: req.query.date,
     });
 
-    const mergedTimeSlots = busyExpert
-      ? [...timeSlots, ...busyExpert.time]
-      : timeSlots;
-
-
+    const mergedTimeSlots = busyExpert ? [...timeSlots, ...busyExpert.time] : timeSlots;
 
     return res.status(200).send({
       status: true,
@@ -139,33 +116,21 @@ exports.getBookingBasedDate = async (req, res) => {
 exports.newBooking = async (req, res, next) => {
   try {
     console.log("req.body++++++++", req.body);
-    if (
-      !req.body.serviceId ||
-      !req.body.userId ||
-      !req.body.expertId ||
-      !req.body.date ||
-      !req.body.time ||
-      !req.body.amount ||
-      !req.body.withoutTax ||
-      !req.body.paymentType ||
-      !req.body.salonId
-    ) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Details!!" });
+
+    if (!req.body.serviceId || !req.body.userId || !req.body.expertId || !req.body.date || !req.body.time || !req.body.amount || !req.body.withoutTax || !req.body.salonId || !req.body.atPlace) {
+      return res.status(200).send({ status: false, message: "Invalid Details!!" });
     }
 
-    let timeSlots = Array.isArray(req.body.time)
-      ? req.body.time
-      : [req.body.time];
+    const today = moment().format("YYYY-MM-DD");
+    let timeSlots = Array.isArray(req.body.time) ? req.body.time : [req.body.time];
     const timeArray = timeSlots[0].split(",");
     // const timeArray = bookingSlots.map((time) => time.trim());
 
-    const [user, expert, salon, setting] = await Promise.all([
+    const [uniqueIdForWalletHistory, user, expert, salon] = await Promise.all([
+      generateUniqueIdentifier(),
       User.findOne({ _id: req.body.userId }),
       Expert.findOne({ _id: req.body.expertId }),
       Salon.findOne({ _id: req.body.salonId }),
-      Setting.findOne({}).sort({ createdAt: -1 }),
     ]);
 
     if (!user) {
@@ -173,22 +138,15 @@ exports.newBooking = async (req, res, next) => {
     }
 
     if (user.isBlock) {
-      return res.status(200).send({
-        status: false,
-        message: "User is blocked. Please contact admin",
-      });
+      return res.status(200).send({ status: false, message: "User is blocked. Please contact admin" });
     }
 
     if (!expert || expert.isBlock) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not found" });
+      return res.status(200).send({ status: false, message: "Expert not found" });
     }
 
     if (!salon || !salon.isActive) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon not found" });
+      return res.status(200).send({ status: false, message: "Salon not found" });
     }
 
     const isTimeAlreadyBooked = await Booking.exists({
@@ -207,21 +165,15 @@ exports.newBooking = async (req, res, next) => {
     if (isTimeAlreadyBooked) {
       return res.status(200).send({
         status: false,
-        message: `One or more selected time slots are already booked for Date ${
-          req.body.date
-        } for Expert ${expert.fname + " " + expert.lname}`,
+        message: `One or more selected time slots are already booked for Date ${req.body.date} for Expert ${expert.fname + " " + expert.lname}`,
       });
     }
 
     const services = req.body.serviceId.split(",");
 
-    console.log("services", services);
-    const expertServices = services.every((service) =>
-      expert.serviceId.includes(service.trim())
-    );
+    const expertServices = services.every((service) => expert.serviceId.includes(service.trim()));
 
     if (!expertServices) {
-      console.log("expertServices---------------Enter");
       return res.status(200).send({
         status: false,
         message: "One or more provided serviceIds are not valid for the expert",
@@ -233,21 +185,17 @@ exports.newBooking = async (req, res, next) => {
     const salonTime = salon.salonTime.find((time) => time.day == dayOfWeek);
 
     if (!salonTime) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon time not found" });
+      return res.status(200).send({ status: false, message: "Salon time not found" });
     }
 
     const salonOpenTime = moment(salonTime.openTime, "hh:mm A");
     const salonCloseTime = moment(salonTime.closedTime, "hh:mm A");
     const breakStartTime = moment(salonTime.breakStartTime, "hh:mm A");
     const breakEndTime = moment(salonTime.breakEndTime, "hh:mm A");
+
     const isWithinSalonHours = timeArray.every((time) => {
       const bookingStartTime = moment(time, "hh:mm:ss A");
-      return (
-        bookingStartTime.isSameOrAfter(salonOpenTime) &&
-        bookingStartTime.isSameOrBefore(salonCloseTime)
-      );
+      return bookingStartTime.isSameOrAfter(salonOpenTime) && bookingStartTime.isSameOrBefore(salonCloseTime);
     });
 
     if (
@@ -257,15 +205,13 @@ exports.newBooking = async (req, res, next) => {
         return (
           bookingStartTime.isSameOrBefore(salonOpenTime) ||
           bookingStartTime.isSameOrAfter(salonCloseTime) ||
-          (bookingStartTime.isSameOrAfter(breakStartTime) &&
-            bookingStartTime.isSameOrBefore(breakEndTime))
+          (bookingStartTime.isSameOrAfter(breakStartTime) && bookingStartTime.isSameOrBefore(breakEndTime))
         );
       })
     ) {
       return res.status(200).send({
         status: false,
-        message:
-          "One or more booking times are outside salon hours or during the break",
+        message: "One or more booking times are outside salon hours or during the break",
       });
     }
 
@@ -277,18 +223,11 @@ exports.newBooking = async (req, res, next) => {
 
     const bookingDate = moment(req.body.date, "YYYY-MM-DD");
     booking.date = bookingDate.format("YYYY-MM-DD");
-    booking.paymentType = req.body.paymentType;
+
     booking.salonId = salon._id;
-    booking.amount = req.body.amount;
+    booking.atPlace = req?.body?.atPlace;
+    booking.address = req?.body?.address || "";
     booking.withoutTax = req.body.withoutTax;
-    booking.salonCommissionPercent = expert.commission;
-
-    if (req.body.paymentType === "cashAfterService") {
-      booking.paymentStatus = 0;
-    } else {
-      booking.paymentStatus = 1;
-    }
-
     booking.serviceId = services;
 
     const servicesData = await Service.find({ _id: { $in: services } });
@@ -312,57 +251,108 @@ exports.newBooking = async (req, res, next) => {
     const result = totalDuration / timeArray.length;
 
     if (result > 15 || result < 1 || resultOfGreater !== result) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Slots not correctly booked" });
+      return res.status(200).send({ status: false, message: "Slots not correctly booked" });
     }
     const servicePrice = totalServicePrice.toFixed(2);
 
-    console.log("totalServicePrice", totalServicePrice);
-    console.log("servicePrice", servicePrice);
-    console.log("req.body.withoutTax", req.body.withoutTax);
+    console.log("totalServicePrice      ", totalServicePrice);
+    console.log("servicePrice           ", servicePrice);
+    console.log("req.body.withoutTax    ", req.body.withoutTax);
 
     if (servicePrice !== req.body.withoutTax.toFixed(2)) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Service Price" });
+      return res.status(200).send({ status: false, message: "Invalid Service Price" });
     }
 
-    const taxAmount = (req.body.withoutTax * setting.tax) / 100;
+    let coupon, discountAmount, totalAmount;
+
+    const taxAmount = (req.body.withoutTax * settingJSON.tax) / 100;
     const withTaxAmount = (taxAmount + req.body.withoutTax).toFixed(2);
     const bookingAmount = req?.body?.amount.toFixed(2);
 
-    console.log("withTaxAmount", withTaxAmount);
-    console.log("bookingAmount", bookingAmount);
-    console.log("taxAmount", taxAmount);
-    console.log(typeof taxAmount);
+    console.log("withTaxAmount         ", withTaxAmount);
+    console.log("bookingAmount         ", bookingAmount);
+    console.log("taxAmount             ", taxAmount);
 
-    if (withTaxAmount !== bookingAmount) {
-      return res.status(200).send({ status: false, message: "Invalid Amount" });
+    totalAmount = withTaxAmount;
+
+    if (req.body.couponId) {
+      const couponObjId = new mongoose.Types.ObjectId(req.body.couponId);
+
+      coupon = await Coupon.findOne({ _id: couponObjId, isActive: true, type: 2, expiryDate: { $gte: today } });
+
+      if (!coupon) {
+        return res.status(200).json({
+          status: false,
+          message: "Invalid or inactive coupon. Please try with a valid coupon or remove it.",
+        });
+      }
+
+      const alreadyUsed = coupon.usedBy && coupon.usedBy.some((entry) => entry.userId.toString() === user._id.toString() && entry.usageType === 2);
+      console.log("alreadyUsed", alreadyUsed);
+
+      if (alreadyUsed) {
+        return res.status(200).json({
+          status: false,
+          message: "Coupon has already been used by this customer for the specified type.",
+        });
+      }
+
+      if (coupon.discountType == 1) {
+        discountAmount = coupon.maxDiscount;
+      } else if (coupon.discountType == 2) {
+        const discount = (parseInt(req.body.withoutTax) * coupon.discountPercent) / 100;
+        const formatedDiscount = parseFloat(discount.toFixed(2));
+
+        discountAmount = formatedDiscount > coupon.maxDiscount ? coupon.maxDiscount : formatedDiscount;
+      }
+
+      if (!alreadyUsed) {
+        coupon.usedBy.push({
+          customerId: customerObjId,
+          usageType: coupon.type,
+        });
+      }
+
+      totalAmount = withTaxAmount - discountAmount;
     }
 
-    booking.tax = taxAmount.toFixed(2);
-    const platformFee = (salon.platformFee * req.body.withoutTax) / 100;
-    const salonCommission =
-      ((req.body.withoutTax - platformFee) * expert.commission) / 100;
+    console.log("totalAmount after add tax and deduct the discount (if any)", totalAmount);
 
-    booking.salonEarning = parseInt(req.body.withoutTax - platformFee).toFixed(
-      2
-    );
-    booking.salonCommission = salonCommission.toFixed(2);
-    booking.expertEarning = (
-      req.body.withoutTax -
-      (platformFee + salonCommission)
-    ).toFixed(2);
+    if (totalAmount !== bookingAmount) {
+      return res.status(200).send({ status: false, message: "Invalid amount after add tax and deduct the discount (if any)" });
+    }
+
+    booking.amount = req.body.amount;
+    booking.tax = taxAmount.toFixed(2);
+
+    const platformFee = (salon.platformFee * req.body.withoutTax) / 100;
     booking.platformFee = parseInt(platformFee);
     booking.platformFeePercent = salon.platformFee.toFixed(2);
+
+    const salonCommission = ((req.body.withoutTax - platformFee) * expert.commission) / 100;
+    booking.salonCommission = salonCommission.toFixed(2);
+    booking.salonCommissionPercent = expert.commission;
+
+    booking.salonEarning = parseInt(req.body.withoutTax - platformFee).toFixed(2);
+    booking.expertEarning = (req.body.withoutTax - (platformFee + salonCommission)).toFixed(2);
     booking.duration = totalDuration;
     booking.time = timeArray;
+
+    booking.coupon = coupon
+      ? {
+          title: coupon.title,
+          description: coupon.description,
+          code: coupon.code,
+          discountType: coupon.discountType,
+          maxDiscount: coupon.maxDiscount,
+          minAmountToApply: coupon.minAmountToApply,
+        }
+      : {};
 
     const uniqueBookingId = await generateUniqueBookingId();
     booking.bookingId = uniqueBookingId;
 
-        const bookingDateFormat = moment().format("YYYY-MM-DD");
+    const bookingDateFormat = moment().format("YYYY-MM-DD");
     const uniqueStrings = await Promise.all(
       timeArray.map((time) =>
         UString.create({
@@ -374,106 +364,111 @@ exports.newBooking = async (req, res, next) => {
 
     await booking.save();
 
-     res.status(200).send({
+    res.status(200).send({
       status: true,
-      message: "Booking Created!!",
+      message: "Booking Created!",
       data: booking,
     });
 
-    console.log("expert.fcmToken", expert.fcmToken)
+    if (coupon) {
+      await coupon.save();
+    }
 
-    const payload = {
-      token: expert.fcmToken,
-      notification: {
-        body: `Your Booking Is Confirm On ${booking.date} At ${booking.startTime}.`,
-        title: "New Booking Request.",
-      },
-    };
-
-    console.log("payload", payload)
-
-
-    const notification = new Notification();
-
-    notification.expertId = expert._id;
-    notification.title = "New Booking Request";
-    notification.image = req.file ? process.env.baseURL + req.file.path : "";
-    notification.message = `Your Booking Is Confirm On ${booking.date} At ${booking.startTime}.`;
-    notification.notificationType = 1;
-    notification.date = new Date().toLocaleString("en-US", {
-      timeZone: "Asia/Kolkata",
-    });
-
-    await notification.save();
-
-
+    await Promise.all([
+      User.updateOne(
+        { _id: user._id, amount: { $gt: 0 } },
+        {
+          $inc: {
+            amount: -totalAmount,
+          },
+        }
+      ),
+      new UserWalletHistory({
+        user: user._id,
+        amount: totalAmount,
+        type: 2,
+        date: moment().format("YYYY-MM-DD"),
+        time: moment().format("HH:mm a"), //moment().format("hh:mm A")
+        uniqueId: uniqueIdForWalletHistory,
+        booking: booking._id,
+        couponAmount: discountAmount,
+        coupon: coupon
+          ? {
+              title: coupon.title,
+              description: coupon.description,
+              code: coupon.code,
+              discountType: coupon.discountType,
+              maxDiscount: coupon.maxDiscount,
+              minAmountToApply: coupon.minAmountToApply,
+            }
+          : {},
+      }).save(),
+    ]);
 
     if (expert && expert.fcmToken !== null) {
       const adminPromise = await admin;
+
+      const payload = {
+        token: expert.fcmToken,
+        notification: {
+          body: `Your Booking Is Confirm On ${booking.date} At ${booking.startTime}.`,
+          title: "New Booking Request.",
+        },
+      };
+
       adminPromise
         .messaging()
         .send(payload)
         .then(async (response) => {
           console.log("Successfully sent with response: ", response);
+
+          const notification = new Notification();
+          notification.expertId = expert._id;
+          notification.title = "New Booking Request";
+          notification.image = req.file ? process.env.baseURL + req.file.path : "";
+          notification.message = `Your Booking Is Confirm On ${booking.date} At ${booking.startTime}.`;
+          notification.notificationType = 1;
+          notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+          await notification.save();
         })
         .catch((error) => {
           console.log("Error sending message: ", error);
         });
     }
-
-
   } catch (error) {
     console.log(error);
-    return res.status(500).send({
-      status: false,
-      message: error.message || "Internal Server Error",
-    });
+    return res.status(500).send({ status: false, message: error.message || "Internal Server Error" });
   }
 };
 
 exports.checkSlots = async (req, res, next) => {
   try {
-    console.log("req.body++++++++", req.body);
-    if (
-      !req.body.serviceId ||
-      !req.body.userId ||
-      !req.body.expertId ||
-      !req.body.date ||
-      !req.body.time ||
-      !req.body.amount ||
-      !req.body.withoutTax ||
-      !req.body.salonId
-    ) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Details!!" });
+    if (!req.body.serviceId || !req.body.userId || !req.body.expertId || !req.body.date || !req.body.time || !req.body.amount || !req.body.withoutTax || !req.body.salonId) {
+      return res.status(200).send({ status: false, message: "Invalid Details!!" });
     }
 
-    let timeSlots = Array.isArray(req.body.time)
-      ? req.body.time
-      : [req.body.time];
+    let timeSlots = Array.isArray(req.body.time) ? req.body.time : [req.body.time];
     const bookingSlots = timeSlots[0].split(",");
     const timeArray = bookingSlots.map((time) => time.trim());
 
-    const [user, expert, salon, setting, isTimeAlreadyBooked] =
-      await Promise.all([
-        User.findOne({ _id: req.body.userId }),
-        Expert.findOne({ _id: req.body.expertId }),
-        Salon.findOne({ _id: req.body.salonId }),
-        Setting.findOne({}).sort({ createdAt: -1 }),
-        Booking.exists({
-          $and: [
-            { date: req.body.date },
-            { expertId: req.body.expertId },
-            { status: { $eq: "pending" } },
-            {
-              time: {
-                $elemMatch: { $in: timeArray },
-              },
+    const [user, expert, salon, setting, isTimeAlreadyBooked] = await Promise.all([
+      User.findOne({ _id: req.body.userId }),
+      Expert.findOne({ _id: req.body.expertId }),
+      Salon.findOne({ _id: req.body.salonId }),
+      global.settingJSON,
+      Booking.exists({
+        $and: [
+          { date: req.body.date },
+          { expertId: req.body.expertId },
+          { status: { $eq: "pending" } },
+          {
+            time: {
+              $elemMatch: { $in: timeArray },
             },
-          ],
-        }),
-      ]);
+          },
+        ],
+      }),
+    ]);
 
     if (!user) {
       return res.status(200).send({ status: false, message: "User not found" });
@@ -487,31 +482,23 @@ exports.checkSlots = async (req, res, next) => {
     }
 
     if (!expert || expert.isBlock) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not found" });
+      return res.status(200).send({ status: false, message: "Expert not found" });
     }
 
     if (!salon || !salon.isActive) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon not found" });
+      return res.status(200).send({ status: false, message: "Salon not found" });
     }
 
     if (isTimeAlreadyBooked) {
       return res.status(200).send({
         status: false,
-        message: `One or more selected time slots are already booked for Date ${
-          req.body.date
-        } for Expert ${expert.fname + " " + expert.lname}`,
+        message: `One or more selected time slots are already booked for Date ${req.body.date} for Expert ${expert.fname + " " + expert.lname}`,
       });
     }
 
     const services = req.body.serviceId.split(",");
 
-    const expertServices = services.every((service) =>
-      expert.serviceId.includes(service.trim())
-    );
+    const expertServices = services.every((service) => expert.serviceId.includes(service.trim()));
 
     if (!expertServices) {
       return res.status(200).send({
@@ -525,9 +512,7 @@ exports.checkSlots = async (req, res, next) => {
     const salonTime = salon.salonTime.find((time) => time.day == dayOfWeek);
 
     if (!salonTime) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Salon time not found" });
+      return res.status(200).send({ status: false, message: "Salon time not found" });
     }
 
     const salonOpenTime = moment(salonTime.openTime, "hh:mm A");
@@ -537,10 +522,7 @@ exports.checkSlots = async (req, res, next) => {
     const breakEndTime = moment(salonTime.breakEndTime, "hh:mm A");
     const isWithinSalonHours = timeArray.every((time) => {
       const bookingStartTime = moment(time, "hh:mm:ss A");
-      return (
-        bookingStartTime.isSameOrAfter(salonOpenTime) &&
-        bookingStartTime.isSameOrBefore(salonCloseTime)
-      );
+      return bookingStartTime.isSameOrAfter(salonOpenTime) && bookingStartTime.isSameOrBefore(salonCloseTime);
     });
 
     if (
@@ -550,15 +532,13 @@ exports.checkSlots = async (req, res, next) => {
         return (
           bookingStartTime.isSameOrBefore(salonOpenTime) ||
           bookingStartTime.isSameOrAfter(salonCloseTime) ||
-          (bookingStartTime.isSameOrAfter(breakStartTime) &&
-            bookingStartTime.isSameOrBefore(breakEndTime))
+          (bookingStartTime.isSameOrAfter(breakStartTime) && bookingStartTime.isSameOrBefore(breakEndTime))
         );
       })
     ) {
       return res.status(200).send({
         status: false,
-        message:
-          "One or more booking times are outside salon hours or during the break",
+        message: "One or more booking times are outside salon hours or during the break",
       });
     }
 
@@ -583,9 +563,7 @@ exports.checkSlots = async (req, res, next) => {
     const result = totalDuration / timeArray.length;
 
     if (result > 15 || result < 1 || resultOfGreater !== result) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Slots not correctly booked" });
+      return res.status(200).send({ status: false, message: "Slots not correctly booked" });
     }
 
     const servicePrice = totalServicePrice.toFixed(2);
@@ -595,12 +573,10 @@ exports.checkSlots = async (req, res, next) => {
     console.log("req.body.withoutTax", req.body.withoutTax);
 
     if (servicePrice !== req.body.withoutTax.toFixed(2)) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Service Price" });
+      return res.status(200).send({ status: false, message: "Invalid Service Price" });
     }
 
-    const taxAmount = (req.body.withoutTax * setting.tax) / 100;
+    const taxAmount = (req.body.withoutTax * global.settingJSON.tax) / 100;
     const withTaxAmount = (taxAmount + req.body.withoutTax).toFixed(2);
     const bookingAmount = req?.body?.amount.toFixed(2);
 
@@ -629,9 +605,7 @@ exports.checkSlots = async (req, res, next) => {
 exports.bookingForUser = async (req, res) => {
   try {
     if (!req?.query?.userId || !req?.query?.status) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Details" });
+      return res.status(200).send({ status: false, message: "Invalid Details" });
     }
 
     const status = req.query.status.trim();
@@ -679,10 +653,7 @@ exports.bookingForUser = async (req, res) => {
       },
       {
         $match: {
-          $or: [
-            { "service.name": { $regex: new RegExp(searchString, "i") } },
-            { "service.name": { $exists: false } },
-          ],
+          $or: [{ "service.name": { $regex: new RegExp(searchString, "i") } }, { "service.name": { $exists: false } }],
         },
       },
       {
@@ -725,14 +696,9 @@ exports.bookingForUser = async (req, res) => {
       },
     ];
 
-    const [bookings, total] = await Promise.all([
-      Booking.aggregate(pipeline),
-      Booking.countDocuments({ userId: user._id, ...getStatusFilter(status) }),
-    ]);
+    const [bookings, total] = await Promise.all([Booking.aggregate(pipeline), Booking.countDocuments({ userId: user._id, ...getStatusFilter(status) })]);
 
-    return res
-      .status(200)
-      .send({ status: true, message: "Success", data: bookings });
+    return res.status(200).send({ status: true, message: "Success", data: bookings });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -745,9 +711,7 @@ exports.bookingForUser = async (req, res) => {
 exports.cancelBookingByUser = async (req, res) => {
   try {
     if (!req?.body?.bookingId || !req.body.reason || !req.body.person) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid details" });
+      return res.status(200).send({ status: false, message: "Invalid details" });
     }
 
     const booking = await Booking.findById(req?.body?.bookingId);
@@ -755,32 +719,24 @@ exports.cancelBookingByUser = async (req, res) => {
       return res.status(200).send({ status: false, message: "data not found" });
     }
 
-    const [user, expert] = await Promise.all([
-      User.findById(booking.userId),
-      Expert.findById(booking.expertId),
-    ]);
+    const [user, expert] = await Promise.all([User.findById(booking.userId), Expert.findById(booking.expertId)]);
 
     if (!user) {
       return res.status(200).send({ status: false, message: "User not found" });
     }
 
     if (!expert) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Expert not found Of this booking" });
+      return res.status(200).send({ status: false, message: "Expert not found Of this booking" });
     }
 
     if (booking.status == "cancel") {
-      return res
-        .status(200)
-        .send({ status: false, message: "Booking is already cancel" });
+      return res.status(200).send({ status: false, message: "Booking is already cancel" });
     }
 
     if (booking.status == "confirm") {
       return res.status(200).send({
         status: false,
-        message:
-          "You are already checked In.Cancellation is not allowed after checkIn.Contact Salon for more details",
+        message: "You are already checked In.Cancellation is not allowed after checkIn.Contact Salon for more details",
       });
     }
 
@@ -790,31 +746,45 @@ exports.cancelBookingByUser = async (req, res) => {
     booking.cancel.date = moment().format("YYYY-MM-DD");
     booking.cancel.person = "user";
     await booking.save();
-    const payload = {
-      token: expert.fcmToken,
-      notification: {
-        body: `Your Booking with Id ${booking.bookingId}  is cancelled By ${user.fname}  ${user.lname}`,
-        title: "Booking Cancel",
-      },
-    };
+
+    res.status(200).send({
+      status: true,
+      message: "Booking Cancelled successfully!!",
+      booking,
+    });
 
     await Promise.all([
-      booking.save(),
+      User.updateOne(
+        { _id: user._id, amount: { $gt: 0 } },
+        {
+          $inc: {
+            amount: booking.amount,
+          },
+        }
+      ),
       Notification.create({
         expertId: expert._id,
         title: req.body.title,
         image: req.file ? process.env.baseURL + req.file.path : "",
         message: req.body.message,
         notificationType: 1,
-        date: new Date().toLocaleString("en-US", {
-          timeZone: "Asia/Kolkata",
-        }),
+        date: new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
       }),
       UString.deleteMany({ bookingId: booking._id }),
+      UserWalletHistory.findOneAndDelete({ booking: booking._id }),
     ]);
 
-    const adminPromise = await admin;
     if (expert && expert.fcmToken !== null) {
+      const adminPromise = await admin;
+
+      const payload = {
+        token: expert?.fcmToken,
+        notification: {
+          body: `Your Booking with Id ${booking.bookingId} is cancelled By ${user.fname} ${user.lname}`,
+          title: "Booking Cancel",
+        },
+      };
+
       adminPromise
         .messaging()
         .send(payload)
@@ -822,32 +792,22 @@ exports.cancelBookingByUser = async (req, res) => {
           console.log("Successfully sent with response: ", response);
         })
         .catch((error) => {
-          console.log("Error sending message:      ", error);
+          console.log("Error sending message:           ", error);
         });
     }
-
-    return res.status(200).send({
-      status: true,
-      message: "Booking Cancelled successfully!!",
-      booking,
-    });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .send({ status: false, message: "Internal server error" });
+    return res.status(500).send({ status: false, message: "Internal server error" });
   }
 };
 
 exports.bookingInfo = async (req, res) => {
   try {
     const { bookingId } = req.query;
-
     if (!bookingId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Invalid Details" });
+      return res.status(200).send({ status: false, message: "Invalid Details" });
     }
+
     const booking = await Booking.findById(bookingId)
       .populate("expertId userId")
       .populate({
@@ -860,10 +820,9 @@ exports.bookingInfo = async (req, res) => {
           path: "categoryId",
         },
       });
+
     if (!booking) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Booking Not Found" });
+      return res.status(200).send({ status: false, message: "Booking Not Found" });
     }
 
     return res.status(200).send({ status: true, message: "Success", booking });

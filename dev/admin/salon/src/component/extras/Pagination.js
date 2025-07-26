@@ -16,7 +16,7 @@ const Pagination = (props) => {
   const onPageChangeClient = (serverPage) => {
     setServerPage(serverPage);
   };
-
+// console.log("totalData",totalData)
   useEffect(() => {
     const totalPages = Math.ceil(totalData / serverPerPage + 1);
     const range = Math.min(3, totalPages);

@@ -1,21 +1,21 @@
 module.exports = {
-  "_id": "65268c530489a584a41b35d9",
+  "_id": "683453988a4f85514a66ed32",
   "tnc": "https://www.google.com/",
   "privacyPolicyLink": "https://www.google.com/",
   "createdAt": "2023-10-11T11:51:47.941Z",
-  "updatedAt": "2024-06-19T09:16:05.140Z",
-  "tax": 18,
+  "updatedAt": "2024-10-18T11:48:07.911Z",
+  "tax": 10,
   "isRazorPay": true,
   "isStripePay": true,
   "razorPayId": "rzp_test_SjZz9HC7RGCfCb",
   "razorSecretKey": "## SECRET KEY ##",
-  "stripePublishableKey": "pk_test_51OFsHfSEMYOcpDHW9N2WeARWsZWPsnWR9reSE7shbyqUPbQpCmLv113AULXO9w6tLN1EbAmxUp3mcuCBHfJkHQJd00Qwe8Wq8v",
-  "stripeSecretKey": "sk_test_51OFsHfSEMYOcpDHWKU0EJzlAUaoU7q3f8aI8wDdOjsRP0VER1nK0Jo0Q625NaLrSztqFvc5k40yN8iEGLczHKCdD00p2Fnyzm8",
+  "stripePublishableKey": "stripePublishableKey",
+  "stripeSecretKey": "stripeSecretKey",
   "maintenanceMode": false,
   "cashAfterService": true,
   "currencyName": "INR",
   "currencySymbol": "₹",
-  "flutterWaveKey": "FLWPUBK_TEST-cdc51a4df113a91fe33a914eaf8d1c75-X",
+  "flutterWaveKey": "flutterWaveKey",
   "isFlutterWave": true,
   "firebaseKey": {
     "type": "service_account",
@@ -29,5 +29,10 @@ module.exports = {
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-y05pu%40multi-salon-aae5f.iam.gserviceaccount.com",
     "universe_domain": "googleapis.com"
-  }
+  },
+  "isAddProductRequest": true,
+  "isUpdateProductRequest": true,
+  "minWithdrawalRequestedAmount": 2,
+  "adminCommissionCharges": 50,
+  "cancelOrderCharges": 10
 };

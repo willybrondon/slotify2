@@ -12,7 +12,6 @@ import ToggleSwitch from "../../extras/ToggleSwitch";
 const WeekTime = () => {
   const { time } = useSelector((state) => state?.time);
   const { dialogue, dialogueType } = useSelector((state) => state?.dialogue);
-  
   const dispatch = useDispatch();
   const [data, setData] = useState([]);
   useEffect(() => {
@@ -68,7 +67,7 @@ const WeekTime = () => {
             className="py-1 me-2"
             style={{ backgroundColor: "#CFF3FF", borderRadius: "8px" }}
             onClick={() => {
-              
+          
               dispatch(openDialog({ type: "timeTable", data: row }));
             }}
           >

@@ -8,7 +8,7 @@ import { addHoliday } from "../../../redux/slice/holidaySlice";
 import ReactDatePicker from "react-datepicker";
 import moment from "moment";
 import { getAllSalons } from "../../../redux/slice/salonSlice";
-const HolidayDialog = () => {
+const BannerDialog = () => {
   const dispatch = useDispatch();
 ;
   const { salon } = useSelector((state) => state.salon);
@@ -69,11 +69,11 @@ const HolidayDialog = () => {
 
   return (
     <div className="dialog">
-      <div class="w-100">
-        <div class="row justify-content-center">
-          <div class="col-xl-4 col-md-6 col-11">
-            <div class="mainDiaogBox" style={{ minHeight: "400px" }}>
-              <div class="row justify-content-between align-items-center formHead">
+      <div className="w-100">
+        <div className="row justify-content-center">
+          <div className="col-xl-4 col-md-6 col-11">
+            <div className="mainDiaogBox" style={{ minHeight: "400px" }}>
+              <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
                   <h2 className="text-theme m0">Holiday Dialog</h2>
                 </div>
@@ -90,8 +90,8 @@ const HolidayDialog = () => {
               </div>
               <div className="row align-items-start formBody">
                 <div className="col-12">
-                  <div class="inputData text  flex-row justify-content-start text-start">
-                    <label for="fname" class="false text-capitalize">
+                  <div className="inputData text  flex-row justify-content-start text-start">
+                    <label for="fname" className="false text-capitalize">
                       Select Salon
                     </label>
                     <select
@@ -115,7 +115,7 @@ const HolidayDialog = () => {
                         }
                       }}
                     >
-                      <option selected >
+                      <option selected disabled>
                         Select Salon
                       </option>
                       {salon.map((data) => (
@@ -211,4 +211,4 @@ const HolidayDialog = () => {
   );
 };
 
-export default HolidayDialog;
+export default BannerDialog;

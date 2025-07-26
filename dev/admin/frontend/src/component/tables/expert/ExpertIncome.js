@@ -190,7 +190,6 @@ const ExpertIncome = () => {
     dispatch(payment(id));
   };
 
-  console.log('data[0]?.expertId?.fname', data[0]?.expertId?.fname)
 
   const types = [
     { name: "Pending", value: 1 },

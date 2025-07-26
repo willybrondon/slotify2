@@ -1,26 +1,17 @@
-const mongoose = require('mongoose')
-const validate = require('validator')
+const mongoose = require("mongoose");
 
 const adminSchema = new mongoose.Schema(
-    {
-        name:String,
-        email:{
-            type:String,
-            require:true,
-        },
-        password:{
-            type:String,
-            required:true,
-        },
-        flag: { type: Boolean, default: false },
-        image:String,
-        purchaseCode:String
-        
-    },
-    {
-        timestamps: true,
-        versionKey:false
-    }
-)
+  {
+    name: { type: String, trim: true, required: true },
+    email: { type: String, trim: true, require: true },
+    password: { type: String, trim: true, required: true },
+    image: { type: String, trim: true, required: true },
+    purchaseCode: { type: String, trim: true, required: true },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+  }
+);
 
-module.exports =  mongoose.model("Admin",adminSchema)
+module.exports = mongoose.model("Admin", adminSchema);

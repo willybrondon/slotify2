@@ -2,8 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
 
-const token = sessionStorage.getItem("token");
-
 const initialState = {
   service: [],
   particularService: [],
@@ -20,11 +18,7 @@ export const getAllServices = createAsyncThunk(
 );
 
 export const addService = createAsyncThunk("salon/service", async (payload) => {
-  return apiInstance.post("salon/service", payload,{
-    headers:{
-      Authorization:token
-    }
-  });
+  return apiInstance.post("salon/service", payload);
 });
 
 export const updateService = createAsyncThunk(
@@ -48,6 +42,20 @@ export const deleteService = createAsyncThunk(
   }
 );
 
+export const allowCity = createAsyncThunk(
+  "salon/service/allowCityForSalonService",
+  async (payload) => {
+    return apiInstance.patch(`salon/service/allowCityForSalonService`, payload);
+  }
+);
+
+export const blockCity = createAsyncThunk(
+  "salon/service/blockCityForSalonService",
+  async (payload) => {
+    return apiInstance.patch(`salon/service/blockCityForSalonService`, payload);
+  }
+);
+
 const serviceSlice = createSlice({
   name: "serviceSlice",
   initialState,
@@ -61,14 +69,8 @@ const serviceSlice = createSlice({
     builder.addCase(getParticularSalonService.fulfilled, (state, action) => {
       
       state.particularService = action?.payload?.data;
-      console.log("mannn==", action?.payload);
-      console.log("ashu===", state.particularService);
-      
-      
-     
       state.isLoading = false;
     });
-    
 
     builder.addCase(getParticularSalonService.rejected, (state, action) => {
       
@@ -152,6 +154,39 @@ const serviceSlice = createSlice({
 
     builder.addCase(deleteService.rejected, (state, action) => {
       state.isLoading = false;
+    });
+
+    builder.addCase(allowCity.pending, (state, action) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(allowCity.fulfilled, (state, action) => {
+      state.isLoading = false;
+      console.log('action', action)
+      if (action.payload.status) {
+        Success("City added Successfully");
+      }
+    }); 
+
+    builder.addCase(allowCity.rejected, (state, action) => {
+      state.isLoading = false;
+      Error("Something went wrong");
+    });
+
+    builder.addCase(blockCity.pending, (state, action) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(blockCity.fulfilled, (state, action) => {
+      state.isLoading = false;
+      if (action.payload.status) {
+        Success("City blocked Successfully");
+      }
+    });
+
+    builder.addCase(blockCity.rejected, (state, action) => {
+      state.isLoading = false;
+      Error("Something went wrong");
     });
   },
 });

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const salonSchema = new mongoose.Schema(
   {
     name: { type: String, default: "", required: true },
@@ -23,7 +24,7 @@ const salonSchema = new mongoose.Schema(
         isActive: { type: Boolean, default: true },
         breakStartTime: { type: String, default: "" },
         breakEndTime: { type: String, default: "" },
-        time:{type:Number,default:15},
+        time: { type: Number, default: 15 },
         isBreak: { type: Boolean, default: true },
       },
     ],
@@ -31,6 +32,7 @@ const salonSchema = new mongoose.Schema(
     about: { type: String, default: "" },
 
     platformFee: { type: Number, default: 0 },
+    earning: { type: Number, default: 0 },
 
     review: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },
@@ -44,15 +46,20 @@ const salonSchema = new mongoose.Schema(
 
     image: [{ type: String, default: "" }],
     mainImage: { type: String, default: "" },
-    flag: { type: Boolean, default: true },
+    isBestSeller: { type: Boolean, default: false },
 
     serviceIds: [
       {
         id: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
         price: { type: Number, default: null },
+        allowCities: [
+          {
+            country: { type: String, trim: true },
+            city: { type: String, trim: true },
+          },
+        ],
       },
     ],
-    
   },
   {
     timestamps: true,
@@ -61,4 +68,3 @@ const salonSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Salon", salonSchema);
-

@@ -5,7 +5,10 @@ import { Success } from "../../component/api/toastServices";
 const initialState = {
   user: [],
   userProfile: {},
-  booking: [],
+  walletData: [],
+  salonWalletData:[],
+  fetchWalletData: [],
+  totalWalletData: null, booking: [],
   isLoading: false,
   isSkeleton: false,
   total: null,
@@ -25,6 +28,24 @@ export const getUser = createAsyncThunk(
   "admin/user/profile",
   async (payload) => {
     return apiInstanceFetch.get(`admin/user/profile?userId=${payload}`);
+  }
+);
+export const getWalletData = createAsyncThunk(
+  "admin/getWalletData/get",
+  async (payload) => {
+    return apiInstanceFetch.get(`admin/user/fetchAllUserWalletRecords?type=${payload?.type}&startDate=${payload?.startDate}&endDate=${payload?.endDate}&start=${payload?.start}&limit=${payload?.limit}`);
+  }
+);
+export const getSalonWalletData = createAsyncThunk(
+  "admin/getSalonWalletData/get",
+  async (payload) => {
+    return apiInstanceFetch.get(`admin/salon/fetchSalonWalletHistoryByAdmin?type=${payload?.type}&startDate=${payload?.startDate}&endDate=${payload?.endDate}&start=${payload?.start}&limit=${payload?.limit}&salonId=${payload?.salonId}`);
+  }
+);
+export const getFetchWalletData = createAsyncThunk(
+  "admin/getFetchWalletData/get",
+  async (payload) => {
+    return apiInstanceFetch.get(`admin/user/getUserWalletHistoryByAdmin?type=${payload?.type}&startDate=${payload?.startDate}&endDate=${payload?.endDate}&start=${payload?.start}&limit=${payload?.limit}&userId=${payload?.userId}`);
   }
 );
 
@@ -73,6 +94,47 @@ const userSlice = createSlice({
     });
 
     builder.addCase(getUser.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(getWalletData.pending, (state, action) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(getWalletData.fulfilled, (state, action) => {
+
+      state.walletData = action?.payload?.data;
+      state.total = action?.payload?.total
+      state.isLoading = false;
+    });
+
+    builder.addCase(getWalletData.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(getSalonWalletData.pending, (state, action) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(getSalonWalletData.fulfilled, (state, action) => {
+
+      state.salonWalletData = action?.payload?.data;
+      state.total = action?.payload?.total
+      state.isLoading = false;
+    });
+
+    builder.addCase(getSalonWalletData.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(getFetchWalletData.pending, (state, action) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(getFetchWalletData.fulfilled, (state, action) => {
+      state.fetchWalletData = action?.payload?.data;
+      state.totalWalletData = action?.payload?.total
+      state.isLoading = false;
+    });
+
+    builder.addCase(getFetchWalletData.rejected, (state, action) => {
       state.isLoading = false;
     });
 

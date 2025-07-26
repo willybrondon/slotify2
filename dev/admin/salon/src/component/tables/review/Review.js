@@ -7,7 +7,7 @@ import Title from "../../extras/Title";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllReview, deleteReview } from "../../../redux/slice/reviewSlice";
-import { warning } from "../../../util/Alert";
+import {  warning } from "../../../util/Alert";
 import Searching from "../../extras/Searching";
 import Rating from "@mui/material/Rating";
 import male from "../../../assets/images/male.png";

@@ -68,14 +68,14 @@ const authSlice = createSlice({
     });
 
     builder.addCase(login.fulfilled, (state, action) => {
+      // console.log("Actionnn",action)
       if (action.payload && action.payload.status !== false) {
         let token_ = jwt_decode(action.payload.token);
         state.admin = token_;
         state.isAuth = true;
-        state.flag = action.payload.flag;
         SetDevKey(secretKey);
         setToken(action.payload.token);
-        console.log("action.payload.token", action.payload.token);
+        // console.log("action.payload.token", action.payload.token);
         sessionStorage.setItem("token", action.payload.token);
         sessionStorage.setItem("key", secretKey ? secretKey : undefined);
         sessionStorage.setItem("isAuth", true);

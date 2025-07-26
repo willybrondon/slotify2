@@ -1,9 +1,7 @@
 const Expert = require("../../models/expert.model");
+const ExpertSettlement = require("../../models/expertSettlement.model");
 const Booking = require("../../models/booking.model");
 const Service = require("../../models/service.model");
-const ExpertSettlement = require("../../models/expertSettlement.model");
-
-
 
 exports.getExpertSettlement = async (req, res) => {
   try {

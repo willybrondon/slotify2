@@ -22,9 +22,15 @@ const settingSchema = new mongoose.Schema(
     flutterWaveKey: { type: String, default: "" },
     isFlutterWave: { type: Boolean, default: false },
 
-    cashAfterService: { type: Boolean, default: false },
+    adminCommissionCharges: { type: Number, default: 0 },
+    cancelOrderCharges: { type: Number, default: 0 },
 
     firebaseKey: { type: Object, default: {} },
+
+    minWithdrawalRequestedAmount: { type: Number, default: 0 }, //min amount requried for withdrawal by salon OR expert
+
+    isAddProductRequest: { type: Boolean, default: false }, //false then directly product add by seller, true then product add through request
+    isUpdateProductRequest: { type: Boolean, default: false }, //false then directly product update by seller, true then product update through request
   },
   {
     timestamps: true,

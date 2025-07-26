@@ -4,6 +4,7 @@ import {  Success } from "../../component/api/toastServices";
 
 const initialState = {
   salary: [],
+  salonExpert:[],
   isLoading: false,
   isSkeleton: false,
   total: null,
@@ -35,6 +36,14 @@ export const expertRevenue = createAsyncThunk(
   async (payload) => {
     return apiInstanceFetch.get(
       `salon/settlement/particularExpert?expertId=${payload.expertId}&startDate=${payload?.startDate}&endDate=${payload?.endDate}&start=${payload?.start}&limit=${payload?.limit}`
+    );
+  }
+);
+export const getSalonExpert = createAsyncThunk(
+  "salon/settlement/getSalonExpert",
+  async (payload) => {
+    return apiInstanceFetch.get(
+      `salon/expert/retriveParExpertWalletHistoryBySalon?expertId=${payload.expertId}&startDate=${payload?.startDate}&endDate=${payload?.endDate}&start=${payload?.start}&limit=${payload?.limit}&type=${payload?.type}`
     );
   }
 );
@@ -85,6 +94,19 @@ const salarySlice = createSlice({
     });
 
     builder.addCase(getSalonEarning.rejected, (state, action) => {
+      state.isSkeleton = false;
+    });
+    builder.addCase(getSalonExpert.pending, (state, action) => {
+      state.isSkeleton = true;
+    });
+
+    builder.addCase(getSalonExpert.fulfilled, (state, action) => {
+      state.salonExpert = action?.payload?.data;
+      state.total  = action?.payload?.total
+      state.isSkeleton = false;
+    });
+
+    builder.addCase(getSalonExpert.rejected, (state, action) => {
       state.isSkeleton = false;
     });
 

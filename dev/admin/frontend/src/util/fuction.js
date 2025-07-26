@@ -25,10 +25,6 @@ export const submitData = (e) => {
     const title = allData[i].title;
     const validation = allData[i].getAttribute("data-validation");
     const ignore = allData[i].getAttribute("data-ignore");
-    console.log("key", key);
-    console.log("value", value);
-    console.log("validation", validation);
-    console.log("ignore", ignore);
     var errorData = e.target.querySelectorAll(`#error-${key}`)[0].classList;
     var errorMessages = e.target.querySelectorAll(`#error-${key}`)[0];
 
@@ -66,7 +62,6 @@ export const submitData = (e) => {
   }
   // Image Validation
   const file = e.target.querySelectorAll('input[type="file"]');
-  console.log("file99999999999", file);
 
   if (file) {
     for (let i = 0; i < file.length; i++) {
@@ -102,7 +97,6 @@ export const submitData = (e) => {
           }
         }
         const finalValue = [...multiImageArray, ...value];
-        console.log("finalValue", finalValue);
 
         if (finalValue <= 0) {
           errorData.remove("d-none");
@@ -119,12 +113,10 @@ export const submitData = (e) => {
 
   // Radio Buttons Validation
   const radio = e.target.querySelectorAll('input[type="radio"]');
-  console.log("radio==========", radio);
   var radioBtn = [];
   for (let i = 0; i < radio.length; i++) {
     radioBtn.push(radio[i].name);
   }
-  console.log("radioBtn==========", Array.from(new Set(radioBtn)));
   const radioArray = Array.from(new Set(radioBtn));
   for (let i = 0; i < radioArray.length; i++) {
     const allRadio = e.target.elements[radioArray[i]];
@@ -138,8 +130,6 @@ export const submitData = (e) => {
       for (let i = 0; i < allRadio.length; i++) {
         allRadio[i].classList.remove("error-radio");
         allRadio[i].previousSibling.classList.remove("text-danger");
-        console.log("radioArray", radioArray);
-        console.log("allRadio.value", allRadio.value);
       }
       formDataObject[radioArray[i]] = allRadio.value;
     }
@@ -162,7 +152,6 @@ export const editData = (editData) => {
 
       if (inputElements.length > 0) {
         const inputType = inputElements[0].type;
-        console.log("inputType", inputType);
 
         if (inputType === "radio" || inputType === "checkbox") {
           for (const radio of inputElements) {
@@ -198,8 +187,6 @@ export const editData = (editData) => {
             }
           }
         } else {
-          console.log("inputElements-----", inputElements[0].value);
-          console.log("inputElements-----[0].value", value);
           inputElements[0].value = value;
         }
       }

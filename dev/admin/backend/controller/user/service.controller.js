@@ -1,24 +1,40 @@
 const Service = require("../../models/service.model");
-const Setting = require("../../models/setting.model");
+
+const normalizeCityName = (cityName) => {
+  return cityName
+    .replace(/\s*\(.*?\)$/, "")
+    .trim()
+    .toLowerCase();
+};
 
 exports.getAll = async (req, res) => {
   try {
+    console.log("req.query ====================== ", req.query);
+
+    if (!req.query.city) {
+      return res.status(200).json({ status: false, message: "city must be requried" });
+    }
+
     const search = req.query.search || "";
+    const city = normalizeCityName(req.query.city);
+
     let query = {};
 
-    const tax = await Setting.findOne().select("tax");
+    const tax = global.settingJSON;
     if (search !== "ALL") {
       query = {
-        $or: [
-          { name: { $regex: search, $options: "i" } },
-          { "category.name": { $regex: search, $options: "i" } },
-        ],
+        $or: [{ name: { $regex: search, $options: "i" } }, { "category.name": { $regex: search, $options: "i" } }],
       };
     }
 
     const aggregationPipeline = [
       {
-        $match: { isDelete: false, status: true, ...query },
+        $match: {
+          isDelete: false,
+          status: true,
+          "allowCities.city": city,
+          ...query,
+        },
       },
       {
         $lookup: {
@@ -53,33 +69,25 @@ exports.getAll = async (req, res) => {
       },
     ];
 
-    const [result,total]  = await Promise.all([
-      Service.aggregate(aggregationPipeline),
-      Service.countDocuments({ isDelete: false, status: true, ...query }),
-    ])
+    const [result, total] = await Promise.all([Service.aggregate(aggregationPipeline), Service.countDocuments({ isDelete: false, status: true, ...query })]);
 
     return res.status(200).json({
       status: true,
       message: "Services found",
       total: total ? total : 0,
       services: result,
-      tax,
+      tax: tax.tax,
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      status: false,
-      error: error.message || "Internal Server Error",
-    });
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
   }
 };
 
 exports.serviceBasedCategory = async (req, res) => {
   try {
     if (!req.query.categoryId) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops Invalid Details" });
+      return res.status(200).send({ status: false, message: "Oops Invalid Details" });
     }
 
     const [service, tax] = await Promise.all([
@@ -88,7 +96,7 @@ exports.serviceBasedCategory = async (req, res) => {
         status: true,
         isDelete: false,
       }),
-      Setting.findOne().select("tax"),
+      global.settingJSON,
     ]);
 
     return res.status(200).json({

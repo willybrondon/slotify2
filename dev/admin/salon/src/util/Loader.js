@@ -7,7 +7,6 @@ const Loader = () => {
 
 
   const roleLoader = useSelector(isLoading)
-  console.log("roleLoader", roleLoader);
 
 
   return (

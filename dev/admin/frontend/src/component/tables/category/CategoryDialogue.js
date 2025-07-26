@@ -44,7 +44,6 @@ const CategoryDialogue = () => {
           ? dispatch(closeDialog())
           : DangerRight(response.message);
       } catch (err) {
-        console.log("err", err);
         DangerRight(err.message);
       }
     }
@@ -52,11 +51,11 @@ const CategoryDialogue = () => {
 
   return (
     <div className="dialog">
-      <div class="w-100">
-        <div class="row justify-content-center">
-          <div class="col-xl-5 col-md-8 col-11">
-            <div class="mainDiaogBox">
-              <div class="row justify-content-between align-items-center formHead">
+      <div className="w-100">
+        <div className="row justify-content-center">
+          <div className="col-xl-5 col-md-8 col-11">
+            <div className="mainDiaogBox">
+              <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
                   <h2 className="text-theme m0">Category dialog</h2>
                 </div>

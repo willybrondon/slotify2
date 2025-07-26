@@ -20,7 +20,6 @@ import { useNavigate } from "react-router-dom";
 
 const Attendance = () => {
   const [data, setData] = useState([]);
-  
   const { attendance } = useSelector((state) => state.attendance);
   const { expert } = useSelector((state) => state.expert);
   const dispatch = useDispatch();
@@ -95,7 +94,7 @@ const Attendance = () => {
             onClick={() => navigate("/salonPanel/attendanceTable")}
           >
             Info
-            {/* <span><i class="fa-solid fa-info"></i></span> */}
+            {/* <span><i className="fa-solid fa-info"></i></span> */}
           </button>
         </span>
       ),
@@ -108,7 +107,7 @@ const Attendance = () => {
           <button
             className="bg-success text-light m5-right p10-x p4-y fs-12 br-5"
             onClick={() => {
-              
+          
               dispatch(attendExpert(row._id));
             }}
           >
@@ -124,7 +123,9 @@ const Attendance = () => {
         <span>
           <button
             className="bg-danger text-light m5-right p10-x p4-y fs-12 br-5"
-            onClick={() => dispatch(absentExpert(row._id))}
+            onClick={() => {
+          
+              dispatch(absentExpert(row._id))}}
           >
             Absent
           </button>

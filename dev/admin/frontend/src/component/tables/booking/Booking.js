@@ -40,7 +40,6 @@ const Booking = () => {
   const { user } = useSelector((state) => state?.user);
   const { userProfile } = useSelector((state) => state?.user);
 
-  console.log("userProfile", userProfile);
 
   const dispatch = useDispatch();
   const [selectedSalon, setSelectedSalon] = useState("ALL");
@@ -371,7 +370,7 @@ const Booking = () => {
               }}
             >
               <option value="ALL" selected>
-                ALL
+                All
               </option>
               {bookingType?.map((data) => {
                 return <option value={data?.value}>{data?.name}</option>;
@@ -428,25 +427,25 @@ const Booking = () => {
       </div>
 
       {/* <div
-        class="offcanvas offcanvas-end"
+        className="offcanvas offcanvas-end"
         tabindex="-1"
         id="offcanvasRight"
         aria-labelledby="offcanvasRightLabel"
         style={{ width: "500px" }}
       >
-        <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasRightLabel">
+        <div className="offcanvas-header">
+          <h5 className="offcanvas-title" id="offcanvasRightLabel">
             New Appointment
           </h5>
           <button
             type="button"
-            class="btn-close"
+            className="btn-close"
             data-bs-dismiss="offcanvas"
             aria-label="Close"
           ></button>
         </div>
 
-        <div class="offcanvas-body">
+        <div className="offcanvas-body">
           <div className="row border-top border-bottom">
             <div
               className="col-6 mb-0 text-center"
@@ -463,7 +462,7 @@ const Booking = () => {
           </div>
           <div className="row">
             <div className="col-12">
-              <div class="inputData">
+              <div className="inputData">
                 <label className="  " htmlFor="category">
                   Salon
                 </label>
@@ -516,7 +515,7 @@ const Booking = () => {
               </div>
             </div>
             <div className="col-12">
-              <div class="inputData">
+              <div className="inputData">
                 <label className="  " htmlFor="category">
                   Expert
                 </label>
@@ -571,7 +570,7 @@ const Booking = () => {
             <>
               <div className="row mt-2">
                 <div className="col-6">
-                  <div class="inputData">
+                  <div className="inputData">
                     <label className="me-4">Choose Start Date</label>
                   </div>
                   <ReactDatePicker
@@ -587,7 +586,7 @@ const Booking = () => {
                   )}
                 </div>
                 <div className="col-6">
-                  <div class="inputData">
+                  <div className="inputData">
                     <label className="me-4">Choose Start Time</label>
                   </div>
                   <ReactDatePicker

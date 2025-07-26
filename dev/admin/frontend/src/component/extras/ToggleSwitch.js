@@ -4,12 +4,12 @@ const ToggleSwitch = (props) => {
   return (
     <>
     
-      <label class="switch">
+      <label className="switch">  
         <input type="checkbox" disabled={props.disabled} checked={props.value} onClick={props.onClick} />
-        <div class="slider"></div>
-        <div class="slider-card">
-          <div class="slider-card-face slider-card-front"></div>
-          <div class="slider-card-face slider-card-back"></div>
+        <div className="slider"></div>
+        <div className="slider-card">
+          <div className="slider-card-face slider-card-front"></div>
+          <div className="slider-card-face slider-card-back"></div>
         </div>
       </label>
     </>

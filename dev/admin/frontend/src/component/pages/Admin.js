@@ -48,6 +48,21 @@ import AddSalon from "../tables/salon/AddSalon";
 import { ExpertDialogue } from "../tables/expert/ExpertDialogue";
 import Appointment from "../tables/appointment/Appointment";
 import { SalonRequest } from "../tables/salonRequest/SalonRequest";
+import ProductCategory from "../tables/ProductCategory/ProductCategory";
+import Attribute from "../tables/attributes/Attribute";
+import Product from "../tables/ProductCategory/Product";
+import ProductDetails from "../tables/ProductCategory/ProductDetails";
+import PendingProduct from "../tables/ProductCategory/PendingProduct";
+import ApprovedProduct from "../tables/ProductCategory/ApprovedProduct";
+import RejectedProduct from "../tables/ProductCategory/RejectedProduct";
+import Recharge from "../tables/Recharge";
+import Order from "../tables/order/Order";
+import OrderDetails from "../tables/order/OrderDetails";
+import WithDrawal from "../tables/WithDrawal/WithDrawal";
+import ExpertRequest from "../tables/WithDrawal/ExpertRequest";
+import UserOrderHistory from "../tables/User/UserOrderHistory";
+import SalonOrder from "../tables/salon/SalonOrder";
+import Coupon from "../tables/coupon/Coupon";
 
 const Admin = () => {
   const location = useLocation();
@@ -62,7 +77,7 @@ const Admin = () => {
     ) {
       navigate("/admin/adminDashboard");
     }
-  }, []);
+  }, [location.pathname, navigate]);
   var webSize = $(window).width();
 
   return (
@@ -80,6 +95,8 @@ const Admin = () => {
             <Route path="/expert/addExpert" element={<ExpertDialogue />} />
             <Route path="/expert/bookings" element={<ExpertBooking />} />
             <Route path="/categoryTable" element={<Category />} />
+            <Route path="/orderTable" element={<Order />} />
+            <Route path="/order/orderDetails" element={<OrderDetails />} />
             <Route path="/serviceTable" element={<Service />} />
             <Route path="/reviewTable" element={<Review />} />
             <Route path="/userTable" element={<User />} />
@@ -89,14 +106,28 @@ const Admin = () => {
               path="/expert/getExpertProfile"
               element={<ExpertProfile />}
             />
+            <Route
+              path="/product/productTableDetails"
+              element={<ProductDetails />}
+            />
             <Route path="/staffEarning" element={<StaffEarning />} />
+            <Route path="/recharge" element={<Recharge />} />
+            <Route path="/withdrawRequest" element={<WithDrawal />} />
+            <Route path="/expertRequest" element={<ExpertRequest />} />
             <Route path="/salonPayment" element={<SalonPayout />} />
             <Route path="/holiday" element={<Holiday />} />
             <Route path="/futureBooking" element={<UpcomingBooking />} />
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/attendanceTable" element={<AttendanceTable />} />
             <Route path="/user/userProfile" element={<UserProfile />} />
+            <Route path="/user/orderHistory" element={<UserOrderHistory />} />
             <Route path="/dailyBookingTable" element={<DailyBooking />} />
+            <Route path="/productCategoryTable" element={<ProductCategory />} />
+            <Route path="/productTable" element={<Product />} />
+            <Route path="/pendingProduct" element={<PendingProduct />} />
+            <Route path="/approvedProduct" element={<ApprovedProduct />} />
+            <Route path="/rejectedProduct" element={<RejectedProduct />} />
+            <Route path="/productAttributes" element={<Attribute />} />
             <Route path="/expert/income" element={<ExpertHistory />} />
             <Route
               path="/particularExpert/income"
@@ -116,12 +147,14 @@ const Admin = () => {
             <Route path="/salon/addSalon" element={<AddSalon />} />
             <Route path="/salon/salonProfile" element={<SalonProfile />} />
             <Route path="/salon/bookings" element={<SalonBooking />} />
+            <Route path="/salon/orders" element={<SalonOrder />} />
             <Route path="/salon/income" element={<SalonHistory />} />
             <Route path="/allSalon/schedule" element={<SalonSchedule />} />
             <Route
               path="/salon/particularSettlement"
               element={<ParticularSalonSettlementInfo />}
             />
+            <Route path="/coupon" element={<Coupon />} />
           </Routes>
         </div>
       </div>

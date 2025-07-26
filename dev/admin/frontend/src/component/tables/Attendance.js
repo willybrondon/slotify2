@@ -105,7 +105,7 @@ const Attendance = () => {
           <button
             className="bg-success text-light m5-right p10-x p4-y fs-12 br-5"
             onClick={() => {
-          
+
               dispatch(attendExpert(row._id));
             }}
           >
@@ -122,7 +122,7 @@ const Attendance = () => {
           <button
             className="bg-danger text-light m5-right p10-x p4-y fs-12 br-5"
             onClick={() => {
-          
+
               dispatch(absentExpert(row._id));
             }}
           >

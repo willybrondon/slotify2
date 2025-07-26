@@ -12,12 +12,10 @@ import { openDialog } from "../../../redux/slice/dialogueSlice";
 import { getExpertBookings } from "../../../redux/slice/expertSlice";
 import CancelBookingDialog from "../booking/CancelBookingDialog";
 
-
 const ExpertBooking = () => {
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
   const { booking, total } = useSelector((state) => state.expert);
   const { setting } = useSelector((state) => state.setting);
-  
 
   const state = useLocation();
 
@@ -208,7 +206,7 @@ const ExpertBooking = () => {
   ];
 
   const handleCancel = (row) => {
-    
+
     dispatch(openDialog({ type: "cancelBooking", data: row }));
   };
 

@@ -13,7 +13,6 @@ export const SalonRequest = () => {
   const [data, setData] = useState();
   const dispatch = useDispatch();
 
-  console.log("SalonRequest", salonRequest);
 
   useEffect(() => {
     dispatch(getSalonRequest());

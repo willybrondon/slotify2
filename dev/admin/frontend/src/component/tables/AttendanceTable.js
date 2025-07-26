@@ -59,7 +59,7 @@ const AttendanceTable = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    
+
     setData(attendance);
   }, [attendance]);
 
@@ -82,7 +82,10 @@ const AttendanceTable = () => {
   const expertTable = [
     {
       Header: "No",
-      Cell: ({ index }) => <span>{index + 1}</span>,
+      Cell: ({ index }) => (
+        <span>{page * rowsPerPage + parseInt(index) + 1}</span>
+
+      )
     },
     {
       Header: "Image",
@@ -197,7 +200,7 @@ const AttendanceTable = () => {
               }}
             >
               <option key="ALL" value="ALL">
-                ALL
+                All
               </option>
               {salon.map((data) => (
                 <option key={data._id} value={data._id}>
@@ -210,22 +213,22 @@ const AttendanceTable = () => {
       </div>
 
       <div>
-      <Table
-        data={data}
-        mapData={expertTable}
-        PerPage={rowsPerPage}
-        Page={page}
-        type={"client"}
-      />
-      <Pagination
-        type={"client"}
-        serverPage={page}
-        setServerPage={setPage}
-        serverPerPage={rowsPerPage}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        totalData={data?.length}
-      />
+        <Table
+          data={data}
+          mapData={expertTable}
+          PerPage={rowsPerPage}
+          Page={page}
+          type={"client"}
+        />
+        <Pagination
+          type={"client"}
+          serverPage={page}
+          setServerPage={setPage}
+          serverPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          totalData={data?.length}
+        />
       </div>
     </div>
   );

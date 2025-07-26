@@ -41,8 +41,8 @@ const DailyBooking = () => {
   const [data, setData] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
-  const [startDate, setStartDate] = useState(startOfMonth);
-  const [endDate, setEndDate] = useState(endOfMonth);
+  const [startDate, setStartDate] = useState("All");
+  const [endDate, setEndDate] = useState("ALL");
   const payload = {
     start: page,
     limit: rowsPerPage,

@@ -42,7 +42,6 @@ function App() {
   const queryClient = new QueryClient();
 
   useEffect(() => {
-    console.log("sessionTimeout", sessionTimeout);
 
     // Set initial timeout
     resetTimeout();

@@ -1,11 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { Tooltip } from "@mui/material";
+// import {makeStyles} from "@mui/styles";
 
 const Navigator = (props) => {
   const location = useLocation();
 
 
   const { name, path, navIcon, onClick ,navSVG,navIconImg} = props;
+
 
   return (
     <li onClick={onClick} key={`navHade`}>

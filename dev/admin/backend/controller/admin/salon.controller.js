@@ -1,8 +1,12 @@
 const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
+const Product = require("../../models/product.model");
+const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
+
 const { deleteFile, deleteFiles } = require("../../middleware/deleteFile");
 const fs = require("fs");
-const moment = require('moment')
+const moment = require("moment");
+const mongoose = require("mongoose");
 
 exports.create = async (req, res) => {
   try {
@@ -49,7 +53,6 @@ exports.create = async (req, res) => {
       longitude: req.body.longitude,
     };
     salon.about = req.body.about;
-    salon.flag ? salon.flag : true;
 
     let uniqueId;
     let isUniqueId = false;
@@ -102,15 +105,11 @@ exports.update = async (req, res) => {
   try {
     if (!req.query.salonId) {
       if (req.files) deleteFiles(req.files);
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Invalid details!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });
     }
     const salon = await Salon.findById(req.query.salonId);
     if (!salon) {
-      return res
-        .status(200)
-        .send({ status: false, message: "Oops ! Salon Not Found!!" });
+      return res.status(200).send({ status: false, message: "Oops ! Salon Not Found!!" });
     }
     const capitalizeFirstLetter = (str) => {
       return str.charAt(0).toUpperCase() + str.slice(1);
@@ -118,31 +117,19 @@ exports.update = async (req, res) => {
     salon.name = req.body.name ? req.body.name : salon.name;
     salon.email = req.body.email ? req.body.email : salon.email;
     salon.addressDetails = {
-      addressLine1: req.body.address
-        ? capitalizeFirstLetter(req.body.address)
-        : salon.addressDetails.addressLine1,
-      landMark: req.body.landMark
-        ? req.body.landMark
-        : salon.addressDetails.landMark,
+      addressLine1: req.body.address ? capitalizeFirstLetter(req.body.address) : salon.addressDetails.addressLine1,
+      landMark: req.body.landMark ? req.body.landMark : salon.addressDetails.landMark,
       city: req.body.city ? req.body.city : salon.addressDetails.city,
       state: req.body.state ? req.body.state : salon.addressDetails.state,
-      country: req.body.country
-        ? req.body.country
-        : salon.addressDetails.country,
+      country: req.body.country ? req.body.country : salon.addressDetails.country,
     };
     salon.about = req.body.about ? req.body.about : salon.about;
     salon.mobile = req.body.mobile ? req.body.mobile : salon.mobile;
     salon.locationCoordinates = {
-      latitude: req.body.latitude
-        ? req.body.latitude
-        : salon.locationCoordinates.latitude,
-      longitude: req.body.longitude
-        ? req.body.longitude
-        : salon.locationCoordinates.longitude,
+      latitude: req.body.latitude ? req.body.latitude : salon.locationCoordinates.latitude,
+      longitude: req.body.longitude ? req.body.longitude : salon.locationCoordinates.longitude,
     };
-    salon.platformFee = req.body.platformFee
-      ? req.body.platformFee
-      : salon.platformFee;
+    salon.platformFee = req.body.platformFee ? req.body.platformFee : salon.platformFee;
     salon.password = req.body.password ? req.body.password : salon.password;
     if (req.files.mainImage) {
       const image = salon?.mainImage.split("storage");
@@ -199,12 +186,7 @@ exports.getAll = async (req, res) => {
 
     if (searchQuery !== "" && searchQuery !== "ALL") {
       searchFilter = {
-        $or: [
-          { "salon.name": { $regex: regex } },
-          { mobile: { $regex: regex } },
-          { email: { $regex: regex } },
-          { "address.landmark": { $regex: regex } },
-        ],
+        $or: [{ "salon.name": { $regex: regex } }, { mobile: { $regex: regex } }, { email: { $regex: regex } }, { "address.landmark": { $regex: regex } }],
       };
     }
 
@@ -232,9 +214,7 @@ exports.getAll = async (req, res) => {
 exports.getSalon = async (req, res) => {
   try {
     if (!req.query.salonId) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid Details" });
+      return res.status(200).json({ status: false, message: "Invalid Details" });
     }
     const salon = await Salon.findById(req.query.salonId).populate({
       path: "serviceIds",
@@ -244,32 +224,24 @@ exports.getSalon = async (req, res) => {
     });
 
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Salon does not Exist" });
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
     return res.status(200).json({ status: true, message: "success", salon });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ status: false, error: error.message || "Server Error" });
+    return res.status(500).json({ status: false, error: error.message || "Server Error" });
   }
 };
 
 exports.updateSalonTime = async (req, res) => {
   try {
     if (!req.query.salonId || !req.query.day) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid Details" });
+      return res.status(200).json({ status: false, message: "Invalid Details" });
     }
     const salon = await Salon.findById(req.query.salonId);
 
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Salon does not Exist" });
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
 
     const salonDay = salon.salonTime.find((time) => time.day === req.query.day);
@@ -283,10 +255,7 @@ exports.updateSalonTime = async (req, res) => {
     salonDay.openTime = req.body.openTime ? req.body.openTime : salonDay.openTime;
     salonDay.closedTime = req.body.closedTime ? req.body.closedTime : salonDay.closedTime;
 
-
     if (salonDay.isBreak === false) {
-
-
       if (closedTime < openTime) {
         return res.status(200).send({
           status: false,
@@ -334,25 +303,51 @@ exports.updateSalonTime = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ status: false, error: error.message || "Server Error" });
+    return res.status(500).json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.manageBreak = async (req, res) => {
+  try {
+    const { salonId, day } = req.query;
+
+    if (!salonId || !day) {
+      return res.status(400).json({ status: false, message: "Invalid Details" });
+    }
+
+    const salon = await Salon.findById(salonId);
+    if (!salon) {
+      return res.status(404).json({ status: false, message: "Salon does not exist" });
+    }
+
+    const salonDay = salon.salonTime.find((time) => time.day === day);
+    if (!salonDay) {
+      return res.status(404).json({ status: false, message: "Day not found in salon schedule" });
+    }
+
+    salonDay.isBreak = !salonDay.isBreak;
+    await salon.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Salon time updated successfully",
+      salonDay,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: false, error: error.message || "Server Error" });
   }
 };
 
 exports.getSalonTime = async (req, res) => {
   try {
     if (!req.query.salonId) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid Details" });
+      return res.status(200).json({ status: false, message: "Invalid Details" });
     }
     const salon = await Salon.findById(req.query.salonId);
 
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Salon does not Exist" });
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
 
     const salonTIme = salon.salonTime;
@@ -364,108 +359,188 @@ exports.getSalonTime = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ status: false, error: error.message || "Server Error" });
+    return res.status(500).json({ status: false, error: error.message || "Server Error" });
   }
 };
 
 exports.isActive = async (req, res) => {
   try {
     if (!req.query.salonId) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid Details" });
+      return res.status(200).json({ status: false, message: "Invalid Details" });
     }
-    const salon = await Salon.findById(req.query.salonId);
 
+    const salon = await Salon.findById(req.query.salonId);
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Salon does not Exist" });
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
 
     salon.isActive = !salon.isActive;
     await salon.save();
+
     return res.status(200).json({ status: true, message: "success", salon });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ status: false, error: error.message || "Server Error" });
+    return res.status(500).json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.isBestSeller = async (req, res) => {
+  try {
+    if (!req.query.salonId) {
+      return res.status(200).json({ status: false, message: "Invalid Details" });
+    }
+
+    const salon = await Salon.findById(req.query.salonId);
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
+    }
+
+    salon.isBestSeller = !salon.isBestSeller;
+    await salon.save();
+
+    return res.status(200).json({ status: true, message: "success", salon });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: false, error: error.message || "Server Error" });
+  }
+};
+
+exports.getProductsOfParticularSalon = async (req, res) => {
+  try {
+    const start = req.query.start ? parseInt(req.query.start) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : 20;
+
+    if (!req.query.salonId) {
+      return res.status(200).json({ status: false, message: "Invalid Details" });
+    }
+
+    const salonId = new mongoose.Types.ObjectId(req.query.salonId);
+
+    const query = [
+      { path: "category", select: "name" },
+      {
+        path: "salon",
+        select: "firstName lastName businessTag businessName image",
+      },
+    ];
+
+    const [salon, totalProducts, product] = await Promise.all([
+      Salon.findById(salonId),
+      Product.countDocuments({ salon: salonId, isAddByAdmin: false }),
+      Product.find({ salon: salonId, isAddByAdmin: false })
+        .populate(query)
+        .sort({ createdAt: -1 })
+        .skip(start * limit)
+        .limit(limit),
+    ]);
+
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "Retrive the products.",
+      totalProducts: totalProducts,
+      product: product,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: false, message: error.message || "Internal Server Error" });
   }
 };
 
 exports.delete = async (req, res) => {
   try {
     if (!req.query.salonId) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid Details" });
+      return res.status(200).json({ status: false, message: "Invalid Details" });
     }
     const salon = await Salon.findById(req.query.salonId);
 
     if (!salon) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Salon does not Exist" });
+      return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
 
     salon.isDelete = true;
-    await Expert.updateMany(
-      { salonId: salon._id, isDelete: false },
-      { $set: { isDelete: true } }
-    );
+    await Expert.updateMany({ salonId: salon._id, isDelete: false }, { $set: { isDelete: true } });
     return res.status(200).json({ status: true, message: "success", salon });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ status: false, error: error.message || "Server Error" });
+    return res.status(500).json({ status: false, error: error.message || "Server Error" });
   }
 };
 
-exports.manageBreak = async (req, res) => {
+exports.fetchSalonWalletHistoryByAdmin = async (req, res) => {
   try {
-    const { salonId, day } = req.query;
+    const { type, salonId } = req.query;
 
-    if (!salonId || !day) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid Details" });
+    if (!type || !salonId) {
+      return res.status(200).json({ status: false, message: "Invalid request: Missing required fields." });
     }
 
-    const salon = await Salon.findById(salonId);
+    const startDate = req.query.startDate || "ALL";
+    const endDate = req.query.endDate || "ALL";
+
+    const start = parseInt(req.query.start) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const salonObjId = new mongoose.Types.ObjectId(salonId);
+
+    let dateFilterQuery = {};
+    if (startDate !== "ALL" && endDate !== "ALL") {
+      const formateStartDate = new Date(startDate);
+      const formateEndDate = new Date(endDate);
+      formateEndDate.setHours(23, 59, 59, 999);
+
+      dateFilterQuery = {
+        createdAt: {
+          $gte: formateStartDate,
+          $lte: formateEndDate,
+        },
+      };
+    }
+
+    let typeQuery = {}; //2.deduct Or 3.deposite Or 4.deposite 
+    if (type !== "All") {
+      if (parseInt(type) === 3) {
+        typeQuery.type = { $in: [3, 4] };
+      } else {
+        typeQuery.type = parseInt(type);
+      }
+    }
+
+    const [salon, total, data] = await Promise.all([
+      Salon.findById(salonObjId),
+      SalonExpertWalletHistory.countDocuments({
+        type: { $ne: 1 },
+        salon: salonObjId,
+        ...dateFilterQuery,
+        ...typeQuery,
+      }),
+      SalonExpertWalletHistory.find({
+        type: { $ne: 1 },
+        salon: salonObjId,
+        ...dateFilterQuery,
+        ...typeQuery,
+      })
+        .select("type payoutStatus amount uniqueId date time createdAt")
+        .sort({ date: -1, time: -1 })
+        .skip(start * limit)
+        .limit(limit),
+    ]);
 
     if (!salon) {
-      return res
-        .status(404)
-        .json({ status: false, message: "Salon does not exist" });
+      return res.status(200).json({ status: false, message: "Oops ! Salon not found!" });
     }
-
-    const salonDay = salon.salonTime.find((time) => time.day === day);
-
-    if (!salonDay) {
-      return res
-        .status(404)
-        .json({ status: false, message: "Day not found in salon schedule" });
-    }
-
-    salonDay.isBreak = !salonDay.isBreak;
-
-
-
-    await salon.save();
 
     return res.status(200).json({
       status: true,
-      message: "Salon time updated successfully",
-      salonDay,
+      message: "Success",
+      total: total,
+      data: data,
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ status: false, error: error.message || "Server Error" });
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
   }
 };

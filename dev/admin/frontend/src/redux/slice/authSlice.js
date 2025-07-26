@@ -13,18 +13,7 @@ const initialState = {
   isLoading: false,
 };
 export const signUp = createAsyncThunk("admin/signUp", async (payload) => {
-  try {
-    const response = await apiInstance.post("admin/signUp", payload);
-    console.log("Signup response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Signup error:", {
-      message: error.message,
-      response: error.response?.data,
-      payload
-    });
-    throw error;
-  }
+  return apiInstance.post("admin/signUp", payload);
 });
 
 export const updateCode = createAsyncThunk(
@@ -39,8 +28,14 @@ export const login = createAsyncThunk("admin/login", async (payload) => {
 });
 
 export const getAdmin = createAsyncThunk("admin/profile", async () => {
-  return apiInstanceFetch.get("admin/profile");
+  return axios.get("admin/profile", {
+    headers: {
+      Authorization: `${localStorage.getItem("adminToken")}`,
+    }
+  });
 });
+
+
 
 export const updateAdmin = createAsyncThunk("admin/update", async (payload) => {
   return apiInstance.patch("admin/update", payload);
@@ -65,7 +60,7 @@ const authSlice = createSlice({
       setToken(token);
     },
     logout(state, action) {
-      localStorage.removeItem("token");
+      localStorage.removeItem("adminToken");
       localStorage.removeItem("admin_");
       localStorage.removeItem("key");
       localStorage.removeItem("isAuth");
@@ -81,17 +76,14 @@ const authSlice = createSlice({
     builder.addCase(login.fulfilled, (state, action) => {
       if (action.payload && action.payload.status !== false) {
         let token_ = jwt_decode(action.payload.token);
-        state.flag = action.payload.flag;
         state.admin = token_;
         state.isAuth = true;
         SetDevKey(secretKey);
         setToken(action.payload.token);
-        localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("adminToken", action.payload.token);
         localStorage.setItem("key", secretKey ? secretKey : undefined);
-        localStorage.setItem("isAuth", true);
         Success("Login successfully");
       } else {
-        ;
         DangerRight(action?.payload?.message);
       }
       state.isLoading = false;
@@ -134,11 +126,10 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.admin = {
         ...state.admin,
-        _id: action.payload?.admin?._id,
-        flag: action.payload?.admin?.flag,
-        name: action.payload?.admin?.name,
-        email: action.payload?.admin?.email,
-        image: action.payload?.admin?.image,
+        _id: action.payload?.data?.admin?._id,
+        name: action.payload?.data?.admin?.name,
+        email: action.payload?.data?.admin?.email,
+        image: action.payload?.data?.admin?.image,
       };
     });
 
@@ -171,7 +162,6 @@ const authSlice = createSlice({
     });
 
     builder.addCase(updateAdminPassword.fulfilled, (state, action) => {
-      ;
       state.isLoading = false;
       state.admin = action?.payload?.admin;
       window.localStorage.clear();
