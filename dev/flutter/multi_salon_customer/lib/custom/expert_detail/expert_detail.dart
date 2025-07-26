@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class ExpertDetails extends StatefulWidget {
   final String leadingIcon;
@@ -32,7 +32,7 @@ class _ExpertDetailsState extends State<ExpertDetails> {
                 widget.title,
                 style: TextStyle(
                     overflow: TextOverflow.ellipsis,
-                    fontFamily: FontFamily.sfProDisplay,
+                    fontFamily: AppFontFamily.sfProDisplay,
                     fontSize: 15,
                     color: AppColors.primaryTextColor),
               ),

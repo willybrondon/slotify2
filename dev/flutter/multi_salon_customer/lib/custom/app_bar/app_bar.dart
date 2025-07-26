@@ -2,40 +2,34 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
-class AppBarCustom extends StatefulWidget {
+class AppBarCustom extends StatelessWidget {
   final String title;
   Widget? method;
   List<Widget>? method1;
   AppBarCustom({super.key, required this.title, this.method, this.method1});
 
   @override
-  State<AppBarCustom> createState() => _AppBarCustomState();
-}
-
-class _AppBarCustomState extends State<AppBarCustom> {
-  customAppBar() {
+  Widget build(BuildContext context) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(55),
       child: AppBar(
         elevation: 0,
         backgroundColor: AppColors.primaryAppColor,
         centerTitle: true,
-        leading: widget.method,
-        actions: widget.method1,
+        leading: method,
+        actions: method1,
         title: Text(
-          widget.title,
-          style:
-              TextStyle(fontFamily: FontFamily.sfProDisplayBold, fontSize: 20, color: AppColors.whiteColor),
+          title,
+          style: TextStyle(
+            fontFamily: AppFontFamily.heeBo600,
+            fontSize: 20,
+            color: AppColors.whiteColor,
+          ),
         ).paddingOnly(top: 7),
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return customAppBar();
   }
 }

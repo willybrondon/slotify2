@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_button/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class AppActiveDialog extends StatelessWidget {
   const AppActiveDialog({super.key});
@@ -23,14 +23,12 @@ class AppActiveDialog extends StatelessWidget {
             Container(
               height: 52,
               decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.only(topLeft: Radius.circular(48), topRight: Radius.circular(48)),
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(48), topRight: Radius.circular(48)),
                   color: AppColors.primaryAppColor),
               child: Center(
                 child: Text(
                   "txtUnderMaintenance".tr,
-                  style: TextStyle(
-                      color: AppColors.whiteColor, fontSize: 16.5, fontFamily: FontFamily.sfProDisplay),
+                  style: TextStyle(color: AppColors.whiteColor, fontSize: 16.5, fontFamily: AppFontFamily.sfProDisplay),
                 ),
               ),
             ),
@@ -42,8 +40,7 @@ class AppActiveDialog extends StatelessWidget {
             Text(
               "txtSorryUnderMaintenance".tr,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontFamily: FontFamily.sfProDisplayMedium, fontSize: 20, color: AppColors.primaryTextColor),
+              style: TextStyle(fontFamily: AppFontFamily.sfProDisplayMedium, fontSize: 20, color: AppColors.primaryTextColor),
             ).paddingOnly(left: 15, right: 15),
             const Spacer(),
             AppButton(
@@ -52,7 +49,7 @@ class AppActiveDialog extends StatelessWidget {
               buttonText: "txtCloseApp".tr,
               color: AppColors.whiteColor,
               fontSize: 17,
-              fontFamily: FontFamily.sfProDisplay,
+              fontFamily: AppFontFamily.sfProDisplay,
               onTap: () {
                 exit(0);
               },

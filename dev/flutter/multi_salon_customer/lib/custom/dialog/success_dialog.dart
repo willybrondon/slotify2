@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_button/app_button.dart';
-import 'package:salon_2/ui/bottom_bar/controller/bottom_bar_controller.dart';
+import 'package:salon_2/ui/bottom_bar_screen/controller/bottom_bar_controller.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class SuccessDialog extends StatelessWidget {
   SuccessDialog({super.key});
@@ -35,7 +35,7 @@ class SuccessDialog extends StatelessWidget {
           Text(
             "txtBookingSuccessful".tr,
             style: TextStyle(
-              fontFamily: FontFamily.sfProDisplayBold,
+              fontFamily: AppFontFamily.sfProDisplayBold,
               color: AppColors.categoryService,
               fontSize: 23,
             ),
@@ -46,7 +46,7 @@ class SuccessDialog extends StatelessWidget {
               "desSuccessfullyBooked".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: FontFamily.sfProDisplayRegular,
+                fontFamily: AppFontFamily.sfProDisplayRegular,
                 color: AppColors.captionDialog,
                 fontSize: 16,
               ),
@@ -62,7 +62,7 @@ class SuccessDialog extends StatelessWidget {
                 height: 46,
                 buttonText: "txtGotoBookings".tr,
                 color: AppColors.whiteColor,
-                fontFamily: FontFamily.sfProDisplay,
+                fontFamily: AppFontFamily.sfProDisplay,
                 borderColor: AppColors.grey.withOpacity(0.1),
                 borderWidth: 1,
                 fontSize: 15,
@@ -81,7 +81,7 @@ class SuccessDialog extends StatelessWidget {
             buttonText: "txtCancel".tr,
             borderColor: AppColors.greyColor.withOpacity(0.1),
             borderWidth: 1,
-            fontFamily: FontFamily.sfProDisplay,
+            fontFamily: AppFontFamily.sfProDisplay,
             fontSize: 15,
             color: AppColors.primaryTextColor,
             onTap: () {

@@ -6,10 +6,10 @@ import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/select_branch_screen/controller/select_branch_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 
 class SelectBranchScreen extends StatelessWidget {
@@ -46,6 +46,7 @@ class SelectBranchScreen extends StatelessWidget {
               serviceId: logic.serviceId.join(","),
               latitude: latitude ?? 0.0,
               longitude: longitude ?? 0.0,
+              city: city ?? "",
             ),
             backgroundColor: AppColors.primaryAppColor,
             child: logic.isLoading.value
@@ -64,7 +65,7 @@ class SelectBranchScreen extends StatelessWidget {
                             Text(
                               "txtNotSalon".tr,
                               style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayMedium,
+                                fontFamily: AppFontFamily.sfProDisplayMedium,
                                 fontSize: 17,
                                 color: AppColors.primaryTextColor,
                               ),
@@ -79,15 +80,18 @@ class SelectBranchScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
-                              Get.toNamed(AppRoutes.booking, arguments: [
-                                selectBranchController.checkItem,
-                                selectBranchController.totalPrice,
-                                selectBranchController.finalTaxRupee,
-                                selectBranchController.totalMinute,
-                                selectBranchController.serviceId,
-                                selectBranchController.withOutTaxRupee,
-                                logic.getServiceBaseSalonCategory?.data?[index].id,
-                              ]);
+                              Get.toNamed(
+                                AppRoutes.booking,
+                                arguments: [
+                                  selectBranchController.checkItem,
+                                  selectBranchController.totalPrice,
+                                  selectBranchController.finalTaxRupee,
+                                  selectBranchController.totalMinute,
+                                  selectBranchController.serviceId,
+                                  selectBranchController.withOutTaxRupee,
+                                  logic.getServiceBaseSalonCategory?.data?[index].id,
+                                ],
+                              );
                             },
                             child: Container(
                               width: Get.width * 0.93,
@@ -125,7 +129,7 @@ class SelectBranchScreen extends StatelessWidget {
                                         logic.getServiceBaseSalonCategory?.data?[index].name ?? "",
                                         style: TextStyle(
                                           color: AppColors.primaryTextColor,
-                                          fontFamily: FontFamily.sfProDisplayBold,
+                                          fontFamily: AppFontFamily.sfProDisplayBold,
                                           fontSize: 15.5,
                                         ),
                                       ),
@@ -150,7 +154,7 @@ class SelectBranchScreen extends StatelessWidget {
                                               logic.getServiceBaseSalonCategory?.data?[index].rating?.toStringAsFixed(1) ?? "",
                                               style: TextStyle(
                                                 color: AppColors.yellow3,
-                                                fontFamily: FontFamily.sfProDisplayBold,
+                                                fontFamily: AppFontFamily.sfProDisplayBold,
                                                 fontSize: 14,
                                               ),
                                             ),
@@ -173,7 +177,7 @@ class SelectBranchScreen extends StatelessWidget {
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             color: AppColors.locationText,
-                                            fontFamily: FontFamily.sfProDisplay,
+                                            fontFamily: AppFontFamily.sfProDisplay,
                                             fontSize: 14,
                                           ),
                                         ),
@@ -195,14 +199,14 @@ class SelectBranchScreen extends StatelessWidget {
                                           style: TextStyle(
                                             color: AppColors.locationText,
                                             fontSize: 13,
-                                            fontFamily: FontFamily.sfProDisplayBold,
+                                            fontFamily: AppFontFamily.sfProDisplayBold,
                                           ),
                                           children: <TextSpan>[
                                             TextSpan(
                                               text: 'txtFromLocation'.tr,
                                               style: TextStyle(
                                                 fontSize: 12,
-                                                fontFamily: FontFamily.sfProDisplayMedium,
+                                                fontFamily: AppFontFamily.sfProDisplayMedium,
                                                 color: AppColors.locationText,
                                               ),
                                             ),

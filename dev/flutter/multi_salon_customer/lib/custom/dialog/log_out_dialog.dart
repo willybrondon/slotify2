@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_button/button.dart';
 import 'package:salon_2/routes/app_routes.dart';
-import 'package:salon_2/ui/login/login_screen/controller/login_screen_controller.dart';
-import 'package:salon_2/ui/login/sign_in_screen/controller/sign_in_controller.dart';
-import 'package:salon_2/ui/setting/controller/setting_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/login_screen/login_screen/controller/login_screen_controller.dart';
+import 'package:salon_2/ui/login_screen/sign_in_screen/controller/sign_in_controller.dart';
+import 'package:salon_2/ui/setting_screen/controller/setting_controller.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class LogOutDialog extends StatelessWidget {
   final SettingController settingController = Get.put(SettingController());
@@ -38,14 +38,14 @@ class LogOutDialog extends StatelessWidget {
                 ).paddingOnly(top: 15, bottom: 35),
                 Text(
                   "txtLogOut".tr,
-                  style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 24),
+                  style: TextStyle(fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 24),
                 ),
                 SizedBox(
                   width: Get.width * 0.6,
                   child: Text(
                     "desLogOut".tr,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplayRegular, color: AppColors.captionDialog, fontSize: 16),
+                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplayRegular, color: AppColors.captionDialog, fontSize: 16),
                   ),
                 ),
                 const Spacer(),
@@ -57,7 +57,7 @@ class LogOutDialog extends StatelessWidget {
                       buttonColor: AppColors.whiteColor,
                       buttonText: "txtClose".tr,
                       textColor: AppColors.primaryAppColor,
-                      fontStyle: FontFamily.sfProDisplay,
+                      fontStyle: AppFontFamily.sfProDisplay,
                       fontSize: 16.5,
                       height: 48,
                       width: Get.width * 0.31,
@@ -70,7 +70,7 @@ class LogOutDialog extends StatelessWidget {
                       buttonColor: AppColors.cancelButton,
                       buttonText: "txtLogOut".tr,
                       textColor: AppColors.whiteColor,
-                      fontStyle: FontFamily.sfProDisplay,
+                      fontStyle: AppFontFamily.sfProDisplay,
                       fontSize: 16.5,
                       height: 48,
                       width: Get.width * 0.31,

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-class AppButton extends StatefulWidget {
+class AppButton extends StatelessWidget {
   Function()? onTap;
   String? buttonText;
   String? fontFamily;
@@ -10,6 +10,7 @@ class AppButton extends StatefulWidget {
   double? height;
   double? fontSize;
   double? borderWidth;
+  double? radius;
   Color? buttonColor;
   Color? color;
   Color? borderColor;
@@ -22,6 +23,7 @@ class AppButton extends StatefulWidget {
     this.width,
     this.height,
     this.borderWidth,
+    this.radius,
     this.fontSize,
     this.buttonColor,
     this.color,
@@ -29,29 +31,31 @@ class AppButton extends StatefulWidget {
   });
 
   @override
-  State<AppButton> createState() => _AppButtonState();
-}
-
-class _AppButtonState extends State<AppButton> {
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            color: widget.buttonColor,
-            border: Border.all(
-                color: widget.borderColor ?? Colors.transparent, width: widget.borderWidth ?? 0.0)),
-        height: widget.height,
-        width: widget.width,
+          borderRadius: BorderRadius.circular(radius ?? 50),
+          color: buttonColor,
+          border: Border.all(
+            color: borderColor ?? Colors.transparent,
+            width: borderWidth ?? 0.0,
+          ),
+        ),
+        height: height,
+        width: width,
         child: Center(
-            child: Text(widget.buttonText!,
-                style: TextStyle(
-                    letterSpacing: 0.5,
-                    color: widget.color,
-                    fontFamily: widget.fontFamily,
-                    fontSize: widget.fontSize))),
+          child: Text(
+            buttonText!,
+            style: TextStyle(
+              letterSpacing: 0.5,
+              color: color,
+              fontFamily: fontFamily,
+              fontSize: fontSize,
+            ),
+          ),
+        ),
       ),
     );
   }

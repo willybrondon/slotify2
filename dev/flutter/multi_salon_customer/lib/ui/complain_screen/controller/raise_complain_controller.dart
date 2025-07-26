@@ -7,13 +7,13 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:salon_2/ui/complain_screen/model/raise_complain_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/services/app_exception.dart';
+import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class RaiseComplainController extends GetxController {
-  ImagePicker picker = ImagePicker();
+   ImagePicker imagePicker = ImagePicker();
   XFile? image;
   File? selectImageFile;
 
@@ -47,14 +47,13 @@ class RaiseComplainController extends GetxController {
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 
-  onPickImage() async {
-    image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      selectImageFile = File(image!.path);
-      update();
-    }
-    update();
-  }
+   onPickImage() async {
+     image = await imagePicker.pickImage(source: ImageSource.gallery);
+     if (image != null) {
+       selectImageFile = File(image!.path);
+     }
+     update([Constant.idComplainImage]);
+   }
 
   //----------- API SERVICE -----------//
 

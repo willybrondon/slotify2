@@ -2,7 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class TextFormFieldCustom extends StatelessWidget {
   final Widget method;

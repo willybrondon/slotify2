@@ -9,11 +9,11 @@ import 'package:salon_2/custom/app_button/app_button.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/category_details/controller/category_detail_controller.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
-import 'package:salon_2/ui/login/sign_in_screen/controller/sign_in_controller.dart';
-import 'package:salon_2/ui/search/controller/search_screen_controller.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/login_screen/sign_in_screen/controller/sign_in_controller.dart';
+import 'package:salon_2/ui/search_screen/controller/search_screen_controller.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/shimmer.dart';
 
@@ -26,16 +26,18 @@ class CategoryDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (bool didPop) {
         homeScreenController.checkItem.clear();
         homeScreenController.totalMinute = 0;
         homeScreenController.serviceId.clear();
         homeScreenController.withOutTaxRupee = 0.0;
         homeScreenController.totalPrice = 0.0;
         homeScreenController.finalTaxRupee = 0.0;
-
-        return true;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
@@ -106,7 +108,7 @@ class CategoryDetailScreen extends StatelessWidget {
                                     child: Text(
                                       logic.checkItem.join(", "),
                                       style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
+                                        fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 17.5,
                                         color: AppColors.categoryService,
                                       ),
@@ -117,7 +119,7 @@ class CategoryDetailScreen extends StatelessWidget {
                               Text(
                                 "${logic.totalMinute} ${"txtMinutes".tr}",
                                 style: TextStyle(
-                                  fontFamily: FontFamily.sfProDisplay,
+                                  fontFamily: AppFontFamily.sfProDisplay,
                                   fontSize: 15.5,
                                   color: AppColors.darkGrey3,
                                 ),
@@ -131,7 +133,7 @@ class CategoryDetailScreen extends StatelessWidget {
                           buttonColor: AppColors.primaryAppColor,
                           buttonText: "txtBookNow".tr,
                           width: Get.width * 0.28,
-                          fontFamily: FontFamily.sfProDisplay,
+                          fontFamily: AppFontFamily.sfProDisplay,
                           color: AppColors.whiteColor,
                           onTap: () async {
                             if (Constant.storage.read<bool>('isLogIn') ?? false) {
@@ -196,7 +198,7 @@ class CategoryDetailScreen extends StatelessWidget {
                                       style: TextStyle(
                                           color: AppColors.darkGrey.withOpacity(0.7),
                                           fontSize: 13.8,
-                                          fontFamily: FontFamily.sfProDisplayMedium),
+                                          fontFamily: AppFontFamily.sfProDisplayMedium),
                                     ),
                                   ],
                                 ),
@@ -206,7 +208,7 @@ class CategoryDetailScreen extends StatelessWidget {
                             Text(
                               "txtServices".tr,
                               style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold,
+                                fontFamily: AppFontFamily.sfProDisplayBold,
                                 fontSize: 18,
                                 color: AppColors.primaryTextColor,
                               ),
@@ -228,7 +230,7 @@ class CategoryDetailScreen extends StatelessWidget {
                                               "txtNotAvailableServices".tr,
                                               style: TextStyle(
                                                 color: AppColors.primaryTextColor,
-                                                fontFamily: FontFamily.sfProDisplay,
+                                                fontFamily: AppFontFamily.sfProDisplay,
                                                 fontSize: 18,
                                               ),
                                             )
@@ -309,14 +311,14 @@ class CategoryDetailScreen extends StatelessWidget {
                                                                   Text(
                                                                     logic.getServiceCategory?.services?[index].name ?? "",
                                                                     style: TextStyle(
-                                                                        fontFamily: FontFamily.sfProDisplay,
+                                                                        fontFamily: AppFontFamily.sfProDisplay,
                                                                         fontSize: 17,
                                                                         color: AppColors.primaryTextColor),
                                                                   ),
                                                                   Text(
                                                                     "${logic.getServiceCategory?.services?[index].duration ?? 0} ${"txtMinutes".tr}",
                                                                     style: TextStyle(
-                                                                        fontFamily: FontFamily.sfProDisplayMedium,
+                                                                        fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                         fontSize: 13,
                                                                         color: AppColors.service),
                                                                   ),

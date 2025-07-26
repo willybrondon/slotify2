@@ -3,12 +3,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:intl/intl.dart';
+import 'package:salon_2/custom/bottom_sheet/payment_bottom_sheet.dart';
 import 'package:salon_2/custom/dialog/confirm_dialog.dart';
 import 'package:salon_2/custom/dialog/success_dialog.dart';
+import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/booking_screen/model/create_booking_model.dart';
 import 'package:salon_2/ui/booking_screen/model/get_booking_model.dart';
@@ -18,20 +19,19 @@ import 'package:salon_2/ui/branch_detail_screen/controller/branch_detail_control
 import 'package:salon_2/ui/category_details/controller/category_detail_controller.dart';
 import 'package:salon_2/ui/expert/expert_detail/controller/expert_detail_controller.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
-import 'package:salon_2/ui/payment/Razor_Pay/razor_pay_service.dart';
-import 'package:salon_2/ui/payment/Stripe_Payment/stripe_service.dart';
-import 'package:salon_2/ui/search/controller/search_screen_controller.dart';
+import 'package:salon_2/ui/payment_screen/method/flutter_wave/flutter_wave_service.dart';
+import 'package:salon_2/ui/payment_screen/method/razor_pay/razor_pay_service.dart';
+import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
+import 'package:salon_2/ui/search_screen/controller/search_screen_controller.dart';
 import 'package:salon_2/ui/select_branch_screen/controller/select_branch_controller.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/ui/view_all_category/controller/view_all_category_controller.dart';
-
-// import 'package:salon_2/ui/payment/in_app_purchase/iap_callback.dart';
-// import 'package:salon_2/ui/payment/in_app_purchase/in_app_purchase_helper.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/ui/wallet_screen/controller/wallet_screen_controller.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:http/http.dart' as http;
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/services/app_exception.dart';
+import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class BookingScreenController extends GetxController {
@@ -40,7 +40,7 @@ class BookingScreenController extends GetxController {
   int selectExpert = -1;
   bool checkValue = false;
   bool isFirstTap = false;
-  String selectedPayment = "Razorpay";
+  String selectedPayment = "wallet";
   List<String> morningSlots = [];
   List<String> afternoonSlots = [];
   List<String> eveningSlots = [];
@@ -80,10 +80,13 @@ class BookingScreenController extends GetxController {
   dynamic args = Get.arguments;
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
   SplashController splashController = Get.find<SplashController>();
+  WalletScreenController walletScreenController = Get.find<WalletScreenController>();
   CategoryDetailController categoryDetailController = Get.put(CategoryDetailController());
   BranchDetailController branchDetailController = Get.put(BranchDetailController());
   SelectBranchController selectBranchController = Get.put(SelectBranchController());
   SearchScreenController searchScreenController = Get.put(SearchScreenController());
+
+  TextEditingController searchEditingController = TextEditingController();
 
   //------ Split Break Time Variables ------//
   String? str;
@@ -101,6 +104,13 @@ class BookingScreenController extends GetxController {
 
   Map<String, PurchaseDetails>? purchases;
 
+  String selectedVenue = "";
+
+  void selectVenue(String venue) {
+    selectedVenue = venue;
+    update([Constant.idProgressView, Constant.idConfirm]);
+  }
+
   @override
   void onInit() async {
     log("Enter booking screen controller");
@@ -108,6 +118,7 @@ class BookingScreenController extends GetxController {
     await onGetExpertServiceBasedSalonApiCall(serviceId: serviceId.join(","), salonId: salonId.toString());
 
     onCheckBoxClick();
+    onGetSlotsList();
     update([Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
 
     Stripe.publishableKey = splashController.settingCategory?.setting?.stripePublishableKey ?? "";
@@ -115,11 +126,6 @@ class BookingScreenController extends GetxController {
     log("Stripe Publishable Key:Stripe.publishableKey ${Stripe.publishableKey}");
 
     await Stripe.instance.applySettings();
-
-    /// ------------>>>>> for in app purchase
-    // InAppPurchaseHelper().getAlreadyPurchaseItems(this);
-    // purchases = InAppPurchaseHelper().getPurchases();
-    // InAppPurchaseHelper().clearTransactions();
     await splitBreakTime();
     super.onInit();
   }
@@ -187,21 +193,51 @@ class BookingScreenController extends GetxController {
     update([Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
   }
 
-  onConfirmButton() {
+  onConfirmButton(BuildContext context) {
     final constant = Constant();
     final isLastStep = currentStep == constant.stepper().length - 1;
     if (isLastStep) {
       checkValue = false;
 
-      Get.dialog(
-        barrierColor: AppColors.blackColor.withOpacity(0.8),
-        Dialog(
-          backgroundColor: AppColors.transparent,
-          shadowColor: AppColors.transparent,
-          elevation: 0,
-          child: const ConfirmDialog(),
-        ),
-      );
+      if (selectedPayment == "wallet") {
+        if (totalPrice > double.parse(walletAmount.toString())) {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            builder: (BuildContext context) {
+              return const PaymentBottomSheet(isRecharge: false);
+            },
+          ).then(
+            (value) async {
+              await walletScreenController.onGetWalletHistoryApiCall(
+                userId: Constant.storage.read<String>('userId') ?? "",
+                month: DateFormat('yyyy-MM').format(DateTime.now()),
+              );
+            },
+          );
+        } else {
+          Get.dialog(
+            barrierColor: AppColors.blackColor.withOpacity(0.8),
+            Dialog(
+              backgroundColor: AppColors.transparent,
+              shadowColor: AppColors.transparent,
+              elevation: 0,
+              child: const ConfirmDialog(),
+            ),
+          );
+        }
+      } else {
+        Get.dialog(
+          barrierColor: AppColors.blackColor.withOpacity(0.8),
+          Dialog(
+            backgroundColor: AppColors.transparent,
+            shadowColor: AppColors.transparent,
+            elevation: 0,
+            child: const ConfirmDialog(),
+          ),
+        );
+      }
+
       log("----------Completed--------------");
     } else {
       stepCount++;
@@ -244,10 +280,8 @@ class BookingScreenController extends GetxController {
   }
 
   splitBreakTime() {
-    str = getBookingModel?.salonTime?.breakTime.toString() ?? "";
-    parts = str?.split('TO');
-    breakStartTime = parts?[0];
-    breakEndTime = parts?[1].trim();
+    breakStartTime = getBookingModel?.salonTime?.breakStartTime;
+    breakEndTime = getBookingModel?.salonTime?.breakEndTime;
   }
 
   onGetSlotsList() {
@@ -273,44 +307,6 @@ class BookingScreenController extends GetxController {
 
     update([Constant.idUpdateSlots, Constant.idProgressView]);
   }
-
-  // onStep2() async {
-  //   await splitBreakTime();
-  //   breakStartTimes = breakStartTime ?? "";
-  //   breakEndTimes = breakEndTime ?? "";
-  //   totalDuration = getBookingModel?.salonTime?.time ?? 0;
-  //
-  //   morningSlots.clear();
-  //   afternoonSlots.clear();
-  //   eveningSlots.clear();
-  //   DateTime shopOpen = DateFormat('hh:mm a').parse(getBookingModel?.salonTime?.openTime.toString() ?? "");
-  //   DateTime shopEnd = DateFormat('hh:mm a').parse(getBookingModel?.salonTime?.closedTime.toString() ?? "");
-  //   DateTime breakStart = DateFormat('hh:mm a').parse(breakStartTime!);
-  //   DateTime breakEnd = DateFormat('hh:mm a').parse(breakEndTime!);
-  //
-  //   log("Shop Open Time :: $shopOpen");
-  //   log("Shop Close Time :: $shopEnd");
-  //   log("Break Start Time :: $breakStart");
-  //   log("Break End Time :: $breakEnd");
-  //
-  //   while (shopOpen.isBefore(breakStart)) {
-  //     morningSlots.add(DateFormat('hh:mm a').format(shopOpen));
-  //     shopOpen = shopOpen.add(Duration(minutes: totalDuration!));
-  //     update([Constant.idUpdateSlots, Constant.idUpdateSlots0]);
-  //   }
-  //
-  //   while (breakEnd.isBefore(shopEnd) || breakEnd.isAtSameMomentAs(shopEnd)) {
-  //     if (breakEnd.isBefore(DateFormat('hh:mm a').parse(breakStartTime!))) {
-  //       morningSlots.add(DateFormat('hh:mm a').format(breakEnd));
-  //     } else {
-  //       afternoonSlots.add(DateFormat('hh:mm a').format(breakEnd));
-  //     }
-  //     breakEnd = breakEnd.add(Duration(minutes: totalDuration!));
-  //   }
-  //
-  //   afternoonSlots.removeLast();
-  //   update([Constant.idUpdateSlots, Constant.idUpdateSlots0, Constant.idConfirm]);
-  // }
 
   bool isBreakTime(String slot) {
     DateTime slotTime = DateFormat('hh:mm a').parse(slot);
@@ -530,6 +526,8 @@ class BookingScreenController extends GetxController {
     required double amount,
     required int withoutTax,
     required String paymentType,
+    required int atPlace,
+    required String address,
   }) async {
     try {
       isLoading(true);
@@ -544,7 +542,9 @@ class BookingScreenController extends GetxController {
         "time": time,
         "amount": amount,
         "withoutTax": withoutTax,
-        "paymentType": paymentType
+        "paymentType": paymentType,
+        "atPlace": atPlace,
+        "address": address,
       });
 
       log("Create Booking Body :: $body");
@@ -576,14 +576,119 @@ class BookingScreenController extends GetxController {
   }
 
   confirmDialogButton(BuildContext context) async {
-    String userId = Constant.storage.read<String>('UserId') ?? "";
+    String userId = Constant.storage.read<String>('userId') ?? "";
 
     if (checkValue) {
       Get.back();
 
-      if (selectedPayment == "cashAfterService") {
+      if (selectedPayment == "wallet") {
+        log("it's wallet ");
+
         await onCreateBookingApiCall(
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
+          expertId: Constant.storage.read<String>('expertDetail') != null
+              ? Constant.storage.read<String>('expertDetail').toString()
+              : Constant.storage.read<String>('expertId').toString(),
+          serviceId: serviceId.join(","),
+          salonId: salonId.toString(),
+          date: formattedDate.toString(),
+          time: slotsString.toString(),
+          amount: totalPrice,
+          withoutTax: withOutTaxRupee.toInt(),
+          paymentType: "",
+          atPlace: selectedVenue == "At Salon" ? 1 : 2,
+          address: searchEditingController.text,
+        );
+
+        if (createBookingCategory?.status == true) {
+          finalTaxRupee = 0.0;
+          withOutTaxRupee = 0.0;
+          totalPrice = 0.0;
+
+          for (var i = 0; i < (categoryDetailController.getServiceCategory?.services?.length ?? 0); i++) {
+            categoryDetailController.onCheckBoxClick(false, i);
+          }
+
+          for (var i = 0; i < (homeScreenController.getAllServiceCategory?.services?.length ?? 0); i++) {
+            homeScreenController.onServiceCheckBoxClick(false, i);
+          }
+
+          for (var i = 0; i < (homeScreenController.getExpertCategory?.data?.services?.length ?? 0); i++) {
+            homeScreenController.onCheckBoxClick(false, i);
+          }
+
+          for (var i = 0; i < (branchDetailController.getSalonDetailCategory?.salon?.serviceIds?.length ?? 0); i++) {
+            branchDetailController.onCheckBoxClick(false, i);
+          }
+
+          homeScreenController.withOutTaxRupee = 0.0;
+          homeScreenController.totalPrice = 0.0;
+          homeScreenController.finalTaxRupee = 0.0;
+          homeScreenController.totalMinute = 0;
+          homeScreenController.checkItem.clear();
+          homeScreenController.serviceId.clear();
+          homeScreenController.serviceName.clear();
+
+          homeScreenController.withOutTaxRupeeExpert = 0.0;
+          homeScreenController.totalPriceExpert = 0.0;
+          homeScreenController.finalTaxRupeeExpert = 0.0;
+          homeScreenController.totalMinuteExpert = 0;
+          homeScreenController.checkItemExpert.clear();
+          homeScreenController.serviceIdExpert.clear();
+          homeScreenController.serviceNameExpert.clear();
+
+          searchScreenController.totalMinute = 0;
+          searchScreenController.checkItem.clear();
+          searchScreenController.serviceId.clear();
+          searchScreenController.serviceName.clear();
+
+          categoryDetailController.totalMinute = 0;
+          categoryDetailController.checkItem.clear();
+          categoryDetailController.serviceId.clear();
+          categoryDetailController.serviceName.clear();
+
+          branchDetailController.withOutTaxRupee = 0.0;
+          branchDetailController.totalPrice = 0.0;
+          branchDetailController.finalTaxRupee = 0.0;
+          branchDetailController.totalMinute = 0;
+          branchDetailController.checkItem.clear();
+          branchDetailController.serviceId.clear();
+
+          selectBranchController.selectBranch = -1;
+          Constant.storage.remove("expertDetail");
+          selectedExpertDataList.clear();
+
+          log("withOutTaxRupee :: home ${homeScreenController.withOutTaxRupee} :: branch ${branchDetailController.withOutTaxRupee} ::  homeExpert ${homeScreenController.withOutTaxRupeeExpert}");
+          log("totalPrice :: home ${homeScreenController.totalPrice} :: branch ${branchDetailController.totalPrice} ::  homeExpert ${homeScreenController.totalPriceExpert}");
+          log("finalTaxRupee :: home ${homeScreenController.finalTaxRupee} :: branch ${branchDetailController.finalTaxRupee} ::  homeExpert ${homeScreenController.finalTaxRupeeExpert}");
+          log("totalMinute :: home ${homeScreenController.totalMinute} :: category ${categoryDetailController.totalMinute} :: branch ${branchDetailController.totalMinute} :: search ${searchScreenController.totalMinute} ");
+          log("checkItem :: home ${homeScreenController.checkItem} :: category ${categoryDetailController.checkItem} :: branch ${branchDetailController.checkItem} :: search ${searchScreenController.checkItem} ");
+          log("serviceId :: home ${homeScreenController.serviceId} :: category ${categoryDetailController.serviceId} :: branch ${branchDetailController.serviceId} :: search ${searchScreenController.serviceId} ");
+
+          1.seconds.delay();
+          Get.delete<CategoryDetailController>();
+          Get.delete<BranchDetailController>();
+          Get.delete<SelectBranchController>();
+          Get.delete<ViewAllCategoryController>();
+          Get.delete<ExpertDetailController>();
+
+          homeScreenController.onGetAllExpertApiCall(start: "0", limit: homeScreenController.limitExpert.toString());
+
+          Get.offAllNamed(AppRoutes.bottom);
+
+          Get.dialog(
+            barrierColor: AppColors.blackColor.withOpacity(0.8),
+            Dialog(
+              backgroundColor: AppColors.transparent,
+              child: SuccessDialog(),
+            ),
+          );
+        } else {
+          Utils.showToast(Get.context!, createBookingCategory?.message ?? "");
+        }
+      } else if (selectedPayment == "cashAfterService") {
+        await onCreateBookingApiCall(
+          userId: Constant.storage.read<String>('userId') ?? "",
           expertId: Constant.storage.read<String>('expertDetail') != null
               ? Constant.storage.read<String>('expertDetail').toString()
               : Constant.storage.read<String>('expertId').toString(),
@@ -594,6 +699,8 @@ class BookingScreenController extends GetxController {
           amount: totalPrice,
           withoutTax: withOutTaxRupee.toInt(),
           paymentType: selectedPayment,
+          atPlace: selectedVenue == "At Salon" ? 1 : 2,
+          address: searchEditingController.text,
         );
 
         if (createBookingCategory?.status == true) {
@@ -692,7 +799,7 @@ class BookingScreenController extends GetxController {
           date: formattedDateNow,
           time: slotsString.toString(),
           rupee: rupee ?? 0,
-          withoutTaxRupee: totalPrice.toInt(),
+          totalAmountWithOutTax: totalPrice.toInt(),
           razorKey: splashController.settingCategory?.setting?.razorPayId ?? "",
           discountAmount: 0,
           discountPercentage: 0,
@@ -708,19 +815,18 @@ class BookingScreenController extends GetxController {
 
         await StripeService().init(
           expertId: Constant.storage.read<String>('expertId').toString(),
-          paymentType: selectedPayment,
           serviceId: serviceId.join(","),
           userId: userId,
           date: formattedDateNow,
-          time: slotsString.toString(),
           rupee: rupee ?? 0,
-          withoutTaxRupee: totalPrice.toInt(),
+          paymentType: selectedPayment,
+          time: slotsString.toString(),
           stripePaymentPublishKey: splashController.settingCategory?.setting?.stripePublishableKey ?? "",
           stripeURL: Constant.stripeUrl,
           stripePaymentKey: splashController.settingCategory?.setting?.stripeSecretKey ?? "",
-          isTest: true,
           discountAmount: 0,
           discountPercentage: 0,
+          totalAmountWithOutTax: int.parse(totalPrice.toString()),
         );
 
         log("Called stripe Init");
@@ -742,81 +848,24 @@ class BookingScreenController extends GetxController {
           Utils.showToast(context, e.toString());
         });
       } else if (selectedPayment == "flutterWave") {
-        // FlutterWaveService().init(
-        //     flutterWavePublishKey: splashController.settingCategory?.setting?.flutterWaveKey ?? "",
-        //     date: formattedDateNow,
-        //     time: slotsString.toString(),
-        //     rupee: rupee ?? 0,
-        //     withoutTaxRupee: totalPrice.toInt(),
-        //     serviceId: serviceId.join(","),
-        //     expertId: Constant.storage.read<String>('expertId').toString(),
-        //     userId: userId,
-        //     paymentType: selectedPayment);
-        //
-        // 1.seconds.delay;
-        // isLoading(false);
-        //
-        // FlutterWaveService().handlePaymentInitialization();
-        Fluttertoast.showToast(msg: "Flutter Wave Payment is undermaintaince");
-      }
+        FlutterWaveService().init(
+            flutterWavePublishKey: splashController.settingCategory?.setting?.flutterWaveKey ?? "",
+            date: formattedDateNow,
+            time: slotsString.toString(),
+            rupee: rupee ?? 0,
+            totalAmountWithOutTax: totalPrice.toString(),
+            serviceId: serviceId.join(","),
+            expertId: Constant.storage.read<String>('expertId').toString(),
+            userId: userId,
+            paymentType: selectedPayment);
 
-      /// In App Purchase Method
-      /*else if (selectedPayment == "In App Purchase") {
-        isLoading(true);
-        update([Constant.idProgressView]);
-
-        InAppPurchaseHelper().init(
-          expertId: Constant.storage.read<String>('expertId').toString(),
-          paymentType: selectedPayment,
-          serviceId: serviceId!.join(","),
-          userId: userId,
-          date: formattedDateNow,
-          time: slotsString.toString(),
-          rupee: rupee ?? 0,
-          withoutTaxRupee: totalPrice.toInt(),
-          discountAmount: 0,
-          discountPercentage: 0,
-          // onComplete: (res) {
-          //   log("::::::${res.toString()}");
-          //   // Get.close(2);
-          //   Get.offAllNamed(AppRoutes.bottom);
-          //   showBookingCompleteDialog();
-          // },
-        );
-        await 1.seconds.delay;
+        1.seconds.delay;
         isLoading(false);
-        update([Constant.idProgressView]);
-        ProductDetails? product = InAppPurchaseHelper().getProductDetail(Utils.getProductId());
-        if (product != null) {
-          InAppPurchaseHelper().buySubscription(product, purchases!);
-        } else {
-          isLoading(false);
-          update([Constant.idProgressView]);
-        }
-        log("it's In App Purchase");
-      }*/
+
+        FlutterWaveService().handlePaymentInitialization();
+      }
     } else {
       Utils.showToast(context, createBookingCategory?.message.toString() ?? "");
     }
   }
-
-  ///For In App Purchase
-// @override
-// void onBillingError(error) {
-//   isLoading(false);
-//   update([Constant.idProgressView]);
-// }
-//
-// @override
-// void onLoaded(bool initialized) {}
-//
-// @override
-// void onPending(PurchaseDetails product) {}
-//
-// @override
-// void onSuccessPurchase(PurchaseDetails product) {
-//   isLoading(false);
-//   update([Constant.idProgressView]);
-//   Get.back(result: true);
-// }
 }

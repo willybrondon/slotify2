@@ -3,9 +3,9 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/ui/expert/expert_detail/controller/expert_detail_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 
 class ExpertReviewScreen extends StatelessWidget {
@@ -49,9 +49,7 @@ class ExpertReviewScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: AppColors.whiteColor,
-                            boxShadow: Constant.boxShadow),
+                            borderRadius: BorderRadius.circular(12), color: AppColors.whiteColor, boxShadow: Constant.boxShadow),
                         child: Column(
                           children: [
                             Row(
@@ -60,7 +58,7 @@ class ExpertReviewScreen extends StatelessWidget {
                                 Text(
                                   "${logic.getReviewCategory!.data![index].userId?.fname} ${logic.getReviewCategory!.data![index].userId?.lname}",
                                   style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplayBold,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                       fontSize: 16.5,
                                       color: AppColors.primaryTextColor),
                                 ),
@@ -71,8 +69,7 @@ class ExpertReviewScreen extends StatelessWidget {
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(6),
-                                      color: AppColors.oceanBlue.withOpacity(0.30)),
+                                      borderRadius: BorderRadius.circular(6), color: AppColors.oceanBlue.withOpacity(0.30)),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -88,7 +85,7 @@ class ExpertReviewScreen extends StatelessWidget {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
-                                              fontFamily: FontFamily.sfProDisplayBold,
+                                              fontFamily: AppFontFamily.sfProDisplayBold,
                                               fontSize: 15,
                                               color: AppColors.blackColor)),
                                     ],
@@ -103,18 +100,14 @@ class ExpertReviewScreen extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplayMedium,
-                                        fontSize: 14,
-                                        color: AppColors.grey)),
+                                        fontFamily: AppFontFamily.sfProDisplayMedium, fontSize: 14, color: AppColors.grey)),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12),
                                   child: Text(logic.date.toString(),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                          fontFamily: FontFamily.sfProDisplayMedium,
-                                          fontSize: 13,
-                                          color: AppColors.grey)),
+                                          fontFamily: AppFontFamily.sfProDisplayMedium, fontSize: 13, color: AppColors.grey)),
                                 ),
                               ],
                             ),

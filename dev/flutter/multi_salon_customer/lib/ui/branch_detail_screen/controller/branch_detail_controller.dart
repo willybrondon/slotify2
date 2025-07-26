@@ -6,14 +6,15 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/branch_detail_screen/model/get_salon_detail_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/services/app_exception.dart';
+import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BranchDetailController extends GetxController with GetSingleTickerProviderStateMixin {
   late TabController? tabController;
+  int index = 0;
   double totalPrice = 0.0;
   int totalMinute = 0;
   double? withTaxRupee;
@@ -28,6 +29,15 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
   dynamic args = Get.arguments;
   late List<bool> isBranchSelected = List.generate((getSalonDetailCategory!.salon!.serviceIds!.length), (index) => false);
 
+  var tabs = [
+    Tab(child: Text("txtServices".tr)),
+    const Tab(child: Text("Product")),
+    Tab(child: Text("txtStaff".tr)),
+    const Tab(child: Text("Gallery")),
+    Tab(child: Text("txtReviews".tr)),
+    Tab(child: Text("txtAbout".tr)),
+  ];
+
   //------ Split Time Variables ------//
   String? str;
   List? parts;
@@ -40,10 +50,11 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
 
   @override
   void onInit() async {
-    tabController = TabController(initialIndex: 0, length: 4, vsync: this);
+    tabController = TabController(initialIndex: 0, length: 6, vsync: this);
 
     await getDataFromArgs();
     await onGetSalonDetailApiCall(salonId: salonId ?? "", latitude: latitude ?? 0.0, longitude: longitude ?? 0.0);
+
     super.onInit();
   }
 
@@ -65,13 +76,6 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
         "https://www.google.com/maps/dir/?api=1&destination=${getSalonDetailCategory?.salon?.locationCoordinates?.latitude},${getSalonDetailCategory?.salon?.locationCoordinates?.longitude}");
     await launchUrl(googleUrl);
   }
-
-  var tabs = [
-    const Tab(text: "Services"),
-    const Tab(text: "Staff"),
-    const Tab(text: "Reviews"),
-    const Tab(text: "About"),
-  ];
 
   onCheckBoxClick(value, int index) {
     isBranchSelected[index] = value;
@@ -134,7 +138,8 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
       final queryParameters = {
         "salonId": salonId,
         "latitude": latitude == 0.0 ? null : latitude.toString(),
-        "longitude": longitude == 0.0 ? null : longitude.toString()
+        "longitude": longitude == 0.0 ? null : longitude.toString(),
+        "city": city ?? "",
       };
 
       log("Get Salon Detail Params :: $queryParameters");

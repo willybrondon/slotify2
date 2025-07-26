@@ -8,9 +8,9 @@ import 'package:salon_2/ui/booking_detail_screen/model/cancel_booking_model.dart
 import 'package:salon_2/ui/booking_detail_screen/model/get_all_booking_model.dart';
 import 'package:salon_2/ui/booking_detail_screen/model/get_complain_model.dart';
 import 'package:salon_2/ui/booking_detail_screen/model/user_submit_review_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/services/app_exception.dart';
+import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class BookingDetailScreenController extends GetxController with GetSingleTickerProviderStateMixin {
@@ -69,7 +69,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
           getPending = [];
 
           await onGetAllBookingApiCall(
-              userId: Constant.storage.read<String>('UserId') ?? "",
+              userId: Constant.storage.read<String>('userId') ?? "",
               status: "pending",
               start: startPending.toString(),
               limit: limitPending.toString(),
@@ -85,7 +85,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
           getCancel = [];
 
           await onGetAllBookingApiCall(
-              userId: Constant.storage.read<String>('UserId') ?? "",
+              userId: Constant.storage.read<String>('userId') ?? "",
               status: "cancel",
               start: startCancel.toString(),
               limit: limitCancel.toString(),
@@ -101,7 +101,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
           getComplete = [];
 
           await onGetAllBookingApiCall(
-              userId: Constant.storage.read<String>('UserId') ?? "",
+              userId: Constant.storage.read<String>('userId') ?? "",
               status: "completed",
               start: startCompleted.toString(),
               limit: limitCompleted.toString(),
@@ -149,7 +149,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
     if (scrollController.hasClients) {
       if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
         await onGetAllBookingApiCall(
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
           status: "pending",
           start: startPending.toString(),
           limit: limitPending.toString(),
@@ -162,7 +162,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
     if (scrollController1.hasClients) {
       if (scrollController1.position.pixels == scrollController1.position.maxScrollExtent) {
         await onGetAllBookingApiCall(
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
           status: "cancel",
           start: startCancel.toString(),
           limit: limitCancel.toString(),
@@ -175,7 +175,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
     if (scrollController2.hasClients) {
       if (scrollController2.position.pixels == scrollController2.position.maxScrollExtent) {
         await onGetAllBookingApiCall(
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
           status: "completed",
           start: startCompleted.toString(),
           limit: limitCompleted.toString(),
@@ -189,7 +189,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       startPending = 0;
       getPending = [];
       await onGetAllBookingApiCall(
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
           status: "pending",
           start: startPending.toString(),
           limit: limitPending.toString(),
@@ -200,7 +200,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       startCancel = 0;
       getCancel = [];
       await onGetAllBookingApiCall(
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
           status: "cancel",
           start: startCancel.toString(),
           limit: limitCancel.toString(),
@@ -211,7 +211,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       startCompleted = 0;
       getComplete = [];
       await onGetAllBookingApiCall(
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
           status: "completed",
           start: startCompleted.toString(),
           limit: limitCompleted.toString(),
@@ -235,7 +235,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       startCompleted = 0;
       getComplete = [];
       await onGetAllBookingApiCall(
-        userId: Constant.storage.read<String>('UserId') ?? "",
+        userId: Constant.storage.read<String>('userId') ?? "",
         status: "pending",
         start: startPending.toString(),
         limit: limitPending.toString(),
@@ -252,7 +252,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       startPending = 0;
       getPending = [];
       await onGetAllBookingApiCall(
-        userId: Constant.storage.read<String>('UserId') ?? "",
+        userId: Constant.storage.read<String>('userId') ?? "",
         status: "cancel",
         start: startCancel.toString(),
         limit: limitCancel.toString(),
@@ -270,7 +270,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       getPending = [];
 
       await onGetAllBookingApiCall(
-        userId: Constant.storage.read<String>('UserId') ?? "",
+        userId: Constant.storage.read<String>('userId') ?? "",
         status: "completed",
         start: startCompleted.toString(),
         limit: limitCompleted.toString(),

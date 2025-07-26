@@ -26,6 +26,7 @@ class SelectBranchController extends GetxController {
       serviceId: serviceId.join(","),
       latitude: latitude ?? 0.0,
       longitude: longitude ?? 0.0,
+      city: city ?? "",
     );
 
     super.onInit();

@@ -10,11 +10,11 @@ import 'package:salon_2/custom/app_button/app_button.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
-import 'package:salon_2/ui/login/sign_in_screen/controller/sign_in_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/login_screen/sign_in_screen/controller/sign_in_controller.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class ExpertServiceDetailScreen extends StatelessWidget {
   ExpertServiceDetailScreen({super.key});
@@ -23,10 +23,13 @@ class ExpertServiceDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (bool didPop) {
         homeScreenController.onBack();
-        return true;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -85,7 +88,7 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                     child: Text(
                                       logic.checkItemExpert.join(", "),
                                       style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
+                                        fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 17.5,
                                         color: AppColors.categoryService,
                                       ),
@@ -98,14 +101,14 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                   Text(
                                     "$currency ${logic.withOutTaxRupeeExpert.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
+                                        fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 15,
                                         color: AppColors.currency.withOpacity(0.9)),
                                   ),
                                   Text(
                                     " ($currency${logic.finalTaxRupeeExpert.toStringAsFixed(2)} ${"txtTax".tr})",
                                     style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
+                                        fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 12,
                                         color: AppColors.currency.withOpacity(0.9)),
                                   ),
@@ -113,7 +116,7 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                   Text(
                                     "= $currency ${logic.totalPriceExpert.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplayBold, fontSize: 17, color: AppColors.currency),
+                                        fontFamily: AppFontFamily.sfProDisplayBold, fontSize: 17, color: AppColors.currency),
                                   ),
                                 ],
                               ).paddingOnly(left: 5),
@@ -131,7 +134,7 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                               buttonText: "txtBookNow".tr,
                               width: Get.width * 0.28,
                               color: AppColors.whiteColor,
-                              fontFamily: FontFamily.sfProDisplayMedium,
+                              fontFamily: AppFontFamily.sfProDisplayMedium,
                               fontSize: 15,
                               onTap: () async {
                                 if (Constant.storage.read<bool>('isLogIn') ?? false) {
@@ -248,7 +251,7 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplay,
+                                fontFamily: AppFontFamily.sfProDisplay,
                                 fontSize: 13.5,
                                 color: AppColors.category,
                               ),

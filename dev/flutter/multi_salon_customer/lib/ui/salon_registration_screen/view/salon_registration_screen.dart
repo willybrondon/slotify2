@@ -8,11 +8,11 @@ import 'package:salon_2/custom/dialog/progress_dialog.dart';
 import 'package:salon_2/custom/text_field/text_field_custom.dart';
 import 'package:salon_2/custom/text_field/text_form_field_custom.dart';
 import 'package:salon_2/ui/salon_registration_screen/controller/salon_registration_controller.dart';
-import 'package:salon_2/utils/api.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/api_constant.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class SalonRegistrationScreen extends StatelessWidget {
   const SalonRegistrationScreen({super.key});
@@ -47,17 +47,17 @@ class SalonRegistrationScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Hello, Salon!",
+                    "txtHelloSalon".tr,
                     style: TextStyle(
-                      fontFamily: FontFamily.sfProDisplay,
+                      fontFamily: AppFontFamily.sfProDisplay,
                       fontSize: 18,
                       color: AppColors.whiteColor,
                     ),
                   ),
                   Text(
-                    "Ready to Take Your Salon to the Next Level",
+                    "txtReadySalon".tr,
                     style: TextStyle(
-                      fontFamily: FontFamily.sfProDisplayRegular,
+                      fontFamily: AppFontFamily.sfProDisplayRegular,
                       fontSize: 13,
                       color: AppColors.whiteColor,
                     ),
@@ -85,7 +85,7 @@ class SalonRegistrationScreen extends StatelessWidget {
                         style: TextStyle(
                           color: AppColors.primaryTextColor,
                           fontSize: 21,
-                          fontFamily: FontFamily.sfProDisplayBold,
+                          fontFamily: AppFontFamily.sfProDisplayBold,
                         ),
                       ),
                     ).paddingOnly(top: 20),
@@ -95,7 +95,7 @@ class SalonRegistrationScreen extends StatelessWidget {
                         style: TextStyle(
                           color: AppColors.email,
                           fontSize: 13.5,
-                          fontFamily: FontFamily.sfProDisplayRegular,
+                          fontFamily: AppFontFamily.sfProDisplayRegular,
                         ),
                       ),
                     ),
@@ -129,11 +129,11 @@ class SalonRegistrationScreen extends StatelessWidget {
                                           color: AppColors.email.withOpacity(0.5),
                                         ),
                                         Text(
-                                          "Select Image",
+                                          "txtSelectImage".tr,
                                           style: TextStyle(
                                               color: AppColors.email.withOpacity(0.5),
                                               fontSize: 13.5,
-                                              fontFamily: FontFamily.sfProDisplayRegular),
+                                              fontFamily: AppFontFamily.sfProDisplayRegular),
                                         ),
                                       ],
                                     )
@@ -158,84 +158,84 @@ class SalonRegistrationScreen extends StatelessWidget {
                       ),
                     ).paddingOnly(top: 15),
                     TextFormFieldCustom(
-                      title: "Salon Name",
+                      title: "txtSalonName".tr,
                       hintTextColor: AppColors.subTitle,
                       hintTextSize: 15,
-                      hintTextStyle: FontFamily.sfProDisplayRegular,
+                      hintTextStyle: AppFontFamily.sfProDisplayRegular,
                       borderWidth: 1,
                       borderColor: AppColors.grey.withOpacity(0.1),
                       method: TextFieldCustom(
                         height: 50,
                         width: Get.width,
-                        hintText: "Enter your salon name",
+                        hintText: "desEnterSalonName".tr,
                         obscureText: false,
                         textInputAction: TextInputAction.next,
                         controller: logic.nameController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your salon name";
+                            return "desPleaseEnterSalonName".tr;
                           }
                           return null;
                         },
                       ),
                     ).paddingOnly(top: 15),
                     TextFormFieldCustom(
-                      title: "Email",
+                      title: "txtEmail".tr,
                       hintTextColor: AppColors.subTitle,
                       hintTextSize: 15,
-                      hintTextStyle: FontFamily.sfProDisplayRegular,
+                      hintTextStyle: AppFontFamily.sfProDisplayRegular,
                       borderWidth: 1,
                       borderColor: AppColors.grey.withOpacity(0.1),
                       method: TextFieldCustom(
                         height: 50,
                         width: Get.width,
-                        hintText: "Enter your email",
+                        hintText: "txtEnterEmail".tr,
                         obscureText: false,
                         textInputType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         controller: logic.emailController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your email";
+                            return "desEnterEmail".tr;
                           }
                           return null;
                         },
                       ),
                     ).paddingOnly(top: 15),
                     TextFormFieldCustom(
-                      title: "Mobile Number",
+                      title: "txtMobileNumber".tr,
                       hintTextColor: AppColors.subTitle,
                       hintTextSize: 15,
-                      hintTextStyle: FontFamily.sfProDisplayRegular,
+                      hintTextStyle: AppFontFamily.sfProDisplayRegular,
                       borderWidth: 1,
                       borderColor: AppColors.grey.withOpacity(0.1),
                       method: TextFieldCustom(
                         height: 50,
                         width: Get.width,
-                        hintText: "Enter your mobile number",
+                        hintText: "desEnterMobileNumber".tr,
                         obscureText: false,
                         textInputType: TextInputType.number,
                         textInputAction: TextInputAction.next,
                         controller: logic.mobileController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your mobile number";
+                            return "desPleaseEnterMobileNumber".tr;
                           }
                           return null;
                         },
                       ),
                     ).paddingOnly(top: 15),
                     TextFormFieldCustom(
-                      title: "Count of experts",
+                      title: "txtCountOfExperts".tr,
                       hintTextColor: AppColors.subTitle,
                       hintTextSize: 15,
-                      hintTextStyle: FontFamily.sfProDisplayRegular,
+                      hintTextStyle: AppFontFamily.sfProDisplayRegular,
                       borderWidth: 1,
                       borderColor: AppColors.grey.withOpacity(0.1),
                       method: TextFieldCustom(
                         height: 50,
                         width: Get.width,
-                        hintText: "Enter your experts count",
+                        hintText: "desEnterExpertCount".tr,
                         obscureText: false,
                         textInputAction: TextInputAction.next,
                         textInputType: TextInputType.number,
@@ -243,53 +243,53 @@ class SalonRegistrationScreen extends StatelessWidget {
                         controller: logic.expertController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your experts count";
+                            return "desPleaseEnterExpertCount".tr;
                           }
                           return null;
                         },
                       ),
                     ).paddingOnly(top: 15),
                     TextFormFieldCustom(
-                      title: "Address",
+                      title: "txtAddress".tr,
                       hintTextColor: AppColors.subTitle,
                       hintTextSize: 15,
-                      hintTextStyle: FontFamily.sfProDisplayRegular,
+                      hintTextStyle: AppFontFamily.sfProDisplayRegular,
                       borderWidth: 1,
                       borderColor: AppColors.grey.withOpacity(0.1),
                       method: TextFieldCustom(
                         height: 50,
                         width: Get.width,
-                        hintText: "Enter your address",
+                        hintText: "desEnterAddress".tr,
                         obscureText: false,
                         textInputAction: TextInputAction.next,
                         controller: logic.addressController,
                         maxLine: 6,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your address";
+                            return "desPleaseEnterAddress".tr;
                           }
                           return null;
                         },
                       ),
                     ).paddingOnly(top: 15),
                     TextFormFieldCustom(
-                      title: "About",
+                      title: "txtAbout".tr,
                       hintTextColor: AppColors.subTitle,
                       hintTextSize: 15,
-                      hintTextStyle: FontFamily.sfProDisplayRegular,
+                      hintTextStyle: AppFontFamily.sfProDisplayRegular,
                       borderWidth: 1,
                       borderColor: AppColors.grey.withOpacity(0.1),
                       method: TextFieldCustom(
                         height: 50,
                         width: Get.width,
-                        hintText: "Enter your salon details",
+                        hintText: "desEnterSalonDetail".tr,
                         obscureText: false,
                         textInputAction: TextInputAction.next,
                         controller: logic.aboutController,
                         maxLine: 6,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your salon details";
+                            return "desPleaseEnterSalonDetail".tr;
                           }
                           return null;
                         },
@@ -299,8 +299,8 @@ class SalonRegistrationScreen extends StatelessWidget {
                       height: 55,
                       width: Get.width,
                       buttonColor: AppColors.primaryAppColor,
-                      buttonText: "Register",
-                      fontFamily: FontFamily.sfProDisplay,
+                      buttonText: "txtRegister".tr,
+                      fontFamily: AppFontFamily.sfProDisplay,
                       color: AppColors.whiteColor,
                       fontSize: 18,
                       onTap: () async {

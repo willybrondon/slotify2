@@ -7,9 +7,9 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/main.dart';
-import 'package:salon_2/ui/profile/controller/profile_screen_controller.dart';
+import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
 import 'package:salon_2/ui/salon_registration_screen/model/salon_registration_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -61,7 +61,7 @@ class SalonRegistrationController extends GetxController {
         }
 
         await onSalonRegistrationApiCall(
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
           name: nameController.text,
           email: emailController.text,
           address: addressController.text,
@@ -78,7 +78,7 @@ class SalonRegistrationController extends GetxController {
           Get.back();
           profileScreenController.onGetUserApiCall();
 
-          Constant.storage.write('isGetUserId', profileScreenController.getUserCategory?.user?.id);
+          Constant.storage.write('userId', profileScreenController.getUserCategory?.user?.id);
           Constant.storage.write('userImage', profileScreenController.getUserCategory?.user?.image);
           Constant.storage.write('salonRequestSent', profileScreenController.getUserCategory?.user?.salonRequestSent);
           Constant.storage.write('fName', profileScreenController.getUserCategory?.user?.fname);

@@ -10,10 +10,10 @@ import 'package:get/get.dart';
 import 'package:salon_2/custom/dialog/review_dialog.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
@@ -37,7 +37,7 @@ class CompleteBookingScreen extends StatelessWidget {
                       child: Text(
                         "txtNotAvailableComplete".tr,
                         style: TextStyle(
-                          fontFamily: FontFamily.sfProDisplayMedium,
+                          fontFamily: AppFontFamily.sfProDisplayMedium,
                           fontSize: 17,
                           color: AppColors.primaryTextColor,
                         ),
@@ -52,7 +52,7 @@ class CompleteBookingScreen extends StatelessWidget {
                         logic.getComplete = [];
 
                         return logic.onGetAllBookingApiCall(
-                          userId: Constant.storage.read<String>('UserId') ?? "",
+                          userId: Constant.storage.read<String>('userId') ?? "",
                           status: "completed",
                           start: logic.startCompleted.toString(),
                           limit: logic.limitCompleted.toString(),
@@ -110,15 +110,17 @@ class CompleteBookingScreen extends StatelessWidget {
                                                       alignment: Alignment.center,
                                                       decoration: BoxDecoration(
                                                         borderRadius: const BorderRadius.only(
-                                                            bottomLeft: Radius.circular(15), topRight: Radius.circular(12)),
-                                                        color: AppColors.tabUnSelect,
+                                                          bottomLeft: Radius.circular(15),
+                                                          topRight: Radius.circular(12),
+                                                        ),
+                                                        color: AppColors.primaryAppColor,
                                                       ),
                                                       child: Text(
                                                         "#${logic.getComplete[index].bookingId}",
                                                         style: TextStyle(
-                                                          fontFamily: FontFamily.sfProDisplay,
+                                                          fontFamily: AppFontFamily.sfProDisplay,
                                                           fontSize: 13,
-                                                          color: AppColors.buttonText,
+                                                          color: AppColors.whiteColor,
                                                         ),
                                                       ),
                                                     ),
@@ -166,7 +168,7 @@ class CompleteBookingScreen extends StatelessWidget {
                                                                   child: Text(
                                                                     result ?? "",
                                                                     style: TextStyle(
-                                                                        fontFamily: FontFamily.sfProDisplay,
+                                                                        fontFamily: AppFontFamily.sfProDisplay,
                                                                         overflow: TextOverflow.ellipsis,
                                                                         fontSize: 17,
                                                                         color: AppColors.primaryTextColor),
@@ -176,7 +178,7 @@ class CompleteBookingScreen extends StatelessWidget {
                                                                 Text(
                                                                   logic.getComplete[index].category?.first.name ?? "",
                                                                   style: TextStyle(
-                                                                      fontFamily: FontFamily.sfProDisplayMedium,
+                                                                      fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                       fontSize: 16,
                                                                       color: AppColors.service),
                                                                 ),
@@ -185,7 +187,7 @@ class CompleteBookingScreen extends StatelessWidget {
                                                                   alignment: Alignment.center,
                                                                   decoration: BoxDecoration(
                                                                     borderRadius: BorderRadius.circular(7),
-                                                                    color: AppColors.green2,
+                                                                    color: AppColors.currencyBoxBg,
                                                                   ),
                                                                   child: Padding(
                                                                     padding:
@@ -193,9 +195,10 @@ class CompleteBookingScreen extends StatelessWidget {
                                                                     child: Text(
                                                                       "$currency ${logic.getComplete[index].amount?.toStringAsFixed(2)}",
                                                                       style: TextStyle(
-                                                                          fontFamily: FontFamily.sfProDisplayBold,
-                                                                          fontSize: 16,
-                                                                          color: AppColors.currency),
+                                                                        fontFamily: AppFontFamily.sfProDisplayBold,
+                                                                        fontSize: 16,
+                                                                        color: AppColors.primaryAppColor,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ).paddingOnly(bottom: 2),
@@ -225,7 +228,7 @@ class CompleteBookingScreen extends StatelessWidget {
                                                                     Text(
                                                                       "  ${logic.getComplete[index].expert?.fname ?? ""} ${logic.getComplete[index].expert?.lname ?? ""}",
                                                                       style: TextStyle(
-                                                                        fontFamily: FontFamily.sfProDisplayMedium,
+                                                                        fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                         fontSize: 11.5,
                                                                         color: AppColors.service,
                                                                       ),
@@ -237,64 +240,87 @@ class CompleteBookingScreen extends StatelessWidget {
                                                           ],
                                                         ),
                                                       ),
-                                                      SizedBox(height: Get.height * 0.01),
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                        child: Divider(color: AppColors.greyColor.withOpacity(0.2)),
-                                                      ),
-                                                      SizedBox(height: Get.height * 0.01),
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                                                      Container(
+                                                        decoration: BoxDecoration(
+                                                          color: AppColors.bgTime,
+                                                          borderRadius: BorderRadius.circular(12),
+                                                        ),
+                                                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
                                                         child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: [
-                                                            Row(
+                                                            Container(
+                                                              height: 40,
+                                                              width: 40,
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                color: AppColors.bgCircle,
+                                                              ),
+                                                              child: Image.asset(AppAsset.icBooking).paddingAll(10),
+                                                            ).paddingOnly(right: 12),
+                                                            Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
-                                                                Image.asset(
-                                                                  AppAsset.icCalendar,
-                                                                  height: 21,
-                                                                  width: 21,
-                                                                ),
-                                                                SizedBox(width: Get.width * 0.02),
                                                                 Text(
-                                                                  logic.getComplete[index].date ?? "",
+                                                                  logic.getComplete[index].date.toString(),
                                                                   style: TextStyle(
-                                                                    fontFamily: FontFamily.sfProDisplay,
+                                                                    fontFamily: AppFontFamily.heeBo700,
                                                                     fontSize: 14,
-                                                                    color: AppColors.service,
+                                                                    color: AppColors.primaryTextColor,
                                                                   ),
                                                                 ),
+                                                                Text(
+                                                                  "Booking Date",
+                                                                  style: TextStyle(
+                                                                    fontFamily: AppFontFamily.heeBo500,
+                                                                    fontSize: 12,
+                                                                    color: AppColors.service,
+                                                                  ),
+                                                                )
                                                               ],
                                                             ),
-                                                            Row(
+                                                            const Spacer(),
+                                                            Container(
+                                                              height: 36,
+                                                              width: 2,
+                                                              color: AppColors.serviceBorder,
+                                                            ),
+                                                            const Spacer(),
+                                                            Container(
+                                                              height: 40,
+                                                              width: 40,
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                color: AppColors.bgCircle,
+                                                              ),
+                                                              child: Image.asset(
+                                                                AppAsset.icClock,
+                                                              ).paddingAll(10),
+                                                            ).paddingOnly(right: 12),
+                                                            Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
-                                                                Image.asset(AppAsset.icCheckIn, height: 21, width: 21),
-                                                                SizedBox(width: Get.width * 0.02),
                                                                 Text(
-                                                                  logic.getComplete[index].checkInTime ?? "",
+                                                                  logic.getComplete[index].time?[0] ?? "",
                                                                   style: TextStyle(
-                                                                      fontFamily: FontFamily.sfProDisplay,
-                                                                      fontSize: 14,
-                                                                      color: AppColors.service),
+                                                                    fontFamily: AppFontFamily.heeBo700,
+                                                                    fontSize: 14,
+                                                                    color: AppColors.primaryTextColor,
+                                                                  ),
                                                                 ),
+                                                                Text(
+                                                                  "Booking Timing",
+                                                                  style: TextStyle(
+                                                                    fontFamily: AppFontFamily.heeBo500,
+                                                                    fontSize: 12,
+                                                                    color: AppColors.service,
+                                                                  ),
+                                                                )
                                                               ],
                                                             ),
-                                                            Row(
-                                                              children: [
-                                                                Image.asset(AppAsset.icCheckOut, height: 21, width: 21),
-                                                                SizedBox(width: Get.width * 0.02),
-                                                                Text(
-                                                                  logic.getComplete[index].checkOutTime ?? "",
-                                                                  style: TextStyle(
-                                                                      fontFamily: FontFamily.sfProDisplay,
-                                                                      fontSize: 14,
-                                                                      color: AppColors.service),
-                                                                ),
-                                                              ],
-                                                            )
+                                                            const Spacer(),
                                                           ],
                                                         ),
-                                                      ),
+                                                      ).paddingOnly(top: 12, left: 12, right: 12),
                                                       SizedBox(height: Get.height * 0.02),
                                                       logic.getComplete[index].isReviewed == true
                                                           ? const SizedBox()
@@ -324,7 +350,7 @@ class CompleteBookingScreen extends StatelessWidget {
                                                                     "txtGetReview".tr,
                                                                     style: TextStyle(
                                                                       color: AppColors.primaryAppColor,
-                                                                      fontFamily: FontFamily.sfProDisplayBold,
+                                                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                                                       fontSize: 16,
                                                                     ),
                                                                   ),

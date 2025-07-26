@@ -4,9 +4,9 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/ui/expert/expert_detail/model/get_review_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/services/app_exception.dart';
+import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class ExpertDetailController extends GetxController {

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class ServicePriceDialog extends StatelessWidget {
   const ServicePriceDialog({super.key});
@@ -38,7 +38,7 @@ class ServicePriceDialog extends StatelessWidget {
                     child: Text(
                       "Services Price",
                       style: TextStyle(
-                        fontFamily: FontFamily.sfProDisplay,
+                        fontFamily: AppFontFamily.sfProDisplay,
                         color: AppColors.whiteColor,
                         fontSize: 20,
                       ),
@@ -83,7 +83,7 @@ class ServicePriceDialog extends StatelessWidget {
                             child: Text(
                               logic.getExpertServiceBaseSalonCategory?.matchedServices?[index].matchedServiceId?.name ?? "",
                               style: TextStyle(
-                                  fontFamily: FontFamily.sfProDisplayBold,
+                                  fontFamily: AppFontFamily.sfProDisplayBold,
                                   color: AppColors.categoryService,
                                   fontSize: 16,
                                   overflow: TextOverflow.ellipsis),
@@ -94,7 +94,7 @@ class ServicePriceDialog extends StatelessWidget {
                               ? Text(
                                   "${logic.getExpertServiceBaseSalonCategory?.matchedServices?[index].matchedServiceId?.duration} ${"txtMinutes".tr}",
                                   style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplayBold,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                       color: AppColors.currency,
                                       fontSize: 14,
                                       overflow: TextOverflow.ellipsis),
@@ -102,7 +102,7 @@ class ServicePriceDialog extends StatelessWidget {
                               : Text(
                                   "$currency ${logic.getExpertServiceBaseSalonCategory?.matchedServices?[index].price?.toStringAsFixed(2)}",
                                   style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplayBold,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                       color: AppColors.currency,
                                       fontSize: 14,
                                       overflow: TextOverflow.ellipsis),

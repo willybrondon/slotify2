@@ -15,10 +15,10 @@ import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/expert/expert_detail/controller/expert_detail_controller.dart';
 import 'package:salon_2/ui/expert/expert_detail/widget/expert_service_detail_screen.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
-import 'package:salon_2/ui/login/sign_in_screen/controller/sign_in_controller.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/login_screen/sign_in_screen/controller/sign_in_controller.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/shimmer.dart';
 
@@ -30,12 +30,14 @@ class ExpertDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (bool didPop) {
         Constant.storage.remove("expertDetail");
         homeScreenController.onBack();
-
-        return true;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
@@ -91,7 +93,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                     child: Text(
                                       logic.checkItemExpert.join(", "),
                                       style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
+                                        fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 17.5,
                                         color: AppColors.categoryService,
                                       ),
@@ -104,22 +106,27 @@ class ExpertDetailScreen extends StatelessWidget {
                                   Text(
                                     "$currency ${logic.withOutTaxRupeeExpert.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
-                                        fontSize: 15,
-                                        color: AppColors.currency.withOpacity(0.9)),
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                      fontSize: 15,
+                                      color: AppColors.currency.withOpacity(0.9),
+                                    ),
                                   ),
                                   Text(
                                     " ($currency${logic.finalTaxRupeeExpert.toStringAsFixed(2)} ${"txtTax".tr})",
                                     style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
-                                        fontSize: 12,
-                                        color: AppColors.currency.withOpacity(0.9)),
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                      fontSize: 12,
+                                      color: AppColors.currency.withOpacity(0.9),
+                                    ),
                                   ),
                                   SizedBox(width: Get.width * 0.02),
                                   Text(
                                     "= $currency ${logic.totalPriceExpert.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplayBold, fontSize: 17, color: AppColors.currency),
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontSize: 17,
+                                      color: AppColors.currency,
+                                    ),
                                   ),
                                 ],
                               ).paddingOnly(left: 5),
@@ -136,7 +143,7 @@ class ExpertDetailScreen extends StatelessWidget {
                               buttonText: "txtBookNow".tr,
                               width: Get.width * 0.28,
                               color: AppColors.whiteColor,
-                              fontFamily: FontFamily.sfProDisplayMedium,
+                              fontFamily: AppFontFamily.sfProDisplayMedium,
                               fontSize: 15,
                               onTap: () async {
                                 if (Constant.storage.read<bool>('isLogIn') ?? false) {
@@ -199,7 +206,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                             ),
                                             blurRadius: 3.0,
                                             spreadRadius: 2.0,
-                                          ), //BoxShadow
+                                          ),
                                           const BoxShadow(
                                             color: Colors.black12,
                                             offset: Offset(0.0, 0.0),
@@ -230,11 +237,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                   return Image.asset(AppAsset.icPlaceHolder);
                                                 },
                                                 errorWidget: (context, url, error) {
-                                                  return Icon(
-                                                    Icons.error_outline,
-                                                    color: AppColors.blackColor,
-                                                    size: 20,
-                                                  );
+                                                  return Image.asset(AppAsset.icPlaceHolder);
                                                 },
                                               ),
                                             ),
@@ -243,7 +246,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                           Text(
                                             "${logic.getExpertCategory?.data?.expert?.fname} ${logic.getExpertCategory?.data?.expert?.lname}",
                                             style: TextStyle(
-                                                fontFamily: FontFamily.sfProDisplayBold,
+                                                fontFamily: AppFontFamily.sfProDisplayBold,
                                                 fontSize: 18,
                                                 color: AppColors.primaryTextColor),
                                           ),
@@ -301,7 +304,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                           ),
                                           SizedBox(height: Get.height * 0.014),
                                           ExpertDetails(
-                                            leadingIcon: AppAsset.icSalon,
+                                            leadingIcon: AppAsset.icSalon1,
                                             title: "${logic.getExpertCategory?.data?.expert?.salonId?.name}",
                                           ),
                                         ],
@@ -312,11 +315,14 @@ class ExpertDetailScreen extends StatelessWidget {
                           ),
                           InkWell(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(
-                                builder: (context) {
-                                  return ExpertServiceDetailScreen();
-                                },
-                              ),);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return ExpertServiceDetailScreen();
+                                  },
+                                ),
+                              );
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -324,13 +330,15 @@ class ExpertDetailScreen extends StatelessWidget {
                                 Text(
                                   "txtMyServices".tr,
                                   style: TextStyle(
-                                      fontSize: 20, fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor),
+                                      fontSize: 20,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      color: AppColors.primaryTextColor),
                                 ).paddingOnly(top: 15, left: 3, bottom: 8),
                                 Text(
                                   "txtViewAll".tr,
                                   style: TextStyle(
                                     fontSize: 13,
-                                    fontFamily: FontFamily.sfProDisplayMedium,
+                                    fontFamily: AppFontFamily.sfProDisplayMedium,
                                     decoration: TextDecoration.underline,
                                     decorationColor: AppColors.service,
                                     color: AppColors.service,
@@ -344,7 +352,7 @@ class ExpertDetailScreen extends StatelessWidget {
                             builder: (logic) {
                               return AnimationLimiter(
                                 child: Container(
-                                  height: 105,
+                                  height: 106,
                                   padding: const EdgeInsets.only(top: 5),
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
@@ -427,7 +435,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                    fontFamily: FontFamily.sfProDisplay,
+                                                    fontFamily: AppFontFamily.sfProDisplay,
                                                     fontSize: 13.5,
                                                     color: AppColors.category,
                                                   ),
@@ -459,7 +467,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                           Text(
                                             "txtNoFoundReview".tr,
                                             style: TextStyle(
-                                              fontFamily: FontFamily.sfProDisplayBold,
+                                              fontFamily: AppFontFamily.sfProDisplayBold,
                                               fontSize: 15,
                                               color: AppColors.primaryTextColor,
                                             ),
@@ -477,7 +485,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                 Text(
                                                   "txtReviews".tr,
                                                   style: TextStyle(
-                                                      fontFamily: FontFamily.sfProDisplayBold,
+                                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                                       fontSize: 18,
                                                       color: AppColors.review),
                                                 ),
@@ -485,7 +493,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                 Text(
                                                   "txtBasedReviews".tr,
                                                   style: TextStyle(
-                                                    fontFamily: FontFamily.sfProDisplayMedium,
+                                                    fontFamily: AppFontFamily.sfProDisplayMedium,
                                                     fontSize: 14,
                                                     color: AppColors.grey,
                                                   ),
@@ -501,7 +509,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                   Text(
                                                     "txtViewAll".tr,
                                                     style: TextStyle(
-                                                        fontFamily: FontFamily.sfProDisplayRegular,
+                                                        fontFamily: AppFontFamily.sfProDisplayRegular,
                                                         fontSize: 13,
                                                         color: AppColors.grey,
                                                         decoration: TextDecoration.underline,
@@ -542,7 +550,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                       Text(
                                                         "${logic.getReviewCategory?.data?[index].userId?.fname ?? ""} ${logic.getReviewCategory?.data?[index].userId?.lname ?? ""}",
                                                         style: TextStyle(
-                                                          fontFamily: FontFamily.sfProDisplayBold,
+                                                          fontFamily: AppFontFamily.sfProDisplayBold,
                                                           fontSize: 16.5,
                                                           color: AppColors.primaryTextColor,
                                                         ),
@@ -573,7 +581,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                               maxLines: 1,
                                                               overflow: TextOverflow.ellipsis,
                                                               style: TextStyle(
-                                                                fontFamily: FontFamily.sfProDisplayMedium,
+                                                                fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                 fontSize: 15,
                                                                 color: AppColors.blackColor,
                                                               ),
@@ -591,7 +599,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                         maxLines: 1,
                                                         overflow: TextOverflow.ellipsis,
                                                         style: TextStyle(
-                                                          fontFamily: FontFamily.sfProDisplayMedium,
+                                                          fontFamily: AppFontFamily.sfProDisplayMedium,
                                                           fontSize: 14,
                                                           color: AppColors.grey,
                                                         ),
@@ -603,7 +611,7 @@ class ExpertDetailScreen extends StatelessWidget {
                                                           maxLines: 1,
                                                           overflow: TextOverflow.ellipsis,
                                                           style: TextStyle(
-                                                            fontFamily: FontFamily.sfProDisplayMedium,
+                                                            fontFamily: AppFontFamily.sfProDisplayMedium,
                                                             fontSize: 13,
                                                             color: AppColors.grey,
                                                           ),

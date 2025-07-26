@@ -1,22 +1,22 @@
 import 'package:get/get.dart';
-import 'package:salon_2/utils/language/Italian_language.dart';
-import 'package:salon_2/utils/language/arabic_language.dart';
-import 'package:salon_2/utils/language/bangali_language.dart';
-import 'package:salon_2/utils/language/chinese_language.dart';
-import 'package:salon_2/utils/language/english_language.dart';
-import 'package:salon_2/utils/language/french_language.dart';
-import 'package:salon_2/utils/language/german_language.dart';
-import 'package:salon_2/utils/language/hindi_language.dart';
-import 'package:salon_2/utils/language/indonesian_language.dart';
-import 'package:salon_2/utils/language/korean_language.dart';
-import 'package:salon_2/utils/language/portuguese_language.dart';
-import 'package:salon_2/utils/language/russian_language.dart';
-import 'package:salon_2/utils/language/spanish_language.dart';
-import 'package:salon_2/utils/language/swahili_language.dart';
-import 'package:salon_2/utils/language/tamil_language.dart';
-import 'package:salon_2/utils/language/telugu_language.dart';
-import 'package:salon_2/utils/language/turkish_language.dart';
-import 'package:salon_2/utils/language/urdu_language.dart';
+import 'package:salon_2/language/arabic_language.dart';
+import 'package:salon_2/language/bangali_language.dart';
+import 'package:salon_2/language/chinese_language.dart';
+import 'package:salon_2/language/english_language.dart';
+import 'package:salon_2/language/french_language.dart';
+import 'package:salon_2/language/german_language.dart';
+import 'package:salon_2/language/hindi_language.dart';
+import 'package:salon_2/language/indonesian_language.dart';
+import 'package:salon_2/language/italian_language.dart';
+import 'package:salon_2/language/korean_language.dart';
+import 'package:salon_2/language/portuguese_language.dart';
+import 'package:salon_2/language/russian_language.dart';
+import 'package:salon_2/language/spanish_language.dart';
+import 'package:salon_2/language/swahili_language.dart';
+import 'package:salon_2/language/tamil_language.dart';
+import 'package:salon_2/language/telugu_language.dart';
+import 'package:salon_2/language/turkish_language.dart';
+import 'package:salon_2/language/urdu_language.dart';
 
 class AppLanguages extends Translations {
   @override

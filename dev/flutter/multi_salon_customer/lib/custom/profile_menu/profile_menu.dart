@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class CustomMenu extends StatelessWidget {
   String? leadingImage;
@@ -35,26 +35,35 @@ class CustomMenu extends StatelessWidget {
     return Column(
       children: [
         InkWell(
-            onTap: onTap,
-            overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+          onTap: onTap,
+          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.whiteColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppColors.grey.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.all(8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
                     Container(
-                      height: 40,
-                      width: 40,
+                      height: 50,
+                      width: 50,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.roundBg,
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.profileIconBg,
                       ),
                       child: Image.asset(
                         leadingImage!,
-                        height: imageHeight ?? 25,
-                        width: imageWidth ?? 25,
-                        color: AppColors.primaryAppColor,
+                        height: 27,
+                        width: 27,
                       ),
                     ),
                     SizedBox(width: Get.width * 0.04),
@@ -64,9 +73,9 @@ class CustomMenu extends StatelessWidget {
                         Text(
                           title!,
                           style: TextStyle(
-                            fontFamily: fontFamily ?? FontFamily.sfProDisplay,
-                            fontSize: fontSize ?? 16,
-                            color: textColor,
+                            fontFamily: AppFontFamily.sfProDisplay,
+                            fontSize: 16,
+                            color: AppColors.appText,
                           ),
                         ),
                         SizedBox(
@@ -74,11 +83,11 @@ class CustomMenu extends StatelessWidget {
                         ),
                         if (subtitle != null)
                           SizedBox(
-                            width: Get.width * 0.68,
+                            width: Get.width * 0.64,
                             child: Text(
                               subtitle!,
                               style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayMedium,
+                                fontFamily: AppFontFamily.sfProDisplayMedium,
                                 fontSize: 13,
                                 color: AppColors.subTitle,
                               ),
@@ -88,10 +97,12 @@ class CustomMenu extends StatelessWidget {
                     ),
                   ],
                 ),
-                Image.asset(AppAsset.icArrowRight, height: 20, width: 20).paddingOnly(right: 7),
+                Image.asset(AppAsset.icArrow, height: 23, width: 23).paddingOnly(right: 7),
               ],
-            )),
-        SizedBox(height: Get.height * 0.035),
+            ),
+          ),
+        ),
+        SizedBox(height: Get.height * 0.02),
       ],
     );
   }
