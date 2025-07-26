@@ -23,8 +23,7 @@ const SalonSettlement = require("./models/salonSettlement.model");
 const ExpertSettlement = require("./models/expertSettlement.model");
 const Attendance = require("./models/attendance.model");
 const Setting = require("./models/setting.model");
-const Service = require("./models/service.model");
-const User = require("./models/user.model");
+
 
 const settingJson = require("./setting");
 
