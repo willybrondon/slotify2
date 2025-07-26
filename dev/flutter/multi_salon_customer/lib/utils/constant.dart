@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class Constant {
   final BookingScreenController bookingScreenController = Get.find<BookingScreenController>();
@@ -19,19 +20,7 @@ class Constant {
 
   /// ===================>> STRIPE
   static const stripeUrl = "https://api.stripe.com/v1/payment_intents";
-  static const stripeMerchantCountryCode = 'IN';
-  // static const stripeCureencyCode = 'INR';
-
-  /// ===================>> Razorpay
-
-  // static const razorPayCurrencyCode = 'INR';
-  static const flutterWavePublishKey = 'FLWPUBK_TEST-cdc51a4df113a91fe33a914eaf8d1c75-X';
-
-  /// In-App Purchase
-  // static const String productIdiOS = "Add your Product ID here for iOS";
-
-  /// 'Your Plan ID (Product ID iOS)';
-  // static const String productIdAndroid = "android.test.purchased";
+  static final stripeMerchantCountryCode = countryCode ?? "";
 
   // ----- RATE APP ----- //
   static String appStoreId = ' ';
@@ -89,50 +78,122 @@ class Constant {
   static var idChangeGender = 'idChangeGender';
   static var idPickSalonImage = 'idPickSalonImage';
   static var idGetCountry = 'idGetCountry';
+  static var idSelectProductSize = 'idSelectProductSize';
+  static var idIncrementQuantity = 'idIncrementQuantity';
+  static var idDecrementQuantity = 'idDecrementQuantity';
+  static var idSelectAddress = 'idSelectAddress';
+  static var idSetPrimary = 'idSetPrimary';
+  static var idSelectPaymentMethod = 'idSelectPaymentMethod';
+  static var idSelectMonth = 'idSelectMonth';
+  static var idComplainImage = 'idComplainImage';
+  static var idSwitchOn = 'idSwitchOn';
+  static var idSelectAmount = 'idSelectAmount';
+  static var idLike = 'idLike';
+  static var idOnBoarding = 'idOnBoarding';
+  static var idProductSaved = 'idProductSaved';
+  static var idMoneyOffer = 'idMoneyOffer';
+  static var idGetCoupon = 'idGetCoupon';
+  static var idApplyCoupon = 'idApplyCoupon';
+
+  static String capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1).toLowerCase();
+  }
 
   //-----------------------------
 
   List<Step> stepper() {
     return [
       Step(
-          isActive: bookingScreenController.currentStep >= 0,
-          state: bookingScreenController.currentStep > 0 ? StepState.complete : StepState.indexed,
-          label: Text(
-            "txtStaff".tr,
-            style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, fontSize: 16, color: AppColors.primaryTextColor),
+        isActive: bookingScreenController.currentStep >= 0,
+        state: bookingScreenController.currentStep > 0 ? StepState.complete : StepState.indexed,
+        label: Text(
+          "Venue",
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 16,
+            color: AppColors.primaryTextColor,
           ),
-          title: const SizedBox(),
-          content: SizedBox(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ),
+        title: const SizedBox(),
+        content: SizedBox(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                "txtChooseYourExpert".tr,
-                style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, fontSize: 16, color: AppColors.primaryTextColor),
+                "Select Service Venue",
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                  fontSize: 16,
+                  color: AppColors.primaryTextColor,
+                ),
               ),
               SizedBox(height: Get.height * 0.02),
-            ]),
-          )),
-      Step(
-          state: bookingScreenController.currentStep > 1 ? StepState.complete : StepState.indexed,
-          isActive: bookingScreenController.currentStep >= 1,
-          label: Text(
-            "txtDateTime".tr,
-            style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, fontSize: 16, color: AppColors.primaryTextColor),
+            ],
           ),
-          title: const SizedBox(),
-          content: Container(
-            color: AppColors.yellowColor,
-          )),
+        ),
+      ),
       Step(
-          state: bookingScreenController.currentStep > 2 ? StepState.complete : StepState.indexed,
-          isActive: bookingScreenController.currentStep >= 2,
-          label: Text(
-            "txtPayment".tr,
-            style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, fontSize: 16, color: AppColors.primaryTextColor),
+        isActive: bookingScreenController.currentStep >= 1,
+        state: bookingScreenController.currentStep > 1 ? StepState.complete : StepState.indexed,
+        label: Text(
+          "txtStaff".tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 16,
+            color: AppColors.primaryTextColor,
           ),
-          title: const SizedBox(),
-          content: Container(
-            color: AppColors.buttonColor,
-          ))
+        ),
+        title: const SizedBox(),
+        content: SizedBox(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "txtChooseYourExpert".tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                  fontSize: 16,
+                  color: AppColors.primaryTextColor,
+                ),
+              ),
+              SizedBox(height: Get.height * 0.02),
+            ],
+          ),
+        ),
+      ),
+      Step(
+        state: bookingScreenController.currentStep > 2 ? StepState.complete : StepState.indexed,
+        isActive: bookingScreenController.currentStep >= 2,
+        label: Text(
+          "txtDateTime".tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 16,
+            color: AppColors.primaryTextColor,
+          ),
+        ),
+        title: const SizedBox(),
+        content: Container(
+          color: AppColors.yellowColor,
+        ),
+      ),
+      Step(
+        state: bookingScreenController.currentStep > 3 ? StepState.complete : StepState.indexed,
+        isActive: bookingScreenController.currentStep >= 3,
+        label: Text(
+          "txtPayment".tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 16,
+            color: AppColors.primaryTextColor,
+          ),
+        ),
+        title: const SizedBox(),
+        content: Container(
+          color: AppColors.buttonColor,
+        ),
+      ),
     ];
   }
 

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_button/button.dart';
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
-import 'package:salon_2/utils/asset.dart';
+import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class ReviewDialog extends StatelessWidget {
@@ -29,12 +29,21 @@ class ReviewDialog extends StatelessWidget {
             height: 55,
             width: Get.width,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
               color: AppColors.primaryAppColor,
             ),
             child: Center(
-              child: Text("txtEnterReview".tr,
-                  style: TextStyle(color: AppColors.whiteColor, fontSize: 18, fontFamily: FontFamily.sfProDisplayBold)),
+              child: Text(
+                "txtEnterReview".tr,
+                style: TextStyle(
+                  color: AppColors.whiteColor,
+                  fontSize: 18,
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                ),
+              ),
             ),
           ),
           SizedBox(height: Get.height * 0.02),
@@ -49,8 +58,14 @@ class ReviewDialog extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Text("txtYourReview".tr,
-                    style: TextStyle(color: AppColors.darkGrey5, fontSize: 14, fontFamily: FontFamily.sfProDisplayMedium)),
+                Text(
+                  "txtYourReview".tr,
+                  style: TextStyle(
+                    color: AppColors.darkGrey5,
+                    fontSize: 14,
+                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                  ),
+                ),
                 const Spacer(),
                 SizedBox(
                   height: 48,
@@ -99,7 +114,11 @@ class ReviewDialog extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: 'txtEnterYourReview'.tr,
                     border: InputBorder.none,
-                    hintStyle: TextStyle(color: AppColors.darkGrey5, fontSize: 14, fontFamily: FontFamily.sfProDisplayMedium),
+                    hintStyle: TextStyle(
+                      color: AppColors.darkGrey5,
+                      fontSize: 14,
+                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                    ),
                   ),
                 ).paddingOnly(left: 10),
               );
@@ -114,7 +133,7 @@ class ReviewDialog extends StatelessWidget {
                 buttonColor: AppColors.whiteColor,
                 buttonText: "txtCancel".tr,
                 textColor: AppColors.primaryTextColor,
-                fontStyle: FontFamily.sfProDisplay,
+                fontStyle: AppFontFamily.sfProDisplay,
                 fontSize: 16.5,
                 height: 48,
                 width: Get.width * 0.31,
@@ -132,7 +151,7 @@ class ReviewDialog extends StatelessWidget {
                     buttonColor: AppColors.primaryAppColor,
                     buttonText: "txtSubmit".tr,
                     textColor: AppColors.whiteColor,
-                    fontStyle: FontFamily.sfProDisplay,
+                    fontStyle: AppFontFamily.sfProDisplay,
                     fontSize: 16.5,
                     height: 48,
                     width: Get.width * 0.31,

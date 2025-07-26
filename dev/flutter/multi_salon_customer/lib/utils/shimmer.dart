@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/ui/branch_detail_screen/controller/branch_detail_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/home_screen/widget/view_all_screen_widget.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:shimmer/shimmer.dart';
 
 class Shimmers {
@@ -107,33 +108,44 @@ class Shimmers {
         itemCount: 4,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
-          childAspectRatio: 0.65,
-          crossAxisSpacing: 9,
+          childAspectRatio: 0.75,
+          crossAxisSpacing: 6,
         ),
         itemBuilder: (BuildContext context, int index) {
-          return Column(
+          return Stack(
             children: [
-              Center(
+              Container(
+                height: 100,
+                width: 80,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.red.withOpacity(0.3),
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: Image.asset(AppAsset.icCategoryPlaceholder).paddingAll(22).paddingOnly(bottom: 15),
+              ),
+              Positioned(
+                bottom: 14.5,
                 child: Container(
-                  height: 100,
-                  width: 100,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.4),
-                    shape: BoxShape.circle,
+                  height: 27,
+                  width: 80,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(14),
+                      bottomRight: Radius.circular(14),
+                    ),
+                    color: Colors.red,
                   ),
-                  child: Image.asset(
-                    AppAsset.icCategoryPlaceholder,
-                    height: 40,
-                    width: 40,
+                  child: Container(
+                    height: 12,
+                    width: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.red,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                height: 12,
-                width: 50,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.red),
               ),
             ],
           );
@@ -350,6 +362,524 @@ class Shimmers {
           );
         },
       ),
+    );
+  }
+
+  static Shimmer newProductShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Constant.baseColor,
+      highlightColor: Constant.highlightColor,
+      period: Constant.period,
+      child: GridView.builder(
+        scrollDirection: Axis.vertical,
+        physics: const ScrollPhysics(),
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        itemCount: 3,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 0.7,
+          crossAxisSpacing: 10,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(21),
+              color: Colors.red.withOpacity(0.2),
+              boxShadow: Constant.boxShadow,
+            ),
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    const Spacer(),
+                    const Spacer(),
+                    const Spacer(),
+                    Image.asset(AppAsset.icImagePlaceholder, height: 55),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        height: 15,
+                        width: 50,
+                        margin: const EdgeInsets.only(left: 10),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Colors.red),
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Container(
+                          height: 15,
+                          width: 40,
+                          margin: const EdgeInsets.only(left: 10),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Colors.red),
+                        ),
+                        const SizedBox(width: 5),
+                        Container(
+                          height: 15,
+                          width: 40,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Colors.red),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    height: 25,
+                    width: 25,
+                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  static Shimmer productCategoryShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Constant.baseColor,
+      highlightColor: Constant.highlightColor,
+      period: Constant.period,
+      child: GridView.builder(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        itemCount: 3,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: 10,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              color: Colors.red.withOpacity(0.2),
+              boxShadow: Constant.boxShadow,
+              border: Border.all(
+                color: AppColors.grey.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Image.asset(AppAsset.icImagePlaceholder).paddingAll(18),
+                ),
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.2),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(14),
+                      bottomRight: Radius.circular(14),
+                    ),
+                  ),
+                  child: Center(
+                    child: Container(
+                      height: 15,
+                      width: 75,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.red,
+                      ),
+                    ).paddingOnly(left: 7, right: 7),
+                  ),
+                ),
+              ],
+            ),
+          ).paddingOnly(bottom: 8);
+        },
+      ),
+    );
+  }
+
+  static Shimmer trendingProductShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Constant.baseColor,
+      highlightColor: Constant.highlightColor,
+      period: Constant.period,
+      child: GridView.builder(
+        scrollDirection: Axis.vertical,
+        physics: const ScrollPhysics(),
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        itemCount: 3,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 0.7,
+          crossAxisSpacing: 10,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(21),
+              color: Colors.red.withOpacity(0.2),
+              boxShadow: Constant.boxShadow,
+            ),
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    const Spacer(),
+                    const Spacer(),
+                    const Spacer(),
+                    Image.asset(AppAsset.icImagePlaceholder, height: 55),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        height: 11,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                        width: 50,
+                        margin: const EdgeInsets.only(left: 10),
+                      ),
+                    ),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        height: 11,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                        width: 50,
+                        margin: const EdgeInsets.only(left: 10),
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Container(
+                          height: 11,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                          width: 40,
+                          margin: const EdgeInsets.only(left: 10),
+                        ),
+                        const SizedBox(width: 5),
+                        Container(
+                          height: 11,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                          width: 40,
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    height: 25,
+                    width: 25,
+                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  static Shimmer productDetailImageShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Constant.baseColor,
+      highlightColor: Constant.highlightColor,
+      period: Constant.period,
+      child: Container(
+        height: Get.height * 0.35,
+        width: Get.width,
+        decoration: BoxDecoration(
+          color: AppColors.currencyGrey.withOpacity(0.5),
+        ),
+        child: Image.asset(AppAsset.icImagePlaceholder).paddingAll(50),
+      ),
+    );
+  }
+
+  static Shimmer productDetailShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Constant.baseColor,
+      highlightColor: Constant.highlightColor,
+      period: Constant.period,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 15,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+              width: 50,
+              margin: const EdgeInsets.only(left: 10, top: 15),
+            ),
+            Container(
+              height: 15,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+              width: 75,
+              margin: const EdgeInsets.only(left: 10),
+            ).paddingOnly(top: 10, bottom: 10),
+            Row(
+              children: [
+                Container(
+                  height: 15,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                  width: 50,
+                  margin: const EdgeInsets.only(left: 10),
+                ),
+                Container(
+                  height: 15,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                  width: 50,
+                ).paddingOnly(right: 13, left: 8),
+                Text(
+                  "( Inclusive Of All Taxes )",
+                  style: TextStyle(
+                    fontFamily: AppFontFamily.heeBo500,
+                    fontSize: 12.5,
+                    color: AppColors.primaryTextColor,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              height: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: AppColors.yellow2,
+              ),
+              child: SizedBox(
+                height: 15,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: 5,
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 13),
+                  itemBuilder: (context, index) {
+                    return Image.asset(
+                      AppAsset.icStarOutline,
+                      height: 15,
+                      width: 15,
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return SizedBox(width: Get.width * 0.017);
+                  },
+                ),
+              ),
+            ).paddingOnly(top: 10, left: 10),
+            Divider(color: AppColors.grey.withOpacity(0.2)).paddingOnly(top: 10, bottom: 10),
+            ViewAll(
+              title: "Product Quantity",
+              subtitle: "",
+              textColor: AppColors.appText,
+              fontFamily: AppFontFamily.heeBo700,
+            ).paddingOnly(left: 10),
+            Container(
+              height: 48,
+              width: 125,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.red.withOpacity(0.2),
+                boxShadow: Constant.boxShadow,
+                border: Border.all(
+                  color: AppColors.grey.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Image.asset(AppAsset.icMinus).paddingAll(5.5),
+                  ),
+                  Text(
+                    '${1}',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontFamily: AppFontFamily.heeBo500,
+                      color: AppColors.greyText,
+                    ),
+                  ),
+                  Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Image.asset(AppAsset.icPlus).paddingAll(5.5),
+                  ),
+                ],
+              ).paddingOnly(left: 5, right: 5),
+            ).paddingOnly(top: 10, left: 10),
+            ViewAll(
+              title: "Product Quantity",
+              subtitle: "",
+              textColor: AppColors.appText,
+              fontFamily: AppFontFamily.heeBo700,
+            ).paddingOnly(left: 10, top: 15),
+            Container(
+              height: 15,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+              width: Get.width,
+              margin: const EdgeInsets.only(left: 10, top: 15, right: 10),
+            ),
+            Container(
+              height: 15,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+              width: 200,
+              margin: const EdgeInsets.only(left: 10, top: 5, right: 10),
+            ),
+            Container(
+              height: 15,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+              width: 245,
+              margin: const EdgeInsets.only(left: 10, top: 5, right: 10),
+            ),
+            Container(
+              height: 15,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+              width: 150,
+              margin: const EdgeInsets.only(left: 10, top: 5, right: 10),
+            ),
+            newProductShimmer().paddingOnly(top: 15, left: 10, right: 15),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Shimmer cartProductShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Constant.baseColor,
+      highlightColor: Constant.highlightColor,
+      period: Constant.period,
+      child: ListView.builder(
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          return Container(
+            height: 145,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              color: Colors.red.withOpacity(0.2),
+              border: Border.all(
+                color: AppColors.grey.withOpacity(0.15),
+                width: 1,
+              ),
+              boxShadow: Constant.boxShadow,
+            ),
+            padding: const EdgeInsets.all(13),
+            child: Row(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      height: 72,
+                      width: 72,
+                      color: AppColors.grey.withOpacity(0.04),
+                      child: Image.asset(AppAsset.icImagePlaceholder).paddingAll(10),
+                    ),
+                    Container(
+                      height: 35,
+                      width: 105,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(7),
+                        color: Colors.red.withOpacity(0.2),
+                        boxShadow: Constant.boxShadow,
+                        border: Border.all(
+                          color: AppColors.grey.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            height: 20,
+                            child: Image.asset(
+                              AppAsset.icMinus,
+                              color: AppColors.quantityGrey,
+                            ).paddingAll(2.5),
+                          ),
+                          Text(
+                            '1',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontFamily: AppFontFamily.heeBo500,
+                              color: AppColors.appText,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                            child: Image.asset(
+                              AppAsset.icPlus,
+                              color: AppColors.quantityGrey,
+                            ).paddingAll(2.5),
+                          ),
+                        ],
+                      ).paddingOnly(left: 7, right: 7),
+                    ).paddingOnly(top: 10),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 15,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                      width: 150,
+                      margin: const EdgeInsets.only(left: 10, top: 15),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          height: 15,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                          width: 50,
+                          margin: const EdgeInsets.only(left: 10, top: 15),
+                        ),
+                        Container(
+                          height: 15,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                          width: 50,
+                          margin: const EdgeInsets.only(left: 10, top: 15),
+                        ).paddingOnly(right: 13),
+                      ],
+                    ).paddingOnly(top: 8),
+                    const Spacer(),
+                    Container(
+                      height: 15,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.red),
+                      width: 80,
+                      margin: const EdgeInsets.only(left: 10, top: 15),
+                    ).paddingOnly(bottom: 5),
+                  ],
+                ).paddingOnly(left: 10),
+                const Spacer(),
+                Image.asset(
+                  AppAsset.icDelete,
+                  height: 27,
+                )
+              ],
+            ),
+          ).paddingOnly(left: 13, right: 13, top: 13);
+        },
+      ).paddingOnly(bottom: 10),
     );
   }
 
@@ -1323,7 +1853,7 @@ class Shimmers {
                   tabs: logic.tabs,
                   labelStyle: const TextStyle(
                     fontSize: 16,
-                    fontFamily: FontFamily.sfProDisplayRegular,
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
                   ),
                   physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -1335,7 +1865,7 @@ class Shimmers {
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelColor: Colors.red,
                   unselectedLabelStyle: const TextStyle(
-                    fontFamily: FontFamily.sfProDisplayRegular,
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
                     fontSize: 15,
                   ),
                   isScrollable: false,
@@ -1393,6 +1923,120 @@ class Shimmers {
                                             height: 20,
                                             width: 50,
                                             decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(5))),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return SizedBox(height: Get.height * 0.02);
+                          },
+                        ),
+                      ).paddingOnly(left: 15, right: 15),
+                      SizedBox(
+                        height: Get.height * 0.28,
+                        child: ListView.separated(
+                          itemCount: 4,
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Container(
+                                        height: 100,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(width: 1.5, color: AppColors.red),
+                                            borderRadius: BorderRadius.circular(10)),
+                                        child: Image.asset(AppAsset.icServicePlaceholder).paddingOnly(top: 10, bottom: 10),
+                                      ),
+                                    ),
+                                    SizedBox(width: Get.width * 0.03),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                            height: 18,
+                                            width: 100,
+                                            decoration:
+                                                BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10))),
+                                        SizedBox(height: Get.height * 0.02),
+                                        Container(
+                                            height: 15,
+                                            width: 150,
+                                            decoration:
+                                                BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10))),
+                                        SizedBox(height: Get.height * 0.02),
+                                        Container(
+                                            height: 16,
+                                            width: 80,
+                                            decoration:
+                                                BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10))),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return SizedBox(height: Get.height * 0.02);
+                          },
+                        ),
+                      ).paddingOnly(left: 15, right: 15),
+                      SizedBox(
+                        height: Get.height * 0.28,
+                        child: ListView.separated(
+                          itemCount: 4,
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Container(
+                                        height: 100,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(width: 1.5, color: AppColors.red),
+                                            borderRadius: BorderRadius.circular(10)),
+                                        child: Image.asset(AppAsset.icServicePlaceholder).paddingOnly(top: 10, bottom: 10),
+                                      ),
+                                    ),
+                                    SizedBox(width: Get.width * 0.03),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                            height: 18,
+                                            width: 100,
+                                            decoration:
+                                                BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10))),
+                                        SizedBox(height: Get.height * 0.02),
+                                        Container(
+                                            height: 15,
+                                            width: 150,
+                                            decoration:
+                                                BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10))),
+                                        SizedBox(height: Get.height * 0.02),
+                                        Container(
+                                            height: 16,
+                                            width: 80,
+                                            decoration:
+                                                BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10))),
                                       ],
                                     ),
                                   ],
@@ -1739,7 +2383,7 @@ class Shimmers {
                 children: [
                   Text(
                     "Subtotal",
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
+                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
                   ),
                   const Spacer(),
                   Container(
@@ -1758,7 +2402,7 @@ class Shimmers {
                 children: [
                   Text(
                     "Tax",
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
+                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
                   ),
                   const Spacer(),
                   Container(
@@ -1782,8 +2426,8 @@ class Shimmers {
               child: Row(
                 children: [
                   Text(
-                    "Total Amount",
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
+                     "txtTotalAmount".tr,
+                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 15, color: AppColors.service),
                   ),
                   const Spacer(),
                   Container(

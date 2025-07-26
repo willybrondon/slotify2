@@ -17,13 +17,15 @@ import 'package:salon_2/custom/date_time_picker/src/properties/easy_header_props
 import 'package:salon_2/custom/date_time_picker/src/widgets/easy_date_timeline_widget/easy_date_timeline_widget.dart';
 import 'package:salon_2/custom/dialog/progress_dialog.dart';
 import 'package:salon_2/custom/dialog/service_price_dialog.dart';
+import 'package:salon_2/custom/text_field/text_field_custom.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/wallet_screen/controller/wallet_screen_controller.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
@@ -37,8 +39,9 @@ class BookingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
         bookingScreenController.onBackStep();
 
         bookingScreenController.expertDetail != null
@@ -62,8 +65,9 @@ class BookingScreen extends StatelessWidget {
         bookingScreenController.withOutTaxRupee == 0.0;
         bookingScreenController.totalPrice == 0.0;
         bookingScreenController.finalTaxRupee == 0.0;
-
-        return false;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
@@ -172,7 +176,7 @@ class BookingScreen extends StatelessWidget {
                                 child: Text(
                                   logic.checkItem.join(", "),
                                   style: TextStyle(
-                                    fontFamily: FontFamily.sfProDisplay,
+                                    fontFamily: AppFontFamily.sfProDisplay,
                                     fontSize: 17.5,
                                     color: AppColors.categoryService,
                                   ),
@@ -187,7 +191,7 @@ class BookingScreen extends StatelessWidget {
                                     Text(
                                       "$currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
                                       style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
+                                        fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 15.5,
                                         color: AppColors.currency.withOpacity(0.9),
                                       ),
@@ -195,7 +199,7 @@ class BookingScreen extends StatelessWidget {
                                     Text(
                                       " ($currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr})",
                                       style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
+                                        fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 12.5,
                                         color: AppColors.currency.withOpacity(0.9),
                                       ),
@@ -204,7 +208,7 @@ class BookingScreen extends StatelessWidget {
                                     Text(
                                       "= $currency ${logic.totalPrice.toStringAsFixed(2)}",
                                       style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplayBold,
+                                        fontFamily: AppFontFamily.sfProDisplayBold,
                                         fontSize: 17,
                                         color: AppColors.currency,
                                       ),
@@ -218,25 +222,35 @@ class BookingScreen extends StatelessWidget {
                     AppButton(
                       height: 46,
                       buttonColor: logic.currentStep == 0
-                          ? logic.expertDetail != null
-                              ? AppColors.primaryAppColor
-                              : logic.selectExpert == -1
-                                  ? AppColors.grey.withOpacity(0.5)
-                                  : AppColors.primaryAppColor
+                          ? logic.selectedVenue.isEmpty
+                              ? AppColors.grey.withOpacity(0.5)
+                              : AppColors.primaryAppColor
                           : logic.currentStep == 1
-                              ? logic.selectedSlotsList.isEmpty
-                                  ? AppColors.grey.withOpacity(0.5)
-                                  : AppColors.primaryAppColor
-                              : AppColors.primaryAppColor,
+                              ? logic.expertDetail != null
+                                  ? AppColors.primaryAppColor
+                                  : logic.selectExpert == -1
+                                      ? AppColors.grey.withOpacity(0.5)
+                                      : AppColors.primaryAppColor
+                              : logic.currentStep == 2
+                                  ? logic.selectedSlotsList.isEmpty
+                                      ? AppColors.grey.withOpacity(0.5)
+                                      : AppColors.primaryAppColor
+                                  : AppColors.primaryAppColor,
                       color: AppColors.whiteColor,
-                      fontFamily: FontFamily.sfProDisplay,
+                      fontFamily: AppFontFamily.sfProDisplay,
                       fontSize: 15,
-                      buttonText: logic.currentStep == 2 ? "txtConfirm".tr : "txtNext".tr,
+                      buttonText: logic.currentStep == 3 ? "txtConfirm".tr : "txtNext".tr,
                       width: Get.width * 0.28,
                       onTap: () async {
                         if (logic.currentStep == 0) {
+                          if (logic.searchEditingController.text.isEmpty && logic.selectedVenue == "At Home") {
+                            Utils.showToast(context, "Please enter an address");
+                          } else {
+                            logic.onConfirmButton(context);
+                          }
+                        } else if (logic.currentStep == 1) {
                           if (logic.expertDetail != null) {
-                            logic.onConfirmButton();
+                            logic.onConfirmButton(context);
 
                             await logic.onGetBookingApiCall(
                               selectedDate: logic.date,
@@ -260,7 +274,7 @@ class BookingScreen extends StatelessWidget {
                           } else {
                             if (logic.selectExpert == -1) {
                             } else {
-                              logic.onConfirmButton();
+                              logic.onConfirmButton(context);
 
                               await logic.onGetBookingApiCall(
                                 selectedDate: logic.date,
@@ -283,13 +297,13 @@ class BookingScreen extends StatelessWidget {
                               log("rupee :: ${logic.rupee}");
                             }
                           }
-                        } else if (logic.currentStep == 1) {
+                        } else if (logic.currentStep == 2) {
                           log("Enter Step 1");
 
                           if (logic.selectedSlotsList.isEmpty) {
                           } else {
                             await logic.onGetCheckBookingApiCall(
-                              userId: Constant.storage.read<String>('UserId') ?? "",
+                              userId: Constant.storage.read<String>('userId') ?? "",
                               expertId: Constant.storage.read<String>('expertDetail') != null
                                   ? Constant.storage.read<String>('expertDetail').toString()
                                   : Constant.storage.read<String>('expertId').toString(),
@@ -302,14 +316,14 @@ class BookingScreen extends StatelessWidget {
                             );
 
                             if (logic.getCheckBookingCategory?.status == true) {
-                              logic.onConfirmButton();
+                              logic.onConfirmButton(context);
                             } else {
                               Utils.showToast(Get.context!, logic.getCheckBookingCategory?.message ?? "");
                             }
                           }
-                        } else if (logic.currentStep == 2) {
+                        } else if (logic.currentStep == 3) {
                           log("Enter Step 2");
-                          logic.onConfirmButton();
+                          logic.onConfirmButton(context);
                         } else {
                           log("Error In Stepper");
                         }
@@ -339,7 +353,10 @@ class BookingScreen extends StatelessWidget {
                           Text(
                             "txtBookingProcess".tr,
                             style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, fontSize: 18, color: AppColors.primaryTextColor),
+                              fontFamily: AppFontFamily.sfProDisplayBold,
+                              fontSize: 18,
+                              color: AppColors.primaryTextColor,
+                            ),
                           ),
                           SizedBox(height: Get.height * 0.02),
                           Container(
@@ -356,63 +373,105 @@ class BookingScreen extends StatelessWidget {
                                 logic.currentStep >= 0
                                     ? stepDesign(
                                         color: AppColors.primaryAppColor,
-                                        title: "txtStaff".tr,
-                                        check: logic.currentStep == 1 || logic.currentStep == 2
-                                            ? Image.asset(
-                                                AppAsset.icCheck,
-                                                height: 10,
-                                                width: 10,
-                                              )
-                                            : Image.asset(
-                                                AppAsset.icCheck,
-                                                color: Colors.transparent,
-                                                height: 10,
-                                                width: 10,
-                                              ),
+                                        title: "Venue",
+                                        widget: Image.asset(
+                                          AppAsset.icCheck1,
+                                          height: 20,
+                                          width: 20,
+                                        ),
                                       )
-                                    : stepDesign(color: AppColors.transparent, title: "txtStaff".tr),
+                                    : stepDesign(
+                                        color: AppColors.transparent,
+                                        title: "Venue",
+                                        fontColor: AppColors.greyColor2,
+                                      ),
+                                const SizedBox(width: 10),
                                 divider(color: logic.currentStep >= 1 ? AppColors.primaryAppColor : AppColors.greyColor),
+                                const SizedBox(width: 10),
                                 logic.currentStep >= 1
                                     ? stepDesign(
                                         color: AppColors.primaryAppColor,
-                                        title: "txtDateTime".tr,
-                                        check: logic.currentStep == 2
-                                            ? Image.asset(
-                                                AppAsset.icCheck,
-                                                height: 10,
-                                                width: 10,
-                                              )
-                                            : Image.asset(
-                                                AppAsset.icCheck,
-                                                color: Colors.transparent,
-                                                height: 10,
-                                                width: 10,
-                                              ),
+                                        title: "txtStaff".tr,
+                                        widget: Image.asset(
+                                          AppAsset.icCheck1,
+                                          height: 20,
+                                          width: 20,
+                                        ),
                                       )
                                     : stepDesign(
-                                        color: AppColors.transparent, title: "txtDateTime".tr, fontColor: AppColors.service),
+                                        color: AppColors.transparent,
+                                        title: "txtStaff".tr,
+                                        fontColor: AppColors.greyColor2,
+                                        widget: Text(
+                                          "2",
+                                          style: TextStyle(
+                                            fontFamily: AppFontFamily.sfProDisplay,
+                                            fontSize: 13,
+                                            color: AppColors.stepper,
+                                          ),
+                                        ),
+                                      ),
+                                const SizedBox(width: 10),
                                 divider(color: logic.currentStep >= 2 ? AppColors.primaryAppColor : AppColors.greyColor),
                                 logic.currentStep >= 2
                                     ? stepDesign(
                                         color: AppColors.primaryAppColor,
-                                        title: "txtPayment".tr,
-                                        check: Image.asset(
-                                          AppAsset.icCheck,
-                                          height: 10,
-                                          width: 10,
+                                        title: "txtDateTime".tr,
+                                        widget: Image.asset(
+                                          AppAsset.icCheck1,
+                                          height: 20,
+                                          width: 20,
                                         ),
                                       )
                                     : stepDesign(
-                                        color: AppColors.transparent, title: "txtPayment".tr, fontColor: AppColors.service),
+                                        color: AppColors.transparent,
+                                        title: "txtDateTime".tr,
+                                        fontColor: AppColors.greyColor2,
+                                        widget: Text(
+                                          "3",
+                                          style: TextStyle(
+                                            fontFamily: AppFontFamily.sfProDisplay,
+                                            fontSize: 13,
+                                            color: AppColors.stepper,
+                                          ),
+                                        ),
+                                      ),
+                                divider(color: logic.currentStep >= 3 ? AppColors.primaryAppColor : AppColors.greyColor),
+                                const SizedBox(width: 6),
+                                logic.currentStep >= 3
+                                    ? stepDesign(
+                                        color: AppColors.primaryAppColor,
+                                        title: "txtPayment".tr,
+                                        widget: Image.asset(
+                                          AppAsset.icCheck1,
+                                          height: 20,
+                                          width: 20,
+                                        ),
+                                      )
+                                    : stepDesign(
+                                        color: AppColors.transparent,
+                                        title: "txtPayment".tr,
+                                        fontColor: AppColors.greyColor2,
+                                        widget: Text(
+                                          "4",
+                                          style: TextStyle(
+                                            fontFamily: AppFontFamily.sfProDisplay,
+                                            fontSize: 13,
+                                            color: AppColors.stepper,
+                                          ),
+                                        ),
+                                      ),
                               ],
                             ),
                           ),
                           SizedBox(height: Get.height * 0.03),
                           logic.currentStep == 0
-                              ? step1()
+                              ? selectServiceVenue()
                               : logic.currentStep == 1
-                                  ? step2()
-                                  : step3()
+                                  ? selectExpert()
+                                  : logic.currentStep == 2
+                                      ? selectDateTime()
+                                      : payment()
                         ],
                       );
                     },
@@ -426,7 +485,158 @@ class BookingScreen extends StatelessWidget {
     );
   }
 
-  step1() {
+  selectServiceVenue() {
+    return GetBuilder<BookingScreenController>(
+      id: Constant.idProgressView,
+      builder: (logic) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Select Service Venue",
+              style: TextStyle(
+                fontFamily: AppFontFamily.sfProDisplay,
+                fontSize: 15,
+                color: AppColors.primaryTextColor,
+              ),
+            ),
+            const SizedBox(height: 15),
+            GestureDetector(
+              onTap: () => logic.selectVenue("At Salon"),
+              child: Container(
+                height: 60,
+                width: Get.width,
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: logic.selectedVenue == "At Salon" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.2),
+                    width: 0.7,
+                  ),
+                ),
+                padding: const EdgeInsets.only(left: 12, right: 12),
+                child: Row(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.roundBg,
+                      ),
+                      child: Image.asset(AppAsset.icSalonIcon).paddingAll(10),
+                    ),
+                    const SizedBox(width: 7),
+                    Text(
+                      "At Salon",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplay,
+                        fontSize: 17,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      height: 22,
+                      width: 22,
+                      decoration: BoxDecoration(
+                        color: logic.selectedVenue == "At Salon" ? AppColors.primaryAppColor : AppColors.whiteColor,
+                        border: Border.all(
+                          color: AppColors.grey.withOpacity(0.2),
+                          width: 0.8,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: logic.selectedVenue == "At Salon" ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+            GestureDetector(
+              onTap: () => logic.selectVenue("At Home"),
+              child: Container(
+                height: 60,
+                width: Get.width,
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: logic.selectedVenue == "At Home" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.2),
+                    width: 0.7,
+                  ),
+                ),
+                padding: const EdgeInsets.only(left: 12, right: 12),
+                child: Row(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.roundBg,
+                      ),
+                      child: Image.asset(AppAsset.icHomeIcon).paddingAll(10),
+                    ),
+                    const SizedBox(width: 7),
+                    Text(
+                      "At Home",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplay,
+                        fontSize: 17,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      height: 22,
+                      width: 22,
+                      decoration: BoxDecoration(
+                        color: logic.selectedVenue == "At Home" ? AppColors.primaryAppColor : AppColors.whiteColor,
+                        border: Border.all(
+                          color: AppColors.grey.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: logic.selectedVenue == "At Home" ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (logic.selectedVenue == "At Home") ...[
+              const SizedBox(height: 15),
+              Container(
+                width: double.infinity,
+                height: 150,
+                margin: const EdgeInsets.only(bottom: 15),
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.whiteColor,
+                  border: Border.all(
+                    color: AppColors.grey.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: TextFieldCustom(
+                  hintText: "Please enter address",
+                  obscureText: false,
+                  textInputAction: TextInputAction.newline,
+                  maxLines: 5,
+                  controller: logic.searchEditingController,
+                ),
+              ),
+            ]
+          ],
+        );
+      },
+    );
+  }
+
+  selectExpert() {
     return GetBuilder<BookingScreenController>(
       id: Constant.idProgressView,
       builder: (logic) {
@@ -438,7 +648,7 @@ class BookingScreen extends StatelessWidget {
                   Text(
                     "txtChooseYourExpert".tr,
                     style: TextStyle(
-                      fontFamily: FontFamily.sfProDisplay,
+                      fontFamily: AppFontFamily.sfProDisplay,
                       fontSize: 15,
                       color: AppColors.primaryTextColor,
                     ),
@@ -457,7 +667,7 @@ class BookingScreen extends StatelessWidget {
                                   Text(
                                     "txtNoFoundExpert".tr,
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplayBold,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                       fontSize: 15,
                                       color: AppColors.primaryTextColor,
                                     ),
@@ -559,7 +769,7 @@ class BookingScreen extends StatelessWidget {
                                                               maxLines: 1,
                                                               overflow: TextOverflow.ellipsis,
                                                               style: TextStyle(
-                                                                fontFamily: FontFamily.sfProDisplay,
+                                                                fontFamily: AppFontFamily.sfProDisplay,
                                                                 fontSize: 15.5,
                                                                 color: AppColors.category,
                                                               ),
@@ -569,7 +779,7 @@ class BookingScreen extends StatelessWidget {
                                                               maxLines: 1,
                                                               overflow: TextOverflow.ellipsis,
                                                               style: TextStyle(
-                                                                fontFamily: FontFamily.sfProDisplay,
+                                                                fontFamily: AppFontFamily.sfProDisplay,
                                                                 fontSize: 15.5,
                                                                 color: AppColors.category,
                                                               ),
@@ -660,23 +870,27 @@ class BookingScreen extends StatelessWidget {
     );
   }
 
-  step2() {
+  selectDateTime() {
     return GetBuilder<BookingScreenController>(
       id: Constant.idProgressView,
       builder: (logic) {
+        if (logic.getBookingModel == null) {
+          return Shimmers.selectSlotShimmer();
+        }
+
         return SingleChildScrollView(
           child: GetBuilder<BookingScreenController>(
             id: Constant.idUpdateSlots0,
             builder: (logic) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: ([
+                children: [
                   Text(
                     "txtSelectDate".tr,
                     style: TextStyle(
                       color: AppColors.primaryTextColor,
                       fontSize: 16,
-                      fontFamily: FontFamily.sfProDisplay,
+                      fontFamily: AppFontFamily.sfProDisplay,
                     ),
                   ).paddingOnly(bottom: 12),
                   Container(
@@ -718,11 +932,11 @@ class BookingScreen extends StatelessWidget {
                         dateFormatter: const DateFormatter.fullDateDMonthAsStrY(),
                         monthStyle: TextStyle(
                           color: AppColors.greyColor,
-                          fontFamily: FontFamily.sfProDisplayMedium,
+                          fontFamily: AppFontFamily.sfProDisplayMedium,
                         ),
                         selectedDateStyle: TextStyle(
                           color: AppColors.darkGrey3,
-                          fontFamily: FontFamily.sfProDisplayMedium,
+                          fontFamily: AppFontFamily.sfProDisplayMedium,
                         ),
                       ),
                       dayProps: EasyDayProps(
@@ -734,21 +948,21 @@ class BookingScreen extends StatelessWidget {
                         todayStyle: DayStyle(
                           dayNumStyle: TextStyle(
                             color: AppColors.primaryAppColor,
-                            fontFamily: FontFamily.sfProDisplayMedium,
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
                           ),
                           dayStrStyle: TextStyle(
                             color: AppColors.primaryAppColor,
-                            fontFamily: FontFamily.sfProDisplayMedium,
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
                           ),
                         ),
                         activeDayStyle: DayStyle(
                           dayNumStyle: TextStyle(
                             color: AppColors.primaryAppColor,
-                            fontFamily: FontFamily.sfProDisplayBold,
+                            fontFamily: AppFontFamily.sfProDisplayBold,
                           ),
                           dayStrStyle: TextStyle(
                             color: AppColors.primaryAppColor,
-                            fontFamily: FontFamily.sfProDisplayBold,
+                            fontFamily: AppFontFamily.sfProDisplayBold,
                           ),
                           decoration: BoxDecoration(
                             borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -757,11 +971,11 @@ class BookingScreen extends StatelessWidget {
                         ),
                         inactiveDayStyle: DayStyle(
                           dayNumStyle: TextStyle(
-                            fontFamily: FontFamily.sfProDisplayMedium,
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
                             color: AppColors.darkGrey3,
                           ),
                           dayStrStyle: TextStyle(
-                            fontFamily: FontFamily.sfProDisplayMedium,
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
                             color: AppColors.darkGrey3,
                           ),
                         ),
@@ -771,7 +985,8 @@ class BookingScreen extends StatelessWidget {
                   logic.getBookingModel?.status == true
                       ? Text(
                           "txtAvailableSlots".tr,
-                          style: TextStyle(color: AppColors.primaryTextColor, fontSize: 16, fontFamily: FontFamily.sfProDisplay),
+                          style:
+                              TextStyle(color: AppColors.primaryTextColor, fontSize: 16, fontFamily: AppFontFamily.sfProDisplay),
                         ).paddingOnly(bottom: 15, top: 8)
                       : const SizedBox(),
                   logic.isLoading1.value
@@ -804,7 +1019,7 @@ class BookingScreen extends StatelessWidget {
                                   ),
                                 )
                           : Utils.showToast(Get.context!, logic.getBookingModel?.message ?? ""),
-                ]),
+                ],
               );
             },
           ),
@@ -866,7 +1081,7 @@ class BookingScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryAppColor,
-                      fontFamily: FontFamily.sfProDisplay,
+                      fontFamily: AppFontFamily.sfProDisplay,
                     ),
                   ),
                 ),
@@ -997,8 +1212,8 @@ class BookingScreen extends StatelessWidget {
                                       slots[index],
                                       style: TextStyle(
                                         fontFamily: isSlotBooked || isSlotTimePassed
-                                            ? FontFamily.sfProDisplayRegular
-                                            : FontFamily.sfProDisplay,
+                                            ? AppFontFamily.sfProDisplayRegular
+                                            : AppFontFamily.sfProDisplay,
                                         fontSize: 14,
                                         decoration:
                                             isSlotBooked || isSlotTimePassed ? TextDecoration.lineThrough : TextDecoration.none,
@@ -1028,7 +1243,7 @@ class BookingScreen extends StatelessWidget {
     );
   }
 
-  step3() {
+  payment() {
     return GetBuilder<BookingScreenController>(
       id: Constant.idProgressView,
       builder: (logic) {
@@ -1038,11 +1253,105 @@ class BookingScreen extends StatelessWidget {
             Text(
               "txtPaymentMethod".tr,
               style: TextStyle(
-                fontFamily: FontFamily.sfProDisplayBold,
+                fontFamily: AppFontFamily.sfProDisplayBold,
                 fontSize: 16,
                 color: AppColors.primaryTextColor,
               ),
             ).paddingOnly(bottom: 13),
+            GetBuilder<BookingScreenController>(
+              id: Constant.idStep3,
+              builder: (logic) {
+                return InkWell(
+                  overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                  onTap: () {
+                    logic.onStep3("wallet");
+                  },
+                  child: Container(
+                    height: 60,
+                    width: Get.width,
+                    padding: const EdgeInsets.only(left: 10, right: 5),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: AppColors.grey.withOpacity(0.1),
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.whiteColor,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              height: 40,
+                              width: 40,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.roundBg,
+                              ),
+                              child: Image.asset(
+                                AppAsset.icWallet,
+                                height: 30,
+                                width: 30,
+                              ),
+                            ),
+                            SizedBox(width: Get.width * 0.04),
+                            Row(
+                              children: [
+                                Text(
+                                  "txtMyWallet".tr,
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.sfProDisplay,
+                                    fontSize: 16.5,
+                                    color: AppColors.primaryTextColor,
+                                  ),
+                                ).paddingOnly(right: 5),
+                                GetBuilder<WalletScreenController>(
+                                  id: Constant.idProgressView,
+                                  builder: (logic) {
+                                    return Text(
+                                      "($currency ${walletAmount?.toStringAsFixed(2)}) ${"txtInYourWallet".tr}",
+                                      style: TextStyle(
+                                        fontFamily: AppFontFamily.sfProDisplay,
+                                        fontSize: 12,
+                                        color: AppColors.currencyGrey,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Container(
+                          height: 25,
+                          width: 25,
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: logic.selectedPayment == "wallet"
+                                  ? AppColors.primaryAppColor
+                                  : AppColors.greyColor.withOpacity(0.3),
+                            ),
+                          ),
+                          child: logic.selectedPayment == "wallet"
+                              ? Image.asset(
+                                  AppAsset.icCheck,
+                                  color: AppColors.primaryAppColor,
+                                  height: 15,
+                                  width: 15,
+                                )
+                              : const SizedBox(),
+                        ).paddingOnly(right: 10)
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ).paddingOnly(bottom: 15),
 
             /// Razorpay Payment
             splashController.settingCategory?.setting?.isRazorPay == true
@@ -1089,7 +1398,7 @@ class BookingScreen extends StatelessWidget {
                                   Text(
                                     "Razorpay",
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
+                                      fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 16.5,
                                       color: AppColors.primaryTextColor,
                                     ),
@@ -1106,7 +1415,11 @@ class BookingScreen extends StatelessWidget {
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: AppColors.greyColor.withOpacity(0.3)),
+                                    border: Border.all(
+                                      color: logic.selectedPayment == "Razorpay"
+                                          ? AppColors.primaryAppColor
+                                          : AppColors.greyColor.withOpacity(0.3),
+                                    ),
                                   ),
                                   child: logic.selectedPayment == "Razorpay"
                                       ? Image.asset(
@@ -1171,7 +1484,7 @@ class BookingScreen extends StatelessWidget {
                                   Text(
                                     "Stripe",
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
+                                      fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 16.5,
                                       color: AppColors.primaryTextColor,
                                     ),
@@ -1188,7 +1501,11 @@ class BookingScreen extends StatelessWidget {
                                         padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: AppColors.greyColor.withOpacity(0.3)),
+                                          border: Border.all(
+                                            color: logic.selectedPayment == "Stripe"
+                                                ? AppColors.primaryAppColor
+                                                : AppColors.greyColor.withOpacity(0.3),
+                                          ),
                                         ),
                                         child: logic.selectedPayment == "Stripe"
                                             ? Image.asset(
@@ -1253,7 +1570,7 @@ class BookingScreen extends StatelessWidget {
                                   Text(
                                     "Flutter Wave",
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
+                                      fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 16.5,
                                       color: AppColors.primaryTextColor,
                                     ),
@@ -1270,7 +1587,11 @@ class BookingScreen extends StatelessWidget {
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: AppColors.greyColor.withOpacity(0.3)),
+                                    border: Border.all(
+                                      color: logic.selectedPayment == "flutterWave"
+                                          ? AppColors.primaryAppColor
+                                          : AppColors.greyColor.withOpacity(0.3),
+                                    ),
                                   ),
                                   child: logic.selectedPayment == "flutterWave"
                                       ? Image.asset(
@@ -1335,7 +1656,7 @@ class BookingScreen extends StatelessWidget {
                                   Text(
                                     "Cash After Service",
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
+                                      fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 16.5,
                                       color: AppColors.primaryTextColor,
                                     ),
@@ -1347,23 +1668,27 @@ class BookingScreen extends StatelessWidget {
                                   logic.onStep3("cashAfterService");
                                 },
                                 child: Container(
-                                        height: 25,
-                                        width: 25,
-                                        padding: const EdgeInsets.all(6),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: AppColors.greyColor.withOpacity(0.3)),
-                                        ),
-                                        child: logic.selectedPayment == "cashAfterService"
-                                            ? Image.asset(
-                                                AppAsset.icCheck,
-                                                color: AppColors.primaryAppColor,
-                                                height: 15,
-                                                width: 15,
-                                              )
-                                            : const SizedBox())
-                                    .paddingOnly(right: 10),
-                              )
+                                  height: 25,
+                                  width: 25,
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: logic.selectedPayment == "cashAfterService"
+                                          ? AppColors.primaryAppColor
+                                          : AppColors.greyColor.withOpacity(0.3),
+                                    ),
+                                  ),
+                                  child: logic.selectedPayment == "cashAfterService"
+                                      ? Image.asset(
+                                          AppAsset.icCheck,
+                                          color: AppColors.primaryAppColor,
+                                          height: 15,
+                                          width: 15,
+                                        )
+                                      : const SizedBox(),
+                                ).paddingOnly(right: 10),
+                              ),
                             ],
                           ),
                         ),
@@ -1372,26 +1697,27 @@ class BookingScreen extends StatelessWidget {
                   ).paddingOnly(bottom: 15)
                 : const SizedBox(),
 
-            splashController.settingCategory?.setting?.isRazorPay == false &&
-                    splashController.settingCategory?.setting?.isStripePay == false &&
-                    splashController.settingCategory?.setting?.cashAfterService == false &&
-                    splashController.settingCategory?.setting?.isFlutterWave == false
-                ? Center(
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          AppAsset.icNoPayment,
-                          height: 185,
-                          width: 185,
-                        ).paddingOnly(top: 30),
-                        Text(
-                          "txtNotPayment".tr,
-                          style: TextStyle(color: AppColors.primaryTextColor, fontFamily: FontFamily.sfProDisplay, fontSize: 18),
-                        )
-                      ],
-                    ),
-                  )
-                : const SizedBox(),
+            // splashController.settingCategory?.setting?.isRazorPay == false &&
+            //         splashController.settingCategory?.setting?.isStripePay == false &&
+            //         splashController.settingCategory?.setting?.cashAfterService == false &&
+            //         splashController.settingCategory?.setting?.isFlutterWave == false
+            //     ? Center(
+            //         child: Column(
+            //           children: [
+            //             Image.asset(
+            //               AppAsset.icNoPayment,
+            //               height: 185,
+            //               width: 185,
+            //             ).paddingOnly(top: 30),
+            //             Text(
+            //               "txtNotPayment".tr,
+            //               style:
+            //                   TextStyle(color: AppColors.primaryTextColor, fontFamily: AppFontFamily.sfProDisplay, fontSize: 18),
+            //             )
+            //           ],
+            //         ),
+            //       )
+            //     : const SizedBox(),
             SizedBox(height: Get.height * 0.02),
           ],
         );
@@ -1399,31 +1725,45 @@ class BookingScreen extends StatelessWidget {
     );
   }
 
-  divider({Color? color}) {
-    return Container(
-      height: 1,
-      width: Get.width * 0.21,
-      margin: const EdgeInsets.only(bottom: 10),
-      color: color,
+  Widget divider({Color? color, double? margin}) {
+    return Expanded(
+      child: Container(
+        height: 3,
+        margin: const EdgeInsets.only(bottom: 5),
+        color: color,
+      ),
     );
   }
 
-  stepDesign({title, Color? color, Color? fontColor, Widget? check}) {
+  Widget stepDesign({title, Color? color, Color? fontColor, Widget? widget}) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-            height: 25,
-            width: 25,
-            margin: const EdgeInsets.only(top: 15),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                border: Border.all(color: AppColors.stepperGrey.withOpacity(0.8), width: 1), shape: BoxShape.circle),
-            child: CircleAvatar(radius: 10, backgroundColor: color, child: check)),
+          height: 32,
+          width: 32,
+          margin: const EdgeInsets.only(top: 20),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: AppColors.stepperGrey.withOpacity(0.8),
+              width: 1,
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: color,
+            child: widget,
+          ),
+        ),
         SizedBox(height: Get.height * 0.005),
         Text(
           title,
-          style: TextStyle(fontFamily: FontFamily.sfProDisplay, fontSize: 11, color: fontColor),
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplay,
+            fontSize: 11,
+            color: fontColor,
+          ),
         ),
       ],
     );

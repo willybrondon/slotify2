@@ -12,14 +12,16 @@ class GetSalonDetailModel {
   bool? status;
   String? message;
   Salon? salon;
+  List<Product>? product;
   List<dynamic>? reviews;
   List<Expert>? experts;
-  num? tax;
+  int? tax;
 
   GetSalonDetailModel({
     this.status,
     this.message,
     this.salon,
+    this.product,
     this.reviews,
     this.experts,
     this.tax,
@@ -29,6 +31,7 @@ class GetSalonDetailModel {
         status: json["status"],
         message: json["message"],
         salon: json["salon"] == null ? null : Salon.fromJson(json["salon"]),
+        product: json["product"] == null ? [] : List<Product>.from(json["product"]!.map((x) => Product.fromJson(x))),
         reviews: json["reviews"] == null ? [] : List<dynamic>.from(json["reviews"]!.map((x) => x)),
         experts: json["experts"] == null ? [] : List<Expert>.from(json["experts"]!.map((x) => Expert.fromJson(x))),
         tax: json["tax"],
@@ -38,6 +41,7 @@ class GetSalonDetailModel {
         "status": status,
         "message": message,
         "salon": salon?.toJson(),
+        "product": product == null ? [] : List<dynamic>.from(product!.map((x) => x.toJson())),
         "reviews": reviews == null ? [] : List<dynamic>.from(reviews!.map((x) => x)),
         "experts": experts == null ? [] : List<dynamic>.from(experts!.map((x) => x.toJson())),
         "tax": tax,
@@ -50,8 +54,8 @@ class Expert {
   String? lname;
   String? image;
   List<String>? serviceId;
-  num? review;
-  num? reviewCount;
+  double? review;
+  int? reviewCount;
 
   Expert({
     this.id,
@@ -69,7 +73,7 @@ class Expert {
         lname: json["lname"],
         image: json["image"],
         serviceId: json["serviceId"] == null ? [] : List<String>.from(json["serviceId"]!.map((x) => x)),
-        review: json["review"],
+        review: json["review"]?.toDouble(),
         reviewCount: json["reviewCount"],
       );
 
@@ -84,17 +88,94 @@ class Expert {
       };
 }
 
+class Product {
+  String? id;
+  String? productCode;
+  int? price;
+  int? shippingCharges;
+  List<String>? images;
+  int? quantity;
+  int? review;
+  int? sold;
+  bool? isOutOfStock;
+  String? createStatus;
+  String? updateStatus;
+  String? productName;
+  String? description;
+  String? category;
+  String? salon;
+  String? mainImage;
+
+  Product({
+    this.id,
+    this.productCode,
+    this.price,
+    this.shippingCharges,
+    this.images,
+    this.quantity,
+    this.review,
+    this.sold,
+    this.isOutOfStock,
+    this.createStatus,
+    this.updateStatus,
+    this.productName,
+    this.description,
+    this.category,
+    this.salon,
+    this.mainImage,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) => Product(
+        id: json["_id"],
+        productCode: json["productCode"],
+        price: json["price"],
+        shippingCharges: json["shippingCharges"],
+        images: json["images"] == null ? [] : List<String>.from(json["images"]!.map((x) => x)),
+        quantity: json["quantity"],
+        review: json["review"],
+        sold: json["sold"],
+        isOutOfStock: json["isOutOfStock"],
+        createStatus: json["createStatus"],
+        updateStatus: json["updateStatus"],
+        productName: json["productName"],
+        description: json["description"],
+        category: json["category"],
+        salon: json["salon"],
+        mainImage: json["mainImage"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "productCode": productCode,
+        "price": price,
+        "shippingCharges": shippingCharges,
+        "images": images == null ? [] : List<dynamic>.from(images!.map((x) => x)),
+        "quantity": quantity,
+        "review": review,
+        "sold": sold,
+        "isOutOfStock": isOutOfStock,
+        "createStatus": createStatus,
+        "updateStatus": updateStatus,
+        "productName": productName,
+        "description": description,
+        "category": category,
+        "salon": salon,
+        "mainImage": mainImage,
+      };
+}
+
 class Salon {
   AddressDetails? addressDetails;
   LocationCoordinates? locationCoordinates;
+  bool? isBestSeller;
   String? id;
   String? name;
   String? email;
   String? mobile;
   String? about;
-  num? platformFee;
-  num? review;
-  num? reviewCount;
+  int? platformFee;
+  double? review;
+  int? reviewCount;
   bool? isActive;
   bool? isDelete;
   List<String>? image;
@@ -103,7 +184,7 @@ class Salon {
   List<SalonTime>? salonTime;
   List<ServiceId>? serviceIds;
   String? password;
-  num? uniqueId;
+  int? uniqueId;
   DateTime? createdAt;
   DateTime? updatedAt;
   double? distance;
@@ -111,6 +192,7 @@ class Salon {
   Salon({
     this.addressDetails,
     this.locationCoordinates,
+    this.isBestSeller,
     this.id,
     this.name,
     this.email,
@@ -137,13 +219,14 @@ class Salon {
         addressDetails: json["addressDetails"] == null ? null : AddressDetails.fromJson(json["addressDetails"]),
         locationCoordinates:
             json["locationCoordinates"] == null ? null : LocationCoordinates.fromJson(json["locationCoordinates"]),
+        isBestSeller: json["isBestSeller"],
         id: json["_id"],
         name: json["name"],
         email: json["email"],
         mobile: json["mobile"],
         about: json["about"],
         platformFee: json["platformFee"],
-        review: json["review"],
+        review: json["review"]?.toDouble(),
         reviewCount: json["reviewCount"],
         isActive: json["isActive"],
         isDelete: json["isDelete"],
@@ -162,6 +245,7 @@ class Salon {
   Map<String, dynamic> toJson() => {
         "addressDetails": addressDetails?.toJson(),
         "locationCoordinates": locationCoordinates?.toJson(),
+        "isBestSeller": isBestSeller,
         "_id": id,
         "name": name,
         "email": email,
@@ -242,8 +326,11 @@ class SalonTime {
   String? openTime;
   String? closedTime;
   bool? isActive;
+  bool? isBreak;
   String? breakTime;
-  num? time;
+  String? breakStartTime;
+  String? breakEndTime;
+  int? time;
   String? id;
 
   SalonTime({
@@ -251,7 +338,10 @@ class SalonTime {
     this.openTime,
     this.closedTime,
     this.isActive,
+    this.isBreak,
     this.breakTime,
+    this.breakStartTime,
+    this.breakEndTime,
     this.time,
     this.id,
   });
@@ -261,7 +351,10 @@ class SalonTime {
         openTime: json["openTime"],
         closedTime: json["closedTime"],
         isActive: json["isActive"],
+        isBreak: json["isBreak"],
         breakTime: json["breakTime"],
+        breakStartTime: json["breakStartTime"],
+        breakEndTime: json["breakEndTime"],
         time: json["time"],
         id: json["_id"],
       );
@@ -271,7 +364,10 @@ class SalonTime {
         "openTime": openTime,
         "closedTime": closedTime,
         "isActive": isActive,
+        "isBreak": isBreak,
         "breakTime": breakTime,
+        "breakStartTime": breakStartTime,
+        "breakEndTime": breakEndTime,
         "time": time,
         "_id": id,
       };
@@ -279,7 +375,7 @@ class SalonTime {
 
 class ServiceId {
   Id? serviceIdId;
-  num? price;
+  int? price;
   String? id;
 
   ServiceId({

@@ -8,15 +8,21 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
+import 'package:salon_2/ui/cart_screen/controller/cart_screen_controller.dart';
 import 'package:salon_2/ui/expert/expert_detail/model/get_expert_model.dart';
+import 'package:salon_2/ui/home_screen/model/favourite_product_model.dart';
+import 'package:salon_2/ui/home_screen/model/favourite_salon_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_all_category_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_all_expert_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_all_salon_model.dart';
-import 'package:salon_2/ui/search/model/get_all_service_model.dart';
+import 'package:salon_2/ui/home_screen/model/get_new_product_model.dart';
+import 'package:salon_2/ui/home_screen/model/get_trending_product_model.dart';
+import 'package:salon_2/ui/product_screen/model/get_product_category_model.dart';
+import 'package:salon_2/ui/search_screen/model/get_all_service_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_service_base_salon_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/services/app_exception.dart';
+import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class HomeScreenController extends GetxController {
@@ -33,7 +39,6 @@ class HomeScreenController extends GetxController {
   int totalMinuteExpert = 0;
   double withOutTaxRupeeExpert = 0.0;
   double finalTaxRupeeExpert = 0.0;
-  double? withTaxRupeeExpert;
 
   int value = 0;
   int currentIndex = 0;
@@ -46,6 +51,11 @@ class HomeScreenController extends GetxController {
   int selectIndexEvening = -1;
   late List<bool> isSelected = List.generate((getAllServiceCategory?.services?.length ?? 0), (index) => false);
   List<bool> isExpertSelected = [];
+  List<bool> isTrendingProductSaved = [];
+  List<bool> isNewProductSaved = [];
+  List<bool> isSalonSaved = [];
+
+  bool isLike = false;
 
   num? rating;
   int? roundedRating;
@@ -70,6 +80,8 @@ class HomeScreenController extends GetxController {
   final BookingDetailScreenController bookingDetailScreenController = Get.find<BookingDetailScreenController>();
   TextEditingController searchEditingController = TextEditingController();
 
+  // CartScreenController cartScreenController = Get.put(CartScreenController());
+
   //----------- API Variables -----------//
   GetAllCategoryModel? getAllCategory;
   GetAllExpertModel? getAllExpertCategory;
@@ -77,6 +89,11 @@ class HomeScreenController extends GetxController {
   GetAllSalonModel? getAllSalonCategory;
   GetServiceBaseSalonModel? getServiceBaseSalonCategory;
   GetExpertModel? getExpertCategory;
+  GetTrendingProductModel? getTrendingProductModel;
+  GetNewProductModel? getNewProductModel;
+  FavouriteProductModel? favouriteProductModel;
+  FavouriteSalonModel? favouriteSalonModel;
+  GetProductCategoryModel? getProductCategoryModel;
   List getExpert = [];
   bool hasMore = true;
   RxBool isLoading = false.obs;
@@ -88,21 +105,42 @@ class HomeScreenController extends GetxController {
     log("Latitude :: $latitude");
     log("Longitude :: $longitude");
 
+    // cartScreenController.onGetCartProductApiCall();
+
     expertScrollController.addListener(onExpertPagination);
     serviceScrollController.addListener(onServicePagination);
+    getTrendingProductModel == null ? await onGetTrendingProductApiCall() : null;
+    getNewProductModel == null ? await onGetNewProductApiCall() : null;
+    getAllSalonCategory == null
+        ? await onGetAllSalonApiCall(
+            latitude: latitude ?? 0.0,
+            longitude: longitude ?? 0.0,
+            userId: Constant.storage.read<String>('userId') ?? "",
+          )
+        : null;
+
+    for (int i = 0; i < (getTrendingProductModel?.data?.length ?? 0); i++) {
+      isTrendingProductSaved.add(getTrendingProductModel?.data?[i].isFavourite ?? false);
+    }
+
+    for (int i = 0; i < (getNewProductModel?.data?.length ?? 0); i++) {
+      isNewProductSaved.add(getNewProductModel?.data?[i].isFavourite ?? false);
+    }
+
+    for (int i = 0; i < (getAllSalonCategory?.data?.length ?? 0); i++) {
+      isSalonSaved.add(getAllSalonCategory?.data?[i].isFavorite ?? false);
+    }
 
     getAllCategory == null ? await onGetAllCategoryApiCall() : null;
     getAllExpertCategory == null
         ? await onGetAllExpertApiCall(start: startExpert.toString(), limit: limitExpert.toString())
         : null;
-    getAllServiceCategory == null ? await onGetAllServiceApiCall() : null;
-    getAllSalonCategory == null
-        ? await onGetAllSalonApiCall(
-            latitude: latitude ?? 0.0,
-            longitude: longitude ?? 0.0,
-            userId: Constant.storage.read<String>('UserId') ?? "",
-          )
-        : null;
+    getAllServiceCategory == null ? await onGetAllServiceApiCall(city: city ?? "") : null;
+    getProductCategoryModel == null ? await onGetProductCategoryApiCall() : null;
+
+    log("isTrendingProductSaved :: $isTrendingProductSaved");
+    log("isNewProductSaved :: $isNewProductSaved");
+    log("isSalonSaved :: $isSalonSaved");
 
     withOutTaxRupee = 0.0;
     totalPrice = 0.0;
@@ -124,7 +162,7 @@ class HomeScreenController extends GetxController {
   }
 
   void printLatestValue(String? text) async {
-    await onGetAllServiceApiCall(search: text);
+    await onGetAllServiceApiCall(search: text, city: city ?? "");
   }
 
   @override
@@ -148,21 +186,138 @@ class HomeScreenController extends GetxController {
 
   void onServicePagination() async {
     if (serviceScrollController.position.pixels == serviceScrollController.position.maxScrollExtent) {
-      await onGetAllServiceApiCall();
+      await onGetAllServiceApiCall(city: city ?? "");
     }
   }
 
   onRefresh() async {
     startExpert = 0;
-    await onGetAllCategoryApiCall();
-    await onGetAllExpertApiCall(start: startExpert.toString(), limit: limitExpert.toString());
-    await onGetAllServiceApiCall();
+    isTrendingProductSaved = [];
+    isNewProductSaved = [];
+    isSalonSaved = [];
+
+    await onGetTrendingProductApiCall();
+    await onGetNewProductApiCall();
     await onGetAllSalonApiCall(
       latitude: latitude ?? 0.0,
       longitude: longitude ?? 0.0,
-      userId: Constant.storage.read<String>('UserId') ?? "",
+      userId: Constant.storage.read<String>('userId') ?? "",
     );
+
+    for (int i = 0; i < (getTrendingProductModel?.data?.length ?? 0); i++) {
+      isTrendingProductSaved.add(getTrendingProductModel?.data?[i].isFavourite ?? false);
+    }
+
+    for (int i = 0; i < (getNewProductModel?.data?.length ?? 0); i++) {
+      isNewProductSaved.add(getNewProductModel?.data?[i].isFavourite ?? false);
+    }
+
+    for (int i = 0; i < (getAllSalonCategory?.data?.length ?? 0); i++) {
+      isSalonSaved.add(getAllSalonCategory?.data?[i].isFavorite ?? false);
+    }
+
+    await onGetAllCategoryApiCall();
+    await onGetAllExpertApiCall(start: startExpert.toString(), limit: limitExpert.toString());
+    await onGetAllServiceApiCall(city: city ?? "");
     update([Constant.idProgressView, Constant.idSearchService, Constant.idServiceList]);
+  }
+
+  onTrendingProductSaved({
+    required String userId,
+    required String productId,
+    required String categoryId,
+  }) async {
+    await onFavouriteProductCall(
+      userId: userId,
+      productId: productId,
+      categoryId: categoryId,
+    );
+
+    if (favouriteProductModel?.status == true) {
+      if (favouriteProductModel?.isFavourite == true) {
+        Utils.showToast(Get.context!, "Product saved successfully");
+
+        int? index = getTrendingProductModel?.data?.indexWhere((element) => element.id == productId);
+        if (index != null) {
+          isTrendingProductSaved[index] = true;
+        }
+      } else {
+        int? index = getTrendingProductModel?.data?.indexWhere((element) => element.id == productId);
+        if (index != null) {
+          isTrendingProductSaved[index] = false;
+        }
+      }
+    } else {
+      Utils.showToast(Get.context!, favouriteProductModel?.message ?? "");
+    }
+
+    update([Constant.idProductSaved, Constant.idProgressView]);
+  }
+
+  onNewProductSaved({
+    required String userId,
+    required String productId,
+    required String categoryId,
+  }) async {
+    await onFavouriteProductCall(
+      userId: userId,
+      productId: productId,
+      categoryId: categoryId,
+    );
+
+    if (favouriteProductModel?.status == true) {
+      if (favouriteProductModel?.isFavourite == true) {
+        Utils.showToast(Get.context!, "Product saved successfully");
+
+        int? index = getNewProductModel?.data?.indexWhere((element) => element.id == productId);
+        if (index != null) {
+          isNewProductSaved[index] = true;
+        }
+      } else {
+        int? index = getNewProductModel?.data?.indexWhere((element) => element.id == productId);
+        if (index != null) {
+          isNewProductSaved[index] = false;
+        }
+      }
+    } else {
+      Utils.showToast(Get.context!, favouriteProductModel?.message ?? "");
+    }
+
+    update([Constant.idProductSaved, Constant.idProgressView]);
+  }
+
+  onLikeSalon({
+    required String userId,
+    required String salonId,
+    required String latitude,
+    required String longitude,
+  }) async {
+    await onFavouriteSalonApiCall(
+      userId: userId,
+      salonId: salonId,
+      latitude: latitude,
+      longitude: longitude,
+    );
+
+    if (favouriteSalonModel?.status == true) {
+      if (favouriteSalonModel?.isFavourite == true) {
+        Utils.showToast(Get.context!, "Salon favourite successfully");
+
+        int? index = getAllSalonCategory?.data?.indexWhere((element) => element.id == salonId);
+        if (index != null) {
+          isSalonSaved[index] = true;
+        }
+      } else {
+        int? index = getAllSalonCategory?.data?.indexWhere((element) => element.id == salonId);
+        if (index != null) {
+          isSalonSaved[index] = false;
+        }
+      }
+    } else {
+      Utils.showToast(Get.context!, favouriteProductModel?.message ?? "");
+    }
+
+    update([Constant.idLike, Constant.idProgressView]);
   }
 
   onServiceCheckBoxClick(value, int index) {
@@ -252,7 +407,7 @@ class HomeScreenController extends GetxController {
         await onGetAllSalonApiCall(
           latitude: latitude ?? 0.0,
           longitude: longitude ?? 0.0,
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
         );
       } else if (permission == LocationPermission.denied) {
         latitude = position!.latitude;
@@ -261,7 +416,7 @@ class HomeScreenController extends GetxController {
         await onGetAllSalonApiCall(
           latitude: latitude ?? 0.0,
           longitude: longitude ?? 0.0,
-          userId: Constant.storage.read<String>('UserId') ?? "",
+          userId: Constant.storage.read<String>('userId') ?? "",
         );
 
         log('Location permissions are denied');
@@ -405,7 +560,8 @@ class HomeScreenController extends GetxController {
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
-      log("Error call Get User Api :: $e");
+      log("Error call Get All Category Api :: $e");
+      Utils.showToast(Get.context!, getAllCategory?.message.toString() ?? "");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
@@ -420,9 +576,7 @@ class HomeScreenController extends GetxController {
       update([Constant.idProgressView]);
 
       final queryParameters = {"start": start, "limit": limit};
-
       log("Get All Expert Params :: $queryParameters");
-
       String queryString = Uri(queryParameters: queryParameters).query;
 
       final url = Uri.parse("${ApiConstant.BASE_URL}${ApiConstant.getAllExpert}$queryString");
@@ -458,18 +612,19 @@ class HomeScreenController extends GetxController {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error Call Get Expert Api :: $e");
+      Utils.showToast(Get.context!, "$e");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
     }
   }
 
-  onGetAllServiceApiCall({String? search}) async {
+  onGetAllServiceApiCall({String? search, required String city}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView, Constant.idSearchService, Constant.idServiceList]);
 
-      final queryParameters = {"search": search ?? ""};
+      final queryParameters = {"search": search ?? "", "city": city};
 
       log("Get All Service Params :: $queryParameters");
 
@@ -496,7 +651,8 @@ class HomeScreenController extends GetxController {
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
-      log("Error call Get All Service Api :: $e");
+      log("Error call Get Service Api :: $e");
+      Utils.showToast(Get.context!, "$e");
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idSearchService, Constant.idServiceList]);
@@ -535,6 +691,7 @@ class HomeScreenController extends GetxController {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get Expert Api :: $e");
+      Utils.showToast(Get.context!, getExpertCategory?.message.toString() ?? "");
     } finally {
       log("enter finally");
       isLoading(false);
@@ -578,19 +735,22 @@ class HomeScreenController extends GetxController {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get All Salon Api :: $e");
+      Utils.showToast(Get.context!, "$e");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
     }
   }
 
-  onGetServiceBasedSalonApiCall({required String serviceId, required double latitude, required double longitude}) async {
+  onGetServiceBasedSalonApiCall(
+      {required String serviceId, required double latitude, required double longitude, required String city}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView, Constant.idSelectBranch]);
 
       final url = Uri.parse(
-          '${ApiConstant.BASE_URL}${ApiConstant.getServiceBasedSalon}?serviceId=$serviceId&latitude=${latitude == 0.0 ? null : latitude}&longitude=${longitude == 0.0 ? null : longitude}');
+        '${ApiConstant.BASE_URL}${ApiConstant.getServiceBasedSalon}?serviceId=$serviceId&latitude=${latitude == 0.0 ? null : latitude}&longitude=${longitude == 0.0 ? null : longitude}&city=$city',
+      );
 
       log("Get Service Based Salon Url :: $url");
 
@@ -610,9 +770,213 @@ class HomeScreenController extends GetxController {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get Service Based Salon Api :: $e");
+      Utils.showToast(Get.context!, "$e");
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idSelectBranch]);
+    }
+  }
+
+  onGetTrendingProductApiCall() async {
+    try {
+      isLoading(true);
+      update([Constant.idProgressView]);
+
+      final queryParameters = {
+        "start": "0",
+        "end": "10",
+        "userId": Constant.storage.read<String>('userId') ?? "",
+        "city": city ?? "",
+      };
+
+      log("Get Trending Product Params :: $queryParameters");
+
+      String queryString = Uri(queryParameters: queryParameters).query;
+
+      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getTrendingProduct + queryString);
+
+      log("Get Trending Product Url :: $url");
+
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      log("Get Trending Product Headers :: $headers");
+
+      final response = await http.get(url, headers: headers);
+
+      log("Get Trending Product StatusCode :: ${response.statusCode}");
+      log("Get Trending Product Body :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        getTrendingProductModel = GetTrendingProductModel.fromJson(jsonResponse);
+      }
+
+      log("Get Trending Product Api Called Successfully");
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+    } catch (e) {
+      log("Error call Get Trending Product Api :: $e");
+      Utils.showToast(Get.context!, getAllCategory?.message.toString() ?? "");
+    } finally {
+      isLoading(false);
+      update([Constant.idProgressView]);
+    }
+  }
+
+  onGetNewProductApiCall() async {
+    try {
+      isLoading(true);
+      update([Constant.idProgressView]);
+
+      final queryParameters = {
+        "start": "0",
+        "end": "10",
+        "userId": Constant.storage.read<String>('userId') ?? "",
+        "city": city ?? "",
+      };
+
+      log("Get New Product Params :: $queryParameters");
+
+      String queryString = Uri(queryParameters: queryParameters).query;
+
+      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getNewProduct + queryString);
+
+      log("Get New Product Url :: $url");
+
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      log("Get New Product Headers :: $headers");
+
+      final response = await http.get(url, headers: headers);
+
+      log("Get New Product StatusCode :: ${response.statusCode}");
+      log("Get New Product Body :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        getNewProductModel = GetNewProductModel.fromJson(jsonResponse);
+      }
+
+      log("Get New Product Api Called Successfully");
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+    } catch (e) {
+      log("Error call Get New Product Api :: $e");
+      Utils.showToast(Get.context!, getAllCategory?.message.toString() ?? "");
+    } finally {
+      isLoading(false);
+      update([Constant.idProgressView]);
+    }
+  }
+
+  onFavouriteProductCall({
+    required String userId,
+    required String productId,
+    required String categoryId,
+  }) async {
+    try {
+      isLoading(true);
+      update([Constant.idProgressView]);
+
+      final body = json.encode({
+        "userId": userId,
+        "productId": productId,
+        "categoryId": categoryId,
+      });
+
+      log("Favourite Product Body :: $body");
+
+      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.favouriteProduct);
+      log("Favourite Product Url :: $url");
+
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      log("Favourite Product Status Code :: ${response.statusCode}");
+      log("Favourite Product Response :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        favouriteProductModel = FavouriteProductModel.fromJson(jsonResponse);
+      }
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+    } catch (e) {
+      log("Error call Favourite Product Api :: $e");
+      Utils.showToast(Get.context!, '$e');
+    } finally {
+      isLoading(false);
+      update([Constant.idProgressView]);
+    }
+  }
+
+  onGetProductCategoryApiCall() async {
+    try {
+      isLoading(true);
+      update([Constant.idProgressView]);
+
+      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getProductCategory);
+      log("Get Product Category Url :: $url");
+
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+
+      final response = await http.get(url, headers: headers);
+
+      log("Get Product Category Status Code :: ${response.statusCode}");
+      log("Get Product Category Response :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        getProductCategoryModel = GetProductCategoryModel.fromJson(jsonResponse);
+      }
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+    } catch (e) {
+      log("Error call Get Product Category Api :: $e");
+      Utils.showToast(Get.context!, '$e');
+    } finally {
+      isLoading(false);
+      update([Constant.idProgressView]);
+    }
+  }
+
+  onFavouriteSalonApiCall({
+    required String userId,
+    required String salonId,
+    required String latitude,
+    required String longitude,
+  }) async {
+    try {
+      update([Constant.idProgressView]);
+
+      final body = json.encode({
+        "userId": userId,
+        "salonId": salonId,
+        "latitude": latitude,
+        "longitude": longitude,
+      });
+
+      log("Favourite Salon Body :: $body");
+
+      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.salonFavourite);
+      log("Favourite Salon Url :: $url");
+
+      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      log("Favourite Salon Status Code :: ${response.statusCode}");
+      log("Favourite Salon Response :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        favouriteSalonModel = FavouriteSalonModel.fromJson(jsonResponse);
+      }
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+    } catch (e) {
+      log("Error call Favourite Salon Api :: $e");
+    } finally {
+      update([Constant.idProgressView]);
     }
   }
 }

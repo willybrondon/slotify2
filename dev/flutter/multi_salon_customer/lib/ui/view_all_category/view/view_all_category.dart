@@ -9,9 +9,9 @@ import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/view_all_category/controller/view_all_category_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/shimmer.dart';
 
@@ -23,15 +23,18 @@ class ViewAllCategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (bool didPop) {
         homeScreenController.startExpert = 0;
         homeScreenController.getExpert = [];
         homeScreenController.onGetAllExpertApiCall(
           start: homeScreenController.startExpert.toString(),
           limit: homeScreenController.limitExpert.toString(),
         );
-        return true;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
@@ -76,7 +79,7 @@ class ViewAllCategoryScreen extends StatelessWidget {
                       itemBuilder: (BuildContext context, int index) {
                         return AnimationConfiguration.staggeredGrid(
                           position: index,
-                          duration: const Duration(milliseconds: 800),
+                          duration: const Duration(milliseconds: 500),
                           columnCount: logic.getAllCategory?.data?.length ?? 0,
                           child: ScaleAnimation(
                             child: FadeInAnimation(
@@ -94,44 +97,45 @@ class ViewAllCategoryScreen extends StatelessWidget {
                                 child: OverflowBox(
                                   maxWidth: double.infinity,
                                   maxHeight: double.infinity,
-                                  child: Column(
+                                  child: Stack(
                                     children: [
-                                      DottedBorder(
-                                        color: AppColors.roundBorder,
-                                        borderType: BorderType.RRect,
-                                        radius: const Radius.circular(35),
-                                        strokeWidth: 1,
-                                        dashPattern: const [2.5, 2.5],
-                                        child: Container(
-                                          height: 70,
-                                          width: 70,
-                                          decoration: const BoxDecoration(shape: BoxShape.circle),
-                                          clipBehavior: Clip.hardEdge,
-                                          child: CachedNetworkImage(
-                                            imageUrl: logic.getAllCategory?.data?[index].image ?? "",
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) {
-                                              return Image.asset(AppAsset.icCategoryPlaceholder).paddingAll(5);
-                                            },
-                                            errorWidget: (context, url, error) {
-                                              return Icon(
-                                                Icons.error_outline,
-                                                color: AppColors.blackColor,
-                                                size: 20,
-                                              );
-                                            },
-                                          ),
+                                      Container(
+                                        height: 100,
+                                        width: 80,
+                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(14)),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: CachedNetworkImage(
+                                          imageUrl: "${logic.getAllCategory?.data?[index].image}",
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) {
+                                            return Image.asset(AppAsset.icCategoryPlaceholder).paddingAll(15);
+                                          },
+                                          errorWidget: (context, url, error) {
+                                            return Image.asset(AppAsset.icCategoryPlaceholder).paddingAll(15);
+                                          },
                                         ),
-                                      ).paddingOnly(top: 10, bottom: 5),
-                                      SizedBox(
-                                        child: Text(
-                                          logic.getAllCategory?.data![index].name.toString() ?? "",
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontFamily: FontFamily.sfProDisplayMedium,
-                                            fontSize: 12.5,
-                                            color: AppColors.category,
+                                      ),
+                                      Positioned(
+                                        bottom: 13,
+                                        child: Container(
+                                          height: 27,
+                                          width: 80,
+                                          decoration: BoxDecoration(
+                                              borderRadius: const BorderRadius.only(
+                                                bottomLeft: Radius.circular(14),
+                                                bottomRight: Radius.circular(14),
+                                              ),
+                                              color: AppColors.whiteColor.withOpacity(0.88)),
+                                          child: Center(
+                                            child: Text(
+                                              logic.getAllCategory?.data![index].name.toString() ?? "",
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontFamily: AppFontFamily.sfProDisplay,
+                                                fontSize: 12.5,
+                                                color: AppColors.appText,
+                                              ),
+                                            ).paddingOnly(left: 5, right: 5),
                                           ),
                                         ),
                                       ),
@@ -144,7 +148,7 @@ class ViewAllCategoryScreen extends StatelessWidget {
                         );
                       },
                     ),
-                  )
+                  ).paddingOnly(left: 15, right: 15, top: 15)
                 : logic.getExpert.isEmpty
                     ? Center(
                         child: Column(
@@ -158,7 +162,7 @@ class ViewAllCategoryScreen extends StatelessWidget {
                               "txtNotExpert".tr,
                               style: TextStyle(
                                 color: AppColors.primaryTextColor,
-                                fontFamily: FontFamily.sfProDisplay,
+                                fontFamily: AppFontFamily.sfProDisplay,
                                 fontSize: 18,
                               ),
                             )
@@ -181,7 +185,7 @@ class ViewAllCategoryScreen extends StatelessWidget {
                                       itemCount: logic.getExpert.length,
                                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 2,
-                                        childAspectRatio: 0.85,
+                                        childAspectRatio: 0.92,
                                         crossAxisSpacing: 13.5,
                                         mainAxisSpacing: 2,
                                       ),
@@ -209,95 +213,94 @@ class ViewAllCategoryScreen extends StatelessWidget {
                                                     ],
                                                   );
                                                 },
-                                                child: OverflowBox(
-                                                  maxHeight: double.infinity,
-                                                  maxWidth: double.infinity,
-                                                  child: Container(
-                                                    width: Get.width * 0.45,
-                                                    margin: const EdgeInsets.only(top: 10),
-                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(21),
-                                                      color: AppColors.whiteColor,
-                                                      boxShadow: Constant.boxShadow,
-                                                    ),
-                                                    child: Column(
-                                                      children: [
-                                                        DottedBorder(
-                                                          color: AppColors.roundBorder,
-                                                          borderType: BorderType.RRect,
-                                                          radius: const Radius.circular(41),
-                                                          strokeWidth: 1,
-                                                          dashPattern: const [2.5, 2.5],
-                                                          child: Container(
-                                                            height: 82,
-                                                            width: 82,
-                                                            decoration: const BoxDecoration(shape: BoxShape.circle),
-                                                            clipBehavior: Clip.hardEdge,
-                                                            child: CachedNetworkImage(
-                                                              imageUrl: logic.getExpert[index].image ?? "",
-                                                              fit: BoxFit.cover,
-                                                              placeholder: (context, url) {
-                                                                return Image.asset(AppAsset.icPlaceHolder);
-                                                              },
-                                                              errorWidget: (context, url, error) {
-                                                                return Icon(
-                                                                  Icons.error_outline,
-                                                                  color: AppColors.blackColor,
-                                                                  size: 20,
+                                                child: Container(
+                                                  width: Get.width * 0.45,
+                                                  margin: const EdgeInsets.only(top: 10),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(21),
+                                                    color: AppColors.whiteColor,
+                                                    boxShadow: Constant.boxShadow,
+                                                  ),
+                                                  child: Column(
+                                                    children: [
+                                                      const Spacer(),
+                                                      const Spacer(),
+                                                      DottedBorder(
+                                                        color: AppColors.roundBorder,
+                                                        borderType: BorderType.RRect,
+                                                        radius: const Radius.circular(41),
+                                                        strokeWidth: 1,
+                                                        dashPattern: const [2.5, 2.5],
+                                                        child: Container(
+                                                          height: 82,
+                                                          width: 82,
+                                                          decoration: const BoxDecoration(shape: BoxShape.circle),
+                                                          clipBehavior: Clip.hardEdge,
+                                                          child: CachedNetworkImage(
+                                                            imageUrl: logic.getExpert[index].image ?? "",
+                                                            fit: BoxFit.cover,
+                                                            placeholder: (context, url) {
+                                                              return Image.asset(AppAsset.icPlaceHolder);
+                                                            },
+                                                            errorWidget: (context, url, error) {
+                                                              return Icon(
+                                                                Icons.error_outline,
+                                                                color: AppColors.blackColor,
+                                                                size: 20,
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const Spacer(),
+                                                      Text(
+                                                        "${logic.getExpert[index].fname} ${logic.getExpert[index].lname}",
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: TextStyle(
+                                                          fontFamily: AppFontFamily.sfProDisplay,
+                                                          fontSize: 15,
+                                                          color: AppColors.primaryTextColor,
+                                                        ),
+                                                      ),
+                                                      const Spacer(),
+                                                      Container(
+                                                        height: 32,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(8),
+                                                          color: AppColors.yellow2,
+                                                        ),
+                                                        child: SizedBox(
+                                                          height: 15,
+                                                          child: ListView.separated(
+                                                            shrinkWrap: true,
+                                                            itemCount: 5,
+                                                            scrollDirection: Axis.horizontal,
+                                                            padding: const EdgeInsets.symmetric(horizontal: 13),
+                                                            itemBuilder: (context, index) {
+                                                              if (index < logic.filledStars!) {
+                                                                return Image.asset(
+                                                                  AppAsset.icStarFilled,
+                                                                  height: 15,
+                                                                  width: 15,
                                                                 );
-                                                              },
-                                                            ),
+                                                              } else {
+                                                                return Image.asset(
+                                                                  AppAsset.icStarOutline,
+                                                                  height: 15,
+                                                                  width: 15,
+                                                                );
+                                                              }
+                                                            },
+                                                            separatorBuilder: (context, index) {
+                                                              return SizedBox(width: Get.width * 0.017);
+                                                            },
                                                           ),
                                                         ),
-                                                        SizedBox(height: Get.height * 0.015),
-                                                        Text(
-                                                          "${logic.getExpert[index].fname} ${logic.getExpert[index].lname}",
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow.ellipsis,
-                                                          style: TextStyle(
-                                                            fontFamily: FontFamily.sfProDisplay,
-                                                            fontSize: 15,
-                                                            color: AppColors.primaryTextColor,
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: Get.height * 0.015),
-                                                        Container(
-                                                          height: 32,
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(8),
-                                                            color: AppColors.yellow2,
-                                                          ),
-                                                          child: SizedBox(
-                                                            height: 15,
-                                                            child: ListView.separated(
-                                                              shrinkWrap: true,
-                                                              itemCount: 5,
-                                                              scrollDirection: Axis.horizontal,
-                                                              padding: const EdgeInsets.symmetric(horizontal: 13),
-                                                              itemBuilder: (context, index) {
-                                                                if (index < logic.filledStars!) {
-                                                                  return Image.asset(
-                                                                    AppAsset.icStarFilled,
-                                                                    height: 15,
-                                                                    width: 15,
-                                                                  );
-                                                                } else {
-                                                                  return Image.asset(
-                                                                    AppAsset.icStarOutline,
-                                                                    height: 15,
-                                                                    width: 15,
-                                                                  );
-                                                                }
-                                                              },
-                                                              separatorBuilder: (context, index) {
-                                                                return SizedBox(width: Get.width * 0.017);
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                                      ),
+                                                      const Spacer(),
+                                                    ],
                                                   ),
                                                 ),
                                               ),

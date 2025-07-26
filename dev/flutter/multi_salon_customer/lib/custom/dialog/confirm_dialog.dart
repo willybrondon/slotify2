@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_button/button.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class ConfirmDialog extends StatefulWidget {
   const ConfirmDialog({super.key});
@@ -39,7 +39,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
               child: Text(
                 "txtConfirmBooking".tr,
                 style: TextStyle(
-                  fontFamily: FontFamily.sfProDisplay,
+                  fontFamily: AppFontFamily.sfProDisplay,
                   color: AppColors.whiteColor,
                   fontSize: 20,
                 ),
@@ -70,7 +70,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
                       bookingScreenController.checkItem[index],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: FontFamily.sfProDisplayBold,
+                        fontFamily: AppFontFamily.sfProDisplayBold,
                         color: AppColors.currency,
                         fontSize: 16,
                       ),
@@ -84,7 +84,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
             "txtBookAppointment".tr,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: FontFamily.sfProDisplayRegular,
+              fontFamily: AppFontFamily.sfProDisplayRegular,
               color: AppColors.captionDialog,
               fontSize: 17,
             ),
@@ -128,7 +128,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.termsDialog,
-                      fontFamily: FontFamily.sfProDisplayRegular,
+                      fontFamily: AppFontFamily.sfProDisplayRegular,
                     ),
                     textAlign: TextAlign.center,
                   ).paddingOnly(right: 15),
@@ -146,7 +146,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
                 textColor: AppColors.primaryAppColor,
                 borderColor: AppColors.greyColor.withOpacity(0.2),
                 borderWidth: 1,
-                fontStyle: FontFamily.sfProDisplay,
+                fontStyle: AppFontFamily.sfProDisplay,
                 fontSize: 16.5,
                 height: 46,
                 width: Get.width * 0.33,
@@ -159,7 +159,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
                     bookingScreenController.checkValue == true ? AppColors.buttonDialog : AppColors.grey.withOpacity(0.5),
                 buttonText: "txtConfirm".tr,
                 textColor: AppColors.whiteColor,
-                fontStyle: FontFamily.sfProDisplay,
+                fontStyle: AppFontFamily.sfProDisplay,
                 fontSize: 16.5,
                 height: 46,
                 width: Get.width * 0.33,

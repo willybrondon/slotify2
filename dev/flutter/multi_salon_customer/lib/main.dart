@@ -3,10 +3,9 @@ import 'dart:developer';
 
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -18,12 +17,6 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:salon_2/localization/localizations_delegate.dart';
 import 'package:salon_2/routes/app_pages.dart';
 import 'package:salon_2/routes/app_routes.dart';
-import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
-
-// import 'package:salon_2/ui/payment/in_app_purchase/in_app_purchase_helper.dart';
-// import 'package:in_app_purchase_android/src/in_app_purchase_android_platform_addition.dart';
-// import 'package:in_app_purchase_storekit/src/store_kit_wrappers/sk_payment_queue_wrapper.dart';
-// import 'package:in_app_purchase_storekit/src/store_kit_wrappers/sk_payment_transaction_wrappers.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/preference.dart';
 import 'localization/locale_constant.dart';
@@ -31,15 +24,31 @@ import 'localization/locale_constant.dart';
 FirebaseMessaging? messaging;
 FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
 String? fcmToken;
-String? currency;
 LocationPermission? permission;
 Position? position;
 double? latitude;
 double? longitude;
-final SplashController splashController = Get.put(SplashController());
 String? country;
 String? countryCode;
+String? city;
 String? dialCode;
+
+String? currency;
+String? currencyName;
+String? privacyPolicyLink;
+String? tnc;
+String? razorPayId;
+String? flutterWaveKey;
+String? stripePublishableKey;
+String? stripeSecretKey;
+bool? isStripePay;
+bool? isRazorPay;
+bool? isFlutterWave;
+
+num? adminCommissionCharges;
+num? cancelOrderCharges;
+num? walletAmount;
+int? cartItemCount;
 
 getDialCode() {
   CountryCode getCountryDialCode(String countryCode) {
@@ -66,19 +75,22 @@ Future<void> backgroundNotification(RemoteMessage message) async {
   );
 
   log("Setting :: $settings");
-  log('Got a message whilst in the foreground!');
-  log('Message data: ${message.data}');
+  log('Got a message!');
+  log('Message data :: ${message.data}');
 
   if (message.notification != null) {
-    log('Message also contained a notification: ${message.notification}');
+    log('Message Contained a Notification :: ${message.notification?.body}');
   }
+
   const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  flutterLocalNotificationsPlugin?.initialize(const InitializationSettings(android: initializationSettingsAndroid),
-      onDidReceiveBackgroundNotificationResponse: (message) {});
+  flutterLocalNotificationsPlugin?.initialize(
+    const InitializationSettings(android: initializationSettingsAndroid),
+  );
+
   var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
     '0',
-    'Salon',
+    'Multi Salon Customer',
     channelDescription: 'hello',
     importance: Importance.max,
     icon: '@mipmap/ic_launcher',
@@ -88,13 +100,22 @@ Future<void> backgroundNotification(RemoteMessage message) async {
   var platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
   );
-  await flutterLocalNotificationsPlugin?.show(
-    message.hashCode,
-    message.notification!.title.toString(),
-    message.notification!.body.toString(),
-    platformChannelSpecifics,
-    payload: 'Custom_Sound',
-  );
+
+  if (message.notification != null && !kIsWeb) {
+    if (Constant.storage.read("notification") == true) {
+      await flutterLocalNotificationsPlugin?.show(
+        message.hashCode,
+        message.notification!.title.toString(),
+        message.notification!.body.toString(),
+        platformChannelSpecifics,
+        payload: 'Custom_Sound',
+      );
+    } else {
+      log("Notification Permission not allowed");
+    }
+  } else {
+    log('Handling background notification :: ${message.data}');
+  }
 }
 
 /// for Get Location
@@ -140,14 +161,6 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await GetStorage.init();
 
-  FlutterError.onError = (errorDetails) {
-    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-  };
-
-  /// Currency
-  await splashController.onSettingApiCall();
-  currency = splashController.settingCategory?.setting?.currencySymbol.toString();
-
   ///************** FCM token ************************\\\
   try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -174,21 +187,7 @@ Future<void> main() async {
 
   /// Preference
   await Preference().instance();
-
-  // InAppPurchaseAndroidPlatformAddition.enablePendingPurchases();
-
-  // if (Platform.isIOS) {
-  //   final transactions = await SKPaymentQueueWrapper().transactions();
-  //
-  //   for (SKPaymentTransactionWrapper element in transactions) {
-  //     await SKPaymentQueueWrapper().finishTransaction(element);
-  //     await SKPaymentQueueWrapper().finishTransaction(element.originalTransaction!);
-  //   }
-  // }
-  // InAppPurchaseHelper().initStoreInfo();
-  runApp(
-    const MyApp(),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {

@@ -7,9 +7,9 @@ import 'package:salon_2/custom/text_field/text_field_custom.dart';
 import 'package:salon_2/custom/text_field/text_form_field_custom.dart';
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class CancelAppointmentDialog extends StatelessWidget {
@@ -38,13 +38,13 @@ class CancelAppointmentDialog extends StatelessWidget {
             ).paddingOnly(bottom: 5),
             Text(
               "txtCancelAppointment".tr,
-              style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 23),
+              style: TextStyle(fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 23),
             ),
             Text(
               "desCancelBooking".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: FontFamily.sfProDisplayRegular,
+                fontFamily: AppFontFamily.sfProDisplayRegular,
                 color: AppColors.captionDialog,
                 fontSize: 15,
               ),
@@ -63,7 +63,7 @@ class CancelAppointmentDialog extends StatelessWidget {
               borderWidth: 1,
               hintTextColor: AppColors.subTitle,
               hintTextSize: 14.5,
-              hintTextStyle: FontFamily.sfProDisplayRegular,
+              hintTextStyle: AppFontFamily.sfProDisplayRegular,
             ).paddingOnly(left: 10),
             const Spacer(),
             Row(
@@ -74,7 +74,7 @@ class CancelAppointmentDialog extends StatelessWidget {
                   buttonColor: AppColors.whiteColor,
                   buttonText: "txtClose".tr,
                   textColor: AppColors.primaryAppColor,
-                  fontStyle: FontFamily.sfProDisplay,
+                  fontStyle: AppFontFamily.sfProDisplay,
                   fontSize: 16.5,
                   height: 45,
                   width: Get.width * 0.31,
@@ -88,7 +88,7 @@ class CancelAppointmentDialog extends StatelessWidget {
                   buttonColor: AppColors.cancelButton,
                   buttonText: "txtCancel".tr,
                   textColor: AppColors.whiteColor,
-                  fontStyle: FontFamily.sfProDisplay,
+                  fontStyle: AppFontFamily.sfProDisplay,
                   fontSize: 16.5,
                   height: 45,
                   width: Get.width * 0.31,
@@ -113,7 +113,7 @@ class CancelAppointmentDialog extends StatelessWidget {
 
                         Get.back();
                         await bookingDetailScreenController.onGetAllBookingApiCall(
-                          userId: Constant.storage.read<String>('UserId') ?? "",
+                          userId: Constant.storage.read<String>('userId') ?? "",
                           status: "pending",
                           start: bookingDetailScreenController.startPending.toString(),
                           limit: bookingDetailScreenController.limitPending.toString(),

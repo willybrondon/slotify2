@@ -3,7 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class ProgressDialog extends StatelessWidget {
   final Widget? child;

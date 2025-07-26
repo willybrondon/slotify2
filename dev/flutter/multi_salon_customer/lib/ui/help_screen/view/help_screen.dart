@@ -5,9 +5,9 @@ import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/custom/profile_menu/profile_menu.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class HelpScreen extends StatelessWidget {
@@ -41,7 +41,7 @@ class HelpScreen extends StatelessWidget {
             imageHeight: 20,
             imageWidth: 20,
             title: "txtPrivacyPolicy".tr,
-            fontFamily: FontFamily.sfProDisplayMedium,
+            fontFamily: AppFontFamily.sfProDisplayMedium,
             fontSize: 14.5,
             onTap: () {
               log("PRIVACY_POLICY_URL link  :: ${splashController.settingCategory?.setting?.privacyPolicyLink ?? ""}");
@@ -53,7 +53,7 @@ class HelpScreen extends StatelessWidget {
             imageHeight: 20,
             imageWidth: 20,
             title: "txtTermsCondition".tr,
-            fontFamily: FontFamily.sfProDisplayMedium,
+            fontFamily: AppFontFamily.sfProDisplayMedium,
             fontSize: 14.5,
             onTap: () {
               log("TC link  :: ${splashController.settingCategory?.setting?.tnc ?? ""}");

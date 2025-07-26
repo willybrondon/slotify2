@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class TextFieldCustom extends StatelessWidget {
   Widget? suffixIcon;
@@ -66,7 +66,7 @@ class TextFieldCustom extends StatelessWidget {
       maxLength: maxLength,
       style: TextStyle(
         fontSize: 15,
-        fontFamily: FontFamily.sfProDisplay,
+        fontFamily: AppFontFamily.sfProDisplay,
         color: AppColors.primaryTextColor,
       ),
       onChanged: onChanged,
@@ -79,11 +79,11 @@ class TextFieldCustom extends StatelessWidget {
         counterText: "",
         errorStyle: TextStyle(
           fontSize: 12,
-          fontFamily: FontFamily.sfProDisplayRegular,
-          color: AppColors.redColor,
+          fontFamily: AppFontFamily.sfProDisplayRegular,
+          color: AppColors.redText,
         ),
         hintStyle: TextStyle(
-            color: AppColors.grey.withOpacity(0.7), fontSize: 14, fontFamily: FontFamily.sfProDisplayRegular),
+            color: AppColors.grey.withOpacity(0.7), fontSize: 14, fontFamily: AppFontFamily.sfProDisplayRegular),
         border: InputBorder.none,
       ),
     );

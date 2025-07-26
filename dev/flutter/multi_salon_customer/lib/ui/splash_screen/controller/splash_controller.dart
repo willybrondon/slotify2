@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/splash_screen/model/get_country_model.dart';
 import 'package:salon_2/ui/splash_screen/model/setting_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/services/app_exception.dart';
+import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class SplashController extends GetxController {
@@ -20,9 +20,36 @@ class SplashController extends GetxController {
   @override
   void onInit() async {
     await onGetCountryApiCall();
-
     getDialCode();
     await onSettingApiCall();
+
+    currencyName = settingCategory?.setting?.currencyName;
+    currency = settingCategory?.setting?.currencySymbol;
+    tnc = settingCategory?.setting?.tnc;
+    privacyPolicyLink = settingCategory?.setting?.privacyPolicyLink;
+    flutterWaveKey = settingCategory?.setting?.flutterWaveKey;
+    razorPayId = settingCategory?.setting?.razorPayId;
+    stripePublishableKey = settingCategory?.setting?.stripePublishableKey;
+    stripeSecretKey = settingCategory?.setting?.stripeSecretKey;
+    isStripePay = settingCategory?.setting?.isStripePay;
+    isRazorPay = settingCategory?.setting?.isRazorPay;
+    isFlutterWave = settingCategory?.setting?.isFlutterWave;
+    adminCommissionCharges = settingCategory?.setting?.adminCommissionCharges;
+    cancelOrderCharges = settingCategory?.setting?.cancelOrderCharges;
+
+    log("Currency Name :: $currencyName");
+    log("Currency :: $currency");
+    log("T&C :: $tnc");
+    log("Privacy Policy Link :: $privacyPolicyLink");
+    log("Flutter Wave Key :: $flutterWaveKey");
+    log("Razor Pay Id :: $razorPayId");
+    log("Stripe Publishable Key :: $stripePublishableKey");
+    log("Stripe Secret Key :: $stripeSecretKey");
+    log("Is StripePay :: $isStripePay");
+    log("Is RazorPay :: $isRazorPay");
+    log("is FlutterWave :: $isFlutterWave");
+    log("Admin Commission Charges :: $adminCommissionCharges");
+    log("Cancel Order Charges :: $cancelOrderCharges");
     super.onInit();
   }
 
@@ -48,8 +75,10 @@ class SplashController extends GetxController {
 
         country = getCountryModel?.country;
         countryCode = getCountryModel?.countryCode;
+        city = getCountryModel?.city;
         log("The Country Name :: $country");
         log("The Country Code :: $countryCode");
+        log("The City Name :: $city");
       }
 
       log("Get Country Api Call Successful");

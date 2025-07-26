@@ -1,53 +1,56 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
-class ViewAll extends StatefulWidget {
+class ViewAll extends StatelessWidget {
   final String title;
   final String subtitle;
+  Color? textColor;
   String? fontFamily;
-  final Function() onTap;
+  double? fontSize;
+  Function()? onTap;
 
-  ViewAll({super.key, required this.title, required this.subtitle, required this.onTap, this.fontFamily});
+  ViewAll({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+    this.textColor,
+    this.fontFamily,
+    this.fontSize,
+  });
 
   @override
-  State<ViewAll> createState() => _ViewAllState();
-}
-
-class _ViewAllState extends State<ViewAll> {
-  viewAll() {
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            widget.title,
+            title,
             style: TextStyle(
-                fontFamily: FontFamily.sfProDisplayBold, fontSize: 18, color: AppColors.primaryTextColor),
+              fontFamily: fontFamily ?? AppFontFamily.heeBo700,
+              fontSize: fontSize ?? 18,
+              color: textColor ?? AppColors.primaryTextColor,
+            ),
           ),
           Column(
             children: [
               Text(
-                widget.subtitle,
+                subtitle,
                 style: TextStyle(
-                    fontFamily: widget.fontFamily,
-                    fontSize: 11.5,
-                    color: AppColors.grey,
-                    decoration: TextDecoration.underline,
-                    decorationColor: AppColors.grey),
+                  fontFamily: AppFontFamily.heeBo500,
+                  fontSize: 12,
+                  color: AppColors.grey,
+                ),
               ),
             ],
           )
         ],
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return viewAll();
   }
 }

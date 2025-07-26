@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_button/button.dart';
 import 'package:salon_2/routes/app_routes.dart';
-import 'package:salon_2/ui/login/login_screen/controller/login_screen_controller.dart';
-import 'package:salon_2/ui/setting/controller/setting_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/login_screen/login_screen/controller/login_screen_controller.dart';
+import 'package:salon_2/ui/setting_screen/controller/setting_controller.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class DeleteAccountDialog extends StatelessWidget {
@@ -37,7 +37,7 @@ class DeleteAccountDialog extends StatelessWidget {
               ).paddingOnly(top: 15, bottom: 35),
               Text(
                 "txtDeleteAccount".tr,
-                style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 24),
+                style: TextStyle(fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 24),
               ),
               SizedBox(
                 width: Get.width * 0.6,
@@ -45,7 +45,7 @@ class DeleteAccountDialog extends StatelessWidget {
                   "desDeletedPermanently".tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: FontFamily.sfProDisplayRegular,
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
                     color: AppColors.captionDialog,
                     fontSize: 13,
                   ),
@@ -60,7 +60,7 @@ class DeleteAccountDialog extends StatelessWidget {
                     buttonColor: AppColors.whiteColor,
                     buttonText: "txtCancel".tr,
                     textColor: AppColors.primaryAppColor,
-                    fontStyle: FontFamily.sfProDisplay,
+                    fontStyle: AppFontFamily.sfProDisplay,
                     fontSize: 16.5,
                     height: 48,
                     width: Get.width * 0.31,
@@ -75,14 +75,14 @@ class DeleteAccountDialog extends StatelessWidget {
                     buttonColor: AppColors.cancelButton,
                     buttonText: "txtDelete".tr,
                     textColor: AppColors.whiteColor,
-                    fontStyle: FontFamily.sfProDisplay,
+                    fontStyle: AppFontFamily.sfProDisplay,
                     fontSize: 16.5,
                     height: 48,
                     width: Get.width * 0.31,
                     onTap: () async {
                       Get.back();
                       await settingController.onDeleteUserApiCall(
-                        userId: Constant.storage.read<String>('UserId').toString(),
+                        userId: Constant.storage.read<String>('userId').toString(),
                       );
 
                       if (settingController.deleteUserCategory?.status == true) {

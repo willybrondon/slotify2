@@ -7,13 +7,13 @@ import 'package:get/get.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
 import 'package:salon_2/ui/booking_detail_screen/widget/booking_detail_screen.dart';
-import 'package:salon_2/ui/bottom_bar/controller/bottom_bar_controller.dart';
-import 'package:salon_2/ui/login/login_screen/controller/login_screen_controller.dart';
-import 'package:salon_2/ui/login/sign_in_screen/controller/sign_in_controller.dart';
-import 'package:salon_2/ui/login/sign_in_screen/view/sign_in_screen.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/bottom_bar_screen/controller/bottom_bar_controller.dart';
+import 'package:salon_2/ui/login_screen/login_screen/controller/login_screen_controller.dart';
+import 'package:salon_2/ui/login_screen/sign_in_screen/controller/sign_in_controller.dart';
+import 'package:salon_2/ui/login_screen/sign_in_screen/view/sign_in_screen.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 
 class Booking extends StatelessWidget {
   Booking({super.key});
@@ -25,11 +25,14 @@ class Booking extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(SignInController()).getDataFromArgs();
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
         Get.find<BottomBarController>().onClick(0);
         bookingDetailScreenController.bookingDetailScreenEditingController.clear();
-        return false;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
@@ -51,7 +54,8 @@ class Booking extends StatelessWidget {
                       children: [
                         Text(
                           "txtPleaseMakeYour".tr,
-                          style: TextStyle(fontFamily: FontFamily.sfProDisplayMedium, color: AppColors.blackColor, fontSize: 16),
+                          style:
+                              TextStyle(fontFamily: AppFontFamily.sfProDisplayMedium, color: AppColors.blackColor, fontSize: 16),
                         ),
                         GestureDetector(
                           onTap: () {
@@ -60,7 +64,7 @@ class Booking extends StatelessWidget {
                           child: Text(
                             "txtProfile!".tr,
                             style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold,
+                                fontFamily: AppFontFamily.sfProDisplayBold,
                                 color: AppColors.primaryAppColor,
                                 decoration: TextDecoration.underline,
                                 fontSize: 17),

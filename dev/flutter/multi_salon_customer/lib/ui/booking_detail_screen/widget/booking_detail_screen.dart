@@ -8,9 +8,9 @@ import 'package:salon_2/ui/booking_detail_screen/widget/complete_booking_screen.
 import 'package:salon_2/custom/text_field/text_field_custom.dart';
 import 'package:salon_2/ui/booking_detail_screen/widget/pending_booking_screen.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class BookingDetailScreen extends StatelessWidget {
   final BookingDetailScreenController bookingDetailScreenController = Get.put(BookingDetailScreenController());
@@ -37,7 +37,11 @@ class BookingDetailScreen extends StatelessWidget {
                   ),
                   child: Text(
                     "txtBooking".tr,
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, fontSize: 20, color: AppColors.whiteColor),
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 20,
+                      color: AppColors.whiteColor,
+                    ),
                   ),
                 ),
                 GetBuilder<BookingDetailScreenController>(
@@ -100,7 +104,7 @@ class BookingDetailScreen extends StatelessWidget {
                             logic.startPending = 0;
                             logic.getPending = [];
                             await logic.onGetAllBookingApiCall(
-                              userId: Constant.storage.read<String>('UserId') ?? "",
+                              userId: Constant.storage.read<String>('userId') ?? "",
                               status: "pending",
                               start: logic.startPending.toString(),
                               limit: logic.limitPending.toString(),
@@ -111,7 +115,7 @@ class BookingDetailScreen extends StatelessWidget {
                             logic.startCancel = 0;
                             logic.getCancel = [];
                             await logic.onGetAllBookingApiCall(
-                              userId: Constant.storage.read<String>('UserId') ?? "",
+                              userId: Constant.storage.read<String>('userId') ?? "",
                               status: "cancel",
                               start: logic.startCancel.toString(),
                               limit: logic.limitCancel.toString(),
@@ -122,7 +126,7 @@ class BookingDetailScreen extends StatelessWidget {
                             logic.startCompleted = 0;
                             logic.getComplete = [];
                             await logic.onGetAllBookingApiCall(
-                              userId: Constant.storage.read<String>('UserId') ?? "",
+                              userId: Constant.storage.read<String>('userId') ?? "",
                               status: "completed",
                               start: logic.startCompleted.toString(),
                               limit: logic.limitCompleted.toString(),
@@ -147,7 +151,7 @@ class BookingDetailScreen extends StatelessWidget {
                   tabs: tabs,
                   labelStyle: const TextStyle(
                     fontSize: 16,
-                    fontFamily: FontFamily.sfProDisplayRegular,
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
                   ),
                   physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -156,7 +160,7 @@ class BookingDetailScreen extends StatelessWidget {
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelColor: AppColors.whiteColor,
                   unselectedLabelStyle: const TextStyle(
-                    fontFamily: FontFamily.sfProDisplayRegular,
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
                     fontSize: 15,
                   ),
                   isScrollable: false,
