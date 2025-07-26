@@ -244,11 +244,11 @@ app.use(express.static(path.join(__dirname, "salon")));
 // Serve static files for salonportal : for solon portal new edited 22/07/2025
 app.use("/salonportal", express.static(path.join(__dirname, "salonportal")));
 // Direct route for salonportal index.html edited 22/07/2025
-app.get("/salonportal/:param?", function (req, res) {
+app.get("/salonportal/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "salonportal", "index.html"));
 });
 
-app.get("/SalonPanel/:param?", function (req, res) {
+app.get("/SalonPanel/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
 });
 
