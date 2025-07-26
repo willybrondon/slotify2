@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const app = express();
-const port = process.env.PORT || 5037;
+const port = process.env.PORT || 6040;
 const moment = require("moment");
 const mongoose = require("mongoose");
 
@@ -249,6 +249,10 @@ app.get("/salonportal/*", function (req, res) {
 });
 
 app.get("/SalonPanel/*", function (req, res) {
+  res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
+});
+
+app.get("/salonpanel/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
 });
 
