@@ -7,7 +7,16 @@ const Input = (props) => {
   const handleImage = (e) => {
 
     if (e.target.files.length > 0) {
-      setImagePath(URL?.createObjectURL(e.target.files[0]));
+      const file = e.target.files[0];
+      const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      
+      if (validMimeTypes.includes(file.type)) {
+        setImagePath(URL?.createObjectURL(file));
+      } else {
+        console.warn(`Invalid file type: ${file.type}. Please upload an image file.`);
+        e.target.value = ''; // Clear the input
+        setImagePath("");
+      }
     } else {
       setImagePath("");
     }
@@ -93,6 +102,7 @@ const Input = (props) => {
         data-validation={validation}
         data-ignore={ignore}
         title={validationError}
+        accept={types === "file" ? "image/jpeg,image/jpg,image/png,image/gif,image/webp" : undefined}
 
       />
       {/* Show Image */}
@@ -286,9 +296,19 @@ export const Image = (props) => {
       if (multi == "multi") {
         // New Path
         const newImagePaths = [];
+        const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        
         for (let i = 0; i < e.target.files.length; i++) {
-          newImagePaths.push(URL.createObjectURL(e.target.files[i]));
+          const file = e.target.files[i];
+          // Check if file has valid MIME type
+          if (validMimeTypes.includes(file.type)) {
+            newImagePaths.push(URL.createObjectURL(file));
+          } else {
+            console.warn(`Skipped file "${file.name}" - invalid MIME type: ${file.type}`);
+            continue;
+          }
         }
+        
         // Old Path
         const addImage = document.getElementById(`${name}-multiImage`);
         for (let i = 0; i < newImagePaths.length; i++) {
@@ -307,21 +327,42 @@ export const Image = (props) => {
           divTag.setAttribute("data-index", "index");
           addImage.appendChild(divTag);
         }
+        
         const newImageFileValue = e.target.files;
         const input = document.getElementById(id);
 
         const dataTransfer = new DataTransfer();
+        
+        // Add existing valid files
         for (let i = 0; i < multiImagePath.length; i++) {
-          dataTransfer.items.add(multiImagePath[i]);
+          const file = multiImagePath[i];
+          if (validMimeTypes.includes(file.type)) {
+            dataTransfer.items.add(file);
+          }
         }
+        
+        // Add new valid files
         for (let i = 0; i < newImageFileValue.length; i++) {
-          dataTransfer.items.add(newImageFileValue[i]);
+          const file = newImageFileValue[i];
+          if (validMimeTypes.includes(file.type)) {
+            dataTransfer.items.add(file);
+          }
         }
+        
         input.files = dataTransfer.files;
         setMultiImagePath(dataTransfer.files);
 
       } else {
-        setImagePath(URL?.createObjectURL(e.target.files[0]));
+        // Single file upload - validate MIME type
+        const file = e.target.files[0];
+        const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        
+        if (validMimeTypes.includes(file.type)) {
+          setImagePath(URL?.createObjectURL(file));
+        } else {
+          console.warn(`Invalid file type: ${file.type}. Please upload an image file.`);
+          e.target.value = ''; // Clear the input
+        }
       }
     } else {
       if (multi === "multi") {
@@ -360,6 +401,7 @@ export const Image = (props) => {
                 className={className}
                 id={id}
                 multiple={true}
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                 onChange={(e) => checkForm(e, "multi")}
               />
             </div>
@@ -377,6 +419,7 @@ export const Image = (props) => {
             name={name}
             className={className}
             id={id}
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
             onChange={(e) => checkForm(e)}
           />
           <img
