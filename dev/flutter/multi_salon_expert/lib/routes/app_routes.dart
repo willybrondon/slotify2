@@ -9,8 +9,8 @@ class AppRoutes {
   static const String viewDetail = "/viewDetail";
   static const String profile = "/profile";
   static const String wallet = "/wallet";
+  static const String history = "/history";
   static const String revenueDetail = "/revenueDetail";
-  static const String paymentHistory = "/paymentHistory";
   static const String orderSummary = "/orderSummary";
   static const String attendance = "/attendance";
   static const String setting = "/setting";

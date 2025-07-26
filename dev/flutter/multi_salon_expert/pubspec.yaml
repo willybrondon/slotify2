@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.1+1
+version: 1.0.0+1
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
@@ -34,49 +34,30 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  shared_preferences: ^2.2.2
   cupertino_icons: ^1.0.2
-  get: ^4.6.6
-  intl: ^0.18.1
-  carousel_slider: ^5.0.0
+  fluttertoast: ^8.2.12
+  get: ^4.7.2
+  month_picker_dialog: ^6.0.3
+  intl: ^0.19.0
+  http: ^1.4.0
   get_storage: ^2.1.1
-  im_stepper: ^1.0.1+1
-  pinput: ^5.0.1
-  intl_phone_field: ^3.2.0
-  http: ^1.1.0
-  firebase_storage_web: ^3.6.17
-  firebase_auth: ^5.5.4
-  firebase_core: ^3.13.1
-  fluttertoast: ^8.2.4
-  flutter_stripe: ^11.5.0
-  razorpay_flutter: ^1.3.6
-  in_app_purchase: 3.0.8
-  dio: ^5.1.2
-  image_picker: ^1.0.5
+  image_picker: ^1.1.2
   shimmer: ^3.0.0
-  in_app_purchase_storekit: 0.3.7
-  clipboard: ^0.1.3
-  speech_to_text: ^7.0.0
-  dotted_border: ^2.1.0
-  salomon_bottom_bar: ^3.3.2
-  scroll_page_view: ^1.0.2
-  firebase_messaging: ^15.2.6
-  flutter_local_notifications: ^19.2.1
-  in_app_review: ^2.0.8
-  share_plus: ^11.0.0
-  url_launcher: ^6.2.6
-  flutter_staggered_animations: ^1.1.1
-  google_sign_in: ^6.2.1
-  flutterwave_standard: ^1.0.8
-  firebase_app_check: ^0.3.2+6
-  geolocator: ^10.1.0
-  geolocator_android: ^4.3.0
-  cached_network_image: ^3.3.0
-  country_code_picker: ^3.0.0
-  firebase_crashlytics: ^4.3.6
   blurrycontainer: ^2.1.0
-  month_picker_dialog: ^2.2.1
-  syncfusion_flutter_datepicker: ^23.2.7
+  salomon_bottom_bar: ^3.3.2
+  clipboard: ^0.1.3
+  firebase_core: ^3.13.0
+  firebase_messaging: ^15.2.5
+  flutter_local_notifications: ^19.2.0
+  in_app_review: ^2.0.10
+  share_plus: ^11.0.0
+  url_launcher: ^6.3.1
+  flutter_staggered_animations: ^1.1.1
+  scroll_page_view: ^1.0.2
+  syncfusion_flutter_datepicker: ^27.1.53
+  dotted_border: ^2.1.0
+  cached_network_image: ^3.4.1
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
@@ -87,7 +68,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -139,7 +120,33 @@ flutter:
     - family: SF-Pro-Display-Ultralight
       fonts:
         - asset: fonts/SFProDisplay/SF-Pro-Display-Ultralight.ttf
-
+    - family: Heebo100
+      fonts:
+        - asset: fonts/Heebo/Heebo100.ttf
+    - family: Heebo200
+      fonts:
+        - asset: fonts/Heebo/Heebo200.ttf
+    - family: Heebo300
+      fonts:
+        - asset: fonts/Heebo/Heebo300.ttf
+    - family: Heebo400
+      fonts:
+        - asset: fonts/Heebo/Heebo400.ttf
+    - family: Heebo500
+      fonts:
+        - asset: fonts/Heebo/Heebo500.ttf
+    - family: Heebo600
+      fonts:
+        - asset: fonts/Heebo/Heebo600.ttf
+    - family: Heebo700
+      fonts:
+        - asset: fonts/Heebo/Heebo700.ttf
+    - family: Heebo800
+      fonts:
+        - asset: fonts/Heebo/Heebo800.ttf
+    - family: Heebo800
+      fonts:
+        - asset: fonts/Heebo/Heebo900.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

@@ -5,10 +5,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/edit_profile/model/edit_profile_model.dart';
 import 'package:salon_2/ui/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/login_screen/model/login_model.dart';
-import 'package:salon_2/utils/api.dart';
+import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/utils/utils.dart';
@@ -97,6 +98,7 @@ class EditProfileController extends GetxController {
         await loginScreenController.onGetExpertApiCall(expertId: Constant.storage.read<String>("expertId").toString());
 
         if (loginScreenController.getExpertCategory?.status == true) {
+          earning = loginScreenController.getExpertCategory?.data?.earning?.toStringAsFixed(2);
           Constant.storage.write('fName', loginScreenController.getExpertCategory?.data?.fname.toString());
           Constant.storage.write('lName', loginScreenController.getExpertCategory?.data?.lname.toString());
           Constant.storage.write('hostImage', loginScreenController.getExpertCategory?.data?.image.toString());

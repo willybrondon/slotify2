@@ -10,10 +10,10 @@ import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_information_screen/controller/booking_information_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -96,7 +96,7 @@ class BookingInformationScreen extends StatelessWidget {
                                         "#${logic.getBookingInformationCategory?.booking?.bookingId}",
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontFamily: FontFamily.sfProDisplay,
+                                          fontFamily: AppFontFamily.sfProDisplay,
                                           fontSize: 12,
                                           color: AppColors.service,
                                         ),
@@ -138,7 +138,7 @@ class BookingInformationScreen extends StatelessWidget {
                                           child: Text(
                                             result ?? "",
                                             style: TextStyle(
-                                              fontFamily: FontFamily.sfProDisplay,
+                                              fontFamily: AppFontFamily.sfProDisplay,
                                               fontSize: 17,
                                               overflow: TextOverflow.ellipsis,
                                               color: AppColors.primaryTextColor,
@@ -149,7 +149,7 @@ class BookingInformationScreen extends StatelessWidget {
                                         Text(
                                           logic.getBookingInformationCategory?.booking?.serviceId?.first.categoryId?.name ?? "",
                                           style: TextStyle(
-                                            fontFamily: FontFamily.sfProDisplayMedium,
+                                            fontFamily: AppFontFamily.sfProDisplayMedium,
                                             fontSize: 14,
                                             color: AppColors.service,
                                           ),
@@ -166,7 +166,7 @@ class BookingInformationScreen extends StatelessWidget {
                                             child: Text(
                                               "$currency ${logic.getBookingInformationCategory?.booking?.expertEarning?.toStringAsFixed(2)}",
                                               style: TextStyle(
-                                                fontFamily: FontFamily.sfProDisplayBold,
+                                                fontFamily: AppFontFamily.sfProDisplayBold,
                                                 fontSize: 16,
                                                 color: AppColors.currency,
                                               ),
@@ -191,7 +191,7 @@ class BookingInformationScreen extends StatelessWidget {
                                             Text(
                                               "  ${logic.getBookingInformationCategory?.booking?.expertId?.fname} ${logic.getBookingInformationCategory?.booking?.expertId?.lname}",
                                               style: TextStyle(
-                                                fontFamily: FontFamily.sfProDisplayMedium,
+                                                fontFamily: AppFontFamily.sfProDisplayMedium,
                                                 fontSize: 11.5,
                                                 color: AppColors.service,
                                               ),
@@ -216,7 +216,7 @@ class BookingInformationScreen extends StatelessWidget {
                                 Text(
                                   date,
                                   style: TextStyle(
-                                    fontFamily: FontFamily.sfProDisplay,
+                                    fontFamily: AppFontFamily.sfProDisplay,
                                     fontSize: 12,
                                     color: AppColors.primaryTextColor,
                                   ),
@@ -230,7 +230,7 @@ class BookingInformationScreen extends StatelessWidget {
                                 Text(
                                   "${logic.getBookingInformationCategory?.booking?.duration} ${"txtMinutes".tr}",
                                   style: TextStyle(
-                                    fontFamily: FontFamily.sfProDisplay,
+                                    fontFamily: AppFontFamily.sfProDisplay,
                                     fontSize: 12,
                                     color: AppColors.primaryTextColor,
                                   ),
@@ -258,7 +258,7 @@ class BookingInformationScreen extends StatelessWidget {
                                               ? "Completed"
                                               : "Cancelled",
                                       style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplay,
+                                        fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 11,
                                         color: logic.getBookingInformationCategory?.booking?.status == "cancel"
                                             ? AppColors.redColor
@@ -276,7 +276,7 @@ class BookingInformationScreen extends StatelessWidget {
                                 "txtServicesDetails".tr,
                                 style: TextStyle(
                                   fontSize: 18,
-                                  fontFamily: FontFamily.sfProDisplayBold,
+                                  fontFamily: AppFontFamily.sfProDisplayBold,
                                   color: AppColors.primaryTextColor,
                                 ),
                               ).paddingOnly(bottom: 13, left: 8),
@@ -314,7 +314,7 @@ class BookingInformationScreen extends StatelessWidget {
                                     Text(
                                       logic.getBookingInformationCategory?.booking?.serviceId?[index].name ?? "",
                                       style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplayMedium,
+                                        fontFamily: AppFontFamily.sfProDisplayMedium,
                                         fontSize: 15,
                                         color: AppColors.service,
                                       ),
@@ -332,7 +332,7 @@ class BookingInformationScreen extends StatelessWidget {
                                   Text(
                                     "txtSubtotal".tr,
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
+                                      fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 15,
                                       color: AppColors.service,
                                     ),
@@ -341,7 +341,7 @@ class BookingInformationScreen extends StatelessWidget {
                                   Text(
                                     "$currency ${logic.getBookingInformationCategory?.booking?.withoutTax?.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplayBold,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                       fontSize: 15,
                                       color: AppColors.primaryAppColor,
                                     ),
@@ -358,7 +358,7 @@ class BookingInformationScreen extends StatelessWidget {
                                   Text(
                                     "txtOtherExpenses".tr,
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
+                                      fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 15,
                                       color: AppColors.service,
                                     ),
@@ -367,7 +367,7 @@ class BookingInformationScreen extends StatelessWidget {
                                   Text(
                                     "$currency ${expenses.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplayBold,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                       fontSize: 15,
                                       color: AppColors.primaryAppColor,
                                     ),
@@ -390,7 +390,7 @@ class BookingInformationScreen extends StatelessWidget {
                                   Text(
                                     "txtNetEarning".tr,
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
+                                      fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 15,
                                       color: AppColors.service,
                                     ),
@@ -399,7 +399,7 @@ class BookingInformationScreen extends StatelessWidget {
                                   Text(
                                     "$currency ${logic.getBookingInformationCategory?.booking?.expertEarning?.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplayBold,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                       fontSize: 15,
                                       color: AppColors.primaryAppColor,
                                     ),
@@ -416,7 +416,7 @@ class BookingInformationScreen extends StatelessWidget {
                           "txtSalonDetails".tr,
                           style: TextStyle(
                             fontSize: 17,
-                            fontFamily: FontFamily.sfProDisplayBold,
+                            fontFamily: AppFontFamily.sfProDisplayBold,
                             color: AppColors.primaryTextColor,
                           ),
                         ).paddingOnly(left: 12, top: 5),
@@ -441,7 +441,7 @@ class BookingInformationScreen extends StatelessWidget {
                                   logic.getBookingInformationCategory?.booking?.salonId?.name ?? "",
                                   style: TextStyle(
                                     color: AppColors.primaryTextColor,
-                                    fontFamily: FontFamily.sfProDisplayBold,
+                                    fontFamily: AppFontFamily.sfProDisplayBold,
                                     fontSize: 16.5,
                                   ),
                                 ),
@@ -460,7 +460,7 @@ class BookingInformationScreen extends StatelessWidget {
                                     "${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.addressLine1}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.landMark}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.city}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.state}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.country}",
                                     style: TextStyle(
                                       color: AppColors.locationText,
-                                      fontFamily: FontFamily.sfProDisplay,
+                                      fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -494,7 +494,7 @@ class BookingInformationScreen extends StatelessWidget {
                                             "txtDirection".tr,
                                             style: TextStyle(
                                               color: AppColors.whiteColor,
-                                              fontFamily: FontFamily.sfProDisplayBold,
+                                              fontFamily: AppFontFamily.sfProDisplayBold,
                                               fontSize: 16.5,
                                             ),
                                           ),
@@ -530,7 +530,7 @@ class BookingInformationScreen extends StatelessWidget {
                                                 "txtCall".tr,
                                                 style: TextStyle(
                                                   color: AppColors.whiteColor,
-                                                  fontFamily: FontFamily.sfProDisplayBold,
+                                                  fontFamily: AppFontFamily.sfProDisplayBold,
                                                   fontSize: 16.5,
                                                 ),
                                               ),
@@ -553,7 +553,7 @@ class BookingInformationScreen extends StatelessWidget {
                                 "txtReasonCancel".tr,
                                 style: TextStyle(
                                   fontSize: 17,
-                                  fontFamily: FontFamily.sfProDisplayBold,
+                                  fontFamily: AppFontFamily.sfProDisplayBold,
                                   color: AppColors.primaryTextColor,
                                 ),
                               ).paddingOnly(left: 12),
@@ -575,7 +575,7 @@ class BookingInformationScreen extends StatelessWidget {
                                 logic.getBookingInformationCategory?.booking?.cancel?.reason ?? "",
                                 style: TextStyle(
                                   fontSize: 15,
-                                  fontFamily: FontFamily.sfProDisplayMedium,
+                                  fontFamily: AppFontFamily.sfProDisplayMedium,
                                   color: AppColors.service,
                                 ),
                               ),
@@ -585,10 +585,10 @@ class BookingInformationScreen extends StatelessWidget {
                           ? Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                "*${"CancelledBy"} ${logic.getBookingInformationCategory?.booking?.cancel?.person}",
+                                "*${"txtCancelledBy".tr} ${logic.getBookingInformationCategory?.booking?.cancel?.person}",
                                 style: TextStyle(
                                   fontSize: 15,
-                                  fontFamily: FontFamily.sfProDisplayMedium,
+                                  fontFamily: AppFontFamily.sfProDisplayMedium,
                                   color: AppColors.redColor,
                                 ),
                               ).paddingOnly(left: 14, top: 4, bottom: 15),

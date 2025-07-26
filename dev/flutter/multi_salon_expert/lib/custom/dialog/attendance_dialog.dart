@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/ui/revenue_screen/controller/revenue_screen_controller.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
+import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class AttendanceDialog extends StatelessWidget {
@@ -42,7 +42,7 @@ class AttendanceDialog extends StatelessWidget {
                   style: TextStyle(
                     color: AppColors.whiteColor,
                     fontSize: 18,
-                    fontFamily: FontFamily.sfProDisplayBold,
+                    fontFamily: AppFontFamily.sfProDisplayBold,
                   ),
                 ),
               ),
@@ -58,7 +58,7 @@ class AttendanceDialog extends StatelessWidget {
               style: TextStyle(
                 color: AppColors.title,
                 fontSize: 18,
-                fontFamily: FontFamily.sfProDisplayMedium,
+                fontFamily: AppFontFamily.sfProDisplayMedium,
               ),
             ),
             const Spacer(),
@@ -73,7 +73,7 @@ class AttendanceDialog extends StatelessWidget {
                       buttonColor: AppColors.transparent,
                       buttonText: "txtNo".tr,
                       textColor: AppColors.primaryAppColor,
-                      fontFamily: FontFamily.sfProDisplay,
+                      fontFamily: AppFontFamily.sfProDisplay,
                       borderColor: AppColors.primaryAppColor,
                       borderWidth: 1,
                       fontSize: 16.5,
@@ -101,7 +101,7 @@ class AttendanceDialog extends StatelessWidget {
                       buttonColor: AppColors.primaryAppColor,
                       buttonText: "txtYes".tr,
                       textColor: AppColors.whiteColor,
-                      fontFamily: FontFamily.sfProDisplay,
+                      fontFamily: AppFontFamily.sfProDisplay,
                       fontSize: 16.5,
                       onTap: () async {
                         await logic.onExpertAttendanceApiCall(

@@ -1,8 +1,9 @@
 // ignore_for_file: must_be_immutable
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class ProgressDialog extends StatelessWidget {
   final Widget? child;
@@ -12,15 +13,15 @@ class ProgressDialog extends StatelessWidget {
   final Animation<Color>? valueColor;
   bool? isCupertinoCircular = false;
 
-  ProgressDialog(
-      {Key? key,
-      @required this.child,
-      @required this.inAsyncCall,
-      this.opacity = 0.5,
-      this.color = Colors.black,
-      this.valueColor,
-      this.isCupertinoCircular})
-      : super(key: key);
+  ProgressDialog({
+    super.key,
+    @required this.child,
+    @required this.inAsyncCall,
+    this.opacity = 0.5,
+    this.color = Colors.black,
+    this.valueColor,
+    this.isCupertinoCircular,
+  });
 
   @override
   Widget build(BuildContext context) {

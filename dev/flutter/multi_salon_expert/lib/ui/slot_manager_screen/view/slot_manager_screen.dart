@@ -14,11 +14,10 @@ import 'package:intl/intl.dart';
 import 'package:salon_2/ui/bottom_bar/controller/bottom_bar_controller.dart';
 import 'package:salon_2/ui/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/slot_manager_screen/controller/slot_manager_controller.dart';
-import 'package:salon_2/utils/api.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -37,56 +36,40 @@ class SlotManagerScreen extends StatelessWidget {
     log("Is first click :: ${slotManagerController.isFirstClick}");
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
         Get.find<BottomBarController>().onClick(0);
-        return false;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(100),
-            child: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: AppColors.transparent,
-              flexibleSpace: Container(
-                height: 90 + statusBarHeight,
-                width: double.infinity,
-                color: AppColors.primaryAppColor,
-                padding: EdgeInsets.only(top: statusBarHeight),
-                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(100),
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: AppColors.transparent,
+            flexibleSpace: Container(
+              height: 90 + statusBarHeight,
+              width: double.infinity,
+              color: AppColors.primaryAppColor,
+              padding: EdgeInsets.only(top: statusBarHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GetBuilder<LoginScreenController>(
-                        id: Constant.idProgressView,
-                        builder: (logic) {
-                          return Container(
-                            margin: const EdgeInsets.only(left: 15, right: 10),
-                            height: 55,
-                            width: 55,
-                            decoration: BoxDecoration(
-                              border: Border.all(width: 0.8, color: AppColors.whiteColor),
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(2),
-                            child: CircleAvatar(
-                              radius: 35,
-                              backgroundImage: NetworkImage(
-                                Constant.storage.read("hostImage") ??
-                                    "${ApiConstant.BASE_URL}static/media/male.459a8699b07b4b9bf3d6.png",
-                              ),
-                            ),
-                          );
-                        },
-                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "${"txtHello".tr}, ${Constant.storage.read<String>('fName').toString()} 👋",
+                            "${"txtHello".tr}, ${Constant.storage.read<String>('fName').toString()}",
                             style: TextStyle(
-                              fontFamily: FontFamily.sfProDisplayBold,
-                              fontSize: 18,
+                              fontFamily: AppFontFamily.heeBo800,
+                              fontSize: 23,
                               color: AppColors.whiteColor,
                             ),
                           ),
@@ -95,334 +78,355 @@ class SlotManagerScreen extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(
-                              fontFamily: FontFamily.sfProDisplayRegular,
+                              fontFamily: AppFontFamily.heeBo400,
                               fontSize: 15,
                               color: AppColors.whiteColor,
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
-                  ).paddingOnly(bottom: 13)
-                ]),
-              ),
+                  ).paddingOnly(bottom: 8)
+                ],
+              ).paddingOnly(left: 18, right: 18),
             ),
           ),
-          backgroundColor: AppColors.backGround,
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: GetBuilder<SlotManagerController>(
-            id: Constant.idUpdateSlots0,
-            builder: (logic) {
-              return GestureDetector(
-                onTap: () {
-                  logic.onClickUploadSlot(
-                      selectSlots: logic.slotsString.toString(),
-                      selectDate: logic.formattedDate.toString(),
-                      expertId: Constant.storage.read<String>("expertId").toString());
-                },
-                child: logic.selectedSlotsList.isEmpty
-                    ? const SizedBox()
-                    : BlurryContainer(
-                        height: 68,
-                        width: Get.width,
-                        blur: 2,
-                        elevation: 0,
-                        color: Colors.white38,
-                        child: Center(
-                          child: Container(
-                            height: 51,
-                            width: 350,
-                            decoration: BoxDecoration(
-                              color: logic.currentIndex == true ? AppColors.cancelButton : AppColors.primaryAppColor,
-                              borderRadius: BorderRadius.circular(45),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "txtMakeBusy".tr,
-                                style: TextStyle(
-                                  fontFamily: FontFamily.sfProDisplay,
-                                  fontSize: 17,
-                                  color: AppColors.whiteColor,
-                                ),
+        ),
+        backgroundColor: AppColors.whiteColor,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: GetBuilder<SlotManagerController>(
+          id: Constant.idUpdateSlots0,
+          builder: (logic) {
+            return GestureDetector(
+              onTap: () {
+                logic.onClickUploadSlot(
+                    selectSlots: logic.slotsString.toString(),
+                    selectDate: logic.formattedDate.toString(),
+                    expertId: Constant.storage.read<String>("expertId").toString());
+              },
+              child: logic.selectedSlotsList.isEmpty
+                  ? const SizedBox()
+                  : BlurryContainer(
+                      height: 68,
+                      width: Get.width,
+                      blur: 2,
+                      elevation: 0,
+                      color: Colors.white38,
+                      child: Center(
+                        child: Container(
+                          height: 51,
+                          width: 350,
+                          decoration: BoxDecoration(
+                            color: logic.currentIndex == true ? AppColors.cancelButton : AppColors.primaryAppColor,
+                            borderRadius: BorderRadius.circular(45),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "txtMakeBusy".tr,
+                              style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplay,
+                                fontSize: 17,
+                                color: AppColors.whiteColor,
                               ),
                             ),
                           ),
                         ),
                       ),
-              );
-            },
-          ),
-          body: GetBuilder<SlotManagerController>(
-            id: Constant.idUpdateSlots0,
-            builder: (logic) {
-              return NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    SliverList(
-                      delegate: SliverChildListDelegate.fixed(
-                        [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "txtSlotManagement".tr,
-                                style: TextStyle(
-                                  fontFamily: FontFamily.sfProDisplayBold,
-                                  color: AppColors.primaryTextColor,
-                                  fontSize: 20,
-                                ),
-                              ).paddingOnly(left: 13),
-                              Container(
-                                height: 150,
-                                width: Get.width,
-                                margin: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: AppColors.whiteColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(width: 1, color: AppColors.grey.withOpacity(0.1)),
-                                ),
-                                child: EasyDateTimeLine(
-                                  initialDate: DateTime.now(),
-                                  disabledDates: logic.getDisabledDates(),
-                                  onDateChange: (selectedDate) async {
-                                    logic.comparedList.clear();
-                                    logic.formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-                                    log("Selected Date :: ${logic.formattedDate}");
-                                    log("salon Id :: ${Constant.storage.read<String>("salonId").toString()}");
-                                    logic.selectedSlotsList.clear();
-                                    logic.currentIndex = false;
-
-                                    await logic.onGetBookingApiCall(
-                                      selectedDate: logic.formattedDate.toString(),
-                                      expertId: Constant.storage.read<String>("expertId").toString(),
-                                      salonId: Constant.storage.read<String>("salonId").toString(),
-                                    );
-                                    logic.selectedAndBookSlot();
-                                    logic.checkSlot();
-                                    logic.onGetSlotsList();
-                                  },
-                                  headerProps: EasyHeaderProps(
-                                    monthPickerType: MonthPickerType.switcher,
-                                    showMonthPicker: true,
-                                    selectedDateFormat: SelectedDateFormat.fullDateMonthAsStrDY,
-                                    monthStyle: TextStyle(
-                                      color: AppColors.primaryTextColor,
-                                      fontFamily: FontFamily.sfProDisplay,
-                                    ),
-                                    selectedDateStyle: TextStyle(
-                                      color: AppColors.darkGrey3,
-                                      fontFamily: FontFamily.sfProDisplayMedium,
-                                    ),
-                                  ),
-                                  dayProps: EasyDayProps(
-                                    height: 80,
-                                    width: 62,
-                                    borderColor: Colors.transparent,
-                                    todayHighlightColor: Colors.transparent,
-                                    dayStructure: DayStructure.dayStrDayNum,
-                                    todayStyle: DayStyle(
-                                      dayNumStyle: TextStyle(
-                                        color: AppColors.dateUnSelect,
-                                        fontFamily: FontFamily.sfProDisplayMedium,
-                                      ),
-                                      dayStrStyle: TextStyle(
-                                        color: AppColors.dateUnSelect,
-                                        fontFamily: FontFamily.sfProDisplayMedium,
-                                      ),
-                                    ),
-                                    activeDayStyle: DayStyle(
-                                      dayNumStyle: TextStyle(
-                                        color: AppColors.primaryTextColor,
-                                        fontFamily: FontFamily.sfProDisplayBold,
-                                      ),
-                                      dayStrStyle: TextStyle(
-                                        color: AppColors.primaryTextColor,
-                                        fontFamily: FontFamily.sfProDisplayBold,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(8),
-                                        ),
-                                        color: AppColors.dateSelect,
-                                      ),
-                                    ),
-                                    inactiveDayStyle: DayStyle(
-                                      dayNumStyle: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplayMedium,
-                                        color: AppColors.dateUnSelect,
-                                      ),
-                                      dayStrStyle: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplayMedium,
-                                        color: AppColors.dateUnSelect,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ).paddingOnly(bottom: 10),
-                              logic.isSlotTimePassed == true
-                                  ? const SizedBox.shrink()
-                                  : Text(
-                                      "txtNotAvailability".tr,
-                                      style: TextStyle(
-                                        fontFamily: FontFamily.sfProDisplayBold,
-                                        color: AppColors.primaryTextColor,
-                                        fontSize: 16,
-                                      ),
-                                    ).paddingOnly(left: 15),
-                              logic.isSlotTimePassed == true
-                                  ? const SizedBox.shrink()
-                                  : GetBuilder<SlotManagerController>(
-                                      id: Constant.idFullDayNotAvailable,
-                                      builder: (logic) {
-                                        return GestureDetector(
-                                          onTap: () {
-                                            if (logic.comparedList.length != logic.getBookingModel?.timeSlots?.length) {
-                                              logic.onClickFullDayNot();
-                                            }
-                                          },
-                                          child: Container(
-                                            color: Colors.transparent,
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  height: 20,
-                                                  width: 20,
-                                                  padding: const EdgeInsets.all(2),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(color: AppColors.primaryAppColor, width: 1),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: logic.currentIndex
-                                                      ? Image.asset(
-                                                          AppAsset.icRound,
-                                                          height: 20,
-                                                          width: 20,
-                                                        )
-                                                      : const SizedBox(),
-                                                ).paddingOnly(right: 6),
-                                                Text(
-                                                  "txtFullDayNotAvailable".tr,
-                                                  style: TextStyle(
-                                                    color: AppColors.blackColor,
-                                                    fontFamily: FontFamily.sfProDisplayMedium,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              ],
-                                            ).paddingOnly(left: 15, top: 12, bottom: 10),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                            ],
-                          ),
-                        ],
-                      ),
                     ),
-                  ];
-                },
-                body: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "txtAvailableSlots".tr,
-                      style: TextStyle(
-                        fontFamily: FontFamily.sfProDisplayBold,
-                        color: AppColors.primaryTextColor,
-                        fontSize: 16,
-                      ),
-                    ).paddingOnly(left: 15),
-                    Expanded(
-                      child: Container(
-                        height: Get.height,
-                        width: Get.width,
-                        margin: const EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 10),
-                        padding: const EdgeInsets.only(top: 15),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: AppColors.whiteColor,
-                          border: Border.all(
-                            width: 1,
-                            color: AppColors.grey.withOpacity(0.1),
-                          ),
-                        ),
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    height: 18,
-                                    width: 28,
-                                    margin: const EdgeInsets.only(right: 5),
+            );
+          },
+        ),
+        body: GetBuilder<SlotManagerController>(
+          id: Constant.idUpdateSlots0,
+          builder: (logic) {
+            return NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverList(
+                    delegate: SliverChildListDelegate.fixed(
+                      [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "txtSlotManagement".tr,
+                              style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplayBold,
+                                color: AppColors.primaryTextColor,
+                                fontSize: 20,
+                              ),
+                            ).paddingOnly(left: 13),
+                            Container(
+                              height: 150,
+                              width: Get.width,
+                              margin: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppColors.whiteColor,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(width: 1, color: AppColors.grey.withOpacity(0.1)),
+                              ),
+                              child: EasyDateTimeLine(
+                                initialDate: DateTime.now(),
+                                disabledDates: logic.getDisabledDates(),
+                                onDateChange: (selectedDate) async {
+                                  logic.comparedList.clear();
+                                  logic.formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+                                  log("Selected Date :: ${logic.formattedDate}");
+                                  log("salon Id :: ${Constant.storage.read<String>("salonId").toString()}");
+                                  logic.selectedSlotsList.clear();
+                                  logic.currentIndex = false;
+
+                                  await logic.onGetBookingApiCall(
+                                    selectedDate: logic.formattedDate.toString(),
+                                    expertId: Constant.storage.read<String>("expertId").toString(),
+                                    salonId: Constant.storage.read<String>("salonId").toString(),
+                                  );
+                                  logic.selectedAndBookSlot();
+                                  logic.checkSlot();
+                                  logic.onGetSlotsList();
+                                },
+                                headerProps: EasyHeaderProps(
+                                  monthPickerType: MonthPickerType.switcher,
+                                  showMonthPicker: true,
+                                  selectedDateFormat: SelectedDateFormat.fullDateMonthAsStrDY,
+                                  monthStyle: TextStyle(
+                                    color: AppColors.primaryTextColor,
+                                    fontFamily: AppFontFamily.sfProDisplay,
+                                  ),
+                                  selectedDateStyle: TextStyle(
+                                    color: AppColors.darkGrey3,
+                                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                                  ),
+                                ),
+                                dayProps: EasyDayProps(
+                                  height: 80,
+                                  width: 62,
+                                  borderColor: Colors.transparent,
+                                  todayHighlightColor: Colors.transparent,
+                                  dayStructure: DayStructure.dayStrDayNum,
+                                  todayStyle: DayStyle(
+                                    dayNumStyle: TextStyle(
+                                      color: AppColors.dateUnSelect,
+                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                    ),
+                                    dayStrStyle: TextStyle(
+                                      color: AppColors.dateUnSelect,
+                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                    ),
+                                  ),
+                                  activeDayStyle: DayStyle(
+                                    dayNumStyle: TextStyle(
+                                      color: AppColors.primaryTextColor,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                    ),
+                                    dayStrStyle: TextStyle(
+                                      color: AppColors.primaryTextColor,
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.redButton,
-                                      borderRadius: BorderRadius.circular(5),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(8),
+                                      ),
+                                      color: AppColors.dateSelect,
                                     ),
                                   ),
-                                  Text(
-                                    "txtNotAvailable".tr,
-                                    style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
-                                      color: AppColors.blackColor,
-                                      fontSize: 14,
+                                  inactiveDayStyle: DayStyle(
+                                    dayNumStyle: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                      color: AppColors.dateUnSelect,
+                                    ),
+                                    dayStrStyle: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                      color: AppColors.dateUnSelect,
                                     ),
                                   ),
-                                  Container(
-                                    height: 18,
-                                    width: 28,
-                                    margin: const EdgeInsets.only(right: 5, left: 10),
-                                    decoration:
-                                        BoxDecoration(color: AppColors.greenButton, borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                  Text(
-                                    "txtAvailable".tr,
-                                    style: TextStyle(
-                                      fontFamily: FontFamily.sfProDisplay,
-                                      color: AppColors.blackColor,
-                                      fontSize: 14,
+                                ),
+                              ),
+                            ).paddingOnly(bottom: 10),
+                            logic.isSlotTimePassed == true
+                                ? const SizedBox.shrink()
+                                : Container(
+                                    width: Get.width,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.holidayBg,
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    padding: const EdgeInsets.all(13),
+                                    margin: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "txtHolidayMode".tr,
+                                          style: TextStyle(
+                                            fontFamily: AppFontFamily.heeBo700,
+                                            color: AppColors.redColor,
+                                            fontSize: 17,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Image.asset(AppAsset.icHoliday, height: 22).paddingOnly(right: 8),
+                                            SizedBox(
+                                              width: Get.width * 0.62,
+                                              child: Text(
+                                                "desNotAvailableWork".tr,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontFamily: AppFontFamily.heeBo600,
+                                                  color: AppColors.primaryAppColor,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            GetBuilder<SlotManagerController>(
+                                              id: Constant.idSwitchOn,
+                                              builder: (logic) {
+                                                return SizedBox(
+                                                  height: 30,
+                                                  child: Switch(
+                                                    value: logic.isSwitchOn,
+                                                    activeColor: AppColors.greenColor,
+                                                    activeTrackColor: AppColors.whiteColor,
+                                                    inactiveThumbColor: AppColors.redColor,
+                                                    inactiveTrackColor: AppColors.whiteColor,
+                                                    trackOutlineColor: WidgetStatePropertyAll(AppColors.grey.withOpacity(0.15)),
+                                                    trackColor: WidgetStatePropertyAll(AppColors.switchBox),
+                                                    onChanged: (value) {
+                                                      if (logic.comparedList.length != logic.getBookingModel?.timeSlots?.length) {
+                                                        logic.onSwitch(value);
+                                                      }
+                                                    },
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ).paddingOnly(right: 15),
-                              logic.isLoading.value
-                                  ? Shimmers.slotManagementShimmer()
-                                  : logic.getBookingModel?.status == true
-                                      ? logic.getBookingModel?.isOpen == false
-                                          ? Center(
-                                              child: SizedBox(
-                                                height: 220,
-                                                width: 220,
-                                                child: Image.asset(AppAsset.imgSalonClosed),
-                                              ).paddingOnly(top: 30),
-                                            )
-                                          : Column(children: [
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ];
+              },
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "txtAvailableSlots".tr,
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      color: AppColors.primaryTextColor,
+                      fontSize: 16,
+                    ),
+                  ).paddingOnly(left: 15),
+                  Expanded(
+                    child: Container(
+                      height: Get.height,
+                      width: Get.width,
+                      margin: const EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 10),
+                      padding: const EdgeInsets.only(top: 15),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: AppColors.whiteColor,
+                        border: Border.all(
+                          width: 1,
+                          color: AppColors.grey.withOpacity(0.1),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Container(
+                                  height: 18,
+                                  width: 28,
+                                  margin: const EdgeInsets.only(right: 5),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.redButton,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                Text(
+                                  "txtNotAvailable".tr,
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.sfProDisplay,
+                                    color: AppColors.blackColor,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Container(
+                                  height: 18,
+                                  width: 28,
+                                  margin: const EdgeInsets.only(right: 5, left: 10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.greenButton,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                Text(
+                                  "txtAvailable".tr,
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.sfProDisplay,
+                                    color: AppColors.blackColor,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ).paddingOnly(right: 15),
+                            logic.isLoading.value
+                                ? Shimmers.slotManagementShimmer()
+                                : logic.getBookingModel?.status == true
+                                    ? logic.getBookingModel?.isOpen == false
+                                        ? Center(
+                                            child: SizedBox(
+                                              height: 220,
+                                              width: 220,
+                                              child: Image.asset(AppAsset.imgSalonClosed),
+                                            ).paddingOnly(top: 30),
+                                          )
+                                        : Column(
+                                            children: [
                                               !(logic.hasMorningSlots)
                                                   ? const SizedBox()
-                                                  : buildSlotCategory("txtMorning".tr, slotManagerController.morningSlots,
-                                                      logic.formattedDate.toString()),
+                                                  : buildSlotCategory(
+                                                      "txtMorning".tr,
+                                                      slotManagerController.morningSlots,
+                                                      logic.formattedDate.toString(),
+                                                    ),
                                               logic.getBookingModel?.allSlots?.evening?.isEmpty == true
                                                   ? const SizedBox()
                                                   : !(logic.hasAfternoonSlots)
                                                       ? const SizedBox()
-                                                      : buildSlotCategory("txtAfternoon".tr, slotManagerController.afternoonSlots,
-                                                          logic.formattedDate.toString()),
-                                            ])
-                                      : Utils.showToast(Get.context!, logic.getBookingModel?.message ?? ""),
-                              SizedBox(height: Get.height * 0.08)
-                            ],
-                          ),
+                                                      : buildSlotCategory(
+                                                          "txtAfternoon".tr,
+                                                          slotManagerController.afternoonSlots,
+                                                          logic.formattedDate.toString(),
+                                                        ),
+                                            ],
+                                          )
+                                    : Utils.showToast(Get.context!, logic.getBookingModel?.message ?? ""),
+                            SizedBox(height: Get.height * 0.08)
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
-          )),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -478,7 +482,7 @@ class SlotManagerScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             color: AppColors.primaryTextColor,
-                            fontFamily: FontFamily.sfProDisplayBold,
+                            fontFamily: AppFontFamily.sfProDisplayBold,
                           ),
                         ),
                       ),
@@ -514,7 +518,7 @@ class SlotManagerScreen extends StatelessWidget {
 
                             return AnimationConfiguration.staggeredGrid(
                               position: index,
-                              duration: const Duration(milliseconds: 800),
+                              duration: const Duration(milliseconds: 500),
                               columnCount: slots.length,
                               child: ScaleAnimation(
                                 child: FadeInAnimation(
@@ -572,8 +576,8 @@ class SlotManagerScreen extends StatelessWidget {
                                             slots[index],
                                             style: TextStyle(
                                               fontFamily: isSlotBooked || isSlotTimePassed
-                                                  ? FontFamily.sfProDisplayRegular
-                                                  : FontFamily.sfProDisplay,
+                                                  ? AppFontFamily.sfProDisplayRegular
+                                                  : AppFontFamily.sfProDisplay,
                                               fontSize: 14,
                                               decorationColor: AppColors.slotText,
                                               decoration: isSlotBooked || isSlotTimePassed

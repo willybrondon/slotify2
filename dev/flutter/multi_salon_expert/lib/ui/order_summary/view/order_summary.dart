@@ -12,20 +12,20 @@ import 'package:salon_2/ui/order_summary/controller/order_summary_controller.dar
 import 'package:salon_2/ui/order_summary/widget/cancel_booking.dart';
 import 'package:salon_2/ui/order_summary/widget/complete_booking.dart';
 import 'package:salon_2/ui/order_summary/widget/pending_booking.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 
 class OrderSummary extends StatelessWidget {
   OrderSummary({super.key});
 
   var tabs = [
-    Tab(text: "   ${"txtToday".tr}   "),
-    Tab(text: "   ${"txtYesterday".tr}   "),
-    Tab(text: "   ${"txtThisWeek".tr}   "),
-    Tab(text: "   ${"txtThisMonth".tr}   "),
+    Tab(text: "txtToday".tr),
+    Tab(text: "txtYesterday".tr),
+    Tab(text: "txtThisWeek".tr),
+    Tab(text: "txtThisMonth".tr),
   ];
 
   @override
@@ -33,7 +33,7 @@ class OrderSummary extends StatelessWidget {
     String currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
 
     return Scaffold(
-      backgroundColor: AppColors.backGround,
+      backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         flexibleSpace: AppBarCustom(
@@ -60,7 +60,11 @@ class OrderSummary extends StatelessWidget {
                 children: [
                   Text(
                     "txtOrderDetails".tr,
-                    style: TextStyle(fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 22),
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.heeBo800,
+                      color: AppColors.primaryTextColor,
+                      fontSize: 22,
+                    ),
                   ).paddingOnly(bottom: 6),
                   GestureDetector(
                     onTap: () => logic.onClickMonth(),
@@ -72,7 +76,7 @@ class OrderSummary extends StatelessWidget {
                         child: Text(
                           logic.selectedDate.toString(),
                           style: TextStyle(
-                            fontFamily: FontFamily.sfProDisplay,
+                            fontFamily: AppFontFamily.sfProDisplay,
                             color: AppColors.primaryAppColor,
                             fontSize: 15,
                           ),
@@ -95,18 +99,21 @@ class OrderSummary extends StatelessWidget {
                       controller: logic.tabController,
                       tabs: tabs,
                       labelStyle: const TextStyle(
-                        fontSize: 15,
-                        fontFamily: FontFamily.sfProDisplayMedium,
+                        fontSize: 16,
+                        fontFamily: AppFontFamily.heeBo500,
                       ),
                       physics: const BouncingScrollPhysics(),
                       indicatorPadding: const EdgeInsets.all(4),
-                      indicator: BoxDecoration(borderRadius: BorderRadius.circular(45), color: AppColors.primaryAppColor),
+                      indicator: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: AppColors.primaryAppColor,
+                      ),
                       indicatorSize: TabBarIndicatorSize.tab,
                       labelColor: AppColors.whiteColor,
                       isScrollable: true,
                       unselectedLabelColor: AppColors.service,
                       dividerColor: Colors.transparent,
-                      overlayColor: MaterialStatePropertyAll(AppColors.transparent),
+                      overlayColor: WidgetStatePropertyAll(AppColors.transparent),
                     )
                   : const OrderSummaryTabView();
             },
@@ -155,20 +162,20 @@ class OrderSummaryTabView extends StatelessWidget {
                       }
                     },
                     child: Container(
-                      margin: const EdgeInsets.only(top: 15, right: 5, bottom: 10),
+                      margin: const EdgeInsets.only(top: 5, right: 5, bottom: 10),
                       alignment: Alignment.center,
                       height: 30,
                       child: Row(
                         children: [
                           Text(
                             "txtPendingBooking".tr,
-                            style: TextStyle(fontFamily: FontFamily.sfProDisplayMedium, color: AppColors.title, fontSize: 15),
+                            style: TextStyle(fontFamily: AppFontFamily.sfProDisplayMedium, color: AppColors.title, fontSize: 15),
                           ),
                           const Spacer(),
                           Text(
                             logic.getOrderSummaryData?.bookingStats?.pendingBooking.toString() ?? "",
                             style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
+                                fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
                           ).paddingOnly(right: Get.width * 0.05),
                           Image.asset(
                             AppAsset.icArrowRight,
@@ -179,10 +186,7 @@ class OrderSummaryTabView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                    child: Divider(color: AppColors.greyColor.withOpacity(0.2)),
-                  ),
+                  Divider(color: AppColors.greyColor.withOpacity(0.1)),
                   InkWell(
                     onTap: () {
                       if (logic.selectedDate == currentMonth) {
@@ -201,7 +205,7 @@ class OrderSummaryTabView extends StatelessWidget {
                           Text(
                             "txtCompleteBooking".tr,
                             style: TextStyle(
-                              fontFamily: FontFamily.sfProDisplayMedium,
+                              fontFamily: AppFontFamily.sfProDisplayMedium,
                               color: AppColors.title,
                               fontSize: 15,
                             ),
@@ -210,7 +214,7 @@ class OrderSummaryTabView extends StatelessWidget {
                           Text(
                             logic.getOrderSummaryData?.bookingStats?.completedBooking.toString() ?? "",
                             style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
+                                fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
                           ).paddingOnly(right: Get.width * 0.05),
                           Image.asset(
                             AppAsset.icArrowRight,
@@ -221,10 +225,7 @@ class OrderSummaryTabView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                    child: Divider(color: AppColors.greyColor.withOpacity(0.2)),
-                  ),
+                  Divider(color: AppColors.greyColor.withOpacity(0.1)),
                   InkWell(
                     onTap: () {
                       if (logic.selectedDate == currentMonth) {
@@ -243,7 +244,7 @@ class OrderSummaryTabView extends StatelessWidget {
                           Text(
                             "txtCancelBooking".tr,
                             style: TextStyle(
-                              fontFamily: FontFamily.sfProDisplayMedium,
+                              fontFamily: AppFontFamily.sfProDisplayMedium,
                               color: AppColors.title,
                               fontSize: 15,
                             ),
@@ -252,7 +253,7 @@ class OrderSummaryTabView extends StatelessWidget {
                           Text(
                             logic.getOrderSummaryData?.bookingStats?.cancelBooking.toString() ?? "",
                             style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
+                                fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
                           ).paddingOnly(right: Get.width * 0.05),
                           Image.asset(
                             AppAsset.icArrowRight,
@@ -263,12 +264,8 @@ class OrderSummaryTabView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                    child: Divider(color: AppColors.greyColor.withOpacity(0.2)),
-                  ),
                 ],
-              ).paddingOnly(top: 5, left: 15, right: 15);
+              ).paddingOnly(top: 10, right: 15);
       },
     );
   }

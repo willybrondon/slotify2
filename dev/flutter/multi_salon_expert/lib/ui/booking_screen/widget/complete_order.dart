@@ -11,10 +11,10 @@ import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/utils/app_button.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -53,7 +53,10 @@ class CompleteOrder extends StatelessWidget {
                           Text(
                             "txtNotCompletedOrder".tr,
                             style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayMedium, fontSize: 20, color: AppColors.primaryTextColor),
+                              fontFamily: AppFontFamily.sfProDisplayMedium,
+                              fontSize: 20,
+                              color: AppColors.primaryTextColor,
+                            ),
                           ),
                         ],
                       ),
@@ -87,7 +90,7 @@ class CompleteOrder extends StatelessWidget {
                                     child: SlideAnimation(
                                       child: FadeInAnimation(
                                         child: InkWell(
-                                          overlayColor: MaterialStatePropertyAll(AppColors.transparent),
+                                          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
                                           onTap: () {
                                             Get.toNamed(AppRoutes.bookingInformation, arguments: [logic.getComplete[index].id]);
                                           },
@@ -122,14 +125,14 @@ class CompleteOrder extends StatelessWidget {
                                                           bottomLeft: Radius.circular(15),
                                                           topRight: Radius.circular(12),
                                                         ),
-                                                        color: AppColors.tabUnSelect,
+                                                        color: AppColors.primaryAppColor,
                                                       ),
                                                       child: Text(
                                                         "#${logic.getComplete[index].bookingId}",
                                                         style: TextStyle(
                                                           fontSize: 12,
-                                                          fontFamily: FontFamily.sfProDisplay,
-                                                          color: AppColors.buttonText,
+                                                          fontFamily: AppFontFamily.heeBo700,
+                                                          color: AppColors.whiteColor,
                                                         ),
                                                       ),
                                                     ),
@@ -176,7 +179,7 @@ class CompleteOrder extends StatelessWidget {
                                                                     style: TextStyle(
                                                                       fontSize: 18,
                                                                       overflow: TextOverflow.ellipsis,
-                                                                      fontFamily: FontFamily.sfProDisplayBold,
+                                                                      fontFamily: AppFontFamily.sfProDisplayBold,
                                                                       color: AppColors.primaryTextColor,
                                                                     ),
                                                                   ),
@@ -185,24 +188,24 @@ class CompleteOrder extends StatelessWidget {
                                                                   logic.getComplete[index].category?.first.name ?? "",
                                                                   style: TextStyle(
                                                                     fontSize: 14,
-                                                                    fontFamily: FontFamily.sfProDisplayRegular,
+                                                                    fontFamily: AppFontFamily.sfProDisplayRegular,
                                                                     color: AppColors.service,
                                                                   ),
                                                                 ),
                                                                 Container(
                                                                   decoration: BoxDecoration(
                                                                     borderRadius: BorderRadius.circular(6),
-                                                                    color: AppColors.green,
+                                                                    color: AppColors.currencyBoxBg,
                                                                   ),
                                                                   child: Padding(
                                                                     padding:
-                                                                        const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                                                        const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                                                                     child: Text(
                                                                       '$currency ${logic.getComplete[index].expertEarning?.toStringAsFixed(2)}',
                                                                       style: TextStyle(
                                                                         fontSize: 16,
-                                                                        fontFamily: FontFamily.sfProDisplayBold,
-                                                                        color: AppColors.currency,
+                                                                        fontFamily: AppFontFamily.heeBo800,
+                                                                        color: AppColors.primaryAppColor,
                                                                       ),
                                                                     ),
                                                                   ),
@@ -233,7 +236,7 @@ class CompleteOrder extends StatelessWidget {
                                                                       "  ${logic.getComplete[index].user?.fname} ${logic.getComplete[index].user?.lname}",
                                                                       style: TextStyle(
                                                                         fontSize: 12,
-                                                                        fontFamily: FontFamily.sfProDisplayMedium,
+                                                                        fontFamily: AppFontFamily.sfProDisplayMedium,
                                                                         color: AppColors.service,
                                                                       ),
                                                                     )
@@ -244,56 +247,95 @@ class CompleteOrder extends StatelessWidget {
                                                           )
                                                         ],
                                                       ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                        child: Divider(
-                                                          color: AppColors.greyColor.withOpacity(0.15),
+                                                      Container(
+                                                        decoration: BoxDecoration(
+                                                          color: AppColors.bgTime,
+                                                          borderRadius: BorderRadius.circular(12),
                                                         ),
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
                                                         child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: [
-                                                            Row(
+                                                            Container(
+                                                              height: 40,
+                                                              width: 40,
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                color: AppColors.bgCircle,
+                                                              ),
+                                                              child: Image.asset(AppAsset.icBooking).paddingAll(10),
+                                                            ).paddingOnly(right: 12),
+                                                            Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
-                                                                Image.asset(AppAsset.icBooking, height: 20, width: 20),
-                                                                SizedBox(width: Get.width * 0.03),
                                                                 Text(
-                                                                  logic.getComplete[index].date ?? "",
+                                                                  logic.getComplete[index].date.toString(),
                                                                   style: TextStyle(
-                                                                    fontFamily: FontFamily.sfProDisplayMedium,
-                                                                    fontSize: 13,
-                                                                    color: AppColors.service,
+                                                                    fontFamily: AppFontFamily.heeBo700,
+                                                                    fontSize: 14,
+                                                                    color: AppColors.primaryTextColor,
                                                                   ),
                                                                 ),
+                                                                Text(
+                                                                  "Booking Date",
+                                                                  style: TextStyle(
+                                                                    fontFamily: AppFontFamily.heeBo500,
+                                                                    fontSize: 12,
+                                                                    color: AppColors.service,
+                                                                  ),
+                                                                )
                                                               ],
                                                             ),
-                                                            Row(
+                                                            const Spacer(),
+                                                            Container(
+                                                              height: 36,
+                                                              width: 2,
+                                                              color: AppColors.serviceBorder,
+                                                            ),
+                                                            const Spacer(),
+                                                            Container(
+                                                              height: 40,
+                                                              width: 40,
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                color: AppColors.bgCircle,
+                                                              ),
+                                                              child: Image.asset(
+                                                                AppAsset.icClock,
+                                                              ).paddingAll(10),
+                                                            ).paddingOnly(right: 12),
+                                                            Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
-                                                                Image.asset(AppAsset.icClock, height: 20, width: 20),
-                                                                SizedBox(width: Get.width * 0.03),
                                                                 Text(
-                                                                  logic.getComplete[index].time?.first ?? "",
+                                                                  logic.getComplete[index].time?[0] ?? "",
                                                                   style: TextStyle(
-                                                                    fontFamily: FontFamily.sfProDisplayMedium,
-                                                                    fontSize: 13,
-                                                                    color: AppColors.service,
+                                                                    fontFamily: AppFontFamily.heeBo700,
+                                                                    fontSize: 14,
+                                                                    color: AppColors.primaryTextColor,
                                                                   ),
                                                                 ),
+                                                                Text(
+                                                                  "Booking Timing",
+                                                                  style: TextStyle(
+                                                                    fontFamily: AppFontFamily.heeBo500,
+                                                                    fontSize: 12,
+                                                                    color: AppColors.service,
+                                                                  ),
+                                                                )
                                                               ],
-                                                            )
+                                                            ),
+                                                            const Spacer(),
                                                           ],
                                                         ),
-                                                      ),
+                                                      ).paddingOnly(top: 12),
                                                       Container(
-                                                        margin: const EdgeInsets.only(top: 20),
+                                                        margin: const EdgeInsets.only(top: 15),
                                                         child: AppButton(
-                                                          height: 43,
+                                                          height: 45,
                                                           width: Get.width,
                                                           buttonColor: AppColors.lightGreenColor,
                                                           buttonText: "txtOrderSuccessfully".tr,
-                                                          fontFamily: FontFamily.sfProDisplayBold,
+                                                          fontFamily: AppFontFamily.sfProDisplayBold,
                                                           fontSize: 15,
                                                           textColor: AppColors.greenColor,
                                                           icon: AppAsset.icOrderConfirm,

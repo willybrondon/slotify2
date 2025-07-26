@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/custom/profile_menu/profile_menu.dart';
 import 'package:salon_2/routes/app_routes.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
@@ -30,6 +30,12 @@ class SettingScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
+          CustomMenu(
+            leadingImage: AppAsset.icNotification,
+            title: "txtNotification".tr,
+            onTap: () {
+            },
+          ),
           CustomMenu(
             leadingImage: AppAsset.icLanguage,
             title: "txtLanguage".tr,

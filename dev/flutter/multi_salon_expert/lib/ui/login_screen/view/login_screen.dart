@@ -7,10 +7,10 @@ import 'package:salon_2/custom/dialog/progress_dialog.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/login_screen/controller/login_screen_controller.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -52,7 +52,7 @@ class LoginScreen extends StatelessWidget {
                               child: Text(
                                 "txtLogIn".tr,
                                 style: TextStyle(
-                                  fontFamily: FontFamily.sfProDisplayBold,
+                                  fontFamily: AppFontFamily.sfProDisplayBold,
                                   fontSize: 30,
                                   color: AppColors.whiteColor,
                                 ),
@@ -64,7 +64,7 @@ class LoginScreen extends StatelessWidget {
                             Text(
                               "txtEnterID".tr,
                               style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold,
+                                fontFamily: AppFontFamily.sfProDisplayBold,
                                 fontSize: 16,
                                 color: AppColors.whiteColor,
                               ),
@@ -80,7 +80,7 @@ class LoginScreen extends StatelessWidget {
                                 cursorColor: AppColors.primaryAppColor,
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontFamily: FontFamily.sfProDisplayBold,
+                                  fontFamily: AppFontFamily.sfProDisplayBold,
                                   color: AppColors.primaryTextColor,
                                 ),
                                 keyboardType: TextInputType.emailAddress,
@@ -91,7 +91,7 @@ class LoginScreen extends StatelessWidget {
                                   hintStyle: TextStyle(
                                     color: AppColors.greyColor,
                                     fontSize: 13.8,
-                                    fontFamily: FontFamily.sfProDisplayMedium,
+                                    fontFamily: AppFontFamily.sfProDisplayMedium,
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: AppColors.primaryAppColor),
@@ -111,7 +111,7 @@ class LoginScreen extends StatelessWidget {
                             Text(
                               "txtPassword".tr,
                               style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold,
+                                fontFamily: AppFontFamily.sfProDisplayBold,
                                 fontSize: 16,
                                 color: AppColors.whiteColor,
                               ),
@@ -127,7 +127,7 @@ class LoginScreen extends StatelessWidget {
                                 cursorColor: AppColors.primaryAppColor,
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontFamily: FontFamily.sfProDisplayBold,
+                                  fontFamily: AppFontFamily.sfProDisplayBold,
                                   color: AppColors.primaryTextColor,
                                 ),
                                 decoration: InputDecoration(
@@ -137,7 +137,7 @@ class LoginScreen extends StatelessWidget {
                                   hintStyle: TextStyle(
                                     color: AppColors.greyColor,
                                     fontSize: 13.8,
-                                    fontFamily: FontFamily.sfProDisplayMedium,
+                                    fontFamily: AppFontFamily.sfProDisplayMedium,
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: AppColors.primaryAppColor),
@@ -188,7 +188,7 @@ class LoginScreen extends StatelessWidget {
                                                 text: 'desTerms'.tr,
                                                 style: TextStyle(
                                                   color: AppColors.whiteColor,
-                                                  fontFamily: FontFamily.sfProDisplay,
+                                                  fontFamily: AppFontFamily.sfProDisplay,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 13,
                                                 ),
@@ -199,7 +199,7 @@ class LoginScreen extends StatelessWidget {
                                                       fontWeight: FontWeight.bold,
                                                       color: AppColors.whiteColor,
                                                       decoration: TextDecoration.underline,
-                                                      fontFamily: FontFamily.sfProDisplay,
+                                                      fontFamily: AppFontFamily.sfProDisplay,
                                                       fontSize: 13,
                                                     ),
                                                   ),
@@ -253,9 +253,9 @@ class LoginScreen extends StatelessWidget {
                                       currentFocus.focusedChild?.unfocus();
 
                                       await logic.onLoginApiCall(
-                                        email: "test@expert.com",
-                                        password: "123456",
-                                        fcmToken: fcmToken!,
+                                        email: "john.doe@gmail.com",
+                                        password: "john123",
+                                        fcmToken: fcmToken ?? "",
                                       );
 
                                       if (logic.loginCategory?.status == true) {
@@ -270,9 +270,13 @@ class LoginScreen extends StatelessWidget {
                                         log("Email Id :: ${Constant.storage.read("emailId")}");
                                         log("Password :: ${Constant.storage.read("password")}");
 
-                                        await logic.onGetExpertApiCall(expertId: Constant.storage.read<String>("expertId").toString());
+                                        await logic.onGetExpertApiCall(
+                                            expertId: Constant.storage.read<String>("expertId").toString());
 
                                         if (logic.getExpertCategory?.status == true) {
+                                          earning =
+                                              loginScreenController.getExpertCategory?.data?.earning?.toStringAsFixed(2);
+                                          Constant.storage.write('isDemoLogin', true);
                                           Constant.storage.write('fName', logic.loginCategory?.expert?.fname.toString());
                                           Constant.storage.write('lName', logic.loginCategory?.expert?.lname.toString());
                                           Constant.storage.write('uniqueID', logic.loginCategory?.expert?.uniqueId.toString());
@@ -280,23 +284,10 @@ class LoginScreen extends StatelessWidget {
                                           Constant.storage.write('paymentType', logic.loginCategory?.expert?.paymentType);
                                           Constant.storage.write("salonId", logic.getExpertCategory?.data?.salonId?.id);
 
-                                          Constant.storage.write("bankName", logic.getExpertCategory?.data?.bankDetails?.bankName.toString());
-                                          Constant.storage
-                                              .write("accountNumber", logic.getExpertCategory?.data?.bankDetails?.accountNumber.toString());
-                                          Constant.storage.write("IFSCCode", logic.getExpertCategory?.data?.bankDetails?.ifscCode.toString());
-                                          Constant.storage
-                                              .write("branchName", logic.getExpertCategory?.data?.bankDetails?.branchName.toString());
-                                          Constant.storage.write("upiId", logic.getExpertCategory?.data?.upiId.toString());
-
                                           log("First Name :: ${Constant.storage.read("fName")}");
                                           log("Last Name :: ${Constant.storage.read("lName")}");
                                           log("Payment Type :: ${Constant.storage.read("paymentType")}");
                                           log("Host Image :: ${Constant.storage.read("hostImage")}");
-                                          log("Bank Name :: ${Constant.storage.read<String>("bankName")}");
-                                          log("Account Number :: ${Constant.storage.read<String>("accountNumber")}");
-                                          log("IFSC Code :: ${Constant.storage.read<String>("IFSCCode")}");
-                                          log("Branch Name :: ${Constant.storage.read<String>("branchName")}");
-                                          log("UPI Id :: ${Constant.storage.read<String>("upiId")}");
 
                                           Get.offAndToNamed(AppRoutes.bottom);
                                         } else {
@@ -305,7 +296,6 @@ class LoginScreen extends StatelessWidget {
                                       } else {
                                         Utils.showToast(Get.context!, "${logic.loginCategory?.message}");
                                       }
-
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(top: 20),
@@ -318,7 +308,7 @@ class LoginScreen extends StatelessWidget {
                                         child: Text(
                                           "Demo Login",
                                           style: TextStyle(
-                                            fontFamily: FontFamily.sfProDisplay,
+                                            fontFamily: AppFontFamily.sfProDisplay,
                                             fontSize: 18,
                                             color: AppColors.whiteColor,
                                           ),
@@ -347,7 +337,7 @@ class LoginScreen extends StatelessWidget {
                                         child: Text(
                                           "txtLogIn".tr,
                                           style: TextStyle(
-                                            fontFamily: FontFamily.sfProDisplay,
+                                            fontFamily: AppFontFamily.sfProDisplay,
                                             fontSize: 18,
                                             color: AppColors.whiteColor,
                                           ),

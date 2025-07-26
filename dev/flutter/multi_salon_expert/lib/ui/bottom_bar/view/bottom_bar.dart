@@ -1,13 +1,10 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:salon_2/custom/bottom_bar/salomon_bottom_bar.dart';
 import 'package:salon_2/ui/bottom_bar/controller/bottom_bar_controller.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 class BottomBarScreen extends StatelessWidget {
   const BottomBarScreen({super.key});
@@ -15,30 +12,32 @@ class BottomBarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: GetBuilder<BottomBarController>(
-      id: Constant.idBottomBar,
-      builder: (logic) {
-        return Scaffold(
+      body: GetBuilder<BottomBarController>(
+        id: Constant.idBottomBar,
+        builder: (logic) {
+          return Scaffold(
             backgroundColor: AppColors.backGround,
             bottomNavigationBar: Container(
               height: 68,
-              decoration: BoxDecoration(boxShadow: [
-                BoxShadow(
-                  color: AppColors.blackColor.withOpacity(0.04),
-                  offset: const Offset(
-                    0.0,
-                    1.0,
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.blackColor.withOpacity(0.04),
+                    offset: const Offset(
+                      1.0,
+                      1.0,
+                    ),
+                    blurRadius: 3.0,
+                    spreadRadius: 2.0,
+                  ), //BoxShadow
+                  const BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 0.0,
+                    spreadRadius: 0.0,
                   ),
-                  blurRadius: 3.0,
-                  spreadRadius: 2.0,
-                ), //BoxShadow
-                const BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(0.0, 0.0),
-                  blurRadius: 0.0,
-                  spreadRadius: 0.0,
-                ),
-              ]),
+                ],
+              ),
               child: OverflowBox(
                 maxHeight: double.infinity,
                 maxWidth: double.infinity,
@@ -49,103 +48,60 @@ class BottomBarScreen extends StatelessWidget {
                   },
                   backgroundColor: AppColors.whiteColor,
                   curve: Curves.easeInOut,
+                  selectedColorOpacity: 1,
                   items: [
-                    SalomonBottomBarItem(
-                        icon: logic.selectIndex == 0
-                            ? Image.asset(
-                                AppAsset.icRevenueFilled,
-                                height: 25,
-                                width: 25,
-                              )
-                            : Image.asset(
-                                AppAsset.icRevenueOutline,
-                                height: 25,
-                                width: 25,
-                              ),
-                        title: Text("txtRevenue".tr,
-                            style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryAppColor, fontSize: 15)),
-                        selectedColor: AppColors.primaryAppColor,
-                        unselectedColor: AppColors.bottomIcon),
-                    SalomonBottomBarItem(
-                        icon: logic.selectIndex == 1
-                            ? Image.asset(
-                                AppAsset.icBookingFilled,
-                                height: 25,
-                                width: 25,
-                              )
-                            : Image.asset(
-                                AppAsset.icBookingOutline,
-                                height: 25,
-                                width: 25,
-                              ),
-                        title: Text("txtBooking".tr,
-                            style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryAppColor, fontSize: 15)),
-                        selectedColor: AppColors.primaryAppColor,
-                        unselectedColor: AppColors.bottomIcon),
-                    SalomonBottomBarItem(
-                        icon: logic.selectIndex == 2
-                            ? Image.asset(
-                                AppAsset.icSlotManageFilled,
-                                height: 23,
-                                width: 23,
-                              )
-                            : Image.asset(
-                                AppAsset.icSlotManageOutline,
-                                height: 23,
-                                width: 23,
-                              ),
-                        title: Text("txtSlotManage".tr,
-                            style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryAppColor, fontSize: 15)),
-                        selectedColor: AppColors.primaryAppColor,
-                        unselectedColor: AppColors.bottomIcon),
-                    SalomonBottomBarItem(
-                        icon: logic.selectIndex == 3
-                            ? GestureDetector(
-                                onTap: () {
-                                  logic.checkScreen = true;
-                                },
-                                child: Image.asset(
-                                  AppAsset.icOrderReportFilled,
-                                  height: 25,
-                                  width: 25,
-                                ),
-                              )
-                            : Image.asset(
-                                AppAsset.icOrderReportOutline,
-                                height: 25,
-                                width: 25,
-                              ),
-                        title: Text("txtOrderReport".tr,
-                            style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryAppColor, fontSize: 15)),
-                        selectedColor: AppColors.primaryAppColor,
-                        unselectedColor: AppColors.bottomIcon),
-                    SalomonBottomBarItem(
-                        icon: logic.selectIndex == 4
-                            ? Image.asset(
-                                AppAsset.icProfileFilled,
-                                height: 25,
-                                width: 25,
-                              )
-                            : Image.asset(
-                                AppAsset.icProfileOutline,
-                                height: 25,
-                                width: 25,
-                              ),
-                        title: Text("txtProfile".tr,
-                            style: TextStyle(
-                                fontFamily: FontFamily.sfProDisplayBold, color: AppColors.primaryAppColor, fontSize: 15)),
-                        selectedColor: AppColors.primaryAppColor,
-                        unselectedColor: AppColors.bottomIcon),
+                    bottomBarItemView(
+                      index: 0,
+                      selectIndex: logic.selectIndex,
+                      selectedImage: AppAsset.icRevenueFilled,
+                      unSelectedImage: AppAsset.icRevenueOutline,
+                    ),
+                    bottomBarItemView(
+                      index: 1,
+                      selectIndex: logic.selectIndex,
+                      selectedImage: AppAsset.icBookingFilled,
+                      unSelectedImage: AppAsset.icBookingOutline,
+                    ),
+                    bottomBarItemView(
+                      index: 2,
+                      selectIndex: logic.selectIndex,
+                      selectedImage: AppAsset.icSlotManageFilled,
+                      unSelectedImage: AppAsset.icSlotManageOutline,
+                    ),
+                    bottomBarItemView(
+                      index: 3,
+                      selectIndex: logic.selectIndex,
+                      selectedImage: AppAsset.icOrderReportFilled,
+                      unSelectedImage: AppAsset.icOrderReportOutline,
+                    ),
+                    bottomBarItemView(
+                      index: 4,
+                      selectIndex: logic.selectIndex,
+                      selectedImage: AppAsset.icProfileFilled,
+                      unSelectedImage: AppAsset.icProfileOutline,
+                    ),
                   ],
                 ),
               ),
             ),
-            body: logic.pages[logic.selectIndex]);
-      },
-    ));
+            body: logic.pages[logic.selectIndex],
+          );
+        },
+      ),
+    );
   }
+}
+
+SalomonBottomBarItem bottomBarItemView({
+  required final int index,
+  required final int selectIndex,
+  required final String selectedImage,
+  required final String unSelectedImage,
+}) {
+  return SalomonBottomBarItem(
+    icon: selectIndex == index
+        ? Image.asset(selectedImage, height: 25, width: 25)
+        : Image.asset(unSelectedImage, height: 25, width: 25),
+    selectedColor: AppColors.primaryAppColor,
+  );
 }

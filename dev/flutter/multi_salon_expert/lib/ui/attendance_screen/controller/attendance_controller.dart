@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:salon_2/utils/api.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/ui/attendance_screen/model/attendance_model.dart';
+import 'package:salon_2/utils/api_constant.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/utils/services/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
-
-import '../model/attendance_model.dart';
 
 class AttendanceController extends GetxController {
   String? selectedDate = DateFormat('yyyy-MM').format(DateTime.now());
@@ -21,8 +20,7 @@ class AttendanceController extends GetxController {
 
   @override
   void onInit() {
-    getAttendanceMonthWise(
-        expertId: Constant.storage.read<String>("expertId").toString(), month: selectedDate ?? '');
+    getAttendanceMonthWise(expertId: Constant.storage.read<String>("expertId").toString(), month: selectedDate ?? '');
     update([Constant.idAttendanceDetails, Constant.idProgressView]);
 
     super.onInit();
@@ -31,20 +29,30 @@ class AttendanceController extends GetxController {
   onClickMonth() {
     showMonthPicker(
       context: Get.context!,
-      backgroundColor: AppColors.whiteColor,
-      headerColor: AppColors.primaryAppColor,
-      roundedCornersRadius: 16,
-      unselectedMonthTextColor: AppColors.primaryAppColor,
-      selectedMonthBackgroundColor: AppColors.primaryAppColor,
-      confirmWidget: Text("Confirm", style: TextStyle(color: AppColors.primaryAppColor)),
-      cancelWidget: Text("Cancel", style: TextStyle(color: AppColors.primaryAppColor)),
+      monthPickerDialogSettings: MonthPickerDialogSettings(
+        dateButtonsSettings: PickerDateButtonsSettings(
+          currentMonthTextColor: AppColors.primaryAppColor,
+          unselectedMonthsTextColor: AppColors.primaryAppColor,
+          selectedMonthBackgroundColor: AppColors.primaryAppColor,
+        ),
+        headerSettings: PickerHeaderSettings(
+          headerBackgroundColor: AppColors.primaryAppColor,
+        ),
+        dialogSettings: PickerDialogSettings(
+          dialogBackgroundColor: AppColors.whiteColor,
+          dialogRoundedCornersRadius: 16,
+        ),
+        actionBarSettings: PickerActionBarSettings(
+          confirmWidget: Text("Confirm", style: TextStyle(color: AppColors.primaryAppColor)),
+          cancelWidget: Text("Cancel", style: TextStyle(color: AppColors.primaryAppColor)),
+        ),
+      ),
       initialDate: DateTime.now(),
       lastDate: DateTime.now(),
     ).then((date) async {
       if (date != null) {
         selectedDate = DateFormat('yyyy-MM').format(date);
-        await getAttendanceMonthWise(
-            expertId: Constant.storage.read<String>("expertId").toString(), month: selectedDate ?? '');
+        await getAttendanceMonthWise(expertId: Constant.storage.read<String>("expertId").toString(), month: selectedDate ?? '');
         log("Selected Date for Attendance :: $selectedDate");
         update([Constant.idAttendanceDetails, Constant.idProgressView]);
       }

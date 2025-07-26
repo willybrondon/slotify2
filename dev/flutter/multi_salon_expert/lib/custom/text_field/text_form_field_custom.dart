@@ -2,8 +2,8 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/utils/colors.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/constant.dart';
 
 class TextFormFieldCustom extends StatelessWidget {
@@ -39,7 +39,7 @@ class TextFormFieldCustom extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.5,
                   color: AppColors.subTitle,
-                  fontFamily: FontFamily.sfProDisplayMedium,
+                  fontFamily: AppFontFamily.sfProDisplayMedium,
                 ),
               ).paddingOnly(left: 3, bottom: 5),
         Container(

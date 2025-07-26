@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -11,11 +12,10 @@ import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/bottom_bar/controller/bottom_bar_controller.dart';
 import 'package:salon_2/ui/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/order_report/order_detail/controller/order_report_controller.dart';
-import 'package:salon_2/utils/api.dart';
-import 'package:salon_2/utils/asset.dart';
-import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/app_asset.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
-import 'package:salon_2/utils/font_family.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -28,10 +28,10 @@ class OrderReportScreen extends StatefulWidget {
 
 class _OrderReportScreenState extends State<OrderReportScreen> {
   var tabs = [
-    Tab(text: "   ${"txtToday".tr}   "),
-    Tab(text: "   ${"txtYesterday".tr}   "),
-    Tab(text: "   ${"txtThisWeek".tr}   "),
-    Tab(text: "   ${"txtThisMonth".tr}   "),
+    Tab(text: "txtToday".tr),
+    Tab(text: "txtYesterday".tr),
+    Tab(text: "txtThisWeek".tr),
+    Tab(text: "txtThisMonth".tr),
   ];
 
   @override
@@ -41,12 +41,16 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
 
     log("loginScreenController.emailController.text${loginScreenController.emailController.text}");
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
         Get.find<BottomBarController>().onClick(0);
-        return false;
+        if (didPop) {
+          return;
+        }
       },
       child: Scaffold(
+        backgroundColor: AppColors.whiteColor,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(100),
           child: AppBar(
@@ -57,75 +61,58 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
               width: double.infinity,
               color: AppColors.primaryAppColor,
               padding: EdgeInsets.only(top: statusBarHeight),
-              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Row(
-                  children: [
-                    GetBuilder<LoginScreenController>(
-                      id: Constant.idProgressView,
-                      builder: (logic) {
-                        return Container(
-                          margin: const EdgeInsets.only(left: 15, right: 10),
-                          height: 55,
-                          width: 55,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 0.8, color: AppColors.whiteColor),
-                            shape: BoxShape.circle,
-                          ),
-                          padding: const EdgeInsets.all(2),
-                          child: CircleAvatar(
-                            radius: 35,
-                            backgroundImage: NetworkImage(
-                              Constant.storage.read("hostImage") ??
-                                  "${ApiConstant.BASE_URL}static/media/male.459a8699b07b4b9bf3d6.png",
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${"txtHello".tr}, ${Constant.storage.read<String>('fName').toString()}",
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo800,
+                              fontSize: 23,
+                              color: AppColors.whiteColor,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "${"txtHello".tr}, ${Constant.storage.read<String>('fName').toString()} 👋",
-                          style: TextStyle(
-                            fontFamily: FontFamily.sfProDisplayBold,
-                            fontSize: 18,
-                            color: AppColors.whiteColor,
+                          Text(
+                            "txtWelcomeService".tr,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo400,
+                              fontSize: 15,
+                              color: AppColors.whiteColor,
+                            ),
                           ),
-                        ),
-                        Text(
-                          "txtWelcomeService".tr,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontFamily: FontFamily.sfProDisplayRegular,
-                            fontSize: 15,
-                            color: AppColors.whiteColor,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ).paddingOnly(bottom: 13)
-              ]),
+                        ],
+                      ),
+                      // Image.asset(AppAsset.icNotificationFilled, height: 40)
+                    ],
+                  ).paddingOnly(bottom: 8)
+                ],
+              ).paddingOnly(left: 18, right: 18),
             ),
           ),
         ),
-        backgroundColor: AppColors.backGround,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-                margin: const EdgeInsets.only(left: 13, bottom: 5),
-                child: Text(
-                  "txtOrderDetails".tr,
-                  style: TextStyle(
-                    fontFamily: FontFamily.sfProDisplayBold,
-                    color: AppColors.primaryTextColor,
-                    fontSize: 22,
-                  ),
-                )),
+              margin: const EdgeInsets.only(left: 13, bottom: 5),
+              child: Text(
+                "txtOrderDetails".tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.heeBo800,
+                  color: AppColors.primaryTextColor,
+                  fontSize: 22,
+                ),
+              ),
+            ),
             GetBuilder<OrderReportController>(
               builder: (logic) {
                 return TabBar(
@@ -134,33 +121,38 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
                   tabs: tabs,
                   labelStyle: const TextStyle(
                     fontSize: 15,
-                    fontFamily: FontFamily.sfProDisplayMedium,
+                    fontFamily: AppFontFamily.heeBo500,
                   ),
                   physics: const BouncingScrollPhysics(),
                   indicatorPadding: const EdgeInsets.all(4),
-                  indicator: BoxDecoration(borderRadius: BorderRadius.circular(45), color: AppColors.primaryAppColor),
+                  indicator: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.primaryAppColor,
+                  ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelColor: AppColors.whiteColor,
                   isScrollable: true,
                   unselectedLabelColor: AppColors.service,
                   dividerColor: Colors.transparent,
-                  overlayColor: MaterialStatePropertyAll(AppColors.transparent),
-                ).paddingOnly(left: 13, bottom: 15);
+                  overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                ).paddingOnly(left: 13);
               },
             ),
+            Divider(color: AppColors.greyColor.withOpacity(0.15)).paddingOnly(top: 5, bottom: 10),
             GetBuilder<OrderReportController>(
               builder: (logic) {
                 return Expanded(
-                    child: TabBarView(
-                  controller: logic.tabController,
-                  physics: const BouncingScrollPhysics(),
-                  children: List.generate(
-                    4,
-                    (index) => OrderReportTabView(
-                      indexTabView: index,
+                  child: TabBarView(
+                    controller: logic.tabController,
+                    physics: const BouncingScrollPhysics(),
+                    children: List.generate(
+                      4,
+                      (index) => OrderReportTabView(
+                        indexTabView: index,
+                      ),
                     ),
                   ),
-                ));
+                );
               },
             )
           ],
@@ -197,7 +189,7 @@ class OrderReportTabView extends StatelessWidget {
                           Text(
                             "txtNoData".tr,
                             style: TextStyle(
-                              fontFamily: FontFamily.sfProDisplayMedium,
+                              fontFamily: AppFontFamily.sfProDisplayMedium,
                               fontSize: 20,
                               color: AppColors.primaryTextColor,
                             ),
@@ -219,11 +211,6 @@ class OrderReportTabView extends StatelessWidget {
                                 physics: const BouncingScrollPhysics(),
                                 itemCount: logic.getBookingStatusWiseCategory?.data?.length ?? 0,
                                 itemBuilder: (context, index) {
-                                  logic.str = logic.getBookingStatusWiseCategory?.data?[index].date.toString();
-                                  logic.parts = logic.str?.split(' ');
-                                  logic.date = logic.parts?[0];
-                                  logic.time = logic.parts![1].trim();
-
                                   return AnimationConfiguration.staggeredGrid(
                                     position: index,
                                     duration: const Duration(milliseconds: 800),
@@ -234,11 +221,13 @@ class OrderReportTabView extends StatelessWidget {
                                           onTap: () {
                                             Get.toNamed(
                                               AppRoutes.viewDetail,
-                                              arguments: logic.getBookingStatusWiseCategory!.data![index],
+                                              arguments: [
+                                                logic.getBookingStatusWiseCategory?.data?[index] ?? [],
+                                                logic.getBookingStatusWiseCategory?.reviews ?? [],
+                                              ],
                                             );
                                           },
                                           child: Container(
-                                            height: 135,
                                             width: double.infinity,
                                             margin: const EdgeInsets.only(left: 5, right: 5),
                                             padding: const EdgeInsets.only(bottom: 10),
@@ -248,7 +237,8 @@ class OrderReportTabView extends StatelessWidget {
                                                 width: 1,
                                                 color: AppColors.grey.withOpacity(0.1),
                                               ),
-                                              borderRadius: BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(18),
+                                              boxShadow: Constant.boxShadow,
                                             ),
                                             child: Stack(
                                               children: [
@@ -271,14 +261,14 @@ class OrderReportTabView extends StatelessWidget {
                                                           bottomLeft: Radius.circular(15),
                                                           topRight: Radius.circular(12),
                                                         ),
-                                                        color: AppColors.tabUnSelect,
+                                                        color: AppColors.bgTime,
                                                       ),
                                                       child: Text(
                                                         "#${logic.getBookingStatusWiseCategory!.data![index].bookingId}",
                                                         style: TextStyle(
                                                           fontSize: 12,
-                                                          fontFamily: FontFamily.sfProDisplay,
-                                                          color: AppColors.buttonText,
+                                                          fontFamily: AppFontFamily.heeBo500,
+                                                          color: AppColors.idTextColor,
                                                         ),
                                                       ),
                                                     ),
@@ -288,91 +278,167 @@ class OrderReportTabView extends StatelessWidget {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Text(
-                                                      "${logic.getBookingStatusWiseCategory!.data![index].userFname} ${logic.getBookingStatusWiseCategory!.data![index].userLname}",
-                                                      style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontFamily: FontFamily.sfProDisplay,
-                                                        color: AppColors.primaryTextColor,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      logic.getBookingStatusWiseCategory!.data![index].service?.first ?? "",
-                                                      style: TextStyle(
-                                                        fontSize: 13,
-                                                        fontFamily: FontFamily.sfProDisplayMedium,
-                                                        color: AppColors.title,
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: Get.height * 0.01),
                                                     Row(
                                                       children: [
-                                                        Row(
+                                                        Container(
+                                                          height: 45,
+                                                          width: 45,
+                                                          decoration: BoxDecoration(
+                                                            color: AppColors.grey.withOpacity(0.05),
+                                                            shape: BoxShape.circle,
+                                                          ),
+                                                          clipBehavior: Clip.hardEdge,
+                                                          child: CachedNetworkImage(
+                                                            imageUrl: logic.getBookingStatusWiseCategory?.data?[index]
+                                                                    .serviceImage?.first ??
+                                                                "",
+                                                            fit: BoxFit.cover,
+                                                            placeholder: (context, url) {
+                                                              return Image.asset(
+                                                                AppAsset.icPlaceholder,
+                                                                color: AppColors.blackColor1,
+                                                              ).paddingAll(10);
+                                                            },
+                                                            errorWidget: (context, url, error) {
+                                                              return Image.asset(
+                                                                AppAsset.icPlaceholder,
+                                                                color: AppColors.blackColor1,
+                                                              ).paddingAll(10);
+                                                            },
+                                                          ),
+                                                        ).paddingOnly(right: 13),
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: [
-                                                            Image.asset(AppAsset.icBooking, height: 19, width: 19),
-                                                            SizedBox(width: Get.width * 0.01),
                                                             Text(
-                                                              logic.date.toString(),
+                                                              "${logic.getBookingStatusWiseCategory!.data![index].userFname} ${logic.getBookingStatusWiseCategory!.data![index].userLname}",
                                                               style: TextStyle(
-                                                                fontFamily: FontFamily.sfProDisplayRegular,
-                                                                fontSize: 12,
-                                                                color: AppColors.service,
+                                                                fontSize: 19,
+                                                                fontFamily: AppFontFamily.heeBo800,
+                                                                color: AppColors.primaryTextColor,
                                                               ),
                                                             ),
-                                                            SizedBox(width: Get.width * 0.05),
-                                                            Image.asset(AppAsset.icClock, height: 19, width: 19),
-                                                            SizedBox(width: Get.width * 0.01),
                                                             Text(
-                                                              logic.getBookingStatusWiseCategory!.data![index].startTime ?? '',
+                                                              logic.getBookingStatusWiseCategory!.data![index].service?.first ??
+                                                                  "",
                                                               style: TextStyle(
-                                                                fontFamily: FontFamily.sfProDisplayRegular,
-                                                                fontSize: 12,
-                                                                color: AppColors.service,
+                                                                fontSize: 14,
+                                                                fontFamily: AppFontFamily.heeBo600,
+                                                                color: AppColors.greyText,
                                                               ),
                                                             ),
                                                           ],
                                                         ),
                                                       ],
                                                     ),
-                                                    SizedBox(height: Get.height * 0.01),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        color: AppColors.bgTime,
+                                                        borderRadius: BorderRadius.circular(12),
+                                                      ),
+                                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+                                                      child: Row(
+                                                        children: [
+                                                          Container(
+                                                            height: 40,
+                                                            width: 40,
+                                                            decoration: BoxDecoration(
+                                                              shape: BoxShape.circle,
+                                                              color: AppColors.bgCircle,
+                                                            ),
+                                                            child: Image.asset(AppAsset.icBooking).paddingAll(10),
+                                                          ).paddingOnly(right: 12),
+                                                          Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                logic.getBookingStatusWiseCategory?.data?[index].date ?? "",
+                                                                style: TextStyle(
+                                                                  fontFamily: AppFontFamily.heeBo700,
+                                                                  fontSize: 14,
+                                                                  color: AppColors.primaryTextColor,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                "txtBookingDate".tr,
+                                                                style: TextStyle(
+                                                                  fontFamily: AppFontFamily.heeBo500,
+                                                                  fontSize: 12,
+                                                                  color: AppColors.service,
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                          const Spacer(),
+                                                          Container(
+                                                            height: 36,
+                                                            width: 2,
+                                                            color: AppColors.serviceBorder,
+                                                          ),
+                                                          const Spacer(),
+                                                          Container(
+                                                            height: 40,
+                                                            width: 40,
+                                                            decoration: BoxDecoration(
+                                                              shape: BoxShape.circle,
+                                                              color: AppColors.bgCircle,
+                                                            ),
+                                                            child: Image.asset(
+                                                              AppAsset.icClock,
+                                                            ).paddingAll(10),
+                                                          ).paddingOnly(right: 12),
+                                                          Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                logic.getBookingStatusWiseCategory?.data?[index].startTime ?? '',
+                                                                style: TextStyle(
+                                                                  fontFamily: AppFontFamily.heeBo700,
+                                                                  fontSize: 14,
+                                                                  color: AppColors.primaryTextColor,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                "txtBookingTiming".tr,
+                                                                style: TextStyle(
+                                                                  fontFamily: AppFontFamily.heeBo500,
+                                                                  fontSize: 12,
+                                                                  color: AppColors.service,
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                          const Spacer(),
+                                                        ],
+                                                      ),
+                                                    ).paddingOnly(top: 12, bottom: 12, right: 12),
                                                     Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         Container(
-                                                          height: 28,
-                                                          width: 78,
                                                           decoration: BoxDecoration(
                                                             borderRadius: BorderRadius.circular(6),
-                                                            color: AppColors.green,
+                                                            color: AppColors.greenBg,
                                                           ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              '$currency ${logic.getBookingStatusWiseCategory?.data?[index].withoutTax?.toStringAsFixed(2)}',
-                                                              style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontFamily: FontFamily.sfProDisplayBold,
-                                                                color: AppColors.currency,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            Get.toNamed(
-                                                              AppRoutes.viewDetail,
-                                                              arguments: logic.getBookingStatusWiseCategory!.data![index],
-                                                            );
-                                                          },
+                                                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 9),
                                                           child: Text(
-                                                            "txtViewDetails".tr,
+                                                            '$currency ${logic.getBookingStatusWiseCategory?.data?[index].withoutTax?.toStringAsFixed(2)}',
                                                             style: TextStyle(
-                                                              fontSize: 12,
-                                                              fontFamily: FontFamily.sfProDisplayMedium,
-                                                              color: AppColors.primaryTextColor,
-                                                              decoration: TextDecoration.underline,
+                                                              fontSize: 16,
+                                                              fontFamily: AppFontFamily.heeBo700,
+                                                              color: AppColors.greenColor,
                                                             ),
-                                                          ).paddingOnly(right: 10),
+                                                          ),
                                                         ),
+                                                        Text(
+                                                          "txtViewDetails".tr,
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontFamily: AppFontFamily.heeBo500,
+                                                              color: AppColors.greyText,
+                                                              decoration: TextDecoration.underline,
+                                                              decorationColor: AppColors.greyText),
+                                                        ).paddingOnly(right: 10),
                                                       ],
                                                     ),
                                                   ],
