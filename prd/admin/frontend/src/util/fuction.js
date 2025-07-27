@@ -104,7 +104,7 @@ export const submitData = (e) => {
         const finalValue = [...multiImageArray, ...value];
         console.log("finalValue", finalValue);
 
-        if (finalValue <= 0) {
+        if (finalValue.length <= 0) {
           errorData.remove("d-none");
           errorData.add("d-block");
           hasEmptyField = true;
