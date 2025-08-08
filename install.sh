@@ -18,6 +18,17 @@ else
 fi
 echo "PUBLIC_IP: $PUBLIC_IP"
 
+
+# Use DOMAIN from environment if set, otherwise prompt the user
+if [ -n "$DOMAIN" ]; then
+    app_domain="$DOMAIN"
+    echo "Using DOMAIN from environment as app_domain: $app_domain"
+else
+    read -p "Your app domain: " app_domain
+fi
+
+echo "DOMAIN: $DOMAIN"
+
 # Update and clear screen
 sudo apt update
 sudo apt upgrade -y
@@ -155,7 +166,7 @@ EMAIL = $EMAIL
 PASSWORD = $PASSWORD
 
 #Server URL
-baseURL = http://${public_ip}:5000/
+baseURL = https://$app_domain/ #https://${public_ip}:5000/
 
 #Secret key for API
 secretKey = ${shared_secret_key}
@@ -177,7 +188,7 @@ echo "
 "
 cd /home/admin/frontend/src/util || exit
 cat > config.js << EOF
-export const baseURL = "http://$public_ip:5000/";
+export const baseURL = "http://$app_domain/";
 export const secretKey = "$shared_secret_key";
 export const projectName = "$app_name";
 EOF
@@ -203,7 +214,7 @@ echo "
 "
 cd /home/admin/salon/src/util || exit
 cat > config.js << EOF
-export const baseURL = "http://$public_ip:5000/";
+export const baseURL = "http://$app_domain/";
 export const secretKey = "$shared_secret_key";
 export const projectName = "$app_name";
 EOF
@@ -278,8 +289,8 @@ echo "
 #                CONGRATULATIONS!              #
 ################################################
 Server setup is complete.
-1. baseURL : http://$public_ip:5000/
-3. SalonPanel : http://$public_ip:5000/salonpanel
+1. baseURL : https://$app_domain/
+3. SalonPanel : http://$app_domain/salonpanel
 2. Secret key : $shared_secret_key
 3. MONGODB_CONNECTION_STRING: "mongodb://admin:dbadmin123@$public_ip:27017/$mongodbUser_name"
 "

@@ -70,56 +70,57 @@ jobs:
         npm test || echo "Tests completed"
 
 # comment for out for now 
-#     - name: start the ssh  key and add the key okay
-#       uses: webfactory/ssh-agent@v0.8.0
-#       with:
-#         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: start the ssh  key and add the key okay
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-#     - name: set up SSH key for test
-#       run: |
-#         ssh-keyscan -H 46.101.229.176 >> ~/.ssh/known_hosts
+    - name: set up SSH key for test
+      run: |
+        ssh-keyscan -H 46.101.229.176 >> ~/.ssh/known_hosts
 # # we compress the admin file to be light when copy
-#     - name: backup storage file 
-#       run: |
-#         ssh root@46.101.229.176 "mkdir -p /home/storage_backup"
-#         ssh root@46.101.229.176 "scp -r /home/admin/backend/storage /home/storage_backup"
+    - name: backup storage file 
+      run: |
+        ssh root@46.101.229.176 "mkdir -p /home/storage_backup"
+        ssh root@46.101.229.176 "scp -r /home/admin/backend/storage /home/storage_backup"
         
-#     - name: copy file to vps 
-#       run: |
-#         sudo apt-get update && sudo apt-get install -y zip unzip
-#         (cd dev && zip -r ../admin.zip admin)
-#         scp admin.zip root@46.101.229.176:/home/
-#         ssh root@46.101.229.176 "unzip -o /home/admin.zip -d /home/"
-#         scp install.sh root@46.101.229.176:/
+    - name: copy file to vps 
+      run: |
+        sudo apt-get update && sudo apt-get install -y zip unzip
+        (cd dev && zip -r ../admin.zip admin)
+        scp admin.zip root@46.101.229.176:/home/
+        ssh root@46.101.229.176 "unzip -o /home/admin.zip -d /home/"
+        scp install.sh root@46.101.229.176:/
     
 # comment for out for now 
-    # - name: create .env file
-    #   env:
-    #     EMAIL: ${{ secrets.EMAIL }}
-    #     PASSWORD: ${{ secrets.PASSWORD }}
-    #   run: |
-    #     echo "EMAIL=$EMAIL" >> .env
-    #     echo "PASSWORD=$PASSWORD" >> .env
-    #     scp .env root@46.101.229.176:/home/admin/backend/.env
+    - name: create .env file
+      env:
+        EMAIL: ${{ secrets.EMAIL }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+      run: |
+        echo "EMAIL=$EMAIL" >> .env
+        echo "PASSWORD=$PASSWORD" >> .env
+        scp .env root@46.101.229.176:/home/admin/backend/.env
         
-    # - name: Run and install dependencies
-    #   env:
-    #     DB_NAME: ${{ secrets.DB_NAME }}
-    #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
-    #     JWT_SECRET: ${{ secrets.JWT_SECRET }}
-    #     PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
-    #     EMAIL: ${{ secrets.EMAIL }}
-    #     PASSWORD: ${{ secrets.PASSWORD }}
-    #     SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-    #   run: |
-    #     ssh root@46.101.229.176 "sudo apt install dos2unix"
-    #     ssh root@46.101.229.176 "cd / && chmod +x install.sh"
-    #     ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DB_NAME='$DB_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' EMAIL='$EMAIL' PASSWORD='$PASSWORD' SENDGRID_API_KEY='$SENDGRID_API_KEY' bash -c 'cd / && ./install.sh'"
+    - name: Run and install dependencies
+      env:
+        DB_NAME: ${{ secrets.DB_NAME }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
+        EMAIL: ${{ secrets.EMAIL }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+        SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        DOMAIN: ${{ secrets.DOMAIN }}
+      run: |
+        ssh root@46.101.229.176 "sudo apt install dos2unix"
+        ssh root@46.101.229.176 "cd / && chmod +x install.sh"
+        ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DOMAIN='$DOMAIN' DB_NAME='$DB_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' EMAIL='$EMAIL' PASSWORD='$PASSWORD' SENDGRID_API_KEY='$SENDGRID_API_KEY' bash -c 'cd / && ./install.sh'"
       
-    # - name: backup storage file 
-    #   run: |
-    #     ssh root@46.101.229.176 "mkdir -p /home/admin/backend/storage"
-    #     ssh root@46.101.229.176 "scp -r /home/storage_backup/storage/* /home/admin/backend/storage"
+    - name: backup storage file 
+      run: |
+        ssh root@46.101.229.176 "mkdir -p /home/admin/backend/storage"
+        ssh root@46.101.229.176 "scp -r /home/storage_backup/storage/* /home/admin/backend/storage"
         
 
   # Flutter App Tests (Cross-platform)
