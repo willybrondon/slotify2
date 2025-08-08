@@ -188,7 +188,7 @@ echo "
 "
 cd /home/admin/frontend/src/util || exit
 cat > config.js << EOF
-export const baseURL = "http://$app_domain/";
+export const baseURL = "https://$app_domain/";
 export const secretKey = "$shared_secret_key";
 export const projectName = "$app_name";
 EOF
@@ -214,7 +214,7 @@ echo "
 "
 cd /home/admin/salon/src/util || exit
 cat > config.js << EOF
-export const baseURL = "http://$app_domain/";
+export const baseURL = "https://$app_domain/";
 export const secretKey = "$shared_secret_key";
 export const projectName = "$app_name";
 EOF
@@ -250,30 +250,112 @@ echo "
 #                CONFIGURE NGINX               #
 ################################################
 "
-sudo cat > /etc/nginx/sites-available/default << EOF
+
+# Install Certbot for SSL
+echo "Installing Certbot for SSL certificates..."
+sudo apt install -y certbot python3-certbot-nginx
+
+# Create Nginx configuration for domain
+sudo cat > /etc/nginx/sites-available/skedisy.com << EOF
+# HTTP to HTTPS redirect
 server {
     listen 80;
     listen [::]:80;
+    server_name skedisy.com www.skedisy.com;
     client_max_body_size 300M;
-    access_log /var/log/nginx/$app_name.access.log;  #whatever your server name
-    error_log /var/log/nginx/$app_name.error.log;   #whatever your server name
-    root /path;
+    access_log /var/log/nginx/skedisy.access.log;
+    error_log /var/log/nginx/skedisy.error.log;
+    return 301 https://\$server_name\$request_uri;
+}
+
+# HTTPS server
+server {
+    listen 443 ssl http2;
+    server_name skedisy.com www.skedisy.com;
+    client_max_body_size 300M;
+    access_log /var/log/nginx/skedisy.access.log;
+    error_log /var/log/nginx/skedisy.error.log;
+    
+    # SSL configuration (will be updated by Certbot)
+    ssl_certificate /etc/letsencrypt/live/skedisy.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/skedisy.com/privkey.pem;
+    
+    # SSL settings
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    
+    # Security headers
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    
+    # Proxy settings
     location / {
-        proxy_pass http://localhost:5000;   #whatever port your app runs on
+        proxy_pass http://localhost:5000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
-        proxy_redirect off;
-
         proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forward-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forward-Proto http;
-        proxy_set_header X-Nginx-Proxy true;     
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_read_timeout 86400;
+        proxy_redirect off;
+        proxy_set_header X-Nginx-Proxy true;
     }
+    
+    # Static files
+    location /static/ {
+        alias /home/admin/backend/public/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/atom+xml
+        image/svg+xml;
 }
 EOF
+
+# Enable the domain site and remove default
+sudo ln -sf /etc/nginx/sites-available/skedisy.com /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# Test Nginx configuration
+sudo nginx -t
+
+# Restart Nginx
+sudo systemctl restart nginx
+
+# Obtain SSL certificate
+echo "Obtaining SSL certificate for skedisy.com..."
+sudo certbot certonly --standalone \
+    --email support@skedisy.com \
+    --agree-tos \
+    --no-eff-email \
+    -d skedisy.com \
+    -d www.skedisy.com
+
+# Reload Nginx after SSL certificate
+sudo systemctl reload nginx
 sudo systemctl restart nginx
 clear
 
@@ -290,7 +372,8 @@ echo "
 ################################################
 Server setup is complete.
 1. baseURL : https://$app_domain/
-3. SalonPanel : http://$app_domain/salonpanel
-2. Secret key : $shared_secret_key
-3. MONGODB_CONNECTION_STRING: "mongodb://admin:dbadmin123@$public_ip:27017/$mongodbUser_name"
+2. SalonPanel : https://$app_domain/salonpanel
+3. Secret key : $shared_secret_key
+4. MONGODB_CONNECTION_STRING: "mongodb://admin:dbadmin123@$public_ip:27017/$mongodbUser_name"
+5. Domain : $app_domain
 "
