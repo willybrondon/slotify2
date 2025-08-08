@@ -82,7 +82,8 @@ Future<void> backgroundNotification(RemoteMessage message) async {
     log('Message Contained a Notification :: ${message.notification?.body}');
   }
 
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin?.initialize(
     const InitializationSettings(android: initializationSettingsAndroid),
@@ -157,43 +158,76 @@ Future<void> main() async {
     return Container();
   };
 
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await GetStorage.init();
-
-  ///************** FCM token ************************\\\
   try {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    await messaging.getToken().then((value) {
-      fcmToken = value ?? '';
-      log("Fcm Token :: $fcmToken");
-    });
+    WidgetsFlutterBinding.ensureInitialized();
+
+    // Initialize Firebase with error handling
+    try {
+      await Firebase.initializeApp();
+      log("Firebase initialized successfully");
+    } catch (e) {
+      log("Error initializing Firebase: $e");
+      // Continue without Firebase if it fails
+    }
+
+    await GetStorage.init();
+
+    ///************** FCM token ************************\\\
+    try {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      await messaging.getToken().then((value) {
+        fcmToken = value ?? '';
+        log("Fcm Token :: $fcmToken");
+      });
+    } catch (e) {
+      log("Error FCM token: $e");
+    }
+
+    log("FCM Token :: $fcmToken");
+    FirebaseMessaging.onBackgroundMessage(backgroundNotification);
+
+    // Initialize location with error handling
+    try {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        log('Location permissions are denied');
+      }
+
+      position = await getDeviceLocation();
+    } catch (e) {
+      log("Error initializing location: $e");
+      // Continue without location if it fails
+    }
+
+    // Get dial code with error handling
+    try {
+      getDialCode();
+    } catch (e) {
+      log("Error getting dial code: $e");
+      dialCode = "+91"; // Default fallback
+    }
+
+    /// For Cover Safe Area
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light
+        .copyWith(statusBarColor: Colors.transparent));
+
+    /// Preference
+    await Preference().instance();
+    runApp(const MyApp());
   } catch (e) {
-    log("Error FCM token: $e");
+    log("Error in main initialization: $e");
+    // Still run the app even if some initialization fails
+    WidgetsFlutterBinding.ensureInitialized();
+    await GetStorage.init();
+    runApp(const MyApp());
   }
-
-  log("FCM Token :: $fcmToken");
-  FirebaseMessaging.onBackgroundMessage(backgroundNotification);
-
-  permission = await Geolocator.requestPermission();
-  if (permission == LocationPermission.denied) {
-    log('Location permissions are denied');
-  }
-
-  position = await getDeviceLocation();
-
-  /// For Cover Safe Area
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent));
-
-  /// Preference
-  await Preference().instance();
-  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  static final StreamController purchaseStreamController = StreamController<PurchaseDetails>.broadcast();
+  static final StreamController purchaseStreamController =
+      StreamController<PurchaseDetails>.broadcast();
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -217,7 +251,8 @@ class _MyAppState extends State<MyApp> {
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+        if (!currentFocus.hasPrimaryFocus &&
+            currentFocus.focusedChild != null) {
           currentFocus.focusedChild?.unfocus();
         }
       },
@@ -229,7 +264,8 @@ class _MyAppState extends State<MyApp> {
         getPages: AppPages.list,
         title: "Salon",
         defaultTransition: Transition.fade,
-        fallbackLocale: const Locale(Constant.languageEn, Constant.countryCodeEn),
+        fallbackLocale:
+            const Locale(Constant.languageEn, Constant.countryCodeEn),
         transitionDuration: const Duration(milliseconds: 200),
       ),
     );
