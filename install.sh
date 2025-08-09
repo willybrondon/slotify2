@@ -226,9 +226,7 @@ npm install --f
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
-nvm install node
-# builb with subpath 
-PUBLIC_URL=/salonpanel npm run build
+npm run build
 sudo rm -rf /home/admin/backend/salon
 mkdir -p /home/admin/backend/salon
 sudo mv /home/admin/salon/build/* /home/admin/backend/salon
@@ -283,12 +281,12 @@ server {
     }
 
     # Serve Salon panel SPA at /salonpanel
-    # location ^~ /salonpanel/static/ {
-    #     alias /home/admin/backend/salon/static/;
-    #     access_log off;
-    #     expires 1y;
-    #     add_header Cache-Control "public, immutable";
-    # }
+    location ^~ /salonpanel/static/ {
+        alias /home/admin/backend/salon/static/;
+        access_log off;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
     # location ^~ /salonpanel/ {
     #     alias /home/admin/backend/salon/;
     #     try_files $uri $uri/ /salonpanel/index.html;
@@ -320,11 +318,14 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 # Obtain SSL certificate
-echo "Obtaining SSL certificate for skedisy.com..."
-sudo certbot certonly --standalone \
+echo "Obtaining/Installing SSL certificate for skedisy.com (non-interactive)..."
+sudo certbot --nginx -n \
     --email support@skedisy.com \
     --agree-tos \
     --no-eff-email \
+    --redirect \
+    --keep-until-expiring \
+    --reinstall \
     -d skedisy.com \
     -d www.skedisy.com
 
