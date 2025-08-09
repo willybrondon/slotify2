@@ -96,7 +96,7 @@ const WithDrawMoney = () => {
                 if (res?.payload?.status) {
                     dispatch(getWithDrawMethod());
                     toast.success(res?.payload?.message);
-                    navigate("/salonPanel/salonDashboard")
+                    navigate("/salonpanel/salonDashboard")
                 } else {
                     toast.error(res?.payload?.message);
                 }

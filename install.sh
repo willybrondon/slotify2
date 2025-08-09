@@ -227,7 +227,8 @@ echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm install node
-npm run build
+# builb with subpath 
+PUBLIC_URL=/salonpanel npm run build
 sudo rm -rf /home/admin/backend/salon
 mkdir -p /home/admin/backend/salon
 sudo mv /home/admin/salon/build/* /home/admin/backend/salon
@@ -281,9 +282,27 @@ server {
         proxy_set_header X-Nginx-Proxy true;
     }
 
+    # Serve Salon panel SPA at /salonpanel
+    location ^~ /salonpanel/static/ {
+        alias /home/admin/backend/salon/static/;
+        access_log off;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    location ^~ /salonpanel/ {
+        alias /home/admin/backend/salon/;
+        try_files $uri $uri/ /salonpanel/index.html;
+    }
+
+    # Serve Salon Portal at /salonportal
+    location ^~ /salonportal/ {
+        alias /home/admin/backend/salonportal/;
+        try_files $uri $uri/ /salonportal/index.html;
+    }
+
     # Static files
     location /static/ {
-        alias /home/admin/backend/public/;
+        alias /home/admin/backend/public/static/;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
@@ -292,7 +311,7 @@ EOF
 
 # Enable the domain site and remove default
 sudo ln -sf /etc/nginx/sites-available/skedisy.com /etc/nginx/sites-enabled/
-sudo rm -f /etc/nginx/sites-enabled/default
+# sudo rm -f /etc/nginx/sites-enabled/default
 
 # Test Nginx configuration
 sudo nginx -t
@@ -327,7 +346,7 @@ echo "
 ################################################
 Server setup is complete.
 1. baseURL : https://$app_domain/
-2. SalonPanel : https://$app_domain/salonpanel
+2. salonpanel : https://$app_domain/salonpanel
 3. Secret key : $shared_secret_key
 4. MONGODB_CONNECTION_STRING: "mongodb://admin:dbadmin123@$public_ip:27017/$mongodbUser_name"
 5. Domain : $app_domain

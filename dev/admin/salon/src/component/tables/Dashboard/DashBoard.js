@@ -166,7 +166,7 @@ const DashBoard = () => {
         {
             Header: "Show More",
             thClass: "text-decoration-underline special cursor",
-            thClick: () => navigate("/salonPanel/futureBooking"),
+            thClick: () => navigate("/salonpanel/futureBooking"),
         },
     ];
     const groupedOrders = upComingOrders?.reduce((acc, order) => {
@@ -211,7 +211,7 @@ const DashBoard = () => {
     });
 
     const handleOrderView = (id) => {
-        navigate(`/salonPanel/orderDetails`, {
+        navigate(`/salonpanel/orderDetails`, {
             state: id,
         });
     };
@@ -427,7 +427,7 @@ const DashBoard = () => {
                                 </svg>
                             }
                             amount={counts?.experts ? counts?.experts : 0}
-                            onClick={() => navigate("/salonPanel/allExperts")}
+                            onClick={() => navigate("/salonpanel/allExperts")}
                         />
                     </div>
                     <div className="col-lg-3 col-sm-6 col-12">
@@ -491,7 +491,7 @@ const DashBoard = () => {
                                 </svg>
                             }
                             amount={counts?.bookings ? counts?.bookings : 0}
-                            onClick={() => navigate("/salonPanel/bookingTable")}
+                            onClick={() => navigate("/salonpanel/bookingTable")}
                         />
                     </div>
                     <div className="col-lg-3 col-sm-6 col-12">
@@ -587,7 +587,7 @@ const DashBoard = () => {
                                     : 0
                             }
                             onClick={() =>
-                                navigate("/salonPanel/dailyBookingTable")
+                                navigate("/salonpanel/dailyBookingTable")
                             }
                         />
                     </div>
@@ -617,7 +617,7 @@ const DashBoard = () => {
                                       setting?.currencySymbol
                                     : 0
                             }
-                            onClick={() => navigate("/salonPanel/staffEarning")}
+                            onClick={() => navigate("/salonpanel/staffEarning")}
                         />
                     </div>
                 </div>

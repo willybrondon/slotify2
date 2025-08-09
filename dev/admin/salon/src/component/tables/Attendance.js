@@ -40,7 +40,7 @@ const Attendance = () => {
   }, [expert]);
 
   const handleInfo = (id) => {
-    navigate("/salonPanel/getExpertProfile", {
+    navigate("/salonpanel/getExpertProfile", {
       state: {
         id,
       },
@@ -91,7 +91,7 @@ const Attendance = () => {
         <span>
           <button
             className="bg-theme text-light m5-right p12-x p4-y fs-12 br-5 "
-            onClick={() => navigate("/salonPanel/attendanceTable")}
+            onClick={() => navigate("/salonpanel/attendanceTable")}
           >
             Info
             {/* <span><i className="fa-solid fa-info"></i></span> */}

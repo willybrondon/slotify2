@@ -57,7 +57,7 @@ export const Review = () => {
 
 
   const handleExpertInfo = (id) => {
-    navigate("/salonPanel/getExpertProfile", {
+    navigate("/salonpanel/getExpertProfile", {
       state: {
         id,
       },

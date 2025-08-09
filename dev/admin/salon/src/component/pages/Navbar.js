@@ -21,7 +21,7 @@ const Navbar = () => {
 
   const navigate = useNavigate();
   const handleNavigate = () => {
-    navigate("/salonPanel/profile");
+    navigate("/salonpanel/profile");
   };
   const enterFullscreen = () => {
     document.body.requestFullscreen();

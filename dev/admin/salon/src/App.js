@@ -26,7 +26,7 @@ function App() {
     activityTimeout = setTimeout(() => {
       window.sessionStorage.clear();
       window.sessionStorage.clear();
-      window.location.href = "/salonPanel";
+      window.location.href = "/salonpanel";
     }, sessionTimeout);
   }, [activityTimeout, sessionTimeout]);
 
@@ -64,10 +64,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="App">
         <Routes>
-          <Route path="/salonPanel" element={<Login />} />
-          <Route path="/salonPanel/login" element={<Login />} />
+          <Route path="/salonpanel" element={<Login />} />
+          <Route path="/salonpanel/login" element={<Login />} />
           <Route element={<AuthRoute />}>
-            <Route path="/salonPanel/*" element={<Admin />} />
+            <Route path="/salonpanel/*" element={<Admin />} />
           </Route>
         </Routes>
       </div>

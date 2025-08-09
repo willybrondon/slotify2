@@ -52,12 +52,12 @@ const Admin = () => {
 
     if (
       location.pathname == "/" ||
-      location.pathname == "/salonPanel" ||
-      location.pathname == "/salonPanel/salonDashboard" ||
+      location.pathname == "/salonpanel" ||
+      location.pathname == "/salonpanel/salonDashboard" ||
       location.pathname == ""
     ) {
 
-      navigate("/salonPanel/salonDashboard");
+      navigate("/salonpanel/salonDashboard");
     }
   }, []);
   var webSize = $(window).width();

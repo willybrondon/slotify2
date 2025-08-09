@@ -23,7 +23,7 @@ const Sidebar = () => {
         console.log("yes", yes);
         if (yes) {
           dispatch(logout());
-          navigate("/salonPanel");
+          navigate("/salonpanel");
         }
       })
       .catch((err) => console.log(err));
@@ -37,7 +37,7 @@ const Sidebar = () => {
   const navBarArray = [
     {
       name: "Dashboard",
-      path: "/salonPanel/salonDashboard",
+      path: "/salonpanel/salonDashboard",
       navSVG: (
         <svg
           width="24"
@@ -65,7 +65,7 @@ const Sidebar = () => {
   const array2 = [
     {
       name: "Expert",
-      path: "/salonPanel/allExperts",
+      path: "/salonpanel/allExperts",
 
       navSVG: (
         <svg
@@ -91,7 +91,7 @@ const Sidebar = () => {
 
     {
       name: "Reviews",
-      path: "/salonPanel/reviewTable",
+      path: "/salonpanel/reviewTable",
       navSVG: (
         <svg
           width="24"
@@ -110,7 +110,7 @@ const Sidebar = () => {
     },
     {
       name: "Complain",
-      path: "/salonPanel/complainTable",
+      path: "/salonpanel/complainTable",
       navSVG: (
         <svg
           width="24"
@@ -156,7 +156,7 @@ const Sidebar = () => {
     },
     {
       name: "Expert attendance",
-      path: "/salonPanel/attendanceTable",
+      path: "/salonpanel/attendanceTable",
       navSVG: (
         <svg
           width="24"
@@ -193,7 +193,7 @@ const Sidebar = () => {
   const array7 = [
     {
       name: "Products",
-      path: "/salonPanel/productsTable",
+      path: "/salonpanel/productsTable",
       navSVG: (
         <Category height={20} width={20} />
       ),
@@ -201,7 +201,7 @@ const Sidebar = () => {
     },
     {
       name: "Attributes",
-      path: "/salonPanel/attribute",
+      path: "/salonpanel/attribute",
       navSVG: (
         <Category height={20} width={20} />
       ),
@@ -213,7 +213,7 @@ const Sidebar = () => {
   const array8 = [
     {
       name: "Orders",
-      path: "/salonPanel/orderTable",
+      path: "/salonpanel/orderTable",
       navSVG: (
         <svg
           width="24"
@@ -234,13 +234,13 @@ const Sidebar = () => {
   const array9 = [
     {
       name: "Services",
-      path: "/salonPanel/cityServiceTable",
+      path: "/salonpanel/cityServiceTable",
       navSVG: (<Services height={20} width={20} />),
       onClick: handleOnClick,
     },
     {
       name: "Products",
-      path: "/salonPanel/cityProductTable",
+      path: "/salonpanel/cityProductTable",
       navSVG: (<Category height={20} width={20} />),
       onClick: handleOnClick,
     }
@@ -248,7 +248,7 @@ const Sidebar = () => {
   const array3 = [
     {
       name: "Services",
-      path: "/salonPanel/serviceTable",
+      path: "/salonpanel/serviceTable",
       navSVG: (
         // <img src={Services} height={20} width={20}/>
         <Services height={20} width={20} />
@@ -260,7 +260,7 @@ const Sidebar = () => {
   const array4 = [
     // {
     //   name: "Expert Earnings",
-    //   path: "/salonPanel/staffEarning",
+    //   path: "/salonpanel/staffEarning",
     //   navSVG: (
     //     <svg
     //       width="24"
@@ -290,7 +290,7 @@ const Sidebar = () => {
     // },
     // {
     //   name: "Salon Earnings",
-    //   path: "/salonPanel/salonEarning",
+    //   path: "/salonpanel/salonEarning",
     //   navSVG: (
     //     <svg
     //       width="24"
@@ -309,7 +309,7 @@ const Sidebar = () => {
     // },
     {
       name: "Withdraw Money",
-      path: "/salonPanel/withdrawMoney",
+      path: "/salonpanel/withdrawMoney",
       navSVG: (
         <WithdrawMoney height={20} width={20} />
       ),
@@ -317,7 +317,7 @@ const Sidebar = () => {
     },
     {
       name: "Wallet History",
-      path: "/salonPanel/walletHistory",
+      path: "/salonpanel/walletHistory",
       navSVG: (
         <svg
           width="24"
@@ -361,7 +361,7 @@ const Sidebar = () => {
           />
         </svg>
       ),
-      path: "/salonPanel/timeTable",
+      path: "/salonpanel/timeTable",
     },
     {
       name: "Salon Holiday",
@@ -379,7 +379,7 @@ const Sidebar = () => {
           />
         </svg>
       ),
-      path: "/salonPanel/holiday",
+      path: "/salonpanel/holiday",
     },
 
     // {
@@ -426,7 +426,7 @@ const Sidebar = () => {
           />
         </svg>
       ),
-      path: "/salonPanel/timeTable",
+      path: "/salonpanel/timeTable",
     },
     {
       name: "Salon Holiday",
@@ -444,7 +444,7 @@ const Sidebar = () => {
           />
         </svg>
       ),
-      path: "/salonPanel/holiday",
+      path: "/salonpanel/holiday",
     },
 
     {
@@ -479,11 +479,11 @@ const Sidebar = () => {
               src={logo}
               alt=""
               className=" cursor"
-              onClick={() => navigate("/salonPanel/salonDashboard")}
+              onClick={() => navigate("/salonpanel/salonDashboard")}
             />
             <h3
               className="cursor text-nowrap mb-0 ms-3"
-              onClick={() => navigate("/salonPanel/salonDashboard")}
+              onClick={() => navigate("/salonpanel/salonDashboard")}
             >
               Salon Slot
             </h3>

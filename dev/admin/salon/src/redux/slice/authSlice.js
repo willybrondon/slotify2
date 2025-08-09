@@ -131,7 +131,7 @@ const authSlice = createSlice({
       // state.admin = {};
       // state.isAuth = false;
 
-      // window.location.href = "/salonPanel/login";
+      // window.location.href = "/salonpanel/login";
       Success("Salon Password Updated Successfully");
     });
 

@@ -86,7 +86,7 @@ const Order = () => {
         setPage(0);
     };
     const handleOrderView = (id) => {
-        navigate(`/salonPanel/orderDetails`, {
+        navigate(`/salonpanel/orderDetails`, {
             state: id
         });
     }

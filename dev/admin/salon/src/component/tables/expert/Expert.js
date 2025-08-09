@@ -71,7 +71,7 @@ export const Expert = () => {
   }
 
   const handleInfo = (id) => {
-    navigate("/salonPanel/allExpert/getExpertProfile", {
+    navigate("/salonpanel/allExpert/getExpertProfile", {
       state: {
         id,
       },
@@ -285,14 +285,14 @@ export const Expert = () => {
   ];
 
   const handleEarning = (id) => {
-    navigate("/salonPanel/expertIncome", {
+    navigate("/salonpanel/expertIncome", {
       state: {
         id,
       },
     });
   };
   const handleBookings = (row) => {
-    navigate("/salonPanel/expertBooking", {
+    navigate("/salonpanel/expertBooking", {
       state: {
         row,
       },
@@ -320,7 +320,7 @@ export const Expert = () => {
     }
   };
   const handleAddExpert = (row) => {
-    navigate("/salonPanel/addExpert", {
+    navigate("/salonpanel/addExpert", {
       state: {
         row,
       },

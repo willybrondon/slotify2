@@ -15,7 +15,7 @@ const Login = (props) => {
 
   useEffect(() => {
     
-    isAuth && navigate("/salonPanel/salonDashboard");
+    isAuth && navigate("/salonpanel/salonDashboard");
   }, [isAuth, navigate]);
 
   const [email, setEmail] = useState("");
@@ -38,7 +38,7 @@ const Login = (props) => {
 
       let response = await dispatch(login(loginData)).unwrap();
       console.log("response", response);
-      response?.status && navigate("/salonPanel/");
+      response?.status && navigate("/salonpanel/");
     }
   };
 

@@ -1,1 +1,1 @@
-# multiSalon-salonPanel
+# multiSalon-salonpanel

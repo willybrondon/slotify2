@@ -75,7 +75,7 @@ const Products = () => {
     }
 
     const handleInfo = (id) => {
-        navigate("/salonPanel/productTableDetails", {
+        navigate("/salonpanel/productTableDetails", {
             state: {
                 id,
             },
@@ -258,14 +258,14 @@ const Products = () => {
     ];
 
     const handleEarning = (id) => {
-        navigate("/salonPanel/expertIncome", {
+        navigate("/salonpanel/expertIncome", {
             state: {
                 id,
             },
         });
     };
     const handleBookings = (row) => {
-        navigate("/salonPanel/expertBooking", {
+        navigate("/salonpanel/expertBooking", {
             state: {
                 row,
             },
@@ -294,7 +294,7 @@ const Products = () => {
     const handleAddProduct = (row) => {
     
 
-        navigate("/salonPanel/addProduct", {
+        navigate("/salonpanel/addProduct", {
             state: {
                 row,
             },

@@ -6,7 +6,7 @@ const Title = (props) => {
   const { name,display,bottom } = props;
 
   const handleDashboardClick = () => {
-    navigate("/salonPanel/salonDashboard");
+    navigate("/salonpanel/salonDashboard");
   };
   return (
     <div
