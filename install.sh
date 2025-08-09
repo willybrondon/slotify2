@@ -283,22 +283,22 @@ server {
     }
 
     # Serve Salon panel SPA at /salonpanel
-    location ^~ /salonpanel/static/ {
-        alias /home/admin/backend/salon/static/;
-        access_log off;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-    location ^~ /salonpanel/ {
-        alias /home/admin/backend/salon/;
-        try_files $uri $uri/ /salonpanel/index.html;
-    }
+    # location ^~ /salonpanel/static/ {
+    #     alias /home/admin/backend/salon/static/;
+    #     access_log off;
+    #     expires 1y;
+    #     add_header Cache-Control "public, immutable";
+    # }
+    # location ^~ /salonpanel/ {
+    #     alias /home/admin/backend/salon/;
+    #     try_files $uri $uri/ /salonpanel/index.html;
+    # }
 
     # Serve Salon Portal at /salonportal
-    location ^~ /salonportal/ {
-        alias /home/admin/backend/salonportal/;
-        try_files $uri $uri/ /salonportal/index.html;
-    }
+    # location ^~ /salonportal/ {
+    #     alias /home/admin/backend/salonportal/;
+    #     try_files $uri $uri/ /salonportal/index.html;
+    # }
 
     # Static files
     location /static/ {
