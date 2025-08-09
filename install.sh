@@ -287,6 +287,12 @@ server {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
+
+    location ^~ /salonpanel/ {
+    alias /home/admin/backend/salon/;
+    try_files $uri $uri/ /salonpanel/index.html;
+    }
+    
     # location ^~ /salonpanel/ {
     #     alias /home/admin/backend/salon/;
     #     try_files $uri $uri/ /salonpanel/index.html;
