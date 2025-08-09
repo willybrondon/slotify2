@@ -73,7 +73,7 @@ const SalonEarning = () => {
   };
 
   function openHistory(id) {
-    navigate("/salonPanel/expertIncome", {
+    navigate("/salonpanel/expertIncome", {
       state: {
         id,
       },
@@ -176,7 +176,7 @@ const SalonEarning = () => {
   ];
 
   const handleInfoSettlement = (row) => {
-    navigate("/salonPanel/settlementInfo", {
+    navigate("/salonpanel/settlementInfo", {
       state: {
         row,
       },

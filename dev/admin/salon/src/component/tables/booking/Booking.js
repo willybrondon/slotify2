@@ -70,7 +70,7 @@ const Booking = () => {
   };
 
   const handleInfo = (id) => {
-    navigate("/salonPanel/getExpertProfile", {
+    navigate("/salonpanel/getExpertProfile", {
       state: {
         id,
       },

@@ -230,7 +230,7 @@ echo "
 ################################################
 Server setup is complete.
 1. baseURL : http://$public_ip:5000/
-3. SalonPanel : http://$public_ip:5000/salonpanel
+3. salonpanel : http://$public_ip:5000/salonpanel
 2. Secret key : $shared_secret_key
 3. MONGODB_CONNECTION_STRING: "mongodb://admin:dbadmin123@$public_ip:27017/$mongodbUser_name"
 "

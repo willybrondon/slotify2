@@ -172,7 +172,7 @@ const UpcomingBooking = () => {
    
   ];
   const handleInfo = (id) => {
-    navigate("/salonPanel/getExpertProfile", {
+    navigate("/salonpanel/getExpertProfile", {
       state: {
         id,
       },

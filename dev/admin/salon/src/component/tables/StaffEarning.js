@@ -57,7 +57,7 @@ const StaffEarning = () => {
   };
 
   const handleInfo = (id) => {
-    navigate("/salonPanel/expertIncome", {
+    navigate("/salonpanel/expertIncome", {
       state: {
         id,
       },
@@ -273,14 +273,14 @@ const StaffEarning = () => {
     },
   ];
   const handleEarning = (id) => {
-    navigate("/salonPanel/expertIncome", {
+    navigate("/salonpanel/expertIncome", {
       state: {
         id,
       },
     });
   };
   const handleInfoSettlement = (row) => {
-    navigate("/salonPanel/expertSettlementInfo", {
+    navigate("/salonpanel/expertSettlementInfo", {
       state: {
         row,
       },
