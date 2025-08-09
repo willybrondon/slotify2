@@ -226,7 +226,7 @@ npm install --f
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
-npm run build
+PUBLIC_URL=/salonpanel npm run build
 sudo rm -rf /home/admin/backend/salon
 mkdir -p /home/admin/backend/salon
 sudo mv /home/admin/salon/build/* /home/admin/backend/salon
@@ -292,17 +292,8 @@ server {
     alias /home/admin/backend/salon/;
     try_files $uri $uri/ /salonpanel/index.html;
     }
-    
-    # location ^~ /salonpanel/ {
-    #     alias /home/admin/backend/salon/;
-    #     try_files $uri $uri/ /salonpanel/index.html;
-    # }
 
-    # Serve Salon Portal at /salonportal
-    # location ^~ /salonportal/ {
-    #     alias /home/admin/backend/salonportal/;
-    #     try_files $uri $uri/ /salonportal/index.html;
-    # }
+   
 
     # Static files
     location /static/ {
