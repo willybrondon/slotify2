@@ -42,7 +42,7 @@ salonportal/
 
 1. **Local Development**: Simply open `index.html` in a web browser
 2. **Web Server**: Upload all files to your web server
-3. **Integration**: Link to your salon panel at `http://46.101.229.176:5000/salonpanel`
+3. **Integration**: Link to your salon panel at `https://skedisy/salonpanel`
 
 ## Customization
 

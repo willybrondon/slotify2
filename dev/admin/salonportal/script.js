@@ -281,7 +281,7 @@ window.addEventListener('DOMContentLoaded', function() {
         var expertQR = document.getElementById('qr-expert-top');
         if (customerQR) {
             new QRCode(customerQR, {
-                text: 'http://46.101.229.176:5000/salonpanel',
+                text: 'https://skedisy/salonpanel',
                 width: 128,
                 height: 128,
                 colorDark : '#111',
@@ -291,7 +291,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }
         if (expertQR) {
             new QRCode(expertQR, {
-                text: 'http://46.101.229.176:5000/salonpanel',
+                text: 'https://skedisy/salonpanel',
                 width: 128,
                 height: 128,
                 colorDark : '#111',
