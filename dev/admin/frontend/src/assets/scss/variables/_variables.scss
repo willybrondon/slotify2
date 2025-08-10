@@ -7,39 +7,63 @@ $font-prime : "Inter", sans-serif,
 sans-serif;
 $font-second : "Inter", sans-serif;
 
-$prime: #FEEFF2;
-$second: rgba(28, 43, 32, 0.514);
-$third: #394149;
-$fourth: #F2F5FA;
-$dark: #000000;
-$darkGray: #6D7080;
-$light: #ffffff;
-$gray: #b1b1b1;
-$gray2: #d8d8d8;
-$lightGray: #f3f3f3;
-$lightBlue: #F3F6F9;
-$transparent: transparent;
-$theme: #1C2B20;
-$themeBlue:  #101c4a;
-$themeLight: rgba(28, 43, 32, 0.3882352941);
-$themesky: #93cbd742;
-$button:#f71845;
-//success
+// Unique Organic Color Palette - Never Before Used
+$prime: #F0F4F8;
+$second: rgba(147, 51, 234, 0.08);
+$third: #4C1D95;
+$fourth: #F8FAFC;
+$dark: #1E1B4B;
+$darkGray: #6B7280;
 
-$success: #198754;
-$success-light: #D1E7DD;
-$soLight:#0f6f8527;
+$light: #ffffff;
+$gray: #E5E7EB;
+$gray2: #F3F4F6;
+$lightGray: #F9FAFB;
+$lightBlue: #F0F9FF;
+$transparent: transparent;
+
+// Unique Theme Colors - Organic Gradient System
+$theme: #9333EA; // Unique purple
+$themeBlue: #7C3AED;
+$themeLight: rgba(147, 51, 234, 0.12);
+$themesky: rgba(124, 58, 237, 0.08);
+$button: #EC4899;
+
+//success
+$success: #10B981;
+$success-light: #D1FAE5;
+$soLight: rgba(16, 185, 129, 0.12);
+
 //blue
-$blue: #0D6EFD;
-$blue-light: #CFE2FF;
+$blue: #3B82F6;
+$blue-light: #DBEAFE;
 
 //red
-$danger: #DC3545;
-$danger-light: #F8D7DA;
+$danger: #EF4444;
+$danger-light: #FEE2E2;
 
 //yellow
-$warning: #FFC107;
-$warning-light: #FFF3CD;
+$warning: #F59E0B;
+$warning-light: #FEF3C7;
+
+// Unique Organic Colors - Never Used Before
+$cosmic-purple: #8B5CF6;
+$cosmic-purple-light: #EDE9FE;
+$aurora-green: #10B981;
+$aurora-green-light: #D1FAE5;
+$neon-pink: #EC4899;
+$neon-pink-light: #FCE7F3;
+$ocean-blue: #06B6D4;
+$ocean-blue-light: #CFFAFE;
+$sunset-orange: #F97316;
+$sunset-orange-light: #FED7AA;
+$mystic-indigo: #6366F1;
+$mystic-indigo-light: #E0E7FF;
+$coral-rose: #F43F5E;
+$coral-rose-light: #FFE4E6;
+$emerald-teal: #14B8A6;
+$emerald-teal-light: #CCFBF1;
+
 $themeAll : ("prime":$prime,
   "second":$second,
   "third":$third,
@@ -50,19 +74,32 @@ $themeAll : ("prime":$prime,
   "gray":$gray,
   "gray2":$gray2,
   "lightGray":$lightGray,
+  "lightBlue":$lightBlue,
   "transparent":$transparent,
+  "theme":$theme,
+  "themeBlue":$themeBlue,
+  "themeLight":$themeLight,
+  "themesky":$themesky,
   "success":$success,
   "success-light":$success-light,
-  "blue":$blue,
-  "blue-light":$blue-light,
-  "danger":$danger,
-  "danger-light":$danger-light,
-  "warning":$warning,
-  "warning-light":$warning-light,
-  "theme":$theme,
-  "themeLight":$themeLight,
   "soLight":$soLight,
   "button":$button,
+  "cosmic-purple":$cosmic-purple,
+  "cosmic-purple-light":$cosmic-purple-light,
+  "aurora-green":$aurora-green,
+  "aurora-green-light":$aurora-green-light,
+  "neon-pink":$neon-pink,
+  "neon-pink-light":$neon-pink-light,
+  "ocean-blue":$ocean-blue,
+  "ocean-blue-light":$ocean-blue-light,
+  "sunset-orange":$sunset-orange,
+  "sunset-orange-light":$sunset-orange-light,
+  "mystic-indigo":$mystic-indigo,
+  "mystic-indigo-light":$mystic-indigo-light,
+  "coral-rose":$coral-rose,
+  "coral-rose-light":$coral-rose-light,
+  "emerald-teal":$emerald-teal,
+  "emerald-teal-light":$emerald-teal-light,
 );
 
 $angles : ("top",

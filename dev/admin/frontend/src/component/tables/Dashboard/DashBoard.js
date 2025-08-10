@@ -158,10 +158,10 @@ const DashBoard = () => {
   return (
     <div className="mainDashboard">
       <div className="dashBoardHead">
-        <h3 className="m3-bottom text-start">WELCOME ADMIN!</h3>
+        <h3 className="m3-bottom text-start">Welcome back, Admin! 👋</h3>
         <div className="row mb-0">
           <div className="col-3 mb-0 d-flex align-items-center">
-            <Title name={"DASHBOARD"} display={"none"} bottom={"0"} />
+            <Title name={"Dashboard Overview"} display={"none"} bottom={"0"} />
           </div>
 
           <div className="col-9 mb-0 d-flex justify-content-end">
@@ -175,6 +175,7 @@ const DashBoard = () => {
           </div>
         </div>
       </div>
+      
       <div className="mainDashbox">
         <div className="row">
           <div className="col-lg-3 col-md-4 col-sm-6 col-12 mt-3">
@@ -482,22 +483,45 @@ const DashBoard = () => {
           </div>
         </div>
       </div>
-      <h4 className="m12-top">DATA ANALYSIS</h4>
-      <div className="m20-top apexChart tsBox">
-        <ApexChart />
+
+      <div className="row mt-4">
+        <div className="col-12">
+          <div className="table-container">
+            <div className="table-title">
+              <h5>Data Analysis</h5>
+              <span>Revenue and Booking Data</span>
+            </div>
+            <ApexChart />
+          </div>
+        </div>
       </div>
-      <div className="row bg-white">
-        <div className="col-lg-6 col-md-12 ">
-          <div className="m40-top tsBox p-3 br-2">
-            <h5 className="text-center text-theme">TOP SALONS</h5>
+
+      <div className="row mt-4">
+        <div className="col-lg-6 col-md-12">
+          <div className="table-container">
+            <div className="table-title">
+              <h5>Top Salons</h5>
+              <button 
+                className="show-more-btn"
+                onClick={() => navigate("/admin/allSalon")}
+              >
+                View All
+              </button>
+            </div>
             <Table data={data} mapData={mapData} className="border-0" />
           </div>
         </div>
         <div className="col-lg-6 col-md-12">
-          <div className="m40-top tsBox p-3 br-2">
-            <h5 className="text-center text-theme">
-              TODAY'S UPCOMING BOOKINGS
-            </h5>
+          <div className="table-container">
+            <div className="table-title">
+              <h5>Today's Upcoming Bookings</h5>
+              <button 
+                className="show-more-btn"
+                onClick={() => navigate("/admin/futureBooking")}
+              >
+                Show More
+              </button>
+            </div>
             <Table
               data={nextBooking}
               mapData={appointMentData}
@@ -521,7 +545,7 @@ const DashBox = ({ dashIcon, dashSVG, title, amount, onClick }) => {
       </div>
       <div className="boxContent text-center col-xl-8 col-md-7 col-6">
         <div className="boxTitle midBox">
-          <p className="text-decoration-underline">{title}</p>
+          <p>{title}</p>
         </div>
         <div className="boxAmount midBox mt-2">
           <p>{amount}</p>
