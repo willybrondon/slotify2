@@ -166,7 +166,7 @@ const DashBoard = () => {
         {
             Header: "Show More",
             thClass: "text-decoration-underline special cursor",
-            thClick: () => navigate("/salonpanel/futureBooking"),
+            thClick: () => navigate("/salonPanel/futureBooking"),
         },
     ];
     const groupedOrders = upComingOrders?.reduce((acc, order) => {
@@ -211,7 +211,7 @@ const DashBoard = () => {
     });
 
     const handleOrderView = (id) => {
-        navigate(`/salonpanel/orderDetails`, {
+        navigate(`/salonPanel/orderDetails`, {
             state: id,
         });
     };
@@ -382,11 +382,11 @@ const DashBoard = () => {
     return (
         <div className="mainDashboard">
             <div className="dashBoardHead">
-                <h3 className="m3-bottom text-start">WELCOME SALON!</h3>
+                <h3 className="m3-bottom text-start">Welcome back, Salon! 👋</h3>
                 <div className="row mb-0">
                     <div className="col-3 mb-0 d-flex align-items-center">
                         <Title
-                            name={"DASHBOARD"}
+                            name={"Dashboard Overview"}
                             display={"none"}
                             bottom={"0"}
                         />
@@ -427,7 +427,7 @@ const DashBoard = () => {
                                 </svg>
                             }
                             amount={counts?.experts ? counts?.experts : 0}
-                            onClick={() => navigate("/salonpanel/allExperts")}
+                            onClick={() => navigate("/salonPanel/allExperts")}
                         />
                     </div>
                     <div className="col-lg-3 col-sm-6 col-12">
@@ -491,7 +491,7 @@ const DashBoard = () => {
                                 </svg>
                             }
                             amount={counts?.bookings ? counts?.bookings : 0}
-                            onClick={() => navigate("/salonpanel/bookingTable")}
+                            onClick={() => navigate("/salonPanel/bookingTable")}
                         />
                     </div>
                     <div className="col-lg-3 col-sm-6 col-12">
@@ -587,7 +587,7 @@ const DashBoard = () => {
                                     : 0
                             }
                             onClick={() =>
-                                navigate("/salonpanel/dailyBookingTable")
+                                navigate("/salonPanel/dailyBookingTable")
                             }
                         />
                     </div>
@@ -617,21 +617,30 @@ const DashBoard = () => {
                                       setting?.currencySymbol
                                     : 0
                             }
-                            onClick={() => navigate("/salonpanel/staffEarning")}
+                            onClick={() => navigate("/salonPanel/staffEarning")}
                         />
                     </div>
                 </div>
             </div>
-            <div className="m40-top apexChart tsBox">
-                <ApexChart />
+            <div className="row mt-4">
+                <div className="col-12">
+                    <div className="table-container">
+                        <div className="table-title">
+                            <h5>Data Analysis</h5>
+                            <span>Revenue and Booking Data</span>
+                        </div>
+                        <ApexChart />
+                    </div>
+                </div>
             </div>
 
-            <div className="row bg-white">
-                <div className="col-md-12 ">
-                    <div className="m40-top tsBox p-3 br-2">
-                        <h5 className="text-center text-theme">
-                            UPCOMING ORDERS
-                        </h5>
+            <div className="row mt-4">
+                <div className="col-12">
+                    <div className="table-container">
+                        <div className="table-title">
+                            <h5>Upcoming Orders</h5>
+                            <span>Recent order activity</span>
+                        </div>
                         <Table
                             data={flattenedOrders}
                             mapData={upComingOrderData}
@@ -643,10 +652,18 @@ const DashBoard = () => {
                 </div>
             </div>
 
-            <div className="row bg-white">
-                <div className="col-lg-6 col-md-12 ">
-                    <div className="m40-top tsBox p-3 br-2">
-                        <h5 className="text-center text-theme">TOP EXPERTS</h5>
+            <div className="row mt-4">
+                <div className="col-lg-6 col-md-12">
+                    <div className="table-container">
+                        <div className="table-title">
+                            <h5>Top Experts</h5>
+                            <button
+                                className="show-more-btn"
+                                onClick={() => navigate("/salonPanel/allExperts")}
+                            >
+                                View All
+                            </button>
+                        </div>
                         <Table
                             data={data}
                             mapData={mapData}
@@ -655,10 +672,16 @@ const DashBoard = () => {
                     </div>
                 </div>
                 <div className="col-lg-6 col-md-12">
-                    <div className="m40-top tsBox p-3 br-2">
-                        <h5 className="text-center text-theme">
-                            TODAY'S UPCOMING BOOKING
-                        </h5>
+                    <div className="table-container">
+                        <div className="table-title">
+                            <h5>Today's Upcoming Bookings</h5>
+                            <button
+                                className="show-more-btn"
+                                onClick={() => navigate("/salonPanel/bookingTable")}
+                            >
+                                Show More
+                            </button>
+                        </div>
                         <Table
                             data={nextBooking}
                             mapData={appointMentData}
@@ -682,7 +705,7 @@ const DashBox = ({ dashIcon, dashSVG, title, amount, onClick }) => {
             </div>
             <div className="boxContent text-center col-xl-8 col-md-7 col-6">
                 <div className="boxTitle midBox">
-                    <p className="text-decoration-underline">{title}</p>
+                    <p>{title}</p>
                 </div>
                 <div className="boxAmount midBox mt-2">
                     <p>{amount}</p>
