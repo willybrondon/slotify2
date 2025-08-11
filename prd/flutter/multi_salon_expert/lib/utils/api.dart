@@ -1,6 +1,8 @@
 class ApiConstant {
-  static const BASE_URL = "http://46.101.229.176:5000/";  // Enter your base URL like :: http://182.168.19.35:5000/
-  static const SECRET_KEY = "r8Cs1WcSI9";  // Enter your key like :: ssf45sd1fs5d1sdf1s56165s15sdf1s
+  static const BASE_URL =
+      "https://skedisy.com/"; // Enter your base URL like :: http://182.168.19.35:5000/
+  static const SECRET_KEY =
+      "r8Cs1WcSI9"; // Enter your key like :: ssf45sd1fs5d1sdf1s56165s15sdf1s
 
   // ---------- expert ---------- //
   static const loginExpert = "user/expert/login";
@@ -9,9 +11,11 @@ class ApiConstant {
   // ---------- booking ---------- //
   static const getBooking = "user/booking/getBookingBasedDate?";
   static const statusWiseBooking = "user/booking/expert/booking?";
-  static const cancelConfirmBooking = "user/booking/expert/cancelConfirmBooking";
+  static const cancelConfirmBooking =
+      "user/booking/expert/cancelConfirmBooking";
   static const completeBooking = "user/booking/expert/completeBooking?";
-  static const bookingTypeStatusWise = "user/booking/expert/bookingWithTypeStatus?";
+  static const bookingTypeStatusWise =
+      "user/booking/expert/bookingWithTypeStatus?";
   static const getAttendance = "user/attendance/getAttendanceForExpert?";
   static const getBookingInformation = "user/booking/bookingInfo?";
 

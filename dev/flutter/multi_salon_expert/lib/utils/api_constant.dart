@@ -1,7 +1,8 @@
 class ApiConstant {
   static const BASE_URL =
-      "http://46.101.229.176:5000/"; // Enter your base URL like :: http://182.168.19.35:5000/
-  static const SECRET_KEY = "r8Cs1WcSI9";
+      "https://skedisy.com/"; // Enter your base URL like :: http://182.168.19.35:5000/
+  static const SECRET_KEY =
+      "r8Cs1WcSI9"; // Enter your key like :: ssf45sd1fs5d1sdf1s56165s15sdf1s
   // ---------- expert ---------- //
   static const loginExpert = "user/expert/login";
   static const getExpert = "user/expert/profile?";

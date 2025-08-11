@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch('http://46.101.229.176:5000/api/send-demo-request', {
+        fetch('https://skedisy.com/api/send-demo-request', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, phone, email, salonType })

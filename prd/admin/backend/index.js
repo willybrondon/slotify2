@@ -3,9 +3,15 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const app = express();
-const port = process.env.PORT || 6040;
+const port = process.env.PORT || 5000;
 const moment = require("moment");
 const mongoose = require("mongoose");
+
+// Set default baseURL if not provided in environment
+if (!process.env.baseURL) {
+  process.env.baseURL = "https://skedisy.com";
+}
+
 require("./middleware/mongodb");
 const fs = require("fs");
 const iconv = require("iconv-lite");
