@@ -247,7 +247,7 @@ app.get("/salonportal/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "salonportal", "index.html"));
 });
 
-app.get("/salonpanel/*", function (req, res) {
+app.get("/SalonPanel/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
 });
 
