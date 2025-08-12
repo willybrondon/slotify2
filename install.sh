@@ -80,12 +80,24 @@ fi
   
 echo "SECRET_KEY: $SECRET_KEY"  
 
-# Use DB_NAME from environment if set, otherwise prompt the user
-if [ -n "$DB_NAME" ]; then
-    app_name="$DB_NAME"
-    echo "Using DB_NAME from environment as app_name: $app_name"
+# Use app name from environment if set, otherwise prompt the user
+if [ -n "$APP_NAME" ]; then
+    app_name="$APP_NAME"
+    echo "Using APP_NAME from environment as app_name: $app_name"
 else
     read -p "Your app name: " app_name
+fi
+
+echo "APP_NAME: $APP_NAME"
+
+
+
+# Use DB_NAME from environment if set, otherwise prompt the user
+if [ -n "$DB_NAME" ]; then
+    db_name="$DB_NAME"
+    echo "Using DB_NAME from environment as app_name: $db_name"
+else
+    read -p "Your bd name: " db_name
 fi
 
 echo "DB_NAME: $DB_NAME"
@@ -120,7 +132,7 @@ sudo systemctl enable mongod
 sleep 10
 
 # Mongodb User Name
-mongodbUser_name=$(echo "$app_name" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+mongodbUser_name=$(echo "$db_name" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
 echo "Your mongodb user name formatted: $mongodbUser_name"
 
 # Create admin user
