@@ -301,6 +301,14 @@ server {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
+
+    # Storage files
+    location /storage/ {
+        alias /home/admin/backend/storage/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header Access-Control-Allow-Origin *;
+    }
 }
 EOF
 
