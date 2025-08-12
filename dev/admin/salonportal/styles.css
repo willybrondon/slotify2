@@ -53,7 +53,7 @@ body {
 }
 
 .nav-logo h2 {
-    color: #2c3e50;
+    color: #000000;
     font-weight: 700;
     font-size: 1.5rem;
 }
@@ -1142,6 +1142,14 @@ body {
     flex-direction: column;
     align-items: center;
     min-width: 100px;
+}
+.qr-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #111;
+    margin-top: 8px;
+    text-align: center;
+    line-height: 1.2;
 }
 .qr-login-top {
     margin-left: 32px;
