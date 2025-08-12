@@ -267,6 +267,7 @@ cron.schedule("55 23 28-31 * *", async () => {
 //schedule session for create demo user's booking with status "pending"
 
 app.use("/storage", express.static(path.join(__dirname, "storage")));
+app.use("/salonpanel/storage", express.static(path.join(__dirname, "storage")));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "salon")));
 
