@@ -39,7 +39,7 @@ const Registration = () => {
 
       if (newPassword !== password)
         error.newPassword = "New Password and Confirm Password doesn't match !";
-      if (!code) error.code = "purchase code is required !";
+      if (!code) error.code = "code is required !";
       return setError({ ...error });
     } else {
       const loginData = {
@@ -67,7 +67,7 @@ const Registration = () => {
             </div>
             <h1>Sign Up !</h1>
             <h6 className="fw-bold text-theme  me-auto my-auto fs-15 py-2 title">
-              Please,Enter Your Email id , Password , PurchaseCode
+              Please,Enter Your Email id , Password , Code
             </h6>
             <div>
               <div className="col-12 ">
@@ -149,17 +149,17 @@ const Registration = () => {
                 <ExInput
                   type={`text`}
                   id={`loginpurachseCode`}
-                  name={`Purchase Code`}
+                  name={`Code`}
                   value={code}
-                  label={`Purchase Code`}
-                  placeholder={`Purchase Code`}
+                  label={`Code`}
+                  placeholder={`Code`}
                   errorMessage={error.code && error.code}
                   onChange={(e) => {
                     setCode(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        code: `Purchase Code is Required`,
+                        code: `Code is Required`,
                       });
                     } else {
                       return setError({
