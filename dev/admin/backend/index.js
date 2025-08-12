@@ -1,4 +1,10 @@
 require("dotenv").config();
+
+// Set default baseURL if not provided in environment
+if (!process.env.baseURL) {
+  process.env.baseURL = "https://skedisy.com";
+}
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
