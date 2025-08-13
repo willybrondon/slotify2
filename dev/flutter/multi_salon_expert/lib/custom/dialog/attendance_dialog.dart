@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable
 
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,8 +17,8 @@ class AttendanceDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: Get.height * 0.41,
-        padding: const EdgeInsets.only(bottom: 25),
+        height: Get.height * 0.5,
+        padding: const EdgeInsets.only(bottom: 30),
         decoration: BoxDecoration(
           color: AppColors.dialogBg,
           borderRadius: BorderRadius.circular(45),
@@ -52,7 +51,7 @@ class AttendanceDialog extends StatelessWidget {
               height: 115,
               width: 115,
               color: AppColors.primaryAppColor,
-            ).paddingOnly(top: 15, bottom: 15),
+            ).paddingOnly(top: 20, bottom: 20),
             Text(
               "txtNoAttendance".tr,
               style: TextStyle(
@@ -60,16 +59,16 @@ class AttendanceDialog extends StatelessWidget {
                 fontSize: 18,
                 fontFamily: AppFontFamily.sfProDisplayMedium,
               ),
-            ),
+            ).paddingOnly(bottom: 20),
             const Spacer(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 GetBuilder<RevenueScreenController>(
                   builder: (logic) {
                     return AppButton(
                       height: 50,
-                      width: Get.width * 0.31,
+                      width: Get.width * 0.35,
                       buttonColor: AppColors.transparent,
                       buttonText: "txtNo".tr,
                       textColor: AppColors.primaryAppColor,
@@ -79,15 +78,19 @@ class AttendanceDialog extends StatelessWidget {
                       fontSize: 16.5,
                       onTap: () async {
                         await logic.onExpertAttendanceApiCall(
-                          expertId: Constant.storage.read<String>("expertId").toString(),
+                          expertId: Constant.storage
+                              .read<String>("expertId")
+                              .toString(),
                           action: "absent",
                         );
 
                         if (logic.expertAttendanceCategory?.status == true) {
                           Get.back();
-                          Utils.showToast(Get.context!, logic.expertAttendanceCategory?.message ?? "");
+                          Utils.showToast(Get.context!,
+                              logic.expertAttendanceCategory?.message ?? "");
                         } else {
-                          Utils.showToast(Get.context!, logic.expertAttendanceCategory?.message ?? "");
+                          Utils.showToast(Get.context!,
+                              logic.expertAttendanceCategory?.message ?? "");
                         }
                       },
                     );
@@ -97,7 +100,7 @@ class AttendanceDialog extends StatelessWidget {
                   builder: (logic) {
                     return AppButton(
                       height: 50,
-                      width: Get.width * 0.31,
+                      width: Get.width * 0.35,
                       buttonColor: AppColors.primaryAppColor,
                       buttonText: "txtYes".tr,
                       textColor: AppColors.whiteColor,
@@ -105,22 +108,26 @@ class AttendanceDialog extends StatelessWidget {
                       fontSize: 16.5,
                       onTap: () async {
                         await logic.onExpertAttendanceApiCall(
-                          expertId: Constant.storage.read<String>("expertId").toString(),
+                          expertId: Constant.storage
+                              .read<String>("expertId")
+                              .toString(),
                           action: "attend",
                         );
 
                         if (logic.expertAttendanceCategory?.status == true) {
                           Get.back();
-                          Utils.showToast(Get.context!, logic.expertAttendanceCategory?.message ?? "");
+                          Utils.showToast(Get.context!,
+                              logic.expertAttendanceCategory?.message ?? "");
                         } else {
-                          Utils.showToast(Get.context!, logic.expertAttendanceCategory?.message ?? "");
+                          Utils.showToast(Get.context!,
+                              logic.expertAttendanceCategory?.message ?? "");
                         }
                       },
                     );
                   },
                 )
               ],
-            ).paddingOnly(left: 15, right: 15)
+            ).paddingOnly(left: 15, right: 15, bottom: 10)
           ],
         ));
   }
