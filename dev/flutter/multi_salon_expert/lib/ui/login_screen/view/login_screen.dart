@@ -40,9 +40,9 @@ class LoginScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: BlurryContainer(
-                      height: Get.height * 0.65,
+                      height: Get.height * 0.75,
                       padding: const EdgeInsets.only(
-                          left: 16, right: 16, bottom: 20),
+                          left: 16, right: 16, bottom: 30),
                       blur: 6,
                       elevation: 0,
                       color: Colors.white12,
@@ -51,7 +51,7 @@ class LoginScreen extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 10.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Center(
                               child: Text(
@@ -236,7 +236,7 @@ class LoginScreen extends StatelessWidget {
                                 );
                               },
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 30),
                             Row(
                               children: [
                                 Expanded(

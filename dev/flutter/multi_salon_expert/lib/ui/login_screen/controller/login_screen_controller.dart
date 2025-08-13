@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:salon_2/ui/login_screen/model/get_profile_model.dart';
 import 'package:salon_2/ui/login_screen/model/login_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
+import 'package:salon_2/utils/http_utils.dart';
 import 'package:salon_2/utils/services/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -68,18 +70,26 @@ class LoginScreenController extends GetxController {
               log("Email Id :: ${Constant.storage.read("emailId")}");
               log("Password :: ${Constant.storage.read("password")}");
 
-              await onGetExpertApiCall(expertId: Constant.storage.read<String>("expertId").toString());
+              await onGetExpertApiCall(
+                  expertId:
+                      Constant.storage.read<String>("expertId").toString());
 
               if (getExpertCategory?.status == true) {
                 earning = getExpertCategory?.data?.earning?.toStringAsFixed(2);
 
                 Constant.storage.write('isDemoLogin', false);
-                Constant.storage.write('fName', loginCategory?.expert?.fname.toString());
-                Constant.storage.write('lName', loginCategory?.expert?.lname.toString());
-                Constant.storage.write('uniqueID', loginCategory?.expert?.uniqueId.toString());
-                Constant.storage.write('hostImage', loginCategory?.expert?.image);
-                Constant.storage.write('paymentType', loginCategory?.expert?.paymentType);
-                Constant.storage.write("salonId", getExpertCategory?.data?.salonId?.id);
+                Constant.storage
+                    .write('fName', loginCategory?.expert?.fname.toString());
+                Constant.storage
+                    .write('lName', loginCategory?.expert?.lname.toString());
+                Constant.storage.write(
+                    'uniqueID', loginCategory?.expert?.uniqueId.toString());
+                Constant.storage
+                    .write('hostImage', loginCategory?.expert?.image);
+                Constant.storage
+                    .write('paymentType', loginCategory?.expert?.paymentType);
+                Constant.storage
+                    .write("salonId", getExpertCategory?.data?.salonId?.id);
 
                 log("First Name :: ${Constant.storage.read("fName")}");
                 log("Last Name :: ${Constant.storage.read("lName")}");
@@ -111,25 +121,29 @@ class LoginScreenController extends GetxController {
     }
   }
 
-  onLoginApiCall({required String email, required String password, required String fcmToken}) async {
+  onLoginApiCall(
+      {required String email,
+      required String password,
+      required String fcmToken}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      final body = json.encode({"email": email, "password": password, "fcmToken": fcmToken});
+      final body = json
+          .encode({"email": email, "password": password, "fcmToken": fcmToken});
 
       log("Login Body :: $body");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.loginExpert);
       log("Login Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Login Headers :: $headers");
 
-      final response = await http.patch(url, headers: headers, body: body);
-
-      log("Login Status Code :: ${response.statusCode}");
-      log("Login Response :: ${response.body}");
+      final response = await HttpUtils.patch(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -159,13 +173,17 @@ class LoginScreenController extends GetxController {
       log("Get Expert Params :: $queryParameters");
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getExpert + queryString);
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.getExpert + queryString);
       log("Get Expert Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get Expert Headers :: $headers");
 
-      final response = await http.get(url, headers: headers);
+      final response = await HttpUtils.get(url, headers: headers);
 
       log("Get Expert StatusCode :: ${response.statusCode}");
       log("Get Expert Body :: ${response.body}");
