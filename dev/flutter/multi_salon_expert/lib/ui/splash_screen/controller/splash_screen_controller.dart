@@ -31,10 +31,20 @@ class SplashScreenController extends GetxController {
 
       log("Setting Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Setting Headers :: $headers");
 
-      final response = await http.get(url, headers: headers);
+      // Add timeout to prevent hanging
+      final response = await http.get(url, headers: headers).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          log("Setting API timeout");
+          throw Exception('Request timeout');
+        },
+      );
 
       log("Setting StatusCode :: ${response.statusCode}");
       log("Setting Body :: ${response.body}");
@@ -42,11 +52,17 @@ class SplashScreenController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         settingCategory = SettingModel.fromJson(jsonResponse);
+        log("Setting API success: ${settingCategory?.status}");
+      } else {
+        log("Setting API failed with status: ${response.statusCode}");
+        settingCategory = null;
       }
     } on AppException catch (exception) {
-      Utils.showToast(Get.context!, exception.message);
+      log("AppException in Setting API: ${exception.message}");
+      settingCategory = null;
     } catch (e) {
       log("Error call Setting Api :: $e");
+      settingCategory = null;
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
