@@ -22,57 +22,108 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final LoginScreenController loginScreenController = Get.find<LoginScreenController>();
-  final SplashScreenController splashScreenController = Get.find<SplashScreenController>();
+  final LoginScreenController loginScreenController =
+      Get.find<LoginScreenController>();
+  final SplashScreenController splashScreenController =
+      Get.find<SplashScreenController>();
   FirebaseMessaging? messaging;
   FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
   bool notificationVisit = false;
 
   @override
   void initState() {
+    // Add a timeout to ensure the app doesn't get stuck
+    Future.delayed(const Duration(seconds: 15), () {
+      log("Splash screen timeout - forcing navigation to login");
+      Get.offAllNamed(AppRoutes.login);
+    });
+
     Future.delayed(const Duration(seconds: 3), () async {
       log("Is login check 1 :: ${Constant.storage.read("isLogIn")}");
 
-      await splashScreenController.onSettingApiCall();
-      initFirebase();
-      if (splashScreenController.settingCategory?.status == true) {
-        if (splashScreenController.settingCategory?.setting?.maintenanceMode == true) {
-          Get.dialog(
-            barrierColor: AppColors.blackColor.withOpacity(0.8),
-            Dialog(
-                backgroundColor: AppColors.transparent,
-                shadowColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                elevation: 0,
-                child: const AppActiveDialog()),
-          );
-        } else {
-          if (Constant.storage.read<bool>('isLogIn') == true) {
-            await loginScreenController.onGetExpertApiCall(expertId: Constant.storage.read<String>("expertId").toString());
+      try {
+        log("Starting setting API call...");
+        await splashScreenController.onSettingApiCall();
+        log("Setting API call completed. Status: ${splashScreenController.settingCategory?.status}");
 
-            if (loginScreenController.getExpertCategory?.status == true) {
-              earning = loginScreenController.getExpertCategory?.data?.earning?.toStringAsFixed(2);
+        initFirebase();
 
-              Constant.storage.write('fName', loginScreenController.getExpertCategory?.data?.fname.toString());
-              Constant.storage.write('lName', loginScreenController.getExpertCategory?.data?.lname.toString());
-              Constant.storage.write('hostImage', loginScreenController.getExpertCategory?.data?.image.toString());
-              Constant.storage.write('uniqueID', loginScreenController.getExpertCategory?.data?.uniqueId.toString());
-              Constant.storage.write("salonId", loginScreenController.getExpertCategory?.data?.salonId?.id.toString());
-
-              log("salon Id :: ${Constant.storage.read<String>("salonId")}");
-              log("Unique ID :: ${Constant.storage.read<String>("uniqueID")}");
-              log("salon Id df:: ${loginScreenController.getExpertCategory?.data?.salonId.toString()}");
-
-              Get.offAllNamed(AppRoutes.bottom);
-            } else {
-              Utils.showToast(Get.context!, loginScreenController.getExpertCategory?.message ?? "");
-            }
+        if (splashScreenController.settingCategory?.status == true) {
+          if (splashScreenController
+                  .settingCategory?.setting?.maintenanceMode ==
+              true) {
+            Get.dialog(
+              barrierColor: AppColors.blackColor.withOpacity(0.8),
+              Dialog(
+                  backgroundColor: AppColors.transparent,
+                  shadowColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  child: const AppActiveDialog()),
+            );
           } else {
-            Get.offAllNamed(AppRoutes.login);
+            if (Constant.storage.read<bool>('isLogIn') == true) {
+              log("User is logged in, getting expert data...");
+              await loginScreenController.onGetExpertApiCall(
+                  expertId:
+                      Constant.storage.read<String>("expertId").toString());
+
+              if (loginScreenController.getExpertCategory?.status == true) {
+                earning = loginScreenController.getExpertCategory?.data?.earning
+                    ?.toStringAsFixed(2);
+
+                Constant.storage.write(
+                    'fName',
+                    loginScreenController.getExpertCategory?.data?.fname
+                        .toString());
+                Constant.storage.write(
+                    'lName',
+                    loginScreenController.getExpertCategory?.data?.lname
+                        .toString());
+                Constant.storage.write(
+                    'hostImage',
+                    loginScreenController.getExpertCategory?.data?.image
+                        .toString());
+                Constant.storage.write(
+                    'uniqueID',
+                    loginScreenController.getExpertCategory?.data?.uniqueId
+                        .toString());
+                Constant.storage.write(
+                    "salonId",
+                    loginScreenController.getExpertCategory?.data?.salonId?.id
+                        .toString());
+
+                log("salon Id :: ${Constant.storage.read<String>("salonId")}");
+                log("Unique ID :: ${Constant.storage.read<String>("uniqueID")}");
+                log("salon Id df:: ${loginScreenController.getExpertCategory?.data?.salonId.toString()}");
+
+                log("Navigating to bottom bar...");
+                Get.offAllNamed(AppRoutes.bottom);
+              } else {
+                log("Expert API failed: ${loginScreenController.getExpertCategory?.message}");
+                Utils.showToast(Get.context!,
+                    loginScreenController.getExpertCategory?.message ?? "");
+                // Navigate to login if expert API fails
+                Get.offAllNamed(AppRoutes.login);
+              }
+            } else {
+              log("User not logged in, navigating to login...");
+              Get.offAllNamed(AppRoutes.login);
+            }
           }
+        } else {
+          log("Setting API failed: ${splashScreenController.settingCategory?.message}");
+          Utils.showToast(
+              Get.context!,
+              splashScreenController.settingCategory?.message ??
+                  "Failed to load settings");
+          // Navigate to login even if setting API fails
+          Get.offAllNamed(AppRoutes.login);
         }
-      } else {
-        Utils.showToast(Get.context!, splashScreenController.settingCategory?.message ?? "");
+      } catch (e) {
+        log("Error in splash screen initialization: $e");
+        // Navigate to login on any error
+        Get.offAllNamed(AppRoutes.login);
       }
     });
     super.initState();
@@ -95,7 +146,8 @@ class _SplashScreenState extends State<SplashScreen> {
       log("This is FCM token :: $value");
     });
 
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
       log("NotificationVisit with start :: $notificationVisit");
@@ -104,11 +156,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (Constant.storage.read("notification") == true) {
         handleMessage(initialMessage);
-
       } else {
         log("Notification Permission not allowed");
       }
-
     }
 
     FirebaseMessaging.onMessageOpenedApp.listen((event) {
@@ -121,7 +171,7 @@ class _SplashScreenState extends State<SplashScreen> {
     });
 
     FirebaseMessaging.onMessage.listen(
-          (RemoteMessage message) {
+      (RemoteMessage message) {
         log('Got a message whilst in the foreground!');
         log('Message data :: ${message.data}');
 
@@ -129,18 +179,20 @@ class _SplashScreenState extends State<SplashScreen> {
           log('Message also contained a notification :: ${message.notification}');
         }
         const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@drawable/ic_launcher');
+            AndroidInitializationSettings('@drawable/ic_launcher');
         flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-        flutterLocalNotificationsPlugin?.initialize(const InitializationSettings(android: initializationSettingsAndroid),
+        flutterLocalNotificationsPlugin?.initialize(
+            const InitializationSettings(
+                android: initializationSettingsAndroid),
             onDidReceiveNotificationResponse: (payload) {
-              log("payload is:- $payload");
+          log("payload is:- $payload");
 
-              if (Constant.storage.read("notification") == true) {
-                handleMessage(message);
-              } else {
-                log("Notification Permission not allowed");
-              }
-            });
+          if (Constant.storage.read("notification") == true) {
+            handleMessage(message);
+          } else {
+            log("Notification Permission not allowed");
+          }
+        });
 
         if (Constant.storage.read("notification") == true) {
           showNotificationWithSound(message);
