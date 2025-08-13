@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -25,6 +26,15 @@ String? fcmToken;
 String? currency;
 String? earning;
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 Future<void> backgroundNotification(RemoteMessage message) async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   NotificationSettings settings = await messaging.requestPermission(
@@ -45,7 +55,8 @@ Future<void> backgroundNotification(RemoteMessage message) async {
     log('Message Contained a Notification :: ${message.notification?.body}');
   }
 
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@drawable/ic_launcher');
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@drawable/ic_launcher');
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin?.initialize(
     const InitializationSettings(android: initializationSettingsAndroid),
@@ -82,10 +93,14 @@ Future<void> backgroundNotification(RemoteMessage message) async {
 }
 
 Future<void> main() async {
+  // Configure HTTP overrides for SSL certificate handling
+  HttpOverrides.global = MyHttpOverrides();
+
   RenderErrorBox.backgroundColor = Colors.transparent;
   RenderErrorBox.textStyle = ui.TextStyle(color: Colors.transparent);
 
-  SplashScreenController splashScreenController = Get.put(SplashScreenController());
+  SplashScreenController splashScreenController =
+      Get.put(SplashScreenController());
 
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return Container();
@@ -96,7 +111,8 @@ Future<void> main() async {
 
   /// Currency
   await splashScreenController.onSettingApiCall();
-  currency = splashScreenController.settingCategory?.setting?.currencySymbol.toString();
+  currency = splashScreenController.settingCategory?.setting?.currencySymbol
+      .toString();
 
   ///************** FCM token ************************\\\
   try {
@@ -151,7 +167,8 @@ class _MyAppState extends State<MyApp> {
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+        if (!currentFocus.hasPrimaryFocus &&
+            currentFocus.focusedChild != null) {
           currentFocus.focusedChild?.unfocus();
         }
       },
@@ -160,7 +177,8 @@ class _MyAppState extends State<MyApp> {
         locale: const Locale("en"),
         translations: AppLanguages(),
         defaultTransition: Transition.fade,
-        fallbackLocale: const Locale(Constant.languageEn, Constant.countryCodeEn),
+        fallbackLocale:
+            const Locale(Constant.languageEn, Constant.countryCodeEn),
         transitionDuration: const Duration(milliseconds: 200),
         initialRoute: AppRoutes.initial,
         getPages: AppPages.list,
