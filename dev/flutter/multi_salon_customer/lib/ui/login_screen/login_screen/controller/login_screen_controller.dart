@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,8 @@ class LoginScreenController extends GetxController {
   bool isFirstTap = false;
   bool? isDataSelected;
 
-  final ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
+  final ProfileScreenController profileScreenController =
+      Get.put(ProfileScreenController());
 
   //----------- API Variables -----------//
   LoginModel? loginCategory;
@@ -118,7 +120,8 @@ class LoginScreenController extends GetxController {
             errorMessage = "Invalid verification ID.";
             break;
           case 'session-expired':
-            errorMessage = "Verification session has expired. Please try again.";
+            errorMessage =
+                "Verification session has expired. Please try again.";
             break;
           case 'quota-exceeded':
             errorMessage = "SMS quota exceeded. Please try again later.";
@@ -130,7 +133,8 @@ class LoginScreenController extends GetxController {
             errorMessage = "Verification ID is missing.";
             break;
           case 'app-not-authorized':
-            errorMessage = "App is not authorized to use Firebase Authentication.";
+            errorMessage =
+                "App is not authorized to use Firebase Authentication.";
             break;
           case 'operation-not-allowed':
             errorMessage = "Phone authentication is not enabled.";
@@ -139,7 +143,8 @@ class LoginScreenController extends GetxController {
             errorMessage = "Too many requests. Please try again later.";
             break;
           case 'credential-already-in-use':
-            errorMessage = "The phone number is already linked to another account.";
+            errorMessage =
+                "The phone number is already linked to another account.";
             break;
           default:
             errorMessage = "An error occurred during OTP verification.";
@@ -167,7 +172,8 @@ class LoginScreenController extends GetxController {
         smsCode: otpEditingController.text,
       );
 
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
       log("User Credential :: $userCredential");
     } on FirebaseAuthException catch (e) {
       String errorMessage;
@@ -192,7 +198,8 @@ class LoginScreenController extends GetxController {
           errorMessage = "Verification ID is missing.";
           break;
         case 'app-not-authorized':
-          errorMessage = "App is not authorized to use Firebase Authentication.";
+          errorMessage =
+              "App is not authorized to use Firebase Authentication.";
           break;
         case 'operation-not-allowed':
           errorMessage = "Phone authentication is not enabled.";
@@ -201,7 +208,8 @@ class LoginScreenController extends GetxController {
           errorMessage = "Too many requests. Please try again later.";
           break;
         case 'credential-already-in-use':
-          errorMessage = "The phone number is already linked to another account.";
+          errorMessage =
+              "The phone number is already linked to another account.";
           break;
         default:
           errorMessage = "An error occurred during OTP verification.";
@@ -231,15 +239,24 @@ class LoginScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView, Constant.idBookingAndLogin]);
 
-      final body = json.encode(
-          {"mobile": mobile, "loginType": loginType, "fcmToken": fcmToken, "email": email, "password": password, "age": age});
+      final body = json.encode({
+        "mobile": mobile,
+        "loginType": loginType,
+        "fcmToken": fcmToken,
+        "email": email,
+        "password": password,
+        "age": age
+      });
 
       log("Login Body :: $body");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.loginUser);
       log("Login Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.post(url, headers: headers, body: body);
 
@@ -252,9 +269,16 @@ class LoginScreenController extends GetxController {
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
+    } on SocketException catch (e) {
+      log("Network error: $e");
+      Utils.showToast(Get.context!,
+          "Network connection error. Please check your internet connection.");
+    } on HandshakeException catch (e) {
+      log("SSL Handshake error: $e");
+      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
     } catch (e) {
       log("Error call Login Api :: $e");
-      Utils.showToast(Get.context!, '$e');
+      Utils.showToast(Get.context!, 'Connection error. Please try again.');
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idBookingAndLogin]);

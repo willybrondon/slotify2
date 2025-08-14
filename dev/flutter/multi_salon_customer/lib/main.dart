@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -49,6 +50,16 @@ num? adminCommissionCharges;
 num? cancelOrderCharges;
 num? walletAmount;
 int? cartItemCount;
+
+// SSL Certificate Bypass for HTTPS requests
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 getDialCode() {
   CountryCode getCountryDialCode(String countryCode) {
@@ -151,6 +162,9 @@ Future<Position> getDeviceLocation() async {
 }
 
 Future<void> main() async {
+  // Set global HTTP overrides to bypass SSL certificate verification
+  HttpOverrides.global = MyHttpOverrides();
+
   RenderErrorBox.backgroundColor = Colors.transparent;
   RenderErrorBox.textStyle = ui.TextStyle(color: Colors.transparent);
 
