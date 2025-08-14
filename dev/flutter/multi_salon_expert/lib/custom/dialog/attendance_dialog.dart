@@ -17,8 +17,8 @@ class AttendanceDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: Get.height * 0.5,
-        padding: const EdgeInsets.only(bottom: 30),
+        height: Get.height * 0.6,
+        padding: const EdgeInsets.only(bottom: 40),
         decoration: BoxDecoration(
           color: AppColors.dialogBg,
           borderRadius: BorderRadius.circular(45),
@@ -48,10 +48,10 @@ class AttendanceDialog extends StatelessWidget {
             ),
             Image.asset(
               AppAsset.icAttendanceNo,
-              height: 115,
-              width: 115,
+              height: 100,
+              width: 100,
               color: AppColors.primaryAppColor,
-            ).paddingOnly(top: 20, bottom: 20),
+            ).paddingOnly(top: 15, bottom: 15),
             Text(
               "txtNoAttendance".tr,
               style: TextStyle(
@@ -59,8 +59,9 @@ class AttendanceDialog extends StatelessWidget {
                 fontSize: 18,
                 fontFamily: AppFontFamily.sfProDisplayMedium,
               ),
-            ).paddingOnly(bottom: 20),
+            ).paddingOnly(bottom: 15),
             const Spacer(),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -127,7 +128,7 @@ class AttendanceDialog extends StatelessWidget {
                   },
                 )
               ],
-            ).paddingOnly(left: 15, right: 15, bottom: 10)
+            ).paddingOnly(left: 15, right: 15, bottom: 20)
           ],
         ));
   }
