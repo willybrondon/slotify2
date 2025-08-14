@@ -16,8 +16,11 @@ class AttendanceDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Center(
+      child: Container(
         height: Get.height * 0.6,
+        width: Get.width * 0.9,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
         padding: const EdgeInsets.only(bottom: 40),
         decoration: BoxDecoration(
           color: AppColors.dialogBg,
@@ -130,6 +133,8 @@ class AttendanceDialog extends StatelessWidget {
               ],
             ).paddingOnly(left: 15, right: 15, bottom: 20)
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

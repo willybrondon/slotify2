@@ -36,8 +36,14 @@ function App() {
 
   useEffect(() => {
     if (!token && !key) return;
-    dispatch(setOldAdmin(token));
-  }, [setToken, key]);
+    
+    // Add a small delay to ensure proper state synchronization
+    const timer = setTimeout(() => {
+      dispatch(setOldAdmin(token));
+    }, 50);
+    
+    return () => clearTimeout(timer);
+  }, [dispatch, token, key]);
 
   const queryClient = new QueryClient();
 
