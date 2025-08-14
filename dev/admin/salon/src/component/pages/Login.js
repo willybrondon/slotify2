@@ -15,7 +15,7 @@ const Login = (props) => {
 
   useEffect(() => {
     
-    isAuth && navigate("/salonpanel/salonDashboard");
+    isAuth && navigate("/salonPanel/salonDashboard");
   }, [isAuth, navigate]);
 
   const [email, setEmail] = useState("");
@@ -36,9 +36,20 @@ const Login = (props) => {
         password,
       };
 
-      let response = await dispatch(login(loginData)).unwrap();
-      console.log("response", response);
-      response?.status && navigate("/salonpanel/");
+      try {
+        let response = await dispatch(login(loginData)).unwrap();
+        console.log("response", response);
+        
+        if (response?.status) {
+          // Add a small delay to ensure session storage is properly set
+          setTimeout(() => {
+            // Force a page reload to ensure all state is properly synchronized
+            window.location.href = "/salonPanel/salonDashboard";
+          }, 100);
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+      }
     }
   };
 

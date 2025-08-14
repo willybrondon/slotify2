@@ -76,10 +76,21 @@ const authSlice = createSlice({
         SetDevKey(secretKey);
         setToken(action.payload.token);
         // console.log("action.payload.token", action.payload.token);
-        sessionStorage.setItem("token", action.payload.token);
-        sessionStorage.setItem("key", secretKey ? secretKey : undefined);
-        sessionStorage.setItem("isAuth", true);
-        Success("Login successfully");
+        
+        // Ensure session storage is set synchronously
+        try {
+          sessionStorage.setItem("token", action.payload.token);
+          sessionStorage.setItem("key", secretKey ? secretKey : undefined);
+          sessionStorage.setItem("isAuth", "true");
+          
+          // Force a small delay to ensure session storage is properly set
+          setTimeout(() => {
+            Success("Login successfully");
+          }, 50);
+        } catch (error) {
+          console.error("Error setting session storage:", error);
+          DangerRight("Login failed - please try again");
+        }
       } else {
         DangerRight(action?.payload?.message);
       }
@@ -131,7 +142,7 @@ const authSlice = createSlice({
       // state.admin = {};
       // state.isAuth = false;
 
-      // window.location.href = "/salonpanel/login";
+      // window.location.href = "/salonPanel/login";
       Success("Salon Password Updated Successfully");
     });
 
