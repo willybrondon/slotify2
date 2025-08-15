@@ -18,9 +18,12 @@ import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class SignInController extends GetxController {
-  final LoginScreenController loginScreenController = Get.find<LoginScreenController>();
-  final ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
-  final EditProfileScreenController editProfileScreenController = Get.put(EditProfileScreenController());
+  final LoginScreenController loginScreenController =
+      Get.find<LoginScreenController>();
+  final ProfileScreenController profileScreenController =
+      Get.put(ProfileScreenController());
+  final EditProfileScreenController editProfileScreenController =
+      Get.put(EditProfileScreenController());
 
   bool isLogIn = Constant.storage.read<bool>('isLogIn') ?? false;
   bool? isDataSelected;
@@ -107,23 +110,31 @@ class SignInController extends GetxController {
             log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
 
             if (loginScreenController.loginCategory!.status == true) {
-              Utils.showToast(Get.context!, ">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
+              Utils.showToast(Get.context!,
+                  ">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
               log(">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
               Utils.showToast(Get.context!, "User Login SuccessFully..!");
               Constant.storage.write('isLogIn', true);
-              Constant.storage.write('userId', loginScreenController.loginCategory?.user?.id);
-              Constant.storage.write('mobileNumber', loginScreenController.loginCategory?.user?.mobile.toString());
-              Constant.storage.write('isUpdate', loginScreenController.loginCategory?.user?.isUpdate);
+              Constant.storage.write(
+                  'userId', loginScreenController.loginCategory?.user?.id);
+              Constant.storage.write('mobileNumber',
+                  loginScreenController.loginCategory?.user?.mobile.toString());
+              Constant.storage.write('isUpdate',
+                  loginScreenController.loginCategory?.user?.isUpdate);
 
               log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
               log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
 
               await profileScreenController.onGetUserApiCall(loginType: 1);
               if (profileScreenController.getUserCategory?.status == true) {
-                Constant.storage.write('userId', profileScreenController.getUserCategory?.user?.id);
-                Constant.storage.write('userImage', profileScreenController.getUserCategory?.user?.image);
-                Constant.storage.write('fName', profileScreenController.getUserCategory?.user?.fname);
-                Constant.storage.write('lName', profileScreenController.getUserCategory?.user?.lname);
+                Constant.storage.write('userId',
+                    profileScreenController.getUserCategory?.user?.id);
+                Constant.storage.write('userImage',
+                    profileScreenController.getUserCategory?.user?.image);
+                Constant.storage.write('fName',
+                    profileScreenController.getUserCategory?.user?.fname);
+                Constant.storage.write('lName',
+                    profileScreenController.getUserCategory?.user?.lname);
 
                 isLogIn = true;
 
@@ -138,10 +149,12 @@ class SignInController extends GetxController {
                 editProfileScreenController.signOnTap();
                 update([Constant.idBookingAndLogin]);
               } else {
-                Utils.showToast(Get.context!, profileScreenController.getUserCategory?.message ?? "");
+                Utils.showToast(Get.context!,
+                    profileScreenController.getUserCategory?.message ?? "");
               }
             } else {
-              Utils.showToast(Get.context!, loginScreenController.loginCategory?.message ?? "");
+              Utils.showToast(Get.context!,
+                  loginScreenController.loginCategory?.message ?? "");
             }
 
             log("Log in Successfully");
@@ -160,21 +173,32 @@ class SignInController extends GetxController {
     }
   }
 
-  onCheckUseApiCall({required String email, required String loginType, required String password}) async {
+  onCheckUseApiCall(
+      {required String email,
+      required String loginType,
+      required String password}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      final queryParameters = {"email": email, "loginType": loginType, "password": password};
+      final queryParameters = {
+        "email": email,
+        "loginType": loginType,
+        "password": password
+      };
 
       log("Check User Params :: $queryParameters");
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.checkUser + queryString);
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.checkUser + queryString);
       log("Check User Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.post(url, headers: headers);
 
@@ -209,7 +233,8 @@ class SignInController extends GetxController {
       final name = googleSignInAccount?.displayName;
 
       if (googleSignInAccount != null) {
-        GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+        GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
 
         log("googleSignInAuthentication.accessToken :: ${googleSignInAuthentication.accessToken}");
 
@@ -217,21 +242,29 @@ class SignInController extends GetxController {
           accessToken: googleSignInAuthentication.accessToken,
           idToken: googleSignInAuthentication.idToken,
         );
-        UserCredential? userCredential = await _auth.signInWithCredential(credential).catchError((onErr) {
+        UserCredential? userCredential =
+            await _auth.signInWithCredential(credential).catchError((onErr) {
           return Utils.showToast(Get.context!, onErr.toString());
         });
 
         if (userCredential.user != null) {
           await loginScreenController.onLoginApiCall(
-              loginType: "2", email: userCredential.user?.email, fcmToken: fcmToken!, password: "", mobile: "", age: "");
+              loginType: "2",
+              email: userCredential.user?.email,
+              fcmToken: fcmToken!,
+              password: "",
+              mobile: "",
+              age: "");
 
           if (loginScreenController.loginCategory?.status == true) {
             log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
             Utils.showToast(Get.context!, "User Login SuccessFully..!");
 
             await Constant.storage.write('isGoogle', true);
-            await Constant.storage.write('userId', loginScreenController.loginCategory?.user?.id);
-            Constant.storage.write('email', loginScreenController.loginCategory?.user?.email);
+            await Constant.storage
+                .write('userId', loginScreenController.loginCategory?.user?.id);
+            Constant.storage.write(
+                'email', loginScreenController.loginCategory?.user?.email);
 
             log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
             log("Email is :: ${Constant.storage.read<String>('email')}");
@@ -239,7 +272,8 @@ class SignInController extends GetxController {
             log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
 
             if (loginScreenController.loginCategory?.user?.isUpdate == false) {
-              Constant.storage.write('userImage', profileScreenController.getUserCategory?.user?.image);
+              Constant.storage.write('userImage',
+                  profileScreenController.getUserCategory?.user?.image);
 
               try {
                 editProfileScreenController.isLoading(true);
@@ -250,24 +284,34 @@ class SignInController extends GetxController {
                   lName: "",
                   email: Constant.storage.read<String>('email').toString(),
                   age: "",
-                  mobile: loginScreenController.loginCategory?.user?.mobile ?? "",
+                  mobile:
+                      loginScreenController.loginCategory?.user?.mobile ?? "",
                   gender: "Male",
                   bio: "",
                   selectImageFile: "",
                 );
 
                 if (editProfileScreenController.updateUserCategory != null &&
-                    editProfileScreenController.updateUserCategory?.status == true) {
+                    editProfileScreenController.updateUserCategory?.status ==
+                        true) {
                   Constant.storage.write('isUpdate', true);
-                  loginScreenController.isUpdate = Constant.storage.read<bool>('isUpdate')!;
+                  loginScreenController.isUpdate =
+                      Constant.storage.read<bool>('isUpdate')!;
 
                   await profileScreenController.onGetUserApiCall();
                   if (profileScreenController.getUserCategory?.status == true) {
-                    Constant.storage.write('userId', profileScreenController.getUserCategory?.user?.id);
-                    Constant.storage.write('userImage', profileScreenController.getUserCategory?.user?.image);
-                    Constant.storage.write('salonRequestSent', profileScreenController.getUserCategory?.user?.salonRequestSent);
-                    Constant.storage.write('fName', profileScreenController.getUserCategory?.user?.fname);
-                    Constant.storage.write('lName', profileScreenController.getUserCategory?.user?.lname);
+                    Constant.storage.write('userId',
+                        profileScreenController.getUserCategory?.user?.id);
+                    Constant.storage.write('userImage',
+                        profileScreenController.getUserCategory?.user?.image);
+                    Constant.storage.write(
+                        'salonRequestSent',
+                        profileScreenController
+                            .getUserCategory?.user?.salonRequestSent);
+                    Constant.storage.write('fName',
+                        profileScreenController.getUserCategory?.user?.fname);
+                    Constant.storage.write('lName',
+                        profileScreenController.getUserCategory?.user?.lname);
 
                     if (isDataSelected == true) {
                       log("enter first google service selected if");
@@ -287,10 +331,18 @@ class SignInController extends GetxController {
                     editProfileScreenController.signOnTap();
                     update([Constant.idBookingAndLogin]);
                   } else {
-                    Utils.showToast(Get.context!, profileScreenController.getUserCategory?.message.toString() ?? "");
+                    Utils.showToast(
+                        Get.context!,
+                        profileScreenController.getUserCategory?.message
+                                .toString() ??
+                            "");
                   }
                 } else {
-                  Utils.showToast(Get.context!, editProfileScreenController.updateUserCategory?.message.toString() ?? "");
+                  Utils.showToast(
+                      Get.context!,
+                      editProfileScreenController.updateUserCategory?.message
+                              .toString() ??
+                          "");
                 }
               } catch (e) {
                 log("Error In Google Login Update :: $e");
@@ -301,11 +353,18 @@ class SignInController extends GetxController {
             } else {
               await profileScreenController.onGetUserApiCall();
               if (profileScreenController.getUserCategory?.status == true) {
-                Constant.storage.write('userId', profileScreenController.getUserCategory?.user?.id);
-                Constant.storage.write('userImage', profileScreenController.getUserCategory?.user?.image);
-                Constant.storage.write('fName', profileScreenController.getUserCategory?.user?.fname);
-                Constant.storage.write('lName', profileScreenController.getUserCategory?.user?.lname);
-                Constant.storage.write('salonRequestSent', profileScreenController.getUserCategory?.user?.salonRequestSent);
+                Constant.storage.write('userId',
+                    profileScreenController.getUserCategory?.user?.id);
+                Constant.storage.write('userImage',
+                    profileScreenController.getUserCategory?.user?.image);
+                Constant.storage.write('fName',
+                    profileScreenController.getUserCategory?.user?.fname);
+                Constant.storage.write('lName',
+                    profileScreenController.getUserCategory?.user?.lname);
+                Constant.storage.write(
+                    'salonRequestSent',
+                    profileScreenController
+                        .getUserCategory?.user?.salonRequestSent);
 
                 log("Sign in data selected :: $isDataSelected");
                 if (isDataSelected == true) {
@@ -319,15 +378,18 @@ class SignInController extends GetxController {
 
                   Get.offAllNamed(AppRoutes.bottom);
                   Constant.storage.write('isLogIn', true);
-                  Constant.storage.write('isUpdate', loginScreenController.loginCategory?.user?.isUpdate);
+                  Constant.storage.write('isUpdate',
+                      loginScreenController.loginCategory?.user?.isUpdate);
                 }
               }
             }
           } else {
-            Utils.showToast(Get.context!, loginScreenController.loginCategory?.message ?? "");
+            Utils.showToast(Get.context!,
+                loginScreenController.loginCategory?.message ?? "");
           }
         } else {
-          Utils.showToast(Get.context!, profileScreenController.getUserCategory?.message ?? "");
+          Utils.showToast(Get.context!,
+              profileScreenController.getUserCategory?.message ?? "");
         }
 
         log('success signing in with Google');

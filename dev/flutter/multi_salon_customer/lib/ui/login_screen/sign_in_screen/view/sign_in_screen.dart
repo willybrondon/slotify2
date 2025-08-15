@@ -48,9 +48,12 @@ class SignInScreen extends StatelessWidget {
                 Container(
                   height: 64,
                   width: 64,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.whiteColor),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle, color: AppColors.whiteColor),
                   clipBehavior: Clip.hardEdge,
-                  child: Image.network("${ApiConstant.BASE_URL}storage/male.png", fit: BoxFit.cover),
+                  child: Image.network(
+                      "${ApiConstant.BASE_URL}storage/male.png",
+                      fit: BoxFit.cover),
                 ).paddingOnly(left: 15, right: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,11 +61,17 @@ class SignInScreen extends StatelessWidget {
                   children: [
                     Text(
                       "txtWelcomeBack".tr,
-                      style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 18, color: AppColors.whiteColor),
+                      style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplay,
+                          fontSize: 18,
+                          color: AppColors.whiteColor),
                     ),
                     Text(
                       "txtLongTime".tr,
-                      style: TextStyle(fontFamily: AppFontFamily.sfProDisplayRegular, fontSize: 13, color: AppColors.whiteColor),
+                      style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplayRegular,
+                          fontSize: 13,
+                          color: AppColors.whiteColor),
                     ),
                   ],
                 ),
@@ -83,11 +92,16 @@ class SignInScreen extends StatelessWidget {
                       Text(
                         "txtEnterUsername".tr,
                         style: TextStyle(
-                            color: AppColors.primaryTextColor, fontSize: 21, fontFamily: AppFontFamily.sfProDisplayBold),
+                            color: AppColors.primaryTextColor,
+                            fontSize: 21,
+                            fontFamily: AppFontFamily.sfProDisplayBold),
                       ).paddingOnly(top: 20),
                       Text(
                         "txtFillDetails".tr,
-                        style: TextStyle(color: AppColors.email, fontSize: 13.5, fontFamily: AppFontFamily.sfProDisplayRegular),
+                        style: TextStyle(
+                            color: AppColors.email,
+                            fontSize: 13.5,
+                            fontFamily: AppFontFamily.sfProDisplayRegular),
                       ).paddingOnly(bottom: 17),
                       GetBuilder<SignInController>(
                         builder: (logic) {
@@ -144,7 +158,8 @@ class SignInScreen extends StatelessWidget {
                                       onTap: () {
                                         logic.onClickObscure();
                                       },
-                                      child: Image.asset(AppAsset.icVisible, cacheHeight: 22)),
+                                      child: Image.asset(AppAsset.icVisible,
+                                          cacheHeight: 22)),
                               hintText: "txtEnterPassword".tr,
                               obscureText: logic.isObscure,
                               maxLine: 1,
@@ -160,7 +175,8 @@ class SignInScreen extends StatelessWidget {
                                 return null;
                               },
                             ),
-                          ).paddingOnly(left: 16, right: 16, top: 15, bottom: 20);
+                          ).paddingOnly(
+                              left: 16, right: 16, top: 15, bottom: 20);
                         },
                       ),
                       Row(
@@ -169,7 +185,8 @@ class SignInScreen extends StatelessWidget {
                             id: Constant.idRemember,
                             builder: (logic) {
                               return InkWell(
-                                overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                                overlayColor: WidgetStatePropertyAll(
+                                    AppColors.transparent),
                                 onTap: () {
                                   logic.onRememberClick();
                                 },
@@ -180,9 +197,13 @@ class SignInScreen extends StatelessWidget {
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: logic.isRemember == true ? AppColors.primaryAppColor : AppColors.transparent,
+                                      color: logic.isRemember == true
+                                          ? AppColors.primaryAppColor
+                                          : AppColors.transparent,
                                       border: Border.all(
-                                          color: logic.isRemember == true ? AppColors.transparent : AppColors.primaryAppColor,
+                                          color: logic.isRemember == true
+                                              ? AppColors.transparent
+                                              : AppColors.primaryAppColor,
                                           width: 1)),
                                   child: logic.isRemember == true
                                       ? Image.asset(
@@ -198,7 +219,8 @@ class SignInScreen extends StatelessWidget {
                             id: Constant.idRemember,
                             builder: (logic) {
                               return InkWell(
-                                overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                                overlayColor: WidgetStatePropertyAll(
+                                    AppColors.transparent),
                                 onTap: () {
                                   logic.onRememberClick();
                                 },
@@ -206,7 +228,8 @@ class SignInScreen extends StatelessWidget {
                                   "txtRememberMe".tr,
                                   style: TextStyle(
                                       color: AppColors.primaryTextColor,
-                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayMedium,
                                       fontSize: 15),
                                 ),
                               );
@@ -235,8 +258,10 @@ class SignInScreen extends StatelessWidget {
                         builder: (logic) {
                           return AppButton(
                             onTap: () {
-                              FocusScopeNode currentFocus = FocusScope.of(context);
-                              if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+                              FocusScopeNode currentFocus =
+                                  FocusScope.of(context);
+                              if (!currentFocus.hasPrimaryFocus &&
+                                  currentFocus.focusedChild != null) {
                                 currentFocus.focusedChild?.unfocus();
                               }
                               logic.onClickSignIn();
@@ -248,25 +273,33 @@ class SignInScreen extends StatelessWidget {
                             fontFamily: AppFontFamily.sfProDisplay,
                             color: AppColors.whiteColor,
                             fontSize: 20,
-                          ).paddingOnly(bottom: 20, left: 13, right: 13, top: 13);
+                          ).paddingOnly(
+                              bottom: 20, left: 13, right: 13, top: 13);
                         },
                       ),
                       InkWell(
-                        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
                         onTap: () {
-                          Get.toNamed(AppRoutes.signUp, arguments: [logic.isDataSelected]);
+                          Get.toNamed(AppRoutes.signUp,
+                              arguments: [logic.isDataSelected]);
                           logic.emailController.clear();
                           logic.passwordController.clear();
                         },
                         child: RichText(
                           text: TextSpan(
                             text: '${"txtNotMember".tr} ',
-                            style: TextStyle(color: AppColors.email, fontSize: 14, fontFamily: AppFontFamily.sfProDisplayMedium),
+                            style: TextStyle(
+                                color: AppColors.email,
+                                fontSize: 14,
+                                fontFamily: AppFontFamily.sfProDisplayMedium),
                             children: <TextSpan>[
                               TextSpan(
                                   text: ' ${"txtSignUp".tr}',
                                   style: TextStyle(
-                                      fontSize: 16, fontFamily: AppFontFamily.sfProDisplay, color: AppColors.categoryService)),
+                                      fontSize: 16,
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                      color: AppColors.categoryService)),
                             ],
                           ),
                         ).paddingOnly(top: 5, bottom: 20),
@@ -295,7 +328,8 @@ class SignInScreen extends StatelessWidget {
                         ],
                       ).paddingOnly(left: 16, right: 16, bottom: 17),
                       InkWell(
-                        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
                         onTap: () {
                           Get.toNamed(AppRoutes.salonRegistration);
                         },
@@ -326,127 +360,149 @@ class SignInScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ).paddingOnly(bottom: 10),
+                        ).paddingOnly(bottom: 20),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GetBuilder<SignInController>(
-                            id: Constant.idProgressView,
-                            builder: (logic) {
-                              return InkWell(
-                                overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-                                onTap: () async {
-                                  await logic.signInWithGoogle();
-                                },
-                                child: Container(
-                                  height: 60,
-                                  width: Get.width * 0.43,
-                                  padding: const EdgeInsets.only(left: 10, right: 10),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.whiteColor,
-                                    borderRadius: BorderRadius.circular(60),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.blackColor.withOpacity(0.03),
-                                        offset: const Offset(
-                                          0.0,
-                                          1.0,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GetBuilder<SignInController>(
+                              id: Constant.idProgressView,
+                              builder: (logic) {
+                                return InkWell(
+                                  overlayColor: WidgetStatePropertyAll(
+                                      AppColors.transparent),
+                                  onTap: () async {
+                                    await logic.signInWithGoogle();
+                                  },
+                                  child: Container(
+                                    height: 60,
+                                    width: (Get.width - 45) *
+                                        0.48, // Adjusted width to prevent overflow
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.whiteColor,
+                                      borderRadius: BorderRadius.circular(60),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.blackColor
+                                              .withOpacity(0.03),
+                                          offset: const Offset(
+                                            0.0,
+                                            1.0,
+                                          ),
+                                          blurRadius: 3.0,
+                                          spreadRadius: 2.0,
                                         ),
-                                        blurRadius: 3.0,
-                                        spreadRadius: 2.0,
-                                      ),
-                                      const BoxShadow(
-                                        color: Colors.black12,
-                                        offset: Offset(0.0, 0.0),
-                                        blurRadius: 0.0,
-                                        spreadRadius: 0.0,
-                                      ),
-                                    ],
+                                        const BoxShadow(
+                                          color: Colors.black12,
+                                          offset: Offset(0.0, 0.0),
+                                          blurRadius: 0.0,
+                                          spreadRadius: 0.0,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          height: 47,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: AppColors.bottom,
+                                          ),
+                                          padding: const EdgeInsets.all(10),
+                                          child: Image.asset(AppAsset.icGoogle),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "Google",
+                                            style: TextStyle(
+                                              color: AppColors.primaryTextColor,
+                                              fontFamily:
+                                                  AppFontFamily.sfProDisplay,
+                                              fontSize: 15,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ).paddingOnly(left: 10),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        height: 47,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: AppColors.bottom,
-                                        ),
-                                        padding: const EdgeInsets.all(10),
-                                        child: Image.asset(AppAsset.icGoogle),
+                                ).paddingOnly(bottom: 20, top: 10);
+                              },
+                            ),
+                            InkWell(
+                              overlayColor:
+                                  WidgetStatePropertyAll(AppColors.transparent),
+                              onTap: () async {
+                                Get.toNamed(AppRoutes.login,
+                                    arguments: [logic.isDataSelected]);
+                                await Get.find<LoginScreenController>()
+                                    .getDataFromArgs();
+                              },
+                              child: Container(
+                                height: 60,
+                                width: (Get.width - 45) *
+                                    0.48, // Adjusted width to prevent overflow
+                                padding:
+                                    const EdgeInsets.only(left: 10, right: 10),
+                                decoration: BoxDecoration(
+                                  color: AppColors.whiteColor,
+                                  borderRadius: BorderRadius.circular(60),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.blackColor
+                                          .withOpacity(0.03),
+                                      offset: const Offset(
+                                        0.0,
+                                        1.0,
                                       ),
-                                      Text(
-                                        "Google",
+                                      blurRadius: 3.0,
+                                      spreadRadius: 2.0,
+                                    ),
+                                    const BoxShadow(
+                                      color: Colors.black12,
+                                      offset: Offset(0.0, 0.0),
+                                      blurRadius: 0.0,
+                                      spreadRadius: 0.0,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      height: 47,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.bottom,
+                                      ),
+                                      padding: const EdgeInsets.all(10),
+                                      child: Image.asset(AppAsset.icMobile),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        "Mobile",
                                         style: TextStyle(
                                           color: AppColors.primaryTextColor,
-                                          fontFamily: AppFontFamily.sfProDisplay,
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplay,
                                           fontSize: 15,
                                         ),
-                                      ).paddingOnly(left: 20),
-                                    ],
-                                  ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ).paddingOnly(left: 10),
+                                    ),
+                                  ],
                                 ),
-                              ).paddingOnly(bottom: 20, top: 10);
-                            },
-                          ),
-                          InkWell(
-                            overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-                            onTap: () async {
-                              Get.toNamed(AppRoutes.login, arguments: [logic.isDataSelected]);
-                              await Get.find<LoginScreenController>().getDataFromArgs();
-                            },
-                            child: Container(
-                              height: 60,
-                              width: Get.width * 0.43,
-                              padding: const EdgeInsets.only(left: 10, right: 10),
-                              decoration: BoxDecoration(
-                                color: AppColors.whiteColor,
-                                borderRadius: BorderRadius.circular(60),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.blackColor.withOpacity(0.03),
-                                    offset: const Offset(
-                                      0.0,
-                                      1.0,
-                                    ),
-                                    blurRadius: 3.0,
-                                    spreadRadius: 2.0,
-                                  ),
-                                  const BoxShadow(
-                                    color: Colors.black12,
-                                    offset: Offset(0.0, 0.0),
-                                    blurRadius: 0.0,
-                                    spreadRadius: 0.0,
-                                  ),
-                                ],
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    height: 47,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.bottom,
-                                    ),
-                                    padding: const EdgeInsets.all(10),
-                                    child: Image.asset(AppAsset.icMobile),
-                                  ),
-                                  Text(
-                                    "Mobile",
-                                    style: TextStyle(
-                                      color: AppColors.primaryTextColor,
-                                      fontFamily: AppFontFamily.sfProDisplay,
-                                      fontSize: 15,
-                                    ),
-                                  ).paddingOnly(left: 20),
-                                ],
-                              ),
-                            ),
-                          ).paddingOnly(bottom: 20, top: 10),
-                        ],
-                      ).paddingSymmetric(horizontal: 15),
+                            ).paddingOnly(bottom: 20, top: 10),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),

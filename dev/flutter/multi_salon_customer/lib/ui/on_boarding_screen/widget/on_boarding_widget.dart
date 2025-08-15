@@ -17,7 +17,6 @@ class OnBoardingView extends StatelessWidget {
         id: Constant.idOnBoarding,
         builder: (logic) {
           return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
                 child: PageView.builder(
@@ -34,12 +33,15 @@ class OnBoardingView extends StatelessWidget {
                   },
                 ),
               ),
+              // Fixed height button container to prevent overlap
               Container(
                 width: Get.width,
+                height: 120, // Fixed height for button area
                 color: AppColors.whiteColor,
+                padding: const EdgeInsets.only(bottom: 20),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 25),
                     GetBuilder<OnBoardingController>(
                       id: Constant.idOnBoarding,
                       builder: (logic) {
@@ -53,7 +55,6 @@ class OnBoardingView extends StatelessWidget {
                         );
                       },
                     ),
-                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -84,31 +85,34 @@ class OnboardingItemView extends StatelessWidget {
           fit: BoxFit.cover,
         ),
       ),
-      child: Column(
-        children: [
-          const Spacer(),
-          const Spacer(),
-          Image.asset(image).paddingOnly(left: 15, right: 15),
-          const Spacer(),
-          Text(
-            title,
-            style: TextStyle(
-              color: AppColors.primaryAppColor,
-              fontFamily: AppFontFamily.heeBo800,
-              fontSize: 28,
-            ),
-            textAlign: TextAlign.center,
-          ).paddingAll(20),
-          Text(
-            "Transform Your Look, Transform Your Life, Your Ultimate Desire Awaits Here.",
-            style: TextStyle(
-              color: AppColors.termsDialog,
-              fontFamily: AppFontFamily.heeBo500,
-              fontSize: 17,
-            ),
-            textAlign: TextAlign.center,
-          ).paddingOnly(left: 20, right: 20),
-        ],
+      child: SafeArea(
+        child: Column(
+          children: [
+            const Spacer(flex: 2),
+            Image.asset(image).paddingOnly(left: 15, right: 15),
+            const Spacer(flex: 1),
+            Text(
+              title,
+              style: TextStyle(
+                color: AppColors.primaryAppColor,
+                fontFamily: AppFontFamily.heeBo800,
+                fontSize: 28,
+              ),
+              textAlign: TextAlign.center,
+            ).paddingAll(20),
+            Text(
+              "Transform Your Look, Transform Your Life, Your Ultimate Desire Awaits Here.",
+              style: TextStyle(
+                color: AppColors.termsDialog,
+                fontFamily: AppFontFamily.heeBo500,
+                fontSize: 17,
+              ),
+              textAlign: TextAlign.center,
+            ).paddingOnly(left: 20, right: 20, bottom: 20),
+            // Add extra space to prevent overlap with button area
+            const SizedBox(height: 100),
+          ],
+        ),
       ),
     );
   }
