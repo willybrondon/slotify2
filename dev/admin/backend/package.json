@@ -19,6 +19,7 @@
   },
   "homepage": "",
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
     "cors": "^2.8.5",
     "cryptr": "^6.3.0",
     "dayjs": "^1.11.13",
