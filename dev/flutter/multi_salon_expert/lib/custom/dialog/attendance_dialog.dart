@@ -65,73 +65,88 @@ class AttendanceDialog extends StatelessWidget {
             ).paddingOnly(bottom: 15),
             const Spacer(),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GetBuilder<RevenueScreenController>(
-                  builder: (logic) {
-                    return AppButton(
-                      height: 50,
-                      width: Get.width * 0.35,
-                      buttonColor: AppColors.transparent,
-                      buttonText: "txtNo".tr,
-                      textColor: AppColors.primaryAppColor,
-                      fontFamily: AppFontFamily.sfProDisplay,
-                      borderColor: AppColors.primaryAppColor,
-                      borderWidth: 1,
-                      fontSize: 16.5,
-                      onTap: () async {
-                        await logic.onExpertAttendanceApiCall(
-                          expertId: Constant.storage
-                              .read<String>("expertId")
-                              .toString(),
-                          action: "absent",
-                        );
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GetBuilder<RevenueScreenController>(
+                      builder: (logic) {
+                        return AppButton(
+                          height: 50,
+                          buttonColor: AppColors.transparent,
+                          buttonText: "txtNo".tr,
+                          textColor: AppColors.primaryAppColor,
+                          fontFamily: AppFontFamily.sfProDisplay,
+                          borderColor: AppColors.primaryAppColor,
+                          borderWidth: 1,
+                          fontSize: 16.5,
+                          onTap: () async {
+                            await logic.onExpertAttendanceApiCall(
+                              expertId: Constant.storage
+                                  .read<String>("expertId")
+                                  .toString(),
+                              action: "absent",
+                            );
 
-                        if (logic.expertAttendanceCategory?.status == true) {
-                          Get.back();
-                          Utils.showToast(Get.context!,
-                              logic.expertAttendanceCategory?.message ?? "");
-                        } else {
-                          Utils.showToast(Get.context!,
-                              logic.expertAttendanceCategory?.message ?? "");
-                        }
-                      },
-                    );
-                  },
-                ),
-                GetBuilder<RevenueScreenController>(
-                  builder: (logic) {
-                    return AppButton(
-                      height: 50,
-                      width: Get.width * 0.35,
-                      buttonColor: AppColors.primaryAppColor,
-                      buttonText: "txtYes".tr,
-                      textColor: AppColors.whiteColor,
-                      fontFamily: AppFontFamily.sfProDisplay,
-                      fontSize: 16.5,
-                      onTap: () async {
-                        await logic.onExpertAttendanceApiCall(
-                          expertId: Constant.storage
-                              .read<String>("expertId")
-                              .toString(),
-                          action: "attend",
+                            if (logic.expertAttendanceCategory?.status ==
+                                true) {
+                              Get.back();
+                              Utils.showToast(
+                                  Get.context!,
+                                  logic.expertAttendanceCategory?.message ??
+                                      "");
+                            } else {
+                              Utils.showToast(
+                                  Get.context!,
+                                  logic.expertAttendanceCategory?.message ??
+                                      "");
+                            }
+                          },
                         );
-
-                        if (logic.expertAttendanceCategory?.status == true) {
-                          Get.back();
-                          Utils.showToast(Get.context!,
-                              logic.expertAttendanceCategory?.message ?? "");
-                        } else {
-                          Utils.showToast(Get.context!,
-                              logic.expertAttendanceCategory?.message ?? "");
-                        }
                       },
-                    );
-                  },
-                )
-              ],
-            ).paddingOnly(left: 15, right: 15, bottom: 20)
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: GetBuilder<RevenueScreenController>(
+                      builder: (logic) {
+                        return AppButton(
+                          height: 50,
+                          buttonColor: AppColors.primaryAppColor,
+                          buttonText: "txtYes".tr,
+                          textColor: AppColors.whiteColor,
+                          fontFamily: AppFontFamily.sfProDisplay,
+                          fontSize: 16.5,
+                          onTap: () async {
+                            await logic.onExpertAttendanceApiCall(
+                              expertId: Constant.storage
+                                  .read<String>("expertId")
+                                  .toString(),
+                              action: "attend",
+                            );
+
+                            if (logic.expertAttendanceCategory?.status ==
+                                true) {
+                              Get.back();
+                              Utils.showToast(
+                                  Get.context!,
+                                  logic.expertAttendanceCategory?.message ??
+                                      "");
+                            } else {
+                              Utils.showToast(
+                                  Get.context!,
+                                  logic.expertAttendanceCategory?.message ??
+                                      "");
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ).paddingOnly(bottom: 20)
           ],
         ),
       ),

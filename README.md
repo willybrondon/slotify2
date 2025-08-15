@@ -1,283 +1,276 @@
-# Slotify Platform 
+# Parcel Analytics for InPost/Mondial Relais
+
+A comprehensive PySpark solution for analyzing parcel delivery data from APM (Automated Parcel Machines) events. This solution processes near-real-time parcel event data and creates downstream summary tables for daily, weekly, and quarterly analysis.
 
 ## Overview
-Slotify is a comprehensive salon management platform that includes an admin panel and mobile applications for customers and salon experts. This guide provides detailed installation instructions for both the admin panel and Flutter mobile applications.
 
-## General Architecture
+This solution processes a Delta table containing parcel events with approximately 10 million rows per day. It focuses on the `ParcelStoredForDeliveryByCourier` event type and creates aggregated summaries grouped by APM ID and courier ID.
 
-The Slotify platform is organized as follows:
+## Features
 
+### 📊 **Multi-level Analytics**
+- **Daily summaries**: Parcel delivery counts per APM, courier, and date
+- **Weekly summaries**: Aggregated weekly delivery statistics
+- **Quarterly summaries**: Long-term quarterly performance metrics
+- **APM-level summaries**: Overall APM performance across all couriers
+
+### 🔄 **Processing Modes**
+- **Batch processing**: Process historical data with date range filtering
+- **Stream processing**: Real-time processing using Spark Structured Streaming
+- **Incremental processing**: Support for append/merge operations
+
+### 📈 **Performance Optimizations**
+- Delta Lake optimizations (auto-optimize, auto-compact)
+- Adaptive query execution
+- Partition management and vacuum operations
+- Efficient APM ID extraction from location identifiers
+
+### 🎯 **Analytics Views**
+- Top performing APMs
+- Courier efficiency metrics
+- Daily and weekly trends
+- Performance benchmarking
+
+## Data Schema
+
+### Source Table Schema
+```sql
+CREATE TABLE parcel_events (
+    parcel_id BIGINT NOT NULL,
+    event_date_time TIMESTAMP NOT NULL,  -- UTC timestamp
+    event_date DATE NOT NULL,            -- Local timezone date
+    event_name STRING NOT NULL,          -- e.g., 'ParcelStoredForDeliveryByCourier'
+    location_id STRING NOT NULL,         -- e.g., 'APM_FR_123'
+    courier_id BIGINT                    -- NULL for non-delivery events
+)
 ```
-[admin]
-│
-├── backend/         # Node.js/Express API, MongoDB, business logic
-│
-├── frontend/        # Main web frontend (React or similar)
-│
-├── salon/           # Salon admin/owner panel (React or similar)
-│
-├── salonportal/     # Static landing/marketing site for demo requests
-│
-[flutter]
-│
-├── multi_salon_expert/    # Flutter app for salon staff/experts
-│
-├── multi_salon_customer/  # Flutter app for salon customers/clients
-│
-[install.sh]
-│
-└── Automates setup, build, deployment, and Nginx config
+
+### Output Tables
+
+#### 1. Daily Summary (`daily_parcel_delivery_summary`)
+```sql
+apm_id, courier_id, event_date, year, month, day, day_of_week, day_name,
+parcels_stored_for_delivery, unique_parcels
 ```
 
-- **Backend** serves API endpoints, handles authentication, business logic, and serves static files for frontend, salon, and salonportal.
-- **Frontend** and **salon** are built and their static files are served by the backend (and proxied by Nginx).
-- **salonportal** is a static site for marketing and demo requests, also served by the backend.
-- **Flutter apps** are for mobile users (experts and customers), communicating with the backend API.
-- **Nginx** acts as a reverse proxy, forwarding HTTP requests to the backend and serving static files.
+#### 2. Weekly Summary (`weekly_parcel_delivery_summary`)
+```sql
+apm_id, courier_id, year_week, week_start, week_end,
+parcels_stored_for_delivery, unique_parcels
+```
+
+#### 3. Quarterly Summary (`quarterly_parcel_delivery_summary`)
+```sql
+apm_id, courier_id, year_quarter, year, quarter,
+parcels_stored_for_delivery, unique_parcels
+```
+
+#### 4. APM Summary (`apm_delivery_summary`)
+```sql
+apm_id, event_date, year, month, day,
+total_parcels_stored, unique_parcels, unique_couriers
+```
+
+## Installation
+
+1. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Configure Spark Environment**
+   ```bash
+   export SPARK_HOME=/path/to/spark
+   export PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
+   ```
+
+3. **Set up Delta Lake**
+   Ensure Delta Lake is properly configured in your Spark environment.
+
+## Usage
+
+### Basic Usage
+
+```python
+from parcel_analytics import ParcelAnalyticsProcessor
+
+# Initialize processor
+processor = ParcelAnalyticsProcessor()
+
+# Batch processing for last 30 days
+daily, weekly, quarterly, apm = processor.batch_process_parcel_analytics(
+    start_date="2024-01-01",
+    end_date="2024-01-31"
+)
+
+# Get performance metrics
+apm_metrics = processor.get_apm_performance_metrics(30)
+courier_metrics = processor.get_courier_performance_metrics(30)
+
+# Create analytics views
+processor.create_analytics_views()
+
+# Optimize tables
+processor.optimize_tables()
+
+# Close session
+processor.close()
+```
+
+### Stream Processing
+
+```python
+# Start stream processing
+query = processor.stream_process_parcel_analytics()
+
+# Monitor the stream
+query.awaitTermination()
+```
+
+### Advanced Queries
+
+```python
+# Get daily trends
+daily_trends = processor.get_daily_trends(30)
+
+# Get weekly trends
+weekly_trends = processor.get_weekly_trends(12)
+
+# Custom SQL queries
+recent_data = processor.spark.sql("""
+    SELECT * FROM daily_parcel_delivery_summary 
+    WHERE event_date >= current_date() - INTERVAL 7 days
+    ORDER BY event_date DESC, parcels_stored_for_delivery DESC
+""")
+```
+
+## Key Features Explained
+
+### 1. APM ID Extraction
+The solution automatically extracts APM IDs from location identifiers:
+- Input: `APM_FR_123` → Output: `123`
+- Handles various location ID formats gracefully
+
+### 2. Event Filtering
+Focuses on `ParcelStoredForDeliveryByCourier` events where:
+- `courier_id` is not null
+- `apm_id` is successfully extracted
+- Events are unique per parcel
+
+### 3. Aggregation Strategy
+- **Count**: Total number of delivery events
+- **Count Distinct**: Unique parcels delivered
+- **Grouping**: By APM ID, courier ID, and time periods
+
+### 4. Performance Optimizations
+- **Delta Lake**: ACID transactions and schema evolution
+- **Auto-optimize**: Automatic file compaction
+- **Partitioning**: Efficient date-based partitioning
+- **Caching**: Strategic data caching for repeated queries
+
+## Analytics Views
+
+### 1. `recent_daily_deliveries`
+Recent 30 days of daily delivery data for quick access.
+
+### 2. `top_performing_apms`
+APMs with >100 total parcels in last 30 days, ranked by performance.
+
+### 3. `courier_efficiency`
+Couriers with >50 total parcels, including efficiency metrics.
+
+## Monitoring and Maintenance
+
+### Table Optimization
+```python
+# Optimize all tables
+processor.optimize_tables()
+```
+
+### Data Quality Checks
+```python
+# Check for data completeness
+missing_data = processor.spark.sql("""
+    SELECT event_date, COUNT(*) as event_count
+    FROM parcel_events
+    WHERE event_name = 'ParcelStoredForDeliveryByCourier'
+    GROUP BY event_date
+    HAVING event_count = 0
+    ORDER BY event_date DESC
+""")
+```
+
+### Performance Monitoring
+```python
+# Monitor query performance
+processor.spark.sql("SET spark.sql.adaptive.enabled=true")
+processor.spark.sql("SET spark.sql.adaptive.coalescePartitions.enabled=true")
+```
+
+## Configuration
+
+### Spark Configuration
+```python
+spark = SparkSession.builder \
+    .appName("ParcelDeliveryAnalytics") \
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+    .config("spark.sql.adaptive.enabled", "true") \
+    .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+    .config("spark.sql.adaptive.skewJoin.enabled", "true") \
+    .getOrCreate()
+```
+
+### Delta Lake Configuration
+```python
+# Auto-optimize settings
+.option("delta.autoOptimize.optimizeWrite", "true") \
+.option("delta.autoOptimize.autoCompact", "true")
+```
+
+## Error Handling
+
+The solution includes comprehensive error handling:
+- Invalid date ranges
+- Missing or malformed data
+- Connection issues
+- Schema evolution support
+
+## Scaling Considerations
+
+### For Large Datasets
+- Use appropriate partition sizes
+- Implement data retention policies
+- Consider incremental processing
+- Monitor memory usage
+
+### For High Volume
+- Tune Spark configurations
+- Use appropriate cluster sizing
+- Implement checkpointing for streams
+- Monitor processing latency
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For questions and support:
+- Check the documentation
+- Review example usage
+- Open an issue for bugs
+- Contact the development team
 
 ---
 
-## Environment 
-- **DEV** - Development environment
-- **PRD** - Production environment
-
-## Required Software
-
-### For Admin Panel Installation:
-- **Ubuntu 22.04** (Server OS)
-- **Node.js v18.20.2** (Backend runtime)
-- **Nginx** (Web server)
-- **MongoDB 7.0** (Database)
-- **PM2** (Process manager)
-- **WinSCP** (File transfer for Windows)
-- **PuTTY** (SSH client for Windows)
-- **MongoDB Compass** (Database management tool)
-
-### For Flutter App Development:
-- **Flutter SDK 3.16.8** (Mobile app framework)
-- **Dart SDK** (Programming language)
-- **Android Studio** (IDE for Android development)
-- **Xcode** (For iOS development on macOS)
-- **Firebase Console** (Backend services)
-- **Git** (Version control)
-
----
-
-## Admin Panel Installation
-
-### Step 1: Server Setup (DigitalOcean)
-
-1. **Create DigitalOcean Account**
-   - Visit [DigitalOcean](https://www.digitalocean.com/?refcode=7370b478e2d7&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=CopyPaste)
-   - Sign up and receive $200 in credits for 2 months
-
-2. **Create Droplet**
-   - Click "Create" button in top right corner
-   - Choose your preferred region
-   - Select **Ubuntu 22.04** as the operating system
-   - Choose appropriate size (minimum 1GB RAM recommended)
-   - Enable backups (optional)
-   - Choose authentication method (SSH key recommended)
-   - Finalize details and create droplet
-
-3. **Get Server IP**
-   - Note the IP address displayed after droplet creation
-   - This will be your server's public IP address
-
-### Step 2: Connect to Server
-
-1. **Using WinSCP (File Transfer)**
-   - Download and install WinSCP
-   - Connect using your server IP, username (root), and password/SSH key
-   - Navigate to `/home` directory
-
-2. **Using PuTTY (Command Line)**
-   - Download and install PuTTY
-   - Connect to your server IP using SSH
-   - Login with root credentials
-
-### Step 3: Upload and Extract Project
-
-1. **Upload Admin Files**
-   - Transfer the `admin.zip` file to `/home` directory using WinSCP
-
-2. **Install Unzip and Extract**
-   ```bash
-   apt install unzip
-   cd /home
-   unzip admin.zip -d /home
-   clear
-   ```
-
-### Step 4: Server Installation Script
-
-1. **Create Install Script**
-   - Navigate to root directory: `cd /`
-   - Create `install.sh` file using WinSCP
-   - Copy the provided `install.sh` content into the file
-
-2. **Run Installation**
-   ```bash
-   sudo apt install dos2unix
-   chmod +x install.sh
-   ./install.sh
-   ```
-
-3. **Follow Installation Prompts**
-   - Enter your server's public IP address
-   - Set your app name
-   - Use default or custom secret keys
-   - Wait for installation to complete
-
-### Step 5: Database Setup
-
-1. **Download MongoDB Compass**
-   - Visit [MongoDB Compass Download](https://www.mongodb.com/try/download/compass)
-   - Install on your local machine
-
-2. **Connect to Database**
-   - Open MongoDB Compass
-   - Use the connection string provided after installation:
-     ```
-     mongodb://admin:dbadmin123@YOUR_SERVER_IP:27017/YOUR_APP_NAME
-     ```
-
-3. **Import Data**
-   - Navigate to your database
-   - Import the `settings` collection from the `DB` folder
-   - Select "Import JSON or CSV File"
-   - Choose the JSON files and import
-
-### Step 6: Access Admin Panel
-
-- **Admin Panel**: `http://YOUR_SERVER_IP:5000/`
-- **Salon Panel**: `http://YOUR_SERVER_IP:5000/salonpanel`
-
----
-
-## Flutter App Installation
-
-### Step 1: Development Environment Setup
-
-#### Windows Setup:
-1. **Install Flutter SDK**
-   - Download Flutter SDK from [Flutter Official Site](https://flutter.dev/docs/get-started/install)
-   - Extract to `C:\src\flutter` (avoid Program Files)
-   - Add `C:\src\flutter\bin` to PATH environment variable
-
-2. **Install Android Studio**
-   - Download from [Android Studio](https://developer.android.com/studio/)
-   - Install Android SDK and configure Flutter
-
-3. **Verify Installation**
-   ```bash
-   flutter doctor
-   ```
-
-#### macOS Setup:
-1. **Install Flutter SDK**
-   - Download and extract Flutter SDK
-   - Add to PATH: `export PATH="$PATH:[PATH_TO_FLUTTER_SDK]/flutter/bin"`
-
-2. **Install Xcode**
-   - Download from App Store
-   - Install Android Studio for Android development
-
-3. **Verify Installation**
-   ```bash
-   flutter doctor
-   ```
-
-### Step 2: Firebase Configuration
-
-1. **Create Firebase Project**
-   - Visit [Firebase Console](https://firebase.google.com/)
-   - Create new project or use existing one
-   - Enable Google Analytics (optional)
-
-2. **Download Private Key**
-   - Go to Project Settings → Service Accounts
-   - Generate new private key
-   - Download JSON file securely
-
-3. **Add Android App**
-   - Click "Add app" → Android
-   - Enter package name (e.g., `com.yourcompany.slotify`)
-   - Download `google-services.json`
-   - Place in `android/app/` directory
-
-4. **Add iOS App** (for macOS users)
-   - Click "Add app" → iOS
-   - Enter bundle identifier
-   - Download `GoogleService-Info.plist`
-   - Add to iOS project
-
-### Step 3: Project Configuration
-
-1. **Extract Flutter Projects**
-   - Extract `multi_salon_customer` for customer app
-   - Extract `multi_salon_expert` for expert app
-
-2. **Update Configuration**
-   - Navigate to `lib/utils/config.dart`
-   - Update `baseURL` with your server IP
-   - Update `secretKey` with your admin panel secret key
-
-3. **Change Package Name**
-   - **Android**: Edit `android/app/src/main/AndroidManifest.xml`
-   - **iOS**: Open iOS module in Xcode → Runner → Signing & Capabilities
-
-4. **Customize App**
-   - **App Name**: Edit `android/app/src/main/AndroidManifest.xml` and iOS `Info.plist`
-   - **App Icon**: Use [App Icon Generator](https://www.appicon.co/)
-   - **App Colors**: Edit `lib/utils/color_res.dart`
-
-### Step 4: Build Applications
-
-1. **Debug Build**
-   ```bash
-   flutter build apk --debug
-   ```
-
-2. **Release Build**
-   ```bash
-   flutter build apk --release
-   ```
-
-3. **iOS Build** (macOS only)
-   ```bash
-   flutter build ios --release
-   ```
-
----
-
-## Post-Installation
-
-### Admin Panel Access:
-- URL: `http://YOUR_SERVER_IP:5000/`
-- Default credentials will be provided in the installation output
-
-### Salon Panel Access:
-- URL: `http://YOUR_SERVER_IP:5000/salonpanel`
-- Salon users can login with their email and password
-
-### Mobile Apps:
-- Install the generated APK files on Android devices
-- For iOS, use Xcode to build and deploy to devices
-
-
-## Important Notes
-
-1. **Security**: Always change default passwords and keys in production
-2. **Backups**: Enable automatic backups for your server
-3. **Updates**: Keep your Flutter SDK and dependencies updated
-4. **Firebase**: Ensure Firebase project is properly configured for push notifications
-5. **SSL**: Consider adding SSL certificates for production use
-
-## Troubleshooting
-
-- **Flutter Doctor Issues**: Follow the official Flutter installation guide
-- **Server Connection**: Ensure firewall allows ports 22 (SSH), 80 (HTTP), and 5000 (App)
-- **Database Connection**: Verify MongoDB is running and accessible
-- **Build Errors**: Check Flutter and Dart versions compatibility
+**Note**: This solution is designed for InPost/Mondial Relais APM data and may require adjustments for other parcel delivery systems.
 
