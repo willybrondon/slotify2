@@ -35,12 +35,12 @@ exports.update = async (req, res) => {
 
     setting.tnc = req.body.tnc ? req.body.tnc : setting.tnc;
     setting.privacyPolicyLink = req.body.privacyPolicyLink ? req.body.privacyPolicyLink : setting.privacyPolicyLink;
-    setting.razorPayId = req.body.razorPayId ? req.body.razorPayId : setting.razorPayId;
-    setting.razorSecretKey = req.body.razorSecretKey ? req.body.razorSecretKey : setting.razorSecretKey;
+    setting.mtnMoneyApiKey = req.body.mtnMoneyApiKey ? req.body.mtnMoneyApiKey : setting.mtnMoneyApiKey;
+    setting.mtnMoneyApiSecret = req.body.mtnMoneyApiSecret ? req.body.mtnMoneyApiSecret : setting.mtnMoneyApiSecret;
+    setting.orangeMoneyApiKey = req.body.orangeMoneyApiKey ? req.body.orangeMoneyApiKey : setting.orangeMoneyApiKey;
+    setting.orangeMoneyApiSecret = req.body.orangeMoneyApiSecret ? req.body.orangeMoneyApiSecret : setting.orangeMoneyApiSecret;
     setting.stripePublishableKey = req.body.stripePublishableKey ? req.body.stripePublishableKey : setting.stripePublishableKey;
     setting.stripeSecretKey = req.body.stripeSecretKey ? req.body.stripeSecretKey : setting.stripeSecretKey;
-
-    setting.flutterWaveKey = req.body.flutterWaveKey ? req.body.flutterWaveKey : setting.flutterWaveKey;
     setting.currencySymbol = req.body.currencySymbol ? req.body.currencySymbol : setting.currencySymbol;
     setting.currencyName = req.body.currencyName ? req.body.currencyName : setting.currencyName;
 
@@ -68,16 +68,16 @@ exports.handleSwitch = async (req, res) => {
     }
 
     if (type == 1) {
-      setting.isRazorPay = !setting.isRazorPay;
+      setting.isMTNMoney = !setting.isMTNMoney;
     }
     if (type == 2) {
-      setting.isStripePay = !setting.isStripePay;
+      setting.isOrangeMoney = !setting.isOrangeMoney;
     }
     if (type == 3) {
-      setting.maintenanceMode = !setting.maintenanceMode;
+      setting.isStripePay = !setting.isStripePay;
     }
     if (type == 4) {
-      setting.isFlutterWave = !setting.isFlutterWave;
+      setting.maintenanceMode = !setting.maintenanceMode;
     }
     if (type == 6) {
       setting.isAddProductRequest = !setting.isAddProductRequest;

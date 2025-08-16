@@ -44,9 +44,9 @@ class PaymentMethodView extends StatelessWidget {
             ? const Column(
                 children: [
                   PaymentTitleView(),
-                  PaymentRazorPayView(),
+                  PaymentMTNMoneyView(),
+                  PaymentOrangeMoneyView(),
                   PaymentStripeView(),
-                  PaymentFlutterWaveView(),
                 ],
               ).paddingAll(15)
             : const Column(
@@ -154,7 +154,9 @@ class PaymentMyWalletView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: logic.selectedPayment == "wallet" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.3),
+                      color: logic.selectedPayment == "wallet"
+                          ? AppColors.primaryAppColor
+                          : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
                   child: logic.selectedPayment == "wallet"
@@ -260,8 +262,8 @@ class PaymentCashOnHandView extends StatelessWidget {
   }
 }
 
-class PaymentRazorPayView extends StatelessWidget {
-  const PaymentRazorPayView({super.key});
+class PaymentMTNMoneyView extends StatelessWidget {
+  const PaymentMTNMoneyView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -271,7 +273,7 @@ class PaymentRazorPayView extends StatelessWidget {
         return InkWell(
           overlayColor: WidgetStatePropertyAll(AppColors.transparent),
           onTap: () {
-            logic.onSelectPaymentMethod("Razorpay");
+            logic.onSelectPaymentMethod("MTNMoney");
           },
           child: Container(
             height: 60,
@@ -298,15 +300,23 @@ class PaymentRazorPayView extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: AppColors.roundBg,
                       ),
-                      child: Image.asset(
-                        AppAsset.icRazorPay,
+                      child: Container(
                         height: 30,
                         width: 30,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryAppColor,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Icon(
+                          Icons.phone_android,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                     SizedBox(width: Get.width * 0.04),
                     Text(
-                      "Razorpay",
+                      "MTN Money",
                       style: TextStyle(
                         fontFamily: AppFontFamily.sfProDisplay,
                         fontSize: 16.5,
@@ -322,14 +332,14 @@ class PaymentRazorPayView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color:
-                          logic.selectedPayment == "Razorpay" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.3),
+                      color: logic.selectedPayment == "MTNMoney"
+                          ? AppColors.primaryAppColor
+                          : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
-                  child: logic.selectedPayment == "Razorpay"
+                  child: logic.selectedPayment == "MTNMoney"
                       ? Image.asset(
                           AppAsset.icCheck,
-                          color: AppColors.primaryAppColor,
                           height: 15,
                           width: 15,
                         )
@@ -406,7 +416,9 @@ class PaymentStripeView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: logic.selectedPayment == "Stripe" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.3),
+                      color: logic.selectedPayment == "Stripe"
+                          ? AppColors.primaryAppColor
+                          : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
                   child: logic.selectedPayment == "Stripe"
@@ -427,8 +439,8 @@ class PaymentStripeView extends StatelessWidget {
   }
 }
 
-class PaymentFlutterWaveView extends StatelessWidget {
-  const PaymentFlutterWaveView({super.key});
+class PaymentOrangeMoneyView extends StatelessWidget {
+  const PaymentOrangeMoneyView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -438,7 +450,7 @@ class PaymentFlutterWaveView extends StatelessWidget {
         return InkWell(
           overlayColor: WidgetStatePropertyAll(AppColors.transparent),
           onTap: () {
-            logic.onSelectPaymentMethod("flutterWave");
+            logic.onSelectPaymentMethod("OrangeMoney");
           },
           child: Container(
             height: 60,
@@ -465,15 +477,23 @@ class PaymentFlutterWaveView extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: AppColors.roundBg,
                       ),
-                      child: Image.asset(
-                        AppAsset.icFlutterWave,
+                      child: Container(
                         height: 30,
                         width: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Icon(
+                          Icons.phone_android,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                     SizedBox(width: Get.width * 0.04),
                     Text(
-                      "Flutter Wave",
+                      "Orange Money",
                       style: TextStyle(
                         fontFamily: AppFontFamily.sfProDisplay,
                         fontSize: 16.5,
@@ -489,15 +509,14 @@ class PaymentFlutterWaveView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: logic.selectedPayment == "flutterWave"
+                      color: logic.selectedPayment == "OrangeMoney"
                           ? AppColors.primaryAppColor
                           : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
-                  child: logic.selectedPayment == "flutterWave"
+                  child: logic.selectedPayment == "OrangeMoney"
                       ? Image.asset(
                           AppAsset.icCheck,
-                          color: AppColors.primaryAppColor,
                           height: 15,
                           width: 15,
                         )

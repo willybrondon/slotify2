@@ -4,8 +4,8 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/services/app_exception/app_exception.dart';
-import 'package:salon_2/ui/payment_screen/method/flutter_wave/flutter_wave_service.dart';
-import 'package:salon_2/ui/payment_screen/method/razor_pay/razor_pay_service.dart';
+import 'package:salon_2/ui/payment_screen/method/mtn_money/mtn_money_service.dart';
+import 'package:salon_2/ui/payment_screen/method/orange_money/orange_money_service.dart';
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
 import 'package:salon_2/ui/payment_screen/model/deposit_to_wallet_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
@@ -34,7 +34,7 @@ class PaymentScreenController extends GetxController {
         totalAmount = args[1];
         isCreateOrder = args[2];
       }
-      selectedPayment = isWalletAdd == true ? "Razorpay" : "wallet";
+      selectedPayment = isWalletAdd == true ? "MTNMoney" : "wallet";
       log("Is Wallet Add :: $isWalletAdd");
       log("Is Create Order :: $isCreateOrder");
       log("Total Amount :: $totalAmount");
@@ -50,16 +50,28 @@ class PaymentScreenController extends GetxController {
   }
 
   onClickPayNow() async {
-    if (selectedPayment == "Razorpay") {
-      log("it's Razorpay ");
-      RazorPayService().init(
+    if (selectedPayment == "MTNMoney") {
+      log("it's MTN Money ");
+      MTNMoneyService().init(
         totalAmountWithOutTax: int.parse(totalAmount ?? ""),
-        razorKey: razorPayId ?? "",
+        mtnMoneyApiKey: mtnMoneyApiKey ?? "",
+        mtnMoneyApiSecret: mtnMoneyApiSecret ?? "",
       );
       1.seconds.delay;
       isLoading(false);
 
-      RazorPayService().razorPayCheckout();
+      MTNMoneyService().mtnMoneyPay();
+    } else if (selectedPayment == "OrangeMoney") {
+      log("it's Orange Money ");
+      OrangeMoneyService().init(
+        totalAmountWithOutTax: int.parse(totalAmount ?? ""),
+        orangeMoneyApiKey: orangeMoneyApiKey ?? "",
+        orangeMoneyApiSecret: orangeMoneyApiSecret ?? "",
+      );
+      1.seconds.delay;
+      isLoading(false);
+
+      OrangeMoneyService().orangeMoneyPay();
     } else if (selectedPayment == "Stripe") {
       log("it's Stripe");
       isLoading(true);
@@ -94,16 +106,6 @@ class PaymentScreenController extends GetxController {
 
         Utils.showToast(Get.context!, e.toString());
       });
-    } else if (selectedPayment == "flutterWave") {
-      FlutterWaveService().init(
-        flutterWavePublishKey: flutterWaveKey ?? "",
-        totalAmountWithOutTax: totalAmount ?? "",
-      );
-
-      1.seconds.delay;
-      isLoading(false);
-
-      FlutterWaveService().handlePaymentInitialization();
     }
   }
 
@@ -111,7 +113,10 @@ class PaymentScreenController extends GetxController {
   DepositToWalletModel? depositToWalletModel;
   RxBool isLoading = false.obs;
 
-  onDepositToWalletApiCall({required String userId, required String amount, required String paymentGateway}) async {
+  onDepositToWalletApiCall(
+      {required String userId,
+      required String amount,
+      required String paymentGateway}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView]);
@@ -126,10 +131,14 @@ class PaymentScreenController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.depositToWallet + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.depositToWallet + queryString);
       log("Deposit To Wallet Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.post(url, headers: headers);
 

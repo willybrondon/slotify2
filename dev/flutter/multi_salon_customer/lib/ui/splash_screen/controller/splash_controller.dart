@@ -27,13 +27,13 @@ class SplashController extends GetxController {
     currency = settingCategory?.setting?.currencySymbol;
     tnc = settingCategory?.setting?.tnc;
     privacyPolicyLink = settingCategory?.setting?.privacyPolicyLink;
-    flutterWaveKey = settingCategory?.setting?.flutterWaveKey;
-    razorPayId = settingCategory?.setting?.razorPayId;
+    mtnMoneyApiKey = settingCategory?.setting?.mtnMoneyApiKey;
+    orangeMoneyApiKey = settingCategory?.setting?.orangeMoneyApiKey;
     stripePublishableKey = settingCategory?.setting?.stripePublishableKey;
     stripeSecretKey = settingCategory?.setting?.stripeSecretKey;
     isStripePay = settingCategory?.setting?.isStripePay;
-    isRazorPay = settingCategory?.setting?.isRazorPay;
-    isFlutterWave = settingCategory?.setting?.isFlutterWave;
+    isMTNMoney = settingCategory?.setting?.isMTNMoney;
+    isOrangeMoney = settingCategory?.setting?.isOrangeMoney;
     adminCommissionCharges = settingCategory?.setting?.adminCommissionCharges;
     cancelOrderCharges = settingCategory?.setting?.cancelOrderCharges;
 
@@ -41,13 +41,13 @@ class SplashController extends GetxController {
     log("Currency :: $currency");
     log("T&C :: $tnc");
     log("Privacy Policy Link :: $privacyPolicyLink");
-    log("Flutter Wave Key :: $flutterWaveKey");
-    log("Razor Pay Id :: $razorPayId");
+    log("MTN Money API Key :: $mtnMoneyApiKey");
+    log("Orange Money API Key :: $orangeMoneyApiKey");
     log("Stripe Publishable Key :: $stripePublishableKey");
     log("Stripe Secret Key :: $stripeSecretKey");
     log("Is StripePay :: $isStripePay");
-    log("Is RazorPay :: $isRazorPay");
-    log("is FlutterWave :: $isFlutterWave");
+    log("Is MTN Money :: $isMTNMoney");
+    log("Is Orange Money :: $isOrangeMoney");
     log("Admin Commission Charges :: $adminCommissionCharges");
     log("Cancel Order Charges :: $cancelOrderCharges");
     super.onInit();
@@ -102,7 +102,10 @@ class SplashController extends GetxController {
 
       log("Setting Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Setting Headers :: $headers");
 
       final response = await http.get(url, headers: headers);

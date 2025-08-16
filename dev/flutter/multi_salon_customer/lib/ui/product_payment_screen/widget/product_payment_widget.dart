@@ -76,7 +76,6 @@ class ProductPaymentMyWalletView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-
         /// Wallet Payment
         GetBuilder<ProductPaymentController>(
           id: Constant.idSelectPaymentMethod,
@@ -173,15 +172,15 @@ class ProductPaymentMyWalletView extends StatelessWidget {
           },
         ).paddingOnly(bottom: 15),
 
-        /// Razorpay Payment
-        splashController.settingCategory?.setting?.isRazorPay == true
+        /// MTN Money Payment
+        splashController.settingCategory?.setting?.isMTNMoney == true
             ? GetBuilder<ProductPaymentController>(
                 id: Constant.idSelectPaymentMethod,
                 builder: (logic) {
                   return InkWell(
                     overlayColor: WidgetStatePropertyAll(AppColors.transparent),
                     onTap: () {
-                      logic.onSelectPaymentMethod("Razorpay");
+                      logic.onSelectPaymentMethod("MTNMoney");
                     },
                     child: Container(
                       height: 60,
@@ -208,15 +207,23 @@ class ProductPaymentMyWalletView extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   color: AppColors.roundBg,
                                 ),
-                                child: Image.asset(
-                                  AppAsset.icRazorPay,
+                                child: Container(
                                   height: 30,
                                   width: 30,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryAppColor,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: const Icon(
+                                    Icons.phone_android,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
                                 ),
                               ),
                               SizedBox(width: Get.width * 0.04),
                               Text(
-                                "Razorpay",
+                                "MTN Money",
                                 style: TextStyle(
                                   fontFamily: AppFontFamily.sfProDisplay,
                                   fontSize: 16.5,
@@ -227,7 +234,7 @@ class ProductPaymentMyWalletView extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              logic.onSelectPaymentMethod("Razorpay");
+                              logic.onSelectPaymentMethod("MTNMoney");
                             },
                             child: Container(
                               height: 25,
@@ -236,12 +243,12 @@ class ProductPaymentMyWalletView extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
-                                  color: logic.selectedPayment == "Razorpay"
+                                  color: logic.selectedPayment == "MTNMoney"
                                       ? AppColors.primaryAppColor
                                       : AppColors.greyColor.withOpacity(0.3),
                                 ),
                               ),
-                              child: logic.selectedPayment == "Razorpay"
+                              child: logic.selectedPayment == "MTNMoney"
                                   ? Image.asset(
                                       AppAsset.icCheck,
                                       color: AppColors.primaryAppColor,
@@ -324,7 +331,8 @@ class ProductPaymentMyWalletView extends StatelessWidget {
                                       border: Border.all(
                                         color: logic.selectedPayment == "Stripe"
                                             ? AppColors.primaryAppColor
-                                            : AppColors.greyColor.withOpacity(0.3),
+                                            : AppColors.greyColor
+                                                .withOpacity(0.3),
                                       ),
                                     ),
                                     child: logic.selectedPayment == "Stripe"
@@ -345,15 +353,15 @@ class ProductPaymentMyWalletView extends StatelessWidget {
               ).paddingOnly(bottom: 15)
             : const SizedBox(),
 
-        /// Flutter Wave Payment
-        splashController.settingCategory?.setting?.isFlutterWave == true
+        /// Orange Money Payment
+        splashController.settingCategory?.setting?.isOrangeMoney == true
             ? GetBuilder<ProductPaymentController>(
                 id: Constant.idSelectPaymentMethod,
                 builder: (logic) {
                   return InkWell(
                     overlayColor: WidgetStatePropertyAll(AppColors.transparent),
                     onTap: () {
-                      logic.onSelectPaymentMethod("flutterWave");
+                      logic.onSelectPaymentMethod("OrangeMoney");
                     },
                     child: Container(
                       height: 60,
@@ -380,15 +388,23 @@ class ProductPaymentMyWalletView extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   color: AppColors.roundBg,
                                 ),
-                                child: Image.asset(
-                                  AppAsset.icFlutterWave,
+                                child: Container(
                                   height: 30,
                                   width: 30,
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: const Icon(
+                                    Icons.phone_android,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
                                 ),
                               ),
                               SizedBox(width: Get.width * 0.04),
                               Text(
-                                "Flutter Wave",
+                                "Orange Money",
                                 style: TextStyle(
                                   fontFamily: AppFontFamily.sfProDisplay,
                                   fontSize: 16.5,
@@ -399,7 +415,7 @@ class ProductPaymentMyWalletView extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              logic.onSelectPaymentMethod("flutterWave");
+                              logic.onSelectPaymentMethod("OrangeMoney");
                             },
                             child: Container(
                               height: 25,
@@ -408,12 +424,12 @@ class ProductPaymentMyWalletView extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
-                                  color: logic.selectedPayment == "flutterWave"
+                                  color: logic.selectedPayment == "OrangeMoney"
                                       ? AppColors.primaryAppColor
                                       : AppColors.greyColor.withOpacity(0.3),
                                 ),
                               ),
-                              child: logic.selectedPayment == "flutterWave"
+                              child: logic.selectedPayment == "OrangeMoney"
                                   ? Image.asset(
                                       AppAsset.icCheck,
                                       color: AppColors.primaryAppColor,

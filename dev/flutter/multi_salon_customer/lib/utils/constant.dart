@@ -9,7 +9,8 @@ import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/app_font_family.dart';
 
 class Constant {
-  final BookingScreenController bookingScreenController = Get.find<BookingScreenController>();
+  final BookingScreenController bookingScreenController =
+      Get.find<BookingScreenController>();
   SplashController splashController = Get.find<SplashController>();
 
   /// <<===================>> ****** App Configs ****** <<===================>>
@@ -106,7 +107,9 @@ class Constant {
     return [
       Step(
         isActive: bookingScreenController.currentStep >= 0,
-        state: bookingScreenController.currentStep > 0 ? StepState.complete : StepState.indexed,
+        state: bookingScreenController.currentStep > 0
+            ? StepState.complete
+            : StepState.indexed,
         label: Text(
           "Venue",
           style: TextStyle(
@@ -135,7 +138,9 @@ class Constant {
       ),
       Step(
         isActive: bookingScreenController.currentStep >= 1,
-        state: bookingScreenController.currentStep > 1 ? StepState.complete : StepState.indexed,
+        state: bookingScreenController.currentStep > 1
+            ? StepState.complete
+            : StepState.indexed,
         label: Text(
           "txtStaff".tr,
           style: TextStyle(
@@ -163,7 +168,9 @@ class Constant {
         ),
       ),
       Step(
-        state: bookingScreenController.currentStep > 2 ? StepState.complete : StepState.indexed,
+        state: bookingScreenController.currentStep > 2
+            ? StepState.complete
+            : StepState.indexed,
         isActive: bookingScreenController.currentStep >= 2,
         label: Text(
           "txtDateTime".tr,
@@ -179,7 +186,9 @@ class Constant {
         ),
       ),
       Step(
-        state: bookingScreenController.currentStep > 3 ? StepState.complete : StepState.indexed,
+        state: bookingScreenController.currentStep > 3
+            ? StepState.complete
+            : StepState.indexed,
         isActive: bookingScreenController.currentStep >= 3,
         label: Text(
           "txtPayment".tr,
@@ -199,20 +208,32 @@ class Constant {
 
   // static const PAYMENT_METHOD_inAppPurchase = 'inAppPurchase';
   static const paymentMethodStripe = 'stripe';
-  static const paymentMethodRazorPay = 'razorpay';
+  static const paymentMethodMTNMoney = 'mtn_money';
 
   static List countryList = [
     {"country": "Arabic (العربية)", "image": AppAsset.imPakistan, "id": "1"},
     {"country": "Bengali (বাংলা)", "image": AppAsset.imIndia, "id": "2"},
-    {"country": "Chinese Simplified (中国人)", "image": AppAsset.imChinese, "id": "3"},
+    {
+      "country": "Chinese Simplified (中国人)",
+      "image": AppAsset.imChinese,
+      "id": "3"
+    },
     {"country": "English (English)", "image": AppAsset.imEnglish, "id": "4"},
     {"country": "French (français)", "image": AppAsset.imFrench, "id": "5"},
     {"country": "German (Deutsche)", "image": AppAsset.imGerman, "id": "6"},
     {"country": "Hindi (हिंदी)", "image": AppAsset.imIndia, "id": "7"},
     {"country": "Italian (italiana)", "image": AppAsset.imItalian, "id": "8"},
-    {"country": "Indonesian (bahasa indo)", "image": AppAsset.imIndonesian, "id": "9"},
+    {
+      "country": "Indonesian (bahasa indo)",
+      "image": AppAsset.imIndonesian,
+      "id": "9"
+    },
     {"country": "Korean (한국인)", "image": AppAsset.imKorean, "id": "10"},
-    {"country": "Portuguese (português)", "image": AppAsset.imPortuguese, "id": "11"},
+    {
+      "country": "Portuguese (português)",
+      "image": AppAsset.imPortuguese,
+      "id": "11"
+    },
     {"country": "Russian (русский)", "image": AppAsset.imRussian, "id": "12"},
     {"country": "Spanish (Español)", "image": AppAsset.imSpanish, "id": "13"},
     {"country": "Swahili (Kiswahili)", "image": AppAsset.imSwahili, "id": "14"},

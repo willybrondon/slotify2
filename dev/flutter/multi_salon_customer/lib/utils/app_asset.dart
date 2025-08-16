@@ -23,7 +23,8 @@ class AppAsset {
   static const icCallFilled = "${getIconsPath}call_filled.png";
   static const icCart = "${getIconsPath}cart.png";
   static const icCashAfterService = "${getIconsPath}cash_after_service.png";
-  static const icCategoryPlaceholder = "${getIconsPath}category_placeholder.png";
+  static const icCategoryPlaceholder =
+      "${getIconsPath}category_placeholder.png";
   static const icCheck = "${getIconsPath}check.png";
   static const icCheck1 = "${getIconsPath}check_1.png";
   static const icCheckIn = "${getIconsPath}check_in.png";
@@ -40,7 +41,7 @@ class AppAsset {
   static const icDownArrow = "${getIconsPath}down_arrow.png";
   static const icEmail = "${getIconsPath}email.png";
   static const icExit = "${getIconsPath}exit.png";
-  static const icFlutterWave = "${getIconsPath}flutter_wave.png";
+  static const icMTNMoney = "${getIconsPath}mtn_money.png";
   static const icForgotPassword = "${getIconsPath}forgot_password.png";
   static const icGoogle = "${getIconsPath}google.png";
   static const icGooglePlay = "${getIconsPath}google_play.png";
@@ -87,7 +88,7 @@ class AppAsset {
   static const icRaiseComplain = "${getIconsPath}raise_complain.png";
   static const icRate = "${getIconsPath}rate.png";
   static const icRating = "${getIconsPath}rating.png";
-  static const icRazorPay = "${getIconsPath}razor_pay.png";
+  static const icOrangeMoney = "${getIconsPath}orange_money.png";
   static const icRedStar = "${getIconsPath}red_star.png";
   static const icReview = "${getIconsPath}review.png";
   static const icRound = "${getIconsPath}round.png";

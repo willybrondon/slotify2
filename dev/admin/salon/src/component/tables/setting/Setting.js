@@ -32,8 +32,8 @@ const Setting = (props) => {
   const [privacyPolicyLink, setPrivacyPolicyLink] = useState();
   const [tnc, setTnc] = useState();
   const [tax, setTax] = useState();
-  const [razorPayId, setRazorPayId] = useState("");
-  const [razorSecretKey, setRazorSecretKey] = useState("");
+  const [mtnMoneyApiKey, setMtnMoneyApiKey] = useState("");
+  const [mtnMoneyApiSecret, setMtnMoneyApiSecret] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
@@ -47,7 +47,8 @@ const Setting = (props) => {
   const [minWithdrawalRequestedAmount, setMinWithdrawalRequestedAmount] = useState("");
   const [currencyName, setCurrencyName] = useState();
   const [currencySymbol, setCurrencySymbol] = useState();
-  const [flutterWaveKey, setFlutterWaveKey] = useState();
+  const [orangeMoneyApiKey, setOrangeMoneyApiKey] = useState("");
+  const [orangeMoneyApiSecret, setOrangeMoneyApiSecret] = useState("");
 
   const [firebaseKey, setfirebaseKey] = useState();
   const [isAddProduct, setIsAddProduct] = useState(false)
@@ -58,12 +59,13 @@ const Setting = (props) => {
     tnc: "",
     stripePublishableKey: "",
     stripeSecretKey: "",
-    razorPayId: "",
-    razorSecretKey: "",
+    mtnMoneyApiKey: "",
+    mtnMoneyApiSecret: "",
     tax: "",
     currencyName: "",
     currencySymbol: "",
-    flutterWaveKey: "",
+    orangeMoneyApiKey: "",
+    orangeMoneyApiSecret: "",
   });
 
   useEffect(() => {
@@ -96,12 +98,13 @@ const Setting = (props) => {
       setCurrencySymbol(setting.currencySymbol);
       setStripePublishableKey(setting.stripePublishableKey);
       setStripeSecretKey(setting.stripeSecretKey);
-      setRazorPayId(setting.razorPayId);
-      setRazorSecretKey(setting.razorSecretKey);
+      setMtnMoneyApiKey(setting.mtnMoneyApiKey);
+      setMtnMoneyApiSecret(setting.mtnMoneyApiSecret);
       setTax(setting.tax);
       setPrivacyPolicyLink(setting?.privacyPolicyLink);
       setTnc(setting.tnc);
-      setFlutterWaveKey(setting.flutterWaveKey);
+      setOrangeMoneyApiKey(setting.orangeMoneyApiKey);
+      setOrangeMoneyApiSecret(setting.orangeMoneyApiSecret);
       setfirebaseKey(JSON.stringify(setting.firebaseKey));
       setIsAddProduct(setting?.isAddProductRequest);
       setIsUpdateProduct(setting?.isUpdateProductRequest);
@@ -120,15 +123,17 @@ const Setting = (props) => {
       !tnc ||
       !stripePublishableKey ||
       !stripeSecretKey ||
-      !razorPayId ||
-      !razorSecretKey ||
+      !mtnMoneyApiKey ||
+      !mtnMoneyApiSecret ||
       !tax ||
       !currencyName ||
       !currencySymbol ||
-      !flutterWaveKey ||
+      !orangeMoneyApiKey ||
+      !orangeMoneyApiSecret ||
       !firebaseKey || 
       !adminCommissionCharges || 
-      !cancelOrderCharges
+      !cancelOrderCharges ||
+      !minWithdrawalRequestedAmount
     ) {
       let error = {};
       if (!privacyPolicyLink)
@@ -138,18 +143,20 @@ const Setting = (props) => {
         error.stripePublishableKey = "Stripe Publishable Key is required";
       if (!stripeSecretKey)
         error.stripeSecretKey = "Stripe Secret Key is required";
-      if (!razorPayId) error.razorPayId = "Razor Pay Id is required";
-      if (!razorSecretKey)
-        error.razorSecretKey = "Razor Secret Key is required";
+      if (!mtnMoneyApiKey) error.mtnMoneyApiKey = "MTN Money API Key is required";
+      if (!mtnMoneyApiSecret)
+        error.mtnMoneyApiSecret = "MTN Money API Secret is required";
       if (!tax) error.tax = "Tax is required";
       if (!currencyName) error.currencyName = "Currency Name is required";
       if (!currencySymbol) error.currencySymbol = "Currency Symbol is required";
-      if (!flutterWaveKey)
-        error.flutterWaveKey = "Flutter Wave Key is required";
+      if (!orangeMoneyApiKey)
+        error.orangeMoneyApiKey = "Orange Money API Key is required";
+      if (!orangeMoneyApiSecret)
+        error.orangeMoneyApiSecret = "Orange Money API Secret is required";
       if (!firebaseKey) error.firebaseKey = "Firebase Key is required";
-      if (!adminCommissionCharges) error.commissionPerProductQuantity = "commissionPerProductQuantity Key is required";
-      if (!cancelOrderCharges) error.cancelOrderCharges = "cancelOrderCharges Key is required";
-      if (!minWithdrawalRequestedAmount) error.minWithdrawalRequestedAmount = "withDrawReq is required";
+      if (!adminCommissionCharges) error.adminCommissionCharges = "Admin Commission Charges is required";
+      if (!cancelOrderCharges) error.cancelOrderCharges = "Cancel Order Charges is required";
+      if (!minWithdrawalRequestedAmount) error.minWithdrawalRequestedAmount = "Minimum Withdrawal Amount is required";
       return setError({ ...error });
     } else {
       const data = {
@@ -157,12 +164,13 @@ const Setting = (props) => {
         tnc,
         stripePublishableKey,
         stripeSecretKey,
-        razorPayId,
-        razorSecretKey,
+        mtnMoneyApiKey,
+        mtnMoneyApiSecret,
         tax,
         currencyName,
         currencySymbol,
-        flutterWaveKey,
+        orangeMoneyApiKey,
+        orangeMoneyApiSecret,
         firebaseKey,
         minWithdrawalRequestedAmount,
         cancelOrderCharges,
@@ -477,44 +485,77 @@ const Setting = (props) => {
                     </div>
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="razorPayId" className="ms-2 order-1">
-                          Razorpay id
+                        <label htmlFor="mtnMoneyApiKey" className="ms-2 order-1">
+                          MTN Money API Key
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
-                          id="razorPayId"
-                          value={razorPayId}
-                          placeholder="Enter razorPay Id"
+                          id="mtnMoneyApiKey"
+                          value={mtnMoneyApiKey}
+                          placeholder="Enter MTN Money API Key"
                           onChange={(e) => {
-                            setRazorPayId(e.target.value);
+                            setMtnMoneyApiKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                razorPayId: ` razorPay Id Is Required`,
+                                mtnMoneyApiKey: `MTN Money API Key Is Required`,
                               });
                             } else {
                               return setError({
                                 ...error,
-                                razorPayId: "",
+                                mtnMoneyApiKey: "",
                               });
                             }
                           }}
                         />
                         {error && (
                           <p className="errorMessage text-start">
-                            {error && error?.razorPayId}
+                            {error && error?.mtnMoneyApiKey}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="mtnMoneyApiSecret" className="ms-2 order-1">
+                          MTN Money API Secret
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="mtnMoneyApiSecret"
+                          value={mtnMoneyApiSecret}
+                          placeholder="Enter MTN Money API Secret"
+                          onChange={(e) => {
+                            setMtnMoneyApiSecret(e.target.value);
+                            if (!e.target.value) {
+                              return setError({
+                                ...error,
+                                mtnMoneyApiSecret: `MTN Money API Secret Is Required`,
+                              });
+                            } else {
+                              return setError({
+                                ...error,
+                                mtnMoneyApiSecret: "",
+                              });
+                            }
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMoneyApiSecret}
                           </p>
                         )}
                       </div>
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">Razor pay active</label>
+                        <label className="my-3">MTN Money payment (enable/disable)</label>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 1)}
-                        value={setting?.isRazorPay}
+                        value={setting?.isMTNMoney}
                       />
                     </div>
                   </div>
@@ -522,49 +563,82 @@ const Setting = (props) => {
                 <div className="col-12 col-md-6 mt-3 ">
                   <div className="settingBoxOuter">
                     <div className="settingBoxHeader">
-                      <h4>FLUTTER WAVE SETTING</h4>
+                      <h4>ORANGE MONEY SETTING</h4>
                     </div>
 
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="flutterWaveKey" className="ms-2 order-1">
-                          Flutterwave key
+                        <label htmlFor="orangeMoneyApiKey" className="ms-2 order-1">
+                          Orange Money API Key
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
-                          id="flutterWaveKey"
-                          value={flutterWaveKey}
-                          placeholder="EnterFlutterWave Key"
+                          id="orangeMoneyApiKey"
+                          value={orangeMoneyApiKey}
+                          placeholder="Enter Orange Money API Key"
                           onChange={(e) => {
-                            setFlutterWaveKey(e.target.value);
+                            setOrangeMoneyApiKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                flutterWaveKey: `FlutterWave Key Is Required`,
+                                orangeMoneyApiKey: `Orange Money API Key Is Required`,
                               });
                             } else {
                               return setError({
                                 ...error,
-                                flutterWaveKey: "",
+                                orangeMoneyApiKey: "",
                               });
                             }
                           }}
                         />
                         {error && (
                           <p className="errorMessage text-start">
-                            {error && error?.flutterWaveKey}
+                            {error && error?.orangeMoneyApiKey}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="orangeMoneyApiSecret" className="ms-2 order-1">
+                          Orange Money API Secret
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="orangeMoneyApiSecret"
+                          value={orangeMoneyApiSecret}
+                          placeholder="Enter Orange Money API Secret"
+                          onChange={(e) => {
+                            setOrangeMoneyApiSecret(e.target.value);
+                            if (!e.target.value) {
+                              return setError({
+                                ...error,
+                                orangeMoneyApiSecret: `Orange Money API Secret Is Required`,
+                              });
+                            } else {
+                              return setError({
+                                ...error,
+                                orangeMoneyApiSecret: "",
+                              });
+                            }
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.orangeMoneyApiSecret}
                           </p>
                         )}
                       </div>
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">flutterwave payment (enable/disable)</label>
+                        <label className="my-3">Orange Money payment (enable/disable)</label>
                       </div>
                       <ToggleSwitch
-                        onClick={() => handleSettingSwitch(setting?._id, 4)}
-                        value={setting?.isFlutterWave}
+                        onClick={() => handleSettingSwitch(setting?._id, 2)}
+                        value={setting?.isOrangeMoney}
                       />
                     </div>
                   </div>

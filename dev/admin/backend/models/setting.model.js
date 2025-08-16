@@ -6,9 +6,13 @@ const settingSchema = new mongoose.Schema(
     privacyPolicyLink: { type: String, default: "" },
     tax: { type: Number, default: 0 }, // tax in percentage
 
-    razorPayId: { type: String, default: "" },
-    isRazorPay: { type: Boolean, default: false },
-    razorSecretKey: { type: String, default: "" },
+    mtnMoneyApiKey: { type: String, default: "" },
+    isMTNMoney: { type: Boolean, default: false },
+    mtnMoneyApiSecret: { type: String, default: "" },
+
+    orangeMoneyApiKey: { type: String, default: "" },
+    isOrangeMoney: { type: Boolean, default: false },
+    orangeMoneyApiSecret: { type: String, default: "" },
 
     isStripePay: { type: Boolean, default: false },
     stripePublishableKey: { type: String, default: "" },
@@ -18,9 +22,6 @@ const settingSchema = new mongoose.Schema(
 
     currencySymbol: { type: String, default: "" },
     currencyName: { type: String, default: "" },
-
-    flutterWaveKey: { type: String, default: "" },
-    isFlutterWave: { type: Boolean, default: false },
 
     adminCommissionCharges: { type: Number, default: 0 },
     cancelOrderCharges: { type: Number, default: 0 },

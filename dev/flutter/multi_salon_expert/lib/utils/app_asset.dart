@@ -32,7 +32,7 @@ class AppAsset {
   static const icDirectionFilled = "${getIconsPath}directionFilled.png";
   static const icEditProfile = "${getIconsPath}editProfile.png";
   static const icEnglish = "${getIconsPath}english.png";
-  static const icFlutterWave = "${getIconsPath}flutterWave.png";
+  static const icMTNMoney = "${getIconsPath}mtn_money.png";
   static const icFrench = "${getIconsPath}french.png";
   static const icGerman = "${getIconsPath}german.png";
   static const icGreenPoint = "${getIconsPath}green_point.png";
@@ -60,7 +60,7 @@ class AppAsset {
   static const icProfileOutline = "${getIconsPath}profileOutline.png";
   static const icRaiseComplain = "${getIconsPath}raiseComplain.png";
   static const icRate = "${getIconsPath}rate.png";
-  static const icRazorPay = "${getIconsPath}razorPay.png";
+  static const icOrangeMoney = "${getIconsPath}orange_money.png";
   static const icRevenue = "${getIconsPath}revenue.png";
   static const icRevenueFilled = "${getIconsPath}revenueFilled.png";
   static const icRevenueOutline = "${getIconsPath}revenueOutline.png";
