@@ -308,6 +308,9 @@ class BookingScreenController extends GetxController {
         stepCount++;
         currentStep += 1;
         log("Skipping staff selection step, going directly to date/time selection");
+
+        // Trigger booking API call for date/time step
+        _triggerBookingApiCall();
       }
     }
     update([
@@ -316,6 +319,33 @@ class BookingScreenController extends GetxController {
       Constant.idStep1,
       Constant.idStep3
     ]);
+  }
+
+  // Helper method to trigger booking API call
+  _triggerBookingApiCall() async {
+    try {
+      await onGetBookingApiCall(
+        selectedDate: date,
+        expertId: Constant.storage.read<String>('expertDetail') != null
+            ? Constant.storage.read<String>('expertDetail').toString()
+            : Constant.storage.read<String>('expertId').toString(),
+        salonId: salonId.toString(),
+      );
+
+      formattedDate = date;
+      splitBreakTime();
+      onGetSlotsList();
+
+      log("Get Booking Status :: ${getBookingModel?.status}");
+      if (getBookingModel?.status == false) {
+        Utils.showToast(Get.context!, getBookingModel?.message ?? "");
+      }
+
+      rupee = (totalPrice.toDouble() + finalTaxRupee.toDouble());
+      log("rupee :: $rupee");
+    } catch (e) {
+      log("Error triggering booking API call: $e");
+    }
   }
 
   onStep1(int index) {

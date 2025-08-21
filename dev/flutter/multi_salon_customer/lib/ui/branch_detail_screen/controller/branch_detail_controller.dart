@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/branch_detail_screen/model/get_salon_detail_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
@@ -72,13 +71,13 @@ class BranchDetailController extends GetxController
       if (args[0] != null) {
         salonId = args[0];
       }
-      if (args[1] != null) {
+      if (args.length > 1 && args[1] != null) {
         city = args[1];
       }
-      if (args[2] != null) {
+      if (args.length > 2 && args[2] != null) {
         latitude = args[2];
       }
-      if (args[3] != null) {
+      if (args.length > 3 && args[3] != null) {
         longitude = args[3];
       }
     }
@@ -87,6 +86,11 @@ class BranchDetailController extends GetxController
     city ??= city;
     latitude ??= latitude;
     longitude ??= longitude;
+
+    log("Branch Detail - Salon ID: $salonId");
+    log("Branch Detail - City: $city");
+    log("Branch Detail - Latitude: $latitude");
+    log("Branch Detail - Longitude: $longitude");
   }
 
   makingPhoneCall() async {
