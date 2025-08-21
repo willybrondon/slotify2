@@ -11,6 +11,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'dart:ui' as ui;
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -144,8 +145,7 @@ Future<Position> getDeviceLocation() async {
 
     // Get city name using reverse geocoding
     try {
-      List<Placemark> placemarks =
-          await Geolocator.reverseGeocodeFromCoordinates(
+      List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
