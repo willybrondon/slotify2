@@ -94,7 +94,8 @@ class HomeScreenTopView extends StatelessWidget {
           child: Container(
             height: 55,
             width: double.infinity,
-            margin: EdgeInsets.only(top: Get.height * 0.15, left: 16, right: 16),
+            margin:
+                EdgeInsets.only(top: Get.height * 0.15, left: 16, right: 16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: AppColors.whiteColor,
@@ -154,8 +155,11 @@ class HomeScreenCategoryView extends StatelessWidget {
                       physics: const ScrollPhysics(),
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
-                      itemCount: (logic.getAllCategory?.data?.length ?? 0) >= 8 ? 8 : logic.getAllCategory?.data?.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      itemCount: (logic.getAllCategory?.data?.length ?? 0) >= 8
+                          ? 8
+                          : logic.getAllCategory?.data?.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         childAspectRatio: 0.75,
                         crossAxisSpacing: 6,
@@ -165,14 +169,19 @@ class HomeScreenCategoryView extends StatelessWidget {
                           position: index,
                           duration: const Duration(milliseconds: 650),
                           columnCount:
-                              (logic.getAllCategory?.data?.length ?? 0) >= 8 ? 8 : logic.getAllCategory?.data?.length ?? 0,
+                              (logic.getAllCategory?.data?.length ?? 0) >= 8
+                                  ? 8
+                                  : logic.getAllCategory?.data?.length ?? 0,
                           child: FadeInAnimation(
                             child: ScaleAnimation(
                               child: GestureDetector(
                                 onTap: () async {
                                   Get.toNamed(
                                     AppRoutes.categoryDetail,
-                                    arguments: [logic.getAllCategory?.data?[index].id, logic.getAllCategory?.data?[index].name],
+                                    arguments: [
+                                      logic.getAllCategory?.data?[index].id,
+                                      logic.getAllCategory?.data?[index].name
+                                    ],
                                   );
                                 },
                                 child: OverflowBox(
@@ -184,18 +193,25 @@ class HomeScreenCategoryView extends StatelessWidget {
                                         height: 100,
                                         width: 80,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(14),
-                                          color: AppColors.grey.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                          color:
+                                              AppColors.grey.withOpacity(0.1),
                                         ),
                                         clipBehavior: Clip.hardEdge,
                                         child: CachedNetworkImage(
-                                          imageUrl: "${logic.getAllCategory?.data?[index].image}",
+                                          imageUrl:
+                                              "${logic.getAllCategory?.data?[index].image}",
                                           fit: BoxFit.cover,
                                           placeholder: (context, url) {
-                                            return Image.asset(AppAsset.icCategoryPlaceholder).paddingAll(15);
+                                            return Image.asset(AppAsset
+                                                    .icCategoryPlaceholder)
+                                                .paddingAll(15);
                                           },
                                           errorWidget: (context, url, error) {
-                                            return Image.asset(AppAsset.icCategoryPlaceholder).paddingAll(15);
+                                            return Image.asset(AppAsset
+                                                    .icCategoryPlaceholder)
+                                                .paddingAll(15);
                                           },
                                         ),
                                       ),
@@ -205,26 +221,34 @@ class HomeScreenCategoryView extends StatelessWidget {
                                           height: 27,
                                           width: 80,
                                           decoration: BoxDecoration(
-                                            borderRadius: const BorderRadius.only(
+                                            borderRadius:
+                                                const BorderRadius.only(
                                               bottomLeft: Radius.circular(14),
                                               bottomRight: Radius.circular(14),
                                             ),
-                                            color: AppColors.whiteColor.withOpacity(0.88),
+                                            color: AppColors.whiteColor
+                                                .withOpacity(0.88),
                                             border: Border.all(
-                                              color: AppColors.grey.withOpacity(0.08),
+                                              color: AppColors.grey
+                                                  .withOpacity(0.08),
                                               width: 0.8,
                                             ),
                                           ),
                                           child: Center(
                                             child: Text(
-                                              logic.getAllCategory?.data![index].name.toString() ?? "",
+                                              logic.getAllCategory?.data![index]
+                                                      .name
+                                                      .toString() ??
+                                                  "",
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.sfProDisplay,
+                                                fontFamily:
+                                                    AppFontFamily.sfProDisplay,
                                                 fontSize: 12.5,
                                                 color: AppColors.appText,
                                               ),
-                                            ).paddingOnly(left: 5, right: 5, bottom: 3),
+                                            ).paddingOnly(
+                                                left: 5, right: 5, bottom: 3),
                                           ),
                                         ),
                                       ),
@@ -291,14 +315,21 @@ class HomeScreenNearSalonView extends StatelessWidget {
                         )
                       : ListView.builder(
                           itemCount:
-                              (logic.getAllSalonCategory?.data?.length ?? 0) > 5 ? 5 : logic.getAllSalonCategory?.data?.length,
+                              (logic.getAllSalonCategory?.data?.length ?? 0) > 5
+                                  ? 5
+                                  : logic.getAllSalonCategory?.data?.length,
                           physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               onTap: () {
-                                Get.toNamed(AppRoutes.branchDetail, arguments: [logic.getAllSalonCategory?.data?[index].id]);
+                                Get.toNamed(AppRoutes.branchDetail, arguments: [
+                                  logic.getAllSalonCategory?.data?[index].id,
+                                  city,
+                                  latitude,
+                                  longitude
+                                ]);
                               },
                               child: Container(
                                 width: Get.width * 0.77,
@@ -320,46 +351,70 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                           height: 158,
                                           width: Get.width * 0.75,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(13),
-                                            color: AppColors.grey.withOpacity(0.2),
+                                            borderRadius:
+                                                BorderRadius.circular(13),
+                                            color:
+                                                AppColors.grey.withOpacity(0.2),
                                           ),
                                           clipBehavior: Clip.hardEdge,
                                           child: CachedNetworkImage(
-                                            imageUrl: logic.getAllSalonCategory?.data?[index].mainImage ?? "",
+                                            imageUrl: logic.getAllSalonCategory
+                                                    ?.data?[index].mainImage ??
+                                                "",
                                             fit: BoxFit.cover,
                                             placeholder: (context, url) {
-                                              return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                              return Image.asset(AppAsset
+                                                      .icImagePlaceholder)
+                                                  .paddingAll(25);
                                             },
                                             errorWidget: (context, url, error) {
-                                              return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                              return Image.asset(AppAsset
+                                                      .icImagePlaceholder)
+                                                  .paddingAll(25);
                                             },
                                           ),
                                         ),
                                         GestureDetector(
                                           onTap: () async {
-                                            if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                                            if (Constant.storage
+                                                    .read<bool>('isLogIn') ??
+                                                false) {
                                               logic.onLikeSalon(
-                                                userId: Constant.storage.read<String>('userId') ?? "",
-                                                salonId: logic.getAllSalonCategory?.data?[index].id ?? "",
+                                                userId: Constant.storage
+                                                        .read<String>(
+                                                            'userId') ??
+                                                    "",
+                                                salonId: logic
+                                                        .getAllSalonCategory
+                                                        ?.data?[index]
+                                                        .id ??
+                                                    "",
                                                 latitude: latitude.toString(),
                                                 longitude: longitude.toString(),
                                               );
                                             } else {
-                                              Get.toNamed(AppRoutes.signIn, arguments: [logic.checkItem.isNotEmpty]);
-                                              await Get.find<SignInController>().getDataFromArgs();
+                                              Get.toNamed(AppRoutes.signIn,
+                                                  arguments: [
+                                                    logic.checkItem.isNotEmpty
+                                                  ]);
+                                              await Get.find<SignInController>()
+                                                  .getDataFromArgs();
                                             }
                                           },
                                           child: Align(
                                             alignment: Alignment.topRight,
-                                            child: logic.isSalonSaved[index] == true
+                                            child: logic.isSalonSaved[index] ==
+                                                    true
                                                 ? Image.asset(
                                                     AppAsset.icLikeFilled,
                                                     height: 32,
-                                                  ).paddingOnly(right: 7, top: 7)
+                                                  ).paddingOnly(
+                                                    right: 7, top: 7)
                                                 : Image.asset(
                                                     AppAsset.icLikeOutline,
                                                     height: 32,
-                                                  ).paddingOnly(right: 7, top: 7),
+                                                  ).paddingOnly(
+                                                    right: 7, top: 7),
                                           ),
                                         ),
                                       ],
@@ -367,10 +422,13 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                     Row(
                                       children: [
                                         Text(
-                                          logic.getAllSalonCategory?.data?[index].name ?? "",
+                                          logic.getAllSalonCategory
+                                                  ?.data?[index].name ??
+                                              "",
                                           style: TextStyle(
                                             color: AppColors.primaryTextColor,
-                                            fontFamily: AppFontFamily.sfProDisplayBold,
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplayBold,
                                             fontSize: 16.5,
                                           ),
                                         ),
@@ -378,11 +436,14 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                         Container(
                                           height: 20,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(17),
+                                            borderRadius:
+                                                BorderRadius.circular(17),
                                             color: AppColors.yellow1,
                                           ),
-                                          padding: const EdgeInsets.symmetric(horizontal: 9),
-                                          margin: const EdgeInsets.only(left: 5),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 9),
+                                          margin:
+                                              const EdgeInsets.only(left: 5),
                                           child: Row(
                                             children: [
                                               Image.asset(
@@ -392,10 +453,14 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                                 color: AppColors.yellow3,
                                               ).paddingOnly(right: 5),
                                               Text(
-                                                logic.getAllSalonCategory?.data?[index].review?.toStringAsFixed(1) ?? "",
+                                                logic.getAllSalonCategory
+                                                        ?.data?[index].review
+                                                        ?.toStringAsFixed(1) ??
+                                                    "",
                                                 style: TextStyle(
                                                   color: AppColors.yellow3,
-                                                  fontFamily: AppFontFamily.sfProDisplayBold,
+                                                  fontFamily: AppFontFamily
+                                                      .sfProDisplayBold,
                                                   fontSize: 13,
                                                 ),
                                               ),
@@ -418,7 +483,8 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                               color: AppColors.termsDialog,
-                                              fontFamily: AppFontFamily.heeBo600,
+                                              fontFamily:
+                                                  AppFontFamily.heeBo600,
                                               fontSize: 14,
                                             ),
                                           ),
@@ -434,20 +500,26 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                         ).paddingOnly(right: 5),
                                         RichText(
                                           text: TextSpan(
-                                            text: logic.getAllSalonCategory?.data?[index].distance == null
+                                            text: logic
+                                                        .getAllSalonCategory
+                                                        ?.data?[index]
+                                                        .distance ==
+                                                    null
                                                 ? ""
                                                 : "${logic.getAllSalonCategory?.data?[index].distance?.toStringAsFixed(2)} ${"txtKMs".tr}  ",
                                             style: TextStyle(
                                               fontSize: 13,
                                               color: AppColors.appText,
-                                              fontFamily: AppFontFamily.heeBo600,
+                                              fontFamily:
+                                                  AppFontFamily.heeBo600,
                                             ),
                                             children: <TextSpan>[
                                               TextSpan(
                                                 text: "txtFromLocation".tr,
                                                 style: TextStyle(
                                                   fontSize: 11,
-                                                  fontFamily: AppFontFamily.heeBo600,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo600,
                                                   color: AppColors.termsDialog,
                                                 ),
                                               ),
@@ -458,17 +530,21 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                         Container(
                                           height: 25,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(6),
+                                            borderRadius:
+                                                BorderRadius.circular(6),
                                             color: AppColors.greenColorBg,
                                           ),
-                                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                                          margin: const EdgeInsets.only(left: 5),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          margin:
+                                              const EdgeInsets.only(left: 5),
                                           child: Center(
                                             child: Text(
                                               "Open",
                                               style: TextStyle(
                                                 color: AppColors.greenColor,
-                                                fontFamily: AppFontFamily.heeBo700,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo700,
                                                 fontSize: 13,
                                               ),
                                             ),
@@ -527,29 +603,37 @@ class HomeScreenNewProductView extends StatelessWidget {
                           return AnimationConfiguration.staggeredGrid(
                             position: index,
                             duration: const Duration(milliseconds: 700),
-                            columnCount: (logic.getNewProductModel?.data?.length ?? 0) >= 3
-                                ? 3
-                                : logic.getNewProductModel?.data?.length ?? 0,
+                            columnCount:
+                                (logic.getNewProductModel?.data?.length ?? 0) >=
+                                        3
+                                    ? 3
+                                    : logic.getNewProductModel?.data?.length ??
+                                        0,
                             child: FadeInAnimation(
                               child: ScaleAnimation(
                                 child: InkWell(
                                   onTap: () {
-                                    if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                                    if (Constant.storage
+                                            .read<bool>('isLogIn') ??
+                                        false) {
                                       Get.toNamed(
                                         AppRoutes.productDetail,
                                         arguments: [
-                                          logic.getNewProductModel?.data?[index].id,
+                                          logic.getNewProductModel?.data?[index]
+                                              .id,
                                         ],
                                       );
                                     } else {
-                                      Get.find<BottomBarController>().onClick(1);
+                                      Get.find<BottomBarController>()
+                                          .onClick(1);
                                     }
                                   },
                                   overlayColor: WidgetStateColor.transparent,
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(21),
-                                      color: RandomColorGenerator.getRandomColor(),
+                                      color:
+                                          RandomColorGenerator.getRandomColor(),
                                       boxShadow: Constant.boxShadow,
                                     ),
                                     width: 110,
@@ -562,14 +646,23 @@ class HomeScreenNewProductView extends StatelessWidget {
                                             const Spacer(),
                                             const Spacer(),
                                             CachedNetworkImage(
-                                              imageUrl: logic.getNewProductModel?.data?[index].mainImage ?? "",
+                                              imageUrl: logic
+                                                      .getNewProductModel
+                                                      ?.data?[index]
+                                                      .mainImage ??
+                                                  "",
                                               height: 80,
                                               fit: BoxFit.cover,
                                               placeholder: (context, url) {
-                                                return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                                return Image.asset(AppAsset
+                                                        .icImagePlaceholder)
+                                                    .paddingAll(5);
                                               },
-                                              errorWidget: (context, url, error) {
-                                                return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                              errorWidget:
+                                                  (context, url, error) {
+                                                return Image.asset(AppAsset
+                                                        .icImagePlaceholder)
+                                                    .paddingAll(5);
                                               },
                                             ),
                                             const Spacer(),
@@ -577,10 +670,15 @@ class HomeScreenNewProductView extends StatelessWidget {
                                               alignment: Alignment.centerLeft,
                                               child: Text(
                                                 Constant.capitalizeFirstLetter(
-                                                    logic.getNewProductModel?.data?[index].productName ?? ""),
+                                                    logic
+                                                            .getNewProductModel
+                                                            ?.data?[index]
+                                                            .productName ??
+                                                        ""),
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo700,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo700,
                                                   fontSize: 14,
                                                   color: AppColors.appText,
                                                 ),
@@ -592,22 +690,36 @@ class HomeScreenNewProductView extends StatelessWidget {
                                                 Text(
                                                   "$currency ${logic.getNewProductModel?.data?[index].price ?? ""}",
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.heeBo800,
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo800,
                                                     fontSize: 14,
-                                                    color: AppColors.primaryAppColor,
+                                                    color: AppColors
+                                                        .primaryAppColor,
                                                   ),
                                                 ).paddingOnly(right: 7),
-                                                logic.getNewProductModel?.data?[index].mrp == null
+                                                logic
+                                                            .getNewProductModel
+                                                            ?.data?[index]
+                                                            .mrp ==
+                                                        null
                                                     ? Container()
                                                     : Text(
                                                         "$currency ${logic.getNewProductModel?.data?[index].mrp ?? ""}",
                                                         style: TextStyle(
-                                                          fontFamily: AppFontFamily.heeBo700,
+                                                          fontFamily:
+                                                              AppFontFamily
+                                                                  .heeBo700,
                                                           fontSize: 14,
-                                                          decoration: TextDecoration.lineThrough,
-                                                          decorationColor: AppColors.currencyRed,
-                                                          color: AppColors.currencyRed,
-                                                          decorationThickness: 1.5,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .lineThrough,
+                                                          decorationColor:
+                                                              AppColors
+                                                                  .currencyRed,
+                                                          color: AppColors
+                                                              .currencyRed,
+                                                          decorationThickness:
+                                                              1.5,
                                                         ),
                                                       ),
                                               ],
@@ -621,19 +733,39 @@ class HomeScreenNewProductView extends StatelessWidget {
                                           top: 8,
                                           child: GestureDetector(
                                             onTap: () {
-                                              if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                                              if (Constant.storage
+                                                      .read<bool>('isLogIn') ??
+                                                  false) {
                                                 logic.onNewProductSaved(
-                                                  userId: Constant.storage.read<String>('userId') ?? "",
-                                                  categoryId: logic.getNewProductModel?.data?[index].category ?? "",
-                                                  productId: logic.getNewProductModel?.data?[index].id ?? "",
+                                                  userId: Constant.storage
+                                                          .read<String>(
+                                                              'userId') ??
+                                                      "",
+                                                  categoryId: logic
+                                                          .getNewProductModel
+                                                          ?.data?[index]
+                                                          .category ??
+                                                      "",
+                                                  productId: logic
+                                                          .getNewProductModel
+                                                          ?.data?[index]
+                                                          .id ??
+                                                      "",
                                                 );
                                               } else {
-                                                Get.find<BottomBarController>().onClick(1);
+                                                Get.find<BottomBarController>()
+                                                    .onClick(1);
                                               }
                                             },
-                                            child: logic.isNewProductSaved[index] == true
-                                                ? Image.asset(AppAsset.icLikeFilled, height: 30)
-                                                : Image.asset(AppAsset.icLikeOutline, height: 30),
+                                            child: logic.isNewProductSaved[
+                                                        index] ==
+                                                    true
+                                                ? Image.asset(
+                                                    AppAsset.icLikeFilled,
+                                                    height: 30)
+                                                : Image.asset(
+                                                    AppAsset.icLikeOutline,
+                                                    height: 30),
                                           ),
                                         ),
                                       ],
@@ -683,23 +815,30 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
-                      itemCount: logic.getTrendingProductModel?.data?.length ?? 0,
+                      itemCount:
+                          logic.getTrendingProductModel?.data?.length ?? 0,
                       itemBuilder: (BuildContext context, int index) {
                         return AnimationConfiguration.staggeredGrid(
                           position: index,
                           duration: const Duration(milliseconds: 650),
-                          columnCount: (logic.getTrendingProductModel?.data?.length ?? 0) >= 3
+                          columnCount: (logic.getTrendingProductModel?.data
+                                          ?.length ??
+                                      0) >=
+                                  3
                               ? 3
-                              : logic.getTrendingProductModel?.data?.length ?? 0,
+                              : logic.getTrendingProductModel?.data?.length ??
+                                  0,
                           child: FadeInAnimation(
                             child: ScaleAnimation(
                               child: InkWell(
                                 onTap: () {
-                                  if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                                  if (Constant.storage.read<bool>('isLogIn') ??
+                                      false) {
                                     Get.toNamed(
                                       AppRoutes.productDetail,
                                       arguments: [
-                                        logic.getTrendingProductModel?.data?[index].id,
+                                        logic.getTrendingProductModel
+                                            ?.data?[index].id,
                                       ],
                                     );
                                   } else {
@@ -710,7 +849,8 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(21),
-                                    color: RandomColorGenerator.getRandomColor(),
+                                    color:
+                                        RandomColorGenerator.getRandomColor(),
                                     boxShadow: Constant.boxShadow,
                                     border: Border.all(
                                       color: AppColors.grey.withOpacity(0.1),
@@ -728,14 +868,22 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                                           const Spacer(),
                                           const Spacer(),
                                           CachedNetworkImage(
-                                            imageUrl: logic.getTrendingProductModel?.data?[index].mainImage ?? "",
+                                            imageUrl: logic
+                                                    .getTrendingProductModel
+                                                    ?.data?[index]
+                                                    .mainImage ??
+                                                "",
                                             height: 85,
                                             fit: BoxFit.cover,
                                             placeholder: (context, url) {
-                                              return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                              return Image.asset(AppAsset
+                                                      .icImagePlaceholder)
+                                                  .paddingAll(5);
                                             },
                                             errorWidget: (context, url, error) {
-                                              return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                              return Image.asset(AppAsset
+                                                      .icImagePlaceholder)
+                                                  .paddingAll(5);
                                             },
                                           ),
                                           const Spacer(),
@@ -743,11 +891,15 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                                           Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              Constant.capitalizeFirstLetter(
-                                                  logic.getTrendingProductModel?.data?[index].productName ?? ""),
+                                              Constant.capitalizeFirstLetter(logic
+                                                      .getTrendingProductModel
+                                                      ?.data?[index]
+                                                      .productName ??
+                                                  ""),
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.heeBo700,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo700,
                                                 fontSize: 14,
                                                 color: AppColors.appText,
                                               ),
@@ -755,11 +907,14 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                                           ),
                                           Row(
                                             children: [
-                                              Image.asset(AppAsset.icRedStar, height: 12, color: AppColors.yellow3),
+                                              Image.asset(AppAsset.icRedStar,
+                                                  height: 12,
+                                                  color: AppColors.yellow3),
                                               Text(
                                                 "${logic.getTrendingProductModel?.data?[index].rating?.toStringAsFixed(1) ?? ""} | ${logic.getTrendingProductModel?.data?[index].sold ?? ""} Sold",
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo700,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo700,
                                                   fontSize: 12,
                                                   color: AppColors.ratingBlack,
                                                 ),
@@ -771,22 +926,34 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                                               Text(
                                                 "$currency ${logic.getTrendingProductModel?.data?[index].price ?? ""}",
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo800,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo800,
                                                   fontSize: 14,
-                                                  color: AppColors.primaryAppColor,
+                                                  color:
+                                                      AppColors.primaryAppColor,
                                                 ),
                                               ).paddingOnly(right: 7),
-                                              logic.getTrendingProductModel?.data?[index].mrp == null
+                                              logic.getTrendingProductModel
+                                                          ?.data?[index].mrp ==
+                                                      null
                                                   ? Container()
                                                   : Text(
                                                       "$currency ${logic.getTrendingProductModel?.data?[index].mrp ?? ""}",
                                                       style: TextStyle(
-                                                        fontFamily: AppFontFamily.heeBo700,
+                                                        fontFamily:
+                                                            AppFontFamily
+                                                                .heeBo700,
                                                         fontSize: 14,
-                                                        decoration: TextDecoration.lineThrough,
-                                                        decorationColor: AppColors.currencyRed,
-                                                        color: AppColors.currencyRed,
-                                                        decorationThickness: 1.5,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
+                                                        decorationColor:
+                                                            AppColors
+                                                                .currencyRed,
+                                                        color: AppColors
+                                                            .currencyRed,
+                                                        decorationThickness:
+                                                            1.5,
                                                       ),
                                                     ),
                                             ],
@@ -795,15 +962,19 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                                           const Spacer(),
                                         ],
                                       ),
-                                      logic.getTrendingProductModel?.data?[index].isBestSeller == true
+                                      logic.getTrendingProductModel
+                                                  ?.data?[index].isBestSeller ==
+                                              true
                                           ? Container(
                                               height: 22,
                                               width: Get.width * 0.17,
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
-                                                borderRadius: const BorderRadius.only(
+                                                borderRadius:
+                                                    const BorderRadius.only(
                                                   topLeft: Radius.circular(21),
-                                                  bottomRight: Radius.circular(21),
+                                                  bottomRight:
+                                                      Radius.circular(21),
                                                   topRight: Radius.circular(21),
                                                 ),
                                                 color: AppColors.sellerBg,
@@ -812,7 +983,8 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                                                 "txtBestSeller".tr,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo700,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo700,
                                                   fontSize: 10,
                                                   color: AppColors.sellerYellow,
                                                 ),
@@ -824,19 +996,39 @@ class HomeScreenTrendingProduct extends StatelessWidget {
                                         top: 8,
                                         child: GestureDetector(
                                           onTap: () {
-                                            if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                                            if (Constant.storage
+                                                    .read<bool>('isLogIn') ??
+                                                false) {
                                               logic.onTrendingProductSaved(
-                                                userId: Constant.storage.read<String>('userId') ?? "",
-                                                categoryId: logic.getTrendingProductModel?.data?[index].category ?? "",
-                                                productId: logic.getTrendingProductModel?.data?[index].id ?? "",
+                                                userId: Constant.storage
+                                                        .read<String>(
+                                                            'userId') ??
+                                                    "",
+                                                categoryId: logic
+                                                        .getTrendingProductModel
+                                                        ?.data?[index]
+                                                        .category ??
+                                                    "",
+                                                productId: logic
+                                                        .getTrendingProductModel
+                                                        ?.data?[index]
+                                                        .id ??
+                                                    "",
                                               );
                                             } else {
-                                              Get.find<BottomBarController>().onClick(1);
+                                              Get.find<BottomBarController>()
+                                                  .onClick(1);
                                             }
                                           },
-                                          child: logic.isTrendingProductSaved[index] == true
-                                              ? Image.asset(AppAsset.icLikeFilled, height: 30)
-                                              : Image.asset(AppAsset.icLikeOutline, height: 30),
+                                          child: logic.isTrendingProductSaved[
+                                                      index] ==
+                                                  true
+                                              ? Image.asset(
+                                                  AppAsset.icLikeFilled,
+                                                  height: 30)
+                                              : Image.asset(
+                                                  AppAsset.icLikeOutline,
+                                                  height: 30),
                                         ),
                                       ),
                                     ],
@@ -909,45 +1101,63 @@ class HomeScreenTopExpertView extends StatelessWidget {
                             physics: const ScrollPhysics(),
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
-                            itemCount: (logic.getAllExpertCategory?.data?.length ?? 0) > 6
-                                ? 6
-                                : logic.getAllExpertCategory?.data?.length,
+                            itemCount:
+                                (logic.getAllExpertCategory?.data?.length ??
+                                            0) >
+                                        6
+                                    ? 6
+                                    : logic.getAllExpertCategory?.data?.length,
                             itemBuilder: (BuildContext context, int index) {
-                              logic.rating = logic.getAllExpertCategory?.data?[index].review ?? 0.0;
+                              logic.rating = logic.getAllExpertCategory
+                                      ?.data?[index].review ??
+                                  0.0;
                               logic.roundedRating = logic.rating?.round();
-                              logic.filledStars = logic.roundedRating?.clamp(0, 5);
+                              logic.filledStars =
+                                  logic.roundedRating?.clamp(0, 5);
 
                               return AnimationConfiguration.staggeredGrid(
                                 position: index,
                                 duration: const Duration(milliseconds: 800),
-                                columnCount: (logic.getAllExpertCategory?.data?.length ?? 0) > 6
-                                    ? 6
-                                    : logic.getAllExpertCategory?.data?.length ?? 0,
+                                columnCount:
+                                    (logic.getAllExpertCategory?.data?.length ??
+                                                0) >
+                                            6
+                                        ? 6
+                                        : logic.getAllExpertCategory?.data
+                                                ?.length ??
+                                            0,
                                 child: ScaleAnimation(
                                   child: FadeInAnimation(
                                     child: GestureDetector(
                                       onTap: () async {
                                         await logic.onGetExpertApiCall(
-                                            expertId: logic.getAllExpertCategory?.data?[index].id ?? "");
+                                            expertId: logic.getAllExpertCategory
+                                                    ?.data?[index].id ??
+                                                "");
 
                                         Get.toNamed(
                                           AppRoutes.expertDetail,
                                           arguments: [
-                                            logic.getAllExpertCategory?.data?[index].id,
+                                            logic.getAllExpertCategory
+                                                ?.data?[index].id,
                                             index,
-                                            logic.getAllExpertCategory?.data?[index].review
+                                            logic.getAllExpertCategory
+                                                ?.data?[index].review
                                           ],
                                         );
                                       },
                                       child: Container(
                                         width: Get.width * 0.35,
-                                        margin: const EdgeInsets.only(right: 10, top: 5, bottom: 5),
+                                        margin: const EdgeInsets.only(
+                                            right: 10, top: 5, bottom: 5),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(21),
+                                          borderRadius:
+                                              BorderRadius.circular(21),
                                           color: AppColors.whiteColor,
                                           boxShadow: Constant.boxShadow,
                                           border: Border.all(
-                                            color: AppColors.grey.withOpacity(0.1),
+                                            color:
+                                                AppColors.grey.withOpacity(0.1),
                                             width: 1,
                                           ),
                                         ),
@@ -964,16 +1174,24 @@ class HomeScreenTopExpertView extends StatelessWidget {
                                               child: Container(
                                                 height: 70,
                                                 width: 70,
-                                                decoration: const BoxDecoration(shape: BoxShape.circle),
+                                                decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle),
                                                 clipBehavior: Clip.hardEdge,
                                                 child: CachedNetworkImage(
-                                                  imageUrl: logic.getAllExpertCategory?.data?[index].image ?? "",
+                                                  imageUrl: logic
+                                                          .getAllExpertCategory
+                                                          ?.data?[index]
+                                                          .image ??
+                                                      "",
                                                   fit: BoxFit.cover,
                                                   placeholder: (context, url) {
-                                                    return Image.asset(AppAsset.icPlaceHolder);
+                                                    return Image.asset(
+                                                        AppAsset.icPlaceHolder);
                                                   },
-                                                  errorWidget: (context, url, error) {
-                                                    return Image.asset(AppAsset.icPlaceHolder);
+                                                  errorWidget:
+                                                      (context, url, error) {
+                                                    return Image.asset(
+                                                        AppAsset.icPlaceHolder);
                                                   },
                                                 ),
                                               ),
@@ -984,7 +1202,8 @@ class HomeScreenTopExpertView extends StatelessWidget {
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.heeBo600,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo600,
                                                 fontSize: 14,
                                                 color: AppColors.category,
                                               ),
@@ -993,7 +1212,8 @@ class HomeScreenTopExpertView extends StatelessWidget {
                                             Container(
                                               height: 32,
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: AppColors.yellow2,
                                               ),
                                               child: SizedBox(
@@ -1001,10 +1221,15 @@ class HomeScreenTopExpertView extends StatelessWidget {
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount: 5,
-                                                  scrollDirection: Axis.horizontal,
-                                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                  itemBuilder: (context, index) {
-                                                    if (index < logic.filledStars!) {
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 10),
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    if (index <
+                                                        logic.filledStars!) {
                                                       return Image.asset(
                                                         AppAsset.icStarFilled,
                                                         height: 13,
@@ -1018,8 +1243,11 @@ class HomeScreenTopExpertView extends StatelessWidget {
                                                       );
                                                     }
                                                   },
-                                                  separatorBuilder: (context, index) {
-                                                    return SizedBox(width: Get.width * 0.015);
+                                                  separatorBuilder:
+                                                      (context, index) {
+                                                    return SizedBox(
+                                                        width:
+                                                            Get.width * 0.015);
                                                   },
                                                 ),
                                               ),

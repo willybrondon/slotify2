@@ -33,12 +33,12 @@ class OnBoardingView extends StatelessWidget {
                   },
                 ),
               ),
-              // Fixed height button container to prevent overlap
+              // Responsive button container to prevent overlap
               Container(
                 width: Get.width,
-                height: 120, // Fixed height for button area
+                height: Get.height * 0.15, // Responsive height for button area
                 color: AppColors.whiteColor,
-                padding: const EdgeInsets.only(bottom: 20),
+                padding: EdgeInsets.only(bottom: Get.height * 0.02),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -88,15 +88,19 @@ class OnboardingItemView extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            const Spacer(flex: 2),
-            Image.asset(image).paddingOnly(left: 15, right: 15),
-            const Spacer(flex: 1),
+            SizedBox(height: Get.height * 0.05),
+            Image.asset(
+              image,
+              height: Get.height * 0.3, // Responsive image height
+              fit: BoxFit.contain,
+            ).paddingOnly(left: 15, right: 15),
+            SizedBox(height: Get.height * 0.03),
             Text(
               title,
               style: TextStyle(
                 color: AppColors.primaryAppColor,
                 fontFamily: AppFontFamily.heeBo800,
-                fontSize: 28,
+                fontSize: Get.width * 0.07, // Responsive font size
               ),
               textAlign: TextAlign.center,
             ).paddingAll(20),
@@ -105,12 +109,12 @@ class OnboardingItemView extends StatelessWidget {
               style: TextStyle(
                 color: AppColors.termsDialog,
                 fontFamily: AppFontFamily.heeBo500,
-                fontSize: 17,
+                fontSize: Get.width * 0.04, // Responsive font size
               ),
               textAlign: TextAlign.center,
             ).paddingOnly(left: 20, right: 20, bottom: 20),
-            // Add extra space to prevent overlap with button area
-            const SizedBox(height: 100),
+            // Responsive spacing to prevent overlap with button area
+            SizedBox(height: Get.height * 0.08),
           ],
         ),
       ),

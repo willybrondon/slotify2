@@ -33,7 +33,6 @@ exports.getAll = async (req, res) => {
           isDelete: false,
           status: true,
           "allowCities.city": city,
-          ...query,
         },
       },
       {
@@ -47,7 +46,6 @@ exports.getAll = async (req, res) => {
       {
         $unwind: "$category",
       },
-
       {
         $project: {
           _id: 1,

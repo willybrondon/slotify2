@@ -62,6 +62,9 @@ class BranchScreenSalonView extends StatelessWidget {
                               AppRoutes.branchDetail,
                               arguments: [
                                 logic.getAllSalonCategory?.data?[index].id,
+                                city,
+                                latitude,
+                                longitude,
                               ],
                             );
                           },
@@ -90,21 +93,31 @@ class BranchScreenSalonView extends StatelessWidget {
                                       ),
                                       clipBehavior: Clip.hardEdge,
                                       child: CachedNetworkImage(
-                                        imageUrl: logic.getAllSalonCategory?.data?[index].mainImage ?? "",
+                                        imageUrl: logic.getAllSalonCategory
+                                                ?.data?[index].mainImage ??
+                                            "",
                                         fit: BoxFit.cover,
                                         errorWidget: (context, url, error) {
-                                          return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                          return Image.asset(
+                                                  AppAsset.icImagePlaceholder)
+                                              .paddingAll(25);
                                         },
                                         placeholder: (context, url) {
-                                          return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                          return Image.asset(
+                                                  AppAsset.icImagePlaceholder)
+                                              .paddingAll(25);
                                         },
                                       ),
                                     ),
                                     GestureDetector(
                                       onTap: () {
                                         logic.onLikeSalon(
-                                          userId: Constant.storage.read<String>('userId') ?? "",
-                                          salonId: logic.getAllSalonCategory?.data?[index].id ?? "",
+                                          userId: Constant.storage
+                                                  .read<String>('userId') ??
+                                              "",
+                                          salonId: logic.getAllSalonCategory
+                                                  ?.data?[index].id ??
+                                              "",
                                           latitude: latitude.toString(),
                                           longitude: longitude.toString(),
                                         );
@@ -127,7 +140,9 @@ class BranchScreenSalonView extends StatelessWidget {
                                 Row(
                                   children: [
                                     Text(
-                                      logic.getAllSalonCategory?.data?[index].name ?? "",
+                                      logic.getAllSalonCategory?.data?[index]
+                                              .name ??
+                                          "",
                                       style: TextStyle(
                                         color: AppColors.appText,
                                         fontFamily: AppFontFamily.heeBo800,
@@ -141,7 +156,8 @@ class BranchScreenSalonView extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(17),
                                         color: AppColors.yellow1,
                                       ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 13),
                                       margin: const EdgeInsets.only(left: 5),
                                       child: Row(
                                         children: [
@@ -152,10 +168,14 @@ class BranchScreenSalonView extends StatelessWidget {
                                             color: AppColors.yellow3,
                                           ).paddingOnly(right: 5),
                                           Text(
-                                            logic.getAllSalonCategory?.data?[index].review?.toStringAsFixed(1) ?? "",
+                                            logic.getAllSalonCategory
+                                                    ?.data?[index].review
+                                                    ?.toStringAsFixed(1) ??
+                                                "",
                                             style: TextStyle(
                                               color: AppColors.yellow3,
-                                              fontFamily: AppFontFamily.sfProDisplayBold,
+                                              fontFamily: AppFontFamily
+                                                  .sfProDisplayBold,
                                               fontSize: 14,
                                             ),
                                           ),
@@ -194,7 +214,9 @@ class BranchScreenSalonView extends StatelessWidget {
                                     ).paddingOnly(right: 8),
                                     RichText(
                                       text: TextSpan(
-                                        text: logic.getAllSalonCategory?.data?[index].distance == null
+                                        text: logic.getAllSalonCategory
+                                                    ?.data?[index].distance ==
+                                                null
                                             ? ""
                                             : "${logic.getAllSalonCategory?.data?[index].distance?.toStringAsFixed(2)} ${"txtKMs".tr}  ",
                                         style: TextStyle(
@@ -207,7 +229,8 @@ class BranchScreenSalonView extends StatelessWidget {
                                             text: "txtFromLocation".tr,
                                             style: TextStyle(
                                               fontSize: 12,
-                                              fontFamily: AppFontFamily.heeBo600,
+                                              fontFamily:
+                                                  AppFontFamily.heeBo600,
                                               color: AppColors.termsDialog,
                                             ),
                                           ),
@@ -221,7 +244,8 @@ class BranchScreenSalonView extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(6),
                                         color: AppColors.greenColorBg,
                                       ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
                                       margin: const EdgeInsets.only(left: 5),
                                       child: Center(
                                         child: Text(

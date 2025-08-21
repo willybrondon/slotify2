@@ -33,7 +33,8 @@ import 'package:salon_2/utils/utils.dart';
 class BookingScreen extends StatelessWidget {
   BookingScreen({super.key});
 
-  BookingScreenController bookingScreenController = Get.put(BookingScreenController());
+  BookingScreenController bookingScreenController =
+      Get.put(BookingScreenController());
   SplashController splashController = Get.put(SplashController());
   HomeScreenController homeScreenController = Get.put(HomeScreenController());
 
@@ -83,13 +84,20 @@ class BookingScreen extends StatelessWidget {
                   onTap: () async {
                     logic.onBackStep();
 
-                    logic.expertDetail != null ? logic.onExpertSelect() : logic.selectExpert = -1;
+                    logic.expertDetail != null
+                        ? logic.onExpertSelect()
+                        : logic.selectExpert = -1;
 
                     await logic.onGetBookingApiCall(
                       selectedDate: logic.date,
-                      expertId: Constant.storage.read<String>('expertDetail') != null
-                          ? Constant.storage.read<String>('expertDetail').toString()
-                          : Constant.storage.read<String>('expertId').toString(),
+                      expertId:
+                          Constant.storage.read<String>('expertDetail') != null
+                              ? Constant.storage
+                                  .read<String>('expertDetail')
+                                  .toString()
+                              : Constant.storage
+                                  .read<String>('expertId')
+                                  .toString(),
                       salonId: logic.salonId.toString(),
                     );
 
@@ -184,7 +192,9 @@ class BookingScreen extends StatelessWidget {
                               ),
                             ),
                           ).paddingOnly(left: 5, bottom: 7),
-                          logic.withOutTaxRupee == 0.0 && logic.totalPrice == 0.0 && logic.finalTaxRupee == 0.0
+                          logic.withOutTaxRupee == 0.0 &&
+                                  logic.totalPrice == 0.0 &&
+                                  logic.finalTaxRupee == 0.0
                               ? const SizedBox()
                               : Row(
                                   children: [
@@ -193,7 +203,8 @@ class BookingScreen extends StatelessWidget {
                                       style: TextStyle(
                                         fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 15.5,
-                                        color: AppColors.currency.withOpacity(0.9),
+                                        color:
+                                            AppColors.currency.withOpacity(0.9),
                                       ),
                                     ),
                                     Text(
@@ -201,14 +212,16 @@ class BookingScreen extends StatelessWidget {
                                       style: TextStyle(
                                         fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 12.5,
-                                        color: AppColors.currency.withOpacity(0.9),
+                                        color:
+                                            AppColors.currency.withOpacity(0.9),
                                       ),
                                     ),
                                     SizedBox(width: Get.width * 0.02),
                                     Text(
                                       "= $currency ${logic.totalPrice.toStringAsFixed(2)}",
                                       style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayBold,
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayBold,
                                         fontSize: 17,
                                         color: AppColors.currency,
                                       ),
@@ -239,11 +252,14 @@ class BookingScreen extends StatelessWidget {
                       color: AppColors.whiteColor,
                       fontFamily: AppFontFamily.sfProDisplay,
                       fontSize: 15,
-                      buttonText: logic.currentStep == 3 ? "txtConfirm".tr : "txtNext".tr,
+                      buttonText: logic.currentStep == 3
+                          ? "txtConfirm".tr
+                          : "txtNext".tr,
                       width: Get.width * 0.28,
                       onTap: () async {
                         if (logic.currentStep == 0) {
-                          if (logic.searchEditingController.text.isEmpty && logic.selectedVenue == "At Home") {
+                          if (logic.searchEditingController.text.isEmpty &&
+                              logic.selectedVenue == "At Home") {
                             Utils.showToast(context, "Please enter an address");
                           } else {
                             logic.onConfirmButton(context);
@@ -254,9 +270,15 @@ class BookingScreen extends StatelessWidget {
 
                             await logic.onGetBookingApiCall(
                               selectedDate: logic.date,
-                              expertId: Constant.storage.read<String>('expertDetail') != null
-                                  ? Constant.storage.read<String>('expertDetail').toString()
-                                  : Constant.storage.read<String>('expertId').toString(),
+                              expertId: Constant.storage
+                                          .read<String>('expertDetail') !=
+                                      null
+                                  ? Constant.storage
+                                      .read<String>('expertDetail')
+                                      .toString()
+                                  : Constant.storage
+                                      .read<String>('expertId')
+                                      .toString(),
                               salonId: logic.salonId.toString(),
                             );
 
@@ -266,10 +288,12 @@ class BookingScreen extends StatelessWidget {
                             logic.onGetSlotsList();
                             log("Get Booking Status :: ${logic.getBookingModel?.status}");
                             if (logic.getBookingModel?.status == false) {
-                              Utils.showToast(Get.context!, logic.getBookingModel?.message ?? "");
+                              Utils.showToast(Get.context!,
+                                  logic.getBookingModel?.message ?? "");
                             }
 
-                            logic.rupee = (logic.totalPrice.toDouble() + logic.finalTaxRupee.toDouble());
+                            logic.rupee = (logic.totalPrice.toDouble() +
+                                logic.finalTaxRupee.toDouble());
                             log("rupee :: ${logic.rupee}");
                           } else {
                             if (logic.selectExpert == -1) {
@@ -278,9 +302,15 @@ class BookingScreen extends StatelessWidget {
 
                               await logic.onGetBookingApiCall(
                                 selectedDate: logic.date,
-                                expertId: Constant.storage.read<String>('expertDetail') != null
-                                    ? Constant.storage.read<String>('expertDetail').toString()
-                                    : Constant.storage.read<String>('expertId').toString(),
+                                expertId: Constant.storage
+                                            .read<String>('expertDetail') !=
+                                        null
+                                    ? Constant.storage
+                                        .read<String>('expertDetail')
+                                        .toString()
+                                    : Constant.storage
+                                        .read<String>('expertId')
+                                        .toString(),
                                 salonId: logic.salonId.toString(),
                               );
                               logic.formattedDate = logic.date;
@@ -290,10 +320,12 @@ class BookingScreen extends StatelessWidget {
 
                               if (logic.getBookingModel?.status == true) {
                               } else {
-                                Utils.showToast(Get.context!, logic.getBookingModel?.message ?? "");
+                                Utils.showToast(Get.context!,
+                                    logic.getBookingModel?.message ?? "");
                               }
 
-                              logic.rupee = (logic.totalPrice.toDouble() + logic.finalTaxRupee.toDouble());
+                              logic.rupee = (logic.totalPrice.toDouble() +
+                                  logic.finalTaxRupee.toDouble());
                               log("rupee :: ${logic.rupee}");
                             }
                           }
@@ -303,22 +335,32 @@ class BookingScreen extends StatelessWidget {
                           if (logic.selectedSlotsList.isEmpty) {
                           } else {
                             await logic.onGetCheckBookingApiCall(
-                              userId: Constant.storage.read<String>('userId') ?? "",
-                              expertId: Constant.storage.read<String>('expertDetail') != null
-                                  ? Constant.storage.read<String>('expertDetail').toString()
-                                  : Constant.storage.read<String>('expertId').toString(),
+                              userId:
+                                  Constant.storage.read<String>('userId') ?? "",
+                              expertId: Constant.storage
+                                          .read<String>('expertDetail') !=
+                                      null
+                                  ? Constant.storage
+                                      .read<String>('expertDetail')
+                                      .toString()
+                                  : Constant.storage
+                                      .read<String>('expertId')
+                                      .toString(),
                               serviceId: logic.serviceId.join(","),
                               salonId: logic.salonId.toString(),
                               date: logic.formattedDate.toString(),
                               time: logic.slotsString.toString(),
                               amount: bookingScreenController.totalPrice,
-                              withoutTax: bookingScreenController.withOutTaxRupee.toInt(),
+                              withoutTax: bookingScreenController
+                                  .withOutTaxRupee
+                                  .toInt(),
                             );
 
                             if (logic.getCheckBookingCategory?.status == true) {
                               logic.onConfirmButton(context);
                             } else {
-                              Utils.showToast(Get.context!, logic.getCheckBookingCategory?.message ?? "");
+                              Utils.showToast(Get.context!,
+                                  logic.getCheckBookingCategory?.message ?? "");
                             }
                           }
                         } else if (logic.currentStep == 3) {
@@ -342,7 +384,8 @@ class BookingScreen extends StatelessWidget {
               inAsyncCall: logic.isLoading.value,
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   child: GetBuilder<BookingScreenController>(
                     id: Constant.idCurrentStep,
                     builder: (logic) {
@@ -386,9 +429,14 @@ class BookingScreen extends StatelessWidget {
                                         fontColor: AppColors.greyColor2,
                                       ),
                                 const SizedBox(width: 10),
-                                divider(color: logic.currentStep >= 1 ? AppColors.primaryAppColor : AppColors.greyColor),
+                                divider(
+                                    color: (logic.currentStep >= 1 ||
+                                            logic.expertDetail != null)
+                                        ? AppColors.primaryAppColor
+                                        : AppColors.greyColor),
                                 const SizedBox(width: 10),
-                                logic.currentStep >= 1
+                                (logic.currentStep >= 1 ||
+                                        logic.expertDetail != null)
                                     ? stepDesign(
                                         color: AppColors.primaryAppColor,
                                         title: "txtStaff".tr,
@@ -405,14 +453,18 @@ class BookingScreen extends StatelessWidget {
                                         widget: Text(
                                           "2",
                                           style: TextStyle(
-                                            fontFamily: AppFontFamily.sfProDisplay,
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplay,
                                             fontSize: 13,
                                             color: AppColors.stepper,
                                           ),
                                         ),
                                       ),
                                 const SizedBox(width: 10),
-                                divider(color: logic.currentStep >= 2 ? AppColors.primaryAppColor : AppColors.greyColor),
+                                divider(
+                                    color: logic.currentStep >= 2
+                                        ? AppColors.primaryAppColor
+                                        : AppColors.greyColor),
                                 logic.currentStep >= 2
                                     ? stepDesign(
                                         color: AppColors.primaryAppColor,
@@ -430,13 +482,17 @@ class BookingScreen extends StatelessWidget {
                                         widget: Text(
                                           "3",
                                           style: TextStyle(
-                                            fontFamily: AppFontFamily.sfProDisplay,
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplay,
                                             fontSize: 13,
                                             color: AppColors.stepper,
                                           ),
                                         ),
                                       ),
-                                divider(color: logic.currentStep >= 3 ? AppColors.primaryAppColor : AppColors.greyColor),
+                                divider(
+                                    color: logic.currentStep >= 3
+                                        ? AppColors.primaryAppColor
+                                        : AppColors.greyColor),
                                 const SizedBox(width: 6),
                                 logic.currentStep >= 3
                                     ? stepDesign(
@@ -455,7 +511,8 @@ class BookingScreen extends StatelessWidget {
                                         widget: Text(
                                           "4",
                                           style: TextStyle(
-                                            fontFamily: AppFontFamily.sfProDisplay,
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplay,
                                             fontSize: 13,
                                             color: AppColors.stepper,
                                           ),
@@ -464,11 +521,122 @@ class BookingScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          SizedBox(height: Get.height * 0.03),
+                          SizedBox(height: Get.height * 0.02),
+
+                          // Show selected expert and salon info when coming from Top Experts
+                          GetBuilder<BookingScreenController>(
+                            id: Constant.idStep1,
+                            builder: (logic) {
+                              if (logic.expertDetail != null &&
+                                  logic.selectedExpertDataList.isNotEmpty &&
+                                  logic.currentStep > 0) {
+                                return Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: AppColors.whiteColor,
+                                    boxShadow: Constant.boxShadow,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Selected Expert & Salon",
+                                        style: TextStyle(
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayBold,
+                                          fontSize: 16,
+                                          color: AppColors.primaryTextColor,
+                                        ),
+                                      ),
+                                      SizedBox(height: Get.height * 0.015),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(25),
+                                              border: Border.all(
+                                                  color:
+                                                      AppColors.primaryAppColor,
+                                                  width: 2),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(25),
+                                              child: CachedNetworkImage(
+                                                imageUrl: logic
+                                                            .selectedExpertDataList
+                                                            .length >
+                                                        3
+                                                    ? logic.selectedExpertDataList[
+                                                            3] ??
+                                                        ""
+                                                    : "",
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    Image.asset(AppAsset
+                                                        .icImagePlaceholder),
+                                                errorWidget: (context, url,
+                                                        error) =>
+                                                    Image.asset(AppAsset
+                                                        .icImagePlaceholder),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${logic.selectedExpertDataList.length > 1 ? logic.selectedExpertDataList[1] : ""} ${logic.selectedExpertDataList.length > 2 ? logic.selectedExpertDataList[2] : ""}",
+                                                  style: TextStyle(
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplayBold,
+                                                    fontSize: 16,
+                                                    color: AppColors
+                                                        .primaryTextColor,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 4),
+                                                Text(
+                                                  logic.salonName != null &&
+                                                          logic.salonName!
+                                                              .isNotEmpty
+                                                      ? logic.salonName!
+                                                      : "At Salon",
+                                                  style: TextStyle(
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplay,
+                                                    fontSize: 14,
+                                                    color: AppColors.greyColor2,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+
+                          SizedBox(height: Get.height * 0.02),
                           logic.currentStep == 0
                               ? selectServiceVenue()
                               : logic.currentStep == 1
-                                  ? selectExpert()
+                                  ? (logic.expertDetail != null
+                                      ? selectDateTime()
+                                      : selectExpert())
                                   : logic.currentStep == 2
                                       ? selectDateTime()
                                       : payment()
@@ -510,7 +678,9 @@ class BookingScreen extends StatelessWidget {
                   color: AppColors.whiteColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: logic.selectedVenue == "At Salon" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.2),
+                    color: logic.selectedVenue == "At Salon"
+                        ? AppColors.primaryAppColor
+                        : AppColors.greyColor.withOpacity(0.2),
                     width: 0.7,
                   ),
                 ),
@@ -540,14 +710,19 @@ class BookingScreen extends StatelessWidget {
                       height: 22,
                       width: 22,
                       decoration: BoxDecoration(
-                        color: logic.selectedVenue == "At Salon" ? AppColors.primaryAppColor : AppColors.whiteColor,
+                        color: logic.selectedVenue == "At Salon"
+                            ? AppColors.primaryAppColor
+                            : AppColors.whiteColor,
                         border: Border.all(
                           color: AppColors.grey.withOpacity(0.2),
                           width: 0.8,
                         ),
                         shape: BoxShape.circle,
                       ),
-                      child: logic.selectedVenue == "At Salon" ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
+                      child: logic.selectedVenue == "At Salon"
+                          ? const Icon(Icons.check,
+                              size: 12, color: Colors.white)
+                          : null,
                     ),
                   ],
                 ),
@@ -563,7 +738,9 @@ class BookingScreen extends StatelessWidget {
                   color: AppColors.whiteColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: logic.selectedVenue == "At Home" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.2),
+                    color: logic.selectedVenue == "At Home"
+                        ? AppColors.primaryAppColor
+                        : AppColors.greyColor.withOpacity(0.2),
                     width: 0.7,
                   ),
                 ),
@@ -593,14 +770,19 @@ class BookingScreen extends StatelessWidget {
                       height: 22,
                       width: 22,
                       decoration: BoxDecoration(
-                        color: logic.selectedVenue == "At Home" ? AppColors.primaryAppColor : AppColors.whiteColor,
+                        color: logic.selectedVenue == "At Home"
+                            ? AppColors.primaryAppColor
+                            : AppColors.whiteColor,
                         border: Border.all(
                           color: AppColors.grey.withOpacity(0.2),
                           width: 1,
                         ),
                         shape: BoxShape.circle,
                       ),
-                      child: logic.selectedVenue == "At Home" ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
+                      child: logic.selectedVenue == "At Home"
+                          ? const Icon(Icons.check,
+                              size: 12, color: Colors.white)
+                          : null,
                     ),
                   ],
                 ),
@@ -657,17 +839,24 @@ class BookingScreen extends StatelessWidget {
                   GetBuilder<BookingScreenController>(
                     id: Constant.idProgressView,
                     builder: (logic) {
-                      logic.selectedExpertDataList.isEmpty ? logic.onExpertSelect() : null;
+                      logic.selectedExpertDataList.isEmpty
+                          ? logic.onExpertSelect()
+                          : null;
 
-                      return logic.getExpertServiceBaseSalonCategory?.data?.isEmpty == true
+                      return logic.getExpertServiceBaseSalonCategory?.data
+                                  ?.isEmpty ==
+                              true
                           ? Center(
                               child: Column(
                                 children: [
-                                  Image.asset(AppAsset.icNoExpert, height: 150, width: 150).paddingOnly(bottom: 7),
+                                  Image.asset(AppAsset.icNoExpert,
+                                          height: 150, width: 150)
+                                      .paddingOnly(bottom: 7),
                                   Text(
                                     "txtNoFoundExpert".tr,
                                     style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
                                       fontSize: 15,
                                       color: AppColors.primaryTextColor,
                                     ),
@@ -681,9 +870,13 @@ class BookingScreen extends StatelessWidget {
                                 physics: const ScrollPhysics(),
                                 padding: EdgeInsets.zero,
                                 shrinkWrap: true,
-                                itemCount:
-                                    logic.expertDetail != null ? 1 : logic.getExpertServiceBaseSalonCategory?.data?.length ?? 0,
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                itemCount: logic.expertDetail != null
+                                    ? 1
+                                    : logic.getExpertServiceBaseSalonCategory
+                                            ?.data?.length ??
+                                        0,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
                                   childAspectRatio: 0.80,
                                   crossAxisSpacing: 13.5,
@@ -692,36 +885,51 @@ class BookingScreen extends StatelessWidget {
                                 itemBuilder: (BuildContext context, int index) {
                                   logic.rating = logic.expertDetail != null
                                       ? logic.selectedExpertDataList[4]
-                                      : logic.getExpertServiceBaseSalonCategory?.data?[index].review ?? 0.0;
+                                      : logic.getExpertServiceBaseSalonCategory
+                                              ?.data?[index].review ??
+                                          0.0;
                                   logic.roundedRating = logic.rating?.round();
-                                  logic.filledStars = logic.roundedRating?.clamp(0, 5);
+                                  logic.filledStars =
+                                      logic.roundedRating?.clamp(0, 5);
 
                                   return AnimationConfiguration.staggeredGrid(
                                     position: index,
                                     duration: const Duration(milliseconds: 800),
-                                    columnCount: logic.getExpertServiceBaseSalonCategory?.data?.length ?? 0,
+                                    columnCount: logic
+                                            .getExpertServiceBaseSalonCategory
+                                            ?.data
+                                            ?.length ??
+                                        0,
                                     child: ScaleAnimation(
                                       child: FadeInAnimation(
                                         child: GestureDetector(
                                           onTap: () {
                                             Constant.storage.write(
                                               'expertId',
-                                              logic.expertDetail ?? logic.getExpertServiceBaseSalonCategory?.data?[index].id,
+                                              logic.expertDetail ??
+                                                  logic
+                                                      .getExpertServiceBaseSalonCategory
+                                                      ?.data?[index]
+                                                      .id,
                                             );
 
                                             log("Expert Id Issss :: ${logic.expertDetail}");
                                             log("Expert Id Is :: ${Constant.storage.read<String>('expertId')}");
 
-                                            if (logic.selectedExpertDataList.isEmpty) {
+                                            if (logic.selectedExpertDataList
+                                                .isEmpty) {
                                               logic.onStep1(index);
                                             }
                                           },
                                           child: Container(
                                             width: Get.width * 0.45,
-                                            margin: const EdgeInsets.only(top: 10),
-                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                            margin:
+                                                const EdgeInsets.only(top: 10),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 12),
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(18),
+                                              borderRadius:
+                                                  BorderRadius.circular(18),
                                               color: AppColors.whiteColor,
                                               boxShadow: Constant.boxShadow,
                                             ),
@@ -730,91 +938,155 @@ class BookingScreen extends StatelessWidget {
                                                 Align(
                                                   alignment: Alignment.center,
                                                   child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
                                                       DottedBorder(
-                                                        color: AppColors.roundBorder,
-                                                        borderType: BorderType.RRect,
-                                                        radius: const Radius.circular(41),
+                                                        color: AppColors
+                                                            .roundBorder,
+                                                        borderType:
+                                                            BorderType.RRect,
+                                                        radius: const Radius
+                                                            .circular(41),
                                                         strokeWidth: 1,
-                                                        dashPattern: const [3, 3],
+                                                        dashPattern: const [
+                                                          3,
+                                                          3
+                                                        ],
                                                         child: Container(
                                                           height: 80,
                                                           width: 80,
-                                                          decoration: const BoxDecoration(shape: BoxShape.circle),
-                                                          clipBehavior: Clip.hardEdge,
-                                                          child: CachedNetworkImage(
-                                                            imageUrl: logic.expertDetail != null
-                                                                ? logic.selectedExpertDataList[3]
-                                                                : logic.getExpertServiceBaseSalonCategory?.data?[index].image ??
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle),
+                                                          clipBehavior:
+                                                              Clip.hardEdge,
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            imageUrl: logic
+                                                                        .expertDetail !=
+                                                                    null
+                                                                ? logic.selectedExpertDataList[
+                                                                    3]
+                                                                : logic
+                                                                        .getExpertServiceBaseSalonCategory
+                                                                        ?.data?[
+                                                                            index]
+                                                                        .image ??
                                                                     "",
                                                             fit: BoxFit.cover,
-                                                            placeholder: (context, url) {
-                                                              return Image.asset(AppAsset.icPlaceHolder);
+                                                            placeholder:
+                                                                (context, url) {
+                                                              return Image.asset(
+                                                                  AppAsset
+                                                                      .icPlaceHolder);
                                                             },
-                                                            errorWidget: (context, url, error) {
+                                                            errorWidget:
+                                                                (context, url,
+                                                                    error) {
                                                               return Icon(
-                                                                Icons.error_outline,
-                                                                color: AppColors.blackColor,
+                                                                Icons
+                                                                    .error_outline,
+                                                                color: AppColors
+                                                                    .blackColor,
                                                                 size: 20,
                                                               );
                                                             },
                                                           ),
                                                         ),
                                                       ),
-                                                      SizedBox(height: Get.height * 0.015),
+                                                      SizedBox(
+                                                          height: Get.height *
+                                                              0.015),
                                                       logic.expertDetail != null
                                                           ? Text(
                                                               "${logic.selectedExpertDataList[1]} ${logic.selectedExpertDataList[2]}",
                                                               maxLines: 1,
-                                                              overflow: TextOverflow.ellipsis,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                               style: TextStyle(
-                                                                fontFamily: AppFontFamily.sfProDisplay,
+                                                                fontFamily:
+                                                                    AppFontFamily
+                                                                        .sfProDisplay,
                                                                 fontSize: 15.5,
-                                                                color: AppColors.category,
+                                                                color: AppColors
+                                                                    .category,
                                                               ),
                                                             )
                                                           : Text(
                                                               "${logic.getExpertServiceBaseSalonCategory?.data?[index].fname} ${logic.getExpertServiceBaseSalonCategory?.data?[index].lname}",
                                                               maxLines: 1,
-                                                              overflow: TextOverflow.ellipsis,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                               style: TextStyle(
-                                                                fontFamily: AppFontFamily.sfProDisplay,
+                                                                fontFamily:
+                                                                    AppFontFamily
+                                                                        .sfProDisplay,
                                                                 fontSize: 15.5,
-                                                                color: AppColors.category,
+                                                                color: AppColors
+                                                                    .category,
                                                               ),
                                                             ),
-                                                      SizedBox(height: Get.height * 0.015),
+                                                      SizedBox(
+                                                          height: Get.height *
+                                                              0.015),
                                                       Container(
                                                         height: 32,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(8),
-                                                          color: AppColors.yellow2,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          color:
+                                                              AppColors.yellow2,
                                                         ),
                                                         child: SizedBox(
                                                           height: 15,
-                                                          child: ListView.separated(
+                                                          child: ListView
+                                                              .separated(
                                                             shrinkWrap: true,
                                                             itemCount: 5,
-                                                            scrollDirection: Axis.horizontal,
-                                                            padding: const EdgeInsets.symmetric(horizontal: 13),
-                                                            itemBuilder: (context, index) {
-                                                              if (index < logic.filledStars!) {
-                                                                return Image.asset(
-                                                                  AppAsset.icStarFilled,
+                                                            scrollDirection:
+                                                                Axis.horizontal,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        13),
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              if (index <
+                                                                  logic
+                                                                      .filledStars!) {
+                                                                return Image
+                                                                    .asset(
+                                                                  AppAsset
+                                                                      .icStarFilled,
                                                                   height: 15,
                                                                   width: 15,
                                                                 );
                                                               } else {
-                                                                return Image.asset(
-                                                                  AppAsset.icStarOutline,
+                                                                return Image
+                                                                    .asset(
+                                                                  AppAsset
+                                                                      .icStarOutline,
                                                                   height: 15,
                                                                   width: 15,
                                                                 );
                                                               }
                                                             },
-                                                            separatorBuilder: (context, index) {
-                                                              return SizedBox(width: Get.width * 0.017);
+                                                            separatorBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              return SizedBox(
+                                                                  width:
+                                                                      Get.width *
+                                                                          0.017);
                                                             },
                                                           ),
                                                         ),
@@ -824,14 +1096,20 @@ class BookingScreen extends StatelessWidget {
                                                 ),
                                                 logic.selectExpert == index
                                                     ? Align(
-                                                        alignment: Alignment.topRight,
+                                                        alignment:
+                                                            Alignment.topRight,
                                                         child: Container(
                                                           height: 22,
                                                           width: 22,
-                                                          padding: const EdgeInsets.all(7),
-                                                          decoration: BoxDecoration(
-                                                            shape: BoxShape.circle,
-                                                            color: AppColors.primaryAppColor,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(7),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: AppColors
+                                                                .primaryAppColor,
                                                           ),
                                                           child: Image.asset(
                                                             AppAsset.icCheck,
@@ -839,15 +1117,23 @@ class BookingScreen extends StatelessWidget {
                                                         ),
                                                       )
                                                     : Align(
-                                                        alignment: Alignment.topRight,
+                                                        alignment:
+                                                            Alignment.topRight,
                                                         child: Container(
                                                           height: 22,
                                                           width: 22,
-                                                          padding: const EdgeInsets.all(7),
-                                                          decoration: BoxDecoration(
-                                                            shape: BoxShape.circle,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(7),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
                                                             border: Border.all(
-                                                              color: AppColors.greyColor.withOpacity(0.2),
+                                                              color: AppColors
+                                                                  .greyColor
+                                                                  .withOpacity(
+                                                                      0.2),
                                                             ),
                                                           ),
                                                         ),
@@ -908,14 +1194,21 @@ class BookingScreen extends StatelessWidget {
                       initialDate: DateTime.now(),
                       disabledDates: logic.getDisabledDates(),
                       onDateChange: (selectedDate) async {
-                        logic.formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+                        logic.formattedDate =
+                            DateFormat('yyyy-MM-dd').format(selectedDate);
                         log("Selected Date :: ${logic.formattedDate}");
 
                         await logic.onGetBookingApiCall(
                           selectedDate: logic.formattedDate.toString(),
-                          expertId: Constant.storage.read<String>('expertDetail') != null
-                              ? Constant.storage.read<String>('expertDetail').toString()
-                              : Constant.storage.read<String>('expertId').toString(),
+                          expertId: Constant.storage
+                                      .read<String>('expertDetail') !=
+                                  null
+                              ? Constant.storage
+                                  .read<String>('expertDetail')
+                                  .toString()
+                              : Constant.storage
+                                  .read<String>('expertId')
+                                  .toString(),
                           salonId: logic.salonId.toString(),
                         );
 
@@ -923,13 +1216,15 @@ class BookingScreen extends StatelessWidget {
                           logic.splitBreakTime();
                           logic.onGetSlotsList();
                         } else {
-                          Utils.showToast(Get.context!, logic.getBookingModel?.message ?? "");
+                          Utils.showToast(Get.context!,
+                              logic.getBookingModel?.message ?? "");
                         }
                       },
                       headerProps: EasyHeaderProps(
                         monthPickerType: MonthPickerType.switcher,
                         showMonthPicker: true,
-                        dateFormatter: const DateFormatter.fullDateDMonthAsStrY(),
+                        dateFormatter:
+                            const DateFormatter.fullDateDMonthAsStrY(),
                         monthStyle: TextStyle(
                           color: AppColors.greyColor,
                           fontFamily: AppFontFamily.sfProDisplayMedium,
@@ -965,7 +1260,8 @@ class BookingScreen extends StatelessWidget {
                             fontFamily: AppFontFamily.sfProDisplayBold,
                           ),
                           decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(8)),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
                             color: AppColors.dateSelect,
                           ),
                         ),
@@ -985,8 +1281,10 @@ class BookingScreen extends StatelessWidget {
                   logic.getBookingModel?.status == true
                       ? Text(
                           "txtAvailableSlots".tr,
-                          style:
-                              TextStyle(color: AppColors.primaryTextColor, fontSize: 16, fontFamily: AppFontFamily.sfProDisplay),
+                          style: TextStyle(
+                              color: AppColors.primaryTextColor,
+                              fontSize: 16,
+                              fontFamily: AppFontFamily.sfProDisplay),
                         ).paddingOnly(bottom: 15, top: 8)
                       : const SizedBox(),
                   logic.isLoading1.value
@@ -1003,22 +1301,31 @@ class BookingScreen extends StatelessWidget {
                               : SingleChildScrollView(
                                   physics: const BouncingScrollPhysics(),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       !(logic.hasMorningSlots)
                                           ? const SizedBox()
                                           : buildSlotCategory(
-                                              "txtMorning".tr, logic.morningSlots, logic.formattedDate.toString()),
-                                      logic.getBookingModel?.allSlots?.evening?.isEmpty == true
+                                              "txtMorning".tr,
+                                              logic.morningSlots,
+                                              logic.formattedDate.toString()),
+                                      logic.getBookingModel?.allSlots?.evening
+                                                  ?.isEmpty ==
+                                              true
                                           ? const SizedBox()
                                           : !(logic.hasAfternoonSlots)
                                               ? const SizedBox()
                                               : buildSlotCategory(
-                                                  "txtAfternoon".tr, logic.afternoonSlots, logic.formattedDate.toString()),
+                                                  "txtAfternoon".tr,
+                                                  logic.afternoonSlots,
+                                                  logic.formattedDate
+                                                      .toString()),
                                     ],
                                   ),
                                 )
-                          : Utils.showToast(Get.context!, logic.getBookingModel?.message ?? ""),
+                          : Utils.showToast(Get.context!,
+                              logic.getBookingModel?.message ?? ""),
                 ],
               );
             },
@@ -1028,7 +1335,8 @@ class BookingScreen extends StatelessWidget {
     );
   }
 
-  Widget buildSlotCategory(String category, List<String> slots, String selectedDate) {
+  Widget buildSlotCategory(
+      String category, List<String> slots, String selectedDate) {
     bookingScreenController.hasMorningSlots = slots.any((slot) {
       DateTime currentTime = DateTime.now();
       DateTime currentDate = DateTime.now();
@@ -1051,7 +1359,8 @@ class BookingScreen extends StatelessWidget {
         slotTime.minute,
       );
 
-      return !currentDate.isAfter(slotDateTime) || !currentTimeWithDate.isAfter(slotTimeWithDate);
+      return !currentDate.isAfter(slotDateTime) ||
+          !currentTimeWithDate.isAfter(slotTimeWithDate);
     });
 
     if (!(bookingScreenController.hasMorningSlots) && category == "Morning") {
@@ -1090,7 +1399,8 @@ class BookingScreen extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.only(left: 8, right: 8),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       childAspectRatio: 2,
                       crossAxisSpacing: 3,
@@ -1100,21 +1410,36 @@ class BookingScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       DateTime currentTime = DateTime.now();
                       DateTime currentDate = DateTime.now();
-                      DateTime slotDateTime = DateFormat('yyyy-MM-dd').parse(selectedDate);
+                      DateTime slotDateTime =
+                          DateFormat('yyyy-MM-dd').parse(selectedDate);
 
-                      DateTime currentTimeWithDate =
-                          DateTime(currentDate.year, currentDate.month, currentDate.day, currentTime.hour, currentTime.minute);
+                      DateTime currentTimeWithDate = DateTime(
+                          currentDate.year,
+                          currentDate.month,
+                          currentDate.day,
+                          currentTime.hour,
+                          currentTime.minute);
 
-                      DateTime slotTime = DateFormat('hh:mm a').parse(slots[index]);
-                      DateTime slotTimeWithDate =
-                          DateTime(slotDateTime.year, slotDateTime.month, slotDateTime.day, slotTime.hour, slotTime.minute);
+                      DateTime slotTime =
+                          DateFormat('hh:mm a').parse(slots[index]);
+                      DateTime slotTimeWithDate = DateTime(
+                          slotDateTime.year,
+                          slotDateTime.month,
+                          slotDateTime.day,
+                          slotTime.hour,
+                          slotTime.minute);
 
-                      List<String>? timeSlots = logic.getBookingModel?.timeSlots;
+                      List<String>? timeSlots =
+                          logic.getBookingModel?.timeSlots;
 
-                      bool isSlotBooked = timeSlots != null && timeSlots.contains(slots[index]);
-                      bool isSelected = logic.selectedSlotsList.contains(slots[index]);
+                      bool isSlotBooked =
+                          timeSlots != null && timeSlots.contains(slots[index]);
+                      bool isSelected =
+                          logic.selectedSlotsList.contains(slots[index]);
 
-                      bool isSlotTimePassed = currentDate.isAfter(slotDateTime) && currentTimeWithDate.isAfter(slotTimeWithDate);
+                      bool isSlotTimePassed =
+                          currentDate.isAfter(slotDateTime) &&
+                              currentTimeWithDate.isAfter(slotTimeWithDate);
 
                       logic.isFirstTap = true;
                       return AnimationConfiguration.staggeredGrid(
@@ -1128,7 +1453,8 @@ class BookingScreen extends StatelessWidget {
                                 if (isSlotBooked) {
                                   if (logic.isFirstTap) {
                                     logic.isFirstTap = false;
-                                    Utils.showToast(Get.context!, "desSlotBooked".tr);
+                                    Utils.showToast(
+                                        Get.context!, "desSlotBooked".tr);
                                     Future.delayed(
                                       const Duration(seconds: 5),
                                       () {
@@ -1139,7 +1465,8 @@ class BookingScreen extends StatelessWidget {
                                 } else if (isSlotTimePassed) {
                                   if (logic.isFirstTap) {
                                     logic.isFirstTap = false;
-                                    Utils.showToast(Get.context!, "desPreviousSlot".tr);
+                                    Utils.showToast(
+                                        Get.context!, "desPreviousSlot".tr);
                                     Future.delayed(
                                       const Duration(seconds: 5),
                                       () {
@@ -1156,31 +1483,43 @@ class BookingScreen extends StatelessWidget {
 
                                     /// if already booked slot within selected slot
                                     List selectSlot = logic.selectedSlotsList;
-                                    List<String>? alreadyBookedSlot = logic.getBookingModel?.timeSlots;
+                                    List<String>? alreadyBookedSlot =
+                                        logic.getBookingModel?.timeSlots;
 
-                                    List commonElements = selectSlot.toSet().intersection(alreadyBookedSlot!.toSet()).toList();
+                                    List commonElements = selectSlot
+                                        .toSet()
+                                        .intersection(
+                                            alreadyBookedSlot!.toSet())
+                                        .toList();
 
                                     log("Booked Slot is :: ${logic.getBookingModel?.timeSlots}");
                                     log("Select Slot is :::: ${logic.selectedSlotsList}");
                                     log("Common element :: $commonElements");
 
                                     if (commonElements.isNotEmpty) {
-                                      Utils.showToast(Get.context!, "desInvalidSlot".tr);
+                                      Utils.showToast(
+                                          Get.context!, "desInvalidSlot".tr);
                                     }
 
                                     /// if already booked slot within break time
                                     List slotSelected = logic.selectedSlotsList;
-                                    String breakTimes = logic.breakStartTimes.trim();
+                                    String breakTimes =
+                                        logic.breakStartTimes.trim();
 
                                     if (slotSelected.contains(breakTimes)) {
-                                      Utils.showToast(Get.context!, "desInvalidSlot".tr);
+                                      Utils.showToast(
+                                          Get.context!, "desInvalidSlot".tr);
                                     }
 
                                     /// if already booked slot within shop close time
                                     log("The Shop Close time :: ${logic.getBookingModel?.salonTime?.closedTime}");
 
-                                    if (slotSelected.contains(logic.getBookingModel?.salonTime?.closedTime)) {
-                                      Utils.showToast(Get.context!, "desInvalidSlot".tr);
+                                    if (slotSelected.contains(logic
+                                        .getBookingModel
+                                        ?.salonTime
+                                        ?.closedTime)) {
+                                      Utils.showToast(
+                                          Get.context!, "desInvalidSlot".tr);
                                     }
 
                                     Future.delayed(
@@ -1211,12 +1550,15 @@ class BookingScreen extends StatelessWidget {
                                     child: Text(
                                       slots[index],
                                       style: TextStyle(
-                                        fontFamily: isSlotBooked || isSlotTimePassed
+                                        fontFamily: isSlotBooked ||
+                                                isSlotTimePassed
                                             ? AppFontFamily.sfProDisplayRegular
                                             : AppFontFamily.sfProDisplay,
                                         fontSize: 14,
                                         decoration:
-                                            isSlotBooked || isSlotTimePassed ? TextDecoration.lineThrough : TextDecoration.none,
+                                            isSlotBooked || isSlotTimePassed
+                                                ? TextDecoration.lineThrough
+                                                : TextDecoration.none,
                                         color: isSelected
                                             ? isSlotBooked
                                                 ? AppColors.textSlot
@@ -1359,7 +1701,8 @@ class BookingScreen extends StatelessWidget {
                     id: Constant.idStep3,
                     builder: (logic) {
                       return InkWell(
-                        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
                         onTap: () {
                           logic.onStep3("Razorpay");
                         },
@@ -1418,7 +1761,8 @@ class BookingScreen extends StatelessWidget {
                                     border: Border.all(
                                       color: logic.selectedPayment == "Razorpay"
                                           ? AppColors.primaryAppColor
-                                          : AppColors.greyColor.withOpacity(0.3),
+                                          : AppColors.greyColor
+                                              .withOpacity(0.3),
                                     ),
                                   ),
                                   child: logic.selectedPayment == "Razorpay"
@@ -1445,7 +1789,8 @@ class BookingScreen extends StatelessWidget {
                     id: Constant.idStep3,
                     builder: (logic) {
                       return InkWell(
-                        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
                         onTap: () {
                           logic.onStep3("Stripe");
                         },
@@ -1500,17 +1845,21 @@ class BookingScreen extends StatelessWidget {
                                         width: 25,
                                         padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
                                           border: Border.all(
-                                            color: logic.selectedPayment == "Stripe"
+                                            color: logic.selectedPayment ==
+                                                    "Stripe"
                                                 ? AppColors.primaryAppColor
-                                                : AppColors.greyColor.withOpacity(0.3),
+                                                : AppColors.greyColor
+                                                    .withOpacity(0.3),
                                           ),
                                         ),
                                         child: logic.selectedPayment == "Stripe"
                                             ? Image.asset(
                                                 AppAsset.icCheck,
-                                                color: AppColors.primaryAppColor,
+                                                color:
+                                                    AppColors.primaryAppColor,
                                                 height: 15,
                                                 width: 15,
                                               )
@@ -1531,7 +1880,8 @@ class BookingScreen extends StatelessWidget {
                     id: Constant.idStep3,
                     builder: (logic) {
                       return InkWell(
-                        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
                         onTap: () {
                           logic.onStep3("flutterWave");
                         },
@@ -1588,9 +1938,11 @@ class BookingScreen extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(
-                                      color: logic.selectedPayment == "flutterWave"
-                                          ? AppColors.primaryAppColor
-                                          : AppColors.greyColor.withOpacity(0.3),
+                                      color:
+                                          logic.selectedPayment == "flutterWave"
+                                              ? AppColors.primaryAppColor
+                                              : AppColors.greyColor
+                                                  .withOpacity(0.3),
                                     ),
                                   ),
                                   child: logic.selectedPayment == "flutterWave"
@@ -1617,7 +1969,8 @@ class BookingScreen extends StatelessWidget {
                     id: Constant.idStep3,
                     builder: (logic) {
                       return InkWell(
-                        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
                         onTap: () {
                           logic.onStep3("cashAfterService");
                         },
@@ -1674,12 +2027,15 @@ class BookingScreen extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(
-                                      color: logic.selectedPayment == "cashAfterService"
+                                      color: logic.selectedPayment ==
+                                              "cashAfterService"
                                           ? AppColors.primaryAppColor
-                                          : AppColors.greyColor.withOpacity(0.3),
+                                          : AppColors.greyColor
+                                              .withOpacity(0.3),
                                     ),
                                   ),
-                                  child: logic.selectedPayment == "cashAfterService"
+                                  child: logic.selectedPayment ==
+                                          "cashAfterService"
                                       ? Image.asset(
                                           AppAsset.icCheck,
                                           color: AppColors.primaryAppColor,

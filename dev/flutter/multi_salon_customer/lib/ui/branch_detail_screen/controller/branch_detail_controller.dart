@@ -12,7 +12,8 @@ import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class BranchDetailController extends GetxController with GetSingleTickerProviderStateMixin {
+class BranchDetailController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   late TabController? tabController;
   int index = 0;
   double totalPrice = 0.0;
@@ -26,8 +27,13 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
   int? roundedRating;
   int? filledStars;
   String? salonId;
+  String? city;
+  double? latitude;
+  double? longitude;
   dynamic args = Get.arguments;
-  late List<bool> isBranchSelected = List.generate((getSalonDetailCategory!.salon!.serviceIds!.length), (index) => false);
+  late List<bool> isBranchSelected = List.generate(
+      (getSalonDetailCategory?.salon?.serviceIds?.length ?? 0),
+      (index) => false);
 
   var tabs = [
     Tab(child: Text("txtServices".tr)),
@@ -53,7 +59,10 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
     tabController = TabController(initialIndex: 0, length: 6, vsync: this);
 
     await getDataFromArgs();
-    await onGetSalonDetailApiCall(salonId: salonId ?? "", latitude: latitude ?? 0.0, longitude: longitude ?? 0.0);
+    await onGetSalonDetailApiCall(
+        salonId: salonId ?? "",
+        latitude: latitude ?? 0.0,
+        longitude: longitude ?? 0.0);
 
     super.onInit();
   }
@@ -63,7 +72,21 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
       if (args[0] != null) {
         salonId = args[0];
       }
+      if (args[1] != null) {
+        city = args[1];
+      }
+      if (args[2] != null) {
+        latitude = args[2];
+      }
+      if (args[3] != null) {
+        longitude = args[3];
+      }
     }
+
+    // Fallback to global values if not provided in arguments
+    city ??= city;
+    latitude ??= latitude;
+    longitude ??= longitude;
   }
 
   makingPhoneCall() async {
@@ -80,7 +103,8 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
   onCheckBoxClick(value, int index) {
     isBranchSelected[index] = value;
 
-    num servicePrice = getSalonDetailCategory?.salon?.serviceIds?[index].price ?? 0.0;
+    num servicePrice =
+        getSalonDetailCategory?.salon?.serviceIds?[index].price ?? 0.0;
     num taxPercentage = getSalonDetailCategory?.tax ?? 0.0;
     double withTaxRupee = (servicePrice * taxPercentage) / 100;
 
@@ -88,9 +112,13 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
       withOutTaxRupee += servicePrice;
       totalPrice += (servicePrice + withTaxRupee);
       finalTaxRupee += withTaxRupee;
-      totalMinute += getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.duration ?? 0;
-      checkItem.add(getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.name);
-      serviceId.add(getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.id);
+      totalMinute += getSalonDetailCategory
+              ?.salon?.serviceIds?[index].serviceIdId?.duration ??
+          0;
+      checkItem.add(
+          getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.name);
+      serviceId.add(
+          getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.id);
 
       log("Branch Details add WithOutTaxRupee :: $withOutTaxRupee");
       log("Branch Details add Total Price :: $totalPrice");
@@ -102,9 +130,13 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
       withOutTaxRupee -= servicePrice;
       totalPrice -= (servicePrice + withTaxRupee);
       finalTaxRupee -= withTaxRupee;
-      totalMinute -= getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.duration ?? 0;
-      checkItem.remove(getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.name);
-      serviceId.remove(getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.id);
+      totalMinute -= getSalonDetailCategory
+              ?.salon?.serviceIds?[index].serviceIdId?.duration ??
+          0;
+      checkItem.remove(
+          getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.name);
+      serviceId.remove(
+          getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.id);
 
       log("Branch Details Minus WithOutTaxRupee :: $withOutTaxRupee");
       log("Branch Details Minus Total Price :: $totalPrice");
@@ -130,7 +162,10 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
 
   //------------ API Services ------------//
 
-  onGetSalonDetailApiCall({required String salonId, required double latitude, required double longitude}) async {
+  onGetSalonDetailApiCall(
+      {required String salonId,
+      required double latitude,
+      required double longitude}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView, Constant.idServiceList]);
@@ -146,11 +181,15 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getSalonDetail + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getSalonDetail + queryString);
 
       log("Get Salon Detail Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get Salon Detail Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -166,7 +205,8 @@ class BranchDetailController extends GetxController with GetSingleTickerProvider
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get Salon Detail Api :: $e");
-      Utils.showToast(Get.context!, getSalonDetailCategory?.message.toString() ?? "");
+      Utils.showToast(
+          Get.context!, getSalonDetailCategory?.message.toString() ?? "");
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idServiceList]);

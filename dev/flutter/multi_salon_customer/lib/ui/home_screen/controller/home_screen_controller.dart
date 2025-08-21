@@ -49,7 +49,8 @@ class HomeScreenController extends GetxController {
   int selectIndexMorning = -1;
   int selectIndexAfternoon = -1;
   int selectIndexEvening = -1;
-  late List<bool> isSelected = List.generate((getAllServiceCategory?.services?.length ?? 0), (index) => false);
+  late List<bool> isSelected = List.generate(
+      (getAllServiceCategory?.services?.length ?? 0), (index) => false);
   List<bool> isExpertSelected = [];
   List<bool> isTrendingProductSaved = [];
   List<bool> isNewProductSaved = [];
@@ -77,7 +78,8 @@ class HomeScreenController extends GetxController {
   String? text;
 
   TextEditingController homeScreenEditingController = TextEditingController();
-  final BookingDetailScreenController bookingDetailScreenController = Get.find<BookingDetailScreenController>();
+  final BookingDetailScreenController bookingDetailScreenController =
+      Get.find<BookingDetailScreenController>();
   TextEditingController searchEditingController = TextEditingController();
 
   // CartScreenController cartScreenController = Get.put(CartScreenController());
@@ -109,7 +111,9 @@ class HomeScreenController extends GetxController {
 
     expertScrollController.addListener(onExpertPagination);
     serviceScrollController.addListener(onServicePagination);
-    getTrendingProductModel == null ? await onGetTrendingProductApiCall() : null;
+    getTrendingProductModel == null
+        ? await onGetTrendingProductApiCall()
+        : null;
     getNewProductModel == null ? await onGetNewProductApiCall() : null;
     getAllSalonCategory == null
         ? await onGetAllSalonApiCall(
@@ -120,7 +124,8 @@ class HomeScreenController extends GetxController {
         : null;
 
     for (int i = 0; i < (getTrendingProductModel?.data?.length ?? 0); i++) {
-      isTrendingProductSaved.add(getTrendingProductModel?.data?[i].isFavourite ?? false);
+      isTrendingProductSaved
+          .add(getTrendingProductModel?.data?[i].isFavourite ?? false);
     }
 
     for (int i = 0; i < (getNewProductModel?.data?.length ?? 0); i++) {
@@ -133,10 +138,15 @@ class HomeScreenController extends GetxController {
 
     getAllCategory == null ? await onGetAllCategoryApiCall() : null;
     getAllExpertCategory == null
-        ? await onGetAllExpertApiCall(start: startExpert.toString(), limit: limitExpert.toString())
+        ? await onGetAllExpertApiCall(
+            start: startExpert.toString(), limit: limitExpert.toString())
         : null;
-    getAllServiceCategory == null ? await onGetAllServiceApiCall(city: city ?? "") : null;
-    getProductCategoryModel == null ? await onGetProductCategoryApiCall() : null;
+    getAllServiceCategory == null
+        ? await onGetAllServiceApiCall(city: city ?? "")
+        : null;
+    getProductCategoryModel == null
+        ? await onGetProductCategoryApiCall()
+        : null;
 
     log("isTrendingProductSaved :: $isTrendingProductSaved");
     log("isNewProductSaved :: $isNewProductSaved");
@@ -175,7 +185,8 @@ class HomeScreenController extends GetxController {
 
   void onExpertPagination() async {
     if (expertScrollController.hasClients) {
-      if (expertScrollController.position.pixels == expertScrollController.position.maxScrollExtent) {
+      if (expertScrollController.position.pixels ==
+          expertScrollController.position.maxScrollExtent) {
         await onGetAllExpertApiCall(
           start: startExpert.toString(),
           limit: limitExpert.toString(),
@@ -185,7 +196,8 @@ class HomeScreenController extends GetxController {
   }
 
   void onServicePagination() async {
-    if (serviceScrollController.position.pixels == serviceScrollController.position.maxScrollExtent) {
+    if (serviceScrollController.position.pixels ==
+        serviceScrollController.position.maxScrollExtent) {
       await onGetAllServiceApiCall(city: city ?? "");
     }
   }
@@ -205,7 +217,8 @@ class HomeScreenController extends GetxController {
     );
 
     for (int i = 0; i < (getTrendingProductModel?.data?.length ?? 0); i++) {
-      isTrendingProductSaved.add(getTrendingProductModel?.data?[i].isFavourite ?? false);
+      isTrendingProductSaved
+          .add(getTrendingProductModel?.data?[i].isFavourite ?? false);
     }
 
     for (int i = 0; i < (getNewProductModel?.data?.length ?? 0); i++) {
@@ -217,9 +230,14 @@ class HomeScreenController extends GetxController {
     }
 
     await onGetAllCategoryApiCall();
-    await onGetAllExpertApiCall(start: startExpert.toString(), limit: limitExpert.toString());
+    await onGetAllExpertApiCall(
+        start: startExpert.toString(), limit: limitExpert.toString());
     await onGetAllServiceApiCall(city: city ?? "");
-    update([Constant.idProgressView, Constant.idSearchService, Constant.idServiceList]);
+    update([
+      Constant.idProgressView,
+      Constant.idSearchService,
+      Constant.idServiceList
+    ]);
   }
 
   onTrendingProductSaved({
@@ -237,12 +255,14 @@ class HomeScreenController extends GetxController {
       if (favouriteProductModel?.isFavourite == true) {
         Utils.showToast(Get.context!, "Product saved successfully");
 
-        int? index = getTrendingProductModel?.data?.indexWhere((element) => element.id == productId);
+        int? index = getTrendingProductModel?.data
+            ?.indexWhere((element) => element.id == productId);
         if (index != null) {
           isTrendingProductSaved[index] = true;
         }
       } else {
-        int? index = getTrendingProductModel?.data?.indexWhere((element) => element.id == productId);
+        int? index = getTrendingProductModel?.data
+            ?.indexWhere((element) => element.id == productId);
         if (index != null) {
           isTrendingProductSaved[index] = false;
         }
@@ -269,12 +289,14 @@ class HomeScreenController extends GetxController {
       if (favouriteProductModel?.isFavourite == true) {
         Utils.showToast(Get.context!, "Product saved successfully");
 
-        int? index = getNewProductModel?.data?.indexWhere((element) => element.id == productId);
+        int? index = getNewProductModel?.data
+            ?.indexWhere((element) => element.id == productId);
         if (index != null) {
           isNewProductSaved[index] = true;
         }
       } else {
-        int? index = getNewProductModel?.data?.indexWhere((element) => element.id == productId);
+        int? index = getNewProductModel?.data
+            ?.indexWhere((element) => element.id == productId);
         if (index != null) {
           isNewProductSaved[index] = false;
         }
@@ -303,12 +325,14 @@ class HomeScreenController extends GetxController {
       if (favouriteSalonModel?.isFavourite == true) {
         Utils.showToast(Get.context!, "Salon favourite successfully");
 
-        int? index = getAllSalonCategory?.data?.indexWhere((element) => element.id == salonId);
+        int? index = getAllSalonCategory?.data
+            ?.indexWhere((element) => element.id == salonId);
         if (index != null) {
           isSalonSaved[index] = true;
         }
       } else {
-        int? index = getAllSalonCategory?.data?.indexWhere((element) => element.id == salonId);
+        int? index = getAllSalonCategory?.data
+            ?.indexWhere((element) => element.id == salonId);
         if (index != null) {
           isSalonSaved[index] = false;
         }
@@ -384,7 +408,9 @@ class HomeScreenController extends GetxController {
 
       await getDeviceLocation();
 
-      (latitude ?? 0.0) == 0.0 && (longitude ?? 0.0) == 0.0 ? permission = await Geolocator.requestPermission() : null;
+      (latitude ?? 0.0) == 0.0 && (longitude ?? 0.0) == 0.0
+          ? permission = await Geolocator.requestPermission()
+          : null;
 
       if (permission == LocationPermission.always) {
         log("message loading :: $isLoading");
@@ -443,6 +469,8 @@ class HomeScreenController extends GetxController {
       log("Latitude :: $latitude");
       log("Longitude :: $longitude");
 
+      // City will be set by reverse geocoding in main.dart
+
       return position;
     } catch (e) {
       log("Error getting location: $e");
@@ -478,7 +506,8 @@ class HomeScreenController extends GetxController {
       withOutTaxRupeeExpert += servicePrice;
       totalPriceExpert += (servicePrice + withTaxRupee);
       finalTaxRupeeExpert += withTaxRupee;
-      totalMinuteExpert += getExpertCategory?.data?.services?[index].id?.duration ?? 0;
+      totalMinuteExpert +=
+          getExpertCategory?.data?.services?[index].id?.duration ?? 0;
       checkItemExpert.add(getExpertCategory?.data?.services?[index].id?.name);
       serviceIdExpert.add(getExpertCategory?.data?.services?[index].id?.id);
       serviceNameExpert.add(getExpertCategory?.data?.services?[index].id?.name);
@@ -494,10 +523,13 @@ class HomeScreenController extends GetxController {
       withOutTaxRupeeExpert -= servicePrice;
       totalPriceExpert -= (servicePrice + withTaxRupee);
       finalTaxRupeeExpert -= withTaxRupee;
-      totalMinuteExpert -= getExpertCategory?.data?.services?[index].id?.duration ?? 0;
-      checkItemExpert.remove(getExpertCategory?.data?.services?[index].id?.name);
+      totalMinuteExpert -=
+          getExpertCategory?.data?.services?[index].id?.duration ?? 0;
+      checkItemExpert
+          .remove(getExpertCategory?.data?.services?[index].id?.name);
       serviceIdExpert.remove(getExpertCategory?.data?.services?[index].id?.id);
-      serviceNameExpert.remove(getExpertCategory?.data?.services?[index].id?.name);
+      serviceNameExpert
+          .remove(getExpertCategory?.data?.services?[index].id?.name);
 
       log("Expert details Minus WithOutTaxRupee :: $withOutTaxRupeeExpert");
       log("Expert details Minus Total Price :: $totalPriceExpert");
@@ -518,7 +550,11 @@ class HomeScreenController extends GetxController {
     }
 
     log("Expert details Final Total price :: $totalPriceExpert");
-    update([Constant.idSearchService, Constant.idServiceList, Constant.idBottomService]);
+    update([
+      Constant.idSearchService,
+      Constant.idServiceList,
+      Constant.idBottomService
+    ]);
   }
 
   onBack() {
@@ -529,7 +565,8 @@ class HomeScreenController extends GetxController {
     checkItemExpert.clear();
     serviceIdExpert.clear();
     serviceNameExpert.clear();
-    isExpertSelected = List.generate((getExpertCategory?.data?.services?.length ?? 0), (index) => false);
+    isExpertSelected = List.generate(
+        (getExpertCategory?.data?.services?.length ?? 0), (index) => false);
 
     update([Constant.idBottomService, Constant.idServiceList]);
   }
@@ -545,7 +582,10 @@ class HomeScreenController extends GetxController {
 
       log("Get All Category Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get All Category Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -579,11 +619,15 @@ class HomeScreenController extends GetxController {
       log("Get All Expert Params :: $queryParameters");
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse("${ApiConstant.BASE_URL}${ApiConstant.getAllExpert}$queryString");
+      final url = Uri.parse(
+          "${ApiConstant.BASE_URL}${ApiConstant.getAllExpert}$queryString");
 
       log("Get All Expert Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get All Expert Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -622,7 +666,11 @@ class HomeScreenController extends GetxController {
   onGetAllServiceApiCall({String? search, required String city}) async {
     try {
       isLoading(true);
-      update([Constant.idProgressView, Constant.idSearchService, Constant.idServiceList]);
+      update([
+        Constant.idProgressView,
+        Constant.idSearchService,
+        Constant.idServiceList
+      ]);
 
       final queryParameters = {"search": search ?? "", "city": city};
 
@@ -630,11 +678,15 @@ class HomeScreenController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getAllService + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getAllService + queryString);
 
       log("Get All Service Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get All Service Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -645,8 +697,10 @@ class HomeScreenController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         getAllServiceCategory = GetAllServiceModel.fromJson(jsonResponse);
-        isSelected = List.generate((getAllServiceCategory?.services?.length ?? 0),
-            (index) => checkItem.contains(getAllServiceCategory?.services?[index].name));
+        isSelected = List.generate(
+            (getAllServiceCategory?.services?.length ?? 0),
+            (index) => checkItem
+                .contains(getAllServiceCategory?.services?[index].name));
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
@@ -655,7 +709,11 @@ class HomeScreenController extends GetxController {
       Utils.showToast(Get.context!, "$e");
     } finally {
       isLoading(false);
-      update([Constant.idProgressView, Constant.idSearchService, Constant.idServiceList]);
+      update([
+        Constant.idProgressView,
+        Constant.idSearchService,
+        Constant.idServiceList
+      ]);
     }
   }
 
@@ -670,11 +728,15 @@ class HomeScreenController extends GetxController {
       log("Get Expert Params :: $queryParameters");
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getExpert + queryString);
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.getExpert + queryString);
 
       log("Get Expert Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get Expert Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -685,13 +747,15 @@ class HomeScreenController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         getExpertCategory = GetExpertModel.fromJson(jsonResponse);
-        isExpertSelected = List.generate((getExpertCategory?.data?.services?.length ?? 0), (index) => false);
+        isExpertSelected = List.generate(
+            (getExpertCategory?.data?.services?.length ?? 0), (index) => false);
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get Expert Api :: $e");
-      Utils.showToast(Get.context!, getExpertCategory?.message.toString() ?? "");
+      Utils.showToast(
+          Get.context!, getExpertCategory?.message.toString() ?? "");
     } finally {
       log("enter finally");
       isLoading(false);
@@ -700,7 +764,10 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  onGetAllSalonApiCall({required double latitude, required double longitude, required String userId}) async {
+  onGetAllSalonApiCall(
+      {required double latitude,
+      required double longitude,
+      required String userId}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView]);
@@ -715,11 +782,15 @@ class HomeScreenController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getAllSalon + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getAllSalon + queryString);
 
       log("Get All Salon Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get All Salon Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -743,7 +814,10 @@ class HomeScreenController extends GetxController {
   }
 
   onGetServiceBasedSalonApiCall(
-      {required String serviceId, required double latitude, required double longitude, required String city}) async {
+      {required String serviceId,
+      required double latitude,
+      required double longitude,
+      required String city}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView, Constant.idSelectBranch]);
@@ -754,7 +828,10 @@ class HomeScreenController extends GetxController {
 
       log("Get Service Based Salon Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get Service Based Salon Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -764,7 +841,8 @@ class HomeScreenController extends GetxController {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        getServiceBaseSalonCategory = GetServiceBaseSalonModel.fromJson(jsonResponse);
+        getServiceBaseSalonCategory =
+            GetServiceBaseSalonModel.fromJson(jsonResponse);
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
@@ -793,11 +871,15 @@ class HomeScreenController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getTrendingProduct + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getTrendingProduct + queryString);
 
       log("Get Trending Product Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get Trending Product Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -807,7 +889,8 @@ class HomeScreenController extends GetxController {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        getTrendingProductModel = GetTrendingProductModel.fromJson(jsonResponse);
+        getTrendingProductModel =
+            GetTrendingProductModel.fromJson(jsonResponse);
       }
 
       log("Get Trending Product Api Called Successfully");
@@ -838,11 +921,15 @@ class HomeScreenController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getNewProduct + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getNewProduct + queryString);
 
       log("Get New Product Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get New Product Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -884,10 +971,14 @@ class HomeScreenController extends GetxController {
 
       log("Favourite Product Body :: $body");
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.favouriteProduct);
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.favouriteProduct);
       log("Favourite Product Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.post(url, headers: headers, body: body);
 
@@ -914,10 +1005,14 @@ class HomeScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getProductCategory);
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.getProductCategory);
       log("Get Product Category Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.get(url, headers: headers);
 
@@ -926,7 +1021,8 @@ class HomeScreenController extends GetxController {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        getProductCategoryModel = GetProductCategoryModel.fromJson(jsonResponse);
+        getProductCategoryModel =
+            GetProductCategoryModel.fromJson(jsonResponse);
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
@@ -960,7 +1056,10 @@ class HomeScreenController extends GetxController {
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.salonFavourite);
       log("Favourite Salon Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.post(url, headers: headers, body: body);
 

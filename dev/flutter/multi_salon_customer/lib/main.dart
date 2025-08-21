@@ -142,6 +142,32 @@ Future<Position> getDeviceLocation() async {
     log("Latitude :: $latitude");
     log("Longitude :: $longitude");
 
+    // Get city name using reverse geocoding
+    try {
+      List<Placemark> placemarks =
+          await Geolocator.reverseGeocodeFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        city = placemarks.first.locality ??
+            placemarks.first.subAdministrativeArea ??
+            "Unknown City";
+        country = placemarks.first.country;
+        countryCode = placemarks.first.isoCountryCode;
+        log("City :: $city");
+        log("Country :: $country");
+        log("Country Code :: $countryCode");
+      } else {
+        city = "Unknown City";
+        log("City :: $city (no placemarks found)");
+      }
+    } catch (e) {
+      log("Error getting city from coordinates: $e");
+      city = "Unknown City";
+    }
+
     return position;
   } catch (e) {
     log("Error getting location: $e");

@@ -62,7 +62,8 @@ class WishlistTabBarView extends StatelessWidget {
             fontSize: 16,
             fontFamily: AppFontFamily.heeBo500,
           ),
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics()),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           indicatorPadding: const EdgeInsets.all(5),
           indicator: BoxDecoration(
@@ -95,7 +96,8 @@ class WishlistTabBarItemView extends StatelessWidget {
         id: Constant.idProgressView,
         builder: (logic) {
           return TabBarView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
             controller: logic.tabController,
             children: [
               const WishlistSalonItemView(),
@@ -118,7 +120,8 @@ class WishlistSalonItemView extends StatelessWidget {
       builder: (logic) {
         return logic.isLoading.value
             ? Shimmers.nearByBranchesWithLocationShimmer()
-            : logic.getFavouriteSalonModel?.favourite?.isEmpty == true || logic.getFavouriteSalonModel?.status == false
+            : logic.getFavouriteSalonModel?.favourite?.isEmpty == true ||
+                    logic.getFavouriteSalonModel?.status == false
                 ? Align(
                     alignment: Alignment.center,
                     child: Column(
@@ -150,7 +153,11 @@ class WishlistSalonItemView extends StatelessWidget {
                           Get.toNamed(
                             AppRoutes.branchDetail,
                             arguments: [
-                              logic.getFavouriteSalonModel?.favourite?[index].id,
+                              logic
+                                  .getFavouriteSalonModel?.favourite?[index].id,
+                              city,
+                              latitude,
+                              longitude,
                             ],
                           );
                         },
@@ -179,21 +186,31 @@ class WishlistSalonItemView extends StatelessWidget {
                                     ),
                                     clipBehavior: Clip.hardEdge,
                                     child: CachedNetworkImage(
-                                      imageUrl: logic.getFavouriteSalonModel?.favourite?[index].mainImage ?? "",
+                                      imageUrl: logic.getFavouriteSalonModel
+                                              ?.favourite?[index].mainImage ??
+                                          "",
                                       fit: BoxFit.cover,
                                       errorWidget: (context, url, error) {
-                                        return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                        return Image.asset(
+                                                AppAsset.icImagePlaceholder)
+                                            .paddingAll(5);
                                       },
                                       placeholder: (context, url) {
-                                        return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                        return Image.asset(
+                                                AppAsset.icImagePlaceholder)
+                                            .paddingAll(5);
                                       },
                                     ),
                                   ),
                                   GestureDetector(
                                     onTap: () {
                                       logic.onClickSalonLikeButton(
-                                        userId: Constant.storage.read<String>('userId') ?? "",
-                                        salonId: logic.getFavouriteSalonModel?.favourite?[index].id ?? "",
+                                        userId: Constant.storage
+                                                .read<String>('userId') ??
+                                            "",
+                                        salonId: logic.getFavouriteSalonModel
+                                                ?.favourite?[index].id ??
+                                            "",
                                         latitudes: latitude.toString(),
                                         longitudes: longitude.toString(),
                                       );
@@ -211,7 +228,9 @@ class WishlistSalonItemView extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(
-                                    logic.getFavouriteSalonModel?.favourite?[index].salonName ?? "",
+                                    logic.getFavouriteSalonModel
+                                            ?.favourite?[index].salonName ??
+                                        "",
                                     style: TextStyle(
                                       color: AppColors.appText,
                                       fontFamily: AppFontFamily.heeBo800,
@@ -225,7 +244,8 @@ class WishlistSalonItemView extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(17),
                                       color: AppColors.yellow1,
                                     ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 13),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 13),
                                     margin: const EdgeInsets.only(left: 5),
                                     child: Row(
                                       children: [
@@ -236,10 +256,14 @@ class WishlistSalonItemView extends StatelessWidget {
                                           color: AppColors.yellow3,
                                         ).paddingOnly(right: 5),
                                         Text(
-                                          logic.getFavouriteSalonModel?.favourite?[index].review?.toStringAsFixed(1) ?? "",
+                                          logic.getFavouriteSalonModel
+                                                  ?.favourite?[index].review
+                                                  ?.toStringAsFixed(1) ??
+                                              "",
                                           style: TextStyle(
                                             color: AppColors.yellow3,
-                                            fontFamily: AppFontFamily.sfProDisplayBold,
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplayBold,
                                             fontSize: 14,
                                           ),
                                         ),
@@ -278,7 +302,11 @@ class WishlistSalonItemView extends StatelessWidget {
                                   ).paddingOnly(right: 8),
                                   RichText(
                                     text: TextSpan(
-                                      text: logic.getFavouriteSalonModel?.favourite?[index].distance == null
+                                      text: logic
+                                                  .getFavouriteSalonModel
+                                                  ?.favourite?[index]
+                                                  .distance ==
+                                              null
                                           ? ""
                                           : "${logic.getFavouriteSalonModel?.favourite?[index].distance?.toStringAsFixed(2)} ${"txtKMs".tr}  ",
                                       style: TextStyle(
@@ -305,7 +333,8 @@ class WishlistSalonItemView extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(6),
                                       color: AppColors.greenColorBg,
                                     ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
                                     margin: const EdgeInsets.only(left: 5),
                                     child: Center(
                                       child: Text(
@@ -339,7 +368,8 @@ class WishlistProductItemView extends StatelessWidget {
     return GetBuilder<WishlistController>(
       id: Constant.idProgressView,
       builder: (logic) {
-        return logic.getFavouriteProductModel?.favourite?.isEmpty == true || logic.getFavouriteProductModel?.status == false
+        return logic.getFavouriteProductModel?.favourite?.isEmpty == true ||
+                logic.getFavouriteProductModel?.status == false
             ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -365,7 +395,8 @@ class WishlistProductItemView extends StatelessWidget {
                 physics: const ScrollPhysics(),
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                itemCount: logic.getFavouriteProductModel?.favourite?.length ?? 0,
+                itemCount:
+                    logic.getFavouriteProductModel?.favourite?.length ?? 0,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   childAspectRatio: 0.75,
@@ -378,7 +409,8 @@ class WishlistProductItemView extends StatelessWidget {
                       Get.toNamed(
                         AppRoutes.productDetail,
                         arguments: [
-                          logic.getFavouriteProductModel?.favourite?[index].productId,
+                          logic.getFavouriteProductModel?.favourite?[index]
+                              .productId,
                         ],
                       );
                     },
@@ -402,22 +434,35 @@ class WishlistProductItemView extends StatelessWidget {
                               const Spacer(),
                               const Spacer(),
                               CachedNetworkImage(
-                                imageUrl: logic.getFavouriteProductModel?.favourite?[index].product?.mainImage ?? "",
+                                imageUrl: logic
+                                        .getFavouriteProductModel
+                                        ?.favourite?[index]
+                                        .product
+                                        ?.mainImage ??
+                                    "",
                                 fit: BoxFit.cover,
                                 height: 85,
                                 placeholder: (context, url) {
-                                  return Image.asset(AppAsset.icImagePlaceholder).paddingAll(10);
+                                  return Image.asset(
+                                          AppAsset.icImagePlaceholder)
+                                      .paddingAll(10);
                                 },
                                 errorWidget: (context, url, error) {
-                                  return Image.asset(AppAsset.icImagePlaceholder).paddingAll(10);
+                                  return Image.asset(
+                                          AppAsset.icImagePlaceholder)
+                                      .paddingAll(10);
                                 },
                               ),
                               const Spacer(),
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  Constant.capitalizeFirstLetter(
-                                      logic.getFavouriteProductModel?.favourite?[index].product?.productName ?? ""),
+                                  Constant.capitalizeFirstLetter(logic
+                                          .getFavouriteProductModel
+                                          ?.favourite?[index]
+                                          .product
+                                          ?.productName ??
+                                      ""),
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamily: AppFontFamily.heeBo700,
@@ -449,13 +494,20 @@ class WishlistProductItemView extends StatelessWidget {
                             child: InkWell(
                               onTap: () {
                                 logic.onClickLikeButton(
-                                  userId: logic.getFavouriteProductModel?.favourite?[index].userId ?? "",
-                                  categoryId: logic.getFavouriteProductModel?.favourite?[index].categoryId ?? "",
-                                  productId: logic.getFavouriteProductModel?.favourite?[index].productId ?? "",
+                                  userId: logic.getFavouriteProductModel
+                                          ?.favourite?[index].userId ??
+                                      "",
+                                  categoryId: logic.getFavouriteProductModel
+                                          ?.favourite?[index].categoryId ??
+                                      "",
+                                  productId: logic.getFavouriteProductModel
+                                          ?.favourite?[index].productId ??
+                                      "",
                                 );
                               },
                               overlayColor: WidgetStateColor.transparent,
-                              child: Image.asset(AppAsset.icLikeFilled, height: 30),
+                              child: Image.asset(AppAsset.icLikeFilled,
+                                  height: 30),
                             ),
                           )
                         ],
