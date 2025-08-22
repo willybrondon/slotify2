@@ -31,7 +31,11 @@ class PaymentScreenController extends GetxController {
   }
 
   getDataFromArgs() {
+    log("Payment Screen - Args received: $args");
+
     if (args != null) {
+      log("Payment Screen - Args length: ${args.length}");
+
       if (args.length >= 4) {
         isWalletAdd = args[0];
         totalAmount = args[1];
@@ -40,16 +44,32 @@ class PaymentScreenController extends GetxController {
         if (args.length > 4) {
           bookingData = args[4]; // Additional booking data
         }
+      } else if (args.length >= 3) {
+        // Handle wallet recharge case with 3 arguments
+        isWalletAdd = args[0];
+        totalAmount = args[1];
+        isCreateOrder = args[2];
+        selectedPayment = null; // Will be set to default below
+        log("Payment Screen - Wallet recharge detected with 3 arguments");
       }
 
       // Set default payment method if not specified
       selectedPayment ??= isWalletAdd == true ? "Razorpay" : "wallet";
 
-      log("Is Wallet Add :: $isWalletAdd");
-      log("Is Create Order :: $isCreateOrder");
-      log("Total Amount :: $totalAmount");
-      log("Selected Payment :: $selectedPayment");
-      log("Booking Data :: $bookingData");
+      log("Payment Screen - Is Wallet Add :: $isWalletAdd");
+      log("Payment Screen - Is Create Order :: $isCreateOrder");
+      log("Payment Screen - Total Amount :: '$totalAmount'");
+      log("Payment Screen - Selected Payment :: '$selectedPayment'");
+      log("Payment Screen - Booking Data :: $bookingData");
+
+      // Validate total amount
+      if (totalAmount == null || totalAmount!.isEmpty) {
+        log("Payment Screen - WARNING: Total amount is null or empty!");
+      } else {
+        log("Payment Screen - Total amount is valid: '$totalAmount'");
+      }
+    } else {
+      log("Payment Screen - WARNING: No arguments received!");
     }
     update([Constant.idSelectPaymentMethod]);
   }

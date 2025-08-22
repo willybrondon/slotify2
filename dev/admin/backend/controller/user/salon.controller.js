@@ -42,7 +42,23 @@ exports.getAll = async (req, res) => {
     // Build query with search filter
     let query = { isDelete: false, isActive: true };
     if (search && search.trim() !== "") {
-      query.name = { $regex: search, $options: "i" };
+      const searchTerm = search.trim();
+      
+      // Enhanced search to include name, address, and city
+      query = {
+        isDelete: false,
+        isActive: true,
+        $or: [
+          { name: { $regex: searchTerm, $options: "i" } },
+          { "addressDetails.addressLine1": { $regex: searchTerm, $options: "i" } },
+          { "addressDetails.landMark": { $regex: searchTerm, $options: "i" } },
+          { "addressDetails.city": { $regex: searchTerm, $options: "i" } },
+          { "addressDetails.state": { $regex: searchTerm, $options: "i" } },
+          { "addressDetails.country": { $regex: searchTerm, $options: "i" } }
+        ]
+      };
+      
+      console.log("Salon API - Enhanced search query:", JSON.stringify(query, null, 2));
     }
 
     let salons = await Salon.find(query);

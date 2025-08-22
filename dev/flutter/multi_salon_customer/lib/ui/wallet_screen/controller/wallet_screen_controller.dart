@@ -69,12 +69,28 @@ class WalletScreenController extends GetxController {
   }
 
   onRechargeClick() {
+    // Validate amount before proceeding
+    String rechargeAmount = currencyController.text.trim();
+    if (rechargeAmount.isEmpty) {
+      rechargeAmount = amount; // Use the selected amount if controller is empty
+    }
+    
+    log("Wallet Recharge - Amount: $rechargeAmount");
+    log("Wallet Recharge - Selected Amount: $amount");
+    log("Wallet Recharge - Controller Text: ${currencyController.text}");
+    
+    if (rechargeAmount.isEmpty || rechargeAmount == "0" || rechargeAmount == "0.0") {
+      Utils.showToast(Get.context!, "Please select a valid amount to recharge");
+      return;
+    }
+
     Get.toNamed(
       AppRoutes.payment,
       arguments: [
-        true,
-        currencyController.text,
-        false,
+        true, // isWalletAdd
+        rechargeAmount, // totalAmount
+        false, // isCreateOrder
+        "Razorpay", // selectedPayment - default to Razorpay for wallet recharge
       ],
     )?.then(
       (value) async {

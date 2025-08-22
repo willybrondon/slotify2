@@ -214,7 +214,8 @@ class SearchScreen extends StatelessWidget {
                     },
                   ),
                 ),
-                logic.getAllServiceCategory?.services?.isEmpty == true
+                logic.getAllServiceCategory?.services?.isEmpty == true &&
+                logic.getAllSalonCategory?.data?.isEmpty == true
                     ? logic.isLoading.value
                         ? Shimmers.searchScreenShimmer()
                         : SizedBox(
@@ -244,158 +245,296 @@ class SearchScreen extends StatelessWidget {
                               ],
                             ),
                           )
-                    : GetBuilder<HomeScreenController>(
-                        id: Constant.idSearchService,
-                        builder: (logic) {
-                          return RefreshIndicator(
-                            onRefresh: () {
-                              logic.searchEditingController.clear();
-
-                              return logic.onGetAllServiceApiCall(city: city ?? "");
-                            },
-                            color: AppColors.primaryAppColor,
-                            child: SizedBox(
-                              height: Get.height,
-                              width: Get.width,
-                              child: AnimationLimiter(
-                                child: ListView.builder(
-                                  itemCount: logic.getAllServiceCategory?.services?.length,
-                                  shrinkWrap: true,
-                                  padding: EdgeInsets.zero,
-                                  controller: logic.serviceScrollController,
-                                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                                  itemBuilder: (context, index) {
-                                    return AnimationConfiguration.staggeredGrid(
-                                      position: index,
-                                      duration: const Duration(milliseconds: 800),
-                                      columnCount: logic.getAllServiceCategory?.services?.length ?? 0,
-                                      child: SlideAnimation(
-                                        child: FadeInAnimation(
-                                          child: GetBuilder<HomeScreenController>(
-                                            id: Constant.idServiceList,
-                                            builder: (logicService) {
-                                              return InkWell(
-                                                overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-                                                onTap: () {
-                                                  if (logicService.isSelected[index] == true) {
-                                                    logicService.onServiceCheckBoxClick(false, index);
-                                                  } else {
-                                                    logicService.onServiceCheckBoxClick(true, index);
-                                                  }
-                                                },
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(10),
-                                                    color: AppColors.whiteColor,
-                                                    boxShadow: Constant.boxShadow,
-                                                    border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
-                                                  ),
-                                                  margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Row(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Container(
-                                                            height: 80,
-                                                            width: 80,
-                                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-                                                            child: ClipRRect(
-                                                              borderRadius: BorderRadius.circular(10),
-                                                              child: CachedNetworkImage(
-                                                                imageUrl:
-                                                                    logic.getAllServiceCategory?.services?[index].image ?? "",
-                                                                fit: BoxFit.cover,
-                                                                placeholder: (context, url) {
-                                                                  return Image.asset(AppAsset.icServicePlaceholder).paddingAll(5);
-                                                                },
-                                                                errorWidget: (context, url, error) {
-                                                                  return Icon(
-                                                                    Icons.error_outline,
-                                                                    color: AppColors.blackColor,
-                                                                    size: 20,
-                                                                  );
-                                                                },
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(width: Get.width * 0.03),
-                                                          Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              SizedBox(
-                                                                width: 170,
-                                                                child: Text(
-                                                                  logic.getAllServiceCategory?.services?[index].name ?? "",
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontFamily: AppFontFamily.sfProDisplay,
-                                                                      fontSize: 17,
-                                                                      color: AppColors.primaryTextColor),
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                "${logic.getAllServiceCategory?.services?[index].duration ?? 0} ${"txtMinutes".tr}",
-                                                                style: TextStyle(
-                                                                    fontFamily: AppFontFamily.sfProDisplayMedium,
-                                                                    fontSize: 13,
-                                                                    color: AppColors.darkGrey3),
-                                                              ),
-                                                            ],
-                                                          ).paddingOnly(top: 5),
-                                                        ],
-                                                      ),
-                                                      GetBuilder<HomeScreenController>(
-                                                        id: Constant.idServiceList,
-                                                        builder: (logic) {
-                                                          return GestureDetector(
-                                                            onTap: () {
-                                                              if (logic.isSelected[index] == true) {
-                                                                logic.onServiceCheckBoxClick(false, index);
-                                                              } else {
-                                                                logic.onServiceCheckBoxClick(true, index);
-                                                              }
-                                                            },
-                                                            child: Container(
-                                                              height: 25,
-                                                              width: 25,
-                                                              padding: const EdgeInsets.all(7),
-                                                              decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(6),
-                                                                border: Border.all(color: AppColors.greyColor.withOpacity(0.5)),
-                                                              ),
-                                                              child: logic.isSelected[index]
-                                                                  ? Image.asset(
-                                                                      AppAsset.icCheck,
-                                                                      color: AppColors.primaryAppColor,
-                                                                    )
-                                                                  : const SizedBox(),
-                                                            ).paddingOnly(right: 10),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ).paddingOnly(top: 80, bottom: 10),
-                              ),
-                            ),
-                          );
-                        },
-                      )
+                    : Column(
+                        children: [
+                          // Show salon results if available (location-based search)
+                          if (logic.getAllSalonCategory?.data?.isNotEmpty == true)
+                            _buildSalonResults(logic),
+                          
+                          // Show service results if available
+                          if (logic.getAllServiceCategory?.services?.isNotEmpty == true)
+                            _buildServiceResults(logic),
+                        ],
+                      ),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+
+  // Helper method to build salon results
+  Widget _buildSalonResults(HomeScreenController logic) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            "Salons Found",
+            style: TextStyle(
+              fontFamily: AppFontFamily.sfProDisplayBold,
+              fontSize: 18,
+              color: AppColors.primaryTextColor,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: logic.getAllSalonCategory?.data?.length ?? 0,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemBuilder: (context, index) {
+              final salon = logic.getAllSalonCategory?.data?[index];
+              return Container(
+                width: 200,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.whiteColor,
+                  boxShadow: Constant.boxShadow,
+                  border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    Get.toNamed(AppRoutes.branchDetail, arguments: [
+                      salon?.id,
+                      city,
+                      latitude,
+                      longitude,
+                    ]);
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                        child: CachedNetworkImage(
+                          imageUrl: salon?.mainImage ?? "",
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            height: 100,
+                            color: AppColors.grey.withOpacity(0.3),
+                            child: const Center(child: CircularProgressIndicator()),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            height: 100,
+                            color: AppColors.grey.withOpacity(0.3),
+                            child: const Icon(Icons.error),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              salon?.name ?? "",
+                              style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplayBold,
+                                fontSize: 14,
+                                color: AppColors.primaryTextColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              salon?.addressDetails?.addressLine1 ?? "",
+                              style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplayRegular,
+                                fontSize: 12,
+                                color: AppColors.darkGrey3,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(Icons.location_on, size: 12, color: AppColors.primaryAppColor),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "${salon?.distance?.toStringAsFixed(1) ?? "0"} km",
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                                    fontSize: 12,
+                                    color: AppColors.primaryAppColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  // Helper method to build service results
+  Widget _buildServiceResults(HomeScreenController logic) {
+    return Expanded(
+      child: GetBuilder<HomeScreenController>(
+        id: Constant.idSearchService,
+        builder: (logic) {
+          return RefreshIndicator(
+            onRefresh: () {
+              logic.searchEditingController.clear();
+              return logic.onGetAllServiceApiCall(city: city ?? "");
+            },
+            color: AppColors.primaryAppColor,
+            child: SizedBox(
+              height: Get.height,
+              width: Get.width,
+              child: AnimationLimiter(
+                child: ListView.builder(
+                  itemCount: logic.getAllServiceCategory?.services?.length,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  controller: logic.serviceScrollController,
+                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  itemBuilder: (context, index) {
+                    return AnimationConfiguration.staggeredGrid(
+                      position: index,
+                      duration: const Duration(milliseconds: 800),
+                      columnCount: logic.getAllServiceCategory?.services?.length ?? 0,
+                      child: SlideAnimation(
+                        child: FadeInAnimation(
+                          child: GetBuilder<HomeScreenController>(
+                            id: Constant.idServiceList,
+                            builder: (logicService) {
+                              return InkWell(
+                                overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                                onTap: () {
+                                  if (logicService.isSelected[index] == true) {
+                                    logicService.onServiceCheckBoxClick(false, index);
+                                  } else {
+                                    logicService.onServiceCheckBoxClick(true, index);
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: AppColors.whiteColor,
+                                    boxShadow: Constant.boxShadow,
+                                    border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+                                  ),
+                                  margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: 80,
+                                            width: 80,
+                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(10),
+                                              child: CachedNetworkImage(
+                                                imageUrl: logic.getAllServiceCategory?.services?[index].image ?? "",
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) {
+                                                  return Image.asset(AppAsset.icServicePlaceholder).paddingAll(5);
+                                                },
+                                                errorWidget: (context, url, error) {
+                                                  return Icon(
+                                                    Icons.error_outline,
+                                                    color: AppColors.blackColor,
+                                                    size: 20,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: Get.width * 0.03),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                width: 170,
+                                                child: Text(
+                                                  logic.getAllServiceCategory?.services?[index].name ?? "",
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      fontFamily: AppFontFamily.sfProDisplay,
+                                                      fontSize: 17,
+                                                      color: AppColors.primaryTextColor),
+                                                ),
+                                              ),
+                                              Text(
+                                                "${logic.getAllServiceCategory?.services?[index].duration ?? 0} ${"txtMinutes".tr}",
+                                                style: TextStyle(
+                                                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                                                    fontSize: 13,
+                                                    color: AppColors.darkGrey3),
+                                              ),
+                                            ],
+                                          ).paddingOnly(top: 5),
+                                        ],
+                                      ),
+                                      GetBuilder<HomeScreenController>(
+                                        id: Constant.idServiceList,
+                                        builder: (logic) {
+                                          return GestureDetector(
+                                            onTap: () {
+                                              if (logic.isSelected[index] == true) {
+                                                logic.onServiceCheckBoxClick(false, index);
+                                              } else {
+                                                logic.onServiceCheckBoxClick(true, index);
+                                              }
+                                            },
+                                            child: Container(
+                                              height: 25,
+                                              width: 25,
+                                              padding: const EdgeInsets.all(7),
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(6),
+                                                border: Border.all(color: AppColors.greyColor.withOpacity(0.5)),
+                                              ),
+                                              child: logic.isSelected[index]
+                                                  ? Image.asset(
+                                                      AppAsset.icCheck,
+                                                      color: AppColors.primaryAppColor,
+                                                    )
+                                                  : const SizedBox(),
+                                            ).paddingOnly(right: 10),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ).paddingOnly(top: 80, bottom: 10),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
