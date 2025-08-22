@@ -8,6 +8,7 @@ import 'package:salon_2/ui/payment_screen/method/flutter_wave/flutter_wave_servi
 import 'package:salon_2/ui/payment_screen/method/razor_pay/razor_pay_service.dart';
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
 import 'package:salon_2/ui/payment_screen/model/deposit_to_wallet_model.dart';
+
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +21,8 @@ class PaymentScreenController extends GetxController {
   bool? isCreateOrder;
   String? totalAmount;
   String? selectedPayment;
+  Map<String, dynamic>?
+      bookingData; // Additional booking data for direct payments
 
   @override
   void onInit() async {
@@ -29,15 +32,24 @@ class PaymentScreenController extends GetxController {
 
   getDataFromArgs() {
     if (args != null) {
-      if (args[0] != null || args[1] != null || args[2] != null) {
+      if (args.length >= 4) {
         isWalletAdd = args[0];
         totalAmount = args[1];
         isCreateOrder = args[2];
+        selectedPayment = args[3];
+        if (args.length > 4) {
+          bookingData = args[4]; // Additional booking data
+        }
       }
-      selectedPayment = isWalletAdd == true ? "Razorpay" : "wallet";
+
+      // Set default payment method if not specified
+      selectedPayment ??= isWalletAdd == true ? "Razorpay" : "wallet";
+
       log("Is Wallet Add :: $isWalletAdd");
       log("Is Create Order :: $isCreateOrder");
       log("Total Amount :: $totalAmount");
+      log("Selected Payment :: $selectedPayment");
+      log("Booking Data :: $bookingData");
     }
     update([Constant.idSelectPaymentMethod]);
   }
@@ -65,35 +77,65 @@ class PaymentScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      // await StripeService().init(
-      //   totalAmountWithOutTax: int.parse(totalAmount ?? ""),
-      //   stripePaymentPublishKey: stripePublishableKey ?? "",
-      //   stripeURL: Constant.stripeUrl,
-      //   stripePaymentKey: stripeSecretKey ?? "",
-      // );
+      try {
+        // Parse amount properly
+        int parsedAmount = 0;
+        if (totalAmount != null && totalAmount!.isNotEmpty) {
+          // Remove any currency symbols and parse
+          String cleanAmount = totalAmount!.replaceAll(RegExp(r'[^\d.]'), '');
+          double amountDouble = double.tryParse(cleanAmount) ?? 0.0;
+          parsedAmount = amountDouble.toInt();
+        }
 
-      await StripeService().init(isTest: true);
+        log("Parsed amount for Stripe: $parsedAmount");
 
-      log("Called stripe Init");
+        // For wallet recharge
+        if (isWalletAdd == true) {
+          await StripeService().init(
+            totalAmountWithOutTax: parsedAmount,
+            stripePaymentPublishKey: stripePublishableKey ?? "",
+            stripeURL: Constant.stripeUrl,
+            stripePaymentKey: stripeSecretKey ?? "",
+            isTest: true,
+            paymentType: "wallet_recharge",
+          );
+        } else {
+          // For direct payment - use passed booking data instead of accessing booking controller
+          await StripeService().init(
+            totalAmountWithOutTax: parsedAmount,
+            stripePaymentPublishKey: stripePublishableKey ?? "",
+            stripeURL: Constant.stripeUrl,
+            stripePaymentKey: stripeSecretKey ?? "",
+            isTest: true,
+            paymentType: "direct_payment",
+            serviceId: bookingData?['serviceId'] ?? "",
+            expertId: bookingData?['expertId'] ?? "",
+            date: bookingData?['date'] ?? "",
+            time: bookingData?['time'] ?? "",
+            rupee: (bookingData?['amount'] ?? 0.0).toDouble(),
+            userId: Constant.storage.read<String>('userId') ?? "",
+          );
+        }
 
-      // int intAmount = int.parse(totalAmount ?? "0");
+        log("Called stripe Init");
 
-      1.seconds.delay;
-      StripeService()
-          .stripePay(
-              // amount: int.parse(totalAmount ?? ""),
-              // amount: (intAmount * 100).toInt(),
-              // callback: () {},
-              )
-          .then((value) {
+        1.seconds.delay;
+        await StripeService().stripePay().then((value) {
+          isLoading(false);
+          update([Constant.idProgressView]);
+        }).catchError((e) {
+          isLoading(false);
+          update([Constant.idProgressView]);
+          log("Stripe payment error: $e");
+          Utils.showToast(Get.context!, "Payment failed: ${e.toString()}");
+        });
+      } catch (e) {
         isLoading(false);
         update([Constant.idProgressView]);
-      }).catchError((e) {
-        isLoading(false);
-        update([Constant.idProgressView]);
-
-        Utils.showToast(Get.context!, e.toString());
-      });
+        log("Stripe initialization error: $e");
+        Utils.showToast(
+            Get.context!, "Payment initialization failed: ${e.toString()}");
+      }
     } else if (selectedPayment == "flutterWave") {
       FlutterWaveService().init(
         flutterWavePublishKey: flutterWaveKey ?? "",
@@ -111,7 +153,10 @@ class PaymentScreenController extends GetxController {
   DepositToWalletModel? depositToWalletModel;
   RxBool isLoading = false.obs;
 
-  onDepositToWalletApiCall({required String userId, required String amount, required String paymentGateway}) async {
+  onDepositToWalletApiCall(
+      {required String userId,
+      required String amount,
+      required String paymentGateway}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView]);
@@ -126,10 +171,14 @@ class PaymentScreenController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.depositToWallet + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.depositToWallet + queryString);
       log("Deposit To Wallet Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.post(url, headers: headers);
 

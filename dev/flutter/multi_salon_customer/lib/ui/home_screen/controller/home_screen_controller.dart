@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
-import 'package:salon_2/ui/cart_screen/controller/cart_screen_controller.dart';
+
 import 'package:salon_2/ui/expert/expert_detail/model/get_expert_model.dart';
 import 'package:salon_2/ui/home_screen/model/favourite_product_model.dart';
 import 'package:salon_2/ui/home_screen/model/favourite_salon_model.dart';
@@ -172,7 +172,63 @@ class HomeScreenController extends GetxController {
   }
 
   void printLatestValue(String? text) async {
-    await onGetAllServiceApiCall(search: text, city: city ?? "");
+    log("Search text: '$text'");
+    log("Current city: '$city'");
+
+    // If search is empty or null, show all services
+    if (text == null || text.trim().isEmpty) {
+      log("Search is empty, showing all services");
+      await onGetAllServiceApiCall(search: "", city: city ?? "");
+    } else {
+      log("Searching for: '$text'");
+
+      // Try different search strategies
+      String searchTerm = text.trim();
+
+      // First, try searching with the current city
+      await onGetAllServiceApiCall(search: searchTerm, city: city ?? "");
+
+      // If no results found, try searching without city filter (fallback)
+      if (getAllServiceCategory?.services?.isEmpty == true ||
+          getAllServiceCategory?.services == null) {
+        log("No results found with city filter, trying without city filter");
+        await onGetAllServiceApiCall(search: searchTerm, city: "");
+      }
+
+      // If still no results, try searching with common city variations
+      if (getAllServiceCategory?.services?.isEmpty == true ||
+          getAllServiceCategory?.services == null) {
+        log("No results found, trying with common city variations");
+        List<String> commonCities = [
+          "paris",
+          "london",
+          "new york",
+          "tokyo",
+          "mumbai",
+          "delhi",
+          "bangalore"
+        ];
+        for (String commonCity in commonCities) {
+          await onGetAllServiceApiCall(search: searchTerm, city: commonCity);
+          if (getAllServiceCategory?.services?.isNotEmpty == true) {
+            log("Found results with city: $commonCity");
+            break;
+          }
+        }
+      }
+
+      // If still no results, try searching for salons
+      if (getAllServiceCategory?.services?.isEmpty == true ||
+          getAllServiceCategory?.services == null) {
+        log("No service results found, trying salon search");
+        await onGetAllSalonApiCall(
+          latitude: latitude ?? 0.0,
+          longitude: longitude ?? 0.0,
+          userId: Constant.storage.read<String>('userId') ?? "",
+          search: searchTerm,
+        );
+      }
+    }
   }
 
   @override
@@ -697,12 +753,22 @@ class HomeScreenController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         getAllServiceCategory = GetAllServiceModel.fromJson(jsonResponse);
+
+        log("Services found: ${getAllServiceCategory?.services?.length ?? 0}");
+        log("Services status: ${getAllServiceCategory?.status}");
+        log("Services message: ${getAllServiceCategory?.message}");
+
+        if (getAllServiceCategory?.services != null) {
+          log("Service names: ${getAllServiceCategory?.services?.map((s) => s.name).toList()}");
+        }
+
         isSelected = List.generate(
             (getAllServiceCategory?.services?.length ?? 0),
             (index) => checkItem
                 .contains(getAllServiceCategory?.services?[index].name));
       }
     } on AppException catch (exception) {
+      log("AppException in onGetAllServiceApiCall: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get Service Api :: $e");
@@ -764,18 +830,22 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  onGetAllSalonApiCall(
-      {required double latitude,
-      required double longitude,
-      required String userId}) async {
+  // Enhanced salon search method
+  onGetAllSalonApiCall({
+    required double latitude,
+    required double longitude,
+    required String userId,
+    String? search,
+  }) async {
     try {
       isLoading(true);
       update([Constant.idProgressView]);
 
       final queryParameters = {
-        "latitude": latitude == 0.0 ? null : latitude.toString(),
-        "longitude": longitude == 0.0 ? null : longitude.toString(),
         "userId": userId,
+        "latitude": latitude.toString(),
+        "longitude": longitude.toString(),
+        if (search != null && search.isNotEmpty) "search": search,
       };
 
       log("Get All Salon Params :: $queryParameters");
@@ -791,7 +861,6 @@ class HomeScreenController extends GetxController {
         "key": ApiConstant.SECRET_KEY,
         'Content-Type': 'application/json'
       };
-      log("Get All Salon Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
 
@@ -801,8 +870,20 @@ class HomeScreenController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         getAllSalonCategory = GetAllSalonModel.fromJson(jsonResponse);
+
+        log("Salons found: ${getAllSalonCategory?.data?.length ?? 0}");
+
+        // If we found salons but no services, show a message
+        if (getAllSalonCategory?.data?.isNotEmpty == true &&
+            (getAllServiceCategory?.services?.isEmpty == true ||
+                getAllServiceCategory?.services == null)) {
+          log("Found salons but no services, updating service list to show salon results");
+          // You could create a custom service model to show salon results
+          // For now, we'll just log that salons were found
+        }
       }
     } on AppException catch (exception) {
+      log("AppException in onGetAllSalonApiCall: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get All Salon Api :: $e");

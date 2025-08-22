@@ -17,7 +17,6 @@ import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_pay_model
 import 'package:salon_2/ui/search_screen/controller/search_screen_controller.dart';
 import 'package:salon_2/ui/select_branch_screen/controller/select_branch_controller.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
-import 'package:salon_2/ui/view_all_category/controller/view_all_category_controller.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
@@ -31,7 +30,7 @@ class StripeService {
   static late String dates;
   static late String times;
   static late double rupees;
-  static late int totalAmountWithOutTaxs;
+  static late double totalAmountWithOutTaxs;
   static late String serviceIds;
   static late String expertIds;
   static late String userIds;
@@ -40,13 +39,20 @@ class StripeService {
 
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
   SplashController splashController = Get.put(SplashController());
-  CategoryDetailController categoryDetailController = Get.put(CategoryDetailController());
-  SearchScreenController searchScreenController = Get.put(SearchScreenController());
-  BookingScreenController bookingScreenController = Get.put(BookingScreenController());
-  PaymentScreenController paymentScreenController = Get.put(PaymentScreenController());
-  BranchDetailController branchDetailController = Get.put(BranchDetailController());
-  SelectBranchController selectBranchController = Get.put(SelectBranchController());
-  ExpertDetailController expertDetailController = Get.put(ExpertDetailController());
+  CategoryDetailController categoryDetailController =
+      Get.put(CategoryDetailController());
+  SearchScreenController searchScreenController =
+      Get.put(SearchScreenController());
+  BookingScreenController bookingScreenController =
+      Get.put(BookingScreenController());
+  PaymentScreenController paymentScreenController =
+      Get.put(PaymentScreenController());
+  BranchDetailController branchDetailController =
+      Get.put(BranchDetailController());
+  SelectBranchController selectBranchController =
+      Get.put(SelectBranchController());
+  ExpertDetailController expertDetailController =
+      Get.put(ExpertDetailController());
 
   init({
     String? stripePaymentPublishKey,
@@ -73,17 +79,37 @@ class StripeService {
     log("expertId :: $expertId");
     log("time :: $time");
 
-    Stripe.publishableKey = "${splashController.settingCategory?.setting?.stripePublishableKey}";
+    // Validate Stripe keys
+    String publishableKey = stripePaymentPublishKey ??
+        splashController.settingCategory?.setting?.stripePublishableKey ??
+        "";
+    String secretKey = stripePaymentKey ??
+        splashController.settingCategory?.setting?.stripeSecretKey ??
+        "";
+
+    if (publishableKey.isEmpty) {
+      throw Exception("Stripe publishable key is not configured");
+    }
+
+    if (secretKey.isEmpty) {
+      throw Exception("Stripe secret key is not configured");
+    }
+
+    log("Using Stripe publishable key: ${publishableKey.substring(0, 7)}...");
+    log("Using Stripe secret key: ${secretKey.substring(0, 7)}...");
+
+    Stripe.publishableKey = publishableKey;
     Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
 
     await Stripe.instance.applySettings().catchError((e) {
-      Utils.showToast(Get.context!, e.toString());
-      bookingScreenController.isLoading(false);
+      log("Stripe settings error: $e");
+      Utils.showToast(
+          Get.context!, "Stripe configuration error: ${e.toString()}");
       throw e.toString();
     });
 
     stripeURLs = stripeURL ?? "";
-    stripePaymentKeys = stripePaymentKey ?? "";
+    stripePaymentKeys = secretKey;
     isTests = isTest ?? true;
     discountAmounts = discountAmount ?? 0.0;
     discountPercentages = discountPercentage ?? 0.0;
@@ -91,7 +117,7 @@ class StripeService {
     dates = date ?? "";
     times = time ?? "";
     rupees = rupee ?? 0.0;
-    totalAmountWithOutTaxs = totalAmountWithOutTax ?? 0;
+    totalAmountWithOutTaxs = (totalAmountWithOutTax ?? 0).toDouble();
     serviceIds = serviceId ?? "";
     expertIds = expertId ?? "";
     userIds = userId ?? "";
@@ -100,31 +126,79 @@ class StripeService {
 
   Future<dynamic> stripePay() async {
     log("stripePaymentKey :::: $stripePaymentKeys");
+    log("totalAmountWithOutTaxs :::: $totalAmountWithOutTaxs");
 
     String userId = Constant.storage.read<String>('userId') ?? "";
     String userName = Constant.storage.read<String>('UserName') ?? "";
     String userEmail = Constant.storage.read<String>('UserEmail') ?? "";
+
     try {
-      int stripeAmount = totalAmountWithOutTaxs * 100;
-      log("stripeAmount :: $stripeAmount");
+      // Parse and validate amount more robustly
+      double amountDouble = 0.0;
+
+      // Handle different amount formats
+      if (totalAmountWithOutTaxs is int) {
+        amountDouble = totalAmountWithOutTaxs.toDouble();
+      } else if (totalAmountWithOutTaxs is double) {
+        amountDouble = totalAmountWithOutTaxs;
+      } else {
+        // Remove any currency symbols and parse
+        String cleanAmount =
+            totalAmountWithOutTaxs.toString().replaceAll(RegExp(r'[^\d.]'), '');
+        amountDouble = double.tryParse(cleanAmount) ?? 0.0;
+      }
+
+      log("Parsed amount: $amountDouble");
+
+      // Validate amount
+      if (amountDouble <= 0) {
+        throw Exception(
+            "Invalid amount. Amount must be greater than 0. Received: $amountDouble");
+      }
+
+      // Convert to cents for Stripe (ensure it's a whole number)
+      int stripeAmount = (amountDouble * 100).round();
+      log("stripeAmount in cents :: $stripeAmount");
+
+      // Get currency from settings
+      String currency = splashController.settingCategory?.setting?.currencyName
+              ?.toLowerCase() ??
+          'usd';
+      log("Currency :: $currency");
+
+      // Validate currency
+      if (currency.isEmpty) {
+        currency = 'usd'; // Default to USD if not set
+      }
 
       Map<String, dynamic> body = {
-        'amount': (totalAmountWithOutTaxs * 100).toString(),
-        'currency': splashController.settingCategory?.setting?.currencyName,
+        'amount': stripeAmount.toString(),
+        'currency': currency,
         'description': 'Name: $userName - Email: $userEmail',
+        'automatic_payment_methods[enabled]': 'true',
       };
 
-      var response = await http.post(Uri.parse(Constant.stripeUrl), body: body, headers: {
-        "Authorization": "Bearer ${splashController.settingCategory?.setting?.stripeSecretKey.toString() ?? ""}",
+      log("Stripe request body :: $body");
+      log("Stripe secret key (masked) :: ${stripePaymentKeys.substring(0, 7)}...");
+      log("Test mode :: $isTests");
+
+      var response =
+          await http.post(Uri.parse(Constant.stripeUrl), body: body, headers: {
+        "Authorization": "Bearer $stripePaymentKeys",
         "Content-Type": 'application/x-www-form-urlencoded'
       });
-      log("End Payment Intent http request post method");
 
       log("Stripe Payment Response StatusCode :: ${response.statusCode}");
       log("Stripe Payment Response Body :: ${response.body}");
 
       if (response.statusCode == 200) {
         StripePayModel res = StripePayModel.fromJson(jsonDecode(response.body));
+
+        if (res.clientSecret == null || res.clientSecret!.isEmpty) {
+          throw Exception(
+              "Payment intent creation failed - no client secret received");
+        }
+
         bookingScreenController.isLoading(true);
 
         String? strSelectString;
@@ -132,23 +206,35 @@ class StripeService {
         String? selectTime;
 
         strSelectString = bookingScreenController.selectedSlot;
-        partsSelectedString = strSelectString.split(' ');
-        selectTime = partsSelectedString[0];
+        if (strSelectString.isNotEmpty) {
+          partsSelectedString = strSelectString.split(' ');
+          selectTime = partsSelectedString[0];
+        }
 
         log("selectTime :: $selectTime");
-        log("selectTime :: ${res.clientSecret}");
+        log("clientSecret :: ${res.clientSecret}");
 
         try {
-          SetupPaymentSheetParameters setupPaymentSheetParameters = SetupPaymentSheetParameters(
-            paymentIntentClientSecret: res.clientSecret,
-            appearance: PaymentSheetAppearance(colors: PaymentSheetAppearanceColors(primary: AppColors.primaryAppColor)),
-            applePay: PaymentSheetApplePay(merchantCountryCode: Constant.stripeMerchantCountryCode),
-            googlePay: PaymentSheetGooglePay(merchantCountryCode: Constant.stripeMerchantCountryCode, testEnv: isTests),
+          SetupPaymentSheetParameters setupPaymentSheetParameters =
+              SetupPaymentSheetParameters(
+            paymentIntentClientSecret: res.clientSecret ?? "",
+            appearance: PaymentSheetAppearance(
+                colors: PaymentSheetAppearanceColors(
+                    primary: AppColors.primaryAppColor)),
+            applePay: PaymentSheetApplePay(
+                merchantCountryCode: Constant.stripeMerchantCountryCode),
+            googlePay: PaymentSheetGooglePay(
+                merchantCountryCode: Constant.stripeMerchantCountryCode,
+                testEnv: isTests),
             merchantDisplayName: Constant.appName,
             customerId: userId.toString(),
             billingDetails: BillingDetails(name: userName, email: userEmail),
           );
-          await Stripe.instance.initPaymentSheet(paymentSheetParameters: setupPaymentSheetParameters).then(
+
+          await Stripe.instance
+              .initPaymentSheet(
+                  paymentSheetParameters: setupPaymentSheetParameters)
+              .then(
             (value) async {
               await Stripe.instance.presentPaymentSheet().then(
                 (value) async {
@@ -160,121 +246,101 @@ class StripeService {
                   log("Time :: $times");
 
                   if (paymentScreenController.isWalletAdd == true) {
+                    // Wallet recharge
                     await paymentScreenController.onDepositToWalletApiCall(
                       userId: Constant.storage.read<String>('userId') ?? "",
                       amount: paymentScreenController.totalAmount ?? "",
-                      paymentGateway: "1",
+                      paymentGateway: "Stripe",
                     );
 
-                    if (paymentScreenController.depositToWalletModel?.status == true) {
-                      Utils.showToast(Get.context!, paymentScreenController.depositToWalletModel?.message ?? "");
+                    if (paymentScreenController.depositToWalletModel?.status ==
+                        true) {
+                      Utils.showToast(
+                          Get.context!,
+                          paymentScreenController
+                                  .depositToWalletModel?.message ??
+                              "");
                       Get.back();
                     } else {
-                      Utils.showToast(Get.context!, paymentScreenController.depositToWalletModel?.message ?? "");
+                      Utils.showToast(
+                          Get.context!,
+                          paymentScreenController
+                                  .depositToWalletModel?.message ??
+                              "");
                     }
                   } else {
+                    // Direct payment - use passed data from payment controller
                     await bookingScreenController.onCreateBookingApiCall(
                       userId: Constant.storage.read<String>('userId') ?? "",
-                      expertId: Constant.storage.read<String>('expertDetail') != null
-                          ? Constant.storage.read<String>('expertDetail').toString()
-                          : Constant.storage.read<String>('expertId').toString(),
-                      serviceId: bookingScreenController.serviceId.join(","),
+                      expertId: expertIds.isNotEmpty
+                          ? expertIds
+                          : (Constant.storage.read<String>('expertDetail') !=
+                                  null
+                              ? Constant.storage
+                                  .read<String>('expertDetail')
+                                  .toString()
+                              : Constant.storage
+                                  .read<String>('expertId')
+                                  .toString()),
+                      serviceId: serviceIds.isNotEmpty
+                          ? serviceIds
+                          : bookingScreenController.serviceId.join(","),
                       salonId: bookingScreenController.salonId.toString(),
-                      date: bookingScreenController.formattedDate.toString(),
-                      time: bookingScreenController.slotsString.toString(),
-                      amount: bookingScreenController.totalPrice,
-                      withoutTax: bookingScreenController.withOutTaxRupee.toInt(),
-                      paymentType: bookingScreenController.selectedPayment,
-                      atPlace: bookingScreenController.selectedVenue == "At Salon" ? 1 : 2,
-                      address: bookingScreenController.searchEditingController.text,
+                      date: dates.isNotEmpty
+                          ? dates
+                          : bookingScreenController.formattedDate.toString(),
+                      time: times.isNotEmpty
+                          ? times
+                          : bookingScreenController.slotsString.toString(),
+                      amount: rupees > 0
+                          ? rupees
+                          : bookingScreenController.totalPrice.toDouble(),
+                      withoutTax:
+                          bookingScreenController.withOutTaxRupee.round(),
+                      paymentType: "Stripe", // Use Stripe as payment type
+                      atPlace:
+                          bookingScreenController.selectedVenue == "At Salon"
+                              ? 1
+                              : 2,
+                      address:
+                          bookingScreenController.searchEditingController.text,
                     );
-                    if (bookingScreenController.createBookingCategory?.status == true) {
-                      bookingScreenController.finalTaxRupee = 0.0;
-                      bookingScreenController.withOutTaxRupee = 0.0;
-                      bookingScreenController.totalPrice = 0.0;
 
-                      for (var i = 0; i < (categoryDetailController.getServiceCategory?.services?.length ?? 0); i++) {
-                        categoryDetailController.onCheckBoxClick(false, i);
-                      }
+                    if (bookingScreenController.createBookingCategory?.status ==
+                        true) {
+                      Utils.showToast(
+                          Get.context!, "Payment successful! Booking created.");
 
-                      for (var i = 0; i < (homeScreenController.getAllServiceCategory?.services?.length ?? 0); i++) {
-                        homeScreenController.onServiceCheckBoxClick(false, i);
-                      }
-
-                      for (var i = 0; i < (homeScreenController.getExpertCategory?.data?.services?.length ?? 0); i++) {
-                        homeScreenController.onCheckBoxClick(false, i);
-                      }
-
-                      for (var i = 0; i < (branchDetailController.getSalonDetailCategory?.salon?.serviceIds?.length ?? 0); i++) {
-                        branchDetailController.onCheckBoxClick(false, i);
-                      }
-
-                      homeScreenController.withOutTaxRupee = 0.0;
-                      homeScreenController.totalPrice = 0.0;
-                      homeScreenController.finalTaxRupee = 0.0;
-                      homeScreenController.totalMinute = 0;
-                      homeScreenController.checkItem.clear();
-                      homeScreenController.serviceId.clear();
-                      homeScreenController.serviceName.clear();
-
-                      homeScreenController.withOutTaxRupeeExpert = 0.0;
-                      homeScreenController.totalPriceExpert = 0.0;
-                      homeScreenController.finalTaxRupeeExpert = 0.0;
-                      homeScreenController.totalMinuteExpert = 0;
-                      homeScreenController.checkItemExpert.clear();
-                      homeScreenController.serviceIdExpert.clear();
-                      homeScreenController.serviceNameExpert.clear();
-
-                      searchScreenController.totalMinute = 0;
-                      searchScreenController.checkItem.clear();
-                      searchScreenController.serviceId.clear();
-                      searchScreenController.serviceName.clear();
-
-                      categoryDetailController.totalMinute = 0;
-                      categoryDetailController.checkItem.clear();
-                      categoryDetailController.serviceId.clear();
-                      categoryDetailController.serviceName.clear();
-
-                      branchDetailController.withOutTaxRupee = 0.0;
-                      branchDetailController.totalPrice = 0.0;
-                      branchDetailController.finalTaxRupee = 0.0;
-                      branchDetailController.totalMinute = 0;
-                      branchDetailController.checkItem.clear();
-                      branchDetailController.serviceId.clear();
-
-                      selectBranchController.selectBranch = -1;
-                      Constant.storage.remove("expertDetail");
-                      bookingScreenController.selectedExpertDataList.clear();
-
-                      log("withOutTaxRupee :: home ${homeScreenController.withOutTaxRupee} :: branch ${branchDetailController.withOutTaxRupee} ::  homeExpert ${homeScreenController.withOutTaxRupeeExpert}");
-                      log("totalPrice :: home ${homeScreenController.totalPrice} :: branch ${branchDetailController.totalPrice} ::  homeExpert ${homeScreenController.totalPriceExpert}");
-                      log("finalTaxRupee :: home ${homeScreenController.finalTaxRupee} :: branch ${branchDetailController.finalTaxRupee} ::  homeExpert ${homeScreenController.finalTaxRupeeExpert}");
-                      log("totalMinute :: home ${homeScreenController.totalMinute} :: category ${categoryDetailController.totalMinute} :: branch ${branchDetailController.totalMinute} :: search ${searchScreenController.totalMinute} ");
-                      log("checkItem :: home ${homeScreenController.checkItem} :: category ${categoryDetailController.checkItem} :: branch ${branchDetailController.checkItem} :: search ${searchScreenController.checkItem} ");
-                      log("serviceId :: home ${homeScreenController.serviceId} :: category ${categoryDetailController.serviceId} :: branch ${branchDetailController.serviceId} :: search ${searchScreenController.serviceId} ");
-
-                      Get.delete<CategoryDetailController>();
-                      Get.delete<BranchDetailController>();
-                      Get.delete<SelectBranchController>();
-                      Get.delete<ViewAllCategoryController>();
-                      Get.delete<ExpertDetailController>();
-
+                      // Navigate back to home screen
                       Get.offAndToNamed(AppRoutes.bottom);
+
+                      // Show success dialog
                       Get.dialog(
-                        barrierColor: AppColors.blackColor.withOpacity(0.8),
+                        barrierColor:
+                            AppColors.blackColor.withValues(alpha: 0.8),
                         Dialog(
                           backgroundColor: AppColors.transparent,
                           child: SuccessDialog(),
                         ),
                       );
                     } else {
-                      Utils.showToast(Get.context!, bookingScreenController.createBookingCategory?.message ?? "");
+                      Utils.showToast(
+                          Get.context!,
+                          bookingScreenController
+                                  .createBookingCategory?.message ??
+                              "Booking failed");
                     }
                   }
                 },
               ).catchError(
                 (e) {
                   log("Error in Stripe Payment Method :: $e");
+                  if (e is StripeException) {
+                    Utils.showToast(Get.context!,
+                        "Payment failed: ${e.error.localizedMessage}");
+                  } else {
+                    Utils.showToast(Get.context!, "Payment failed: $e");
+                  }
                 },
               );
 
@@ -284,23 +350,46 @@ class StripeService {
         } catch (e) {
           if (e is StripeException) {
             log('Stripe Exception :: ${e.error.localizedMessage}');
+            Utils.showToast(
+                Get.context!, "Payment failed: ${e.error.localizedMessage}");
           } else {
             log('Stripe Payment Method Unexpected Error :: $e');
+            Utils.showToast(Get.context!, "Payment failed: $e");
           }
         }
       } else if (response.statusCode == 401) {
-        log("Error during Stripe payment");
+        log("Error during Stripe payment - Unauthorized");
+        bookingScreenController.isLoading(false);
+        Utils.showToast(Get.context!, "Payment failed: Invalid API key");
+        throw 'Invalid API key';
+      } else {
+        log("Error during Stripe payment - Status: ${response.statusCode}");
         bookingScreenController.isLoading(false);
 
-        throw 'Something Went Wrong';
+        // Try to parse error message from response
+        try {
+          final errorResponse = jsonDecode(response.body);
+          final errorMessage =
+              errorResponse['error']?['message'] ?? 'Payment failed';
+          Utils.showToast(Get.context!, errorMessage);
+          throw errorMessage;
+        } catch (parseError) {
+          Utils.showToast(Get.context!, "Payment failed: Something went wrong");
+          throw 'Something Went Wrong';
+        }
       }
       return jsonDecode(response.body);
     } catch (e) {
+      bookingScreenController.isLoading(false);
       if (e is StripeException) {
         log('Stripe Error: ${e.error.localizedMessage}');
+        Utils.showToast(
+            Get.context!, "Payment failed: ${e.error.localizedMessage}");
       } else {
         log('Unexpected error: $e');
+        Utils.showToast(Get.context!, "Payment failed: $e");
       }
+      rethrow;
     }
   }
 }

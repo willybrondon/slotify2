@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/branch_detail_screen/model/get_salon_detail_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
@@ -26,9 +27,9 @@ class BranchDetailController extends GetxController
   int? roundedRating;
   int? filledStars;
   String? salonId;
-  String? city;
-  double? latitude;
-  double? longitude;
+  String? localCity;
+  double? localLatitude;
+  double? localLongitude;
   dynamic args = Get.arguments;
   late List<bool> isBranchSelected = List.generate(
       (getSalonDetailCategory?.salon?.serviceIds?.length ?? 0),
@@ -60,8 +61,8 @@ class BranchDetailController extends GetxController
     await getDataFromArgs();
     await onGetSalonDetailApiCall(
         salonId: salonId ?? "",
-        latitude: latitude ?? 0.0,
-        longitude: longitude ?? 0.0);
+        latitude: localLatitude ?? 0.0,
+        longitude: localLongitude ?? 0.0);
 
     super.onInit();
   }
@@ -72,25 +73,25 @@ class BranchDetailController extends GetxController
         salonId = args[0];
       }
       if (args.length > 1 && args[1] != null) {
-        city = args[1];
+        localCity = args[1];
       }
       if (args.length > 2 && args[2] != null) {
-        latitude = args[2];
+        localLatitude = args[2];
       }
       if (args.length > 3 && args[3] != null) {
-        longitude = args[3];
+        localLongitude = args[3];
       }
     }
 
     // Fallback to global values if not provided in arguments
-    city ??= city;
-    latitude ??= latitude;
-    longitude ??= longitude;
+    localCity ??= city;
+    localLatitude ??= latitude;
+    localLongitude ??= longitude;
 
     log("Branch Detail - Salon ID: $salonId");
-    log("Branch Detail - City: $city");
-    log("Branch Detail - Latitude: $latitude");
-    log("Branch Detail - Longitude: $longitude");
+    log("Branch Detail - City: $localCity");
+    log("Branch Detail - Latitude: $localLatitude");
+    log("Branch Detail - Longitude: $localLongitude");
   }
 
   makingPhoneCall() async {
@@ -178,10 +179,14 @@ class BranchDetailController extends GetxController
         "salonId": salonId,
         "latitude": latitude == 0.0 ? null : latitude.toString(),
         "longitude": longitude == 0.0 ? null : longitude.toString(),
-        "city": city ?? "",
+        "city": localCity ?? "",
       };
 
       log("Get Salon Detail Params :: $queryParameters");
+      log("Get Salon Detail - City being sent: '${localCity ?? ""}'");
+      log("Get Salon Detail - Global city: '${city ?? ""}'");
+      log("Get Salon Detail - Latitude: $latitude");
+      log("Get Salon Detail - Longitude: $longitude");
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
@@ -204,6 +209,14 @@ class BranchDetailController extends GetxController
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         getSalonDetailCategory = GetSalonDetailModel.fromJson(jsonResponse);
+
+        // Log the response data to see what services are returned
+        if (getSalonDetailCategory?.salon?.serviceIds != null) {
+          log("Get Salon Detail - Services found: ${getSalonDetailCategory?.salon?.serviceIds?.length ?? 0}");
+          log("Get Salon Detail - Service names: ${getSalonDetailCategory?.salon?.serviceIds?.map((s) => s.serviceIdId?.name).toList()}");
+        } else {
+          log("Get Salon Detail - No services found in response");
+        }
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);

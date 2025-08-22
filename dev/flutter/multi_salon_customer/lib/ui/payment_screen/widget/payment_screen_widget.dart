@@ -154,7 +154,9 @@ class PaymentMyWalletView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: logic.selectedPayment == "wallet" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.3),
+                      color: logic.selectedPayment == "wallet"
+                          ? AppColors.primaryAppColor
+                          : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
                   child: logic.selectedPayment == "wallet"
@@ -322,8 +324,9 @@ class PaymentRazorPayView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color:
-                          logic.selectedPayment == "Razorpay" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.3),
+                      color: logic.selectedPayment == "Razorpay"
+                          ? AppColors.primaryAppColor
+                          : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
                   child: logic.selectedPayment == "Razorpay"
@@ -406,7 +409,9 @@ class PaymentStripeView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: logic.selectedPayment == "Stripe" ? AppColors.primaryAppColor : AppColors.greyColor.withOpacity(0.3),
+                      color: logic.selectedPayment == "Stripe"
+                          ? AppColors.primaryAppColor
+                          : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
                   child: logic.selectedPayment == "Stripe"
