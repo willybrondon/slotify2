@@ -2,7 +2,6 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -26,7 +25,8 @@ class SearchScreenController extends GetxController {
   @override
   void onInit() async {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      homeScreenController.onGetAllServiceApiCall(city: city ?? "");
+      // Don't load all services by default - only show most searched services
+      // homeScreenController.onGetAllServiceApiCall(city: city ?? "");
       if (homeScreenController.getAllServiceCategory?.status == false) {
         Utils.showToast(Get.context!, homeScreenController.getAllServiceCategory?.message ?? "");
       }

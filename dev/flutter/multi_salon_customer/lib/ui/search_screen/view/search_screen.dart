@@ -53,7 +53,8 @@ class SearchScreen extends StatelessWidget {
             (homeScreenController.getAllServiceCategory?.services?.length ?? 0),
             (index) => false,
           );
-          homeScreenController.onGetAllServiceApiCall(city: city ?? "");
+          // Don't load all services when popping - only show most searched services
+          // homeScreenController.onGetAllServiceApiCall(city: city ?? "");
         }
         if (didPop) {
           return;
@@ -79,7 +80,8 @@ class SearchScreen extends StatelessWidget {
                 homeScreenController.searchEditingController.clear();
                 homeScreenController.isSelected =
                     List.generate((homeScreenController.getAllServiceCategory?.services?.length ?? 0), (index) => false);
-                homeScreenController.onGetAllServiceApiCall(city: city ?? "");
+                // Don't load all services when going back - only show most searched services
+                // homeScreenController.onGetAllServiceApiCall(city: city ?? "");
 
                 Get.back();
               },
@@ -218,33 +220,7 @@ class SearchScreen extends StatelessWidget {
                 logic.getAllSalonCategory?.data?.isEmpty == true
                     ? logic.isLoading.value
                         ? Shimmers.searchScreenShimmer()
-                        : SizedBox(
-                            height: Get.height,
-                            width: Get.width,
-                            child: Stack(
-                              children: [
-                                Center(
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        AppAsset.icNoService,
-                                        height: 185,
-                                        width: 185,
-                                      ).paddingOnly(top: Get.height * 0.25),
-                                      Text(
-                                        "txtNotAvailableServices".tr,
-                                        style: TextStyle(
-                                          fontFamily: AppFontFamily.sfProDisplayMedium,
-                                          fontSize: 17,
-                                          color: AppColors.primaryTextColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
+                        : _buildMostSearchedServices(logic) // Show most searched services instead of "not available"
                     : Column(
                         children: [
                           // Show salon results if available (location-based search)
@@ -261,6 +237,110 @@ class SearchScreen extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  // Helper method to build most searched services
+  Widget _buildMostSearchedServices(HomeScreenController logic) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            "Most Searched Services",
+            style: TextStyle(
+              fontFamily: AppFontFamily.sfProDisplayBold,
+              fontSize: 18,
+              color: AppColors.primaryTextColor,
+            ),
+          ),
+        ),
+        // Show up to 5 most searched services
+        ...List.generate(
+          (logic.getAllServiceCategory?.services?.length ?? 0) > 5 
+              ? 5 
+              : (logic.getAllServiceCategory?.services?.length ?? 0),
+          (index) {
+            final service = logic.getAllServiceCategory?.services?[index];
+            if (service == null) return const SizedBox.shrink();
+            
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: AppColors.whiteColor,
+                boxShadow: Constant.boxShadow,
+                border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: CachedNetworkImage(
+                        imageUrl: service.image ?? "",
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) {
+                          return Image.asset(AppAsset.icServicePlaceholder).paddingAll(8);
+                        },
+                        errorWidget: (context, url, error) {
+                          return Icon(
+                            Icons.error_outline,
+                            color: AppColors.blackColor,
+                            size: 20,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          service.name ?? "",
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplayBold,
+                            fontSize: 16,
+                            color: AppColors.primaryTextColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "${service.duration ?? 0} ${"txtMinutes".tr}",
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
+                            fontSize: 14,
+                            color: AppColors.darkGrey3,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          service.categoryname ?? "Service",
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
+                            fontSize: 14,
+                            color: AppColors.primaryAppColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 20),
+      ],
     );
   }
 
