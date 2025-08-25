@@ -171,286 +171,34 @@ class HomeScreenController extends GetxController {
     super.onInit();
   }
 
-  void printLatestValue(String? text) async {
-    log("Search text: '$text'");
-    log("Current city: '$city'");
-
-    // If search is empty or null, show all services
+  // Simplified and consistent search method
+  printLatestValue(String? text) async {
     if (text == null || text.trim().isEmpty) {
-      log("Search is empty, showing all services");
-      await onGetAllServiceApiCall(search: "", city: city ?? "");
-    } else {
-      log("Searching for: '$text'");
-
-      // Try different search strategies
-      String searchTerm = text.trim();
-
-      // Check if search term looks like a location (contains location keywords or city names)
-      bool isLocationSearch = _isLocationSearch(searchTerm);
-      log("Is location search: $isLocationSearch");
-
-      // If it looks like a location search, prioritize salon search
-      if (isLocationSearch) {
-        log("Location search detected, searching for salons first");
-        await onGetAllSalonApiCall(
-          latitude: latitude ?? 0.0,
-          longitude: longitude ?? 0.0,
-          userId: Constant.storage.read<String>('userId') ?? "",
-          search: searchTerm,
-        );
-
-        // If salon search found results, also try service search with the location
-        if (getAllSalonCategory?.data?.isNotEmpty == true) {
-          log("Found salons, also searching for services in this location");
-          await onGetAllServiceApiCall(search: "", city: searchTerm);
-        }
-      } else {
-        // Regular service search first
-        // First, try searching with the current city
-        await onGetAllServiceApiCall(search: searchTerm, city: city ?? "");
-
-        // If no results found, try searching without city filter (fallback)
-        if (getAllServiceCategory?.services?.isEmpty == true ||
-            getAllServiceCategory?.services == null) {
-          log("No results found with city filter, trying without city filter");
-          await onGetAllServiceApiCall(search: searchTerm, city: "");
-        }
-
-        // If still no results, try searching with common city variations
-        if (getAllServiceCategory?.services?.isEmpty == true ||
-            getAllServiceCategory?.services == null) {
-          log("No results found, trying with common city variations");
-          List<String> commonCities = [
-            "paris",
-            "london",
-            "new york",
-            "tokyo",
-            "mumbai",
-            "delhi",
-            "bangalore"
-          ];
-          for (String commonCity in commonCities) {
-            await onGetAllServiceApiCall(search: searchTerm, city: commonCity);
-            if (getAllServiceCategory?.services?.isNotEmpty == true) {
-              log("Found results with city: $commonCity");
-              break;
-            }
-          }
-        }
-
-        // If still no results, try searching for salons
-        if (getAllServiceCategory?.services?.isEmpty == true ||
-            getAllServiceCategory?.services == null) {
-          log("No service results found, trying salon search");
-          await onGetAllSalonApiCall(
-            latitude: latitude ?? 0.0,
-            longitude: longitude ?? 0.0,
-            userId: Constant.storage.read<String>('userId') ?? "",
-            search: searchTerm,
-          );
-        }
-      }
-    }
-  }
-
-  // Helper method to detect if search term looks like a location
-  bool _isLocationSearch(String searchTerm) {
-    String term = searchTerm.toLowerCase().trim();
-
-    // Common location keywords
-    List<String> locationKeywords = [
-      'street',
-      'avenue',
-      'road',
-      'lane',
-      'drive',
-      'boulevard',
-      'place',
-      'square',
-      'district',
-      'neighborhood',
-      'area',
-      'zone',
-      'region',
-      'quarter',
-      'block',
-      'building',
-      'center',
-      'mall',
-      'plaza',
-      'complex',
-      'tower',
-      'apartment',
-      'residential',
-      'commercial',
-      'downtown',
-      'uptown',
-      'suburb',
-      'city',
-      'town',
-      'village',
-      'county',
-      'state',
-      'province',
-      'country'
-    ];
-
-    // Common city names and location terms
-    List<String> cityNames = [
-      'paris',
-      'london',
-      'new york',
-      'tokyo',
-      'mumbai',
-      'delhi',
-      'bangalore',
-      'chennai',
-      'kolkata',
-      'hyderabad',
-      'pune',
-      'ahmedabad',
-      'jaipur',
-      'lucknow',
-      'kanpur',
-      'nagpur',
-      'indore',
-      'thane',
-      'bhopal',
-      'visakhapatnam',
-      'patna',
-      'vadodara',
-      'ghaziabad',
-      'ludhiana',
-      'agra',
-      'nashik',
-      'faridabad',
-      'meerut',
-      'rajkot',
-      'kalyan',
-      'vasai',
-      'vashi',
-      'aurangabad',
-      'dhanbad',
-      'amritsar',
-      'allahabad',
-      'ranchi',
-      'howrah',
-      'coimbatore',
-      'jabalpur',
-      'gwalior',
-      'vijayawada',
-      'jodhpur',
-      'madurai',
-      'raipur',
-      'kota',
-      'guwahati',
-      'chandigarh',
-      'solapur',
-      'hubli',
-      'bareilly',
-      'moradabad',
-      'gurgaon',
-      'aligarh',
-      'jalandhar',
-      'tiruchirappalli',
-      'bhubaneswar',
-      'salem',
-      'warangal',
-      'mira',
-      'thiruvananthapuram',
-      'bhiwandi',
-      'saharanpur',
-      'gorakhpur',
-      'guntur',
-      'bikaner',
-      'amravati',
-      'noida',
-      'jamshedpur',
-      'bhilai',
-      'cuttack',
-      'firozabad',
-      'kochi',
-      'nellore',
-      'bhavnagar',
-      'dehradun',
-      'durgapur',
-      'asansol',
-      'rourkela',
-      'bhagalpur',
-      'mangalore',
-      'bellary',
-      'mysore',
-      'tiruppur',
-      'karnal',
-      'bathinda',
-      'ratlam',
-      'avadi',
-      'dindigul',
-      'aizawl',
-      'tirunelveli',
-      'rohtak',
-      'panipat',
-      'dharamsala',
-      'bharatpur',
-      'puducherry',
-      'port blair',
-      'silchar',
-      'hajipur',
-      'deoria',
-      'bhagpat',
-      'madhepura',
-      'chhapra',
-      'motihari',
-      'siwan',
-      'gopalganj',
-      'bettiah',
-      'bagaha',
-      'aurangabad',
-      'buxar',
-      'kaimur',
-      'rohtas',
-      'jehanabad',
-      'arwal',
-      'nalanda',
-      'patna',
-      'bhojpur',
-      'buxar',
-      'kaimur',
-      'rohtas',
-      'jehanabad',
-      'arwal',
-      'nalanda'
-    ];
-
-    // Check if search term contains location keywords
-    for (String keyword in locationKeywords) {
-      if (term.contains(keyword)) {
-        log("Location keyword found: $keyword");
-        return true;
-      }
+      log("Search is empty, clearing results and showing recent searches");
+      getAllServiceCategory = null; // Clear service results
+      getAllSalonCategory = null; // Clear salon results
+      update([Constant.idSearchService, Constant.idBottomService]);
+      return; // Exit early
     }
 
-    // Check if search term is a city name
-    for (String city in cityNames) {
-      if (term.contains(city) || city.contains(term)) {
-        log("City name found: $city");
-        return true;
-      }
-    }
+    log("Searching for: '${text.trim()}'");
 
-    // Check if search term contains numbers (likely an address)
-    if (RegExp(r'\d').hasMatch(term)) {
-      log("Numbers found in search term, likely an address");
-      return true;
-    }
+    String searchTerm = text.trim();
 
-    // Check if search term contains postal code pattern
-    if (RegExp(r'\b\d{5,6}\b').hasMatch(term)) {
-      log("Postal code pattern found");
-      return true;
-    }
+    // First try service search with current city
+    await onGetAllServiceApiCall(search: searchTerm, city: city ?? "");
 
-    return false;
+    // If no service results, try salon search
+    if (getAllServiceCategory?.services?.isEmpty == true ||
+        getAllServiceCategory?.services == null) {
+      log("No service results found, trying salon search");
+      await onGetAllSalonApiCall(
+        latitude: latitude ?? 0.0,
+        longitude: longitude ?? 0.0,
+        userId: Constant.storage.read<String>('userId') ?? "",
+        search: searchTerm,
+      );
+    }
   }
 
   @override

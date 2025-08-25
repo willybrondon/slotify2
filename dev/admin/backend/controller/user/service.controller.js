@@ -92,9 +92,9 @@ exports.getAll = async (req, res) => {
 
       console.log("Service API - Services after city filtering:", cityFilteredServices.length);
 
-      // If no services found for the specific city, show all services as fallback
-      if (cityFilteredServices.length === 0 && allServices.length > 0) {
-        console.log("Service API - WARNING: No services found for city '" + city + "'. Showing all services as fallback.");
+      // Only show fallback if no search term is provided (for browsing, not searching)
+      if (cityFilteredServices.length === 0 && allServices.length > 0 && (!search || search.trim() === "")) {
+        console.log("Service API - No services found for city '" + city + "'. Showing all services as fallback for browsing.");
         cityFilteredServices = allServices;
       }
     } else {
@@ -109,12 +109,32 @@ exports.getAll = async (req, res) => {
         const categoryName = service.categoryId?.name?.toLowerCase() || "";
         const searchTerm = search.toLowerCase().trim();
         
-        const nameMatch = serviceName.includes(searchTerm);
-        const categoryMatch = categoryName.includes(searchTerm);
-        
-        console.log(`Service ${service.name} - Name match: ${nameMatch}, Category match: ${categoryMatch}`);
-        
-        return nameMatch || categoryMatch;
+        // More strict matching - require at least 3 characters for partial matches
+        if (searchTerm.length < 3) {
+          // For short search terms, require exact word boundaries or exact matches
+          const nameMatch = serviceName === searchTerm || 
+                           serviceName.startsWith(searchTerm + " ") ||
+                           serviceName.endsWith(" " + searchTerm) ||
+                           serviceName.includes(" " + searchTerm + " ");
+          const categoryMatch = categoryName === searchTerm ||
+                               categoryName.startsWith(searchTerm + " ") ||
+                               categoryName.endsWith(" " + searchTerm) ||
+                               categoryName.includes(" " + searchTerm + " ");
+          
+          console.log(`Service ${service.name} - Short search '${searchTerm}': Name match: ${nameMatch}, Category match: ${categoryMatch}`);
+          return nameMatch || categoryMatch;
+        } else {
+          // For longer search terms, allow partial matches but require significant overlap
+          const nameMatch = serviceName.includes(searchTerm) && 
+                           (serviceName.length <= searchTerm.length * 2 || 
+                            serviceName.indexOf(searchTerm) <= 3);
+          const categoryMatch = categoryName.includes(searchTerm) && 
+                               (categoryName.length <= searchTerm.length * 2 || 
+                                categoryName.indexOf(searchTerm) <= 3);
+          
+          console.log(`Service ${service.name} - Long search '${searchTerm}': Name match: ${nameMatch}, Category match: ${categoryMatch}`);
+          return nameMatch || categoryMatch;
+        }
       });
     }
 

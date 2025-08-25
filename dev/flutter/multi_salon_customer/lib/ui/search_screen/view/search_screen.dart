@@ -29,7 +29,7 @@ class SearchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: true,
-      onPopInvoked: (bool didPop) {
+      onPopInvoked: (bool didPop) async {
         FocusScopeNode currentFocus = FocusScope.of(context);
         if (currentFocus.focusedChild != null) {
           homeScreenController.isSelected = List.generate(
@@ -57,6 +57,14 @@ class SearchScreen extends StatelessWidget {
           // Clear all search results when popping
           homeScreenController.getAllServiceCategory = null;
           homeScreenController.getAllSalonCategory = null;
+          
+          // Reload nearby salons to restore original state
+          await homeScreenController.onGetAllSalonApiCall(
+            latitude: latitude ?? 0.0,
+            longitude: longitude ?? 0.0,
+            userId: Constant.storage.read<String>('userId') ?? "",
+          );
+          
           homeScreenController.update([Constant.idSearchService, Constant.idProgressView]);
         }
         if (didPop) {
@@ -87,6 +95,14 @@ class SearchScreen extends StatelessWidget {
                 // Clear all search results when going back
                 homeScreenController.getAllServiceCategory = null;
                 homeScreenController.getAllSalonCategory = null;
+                
+                // Reload nearby salons to restore original state
+                await homeScreenController.onGetAllSalonApiCall(
+                  latitude: latitude ?? 0.0,
+                  longitude: longitude ?? 0.0,
+                  userId: Constant.storage.read<String>('userId') ?? "",
+                );
+                
                 homeScreenController.update([Constant.idSearchService, Constant.idProgressView]);
 
                 Get.back();
@@ -185,8 +201,9 @@ class SearchScreen extends StatelessWidget {
         body: GetBuilder<HomeScreenController>(
           id: Constant.idProgressView,
           builder: (logic) {
-            return Stack(
+            return Column(
               children: [
+                // Search bar at the top
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 15),
@@ -222,25 +239,27 @@ class SearchScreen extends StatelessWidget {
                     },
                   ),
                 ),
-                // Check if search bar is empty to show most searched services
-                logic.searchEditingController.text.trim().isEmpty
-                    ? _buildMostSearchedServices(logic) // Show most searched services when search bar is empty
-                    : logic.getAllServiceCategory?.services?.isEmpty == true &&
-                      logic.getAllSalonCategory?.data?.isEmpty == true
-                        ? logic.isLoading.value
-                            ? Shimmers.searchScreenShimmer()
-                            : _buildMostSearchedServices(logic) // Show most searched services if no search results
-                        : Column(
-                            children: [
-                              // Show salon results if available (location-based search)
-                              if (logic.getAllSalonCategory?.data?.isNotEmpty == true)
-                                _buildSalonResults(logic),
-                              
-                              // Show service results if available
-                              if (logic.getAllServiceCategory?.services?.isNotEmpty == true)
-                                _buildServiceResults(logic),
-                            ],
-                          ),
+                // Content below search bar
+                Expanded(
+                  child: logic.searchEditingController.text.trim().isEmpty
+                      ? _buildMostSearchedServices(logic) // Show most searched services when search bar is empty
+                      : logic.getAllServiceCategory?.services?.isEmpty == true &&
+                        logic.getAllSalonCategory?.data?.isEmpty == true
+                          ? logic.isLoading.value
+                              ? Shimmers.searchScreenShimmer()
+                              : _buildMostSearchedServices(logic) // Show most searched services if no search results
+                          : Column(
+                              children: [
+                                // Show salon results if available (location-based search)
+                                if (logic.getAllSalonCategory?.data?.isNotEmpty == true)
+                                  _buildSalonResults(logic),
+                                
+                                // Show service results if available
+                                if (logic.getAllServiceCategory?.services?.isNotEmpty == true)
+                                  _buildServiceResults(logic),
+                              ],
+                            ),
+                ),
               ],
             );
           },
@@ -258,7 +277,7 @@ class SearchScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0),
             child: Text(
               "Most Searched Services",
               style: TextStyle(
@@ -268,24 +287,27 @@ class SearchScreen extends StatelessWidget {
               ),
             ),
           ),
-          Center(
-            child: Column(
-              children: [
-                Image.asset(
-                  AppAsset.icNoService,
-                  height: 120,
-                  width: 120,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Start typing to search for services",
-                  style: TextStyle(
-                    fontFamily: AppFontFamily.sfProDisplayMedium,
-                    fontSize: 16,
-                    color: AppColors.darkGrey3,
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    AppAsset.icNoService,
+                    height: 120,
+                    width: 120,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Text(
+                    "Start typing to search for services",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                      fontSize: 16,
+                      color: AppColors.darkGrey3,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -296,7 +318,7 @@ class SearchScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0),
           child: Text(
             "Most Searched Services",
             style: TextStyle(
@@ -306,90 +328,93 @@ class SearchScreen extends StatelessWidget {
             ),
           ),
         ),
-        // Show up to 5 most searched services
-        ...List.generate(
-          (logic.getAllServiceCategory?.services?.length ?? 0) > 5 
-              ? 5 
-              : (logic.getAllServiceCategory?.services?.length ?? 0),
-          (index) {
-            final service = logic.getAllServiceCategory?.services?[index];
-            if (service == null) return const SizedBox.shrink();
-            
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: AppColors.whiteColor,
-                boxShadow: Constant.boxShadow,
-                border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    height: 60,
-                    width: 60,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: CachedNetworkImage(
-                        imageUrl: service.image ?? "",
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) {
-                          return Image.asset(AppAsset.icServicePlaceholder).paddingAll(8);
-                        },
-                        errorWidget: (context, url, error) {
-                          return Icon(
-                            Icons.error_outline,
-                            color: AppColors.blackColor,
-                            size: 20,
-                          );
-                        },
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            children: List.generate(
+              (logic.getAllServiceCategory?.services?.length ?? 0) > 5 
+                  ? 5 
+                  : (logic.getAllServiceCategory?.services?.length ?? 0),
+              (index) {
+                final service = logic.getAllServiceCategory?.services?[index];
+                if (service == null) return const SizedBox.shrink();
+                
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.whiteColor,
+                    boxShadow: Constant.boxShadow,
+                    border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 60,
+                        width: 60,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: CachedNetworkImage(
+                            imageUrl: service.image ?? "",
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) {
+                              return Image.asset(AppAsset.icServicePlaceholder).paddingAll(8);
+                            },
+                            errorWidget: (context, url, error) {
+                              return Icon(
+                                Icons.error_outline,
+                                color: AppColors.blackColor,
+                                size: 20,
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              service.name ?? "",
+                              style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplayBold,
+                                fontSize: 16,
+                                color: AppColors.primaryTextColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "${service.duration ?? 0} ${"txtMinutes".tr}",
+                              style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplayMedium,
+                                fontSize: 14,
+                                color: AppColors.darkGrey3,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              service.categoryname ?? "Service",
+                              style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplayMedium,
+                                fontSize: 14,
+                                color: AppColors.primaryAppColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          service.name ?? "",
-                          style: TextStyle(
-                            fontFamily: AppFontFamily.sfProDisplayBold,
-                            fontSize: 16,
-                            color: AppColors.primaryTextColor,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "${service.duration ?? 0} ${"txtMinutes".tr}",
-                          style: TextStyle(
-                            fontFamily: AppFontFamily.sfProDisplayMedium,
-                            fontSize: 14,
-                            color: AppColors.darkGrey3,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          service.categoryname ?? "Service",
-                          style: TextStyle(
-                            fontFamily: AppFontFamily.sfProDisplayMedium,
-                            fontSize: 14,
-                            color: AppColors.primaryAppColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+                );
+              },
+            ),
+          ),
         ),
-        const SizedBox(height: 20),
       ],
     );
   }
