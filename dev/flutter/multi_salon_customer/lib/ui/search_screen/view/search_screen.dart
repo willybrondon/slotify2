@@ -53,8 +53,11 @@ class SearchScreen extends StatelessWidget {
             (homeScreenController.getAllServiceCategory?.services?.length ?? 0),
             (index) => false,
           );
-          // Don't load all services when popping - only show most searched services
-          // homeScreenController.onGetAllServiceApiCall(city: city ?? "");
+          
+          // Clear all search results when popping
+          homeScreenController.getAllServiceCategory = null;
+          homeScreenController.getAllSalonCategory = null;
+          homeScreenController.update([Constant.idSearchService, Constant.idProgressView]);
         }
         if (didPop) {
           return;
@@ -80,8 +83,11 @@ class SearchScreen extends StatelessWidget {
                 homeScreenController.searchEditingController.clear();
                 homeScreenController.isSelected =
                     List.generate((homeScreenController.getAllServiceCategory?.services?.length ?? 0), (index) => false);
-                // Don't load all services when going back - only show most searched services
-                // homeScreenController.onGetAllServiceApiCall(city: city ?? "");
+                
+                // Clear all search results when going back
+                homeScreenController.getAllServiceCategory = null;
+                homeScreenController.getAllSalonCategory = null;
+                homeScreenController.update([Constant.idSearchService, Constant.idProgressView]);
 
                 Get.back();
               },
@@ -216,22 +222,25 @@ class SearchScreen extends StatelessWidget {
                     },
                   ),
                 ),
-                logic.getAllServiceCategory?.services?.isEmpty == true &&
-                logic.getAllSalonCategory?.data?.isEmpty == true
-                    ? logic.isLoading.value
-                        ? Shimmers.searchScreenShimmer()
-                        : _buildMostSearchedServices(logic) // Show most searched services instead of "not available"
-                    : Column(
-                        children: [
-                          // Show salon results if available (location-based search)
-                          if (logic.getAllSalonCategory?.data?.isNotEmpty == true)
-                            _buildSalonResults(logic),
-                          
-                          // Show service results if available
-                          if (logic.getAllServiceCategory?.services?.isNotEmpty == true)
-                            _buildServiceResults(logic),
-                        ],
-                      ),
+                // Check if search bar is empty to show most searched services
+                logic.searchEditingController.text.trim().isEmpty
+                    ? _buildMostSearchedServices(logic) // Show most searched services when search bar is empty
+                    : logic.getAllServiceCategory?.services?.isEmpty == true &&
+                      logic.getAllSalonCategory?.data?.isEmpty == true
+                        ? logic.isLoading.value
+                            ? Shimmers.searchScreenShimmer()
+                            : _buildMostSearchedServices(logic) // Show most searched services if no search results
+                        : Column(
+                            children: [
+                              // Show salon results if available (location-based search)
+                              if (logic.getAllSalonCategory?.data?.isNotEmpty == true)
+                                _buildSalonResults(logic),
+                              
+                              // Show service results if available
+                              if (logic.getAllServiceCategory?.services?.isNotEmpty == true)
+                                _buildServiceResults(logic),
+                            ],
+                          ),
               ],
             );
           },
@@ -242,6 +251,47 @@ class SearchScreen extends StatelessWidget {
 
   // Helper method to build most searched services
   Widget _buildMostSearchedServices(HomeScreenController logic) {
+    // If no services are loaded, show a message or load some default services
+    if (logic.getAllServiceCategory?.services?.isEmpty == true || 
+        logic.getAllServiceCategory?.services == null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              "Most Searched Services",
+              style: TextStyle(
+                fontFamily: AppFontFamily.sfProDisplayBold,
+                fontSize: 18,
+                color: AppColors.primaryTextColor,
+              ),
+            ),
+          ),
+          Center(
+            child: Column(
+              children: [
+                Image.asset(
+                  AppAsset.icNoService,
+                  height: 120,
+                  width: 120,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Start typing to search for services",
+                  style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                    fontSize: 16,
+                    color: AppColors.darkGrey3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
