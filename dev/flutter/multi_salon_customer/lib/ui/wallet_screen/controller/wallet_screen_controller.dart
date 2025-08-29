@@ -90,7 +90,7 @@ class WalletScreenController extends GetxController {
         true, // isWalletAdd
         rechargeAmount, // totalAmount
         false, // isCreateOrder
-        "Razorpay", // selectedPayment - default to Razorpay for wallet recharge
+        "Stripe", // selectedPayment - default to Stripe for wallet recharge (Razorpay and FlutterWave commented out)
       ],
     )?.then(
       (value) async {

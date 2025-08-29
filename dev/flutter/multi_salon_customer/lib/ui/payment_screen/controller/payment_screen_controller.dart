@@ -4,8 +4,8 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/services/app_exception/app_exception.dart';
-import 'package:salon_2/ui/payment_screen/method/flutter_wave/flutter_wave_service.dart';
-import 'package:salon_2/ui/payment_screen/method/razor_pay/razor_pay_service.dart';
+// import 'package:salon_2/ui/payment_screen/method/flutter_wave/flutter_wave_service.dart'; // Commented out - not used for wallet recharge
+// import 'package:salon_2/ui/payment_screen/method/razor_pay/razor_pay_service.dart'; // Commented out - not used for wallet recharge
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
 import 'package:salon_2/ui/payment_screen/model/deposit_to_wallet_model.dart';
 
@@ -54,7 +54,7 @@ class PaymentScreenController extends GetxController {
       }
 
       // Set default payment method if not specified
-      selectedPayment ??= isWalletAdd == true ? "Razorpay" : "wallet";
+      selectedPayment ??= isWalletAdd == true ? "Stripe" : "wallet"; // Changed from "Razorpay" to "Stripe" for wallet recharge
 
       log("Payment Screen - Is Wallet Add :: $isWalletAdd");
       log("Payment Screen - Is Create Order :: $isCreateOrder");
@@ -82,17 +82,18 @@ class PaymentScreenController extends GetxController {
   }
 
   onClickPayNow() async {
-    if (selectedPayment == "Razorpay") {
-      log("it's Razorpay ");
-      RazorPayService().init(
-        totalAmountWithOutTax: int.parse(totalAmount ?? ""),
-        razorKey: razorPayId ?? "",
-      );
-      1.seconds.delay;
-      isLoading(false);
+    // if (selectedPayment == "Razorpay") {
+    //   log("it's Razorpay ");
+    //   RazorPayService().init(
+    //     totalAmountWithOutTax: int.parse(totalAmount ?? ""),
+    //     razorKey: razorPayId ?? "",
+    //   );
+    //   1.seconds.delay;
+    //   isLoading(false);
 
-      RazorPayService().razorPayCheckout();
-    } else if (selectedPayment == "Stripe") {
+    //   RazorPayService().razorPayCheckout();
+    // } else 
+    if (selectedPayment == "Stripe") {
       log("it's Stripe");
       isLoading(true);
       update([Constant.idProgressView]);
@@ -156,17 +157,18 @@ class PaymentScreenController extends GetxController {
         Utils.showToast(
             Get.context!, "Payment initialization failed: ${e.toString()}");
       }
-    } else if (selectedPayment == "flutterWave") {
-      FlutterWaveService().init(
-        flutterWavePublishKey: flutterWaveKey ?? "",
-        totalAmountWithOutTax: totalAmount ?? "",
-      );
-
-      1.seconds.delay;
-      isLoading(false);
-
-      FlutterWaveService().handlePaymentInitialization();
     }
+    // else if (selectedPayment == "flutterWave") {
+    //   FlutterWaveService().init(
+    //     flutterWavePublishKey: flutterWaveKey ?? "",
+    //     totalAmountWithOutTax: totalAmount ?? "",
+    //   );
+
+    //   1.seconds.delay;
+    //   isLoading(false);
+
+    //   FlutterWaveService().handlePaymentInitialization();
+    // }
   }
 
   //----------- API Variables -----------//

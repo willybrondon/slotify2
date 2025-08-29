@@ -44,9 +44,9 @@ class PaymentMethodView extends StatelessWidget {
             ? const Column(
                 children: [
                   PaymentTitleView(),
-                  PaymentRazorPayView(),
+                  // PaymentRazorPayView(), // Commented out for wallet recharge
                   PaymentStripeView(),
-                  PaymentFlutterWaveView(),
+                  // PaymentFlutterWaveView(), // Commented out for wallet recharge
                 ],
               ).paddingAll(15)
             : const Column(
