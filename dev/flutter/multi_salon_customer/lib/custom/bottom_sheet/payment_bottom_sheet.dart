@@ -494,8 +494,8 @@ class PaymentBottomSheet extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -733,8 +733,8 @@ class PaymentBottomSheet extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }*/
