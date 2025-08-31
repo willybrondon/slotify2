@@ -43,6 +43,7 @@ class EditProfileScreen extends StatelessWidget {
         key: editProfileScreenController.formKey,
         child: Scaffold(
           backgroundColor: AppColors.backGround,
+          resizeToAvoidBottomInset: false,
           bottomNavigationBar: GetBuilder<EditProfileScreenController>(
             id: Constant.idUpdate,
             builder: (logic) {

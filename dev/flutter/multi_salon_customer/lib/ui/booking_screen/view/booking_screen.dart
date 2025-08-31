@@ -72,6 +72,7 @@ class BookingScreen extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           automaticallyImplyLeading: false,
           flexibleSpace: AppBarCustom(
@@ -530,7 +531,7 @@ class BookingScreen extends StatelessWidget {
                             builder: (logic) {
                               if (logic.expertDetail != null &&
                                   logic.selectedExpertDataList.isNotEmpty &&
-                                  logic.currentStep > 0) {
+                                  logic.selectedVenue.isNotEmpty) {
                                 return Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(

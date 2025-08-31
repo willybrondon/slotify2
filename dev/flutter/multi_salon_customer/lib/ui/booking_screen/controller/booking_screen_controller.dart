@@ -133,9 +133,9 @@ class BookingScreenController extends GetxController {
     // Check if expert is pre-selected (coming from Top Experts)
     expertDetail = Constant.storage.read("expertDetail");
     if (expertDetail != null) {
-      // Skip only staff selection step when expert is pre-selected
-      currentStep = 1;
-      stepCount = 1;
+      // Keep currentStep = 0 for venue selection first, then show expert/salon/address
+      currentStep = 0;
+      stepCount = 0;
       onExpertSelect();
     }
 

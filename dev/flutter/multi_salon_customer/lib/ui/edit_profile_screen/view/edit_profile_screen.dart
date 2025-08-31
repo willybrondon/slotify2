@@ -12,7 +12,10 @@ class EditProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: Constant.storage.read<bool>('isLogIn') == true && Constant.storage.read<bool>('isUpdate') == false ? false : true,
+      canPop: Constant.storage.read<bool>('isLogIn') == true &&
+              Constant.storage.read<bool>('isUpdate') == false
+          ? false
+          : true,
       onPopInvoked: (bool didPop) {
         if (didPop) {
           return;
@@ -20,6 +23,7 @@ class EditProfileScreen extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           automaticallyImplyLeading: false,
           flexibleSpace: const EditProfileTopBarView(),
