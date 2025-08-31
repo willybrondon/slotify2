@@ -367,6 +367,7 @@ class BookingScreen extends StatelessWidget {
             return ProgressDialog(
               inAsyncCall: logic.isLoading.value,
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 12),

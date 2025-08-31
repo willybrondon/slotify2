@@ -56,12 +56,13 @@ class EditProfileWidgetView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
           const EditProfileImageView().paddingOnly(bottom: 12, top: 15),
           const EditProfileDataView().paddingAll(15),
-          // Add extra padding at bottom to ensure button is visible
-          SizedBox(height: Get.height * 0.1),
+          // Add extra padding at bottom to ensure button is visible when scrolling
+          SizedBox(height: Get.height * 0.15),
         ],
       ),
     );

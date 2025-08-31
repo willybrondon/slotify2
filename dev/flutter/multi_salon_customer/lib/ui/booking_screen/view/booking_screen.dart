@@ -383,6 +383,7 @@ class BookingScreen extends StatelessWidget {
             return ProgressDialog(
               inAsyncCall: logic.isLoading.value,
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -747,7 +748,14 @@ class BookingScreen extends StatelessWidget {
                                                           .text
                                                       : logic.selectedVenue ==
                                                               "At Salon"
-                                                          ? "At Salon"
+                                                          ? (logic.salonAddress !=
+                                                                      null &&
+                                                                  logic
+                                                                      .salonAddress!
+                                                                      .isNotEmpty
+                                                              ? logic
+                                                                  .salonAddress!
+                                                              : "At Salon")
                                                           : "Select venue",
                                                   style: TextStyle(
                                                     fontFamily: AppFontFamily
@@ -762,240 +770,6 @@ class BookingScreen extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
-
-                          // Venue selection controls for Top Experts
-                          GetBuilder<BookingScreenController>(
-                            id: Constant.idStep1,
-                            builder: (logic) {
-                              if (logic.expertDetail != null &&
-                                  logic.selectedExpertDataList.isNotEmpty &&
-                                  logic.currentStep > 0) {
-                                return Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: AppColors.whiteColor,
-                                    boxShadow: Constant.boxShadow,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Select Service Venue",
-                                        style: TextStyle(
-                                          fontFamily:
-                                              AppFontFamily.sfProDisplayBold,
-                                          fontSize: 16,
-                                          color: AppColors.primaryTextColor,
-                                        ),
-                                      ),
-                                      SizedBox(height: 16),
-
-                                      // At Salon Option
-                                      GestureDetector(
-                                        onTap: () =>
-                                            logic.selectVenue("At Salon"),
-                                        child: Container(
-                                          height: 60,
-                                          width: Get.width,
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 5),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              width: 1.5,
-                                              color: logic.selectedVenue ==
-                                                      "At Salon"
-                                                  ? AppColors.primaryAppColor
-                                                  : AppColors.grey
-                                                      .withOpacity(0.3),
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            color: AppColors.whiteColor,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                height: 40,
-                                                width: 40,
-                                                margin: const EdgeInsets.only(
-                                                    left: 15),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: logic.selectedVenue ==
-                                                          "At Salon"
-                                                      ? AppColors
-                                                          .primaryAppColor
-                                                      : AppColors.grey
-                                                          .withOpacity(0.1),
-                                                ),
-                                                child: Icon(
-                                                  Icons.store,
-                                                  color: logic.selectedVenue ==
-                                                          "At Salon"
-                                                      ? AppColors.whiteColor
-                                                      : AppColors.greyColor2,
-                                                  size: 20,
-                                                ),
-                                              ),
-                                              SizedBox(width: 15),
-                                              Text(
-                                                "At Salon",
-                                                style: TextStyle(
-                                                  fontFamily: AppFontFamily
-                                                      .sfProDisplay,
-                                                  fontSize: 16,
-                                                  color: logic.selectedVenue ==
-                                                          "At Salon"
-                                                      ? AppColors
-                                                          .primaryAppColor
-                                                      : AppColors
-                                                          .primaryTextColor,
-                                                ),
-                                              ),
-                                              Spacer(),
-                                              if (logic.selectedVenue ==
-                                                  "At Salon")
-                                                Container(
-                                                  margin: const EdgeInsets.only(
-                                                      right: 15),
-                                                  child: Icon(
-                                                    Icons.check_circle,
-                                                    color: AppColors
-                                                        .primaryAppColor,
-                                                    size: 24,
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 15),
-
-                                      // At Home Option
-                                      GestureDetector(
-                                        onTap: () =>
-                                            logic.selectVenue("At Home"),
-                                        child: Container(
-                                          height: 60,
-                                          width: Get.width,
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 5),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              width: 1.5,
-                                              color: logic.selectedVenue ==
-                                                      "At Home"
-                                                  ? AppColors.primaryAppColor
-                                                  : AppColors.grey
-                                                      .withOpacity(0.3),
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            color: AppColors.whiteColor,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                height: 40,
-                                                width: 40,
-                                                margin: const EdgeInsets.only(
-                                                    left: 15),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: logic.selectedVenue ==
-                                                          "At Home"
-                                                      ? AppColors
-                                                          .primaryAppColor
-                                                      : AppColors.grey
-                                                          .withOpacity(0.1),
-                                                ),
-                                                child: Icon(
-                                                  Icons.home,
-                                                  color: logic.selectedVenue ==
-                                                          "At Home"
-                                                      ? AppColors.whiteColor
-                                                      : AppColors.greyColor2,
-                                                  size: 20,
-                                                ),
-                                              ),
-                                              SizedBox(width: 15),
-                                              Text(
-                                                "At Home",
-                                                style: TextStyle(
-                                                  fontFamily: AppFontFamily
-                                                      .sfProDisplay,
-                                                  fontSize: 16,
-                                                  color: logic.selectedVenue ==
-                                                          "At Home"
-                                                      ? AppColors
-                                                          .primaryAppColor
-                                                      : AppColors
-                                                          .primaryTextColor,
-                                                ),
-                                              ),
-                                              Spacer(),
-                                              if (logic.selectedVenue ==
-                                                  "At Home")
-                                                Container(
-                                                  margin: const EdgeInsets.only(
-                                                      right: 15),
-                                                  child: Icon(
-                                                    Icons.check_circle,
-                                                    color: AppColors
-                                                        .primaryAppColor,
-                                                    size: 24,
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      // Address input field for At Home
-                                      if (logic.selectedVenue == "At Home") ...[
-                                        SizedBox(height: 15),
-                                        Text(
-                                          "Enter Address",
-                                          style: TextStyle(
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplay,
-                                            fontSize: 14,
-                                            color: AppColors.primaryTextColor,
-                                          ),
-                                        ),
-                                        SizedBox(height: 8),
-                                        TextFieldCustom(
-                                          controller:
-                                              logic.searchEditingController,
-                                          hintText: "Enter your address",
-                                          maxLines: 3,
-                                        ),
-                                        SizedBox(height: 10),
-                                        AppButton(
-                                          height: 45,
-                                          width: Get.width,
-                                          buttonColor:
-                                              AppColors.primaryAppColor,
-                                          color: AppColors.whiteColor,
-                                          fontFamily:
-                                              AppFontFamily.sfProDisplay,
-                                          fontSize: 14,
-                                          buttonText: "Select Address",
-                                          onTap: () {
-                                            logic.onAddressSelected();
-                                          },
-                                        ),
-                                      ],
                                     ],
                                   ),
                                 );

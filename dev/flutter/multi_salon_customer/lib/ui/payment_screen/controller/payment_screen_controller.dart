@@ -157,6 +157,22 @@ class PaymentScreenController extends GetxController {
         Utils.showToast(
             Get.context!, "Payment initialization failed: ${e.toString()}");
       }
+    } else if (selectedPayment == "cashAfterService") {
+      log("it's Cash After Service");
+      // For Cash After Service, proceed directly to booking creation
+      if (isWalletAdd == false && bookingData != null) {
+        // This is a direct service payment, not wallet recharge
+        // The booking should be created directly without going through wallet
+        log("Processing Cash After Service payment for direct booking");
+        // You can add logic here to handle cash after service if needed
+        // For now, just show a success message
+        Utils.showToast(Get.context!, "Cash After Service selected. Please pay at the salon.");
+        Get.back(); // Go back to previous screen
+      }
+    } else if (selectedPayment == "wallet") {
+      log("it's My Wallet");
+      // Handle wallet payment logic here
+      // This should proceed to wallet payment processing
     }
     // else if (selectedPayment == "flutterWave") {
     //   FlutterWaveService().init(

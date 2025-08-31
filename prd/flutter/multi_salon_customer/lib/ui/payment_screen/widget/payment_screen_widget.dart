@@ -7,8 +7,8 @@ import 'package:salon_2/ui/home_screen/widget/view_all_screen_widget.dart';
 import 'package:salon_2/ui/payment_screen/controller/payment_screen_controller.dart';
 import 'package:salon_2/ui/wallet_screen/controller/wallet_screen_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
-import 'package:salon_2/utils/app_colors.dart';
-import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/colors.dart';
+import 'package:salon_2/utils/font_family.dart';
 import 'package:salon_2/utils/constant.dart';
 
 class PaymentAppBarView extends StatelessWidget {
@@ -44,9 +44,7 @@ class PaymentMethodView extends StatelessWidget {
             ? const Column(
                 children: [
                   PaymentTitleView(),
-                  // PaymentRazorPayView(), // Commented out for wallet recharge
                   PaymentStripeView(),
-                  // PaymentFlutterWaveView(), // Commented out for wallet recharge
                 ],
               ).paddingAll(15)
             : Column(
@@ -56,7 +54,6 @@ class PaymentMethodView extends StatelessWidget {
                   if (logic.selectedPayment == "wallet") PaymentMyWalletView(),
                   if (logic.selectedPayment == "Stripe") PaymentStripeView(),
                   if (logic.selectedPayment == "cashAfterService") PaymentCashOnHandView(),
-                  // Add other payment methods as needed
                   
                   // Show a message that payment method is already selected
                   Container(
@@ -84,7 +81,7 @@ class PaymentMethodView extends StatelessWidget {
                             style: TextStyle(
                               color: AppColors.primaryAppColor,
                               fontSize: 14,
-                              fontFamily: AppFontFamily.sfProDisplay,
+                              fontFamily: FontFamily.sfProDisplay,
                             ),
                           ),
                         ),
@@ -107,7 +104,7 @@ class PaymentTitleView extends StatelessWidget {
       title: "txtPaymentMethod".tr,
       subtitle: "",
       textColor: AppColors.primaryTextColor,
-      fontFamily: AppFontFamily.heeBo700,
+      fontFamily: FontFamily.heeBo700,
       fontSize: 18,
     ).paddingOnly(bottom: 14);
   }
@@ -163,7 +160,7 @@ class PaymentMyWalletView extends StatelessWidget {
                         Text(
                           "txtMyWallet".tr,
                           style: TextStyle(
-                            fontFamily: AppFontFamily.sfProDisplay,
+                            fontFamily: FontFamily.sfProDisplay,
                             fontSize: 16.5,
                             color: AppColors.primaryTextColor,
                           ),
@@ -174,9 +171,9 @@ class PaymentMyWalletView extends StatelessWidget {
                             return Text(
                               "($currency ${walletAmount?.toStringAsFixed(2)}) ${"txtInYourWallet".tr}",
                               style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplay,
-                                fontSize: 12,
-                                color: AppColors.currencyGrey,
+                                fontFamily: FontFamily.sfProDisplay,
+                                fontSize: 13.5,
+                                color: AppColors.primaryTextColor,
                               ),
                             );
                           },
@@ -185,27 +182,32 @@ class PaymentMyWalletView extends StatelessWidget {
                     ),
                   ],
                 ),
-                Container(
-                  height: 25,
-                  width: 25,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: logic.selectedPayment == "wallet"
-                          ? AppColors.primaryAppColor
-                          : AppColors.greyColor.withOpacity(0.3),
+                GestureDetector(
+                  onTap: () {
+                    logic.onSelectPaymentMethod("wallet");
+                  },
+                  child: Container(
+                    height: 25,
+                    width: 25,
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: logic.selectedPayment == "wallet"
+                            ? AppColors.primaryAppColor
+                            : AppColors.greyColor.withOpacity(0.3),
+                      ),
                     ),
-                  ),
-                  child: logic.selectedPayment == "wallet"
-                      ? Image.asset(
-                          AppAsset.icCheck,
-                          color: AppColors.primaryAppColor,
-                          height: 15,
-                          width: 15,
-                        )
-                      : const SizedBox(),
-                ).paddingOnly(right: 10)
+                    child: logic.selectedPayment == "wallet"
+                        ? Image.asset(
+                            AppAsset.icCheck,
+                            color: AppColors.primaryAppColor,
+                            height: 15,
+                            width: 15,
+                          )
+                        : const SizedBox(),
+                  ).paddingOnly(right: 10),
+                )
               ],
             ),
           ),
@@ -255,127 +257,47 @@ class PaymentCashOnHandView extends StatelessWidget {
                       ),
                       child: Image.asset(
                         AppAsset.icCashAfterService,
-                        height: 25,
-                        width: 25,
-                      ),
-                    ),
-                    SizedBox(width: Get.width * 0.04),
-                    Text(
-                      "Cash After Service",
-                      style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplay,
-                        fontSize: 16.5,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  height: 25,
-                  width: 25,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: logic.selectedPayment == "cashAfterService"
-                          ? AppColors.primaryAppColor
-                          : AppColors.greyColor.withOpacity(0.3),
-                    ),
-                  ),
-                  child: logic.selectedPayment == "cashAfterService"
-                      ? Image.asset(
-                          AppAsset.icCheck,
-                          color: AppColors.primaryAppColor,
-                          height: 15,
-                          width: 15,
-                        )
-                      : const SizedBox(),
-                ).paddingOnly(right: 10)
-              ],
-            ),
-          ),
-        );
-      },
-    ).paddingOnly(bottom: 15);
-  }
-}
-
-class PaymentRazorPayView extends StatelessWidget {
-  const PaymentRazorPayView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GetBuilder<PaymentScreenController>(
-      id: Constant.idSelectPaymentMethod,
-      builder: (logic) {
-        return InkWell(
-          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-          onTap: () {
-            logic.onSelectPaymentMethod("Razorpay");
-          },
-          child: Container(
-            height: 60,
-            width: Get.width,
-            padding: const EdgeInsets.only(left: 10, right: 5),
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 1,
-                color: AppColors.grey.withOpacity(0.1),
-              ),
-              borderRadius: BorderRadius.circular(10),
-              color: AppColors.whiteColor,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 40,
-                      width: 40,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.roundBg,
-                      ),
-                      child: Image.asset(
-                        AppAsset.icRazorPay,
                         height: 30,
                         width: 30,
                       ),
                     ),
                     SizedBox(width: Get.width * 0.04),
                     Text(
-                      "Razorpay",
+                      "txtCashAfterService".tr,
                       style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplay,
+                        fontFamily: FontFamily.sfProDisplay,
                         fontSize: 16.5,
                         color: AppColors.primaryTextColor,
                       ),
                     ),
                   ],
                 ),
-                Container(
-                  height: 25,
-                  width: 25,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: logic.selectedPayment == "Razorpay"
-                          ? AppColors.primaryAppColor
-                          : AppColors.greyColor.withOpacity(0.3),
+                GestureDetector(
+                  onTap: () {
+                    logic.onSelectPaymentMethod("cashAfterService");
+                  },
+                  child: Container(
+                    height: 25,
+                    width: 25,
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: logic.selectedPayment == "cashAfterService"
+                            ? AppColors.primaryAppColor
+                            : AppColors.greyColor.withOpacity(0.3),
+                      ),
                     ),
-                  ),
-                  child: logic.selectedPayment == "Razorpay"
-                      ? Image.asset(
-                          AppAsset.icCheck,
-                          color: AppColors.primaryAppColor,
-                          height: 15,
-                          width: 15,
-                        )
-                      : const SizedBox(),
-                ).paddingOnly(right: 10)
+                    child: logic.selectedPayment == "cashAfterService"
+                        ? Image.asset(
+                            AppAsset.icCheck,
+                            color: AppColors.primaryAppColor,
+                            height: 15,
+                            width: 15,
+                          )
+                        : const SizedBox(),
+                  ).paddingOnly(right: 10),
+                )
               ],
             ),
           ),
@@ -431,121 +353,41 @@ class PaymentStripeView extends StatelessWidget {
                     ),
                     SizedBox(width: Get.width * 0.04),
                     Text(
-                      "Stripe",
+                      "txtStripe".tr,
                       style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplay,
+                        fontFamily: FontFamily.sfProDisplay,
                         fontSize: 16.5,
                         color: AppColors.primaryTextColor,
                       ),
                     ),
                   ],
                 ),
-                Container(
-                  height: 25,
-                  width: 25,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: logic.selectedPayment == "Stripe"
-                          ? AppColors.primaryAppColor
-                          : AppColors.greyColor.withOpacity(0.3),
-                    ),
-                  ),
-                  child: logic.selectedPayment == "Stripe"
-                      ? Image.asset(
-                          AppAsset.icCheck,
-                          color: AppColors.primaryAppColor,
-                          height: 15,
-                          width: 15,
-                        )
-                      : const SizedBox(),
-                ).paddingOnly(right: 10),
-              ],
-            ),
-          ),
-        );
-      },
-    ).paddingOnly(bottom: 15);
-  }
-}
-
-class PaymentFlutterWaveView extends StatelessWidget {
-  const PaymentFlutterWaveView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GetBuilder<PaymentScreenController>(
-      id: Constant.idSelectPaymentMethod,
-      builder: (logic) {
-        return InkWell(
-          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-          onTap: () {
-            logic.onSelectPaymentMethod("flutterWave");
-          },
-          child: Container(
-            height: 60,
-            width: Get.width,
-            padding: const EdgeInsets.only(left: 10, right: 5),
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 1,
-                color: AppColors.grey.withOpacity(0.1),
-              ),
-              borderRadius: BorderRadius.circular(10),
-              color: AppColors.whiteColor,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 40,
-                      width: 40,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.roundBg,
-                      ),
-                      child: Image.asset(
-                        AppAsset.icFlutterWave,
-                        height: 30,
-                        width: 30,
+                GestureDetector(
+                  onTap: () {
+                    logic.onSelectPaymentMethod("Stripe");
+                  },
+                  child: Container(
+                    height: 25,
+                    width: 25,
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: logic.selectedPayment == "Stripe"
+                            ? AppColors.primaryAppColor
+                            : AppColors.greyColor.withOpacity(0.3),
                       ),
                     ),
-                    SizedBox(width: Get.width * 0.04),
-                    Text(
-                      "Flutter Wave",
-                      style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplay,
-                        fontSize: 16.5,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  height: 25,
-                  width: 25,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: logic.selectedPayment == "flutterWave"
-                          ? AppColors.primaryAppColor
-                          : AppColors.greyColor.withOpacity(0.3),
-                    ),
-                  ),
-                  child: logic.selectedPayment == "flutterWave"
-                      ? Image.asset(
-                          AppAsset.icCheck,
-                          color: AppColors.primaryAppColor,
-                          height: 15,
-                          width: 15,
-                        )
-                      : const SizedBox(),
-                ).paddingOnly(right: 10)
+                    child: logic.selectedPayment == "Stripe"
+                        ? Image.asset(
+                            AppAsset.icCheck,
+                            color: AppColors.primaryAppColor,
+                            height: 15,
+                            width: 15,
+                          )
+                        : const SizedBox(),
+                  ).paddingOnly(right: 10),
+                )
               ],
             ),
           ),
@@ -590,7 +432,7 @@ class PaymentScreenBottomView extends StatelessWidget {
                     Text(
                       "txtTotalAmount".tr,
                       style: TextStyle(
-                        fontFamily: AppFontFamily.heeBo700,
+                        fontFamily: FontFamily.heeBo700,
                         fontSize: 17,
                         color: AppColors.appText,
                       ),
@@ -600,7 +442,7 @@ class PaymentScreenBottomView extends StatelessWidget {
                         Text(
                           "$currency ${logic.totalAmount}",
                           style: TextStyle(
-                            fontFamily: AppFontFamily.heeBo800,
+                            fontFamily: FontFamily.heeBo800,
                             fontSize: 18,
                             color: AppColors.primaryAppColor,
                           ),
@@ -616,7 +458,7 @@ class PaymentScreenBottomView extends StatelessWidget {
                 height: 46,
                 buttonColor: AppColors.primaryAppColor,
                 color: AppColors.whiteColor,
-                fontFamily: AppFontFamily.sfProDisplay,
+                fontFamily: FontFamily.sfProDisplay,
                 fontSize: 15,
                 buttonText: "Continue",
                 width: Get.width * 0.28,
@@ -631,3 +473,4 @@ class PaymentScreenBottomView extends StatelessWidget {
     );
   }
 }
+
