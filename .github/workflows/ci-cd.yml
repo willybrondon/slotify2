@@ -361,11 +361,11 @@ jobs:
       #     tail -n 100 xcodebuild.log
       - name: build archive
         run: |
-          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
+          cd "dev/flutter/multi_salon_${{ matrix.app }}/ios"
           xcodebuild -workspace Runner.xcworkspace -scheme "Runner" \
           -archivePath $RUNNER_TEMP/Runner.xcarchive \
           -sdk iphoneos \
-          -configuration Debug \
+          --configuration Release \
           -destination generic/platform=iOS \
           DEVELOPMENT_TEAM=7B755FRMAM \
           clean archive

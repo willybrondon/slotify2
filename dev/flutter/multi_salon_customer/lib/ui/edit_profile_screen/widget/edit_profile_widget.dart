@@ -29,10 +29,12 @@ class EditProfileTopBarView extends StatelessWidget {
           log("message update:: ${Constant.storage.read<bool>('isUpdate')}");
 
           return AppBarCustom(
-            title: Constant.storage.read<bool>('isLogIn') == true && Constant.storage.read<bool>('isUpdate') == false
+            title: Constant.storage.read<bool>('isLogIn') == true &&
+                    Constant.storage.read<bool>('isUpdate') == false
                 ? "txtMakeProfile".tr
                 : "txtEditProfile".tr,
-            method: Constant.storage.read<bool>('isLogIn') == true && Constant.storage.read<bool>('isUpdate') == false
+            method: Constant.storage.read<bool>('isLogIn') == true &&
+                    Constant.storage.read<bool>('isUpdate') == false
                 ? const SizedBox()
                 : InkWell(
                     overlayColor: WidgetStatePropertyAll(AppColors.transparent),
@@ -53,11 +55,15 @@ class EditProfileWidgetView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const EditProfileImageView().paddingOnly(bottom: 12, top: 15),
-        const EditProfileDataView().paddingAll(15),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const EditProfileImageView().paddingOnly(bottom: 12, top: 15),
+          const EditProfileDataView().paddingAll(15),
+          // Add extra padding at bottom to ensure button is visible
+          SizedBox(height: Get.height * 0.1),
+        ],
+      ),
     );
   }
 }
@@ -67,7 +73,8 @@ class EditProfileImageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ProfileScreenController profileScreenController = Get.find<ProfileScreenController>();
+    ProfileScreenController profileScreenController =
+        Get.find<ProfileScreenController>();
 
     return Column(
       children: [
@@ -98,8 +105,11 @@ class EditProfileImageView extends StatelessWidget {
                         decoration: const BoxDecoration(shape: BoxShape.circle),
                         child: logic.image?.path == null
                             ? Image.network(
-                                profileScreenController.getUserCategory?.user?.image ?? "${ApiConstant.BASE_URL}static/male.png",
-                                errorBuilder: (context, error, stackTrace) => Container(
+                                profileScreenController
+                                        .getUserCategory?.user?.image ??
+                                    "${ApiConstant.BASE_URL}static/male.png",
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
                                   height: 120,
                                   width: 120,
                                   decoration: BoxDecoration(
@@ -115,7 +125,8 @@ class EditProfileImageView extends StatelessWidget {
                             : CircleAvatar(
                                 radius: 60,
                                 backgroundImage: FileImage(
-                                  File(logic.image?.path ?? '${ApiConstant.BASE_URL}static/male.png'),
+                                  File(logic.image?.path ??
+                                      '${ApiConstant.BASE_URL}static/male.png'),
                                 ),
                               ),
                       ),
@@ -277,7 +288,9 @@ class EditProfileGenderView extends StatelessWidget {
                                 color: AppColors.service,
                               ),
                             ),
-                            child: logic.checkedValue == index ? Image.asset(AppAsset.icRound) : const SizedBox(),
+                            child: logic.checkedValue == index
+                                ? Image.asset(AppAsset.icRound)
+                                : const SizedBox(),
                           ),
                         ),
                   SizedBox(width: Get.width * 0.03),
@@ -329,7 +342,8 @@ class EditProfileEditView extends StatelessWidget {
             buttonText: "txtUpdateProfile".tr,
             onTap: () async {
               FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+              if (!currentFocus.hasPrimaryFocus &&
+                  currentFocus.focusedChild != null) {
                 currentFocus.focusedChild?.unfocus();
               }
               logic.onUpdateClick();

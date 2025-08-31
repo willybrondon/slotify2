@@ -35,12 +35,25 @@ class SalonRegistrationScreen extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                height: 64,
-                width: 64,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.whiteColor),
-                clipBehavior: Clip.hardEdge,
-                child: Image.network("${ApiConstant.BASE_URL}storage/male.png", fit: BoxFit.cover),
+              // Back Button (replacing the circular photo)
+              InkWell(
+                overlayColor: MaterialStateProperty.all(AppColors.transparent),
+                onTap: () {
+                  Get.back();
+                },
+                child: Container(
+                  height: 64,
+                  width: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.whiteColor,
+                  ),
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: AppColors.primaryAppColor,
+                    size: 28,
+                  ),
+                ),
               ).paddingOnly(left: 15, right: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,23 +130,29 @@ class SalonRegistrationScreen extends StatelessWidget {
                               width: 130,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+                                border: Border.all(
+                                    color: AppColors.grey.withOpacity(0.1),
+                                    width: 1),
                               ),
                               child: logic.image?.path == null
                                   ? Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Image.asset(
                                           AppAsset.icAddProfileImage,
                                           height: 30,
-                                          color: AppColors.email.withOpacity(0.5),
+                                          color:
+                                              AppColors.email.withOpacity(0.5),
                                         ),
                                         Text(
                                           "txtSelectImage".tr,
                                           style: TextStyle(
-                                              color: AppColors.email.withOpacity(0.5),
+                                              color: AppColors.email
+                                                  .withOpacity(0.5),
                                               fontSize: 13.5,
-                                              fontFamily: AppFontFamily.sfProDisplayRegular),
+                                              fontFamily: AppFontFamily
+                                                  .sfProDisplayRegular),
                                         ),
                                       ],
                                     )
@@ -143,12 +162,14 @@ class SalonRegistrationScreen extends StatelessWidget {
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
-                                          color: AppColors.grey.withOpacity(0.1),
+                                          color:
+                                              AppColors.grey.withOpacity(0.1),
                                           width: 1,
                                         ),
                                       ),
                                       child: Image.file(
-                                        File(logic.image?.path ?? '${ApiConstant.BASE_URL}static/male.png'),
+                                        File(logic.image?.path ??
+                                            '${ApiConstant.BASE_URL}static/male.png'),
                                         fit: BoxFit.cover,
                                       ),
                                     ),

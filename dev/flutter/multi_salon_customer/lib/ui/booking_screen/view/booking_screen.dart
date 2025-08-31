@@ -542,7 +542,7 @@ class BookingScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Selected Expert & Salon",
+                                        "Selected Expert & Salon & Address",
                                         style: TextStyle(
                                           fontFamily:
                                               AppFontFamily.sfProDisplayBold,
@@ -551,6 +551,8 @@ class BookingScreen extends StatelessWidget {
                                         ),
                                       ),
                                       SizedBox(height: Get.height * 0.015),
+
+                                      // Expert Row
                                       Row(
                                         children: [
                                           Container(
@@ -594,6 +596,16 @@ class BookingScreen extends StatelessWidget {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
+                                                  "Expert",
+                                                  style: TextStyle(
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplay,
+                                                    fontSize: 12,
+                                                    color: AppColors.greyColor2,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 2),
+                                                Text(
                                                   "${logic.selectedExpertDataList.length > 1 ? logic.selectedExpertDataList[1] : ""} ${logic.selectedExpertDataList.length > 2 ? logic.selectedExpertDataList[2] : ""}",
                                                   style: TextStyle(
                                                     fontFamily: AppFontFamily
@@ -603,7 +615,58 @@ class BookingScreen extends StatelessWidget {
                                                         .primaryTextColor,
                                                   ),
                                                 ),
-                                                SizedBox(height: 4),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      SizedBox(height: 16),
+
+                                      // Salon Row
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(25),
+                                              border: Border.all(
+                                                  color: AppColors.grey
+                                                      .withOpacity(0.3),
+                                                  width: 2),
+                                            ),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(25),
+                                                color: AppColors.grey
+                                                    .withOpacity(0.1),
+                                              ),
+                                              child: Icon(
+                                                Icons.store,
+                                                color: AppColors.greyColor2,
+                                                size: 24,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Salon",
+                                                  style: TextStyle(
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplay,
+                                                    fontSize: 12,
+                                                    color: AppColors.greyColor2,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 2),
                                                 Text(
                                                   logic.salonName != null &&
                                                           logic.salonName!
@@ -612,9 +675,10 @@ class BookingScreen extends StatelessWidget {
                                                       : "At Salon",
                                                   style: TextStyle(
                                                     fontFamily: AppFontFamily
-                                                        .sfProDisplay,
-                                                    fontSize: 14,
-                                                    color: AppColors.greyColor2,
+                                                        .sfProDisplayBold,
+                                                    fontSize: 16,
+                                                    color: AppColors
+                                                        .primaryTextColor,
                                                   ),
                                                 ),
                                               ],
@@ -622,6 +686,316 @@ class BookingScreen extends StatelessWidget {
                                           ),
                                         ],
                                       ),
+
+                                      SizedBox(height: 16),
+
+                                      // Address Row
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(25),
+                                              border: Border.all(
+                                                  color: AppColors.grey
+                                                      .withOpacity(0.3),
+                                                  width: 2),
+                                            ),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(25),
+                                                color: AppColors.grey
+                                                    .withOpacity(0.1),
+                                              ),
+                                              child: Icon(
+                                                logic.selectedVenue == "At Home"
+                                                    ? Icons.home
+                                                    : Icons.store,
+                                                color: AppColors.greyColor2,
+                                                size: 24,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Address",
+                                                  style: TextStyle(
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplay,
+                                                    fontSize: 12,
+                                                    color: AppColors.greyColor2,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 2),
+                                                Text(
+                                                  logic.selectedVenue ==
+                                                              "At Home" &&
+                                                          logic
+                                                              .searchEditingController
+                                                              .text
+                                                              .isNotEmpty
+                                                      ? logic
+                                                          .searchEditingController
+                                                          .text
+                                                      : logic.selectedVenue ==
+                                                              "At Salon"
+                                                          ? "At Salon"
+                                                          : "Select venue",
+                                                  style: TextStyle(
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplayBold,
+                                                    fontSize: 16,
+                                                    color: AppColors
+                                                        .primaryTextColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+
+                          // Venue selection controls for Top Experts
+                          GetBuilder<BookingScreenController>(
+                            id: Constant.idStep1,
+                            builder: (logic) {
+                              if (logic.expertDetail != null &&
+                                  logic.selectedExpertDataList.isNotEmpty &&
+                                  logic.currentStep > 0) {
+                                return Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: AppColors.whiteColor,
+                                    boxShadow: Constant.boxShadow,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Select Service Venue",
+                                        style: TextStyle(
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayBold,
+                                          fontSize: 16,
+                                          color: AppColors.primaryTextColor,
+                                        ),
+                                      ),
+                                      SizedBox(height: 16),
+
+                                      // At Salon Option
+                                      GestureDetector(
+                                        onTap: () =>
+                                            logic.selectVenue("At Salon"),
+                                        child: Container(
+                                          height: 60,
+                                          width: Get.width,
+                                          padding: const EdgeInsets.only(
+                                              left: 10, right: 5),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: 1.5,
+                                              color: logic.selectedVenue ==
+                                                      "At Salon"
+                                                  ? AppColors.primaryAppColor
+                                                  : AppColors.grey
+                                                      .withOpacity(0.3),
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            color: AppColors.whiteColor,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 40,
+                                                width: 40,
+                                                margin: const EdgeInsets.only(
+                                                    left: 15),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: logic.selectedVenue ==
+                                                          "At Salon"
+                                                      ? AppColors
+                                                          .primaryAppColor
+                                                      : AppColors.grey
+                                                          .withOpacity(0.1),
+                                                ),
+                                                child: Icon(
+                                                  Icons.store,
+                                                  color: logic.selectedVenue ==
+                                                          "At Salon"
+                                                      ? AppColors.whiteColor
+                                                      : AppColors.greyColor2,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                              SizedBox(width: 15),
+                                              Text(
+                                                "At Salon",
+                                                style: TextStyle(
+                                                  fontFamily: AppFontFamily
+                                                      .sfProDisplay,
+                                                  fontSize: 16,
+                                                  color: logic.selectedVenue ==
+                                                          "At Salon"
+                                                      ? AppColors
+                                                          .primaryAppColor
+                                                      : AppColors
+                                                          .primaryTextColor,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              if (logic.selectedVenue ==
+                                                  "At Salon")
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      right: 15),
+                                                  child: Icon(
+                                                    Icons.check_circle,
+                                                    color: AppColors
+                                                        .primaryAppColor,
+                                                    size: 24,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 15),
+
+                                      // At Home Option
+                                      GestureDetector(
+                                        onTap: () =>
+                                            logic.selectVenue("At Home"),
+                                        child: Container(
+                                          height: 60,
+                                          width: Get.width,
+                                          padding: const EdgeInsets.only(
+                                              left: 10, right: 5),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: 1.5,
+                                              color: logic.selectedVenue ==
+                                                      "At Home"
+                                                  ? AppColors.primaryAppColor
+                                                  : AppColors.grey
+                                                      .withOpacity(0.3),
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            color: AppColors.whiteColor,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 40,
+                                                width: 40,
+                                                margin: const EdgeInsets.only(
+                                                    left: 15),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: logic.selectedVenue ==
+                                                          "At Home"
+                                                      ? AppColors
+                                                          .primaryAppColor
+                                                      : AppColors.grey
+                                                          .withOpacity(0.1),
+                                                ),
+                                                child: Icon(
+                                                  Icons.home,
+                                                  color: logic.selectedVenue ==
+                                                          "At Home"
+                                                      ? AppColors.whiteColor
+                                                      : AppColors.greyColor2,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                              SizedBox(width: 15),
+                                              Text(
+                                                "At Home",
+                                                style: TextStyle(
+                                                  fontFamily: AppFontFamily
+                                                      .sfProDisplay,
+                                                  fontSize: 16,
+                                                  color: logic.selectedVenue ==
+                                                          "At Home"
+                                                      ? AppColors
+                                                          .primaryAppColor
+                                                      : AppColors
+                                                          .primaryTextColor,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              if (logic.selectedVenue ==
+                                                  "At Home")
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      right: 15),
+                                                  child: Icon(
+                                                    Icons.check_circle,
+                                                    color: AppColors
+                                                        .primaryAppColor,
+                                                    size: 24,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                      // Address input field for At Home
+                                      if (logic.selectedVenue == "At Home") ...[
+                                        SizedBox(height: 15),
+                                        Text(
+                                          "Enter Address",
+                                          style: TextStyle(
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplay,
+                                            fontSize: 14,
+                                            color: AppColors.primaryTextColor,
+                                          ),
+                                        ),
+                                        SizedBox(height: 8),
+                                        TextFieldCustom(
+                                          controller:
+                                              logic.searchEditingController,
+                                          hintText: "Enter your address",
+                                          maxLines: 3,
+                                        ),
+                                        SizedBox(height: 10),
+                                        AppButton(
+                                          height: 45,
+                                          width: Get.width,
+                                          buttonColor:
+                                              AppColors.primaryAppColor,
+                                          color: AppColors.whiteColor,
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplay,
+                                          fontSize: 14,
+                                          buttonText: "Select Address",
+                                          onTap: () {
+                                            logic.onAddressSelected();
+                                          },
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 );
@@ -1695,93 +2069,93 @@ class BookingScreen extends StatelessWidget {
               },
             ).paddingOnly(bottom: 15),
 
-            /// Razorpay Payment
-            splashController.settingCategory?.setting?.isRazorPay == true
-                ? GetBuilder<BookingScreenController>(
-                    id: Constant.idStep3,
-                    builder: (logic) {
-                      return InkWell(
-                        overlayColor:
-                            WidgetStatePropertyAll(AppColors.transparent),
-                        onTap: () {
-                          logic.onStep3("Razorpay");
-                        },
-                        child: Container(
-                          height: 60,
-                          width: Get.width,
-                          padding: const EdgeInsets.only(left: 10, right: 5),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: AppColors.grey.withOpacity(0.1),
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                            color: AppColors.whiteColor,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    width: 40,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.roundBg,
-                                    ),
-                                    child: Image.asset(
-                                      AppAsset.icRazorPay,
-                                      height: 30,
-                                      width: 30,
-                                    ),
-                                  ),
-                                  SizedBox(width: Get.width * 0.04),
-                                  Text(
-                                    "Razorpay",
-                                    style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplay,
-                                      fontSize: 16.5,
-                                      color: AppColors.primaryTextColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  logic.onStep3("Razorpay");
-                                },
-                                child: Container(
-                                  height: 25,
-                                  width: 25,
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(
-                                      color: logic.selectedPayment == "Razorpay"
-                                          ? AppColors.primaryAppColor
-                                          : AppColors.greyColor
-                                              .withOpacity(0.3),
-                                    ),
-                                  ),
-                                  child: logic.selectedPayment == "Razorpay"
-                                      ? Image.asset(
-                                          AppAsset.icCheck,
-                                          color: AppColors.primaryAppColor,
-                                          height: 15,
-                                          width: 15,
-                                        )
-                                      : const SizedBox(),
-                                ).paddingOnly(right: 10),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ).paddingOnly(bottom: 15)
-                : const SizedBox(),
+            // Razorpay Payment Method - COMMENTED OUT as requested
+            // splashController.settingCategory?.setting?.isRazorPay == true
+            //     ? GetBuilder<BookingScreenController>(
+            //         id: Constant.idStep3,
+            //         builder: (logic) {
+            //           return InkWell(
+            //             overlayColor:
+            //                 WidgetStatePropertyAll(AppColors.transparent),
+            //             onTap: () {
+            //               logic.onStep3("Razorpay");
+            //             },
+            //             child: Container(
+            //               height: 60,
+            //               width: Get.width,
+            //               padding: const EdgeInsets.only(left: 10, right: 5),
+            //               decoration: BoxDecoration(
+            //                 border: Border.all(
+            //                   width: 1,
+            //                   color: AppColors.grey.withOpacity(0.1),
+            //                 ),
+            //                 borderRadius: BorderRadius.circular(10),
+            //                 color: AppColors.whiteColor,
+            //               ),
+            //               child: Row(
+            //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //                 children: [
+            //                   Row(
+            //                     children: [
+            //                       Container(
+            //                         height: 40,
+            //                         width: 40,
+            //                         alignment: Alignment.center,
+            //                         decoration: BoxDecoration(
+            //                           shape: BoxShape.circle,
+            //                           color: AppColors.roundBg,
+            //                         ),
+            //                         child: Image.asset(
+            //                           AppAsset.icRazorPay,
+            //                           height: 30,
+            //                           width: 30,
+            //                         ),
+            //                       ),
+            //                       SizedBox(width: Get.width * 0.04),
+            //                       Text(
+            //                         "Razorpay",
+            //                         style: TextStyle(
+            //                           fontFamily: AppFontFamily.sfProDisplay,
+            //                           fontSize: 16.5,
+            //                           color: AppColors.primaryTextColor,
+            //                         ),
+            //                       ),
+            //                     ],
+            //                   ),
+            //                   GestureDetector(
+            //                     onTap: () {
+            //                       logic.onStep3("Razorpay");
+            //                     },
+            //                     child: Container(
+            //                       height: 25,
+            //                       width: 25,
+            //                       padding: const EdgeInsets.all(6),
+            //                       decoration: BoxDecoration(
+            //                         borderRadius: BorderRadius.circular(6),
+            //                         border: Border.all(
+            //                           color: logic.selectedPayment == "Razorpay"
+            //                               ? AppColors.primaryAppColor
+            //                               : AppColors.greyColor
+            //                                   .withOpacity(0.3),
+            //                         ),
+            //                       ),
+            //                       child: logic.selectedPayment == "Razorpay"
+            //                           ? Image.asset(
+            //                               AppAsset.icCheck,
+            //                               color: AppColors.primaryAppColor,
+            //                               height: 15,
+            //                               width: 15,
+            //                             )
+            //                           : const SizedBox(),
+            //                     ).paddingOnly(right: 10),
+            //                   )
+            //                 ],
+            //               ),
+            //             ),
+            //           );
+            //         },
+            //       ).paddingOnly(bottom: 15)
+            //     : const SizedBox(),
 
             /// Stripe Payment
             splashController.settingCategory?.setting?.isStripePay == true
@@ -1874,94 +2248,93 @@ class BookingScreen extends StatelessWidget {
                   ).paddingOnly(bottom: 15)
                 : const SizedBox(),
 
-            /// Flutter Wave Payment
-            splashController.settingCategory?.setting?.isFlutterWave == true
-                ? GetBuilder<BookingScreenController>(
-                    id: Constant.idStep3,
-                    builder: (logic) {
-                      return InkWell(
-                        overlayColor:
-                            WidgetStatePropertyAll(AppColors.transparent),
-                        onTap: () {
-                          logic.onStep3("flutterWave");
-                        },
-                        child: Container(
-                          height: 60,
-                          width: Get.width,
-                          padding: const EdgeInsets.only(left: 10, right: 5),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: AppColors.grey.withOpacity(0.1),
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                            color: AppColors.whiteColor,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    width: 40,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.roundBg,
-                                    ),
-                                    child: Image.asset(
-                                      AppAsset.icFlutterWave,
-                                      height: 30,
-                                      width: 30,
-                                    ),
-                                  ),
-                                  SizedBox(width: Get.width * 0.04),
-                                  Text(
-                                    "Flutter Wave",
-                                    style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplay,
-                                      fontSize: 16.5,
-                                      color: AppColors.primaryTextColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  logic.onStep3("flutterWave");
-                                },
-                                child: Container(
-                                  height: 25,
-                                  width: 25,
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(
-                                      color:
-                                          logic.selectedPayment == "flutterWave"
-                                              ? AppColors.primaryAppColor
-                                              : AppColors.greyColor
-                                                  .withOpacity(0.3),
-                                    ),
-                                  ),
-                                  child: logic.selectedPayment == "flutterWave"
-                                      ? Image.asset(
-                                          AppAsset.icCheck,
-                                          color: AppColors.primaryAppColor,
-                                          height: 15,
-                                          width: 15,
-                                        )
-                                      : const SizedBox(),
-                                ).paddingOnly(right: 10),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ).paddingOnly(bottom: 15)
-                : const SizedBox(),
+            // Flutter Wave Payment Method - COMMENTED OUT as requested
+            // splashController.settingCategory?.setting?.isFlutterWave == true
+            //     ? GetBuilder<BookingScreenController>(
+            //         id: Constant.idStep3,
+            //         builder: (logic) {
+            //           return InkWell(
+            //             overlayColor:
+            //                 WidgetStatePropertyAll(AppColors.transparent),
+            //             onTap: () {
+            //               logic.onStep3("flutterWave");
+            //             },
+            //             child: Container(
+            //               height: 60,
+            //               width: Get.width,
+            //               padding: const EdgeInsets.only(left: 10, right: 5),
+            //               decoration: BoxDecoration(
+            //                 border: Border.all(
+            //                   width: 1,
+            //                           color: AppColors.grey.withOpacity(0.1),
+            //                         ),
+            //                         borderRadius: BorderRadius.circular(10),
+            //                         color: AppColors.whiteColor,
+            //                       ),
+            //                       child: Row(
+            //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //                         children: [
+            //                           Row(
+            //                             children: [
+            //                               Container(
+            //                                 height: 40,
+            //                                 width: 40,
+            //                               alignment: Alignment.center,
+            //                               decoration: BoxDecoration(
+            //                                 shape: BoxShape.circle,
+            //                                 color: AppColors.roundBg,
+            //                               ),
+            //                               child: Image.asset(
+            //                                 AppAsset.icFlutterWave,
+            //                                 height: 30,
+            //                                 width: 30,
+            //                               ),
+            //                             ),
+            //                             SizedBox(width: Get.width * 0.04),
+            //                             Text(
+            //                               "Flutter Wave",
+            //                               style: TextStyle(
+            //                                 fontFamily: AppFontFamily.sfProDisplay,
+            //                                 fontSize: 16.5,
+            //                                 color: AppColors.primaryTextColor,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                           GestureDetector(
+            //                             onTap: () {
+            //                               logic.onStep3("flutterWave");
+            //                             },
+            //                             child: Container(
+            //                               height: 25,
+            //                               width: 25,
+            //                               padding: const EdgeInsets.all(6),
+            //                               decoration: BoxDecoration(
+            //                                 borderRadius: BorderRadius.circular(6),
+            //                                 border: Border.all(
+            //                                   color:
+            //                                       logic.selectedPayment == "flutterWave"
+            //                                           ? AppColors.primaryAppColor
+            //                                           ? AppColors.greyColor
+            //                                               .withOpacity(0.3),
+            //                                 ),
+            //                               ),
+            //                               child: logic.selectedPayment == "flutterWave"
+            //                                   ? Image.asset(
+            //                                       AppAsset.icCheck,
+            //                                       color: AppColors.primaryAppColor,
+            //                                       height: 15,
+            //                                       width: 15,
+            //                                     )
+            //                                   : const SizedBox(),
+            //                             ).paddingOnly(right: 10),
+            //                           )
+            //                         ],
+            //                       ),
+            //                     ),
+            //                   );
+            //                 },
+            //               ).paddingOnly(bottom: 15)
+            //             : const SizedBox(),
 
             /// Cash After Service Payment
             splashController.settingCategory?.setting?.cashAfterService == true
@@ -2075,6 +2448,8 @@ class BookingScreen extends StatelessWidget {
             //       )
             //     : const SizedBox(),
             SizedBox(height: Get.height * 0.02),
+            // Add extra bottom padding to ensure service prices and next button are visible
+            SizedBox(height: Get.height * 0.15),
           ],
         );
       },

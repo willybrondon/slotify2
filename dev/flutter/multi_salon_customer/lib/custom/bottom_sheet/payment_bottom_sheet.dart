@@ -25,11 +25,11 @@ class PaymentBottomSheet extends StatelessWidget {
         ];
 
         return Container(
-          height: logic.getCouponModel?.data?.isEmpty == true
-              ? Get.height * 0.6
+          height: MediaQuery.of(context).size.height * (logic.getCouponModel?.data?.isEmpty == true
+              ? 0.65
               : logic.applyCoupon == -1
-                  ? Get.height * 0.79
-                  : Get.height * 0.92,
+                  ? 0.85
+                  : 0.95),
           width: Get.width,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
@@ -38,7 +38,8 @@ class PaymentBottomSheet extends StatelessWidget {
             ),
             color: AppColors.whiteColor,
           ),
-          child: Column(
+          child: SafeArea(
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(

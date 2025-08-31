@@ -23,15 +23,21 @@ import 'package:salon_2/utils/constant.dart';
 class EditProfileScreen extends StatelessWidget {
   EditProfileScreen({super.key});
 
-  final EditProfileScreenController editProfileScreenController = Get.find<EditProfileScreenController>();
-  final LoginScreenController loginScreenController = Get.find<LoginScreenController>();
-  final ProfileScreenController profileScreenController = Get.find<ProfileScreenController>();
+  final EditProfileScreenController editProfileScreenController =
+      Get.find<EditProfileScreenController>();
+  final LoginScreenController loginScreenController =
+      Get.find<LoginScreenController>();
+  final ProfileScreenController profileScreenController =
+      Get.find<ProfileScreenController>();
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        return Constant.storage.read<bool>('isLogIn') == true && Constant.storage.read<bool>('isUpdate') == false ? false : true;
+        return Constant.storage.read<bool>('isLogIn') == true &&
+                Constant.storage.read<bool>('isUpdate') == false
+            ? false
+            : true;
       },
       child: Form(
         key: editProfileScreenController.formKey,
@@ -41,7 +47,8 @@ class EditProfileScreen extends StatelessWidget {
             id: Constant.idUpdate,
             builder: (logic) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 height: 65,
                 width: double.infinity,
                 child: AppButton(
@@ -52,7 +59,8 @@ class EditProfileScreen extends StatelessWidget {
                   buttonText: "txtUpdate".tr,
                   onTap: () async {
                     FocusScopeNode currentFocus = FocusScope.of(context);
-                    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+                    if (!currentFocus.hasPrimaryFocus &&
+                        currentFocus.focusedChild != null) {
                       currentFocus.focusedChild?.unfocus();
                     }
                     logic.onUpdateClick();
@@ -70,13 +78,16 @@ class EditProfileScreen extends StatelessWidget {
                 log("message update:: ${Constant.storage.read<bool>('isUpdate')}");
 
                 return AppBarCustom(
-                  title: Constant.storage.read<bool>('isLogIn') == true && Constant.storage.read<bool>('isUpdate') == false
+                  title: Constant.storage.read<bool>('isLogIn') == true &&
+                          Constant.storage.read<bool>('isUpdate') == false
                       ? "txtMakeProfile".tr
                       : "txtEditProfile".tr,
-                  method: Constant.storage.read<bool>('isLogIn') == true && Constant.storage.read<bool>('isUpdate') == false
+                  method: Constant.storage.read<bool>('isLogIn') == true &&
+                          Constant.storage.read<bool>('isUpdate') == false
                       ? const SizedBox()
                       : InkWell(
-                          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                          overlayColor:
+                              WidgetStatePropertyAll(AppColors.transparent),
                           onTap: () {
                             Get.back();
                           },
@@ -96,7 +107,8 @@ class EditProfileScreen extends StatelessWidget {
                 inAsyncCall: logic.isLoading.value,
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 12),
                     child: Column(
                       children: [
                         SizedBox(height: Get.height * 0.01),
@@ -123,19 +135,28 @@ class EditProfileScreen extends StatelessWidget {
                                         height: 120,
                                         width: 120,
                                         clipBehavior: Clip.hardEdge,
-                                        decoration: const BoxDecoration(shape: BoxShape.circle),
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle),
                                         child: logic.image?.path == null
                                             ? Image.network(
-                                                profileScreenController.getUserCategory?.user?.image ??
+                                                profileScreenController
+                                                        .getUserCategory
+                                                        ?.user
+                                                        ?.image ??
                                                     "${ApiConstant.BASE_URL}static/male.png",
-                                                errorBuilder: (context, error, stackTrace) => Container(
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    Container(
                                                   height: 120,
                                                   width: 120,
                                                   decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
-                                                    color: AppColors.grey.withOpacity(0.2),
-                                                    image: const DecorationImage(
-                                                      image: AssetImage(AppAsset.imMale),
+                                                    color: AppColors.grey
+                                                        .withOpacity(0.2),
+                                                    image:
+                                                        const DecorationImage(
+                                                      image: AssetImage(
+                                                          AppAsset.imMale),
                                                       fit: BoxFit.cover,
                                                     ),
                                                   ),
@@ -144,7 +165,8 @@ class EditProfileScreen extends StatelessWidget {
                                             : CircleAvatar(
                                                 radius: 60,
                                                 backgroundImage: FileImage(
-                                                  File(logic.image?.path ?? '${ApiConstant.BASE_URL}static/male.png'),
+                                                  File(logic.image?.path ??
+                                                      '${ApiConstant.BASE_URL}static/male.png'),
                                                 ),
                                               ),
                                       ),
@@ -199,7 +221,9 @@ class EditProfileScreen extends StatelessWidget {
                               if (value!.isEmpty) {
                                 return "txtEnterYourFirstName".tr;
                               }
-                              return logic.fNameEditingController.text.isEmpty ? "" : null;
+                              return logic.fNameEditingController.text.isEmpty
+                                  ? ""
+                                  : null;
                             },
                           ),
                           title: "txtFirstName".tr,
@@ -216,16 +240,17 @@ class EditProfileScreen extends StatelessWidget {
                             obscureText: false,
                             controller: logic.lNameEditingController,
                             textInputAction: TextInputAction.next,
-                            validator: Constant.storage.read<bool>('isGoogle') == false
-                                ? (value) {
-                                    if (value!.isEmpty) {
-                                      return 'txtEnterYourLastName'.tr;
-                                    }
-                                    return null;
-                                  }
-                                : (value) {
-                                    return null;
-                                  },
+                            validator:
+                                Constant.storage.read<bool>('isGoogle') == false
+                                    ? (value) {
+                                        if (value!.isEmpty) {
+                                          return 'txtEnterYourLastName'.tr;
+                                        }
+                                        return null;
+                                      }
+                                    : (value) {
+                                        return null;
+                                      },
                           ),
                           title: "txtLastName".tr,
                           borderColor: AppColors.greyColor.withOpacity(0.1),
@@ -243,21 +268,25 @@ class EditProfileScreen extends StatelessWidget {
                                   readOnly: true,
                                   controller: logic.emailEditingController,
                                   textInputAction: TextInputAction.next,
-                                  validator: Constant.storage.read<bool>('isGoogle') == false
-                                      ? (value) {
-                                          if (value!.isEmpty) {
-                                            return "desEnterEmail".tr;
-                                          } else if (logic.isEmailValid(value)) {
-                                            return "desEnterValidEmail".tr;
-                                          }
-                                          return null;
-                                        }
-                                      : (value) {
-                                          return null;
-                                        },
+                                  validator:
+                                      Constant.storage.read<bool>('isGoogle') ==
+                                              false
+                                          ? (value) {
+                                              if (value!.isEmpty) {
+                                                return "desEnterEmail".tr;
+                                              } else if (logic
+                                                  .isEmailValid(value)) {
+                                                return "desEnterValidEmail".tr;
+                                              }
+                                              return null;
+                                            }
+                                          : (value) {
+                                              return null;
+                                            },
                                 ),
                                 title: "txtEmail".tr,
-                                borderColor: AppColors.greyColor.withOpacity(0.1),
+                                borderColor:
+                                    AppColors.greyColor.withOpacity(0.1),
                                 borderWidth: 1,
                                 hintTextColor: AppColors.subTitle,
                                 hintTextSize: 14.5,
@@ -272,25 +301,31 @@ class EditProfileScreen extends StatelessWidget {
                                   fieldName: "MobileNumber",
                                   readOnly: true,
                                   textInputType: TextInputType.number,
-                                  controller: logic.mobileNumberEditingController,
+                                  controller:
+                                      logic.mobileNumberEditingController,
                                   textInputAction: TextInputAction.next,
                                   maxLength: 13,
-                                  validator: Constant.storage.read<bool>('isMobile') == false ||
-                                          Constant.storage.read<bool>('isGoogle') == true
-                                      ? (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter a Mobile';
-                                          } else if (value.length < 7) {
-                                            return 'please a enter correct mobile number';
-                                          }
-                                          return null;
-                                        }
-                                      : (value) {
-                                          return null;
-                                        },
+                                  validator:
+                                      Constant.storage.read<bool>('isMobile') ==
+                                                  false ||
+                                              Constant.storage
+                                                      .read<bool>('isGoogle') ==
+                                                  true
+                                          ? (value) {
+                                              if (value!.isEmpty) {
+                                                return 'Please enter a Mobile';
+                                              } else if (value.length < 7) {
+                                                return 'please a enter correct mobile number';
+                                              }
+                                              return null;
+                                            }
+                                          : (value) {
+                                              return null;
+                                            },
                                 ),
                                 title: "txtContactNumber".tr,
-                                borderColor: AppColors.greyColor.withOpacity(0.1),
+                                borderColor:
+                                    AppColors.greyColor.withOpacity(0.1),
                                 borderWidth: 1,
                                 hintTextColor: AppColors.subTitle,
                                 hintTextSize: 14.5,
@@ -303,8 +338,11 @@ class EditProfileScreen extends StatelessWidget {
                             obscureText: false,
                             fieldName: "MobileNumber",
                             textInputType: TextInputType.number,
-                            inputFormatters: [LengthLimitingTextInputFormatter(2)],
-                            controller: editProfileScreenController.ageEditingController,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(2)
+                            ],
+                            controller: editProfileScreenController
+                                .ageEditingController,
                             textInputAction: TextInputAction.next,
                           ),
                           title: "txtAge".tr,
@@ -319,10 +357,13 @@ class EditProfileScreen extends StatelessWidget {
                           method: TextFieldCustom(
                             hintText: "txtEnterBIO".tr,
                             obscureText: false,
-                            controller: editProfileScreenController.bioEditingController,
+                            controller: editProfileScreenController
+                                .bioEditingController,
                             textInputAction: TextInputAction.done,
                             maxLine: 4,
-                            inputFormatters: [LengthLimitingTextInputFormatter(100)],
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(100)
+                            ],
                           ),
                           title: "txtBio".tr,
                           borderColor: AppColors.greyColor.withOpacity(0.1),
@@ -354,7 +395,10 @@ class EditProfileScreen extends StatelessWidget {
                                                 height: 20,
                                                 width: 20,
                                                 decoration: BoxDecoration(
-                                                    shape: BoxShape.circle, border: Border.all(color: AppColors.greyColor2)),
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                        color: AppColors
+                                                            .greyColor2)),
                                               ),
                                             )
                                           : GestureDetector(
@@ -364,7 +408,8 @@ class EditProfileScreen extends StatelessWidget {
                                               child: Container(
                                                 height: 20,
                                                 width: 20,
-                                                padding: const EdgeInsets.all(1.3),
+                                                padding:
+                                                    const EdgeInsets.all(1.3),
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
@@ -372,9 +417,11 @@ class EditProfileScreen extends StatelessWidget {
                                                     color: AppColors.service,
                                                   ),
                                                 ),
-                                                child: logic.checkedValue == index
-                                                    ? Image.asset(AppAsset.icRound)
-                                                    : const SizedBox(),
+                                                child:
+                                                    logic.checkedValue == index
+                                                        ? Image.asset(
+                                                            AppAsset.icRound)
+                                                        : const SizedBox(),
                                               ),
                                             ),
                                       SizedBox(width: Get.width * 0.03),
@@ -387,7 +434,8 @@ class EditProfileScreen extends StatelessWidget {
                                           style: TextStyle(
                                               fontSize: 16,
                                               color: AppColors.primaryTextColor,
-                                              fontFamily: FontFamily.sfProDisplayMedium),
+                                              fontFamily: FontFamily
+                                                  .sfProDisplayMedium),
                                         ),
                                       ),
                                     ],
@@ -402,6 +450,8 @@ class EditProfileScreen extends StatelessWidget {
                             },
                           ),
                         ),
+                        // Add extra bottom padding to ensure Update Profile button is visible
+                        SizedBox(height: Get.height * 0.1),
                       ],
                     ),
                   ),

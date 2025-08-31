@@ -117,6 +117,11 @@ class BookingScreenController extends GetxController {
     update([Constant.idProgressView, Constant.idConfirm]);
   }
 
+  void onAddressSelected() {
+    // Update the UI to show the address is selected
+    update([Constant.idProgressView, Constant.idConfirm]);
+  }
+
   @override
   void onInit() async {
     log("Enter booking screen controller");
