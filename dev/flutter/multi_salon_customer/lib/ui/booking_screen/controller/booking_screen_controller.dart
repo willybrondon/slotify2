@@ -15,6 +15,7 @@ import 'package:salon_2/ui/booking_screen/model/create_booking_model.dart';
 import 'package:salon_2/ui/booking_screen/model/get_booking_model.dart';
 import 'package:salon_2/ui/booking_screen/model/get_check_booking_model.dart';
 import 'package:salon_2/ui/booking_screen/model/get_expert_service_base_salon_model.dart';
+import 'package:salon_2/ui/branch_detail_screen/model/get_salon_detail_model.dart';
 import 'package:salon_2/ui/branch_detail_screen/controller/branch_detail_controller.dart';
 import 'package:salon_2/ui/category_details/controller/category_detail_controller.dart';
 import 'package:salon_2/ui/expert/expert_detail/controller/expert_detail_controller.dart';
@@ -68,6 +69,9 @@ class BookingScreenController extends GetxController {
   String? salonName; // Add salon name variable
   String? salonAddress; // Add salon address variable
   List<dynamic> selectedExpertDataList = [];
+
+  // Import the salon detail model and controller
+  GetSalonDetailModel? getSalonDetailCategory;
 
   num? rating;
   int? roundedRating;
@@ -133,15 +137,15 @@ class BookingScreenController extends GetxController {
     // Check if expert is pre-selected (coming from Top Experts)
     expertDetail = Constant.storage.read("expertDetail");
     if (expertDetail != null) {
-      // Keep currentStep = 0 for venue selection first, then show expert/salon/address
+      // For Top Experts: venue selection is step 0, staff info is step 1
       currentStep = 0;
       stepCount = 0;
       onExpertSelect();
+      // Fetch salon details to get real address
+      await fetchSalonDetails();
     }
 
-    // Set default salon address for display purposes
-    salonAddress =
-        "123 Main Street, City, State, Country"; // Default address - this should come from API
+    // Salon address will be fetched from API when needed
 
     onCheckBoxClick();
     onGetSlotsList();
@@ -309,14 +313,16 @@ class BookingScreenController extends GetxController {
       stepCount++;
       currentStep += 1;
 
-      // Skip staff selection step if expert is pre-selected
-      if (expertDetail != null && currentStep == 1) {
-        stepCount++;
-        currentStep += 1;
-        log("Skipping staff selection step, going directly to date/time selection");
-
-        // Trigger booking API call for date/time step
-        _triggerBookingApiCall();
+      // For Top Experts: Handle the new step flow
+      if (expertDetail != null) {
+        if (currentStep == 1) {
+          // Just moved from venue selection to staff info display - no API call needed
+          log("Top Experts: Moved to staff info display step");
+        } else if (currentStep == 2) {
+          // Moving from staff info to date/time - trigger booking API call
+          log("Top Experts: Moving to date/time selection");
+          _triggerBookingApiCall();
+        }
       }
     }
     update([
@@ -388,10 +394,64 @@ class BookingScreenController extends GetxController {
           selectedExpertDataList
               .add(getExpertServiceBaseSalonCategory?.data?[i].reviewCount);
 
+          // Store salon name and ID for address fetching
+          salonName = getExpertServiceBaseSalonCategory?.data?[i].salon;
+
           log("selectedExpertIndices :: $selectedExpertDataList");
+          log("salonName (ID) :: $salonName");
           break;
         }
       }
+    }
+  }
+
+  // Fetch actual salon details including address
+  Future<void> fetchSalonDetails() async {
+    if (salonId == null) return;
+
+    try {
+      isLoading1(true);
+
+      final queryString = "salonId=$salonId";
+      final url = Uri.parse(
+          '${ApiConstant.BASE_URL}${ApiConstant.getSalonDetail}$queryString');
+
+      log("Fetch Salon Details Url :: $url");
+
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      log("Fetch Salon Details StatusCode :: ${response.statusCode}");
+      log("Fetch Salon Details Body :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        getSalonDetailCategory = GetSalonDetailModel.fromJson(jsonResponse);
+
+        // Build the actual salon address
+        final addressDetails = getSalonDetailCategory?.salon?.addressDetails;
+        if (addressDetails != null) {
+          salonAddress =
+              "${addressDetails.addressLine1 ?? ''}, ${addressDetails.landMark ?? ''}, ${addressDetails.city ?? ''}, ${addressDetails.state ?? ''}, ${addressDetails.country ?? ''}";
+          // Clean up extra commas and spaces
+          salonAddress = salonAddress
+              ?.replaceAll(RegExp(r',\s*,'), ',')
+              .replaceAll(RegExp(r'^,\s*|,\s*$'), '');
+          log("Real Salon Address :: $salonAddress");
+        }
+
+        update([Constant.idProgressView, Constant.idConfirm]);
+      }
+    } catch (e) {
+      log("Error fetching salon details: $e");
+      // Fallback to a generic address if API fails
+      salonAddress = "Salon Address";
+    } finally {
+      isLoading1(false);
     }
   }
 

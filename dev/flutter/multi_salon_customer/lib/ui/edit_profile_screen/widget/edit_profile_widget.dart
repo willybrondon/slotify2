@@ -62,7 +62,29 @@ class EditProfileWidgetView extends StatelessWidget {
           const EditProfileImageView().paddingOnly(bottom: 12, top: 15),
           const EditProfileDataView().paddingAll(15),
           // Add extra padding at bottom to ensure button is visible when scrolling
-          SizedBox(height: Get.height * 0.15),
+          GetBuilder<EditProfileScreenController>(
+            id: Constant.idUpdate,
+            builder: (logic) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: AppButton(
+                  buttonColor: AppColors.primaryAppColor,
+                  color: AppColors.whiteColor,
+                  fontSize: 16,
+                  fontFamily: AppFontFamily.heeBo700,
+                  buttonText: "txtUpdateProfile".tr,
+                  onTap: () async {
+                    FocusScopeNode currentFocus = FocusScope.of(context);
+                    if (!currentFocus.hasPrimaryFocus &&
+                        currentFocus.focusedChild != null) {
+                      currentFocus.focusedChild?.unfocus();
+                    }
+                    logic.onUpdateClick();
+                  },
+                ),
+              );
+            },
+          ).paddingOnly(bottom: 20),
         ],
       ),
     );

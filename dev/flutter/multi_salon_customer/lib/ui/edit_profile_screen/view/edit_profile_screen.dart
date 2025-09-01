@@ -28,7 +28,6 @@ class EditProfileScreen extends StatelessWidget {
           automaticallyImplyLeading: false,
           flexibleSpace: const EditProfileTopBarView(),
         ),
-        bottomNavigationBar: const EditProfileEditView(),
         body: GetBuilder<EditProfileScreenController>(
           id: Constant.idProgressView,
           builder: (logic) {

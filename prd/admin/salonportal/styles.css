@@ -91,7 +91,7 @@ body {
 /* Hero Section */
 .hero {
     padding: 120px 0 80px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #000000;
     color: white;
     min-height: 100vh;
     display: flex;
@@ -645,7 +645,7 @@ body {
 /* CTA Section */
 .cta {
     padding: 6rem 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #000000;
     color: white;
     text-align: center;
 }
@@ -665,7 +665,7 @@ body {
 /* Final CTA */
 .final-cta {
     padding: 4rem 0;
-    background: #2c3e50;
+    background: #000000;
     color: white;
     text-align: center;
 }
@@ -681,7 +681,7 @@ body {
 
 /* Footer */
 .footer {
-    background: #1a252f;
+    background: #000000;
     color: white;
     padding: 4rem 0 2rem;
 }

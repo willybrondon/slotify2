@@ -44,32 +44,6 @@ class EditProfileScreen extends StatelessWidget {
         child: Scaffold(
           backgroundColor: AppColors.backGround,
           resizeToAvoidBottomInset: false,
-          bottomNavigationBar: GetBuilder<EditProfileScreenController>(
-            id: Constant.idUpdate,
-            builder: (logic) {
-              return Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                height: 65,
-                width: double.infinity,
-                child: AppButton(
-                  buttonColor: AppColors.primaryAppColor,
-                  color: AppColors.whiteColor,
-                  fontSize: 18,
-                  fontFamily: FontFamily.sfProDisplay,
-                  buttonText: "txtUpdate".tr,
-                  onTap: () async {
-                    FocusScopeNode currentFocus = FocusScope.of(context);
-                    if (!currentFocus.hasPrimaryFocus &&
-                        currentFocus.focusedChild != null) {
-                      currentFocus.focusedChild?.unfocus();
-                    }
-                    logic.onUpdateClick();
-                  },
-                ),
-              ).paddingOnly(bottom: 10);
-            },
-          ),
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(55),
             child: GetBuilder<LoginScreenController>(
@@ -451,8 +425,35 @@ class EditProfileScreen extends StatelessWidget {
                             },
                           ),
                         ),
-                        // Add extra bottom padding to ensure Update Profile button is visible
-                        SizedBox(height: Get.height * 0.1),
+                        // Update button inside scroll (like Register)
+                        SizedBox(height: Get.height * 0.02),
+                        GetBuilder<EditProfileScreenController>(
+                          id: Constant.idUpdate,
+                          builder: (logic) {
+                            return Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              height: 65,
+                              width: double.infinity,
+                              child: AppButton(
+                                buttonColor: AppColors.primaryAppColor,
+                                color: AppColors.whiteColor,
+                                fontSize: 18,
+                                fontFamily: FontFamily.sfProDisplay,
+                                buttonText: "txtUpdate".tr,
+                                onTap: () async {
+                                  FocusScopeNode currentFocus =
+                                      FocusScope.of(context);
+                                  if (!currentFocus.hasPrimaryFocus &&
+                                      currentFocus.focusedChild != null) {
+                                    currentFocus.focusedChild?.unfocus();
+                                  }
+                                  logic.onUpdateClick();
+                                },
+                              ),
+                            ).paddingOnly(bottom: 10);
+                          },
+                        ),
                       ],
                     ),
                   ),
