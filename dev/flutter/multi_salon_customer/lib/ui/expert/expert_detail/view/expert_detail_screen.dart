@@ -26,7 +26,42 @@ class ExpertDetailScreen extends StatelessWidget {
   ExpertDetailScreen({super.key});
 
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
-  ExpertDetailController expertDetailController = Get.find<ExpertDetailController>();
+  ExpertDetailController expertDetailController =
+      Get.find<ExpertDetailController>();
+
+  // Helper method to get salon address from existing salon data
+  String getSalonAddress() {
+    try {
+      final expertSalonId =
+          homeScreenController.getExpertCategory?.data?.expert?.salonId?.id;
+      if (expertSalonId != null) {
+        try {
+          final salon =
+              homeScreenController.getAllSalonCategory?.data?.firstWhere(
+            (salon) => salon.id == expertSalonId,
+          );
+
+          if (salon != null && salon.addressDetails != null) {
+            final address = salon.addressDetails!;
+            final parts = [
+              address.addressLine1,
+              address.landMark,
+              address.city,
+              address.state,
+              address.country,
+            ].where((part) => part != null && part.isNotEmpty).toList();
+
+            return parts.join(', ');
+          }
+        } catch (e) {
+          // If firstWhere fails, return default message
+        }
+      }
+      return "Address not available";
+    } catch (e) {
+      return "Address not available";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +143,8 @@ class ExpertDetailScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 15,
-                                      color: AppColors.currency.withOpacity(0.9),
+                                      color:
+                                          AppColors.currency.withOpacity(0.9),
                                     ),
                                   ),
                                   Text(
@@ -116,14 +152,16 @@ class ExpertDetailScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 12,
-                                      color: AppColors.currency.withOpacity(0.9),
+                                      color:
+                                          AppColors.currency.withOpacity(0.9),
                                     ),
                                   ),
                                   SizedBox(width: Get.width * 0.02),
                                   Text(
                                     "= $currency ${logic.totalPriceExpert.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
                                       fontSize: 17,
                                       color: AppColors.currency,
                                     ),
@@ -146,9 +184,12 @@ class ExpertDetailScreen extends StatelessWidget {
                               fontFamily: AppFontFamily.sfProDisplayMedium,
                               fontSize: 15,
                               onTap: () async {
-                                if (Constant.storage.read<bool>('isLogIn') ?? false) {
-                                  Constant.storage
-                                      .write("expertDetail", homeScreenController.getExpertCategory?.data?.expert?.id);
+                                if (Constant.storage.read<bool>('isLogIn') ??
+                                    false) {
+                                  Constant.storage.write(
+                                      "expertDetail",
+                                      homeScreenController
+                                          .getExpertCategory?.data?.expert?.id);
 
                                   Get.toNamed(AppRoutes.booking, arguments: [
                                     homeScreenController.checkItemExpert,
@@ -157,11 +198,16 @@ class ExpertDetailScreen extends StatelessWidget {
                                     homeScreenController.totalMinuteExpert,
                                     homeScreenController.serviceIdExpert,
                                     homeScreenController.withOutTaxRupeeExpert,
-                                    homeScreenController.getExpertCategory?.data?.expert?.salonId?.id
+                                    homeScreenController.getExpertCategory?.data
+                                        ?.expert?.salonId?.id
                                   ]);
                                 } else {
-                                  Get.toNamed(AppRoutes.signIn, arguments: [homeScreenController.checkItemExpert.isNotEmpty]);
-                                  await Get.find<SignInController>().getDataFromArgs();
+                                  Get.toNamed(AppRoutes.signIn, arguments: [
+                                    homeScreenController
+                                        .checkItemExpert.isNotEmpty
+                                  ]);
+                                  await Get.find<SignInController>()
+                                      .getDataFromArgs();
                                 }
                               },
                             );
@@ -192,14 +238,16 @@ class ExpertDetailScreen extends StatelessWidget {
                             builder: (logic) {
                               return logic.getExpertCategory != null
                                   ? Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 12),
                                       margin: const EdgeInsets.only(top: 17),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
                                         color: AppColors.whiteColor,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: AppColors.blackColor.withOpacity(0.02),
+                                            color: AppColors.blackColor
+                                                .withOpacity(0.02),
                                             offset: const Offset(
                                               0.0,
                                               1.0,
@@ -231,13 +279,21 @@ class ExpertDetailScreen extends StatelessWidget {
                                               ),
                                               clipBehavior: Clip.hardEdge,
                                               child: CachedNetworkImage(
-                                                imageUrl: logic.getExpertCategory?.data?.expert?.image ?? "",
+                                                imageUrl: logic
+                                                        .getExpertCategory
+                                                        ?.data
+                                                        ?.expert
+                                                        ?.image ??
+                                                    "",
                                                 fit: BoxFit.cover,
                                                 placeholder: (context, url) {
-                                                  return Image.asset(AppAsset.icPlaceHolder);
+                                                  return Image.asset(
+                                                      AppAsset.icPlaceHolder);
                                                 },
-                                                errorWidget: (context, url, error) {
-                                                  return Image.asset(AppAsset.icPlaceHolder);
+                                                errorWidget:
+                                                    (context, url, error) {
+                                                  return Image.asset(
+                                                      AppAsset.icPlaceHolder);
                                                 },
                                               ),
                                             ),
@@ -246,15 +302,18 @@ class ExpertDetailScreen extends StatelessWidget {
                                           Text(
                                             "${logic.getExpertCategory?.data?.expert?.fname} ${logic.getExpertCategory?.data?.expert?.lname}",
                                             style: TextStyle(
-                                                fontFamily: AppFontFamily.sfProDisplayBold,
+                                                fontFamily: AppFontFamily
+                                                    .sfProDisplayBold,
                                                 fontSize: 18,
-                                                color: AppColors.primaryTextColor),
+                                                color:
+                                                    AppColors.primaryTextColor),
                                           ),
                                           SizedBox(height: Get.height * 0.015),
                                           Container(
                                             height: 32,
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                               color: AppColors.yellow2,
                                             ),
                                             child: SizedBox(
@@ -262,10 +321,19 @@ class ExpertDetailScreen extends StatelessWidget {
                                               child: ListView.separated(
                                                 shrinkWrap: true,
                                                 itemCount: 5,
-                                                scrollDirection: Axis.horizontal,
-                                                padding: const EdgeInsets.symmetric(horizontal: 13),
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 13),
                                                 itemBuilder: (context, index) {
-                                                  if (index < (logic.getExpertCategory?.data?.expert?.review ?? 0)) {
+                                                  if (index <
+                                                      (logic
+                                                              .getExpertCategory
+                                                              ?.data
+                                                              ?.expert
+                                                              ?.review ??
+                                                          0)) {
                                                     return Image.asset(
                                                       AppAsset.icStarFilled,
                                                       height: 15,
@@ -279,33 +347,47 @@ class ExpertDetailScreen extends StatelessWidget {
                                                     );
                                                   }
                                                 },
-                                                separatorBuilder: (context, index) {
-                                                  return SizedBox(width: Get.width * 0.017);
+                                                separatorBuilder:
+                                                    (context, index) {
+                                                  return SizedBox(
+                                                      width: Get.width * 0.017);
                                                 },
                                               ),
                                             ),
                                           ),
                                           SizedBox(height: Get.height * 0.015),
-                                          Divider(thickness: 1, color: AppColors.greyColor.withOpacity(0.1)),
+                                          Divider(
+                                              thickness: 1,
+                                              color: AppColors.greyColor
+                                                  .withOpacity(0.1)),
                                           SizedBox(height: Get.height * 0.015),
                                           ExpertDetails(
                                             leadingIcon: AppAsset.icEmail,
-                                            title: "${logic.getExpertCategory?.data?.expert?.email}",
+                                            title:
+                                                "${logic.getExpertCategory?.data?.expert?.email}",
                                           ),
                                           SizedBox(height: Get.height * 0.014),
                                           ExpertDetails(
                                             leadingIcon: AppAsset.icCall,
-                                            title: "${logic.getExpertCategory?.data?.expert?.mobile}",
+                                            title:
+                                                "${logic.getExpertCategory?.data?.expert?.mobile}",
                                           ),
                                           SizedBox(height: Get.height * 0.014),
                                           ExpertDetails(
                                             leadingIcon: AppAsset.icAge,
-                                            title: "${logic.getExpertCategory?.data?.expert?.age}",
+                                            title:
+                                                "${logic.getExpertCategory?.data?.expert?.age}",
                                           ),
                                           SizedBox(height: Get.height * 0.014),
                                           ExpertDetails(
                                             leadingIcon: AppAsset.icSalon1,
-                                            title: "${logic.getExpertCategory?.data?.expert?.salonId?.name}",
+                                            title:
+                                                "${logic.getExpertCategory?.data?.expert?.salonId?.name}",
+                                          ),
+                                          SizedBox(height: Get.height * 0.014),
+                                          ExpertDetails(
+                                            leadingIcon: AppAsset.icLocation,
+                                            title: "${getSalonAddress()}",
                                           ),
                                         ],
                                       ),
@@ -331,14 +413,16 @@ class ExpertDetailScreen extends StatelessWidget {
                                   "txtMyServices".tr,
                                   style: TextStyle(
                                       fontSize: 20,
-                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
                                       color: AppColors.primaryTextColor),
                                 ).paddingOnly(top: 15, left: 3, bottom: 8),
                                 Text(
                                   "txtViewAll".tr,
                                   style: TextStyle(
                                     fontSize: 13,
-                                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                                    fontFamily:
+                                        AppFontFamily.sfProDisplayMedium,
                                     decoration: TextDecoration.underline,
                                     decorationColor: AppColors.service,
                                     color: AppColors.service,
@@ -356,53 +440,89 @@ class ExpertDetailScreen extends StatelessWidget {
                                   padding: const EdgeInsets.only(top: 5),
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
-                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
                                     padding: EdgeInsets.zero,
                                     shrinkWrap: true,
-                                    itemCount: logic.getExpertCategory?.data?.services?.length,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      return AnimationConfiguration.staggeredGrid(
+                                    itemCount: logic.getExpertCategory?.data
+                                        ?.services?.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return AnimationConfiguration
+                                          .staggeredGrid(
                                         position: index,
-                                        duration: const Duration(milliseconds: 800),
-                                        columnCount: logic.getExpertCategory?.data?.services?.length ?? 0,
+                                        duration:
+                                            const Duration(milliseconds: 800),
+                                        columnCount: logic.getExpertCategory
+                                                ?.data?.services?.length ??
+                                            0,
                                         child: FadeInAnimation(
                                           child: ScaleAnimation(
                                             child: Column(
                                               children: [
                                                 GestureDetector(
                                                   onTap: () {
-                                                    if (logic.isExpertSelected[index] == true) {
-                                                      logic.onCheckBoxClick(false, index);
+                                                    if (logic.isExpertSelected[
+                                                            index] ==
+                                                        true) {
+                                                      logic.onCheckBoxClick(
+                                                          false, index);
                                                     } else {
-                                                      logic.onCheckBoxClick(true, index);
+                                                      logic.onCheckBoxClick(
+                                                          true, index);
                                                     }
                                                   },
                                                   child: Stack(
                                                     children: [
                                                       DottedBorder(
-                                                        color: AppColors.roundBorder,
-                                                        borderType: BorderType.RRect,
-                                                        radius: const Radius.circular(40),
+                                                        color: AppColors
+                                                            .roundBorder,
+                                                        borderType:
+                                                            BorderType.RRect,
+                                                        radius: const Radius
+                                                            .circular(40),
                                                         strokeWidth: 1,
-                                                        dashPattern: const [2.5, 2],
+                                                        dashPattern: const [
+                                                          2.5,
+                                                          2
+                                                        ],
                                                         child: Container(
                                                           height: 70,
                                                           width: 70,
-                                                          decoration: const BoxDecoration(
-                                                            shape: BoxShape.circle,
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
                                                           ),
-                                                          clipBehavior: Clip.hardEdge,
-                                                          child: CachedNetworkImage(
-                                                            imageUrl:
-                                                                logic.getExpertCategory?.data?.services?[index].id?.image ?? "",
+                                                          clipBehavior:
+                                                              Clip.hardEdge,
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            imageUrl: logic
+                                                                    .getExpertCategory
+                                                                    ?.data
+                                                                    ?.services?[
+                                                                        index]
+                                                                    .id
+                                                                    ?.image ??
+                                                                "",
                                                             fit: BoxFit.cover,
-                                                            placeholder: (context, url) {
-                                                              return Image.asset(AppAsset.icServicePlaceholder).paddingAll(10);
+                                                            placeholder:
+                                                                (context, url) {
+                                                              return Image.asset(
+                                                                      AppAsset
+                                                                          .icServicePlaceholder)
+                                                                  .paddingAll(
+                                                                      10);
                                                             },
-                                                            errorWidget: (context, url, error) {
+                                                            errorWidget:
+                                                                (context, url,
+                                                                    error) {
                                                               return Icon(
-                                                                Icons.error_outline,
-                                                                color: AppColors.blackColor,
+                                                                Icons
+                                                                    .error_outline,
+                                                                color: AppColors
+                                                                    .blackColor,
                                                                 size: 20,
                                                               );
                                                             },
@@ -412,17 +532,25 @@ class ExpertDetailScreen extends StatelessWidget {
                                                       Positioned(
                                                         top: 50,
                                                         left: Get.width * 0.125,
-                                                        child: logic.isExpertSelected[index]
+                                                        child: logic.isExpertSelected[
+                                                                index]
                                                             ? Container(
                                                                 height: 22,
                                                                 width: 22,
-                                                                padding: const EdgeInsets.all(7),
-                                                                decoration: BoxDecoration(
-                                                                  shape: BoxShape.circle,
-                                                                  color: AppColors.primaryAppColor,
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(7),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: AppColors
+                                                                      .primaryAppColor,
                                                                 ),
-                                                                child: Image.asset(
-                                                                  AppAsset.icCheck,
+                                                                child:
+                                                                    Image.asset(
+                                                                  AppAsset
+                                                                      .icCheck,
                                                                 ),
                                                               )
                                                             : const SizedBox(),
@@ -431,11 +559,19 @@ class ExpertDetailScreen extends StatelessWidget {
                                                   ),
                                                 ),
                                                 Text(
-                                                  logic.getExpertCategory?.data?.services?[index].id?.name ?? "",
+                                                  logic
+                                                          .getExpertCategory
+                                                          ?.data
+                                                          ?.services?[index]
+                                                          .id
+                                                          ?.name ??
+                                                      "",
                                                   maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.sfProDisplay,
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplay,
                                                     fontSize: 13.5,
                                                     color: AppColors.category,
                                                   ),
@@ -451,11 +587,15 @@ class ExpertDetailScreen extends StatelessWidget {
                               );
                             },
                           ),
-                          Divider(thickness: 1, color: AppColors.greyColor.withOpacity(0.1)).paddingOnly(top: 10, bottom: 10),
+                          Divider(
+                                  thickness: 1,
+                                  color: AppColors.greyColor.withOpacity(0.1))
+                              .paddingOnly(top: 10, bottom: 10),
                           GetBuilder<ExpertDetailController>(
                             id: Constant.idUserReview,
                             builder: (logic) {
-                              return logic.getReviewCategory?.data?.isEmpty == true
+                              return logic.getReviewCategory?.data?.isEmpty ==
+                                      true
                                   ? Center(
                                       child: Column(
                                         children: [
@@ -467,7 +607,8 @@ class ExpertDetailScreen extends StatelessWidget {
                                           Text(
                                             "txtNoFoundReview".tr,
                                             style: TextStyle(
-                                              fontFamily: AppFontFamily.sfProDisplayBold,
+                                              fontFamily: AppFontFamily
+                                                  .sfProDisplayBold,
                                               fontSize: 15,
                                               color: AppColors.primaryTextColor,
                                             ),
@@ -478,22 +619,26 @@ class ExpertDetailScreen extends StatelessWidget {
                                   : Column(
                                       children: [
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
                                               children: [
                                                 Text(
                                                   "txtReviews".tr,
                                                   style: TextStyle(
-                                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                                      fontFamily: AppFontFamily
+                                                          .sfProDisplayBold,
                                                       fontSize: 18,
                                                       color: AppColors.review),
                                                 ),
-                                                SizedBox(width: Get.width * 0.02),
+                                                SizedBox(
+                                                    width: Get.width * 0.02),
                                                 Text(
                                                   "txtBasedReviews".tr,
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplayMedium,
                                                     fontSize: 14,
                                                     color: AppColors.grey,
                                                   ),
@@ -502,18 +647,23 @@ class ExpertDetailScreen extends StatelessWidget {
                                             ),
                                             GestureDetector(
                                               onTap: () {
-                                                Get.toNamed(AppRoutes.expertReview);
+                                                Get.toNamed(
+                                                    AppRoutes.expertReview);
                                               },
                                               child: Column(
                                                 children: [
                                                   Text(
                                                     "txtViewAll".tr,
                                                     style: TextStyle(
-                                                        fontFamily: AppFontFamily.sfProDisplayRegular,
+                                                        fontFamily: AppFontFamily
+                                                            .sfProDisplayRegular,
                                                         fontSize: 13,
                                                         color: AppColors.grey,
-                                                        decoration: TextDecoration.underline,
-                                                        decorationColor: AppColors.grey),
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline,
+                                                        decorationColor:
+                                                            AppColors.grey),
                                                   ),
                                                 ],
                                               ),
@@ -522,68 +672,113 @@ class ExpertDetailScreen extends StatelessWidget {
                                         ),
                                         SizedBox(height: Get.height * 0.02),
                                         ListView.builder(
-                                          itemCount: (logic.getReviewCategory?.data?.length ?? 0) > 6
+                                          itemCount: (logic.getReviewCategory
+                                                          ?.data?.length ??
+                                                      0) >
+                                                  6
                                               ? 6
-                                              : logic.getReviewCategory?.data?.length ?? 0,
+                                              : logic.getReviewCategory?.data
+                                                      ?.length ??
+                                                  0,
                                           shrinkWrap: true,
                                           padding: EdgeInsets.zero,
-                                          physics: const NeverScrollableScrollPhysics(),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
                                           itemBuilder: (context, index) {
-                                            logic.str = logic.getReviewCategory?.data?[index].createdAt.toString();
+                                            logic.str = logic.getReviewCategory
+                                                ?.data?[index].createdAt
+                                                .toString();
                                             logic.parts = logic.str?.split('T');
                                             logic.date = logic.parts?[0];
                                             logic.time = logic.parts?[1].trim();
 
                                             return Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                                              margin: const EdgeInsets.only(bottom: 10),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 12),
+                                              margin: const EdgeInsets.only(
+                                                  bottom: 10),
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                                 color: AppColors.whiteColor,
                                                 boxShadow: Constant.boxShadow,
                                               ),
                                               child: Column(
                                                 children: [
                                                   Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
                                                       Text(
                                                         "${logic.getReviewCategory?.data?[index].userId?.fname ?? ""} ${logic.getReviewCategory?.data?[index].userId?.lname ?? ""}",
                                                         style: TextStyle(
-                                                          fontFamily: AppFontFamily.sfProDisplayBold,
+                                                          fontFamily: AppFontFamily
+                                                              .sfProDisplayBold,
                                                           fontSize: 16.5,
-                                                          color: AppColors.primaryTextColor,
+                                                          color: AppColors
+                                                              .primaryTextColor,
                                                         ),
                                                       ),
                                                       Container(
                                                         width: Get.width * 0.14,
-                                                        padding: const EdgeInsets.symmetric(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
                                                           horizontal: 8,
                                                           vertical: 5,
                                                         ),
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          color: AppColors.oceanBlue.withOpacity(0.3),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(6),
+                                                          color: AppColors
+                                                              .oceanBlue
+                                                              .withOpacity(0.3),
                                                         ),
                                                         child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Image.asset(
-                                                              (logic.getReviewCategory?.data?[index].rating?.toInt() ?? 0) >= 4
-                                                                  ? AppAsset.icGreenStar
-                                                                  : AppAsset.icRedStar,
+                                                              (logic.getReviewCategory?.data?[index].rating
+                                                                              ?.toInt() ??
+                                                                          0) >=
+                                                                      4
+                                                                  ? AppAsset
+                                                                      .icGreenStar
+                                                                  : AppAsset
+                                                                      .icRedStar,
                                                               height: 15,
                                                               width: 15,
                                                             ),
-                                                            SizedBox(width: Get.width * 0.02),
+                                                            SizedBox(
+                                                                width:
+                                                                    Get.width *
+                                                                        0.02),
                                                             Text(
-                                                              logic.getReviewCategory?.data?[index].rating.toString() ?? "",
+                                                              logic
+                                                                      .getReviewCategory
+                                                                      ?.data?[
+                                                                          index]
+                                                                      .rating
+                                                                      .toString() ??
+                                                                  "",
                                                               maxLines: 1,
-                                                              overflow: TextOverflow.ellipsis,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                               style: TextStyle(
-                                                                fontFamily: AppFontFamily.sfProDisplayMedium,
+                                                                fontFamily:
+                                                                    AppFontFamily
+                                                                        .sfProDisplayMedium,
                                                                 fontSize: 15,
-                                                                color: AppColors.blackColor,
+                                                                color: AppColors
+                                                                    .blackColor,
                                                               ),
                                                             ),
                                                           ],
@@ -592,28 +787,43 @@ class ExpertDetailScreen extends StatelessWidget {
                                                     ],
                                                   ),
                                                   Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
                                                       Text(
-                                                        logic.getReviewCategory?.data?[index].review.toString() ?? "",
+                                                        logic
+                                                                .getReviewCategory
+                                                                ?.data?[index]
+                                                                .review
+                                                                .toString() ??
+                                                            "",
                                                         maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         style: TextStyle(
-                                                          fontFamily: AppFontFamily.sfProDisplayMedium,
+                                                          fontFamily: AppFontFamily
+                                                              .sfProDisplayMedium,
                                                           fontSize: 14,
                                                           color: AppColors.grey,
                                                         ),
                                                       ),
                                                       Padding(
-                                                        padding: const EdgeInsets.only(top: 12),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(top: 12),
                                                         child: Text(
                                                           logic.date ?? "",
                                                           maxLines: 1,
-                                                          overflow: TextOverflow.ellipsis,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                           style: TextStyle(
-                                                            fontFamily: AppFontFamily.sfProDisplayMedium,
+                                                            fontFamily:
+                                                                AppFontFamily
+                                                                    .sfProDisplayMedium,
                                                             fontSize: 13,
-                                                            color: AppColors.grey,
+                                                            color:
+                                                                AppColors.grey,
                                                           ),
                                                         ),
                                                       ),
