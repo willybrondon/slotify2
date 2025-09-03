@@ -101,6 +101,9 @@ class HomeScreenController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool isLoading1 = false.obs;
 
+  // Map to store expert salon details
+  Map<String, Map<String, dynamic>> expertSalonDetails = {};
+
   @override
   void onInit() async {
     log("Enter in Home Screen Controller");

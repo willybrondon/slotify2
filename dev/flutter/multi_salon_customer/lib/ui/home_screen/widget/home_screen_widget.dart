@@ -1095,7 +1095,7 @@ class HomeScreenTopExpertView extends StatelessWidget {
                       )
                     : AnimationLimiter(
                         child: SizedBox(
-                          height: 185,
+                          height: 220,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             physics: const ScrollPhysics(),
@@ -1209,6 +1209,77 @@ class HomeScreenTopExpertView extends StatelessWidget {
                                               ),
                                             ),
                                             const Spacer(),
+                                            // Add salon information if available
+                                            if (logic.getAllExpertCategory
+                                                    ?.data?[index].salonInfo !=
+                                                null) ...[
+                                              Container(
+                                                width: Get.width * 0.3,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    // Salon name
+                                                    Text(
+                                                      logic
+                                                              .getAllExpertCategory
+                                                              ?.data?[index]
+                                                              .salonInfo
+                                                              ?.name ??
+                                                          "",
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            AppFontFamily
+                                                                .heeBo600,
+                                                        fontSize: 12,
+                                                        color: AppColors
+                                                            .primaryTextColor,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 2),
+                                                    // Salon address
+                                                    if (logic
+                                                            .getAllExpertCategory
+                                                            ?.data?[index]
+                                                            .salonInfo
+                                                            ?.addressDetails !=
+                                                        null) ...[
+                                                      Row(
+                                                        children: [
+                                                          Image.asset(
+                                                            AppAsset.icLocation,
+                                                            height: 12,
+                                                            width: 12,
+                                                          ).paddingOnly(
+                                                              right: 3),
+                                                          Expanded(
+                                                            child: Text(
+                                                              "${logic.getAllExpertCategory?.data?[index].salonInfo?.addressDetails?.addressLine1 ?? ""}, ${logic.getAllExpertCategory?.data?[index].salonInfo?.addressDetails?.city ?? ""}",
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                color: AppColors
+                                                                    .termsDialog,
+                                                                fontFamily:
+                                                                    AppFontFamily
+                                                                        .heeBo600,
+                                                                fontSize: 10,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ],
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                            ],
                                             Container(
                                               height: 32,
                                               decoration: BoxDecoration(

@@ -2205,8 +2205,7 @@ class BookingScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 2),
                             Text(
-                              logic.getSalonDetailCategory?.salon?.name ??
-                                  "Salon Name",
+                              logic.salonName ?? "Salon Name",
                               style: TextStyle(
                                 fontFamily: AppFontFamily.sfProDisplayBold,
                                 fontSize: 16,
@@ -2261,10 +2260,11 @@ class BookingScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 2),
                             Text(
-                              logic.selectedVenue == "At Home" &&
-                                      logic.searchEditingController.text
+                              logic.selectedVenue == "At Home"
+                                  ? (logic.searchEditingController.text
                                           .isNotEmpty
-                                  ? logic.searchEditingController.text
+                                      ? logic.searchEditingController.text
+                                      : "Please enter address")
                                   : logic.selectedVenue == "At Salon"
                                       ? (logic.salonAddress != null &&
                                               logic.salonAddress!.isNotEmpty

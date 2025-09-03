@@ -143,6 +143,15 @@ class BookingScreenController extends GetxController {
       onExpertSelect();
       // Fetch salon details to get real address
       await fetchSalonDetails();
+
+      // Get salon name from home screen controller expert data
+      await homeScreenController.onGetExpertApiCall(expertId: expertDetail!);
+      if (homeScreenController.getExpertCategory?.data?.expert?.salonId?.name !=
+          null) {
+        salonName =
+            homeScreenController.getExpertCategory!.data!.expert!.salonId!.name;
+        log("Salon name from home controller: $salonName");
+      }
     }
 
     // Salon address will be fetched from API when needed
