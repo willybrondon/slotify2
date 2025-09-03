@@ -28,7 +28,7 @@ class SettingScreen extends StatelessWidget {
             },
             child: Icon(
               Icons.arrow_back,
-              color: AppColors.whiteColor,
+              color: AppColors.blackColor,
             ),
           ),
         ),
@@ -38,7 +38,8 @@ class SettingScreen extends StatelessWidget {
         builder: (logic) {
           return logic.isLogIn != true
               ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   child: Column(
                     children: [
                       settingMenu(
@@ -52,7 +53,8 @@ class SettingScreen extends StatelessWidget {
                   ),
                 )
               : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   child: Column(
                     children: [
                       settingMenu(
@@ -151,8 +153,10 @@ class SettingScreen extends StatelessWidget {
                                   activeTrackColor: AppColors.whiteColor,
                                   inactiveThumbColor: AppColors.redText,
                                   inactiveTrackColor: AppColors.whiteColor,
-                                  trackOutlineColor: WidgetStatePropertyAll(AppColors.grey.withOpacity(0.15)),
-                                  trackColor: WidgetStatePropertyAll(AppColors.switchBox),
+                                  trackOutlineColor: WidgetStatePropertyAll(
+                                      AppColors.grey.withOpacity(0.15)),
+                                  trackColor: WidgetStatePropertyAll(
+                                      AppColors.switchBox),
                                   onChanged: (value) {
                                     logic.onSwitch(value);
                                   },
@@ -160,7 +164,8 @@ class SettingScreen extends StatelessWidget {
                               );
                             },
                           )
-                        : Image.asset(AppAsset.icArrowRight, height: 22, width: 22),
+                        : Image.asset(AppAsset.icArrowRight,
+                            height: 22, width: 22),
               ],
             ),
           ),

@@ -13,7 +13,8 @@ import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 
 class BookingDetailScreen extends StatelessWidget {
-  final BookingDetailScreenController bookingDetailScreenController = Get.put(BookingDetailScreenController());
+  final BookingDetailScreenController bookingDetailScreenController =
+      Get.put(BookingDetailScreenController());
 
   BookingDetailScreen({super.key});
 
@@ -31,16 +32,17 @@ class BookingDetailScreen extends StatelessWidget {
                   height: Get.height * 0.18,
                   width: double.infinity,
                   alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryAppColor,
+                    color: AppColors.whiteColor,
                   ),
                   child: Text(
                     "txtBooking".tr,
                     style: TextStyle(
                       fontFamily: AppFontFamily.sfProDisplayBold,
                       fontSize: 20,
-                      color: AppColors.whiteColor,
+                      color: AppColors.blackColor,
                     ),
                   ),
                 ),
@@ -50,7 +52,8 @@ class BookingDetailScreen extends StatelessWidget {
                     return Container(
                       height: 50,
                       width: double.infinity,
-                      margin: EdgeInsets.only(top: Get.height * 0.14, left: 16, right: 16),
+                      margin: EdgeInsets.only(
+                          top: Get.height * 0.14, left: 16, right: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         color: AppColors.whiteColor,
@@ -96,7 +99,8 @@ class BookingDetailScreen extends StatelessWidget {
                         controller: logic.bookingDetailScreenEditingController,
                         onEditingComplete: () async {
                           FocusScopeNode currentFocus = FocusScope.of(context);
-                          if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+                          if (!currentFocus.hasPrimaryFocus &&
+                              currentFocus.focusedChild != null) {
                             currentFocus.focusedChild?.unfocus();
                           }
 
@@ -104,7 +108,8 @@ class BookingDetailScreen extends StatelessWidget {
                             logic.startPending = 0;
                             logic.getPending = [];
                             await logic.onGetAllBookingApiCall(
-                              userId: Constant.storage.read<String>('userId') ?? "",
+                              userId:
+                                  Constant.storage.read<String>('userId') ?? "",
                               status: "pending",
                               start: logic.startPending.toString(),
                               limit: logic.limitPending.toString(),
@@ -115,7 +120,8 @@ class BookingDetailScreen extends StatelessWidget {
                             logic.startCancel = 0;
                             logic.getCancel = [];
                             await logic.onGetAllBookingApiCall(
-                              userId: Constant.storage.read<String>('userId') ?? "",
+                              userId:
+                                  Constant.storage.read<String>('userId') ?? "",
                               status: "cancel",
                               start: logic.startCancel.toString(),
                               limit: logic.limitCancel.toString(),
@@ -126,7 +132,8 @@ class BookingDetailScreen extends StatelessWidget {
                             logic.startCompleted = 0;
                             logic.getComplete = [];
                             await logic.onGetAllBookingApiCall(
-                              userId: Constant.storage.read<String>('userId') ?? "",
+                              userId:
+                                  Constant.storage.read<String>('userId') ?? "",
                               status: "completed",
                               start: logic.startCompleted.toString(),
                               limit: logic.limitCompleted.toString(),
@@ -153,10 +160,14 @@ class BookingDetailScreen extends StatelessWidget {
                     fontSize: 16,
                     fontFamily: AppFontFamily.sfProDisplayRegular,
                   ),
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   indicatorPadding: const EdgeInsets.all(5),
-                  indicator: BoxDecoration(borderRadius: BorderRadius.circular(55), color: AppColors.primaryAppColor),
+                  indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(55),
+                      color: AppColors.primaryAppColor),
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelColor: AppColors.whiteColor,
                   unselectedLabelStyle: const TextStyle(
@@ -174,7 +185,8 @@ class BookingDetailScreen extends StatelessWidget {
               child: GetBuilder<BookingDetailScreenController>(
                 builder: (logic) {
                   return TabBarView(
-                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
                     controller: logic.tabController,
                     children: [
                       PendingBookingScreen(),

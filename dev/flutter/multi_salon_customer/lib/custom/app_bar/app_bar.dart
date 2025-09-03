@@ -17,7 +17,7 @@ class AppBarCustom extends StatelessWidget {
       preferredSize: const Size.fromHeight(55),
       child: AppBar(
         elevation: 0,
-        backgroundColor: AppColors.primaryAppColor,
+        backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         leading: method,
         actions: method1,
@@ -26,7 +26,7 @@ class AppBarCustom extends StatelessWidget {
           style: TextStyle(
             fontFamily: AppFontFamily.heeBo600,
             fontSize: 20,
-            color: AppColors.whiteColor,
+            color: AppColors.blackColor,
           ),
         ).paddingOnly(top: 7),
       ),

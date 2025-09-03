@@ -16,7 +16,7 @@ class NotificationTopView extends StatelessWidget {
       height: 100 + statusBarHeight,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.primaryAppColor,
+        color: AppColors.whiteColor,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -24,7 +24,8 @@ class NotificationTopView extends StatelessWidget {
           Container(
             height: 60,
             width: 60,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.whiteColor),
+            decoration: BoxDecoration(
+                shape: BoxShape.circle, color: AppColors.whiteColor),
             clipBehavior: Clip.hardEdge,
             child: Image.asset(AppAsset.icNotifications).paddingAll(11),
           ).paddingOnly(left: 15, right: 12),
@@ -34,11 +35,17 @@ class NotificationTopView extends StatelessWidget {
             children: [
               Text(
                 "txtWelcomeBack".tr,
-                style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 18, color: AppColors.whiteColor),
+                style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplay,
+                    fontSize: 18,
+                    color: AppColors.blackColor),
               ),
               Text(
                 "txtLongTime".tr,
-                style: TextStyle(fontFamily: AppFontFamily.sfProDisplayRegular, fontSize: 13, color: AppColors.whiteColor),
+                style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    fontSize: 13,
+                    color: AppColors.blackColor),
               ),
             ],
           ),

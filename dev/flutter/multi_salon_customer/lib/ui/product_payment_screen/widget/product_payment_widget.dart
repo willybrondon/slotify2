@@ -26,7 +26,7 @@ class ProductPaymentAppBarView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -76,7 +76,6 @@ class ProductPaymentMyWalletView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-
         /// Wallet Payment
         GetBuilder<ProductPaymentController>(
           id: Constant.idSelectPaymentMethod,
@@ -324,7 +323,8 @@ class ProductPaymentMyWalletView extends StatelessWidget {
                                       border: Border.all(
                                         color: logic.selectedPayment == "Stripe"
                                             ? AppColors.primaryAppColor
-                                            : AppColors.greyColor.withOpacity(0.3),
+                                            : AppColors.greyColor
+                                                .withOpacity(0.3),
                                       ),
                                     ),
                                     child: logic.selectedPayment == "Stripe"

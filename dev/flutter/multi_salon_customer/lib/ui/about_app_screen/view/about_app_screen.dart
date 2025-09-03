@@ -28,7 +28,7 @@ class AboutAppScreen extends StatelessWidget {
             },
             child: Icon(
               Icons.arrow_back,
-              color: AppColors.whiteColor,
+              color: AppColors.blackColor,
             ),
           ),
         ),
@@ -46,7 +46,8 @@ class AboutAppScreen extends StatelessWidget {
                 fontSize: 14.5,
                 onTap: () {
                   log("PRIVACY_POLICY_URL link  :: ${logic.settingCategory?.setting?.privacyPolicyLink ?? ""}");
-                  Utils.launchURL(logic.settingCategory?.setting?.privacyPolicyLink ?? "");
+                  Utils.launchURL(
+                      logic.settingCategory?.setting?.privacyPolicyLink ?? "");
                 },
               ),
               CustomMenu(

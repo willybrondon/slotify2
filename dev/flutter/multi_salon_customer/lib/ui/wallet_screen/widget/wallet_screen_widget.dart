@@ -27,7 +27,7 @@ class WalletAppBarView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -197,15 +197,18 @@ class WalletCurrentTransactionView extends StatelessWidget {
             : ListView.builder(
                 scrollDirection: Axis.vertical,
                 itemCount:
-                    (logic.getWalletHistoryModel?.data?.length ?? 0) >= 10 ? 10 : logic.getWalletHistoryModel?.data?.length ?? 0,
+                    (logic.getWalletHistoryModel?.data?.length ?? 0) >= 10
+                        ? 10
+                        : logic.getWalletHistoryModel?.data?.length ?? 0,
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   return AnimationConfiguration.staggeredGrid(
                     position: index,
                     duration: const Duration(milliseconds: 800),
-                    columnCount: (logic.getWalletHistoryModel?.data?.length ?? 0) >= 10
-                        ? 10
-                        : logic.getWalletHistoryModel?.data?.length ?? 0,
+                    columnCount:
+                        (logic.getWalletHistoryModel?.data?.length ?? 0) >= 10
+                            ? 10
+                            : logic.getWalletHistoryModel?.data?.length ?? 0,
                     child: SlideAnimation(
                       child: FadeInAnimation(
                         child: Container(
@@ -220,51 +223,79 @@ class WalletCurrentTransactionView extends StatelessWidget {
                             ),
                           ),
                           padding: const EdgeInsets.only(left: 7, right: 10),
-                          margin: const EdgeInsets.only(left: 12, right: 12, top: 10),
+                          margin: const EdgeInsets.only(
+                              left: 12, right: 12, top: 10),
                           child: Row(
                             children: [
                               Container(
                                 height: 55,
                                 width: 55,
                                 decoration: BoxDecoration(
-                                  color: logic.getWalletHistoryModel?.data?[index].type == 1 ||
-                                          logic.getWalletHistoryModel?.data?[index].type == 5
+                                  color: logic.getWalletHistoryModel
+                                                  ?.data?[index].type ==
+                                              1 ||
+                                          logic.getWalletHistoryModel
+                                                  ?.data?[index].type ==
+                                              5
                                       ? AppColors.greenBg
                                       : AppColors.redBg,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Image.asset(
-                                  logic.getWalletHistoryModel?.data?[index].type == 1 ||
-                                          logic.getWalletHistoryModel?.data?[index].type == 5
+                                  logic.getWalletHistoryModel?.data?[index]
+                                                  .type ==
+                                              1 ||
+                                          logic.getWalletHistoryModel
+                                                  ?.data?[index].type ==
+                                              5
                                       ? AppAsset.icWalletAdd
                                       : AppAsset.icWalletMinus,
                                 ).paddingAll(7),
                               ),
                               Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    logic.getWalletHistoryModel?.data?[index].type == 1
+                                    logic.getWalletHistoryModel?.data?[index]
+                                                .type ==
+                                            1
                                         ? "txtWalletDeposit".tr
-                                        : logic.getWalletHistoryModel?.data?[index].type == 2
+                                        : logic.getWalletHistoryModel
+                                                    ?.data?[index].type ==
+                                                2
                                             ? "txtBookingFeeDeduction".tr
-                                            : logic.getWalletHistoryModel?.data?[index].type == 3
-                                                ? "txtProductPurchaseDeduction".tr
-                                                : logic.getWalletHistoryModel?.data?[index].type == 4
-                                                    ? "txtOrderCancellationFee".tr
+                                            : logic.getWalletHistoryModel
+                                                        ?.data?[index].type ==
+                                                    3
+                                                ? "txtProductPurchaseDeduction"
+                                                    .tr
+                                                : logic
+                                                            .getWalletHistoryModel
+                                                            ?.data?[index]
+                                                            .type ==
+                                                        4
+                                                    ? "txtOrderCancellationFee"
+                                                        .tr
                                                     : "txtOrderRefund".tr,
                                     style: TextStyle(
                                       fontFamily: AppFontFamily.heeBo700,
                                       fontSize: 14,
-                                      color: logic.getWalletHistoryModel?.data?[index].type == 1 ||
-                                              logic.getWalletHistoryModel?.data?[index].type == 5
+                                      color: logic.getWalletHistoryModel
+                                                      ?.data?[index].type ==
+                                                  1 ||
+                                              logic.getWalletHistoryModel
+                                                      ?.data?[index].type ==
+                                                  5
                                           ? AppColors.greenText
                                           : AppColors.redText,
                                     ),
                                   ),
                                   Text(
-                                    logic.getWalletHistoryModel?.data?[index].uniqueId ?? "",
+                                    logic.getWalletHistoryModel?.data?[index]
+                                            .uniqueId ??
+                                        "",
                                     style: TextStyle(
                                       fontFamily: AppFontFamily.heeBo700,
                                       fontSize: 12,
@@ -283,24 +314,37 @@ class WalletCurrentTransactionView extends StatelessWidget {
                               ).paddingOnly(top: 10, bottom: 10, left: 10),
                               const Spacer(),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: logic.getWalletHistoryModel?.data?[index].type == 1 ||
-                                          logic.getWalletHistoryModel?.data?[index].type == 5
+                                  color: logic.getWalletHistoryModel
+                                                  ?.data?[index].type ==
+                                              1 ||
+                                          logic.getWalletHistoryModel
+                                                  ?.data?[index].type ==
+                                              5
                                       ? AppColors.greenBg
                                       : AppColors.redBg,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  logic.getWalletHistoryModel?.data?[index].type == 1 ||
-                                          logic.getWalletHistoryModel?.data?[index].type == 5
+                                  logic.getWalletHistoryModel?.data?[index]
+                                                  .type ==
+                                              1 ||
+                                          logic.getWalletHistoryModel
+                                                  ?.data?[index].type ==
+                                              5
                                       ? "+ ${logic.getWalletHistoryModel?.data?[index].amount ?? ""}"
                                       : "- ${logic.getWalletHistoryModel?.data?[index].amount ?? ""}",
                                   style: TextStyle(
                                     fontFamily: AppFontFamily.heeBo700,
                                     fontSize: 14,
-                                    color: logic.getWalletHistoryModel?.data?[index].type == 1 ||
-                                            logic.getWalletHistoryModel?.data?[index].type == 5
+                                    color: logic.getWalletHistoryModel
+                                                    ?.data?[index].type ==
+                                                1 ||
+                                            logic.getWalletHistoryModel
+                                                    ?.data?[index].type ==
+                                                5
                                         ? AppColors.greenText
                                         : AppColors.redText,
                                   ),

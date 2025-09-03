@@ -25,7 +25,7 @@ class OrderAppBarView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -90,7 +90,8 @@ class OrderListView extends StatelessWidget {
 class OrderListItemView extends StatelessWidget {
   final Items items;
   final OrderData orderData;
-  const OrderListItemView({super.key, required this.items, required this.orderData});
+  const OrderListItemView(
+      {super.key, required this.items, required this.orderData});
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +114,8 @@ class OrderListItemView extends StatelessWidget {
               },
             );
           },
-          overlayColor: const WidgetStatePropertyAll(WidgetStateColor.transparent),
+          overlayColor:
+              const WidgetStatePropertyAll(WidgetStateColor.transparent),
           child: Container(
             height: 132,
             decoration: BoxDecoration(
@@ -141,10 +143,12 @@ class OrderListItemView extends StatelessWidget {
                         imageUrl: items.product?.mainImage ?? "",
                         fit: BoxFit.cover,
                         placeholder: (context, url) {
-                          return Image.asset(AppAsset.icImagePlaceholder).paddingAll(15);
+                          return Image.asset(AppAsset.icImagePlaceholder)
+                              .paddingAll(15);
                         },
                         errorWidget: (context, url, error) {
-                          return Image.asset(AppAsset.icImagePlaceholder).paddingAll(15);
+                          return Image.asset(AppAsset.icImagePlaceholder)
+                              .paddingAll(15);
                         },
                       ),
                     ),
@@ -157,7 +161,8 @@ class OrderListItemView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            Constant.capitalizeFirstLetter(items.product?.productName ?? ""),
+                            Constant.capitalizeFirstLetter(
+                                items.product?.productName ?? ""),
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo700,
@@ -206,7 +211,8 @@ class OrderListItemView extends StatelessWidget {
                       ),
                     ).paddingOnly(left: 10),
                     const Spacer(),
-                    Image.asset(AppAsset.icArrowRight, height: 25, color: AppColors.arrowColor),
+                    Image.asset(AppAsset.icArrowRight,
+                        height: 25, color: AppColors.arrowColor),
                   ],
                 ).paddingOnly(left: 10, right: 10, top: 10),
                 Container(
@@ -217,7 +223,8 @@ class OrderListItemView extends StatelessWidget {
                       bottomRight: Radius.circular(12),
                     ),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -252,9 +259,11 @@ class OrderListItemView extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: AppFontFamily.heeBo700,
                           fontSize: 11,
-                          color: items.status == "Pending" || items.status == "Delivered"
+                          color: items.status == "Pending" ||
+                                  items.status == "Delivered"
                               ? AppColors.greenText
-                              : items.status == "Confirmed" || items.status == "Out Of Delivery"
+                              : items.status == "Confirmed" ||
+                                      items.status == "Out Of Delivery"
                                   ? AppColors.orange
                                   : AppColors.redText,
                         ),

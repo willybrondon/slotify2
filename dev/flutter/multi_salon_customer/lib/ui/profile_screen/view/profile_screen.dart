@@ -26,7 +26,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
-    LoginScreenController loginScreenController = Get.put(LoginScreenController());
+    LoginScreenController loginScreenController =
+        Get.put(LoginScreenController());
 
     log("loginScreenController.emailController.text${loginScreenController.otpEditingController.text}");
 
@@ -58,20 +59,22 @@ class ProfileScreen extends StatelessWidget {
                                       height: 95,
                                       width: double.infinity,
                                       alignment: Alignment.center,
-                                      color: AppColors.primaryAppColor,
+                                      color: AppColors.whiteColor,
                                       child: Text(
                                         "txtProfile".tr,
                                         style: TextStyle(
-                                          fontFamily: AppFontFamily.sfProDisplayBold,
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayBold,
                                           fontSize: 20,
-                                          color: AppColors.whiteColor,
+                                          color: AppColors.blackColor,
                                         ),
                                       ).paddingOnly(top: 30),
                                     )
                                   : const SizedBox(),
                               logic.isUpdate == false
                                   ? Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 30),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 30),
                                       child: userprofile(),
                                     )
                                   : GetBuilder<ProfileScreenController>(
@@ -79,56 +82,85 @@ class ProfileScreen extends StatelessWidget {
                                       init: ProfileScreenController(),
                                       builder: (logicProfile) {
                                         return Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Stack(
                                               children: [
                                                 Container(
-                                                  height: Get.height * 0.17 + statusBarHeight,
+                                                  height: Get.height * 0.17 +
+                                                      statusBarHeight,
                                                   width: double.infinity,
                                                   decoration: BoxDecoration(
-                                                    color: AppColors.primaryAppColor,
+                                                    color: AppColors.whiteColor,
                                                   ),
                                                   child: Center(
                                                     child: Text(
                                                       "txtProfile".tr,
                                                       style: TextStyle(
-                                                        fontFamily: AppFontFamily.sfProDisplayBold,
+                                                        fontFamily: AppFontFamily
+                                                            .sfProDisplayBold,
                                                         fontSize: 20,
-                                                        color: AppColors.whiteColor,
+                                                        color: AppColors
+                                                            .blackColor,
                                                       ),
                                                     ).paddingOnly(bottom: 35),
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsets.only(top: Get.height * 0.13),
+                                                  padding: EdgeInsets.only(
+                                                      top: Get.height * 0.13),
                                                   child: Stack(
                                                     children: [
                                                       Center(
                                                         child: CircleAvatar(
                                                           radius: 63,
-                                                          backgroundColor: AppColors.whiteColor,
+                                                          backgroundColor:
+                                                              AppColors
+                                                                  .whiteColor,
                                                           child: Container(
                                                             height: 120,
                                                             width: 120,
-                                                            clipBehavior: Clip.hardEdge,
-                                                            decoration: BoxDecoration(
-                                                              shape: BoxShape.circle,
-                                                              color: AppColors.grey.withOpacity(0.2),
+                                                            clipBehavior:
+                                                                Clip.hardEdge,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color: AppColors
+                                                                  .grey
+                                                                  .withOpacity(
+                                                                      0.2),
                                                             ),
-                                                            child: Image.network(
-                                                              Constant.storage.read<String>('userImage') ??
+                                                            child:
+                                                                Image.network(
+                                                              Constant.storage.read<
+                                                                          String>(
+                                                                      'userImage') ??
                                                                   "${ApiConstant.BASE_URL}static/male.png",
                                                               fit: BoxFit.cover,
-                                                              errorBuilder: (context, error, stackTrace) => Container(
+                                                              errorBuilder:
+                                                                  (context,
+                                                                          error,
+                                                                          stackTrace) =>
+                                                                      Container(
                                                                 height: 120,
                                                                 width: 120,
-                                                                decoration: BoxDecoration(
-                                                                  shape: BoxShape.circle,
-                                                                  color: AppColors.grey.withOpacity(0.2),
-                                                                  image: const DecorationImage(
-                                                                    image: AssetImage(AppAsset.imMale),
-                                                                    fit: BoxFit.cover,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: AppColors
+                                                                      .grey
+                                                                      .withOpacity(
+                                                                          0.2),
+                                                                  image:
+                                                                      const DecorationImage(
+                                                                    image: AssetImage(
+                                                                        AppAsset
+                                                                            .imMale),
+                                                                    fit: BoxFit
+                                                                        .cover,
                                                                   ),
                                                                 ),
                                                               ),
@@ -145,25 +177,40 @@ class ProfileScreen extends StatelessWidget {
                                             Text(
                                               "${Constant.storage.read<String>("fName")} ${Constant.storage.read<String>("lName")}",
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.heeBo800,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo800,
                                                 fontSize: 20,
-                                                color: AppColors.primaryTextColor,
+                                                color:
+                                                    AppColors.primaryTextColor,
                                               ),
                                             ),
                                             Text(
-                                              logicProfile.getUserCategory?.user?.loginType == 3
-                                                  ? logicProfile.getUserCategory?.user?.mobile.toString() ?? ""
-                                                  : logicProfile.getUserCategory?.user?.email.toString() ?? "",
+                                              logicProfile.getUserCategory?.user
+                                                          ?.loginType ==
+                                                      3
+                                                  ? logicProfile.getUserCategory
+                                                          ?.user?.mobile
+                                                          .toString() ??
+                                                      ""
+                                                  : logicProfile.getUserCategory
+                                                          ?.user?.email
+                                                          .toString() ??
+                                                      "",
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.heeBo500,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo500,
                                                 fontSize: 16,
                                                 color: AppColors.email,
                                               ),
                                             ),
                                             SizedBox(height: Get.height * 0.04),
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                                              child: logic.isLogIn == true ? editUserprofile() : userprofile(),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12),
+                                              child: logic.isLogIn == true
+                                                  ? editUserprofile()
+                                                  : userprofile(),
                                             )
                                           ],
                                         );
@@ -234,7 +281,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   editUserprofile() {
-    ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
+    ProfileScreenController profileScreenController =
+        Get.put(ProfileScreenController());
 
     return Column(
       children: [
@@ -250,13 +298,22 @@ class ProfileScreen extends StatelessWidget {
                 await logicProfile.onGetUserApiCall();
 
                 if (logicProfile.getUserCategory?.status == true) {
-                  Constant.storage.write('fName', profileScreenController.getUserCategory?.user?.fname);
-                  Constant.storage.write('lName', profileScreenController.getUserCategory?.user?.lname);
-                  Constant.storage.write('salonRequestSent', profileScreenController.getUserCategory?.user?.salonRequestSent);
+                  Constant.storage.write('fName',
+                      profileScreenController.getUserCategory?.user?.fname);
+                  Constant.storage.write('lName',
+                      profileScreenController.getUserCategory?.user?.lname);
+                  Constant.storage.write(
+                      'salonRequestSent',
+                      profileScreenController
+                          .getUserCategory?.user?.salonRequestSent);
 
                   Future.delayed(const Duration(milliseconds: 100), () async {
-                    await Get.put<EditProfileScreenController>(EditProfileScreenController()).getDataFromArgs();
-                    await Get.put<EditProfileScreenController>(EditProfileScreenController()).getArgumentsData();
+                    await Get.put<EditProfileScreenController>(
+                            EditProfileScreenController())
+                        .getDataFromArgs();
+                    await Get.put<EditProfileScreenController>(
+                            EditProfileScreenController())
+                        .getArgumentsData();
                   });
 
                   Get.toNamed(AppRoutes.editProfile, arguments: [
@@ -270,7 +327,8 @@ class ProfileScreen extends StatelessWidget {
                     false
                   ]);
                 } else {
-                  Utils.showToast(Get.context!, logicProfile.getUserCategory?.message ?? "");
+                  Utils.showToast(Get.context!,
+                      logicProfile.getUserCategory?.message ?? "");
                 }
               },
             );
@@ -353,7 +411,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget profileMenu({String? leadingImage, title, subtitle, Function()? onTap}) {
+  Widget profileMenu(
+      {String? leadingImage, title, subtitle, Function()? onTap}) {
     return Column(
       children: [
         InkWell(
@@ -407,7 +466,8 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                Image.asset(AppAsset.icArrow, height: 23, width: 23).paddingOnly(right: 7),
+                Image.asset(AppAsset.icArrow, height: 23, width: 23)
+                    .paddingOnly(right: 7),
               ],
             ),
           ),

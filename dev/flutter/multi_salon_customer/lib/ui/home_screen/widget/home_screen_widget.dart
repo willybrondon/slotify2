@@ -33,7 +33,7 @@ class HomeScreenTopView extends StatelessWidget {
             horizontal: 16,
           ),
           decoration: BoxDecoration(
-            color: AppColors.primaryAppColor,
+            color: AppColors.whiteColor,
           ),
           child: Row(
             children: [
@@ -50,7 +50,7 @@ class HomeScreenTopView extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: AppFontFamily.sfProDisplayBold,
                           fontSize: 20,
-                          color: AppColors.whiteColor,
+                          color: AppColors.blackColor,
                         ),
                       );
                     },
@@ -60,7 +60,7 @@ class HomeScreenTopView extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: AppFontFamily.sfProDisplayRegular,
                       fontSize: 16,
-                      color: AppColors.whiteColor,
+                      color: AppColors.blackColor,
                     ),
                   ),
                 ],

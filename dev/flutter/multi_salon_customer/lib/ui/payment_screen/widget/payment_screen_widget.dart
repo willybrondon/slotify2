@@ -25,7 +25,7 @@ class PaymentAppBarView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -55,9 +55,10 @@ class PaymentMethodView extends StatelessWidget {
                   // Show the payment method that was already selected in booking screen
                   if (logic.selectedPayment == "wallet") PaymentMyWalletView(),
                   if (logic.selectedPayment == "Stripe") PaymentStripeView(),
-                  if (logic.selectedPayment == "cashAfterService") PaymentCashOnHandView(),
+                  if (logic.selectedPayment == "cashAfterService")
+                    PaymentCashOnHandView(),
                   // Add other payment methods as needed
-                  
+
                   // Show a message that payment method is already selected
                   Container(
                     width: Get.width,

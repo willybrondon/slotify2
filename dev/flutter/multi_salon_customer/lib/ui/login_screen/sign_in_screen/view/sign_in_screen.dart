@@ -40,7 +40,7 @@ class SignInScreen extends StatelessWidget {
             height: 100 + statusBarHeight,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.primaryAppColor,
+              color: AppColors.whiteColor,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -64,14 +64,14 @@ class SignInScreen extends StatelessWidget {
                       style: TextStyle(
                           fontFamily: AppFontFamily.sfProDisplay,
                           fontSize: 18,
-                          color: AppColors.whiteColor),
+                          color: AppColors.blackColor),
                     ),
                     Text(
                       "txtLongTime".tr,
                       style: TextStyle(
                           fontFamily: AppFontFamily.sfProDisplayRegular,
                           fontSize: 13,
-                          color: AppColors.whiteColor),
+                          color: AppColors.blackColor),
                     ),
                   ],
                 ),
