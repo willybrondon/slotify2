@@ -2081,17 +2081,7 @@ class BookingScreen extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "txtStaffDetails".tr,
-              style: TextStyle(
-                fontFamily: AppFontFamily.sfProDisplayBold,
-                fontSize: 18,
-                color: AppColors.primaryTextColor,
-              ),
-            ),
-            SizedBox(height: Get.height * 0.02),
-
-            // Expert/Salon/Address Container
+            // Expert Container
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -2102,16 +2092,6 @@ class BookingScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Selected Expert & Salon & Address",
-                    style: TextStyle(
-                      fontFamily: AppFontFamily.sfProDisplayBold,
-                      fontSize: 16,
-                      color: AppColors.primaryTextColor,
-                    ),
-                  ),
-                  SizedBox(height: Get.height * 0.015),
-
                   // Expert Row
                   Row(
                     children: [
@@ -2153,124 +2133,6 @@ class BookingScreen extends StatelessWidget {
                             SizedBox(height: 2),
                             Text(
                               "${logic.selectedExpertDataList.length > 1 ? logic.selectedExpertDataList[1] : ""} ${logic.selectedExpertDataList.length > 2 ? logic.selectedExpertDataList[2] : ""}",
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold,
-                                fontSize: 16,
-                                color: AppColors.primaryTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 16),
-
-                  // Salon Row
-                  Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                              color: AppColors.grey.withOpacity(0.3), width: 2),
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            color: AppColors.grey.withOpacity(0.1),
-                          ),
-                          child: Icon(
-                            Icons.store,
-                            color: AppColors.greyColor2,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Salon",
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplay,
-                                fontSize: 12,
-                                color: AppColors.greyColor2,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              logic.salonName ?? "Salon Name",
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold,
-                                fontSize: 16,
-                                color: AppColors.primaryTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 16),
-
-                  // Address Row
-                  Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                              color: AppColors.grey.withOpacity(0.3), width: 2),
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            color: AppColors.grey.withOpacity(0.1),
-                          ),
-                          child: Icon(
-                            logic.selectedVenue == "At Home"
-                                ? Icons.home
-                                : Icons.store,
-                            color: AppColors.greyColor2,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Address",
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplay,
-                                fontSize: 12,
-                                color: AppColors.greyColor2,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              logic.selectedVenue == "At Home"
-                                  ? (logic.searchEditingController.text
-                                          .isNotEmpty
-                                      ? logic.searchEditingController.text
-                                      : "Please enter address")
-                                  : logic.selectedVenue == "At Salon"
-                                      ? (logic.salonAddress != null &&
-                                              logic.salonAddress!.isNotEmpty
-                                          ? logic.salonAddress!
-                                          : "Salon Address")
-                                      : "Select venue",
                               style: TextStyle(
                                 fontFamily: AppFontFamily.sfProDisplayBold,
                                 fontSize: 16,
