@@ -232,7 +232,7 @@ jobs:
     strategy:
       matrix:
         app: [customer, expert]
-        environment: [dev, prd]
+        environment: [dev]
     steps:
       # this was more debug as was curious what came pre-installed oky
       # GitHub shares this online, e.g. https://github.com/actions/runner-images/blob/macOS-12/20230224.1/images/macos/macos-12-Readme.md
@@ -254,7 +254,7 @@ jobs:
 
       - name: Get Flutter dependencies
         run: |
-          cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+          cd "dev/flutter/multi_salon_${{ matrix.app }}"
           flutter clean
           flutter pub get
       
