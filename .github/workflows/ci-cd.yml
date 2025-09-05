@@ -357,7 +357,7 @@ jobs:
           sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "iPhone Distribution";/g' Runner.xcodeproj/project.pbxproj
           
           # Configure signing for expert app
-          cd "../multi_salon_expert/ios"
+          cd "../../multi_salon_expert/ios"
           sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
           sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
           sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = "";/g' Runner.xcodeproj/project.pbxproj
