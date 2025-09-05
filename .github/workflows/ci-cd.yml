@@ -368,6 +368,7 @@ jobs:
           -configuration Release \
           -destination generic/platform=iOS \
           DEVELOPMENT_TEAM=7B755FRMAM \
+          -allowProvisioningUpdates \
           clean archive
 
       - name: export ipa
