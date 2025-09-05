@@ -77,7 +77,7 @@ dependencies:
   in_app_review: ^2.0.10
 #  in_app_review: ^2.0.8
   share_plus: ^11.0.0
-  url_launcher: ^6.3.1
+  url_launcher: ^6.3.2
   flutter_staggered_animations: ^1.1.1
   google_sign_in: ^6.3.0
   flutterwave_standard: ^1.1.0

@@ -257,6 +257,7 @@ jobs:
           cd "dev/flutter/multi_salon_${{ matrix.app }}"
           flutter clean
           flutter pub get
+          flutter pub upgrade
       
 
       - name: Install the Apple certificate and provisioning profile

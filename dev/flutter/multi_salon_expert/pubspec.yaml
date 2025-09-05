@@ -51,7 +51,7 @@ dependencies:
   flutter_local_notifications: ^19.2.0
   in_app_review: ^2.0.10
   share_plus: ^11.0.0
-  url_launcher: ^6.3.1
+  url_launcher: ^6.3.2
   flutter_staggered_animations: ^1.1.1
   scroll_page_view: ^1.0.2
   syncfusion_flutter_datepicker: ^27.1.53
