@@ -345,6 +345,19 @@ jobs:
           
          
 
+      - name: Setup Apple ID for Automatic Signing
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          # Create keychain for Apple ID authentication
+          security create-keychain -p "temp_password" ~/Library/Keychains/temp.keychain
+          security set-keychain-settings -lut 21600 ~/Library/Keychains/temp.keychain
+          security unlock-keychain -p "temp_password" ~/Library/Keychains/temp.keychain
+          
+          # Add Apple ID to Xcode accounts (this will be handled by -allowProvisioningUpdates)
+          echo "Apple ID configured for automatic signing: $APPLE_ID"
+
       - name: install pod ios for testting 
         run: |
           cd "dev/flutter/multi_salon_${{ matrix.app }}/ios"
@@ -369,6 +382,7 @@ jobs:
           -configuration Release \
           -destination generic/platform=iOS \
           DEVELOPMENT_TEAM=7B755FRMAM \
+          -allowProvisioningUpdates \
           clean archive
 
       - name: export ipa
