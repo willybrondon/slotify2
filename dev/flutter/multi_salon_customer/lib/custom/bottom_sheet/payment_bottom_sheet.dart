@@ -542,7 +542,7 @@ class PaymentBottomSheet extends StatelessWidget {
                     onTap: () {
                       logic.onRechargeClick();
                     },
-                  ).paddingOnly(top: 25, left: 12.5, bottom: 8);
+                  ).paddingOnly(top: 25, left: 12.5, right: 12.5, bottom: 8);
                 },
               ),
             ],
