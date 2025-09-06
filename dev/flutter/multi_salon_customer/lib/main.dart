@@ -215,12 +215,33 @@ Future<void> main() async {
     ///************** FCM token ************************\\\
     try {
       FirebaseMessaging messaging = FirebaseMessaging.instance;
-      await messaging.getToken().then((value) {
-        fcmToken = value ?? '';
-        log("Fcm Token :: $fcmToken");
-      });
+
+      // Request permission for notifications
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+
+      log("Notification Settings :: $settings");
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        await messaging.getToken().then((value) {
+          fcmToken = value ?? '';
+          log("Fcm Token :: $fcmToken");
+        });
+      } else {
+        log("Notification permission denied, using empty FCM token");
+        fcmToken = '';
+      }
     } catch (e) {
       log("Error FCM token: $e");
+      fcmToken = '';
     }
 
     log("FCM Token :: $fcmToken");

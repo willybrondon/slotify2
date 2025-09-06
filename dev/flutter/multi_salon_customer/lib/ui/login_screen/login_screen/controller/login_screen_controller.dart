@@ -239,26 +239,36 @@ class LoginScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView, Constant.idBookingAndLogin]);
 
+      // Ensure FCM token is not null for iOS
+      String safeFcmToken = fcmToken.isNotEmpty ? fcmToken : '';
+
       final body = json.encode({
         "mobile": mobile,
         "loginType": loginType,
-        "fcmToken": fcmToken,
+        "fcmToken": safeFcmToken,
         "email": email,
         "password": password,
         "age": age
       });
 
       log("Login Body :: $body");
+      log("FCM Token being sent :: $safeFcmToken");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.loginUser);
       log("Login Url :: $url");
 
       final headers = {
         "key": ApiConstant.SECRET_KEY,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'MultiSalonCustomer/1.0',
       };
 
-      final response = await http.post(url, headers: headers, body: body);
+      log("Login Headers :: $headers");
+
+      final response = await http
+          .post(url, headers: headers, body: body)
+          .timeout(const Duration(seconds: 30));
 
       log("Login Status Code :: ${response.statusCode}");
       log("Login Response :: ${response.body}");
@@ -266,8 +276,13 @@ class LoginScreenController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         loginCategory = LoginModel.fromJson(jsonResponse);
+        log("Login successful: ${loginCategory?.status}");
+      } else {
+        log("Login failed with status code: ${response.statusCode}");
+        Utils.showToast(Get.context!, "Login failed. Please try again.");
       }
     } on AppException catch (exception) {
+      log("App Exception: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
     } on SocketException catch (e) {
       log("Network error: $e");
@@ -276,6 +291,10 @@ class LoginScreenController extends GetxController {
     } on HandshakeException catch (e) {
       log("SSL Handshake error: $e");
       Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+    } on TimeoutException catch (e) {
+      log("Timeout error: $e");
+      Utils.showToast(Get.context!,
+          "Request timeout. Please check your connection and try again.");
     } catch (e) {
       log("Error call Login Api :: $e");
       Utils.showToast(Get.context!, 'Connection error. Please try again.');

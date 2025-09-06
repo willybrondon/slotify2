@@ -191,10 +191,16 @@ class SignInController extends GetxController {
 
       final headers = {
         "key": ApiConstant.SECRET_KEY,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'MultiSalonCustomer/1.0',
       };
 
-      final response = await http.post(url, headers: headers, body: body);
+      log("Check User Headers :: $headers");
+
+      final response = await http
+          .post(url, headers: headers, body: body)
+          .timeout(const Duration(seconds: 30));
 
       log("Check User Status Code :: ${response.statusCode}");
       log("Check User Response :: ${response.body}");
@@ -202,12 +208,28 @@ class SignInController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         checkUserCategory = CheckUserModel.fromJson(jsonResponse);
+        log("Check User successful: ${checkUserCategory?.status}");
+      } else {
+        log("Check User failed with status code: ${response.statusCode}");
+        Utils.showToast(Get.context!, "Check user failed. Please try again.");
       }
     } on AppException catch (exception) {
+      log("App Exception in Check User: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
+    } on SocketException catch (e) {
+      log("Network error in Check User: $e");
+      Utils.showToast(Get.context!,
+          "Network connection error. Please check your internet connection.");
+    } on HandshakeException catch (e) {
+      log("SSL Handshake error in Check User: $e");
+      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+    } on TimeoutException catch (e) {
+      log("Timeout error in Check User: $e");
+      Utils.showToast(Get.context!,
+          "Request timeout. Please check your connection and try again.");
     } catch (e) {
       log("Error call Check User Api :: $e");
-      Utils.showToast(Get.context!, '$e');
+      Utils.showToast(Get.context!, 'Connection error. Please try again.');
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
