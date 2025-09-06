@@ -133,6 +133,7 @@ class LoginScreenController extends GetxController {
           .encode({"email": email, "password": password, "fcmToken": fcmToken});
 
       log("Login Body :: $body");
+      log("FCM Token for login :: $fcmToken");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.loginExpert);
       log("Login Url :: $url");
@@ -145,19 +146,27 @@ class LoginScreenController extends GetxController {
 
       final response = await HttpUtils.patch(url, headers: headers, body: body);
 
+      log("Login Response Status Code :: ${response.statusCode}");
+      log("Login Response Body :: ${response.body}");
+
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         log("User Login SuccessFully..!");
         loginCategory = LoginModel.fromJson(jsonResponse);
+        log("Login Category Status :: ${loginCategory?.status}");
+        log("Login Category Message :: ${loginCategory?.message}");
       } else {
         final jsonResponse = jsonDecode(response.body);
         loginCategory = LoginModel.fromJson(jsonResponse);
+        log("Login Failed - Status Code: ${response.statusCode}");
+        log("Login Failed - Response: ${response.body}");
       }
     } on AppException catch (exception) {
+      log("AppException in login: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Login Api :: $e");
-      Utils.showToast(Get.context!, '$e');
+      Utils.showToast(Get.context!, 'Login failed: $e');
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);

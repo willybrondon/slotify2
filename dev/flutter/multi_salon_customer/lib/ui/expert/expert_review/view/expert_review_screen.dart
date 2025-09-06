@@ -26,7 +26,7 @@ class ExpertReviewScreen extends StatelessWidget {
             },
             child: Icon(
               Icons.arrow_back,
-              color: AppColors.whiteColor,
+              color: AppColors.blackColor,
             ),
           ),
         ),
@@ -47,9 +47,12 @@ class ExpertReviewScreen extends StatelessWidget {
                   child: SlideAnimation(
                     child: FadeInAnimation(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12), color: AppColors.whiteColor, boxShadow: Constant.boxShadow),
+                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.whiteColor,
+                            boxShadow: Constant.boxShadow),
                         child: Column(
                           children: [
                             Row(
@@ -58,7 +61,8 @@ class ExpertReviewScreen extends StatelessWidget {
                                 Text(
                                   "${logic.getReviewCategory!.data![index].userId?.fname} ${logic.getReviewCategory!.data![index].userId?.lname}",
                                   style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
                                       fontSize: 16.5,
                                       color: AppColors.primaryTextColor),
                                 ),
@@ -69,23 +73,32 @@ class ExpertReviewScreen extends StatelessWidget {
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(6), color: AppColors.oceanBlue.withOpacity(0.30)),
+                                      borderRadius: BorderRadius.circular(6),
+                                      color: AppColors.oceanBlue
+                                          .withOpacity(0.30)),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Image.asset(
-                                        logic.getReviewCategory!.data![index].rating!.toInt() >= 4
+                                        logic.getReviewCategory!.data![index]
+                                                    .rating!
+                                                    .toInt() >=
+                                                4
                                             ? AppAsset.icGreenStar
                                             : AppAsset.icRedStar,
                                         height: 15,
                                         width: 15,
                                       ),
                                       SizedBox(width: Get.width * 0.02),
-                                      Text(logic.getReviewCategory!.data![index].rating.toString(),
+                                      Text(
+                                          logic.getReviewCategory!.data![index]
+                                              .rating
+                                              .toString(),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
-                                              fontFamily: AppFontFamily.sfProDisplayBold,
+                                              fontFamily: AppFontFamily
+                                                  .sfProDisplayBold,
                                               fontSize: 15,
                                               color: AppColors.blackColor)),
                                     ],
@@ -96,18 +109,26 @@ class ExpertReviewScreen extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(logic.getReviewCategory!.data![index].review.toString(),
+                                Text(
+                                    logic.getReviewCategory!.data![index].review
+                                        .toString(),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayMedium, fontSize: 14, color: AppColors.grey)),
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayMedium,
+                                        fontSize: 14,
+                                        color: AppColors.grey)),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12),
                                   child: Text(logic.date.toString(),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                          fontFamily: AppFontFamily.sfProDisplayMedium, fontSize: 13, color: AppColors.grey)),
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayMedium,
+                                          fontSize: 13,
+                                          color: AppColors.grey)),
                                 ),
                               ],
                             ),

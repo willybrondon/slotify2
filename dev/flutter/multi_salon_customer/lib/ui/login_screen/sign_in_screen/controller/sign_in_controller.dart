@@ -181,18 +181,12 @@ class SignInController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      final queryParameters = {
-        "email": email,
-        "loginType": loginType,
-        "password": password
-      };
+      final body = json.encode(
+          {"email": email, "loginType": loginType, "password": password});
 
-      log("Check User Params :: $queryParameters");
+      log("Check User Body :: $body");
 
-      String queryString = Uri(queryParameters: queryParameters).query;
-
-      final url =
-          Uri.parse(ApiConstant.BASE_URL + ApiConstant.checkUser + queryString);
+      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.checkUser);
       log("Check User Url :: $url");
 
       final headers = {
@@ -200,7 +194,7 @@ class SignInController extends GetxController {
         'Content-Type': 'application/json'
       };
 
-      final response = await http.post(url, headers: headers);
+      final response = await http.post(url, headers: headers, body: body);
 
       log("Check User Status Code :: ${response.statusCode}");
       log("Check User Response :: ${response.body}");

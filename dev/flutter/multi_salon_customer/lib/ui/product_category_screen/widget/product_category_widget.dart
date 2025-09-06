@@ -24,7 +24,7 @@ class ProductCategoryAppBarView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -75,13 +75,17 @@ class ProductCategoryItemView extends StatelessWidget {
                       child: AspectRatio(
                         aspectRatio: 1.2,
                         child: CachedNetworkImage(
-                          imageUrl: logic.getProductCategoryModel?.data?[index].image ?? "",
+                          imageUrl: logic.getProductCategoryModel?.data?[index]
+                                  .image ??
+                              "",
                           fit: BoxFit.cover,
                           placeholder: (context, url) {
-                            return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                            return Image.asset(AppAsset.icImagePlaceholder)
+                                .paddingAll(25);
                           },
                           errorWidget: (context, url, error) {
-                            return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                            return Image.asset(AppAsset.icImagePlaceholder)
+                                .paddingAll(25);
                           },
                         ),
                       ),
@@ -97,7 +101,8 @@ class ProductCategoryItemView extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          logic.getProductCategoryModel?.data?[index].name ?? "",
+                          logic.getProductCategoryModel?.data?[index].name ??
+                              "",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontFamily: AppFontFamily.heeBo700,

@@ -18,9 +18,12 @@ import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/shimmer.dart';
 
 class CategoryDetailScreen extends StatelessWidget {
-  final CategoryDetailController categoryDetailController = Get.find<CategoryDetailController>();
-  final SearchScreenController searchScreenController = Get.find<SearchScreenController>();
-  final HomeScreenController homeScreenController = Get.find<HomeScreenController>();
+  final CategoryDetailController categoryDetailController =
+      Get.find<CategoryDetailController>();
+  final SearchScreenController searchScreenController =
+      Get.find<SearchScreenController>();
+  final HomeScreenController homeScreenController =
+      Get.find<HomeScreenController>();
 
   CategoryDetailScreen({super.key});
 
@@ -52,7 +55,7 @@ class CategoryDetailScreen extends StatelessWidget {
               },
               child: Icon(
                 Icons.arrow_back,
-                color: AppColors.whiteColor,
+                color: AppColors.blackColor,
               ),
             ),
           ),
@@ -136,7 +139,8 @@ class CategoryDetailScreen extends StatelessWidget {
                           fontFamily: AppFontFamily.sfProDisplay,
                           color: AppColors.whiteColor,
                           onTap: () async {
-                            if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                            if (Constant.storage.read<bool>('isLogIn') ??
+                                false) {
                               log("Total Minute :: ${logic.totalMinute}");
 
                               Get.toNamed(AppRoutes.selectBranch, arguments: [
@@ -148,8 +152,10 @@ class CategoryDetailScreen extends StatelessWidget {
                                 0.0,
                               ]);
                             } else {
-                              Get.toNamed(AppRoutes.signIn, arguments: [logic.checkItem.isNotEmpty]);
-                              await Get.find<SignInController>().getDataFromArgs();
+                              Get.toNamed(AppRoutes.signIn,
+                                  arguments: [logic.checkItem.isNotEmpty]);
+                              await Get.find<SignInController>()
+                                  .getDataFromArgs();
                             }
                           },
                         )
@@ -166,12 +172,14 @@ class CategoryDetailScreen extends StatelessWidget {
                 ? Shimmers.categoryDetailsShimmer()
                 : RefreshIndicator(
                     onRefresh: () async {
-                      return await logic.onGetServiceApiCall(categoryId: logic.categoryId!);
+                      return await logic.onGetServiceApiCall(
+                          categoryId: logic.categoryId!);
                     },
                     color: AppColors.primaryAppColor,
                     child: SingleChildScrollView(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -196,9 +204,11 @@ class CategoryDetailScreen extends StatelessWidget {
                                     Text(
                                       "txtSearchServices".tr,
                                       style: TextStyle(
-                                          color: AppColors.darkGrey.withOpacity(0.7),
+                                          color: AppColors.darkGrey
+                                              .withOpacity(0.7),
                                           fontSize: 13.8,
-                                          fontFamily: AppFontFamily.sfProDisplayMedium),
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayMedium),
                                     ),
                                   ],
                                 ),
@@ -217,7 +227,9 @@ class CategoryDetailScreen extends StatelessWidget {
                             GetBuilder<CategoryDetailController>(
                               id: Constant.idServiceList,
                               builder: (logic) {
-                                return logic.getServiceCategory?.services?.isEmpty ?? true
+                                return logic.getServiceCategory?.services
+                                            ?.isEmpty ??
+                                        true
                                     ? Center(
                                         child: Column(
                                           children: [
@@ -229,8 +241,10 @@ class CategoryDetailScreen extends StatelessWidget {
                                             Text(
                                               "txtNotAvailableServices".tr,
                                               style: TextStyle(
-                                                color: AppColors.primaryTextColor,
-                                                fontFamily: AppFontFamily.sfProDisplay,
+                                                color:
+                                                    AppColors.primaryTextColor,
+                                                fontFamily:
+                                                    AppFontFamily.sfProDisplay,
                                                 fontSize: 18,
                                               ),
                                             )
@@ -239,116 +253,204 @@ class CategoryDetailScreen extends StatelessWidget {
                                       )
                                     : AnimationLimiter(
                                         child: ListView.separated(
-                                          itemCount: logic.getServiceCategory?.services?.length ?? 0,
+                                          itemCount: logic.getServiceCategory
+                                                  ?.services?.length ??
+                                              0,
                                           shrinkWrap: true,
                                           padding: EdgeInsets.zero,
-                                          physics: const NeverScrollableScrollPhysics(),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
                                           itemBuilder: (context, index) {
-                                            return AnimationConfiguration.staggeredGrid(
+                                            return AnimationConfiguration
+                                                .staggeredGrid(
                                               position: index,
-                                              duration: const Duration(milliseconds: 800),
-                                              columnCount: logic.getServiceCategory?.services?.length ?? 0,
+                                              duration: const Duration(
+                                                  milliseconds: 800),
+                                              columnCount: logic
+                                                      .getServiceCategory
+                                                      ?.services
+                                                      ?.length ??
+                                                  0,
                                               child: SlideAnimation(
                                                 child: FadeInAnimation(
                                                   child: GestureDetector(
                                                     onTap: () {
-                                                      if (logic.isCategorySelected[index] == true) {
-                                                        logic.onCheckBoxClick(false, index);
+                                                      if (logic.isCategorySelected[
+                                                              index] ==
+                                                          true) {
+                                                        logic.onCheckBoxClick(
+                                                            false, index);
                                                       } else {
-                                                        logic.onCheckBoxClick(true, index);
+                                                        logic.onCheckBoxClick(
+                                                            true, index);
                                                       }
                                                     },
                                                     child: Container(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 6,
+                                                          vertical: 6),
                                                       decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(10),
-                                                        color: AppColors.whiteColor,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color: AppColors
+                                                            .whiteColor,
                                                         border: Border.all(
-                                                          color: AppColors.grey.withOpacity(0.1),
+                                                          color: AppColors.grey
+                                                              .withOpacity(0.1),
                                                           width: 1,
                                                         ),
                                                       ),
                                                       child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: [
                                                           Row(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             children: [
                                                               Container(
                                                                 height: 80,
                                                                 width: 80,
-                                                                decoration: BoxDecoration(
-                                                                  borderRadius: BorderRadius.circular(12),
-                                                                  border: Border.all(
-                                                                    color: AppColors.grey.withOpacity(0.2),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              12),
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: AppColors
+                                                                        .grey
+                                                                        .withOpacity(
+                                                                            0.2),
                                                                     width: 1,
                                                                   ),
                                                                 ),
-                                                                child: ClipRRect(
-                                                                  borderRadius: BorderRadius.circular(10),
-                                                                  child: CachedNetworkImage(
+                                                                child:
+                                                                    ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                  child:
+                                                                      CachedNetworkImage(
                                                                     imageUrl:
                                                                         "${logic.getServiceCategory?.services?[index].image}",
-                                                                    fit: BoxFit.cover,
-                                                                    placeholder: (context, url) {
-                                                                      return Image.asset(AppAsset.icServicePlaceholder)
-                                                                          .paddingAll(10);
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                    placeholder:
+                                                                        (context,
+                                                                            url) {
+                                                                      return Image.asset(AppAsset
+                                                                              .icServicePlaceholder)
+                                                                          .paddingAll(
+                                                                              10);
                                                                     },
-                                                                    errorWidget: (context, url, error) {
+                                                                    errorWidget:
+                                                                        (context,
+                                                                            url,
+                                                                            error) {
                                                                       return Icon(
-                                                                        Icons.error_outline,
-                                                                        color: AppColors.blackColor,
-                                                                        size: 20,
+                                                                        Icons
+                                                                            .error_outline,
+                                                                        color: AppColors
+                                                                            .blackColor,
+                                                                        size:
+                                                                            20,
                                                                       );
                                                                     },
                                                                   ),
                                                                 ),
                                                               ),
-                                                              SizedBox(width: Get.width * 0.03),
+                                                              SizedBox(
+                                                                  width:
+                                                                      Get.width *
+                                                                          0.03),
                                                               Column(
-                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
                                                                 children: [
                                                                   Text(
-                                                                    logic.getServiceCategory?.services?[index].name ?? "",
+                                                                    logic
+                                                                            .getServiceCategory
+                                                                            ?.services?[index]
+                                                                            .name ??
+                                                                        "",
                                                                     style: TextStyle(
-                                                                        fontFamily: AppFontFamily.sfProDisplay,
-                                                                        fontSize: 17,
-                                                                        color: AppColors.primaryTextColor),
+                                                                        fontFamily:
+                                                                            AppFontFamily
+                                                                                .sfProDisplay,
+                                                                        fontSize:
+                                                                            17,
+                                                                        color: AppColors
+                                                                            .primaryTextColor),
                                                                   ),
                                                                   Text(
                                                                     "${logic.getServiceCategory?.services?[index].duration ?? 0} ${"txtMinutes".tr}",
                                                                     style: TextStyle(
-                                                                        fontFamily: AppFontFamily.sfProDisplayMedium,
-                                                                        fontSize: 13,
-                                                                        color: AppColors.service),
+                                                                        fontFamily:
+                                                                            AppFontFamily
+                                                                                .sfProDisplayMedium,
+                                                                        fontSize:
+                                                                            13,
+                                                                        color: AppColors
+                                                                            .service),
                                                                   ),
                                                                 ],
-                                                              ).paddingOnly(top: 5),
+                                                              ).paddingOnly(
+                                                                  top: 5),
                                                             ],
                                                           ),
                                                           GestureDetector(
                                                             onTap: () {
-                                                              if (logic.isCategorySelected[index] == true) {
-                                                                logic.onCheckBoxClick(false, index);
+                                                              if (logic.isCategorySelected[
+                                                                      index] ==
+                                                                  true) {
+                                                                logic
+                                                                    .onCheckBoxClick(
+                                                                        false,
+                                                                        index);
                                                               } else {
-                                                                logic.onCheckBoxClick(true, index);
+                                                                logic
+                                                                    .onCheckBoxClick(
+                                                                        true,
+                                                                        index);
                                                               }
                                                             },
                                                             child: Container(
                                                               height: 25,
                                                               width: 25,
-                                                              padding: const EdgeInsets.all(7),
-                                                              decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(6),
-                                                                border: Border.all(color: AppColors.greyColor.withOpacity(0.5)),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(7),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            6),
+                                                                border: Border.all(
+                                                                    color: AppColors
+                                                                        .greyColor
+                                                                        .withOpacity(
+                                                                            0.5)),
                                                               ),
-                                                              child: logic.isCategorySelected[index]
+                                                              child: logic.isCategorySelected[
+                                                                      index]
                                                                   ? Image.asset(
-                                                                      AppAsset.icCheck,
-                                                                      color: AppColors.primaryAppColor,
+                                                                      AppAsset
+                                                                          .icCheck,
+                                                                      color: AppColors
+                                                                          .primaryAppColor,
                                                                     )
                                                                   : const SizedBox(),
-                                                            ).paddingOnly(right: 10),
+                                                            ).paddingOnly(
+                                                                right: 10),
                                                           )
                                                         ],
                                                       ),
@@ -359,7 +461,8 @@ class CategoryDetailScreen extends StatelessWidget {
                                             );
                                           },
                                           separatorBuilder: (context, index) {
-                                            return SizedBox(height: Get.height * 0.01);
+                                            return SizedBox(
+                                                height: Get.height * 0.01);
                                           },
                                         ),
                                       );

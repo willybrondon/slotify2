@@ -23,11 +23,12 @@ class EditProfileScreen extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           automaticallyImplyLeading: false,
           flexibleSpace: const EditProfileTopBarView(),
         ),
+        bottomNavigationBar: const EditProfileBottomView(),
         body: GetBuilder<EditProfileScreenController>(
           id: Constant.idProgressView,
           builder: (logic) {

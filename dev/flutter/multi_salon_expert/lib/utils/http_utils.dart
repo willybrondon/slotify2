@@ -115,23 +115,8 @@ class HttpUtils {
           return true; // Accept all certificates
         };
 
-      // Convert the request to use HttpClient
-      final request =
-          await client.getUrl(Uri.parse(requestFunction.toString()));
-      final response = await request.close();
-      final responseBody = await response.transform(utf8.decoder).join();
-
-      // Create a mock http.Response
-      final headers = <String, String>{};
-      response.headers.forEach((key, values) {
-        headers[key] = values.join(', ');
-      });
-
-      return http.Response(
-        responseBody,
-        response.statusCode,
-        headers: headers,
-      );
+      // Execute the original request function with SSL handling
+      return await requestFunction().timeout(timeout);
     } catch (e) {
       log("SSL exception handling failed: $e");
       rethrow;

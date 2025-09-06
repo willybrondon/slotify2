@@ -19,7 +19,8 @@ class ViewAllCategoryScreen extends StatelessWidget {
   ViewAllCategoryScreen({super.key});
 
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
-  ViewAllCategoryController viewAllCategoryController = Get.find<ViewAllCategoryController>();
+  ViewAllCategoryController viewAllCategoryController =
+      Get.find<ViewAllCategoryController>();
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,9 @@ class ViewAllCategoryScreen extends StatelessWidget {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           flexibleSpace: AppBarCustom(
-            title: viewAllCategoryController.title == "txtCategory".tr ? "txtCategories".tr : "txtExperts".tr,
+            title: viewAllCategoryController.title == "txtCategory".tr
+                ? "txtCategories".tr
+                : "txtExperts".tr,
             method: InkWell(
               overlayColor: WidgetStatePropertyAll(AppColors.transparent),
               onTap: () {
@@ -55,7 +58,7 @@ class ViewAllCategoryScreen extends StatelessWidget {
               },
               child: Icon(
                 Icons.arrow_back,
-                color: AppColors.whiteColor,
+                color: AppColors.blackColor,
               ),
             ),
           ),
@@ -71,7 +74,8 @@ class ViewAllCategoryScreen extends StatelessWidget {
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       itemCount: logic.getAllCategory?.data?.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         childAspectRatio: 0.8,
                         crossAxisSpacing: 6,
@@ -84,7 +88,8 @@ class ViewAllCategoryScreen extends StatelessWidget {
                           child: ScaleAnimation(
                             child: FadeInAnimation(
                               child: InkWell(
-                                overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                                overlayColor: WidgetStatePropertyAll(
+                                    AppColors.transparent),
                                 onTap: () {
                                   Get.toNamed(
                                     AppRoutes.categoryDetail,
@@ -102,16 +107,23 @@ class ViewAllCategoryScreen extends StatelessWidget {
                                       Container(
                                         height: 100,
                                         width: 80,
-                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(14)),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(14)),
                                         clipBehavior: Clip.hardEdge,
                                         child: CachedNetworkImage(
-                                          imageUrl: "${logic.getAllCategory?.data?[index].image}",
+                                          imageUrl:
+                                              "${logic.getAllCategory?.data?[index].image}",
                                           fit: BoxFit.cover,
                                           placeholder: (context, url) {
-                                            return Image.asset(AppAsset.icCategoryPlaceholder).paddingAll(15);
+                                            return Image.asset(AppAsset
+                                                    .icCategoryPlaceholder)
+                                                .paddingAll(15);
                                           },
                                           errorWidget: (context, url, error) {
-                                            return Image.asset(AppAsset.icCategoryPlaceholder).paddingAll(15);
+                                            return Image.asset(AppAsset
+                                                    .icCategoryPlaceholder)
+                                                .paddingAll(15);
                                           },
                                         ),
                                       ),
@@ -121,17 +133,24 @@ class ViewAllCategoryScreen extends StatelessWidget {
                                           height: 27,
                                           width: 80,
                                           decoration: BoxDecoration(
-                                              borderRadius: const BorderRadius.only(
+                                              borderRadius:
+                                                  const BorderRadius.only(
                                                 bottomLeft: Radius.circular(14),
-                                                bottomRight: Radius.circular(14),
+                                                bottomRight:
+                                                    Radius.circular(14),
                                               ),
-                                              color: AppColors.whiteColor.withOpacity(0.88)),
+                                              color: AppColors.whiteColor
+                                                  .withOpacity(0.88)),
                                           child: Center(
                                             child: Text(
-                                              logic.getAllCategory?.data![index].name.toString() ?? "",
+                                              logic.getAllCategory?.data![index]
+                                                      .name
+                                                      .toString() ??
+                                                  "",
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.sfProDisplay,
+                                                fontFamily:
+                                                    AppFontFamily.sfProDisplay,
                                                 fontSize: 12.5,
                                                 color: AppColors.appText,
                                               ),
@@ -181,72 +200,117 @@ class ViewAllCategoryScreen extends StatelessWidget {
                                       scrollDirection: Axis.vertical,
                                       controller: logic.expertScrollController,
                                       physics: const BouncingScrollPhysics(),
-                                      padding: const EdgeInsets.only(bottom: 40),
+                                      padding:
+                                          const EdgeInsets.only(bottom: 40),
                                       itemCount: logic.getExpert.length,
-                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 2,
                                         childAspectRatio: 0.92,
                                         crossAxisSpacing: 13.5,
                                         mainAxisSpacing: 2,
                                       ),
-                                      itemBuilder: (BuildContext context, int index) {
-                                        logic.rating = logic.getExpert[index].review ?? 0.0;
-                                        logic.roundedRating = logic.rating?.round();
-                                        logic.filledStars = logic.roundedRating?.clamp(0, 5);
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        logic.rating =
+                                            logic.getExpert[index].review ??
+                                                0.0;
+                                        logic.roundedRating =
+                                            logic.rating?.round();
+                                        logic.filledStars =
+                                            logic.roundedRating?.clamp(0, 5);
 
-                                        return AnimationConfiguration.staggeredGrid(
+                                        return AnimationConfiguration
+                                            .staggeredGrid(
                                           position: index,
-                                          duration: const Duration(milliseconds: 800),
+                                          duration:
+                                              const Duration(milliseconds: 800),
                                           columnCount: logic.getExpert.length,
                                           child: ScaleAnimation(
                                             child: FadeInAnimation(
                                               child: GestureDetector(
                                                 onTap: () async {
-                                                  await logic.onGetExpertApiCall(expertId: logic.getExpert[index].id ?? "");
+                                                  await logic
+                                                      .onGetExpertApiCall(
+                                                          expertId: logic
+                                                                  .getExpert[
+                                                                      index]
+                                                                  .id ??
+                                                              "");
 
                                                   Get.toNamed(
                                                     AppRoutes.expertDetail,
                                                     arguments: [
                                                       logic.getExpert[index].id,
                                                       index,
-                                                      logic.getExpert[index].review,
+                                                      logic.getExpert[index]
+                                                          .review,
                                                     ],
                                                   );
                                                 },
                                                 child: Container(
                                                   width: Get.width * 0.45,
-                                                  margin: const EdgeInsets.only(top: 10),
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                  margin: const EdgeInsets.only(
+                                                      top: 10),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 12),
                                                   decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(21),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            21),
                                                     color: AppColors.whiteColor,
-                                                    boxShadow: Constant.boxShadow,
+                                                    boxShadow:
+                                                        Constant.boxShadow,
                                                   ),
                                                   child: Column(
                                                     children: [
                                                       const Spacer(),
                                                       const Spacer(),
                                                       DottedBorder(
-                                                        color: AppColors.roundBorder,
-                                                        borderType: BorderType.RRect,
-                                                        radius: const Radius.circular(41),
+                                                        color: AppColors
+                                                            .roundBorder,
+                                                        borderType:
+                                                            BorderType.RRect,
+                                                        radius: const Radius
+                                                            .circular(41),
                                                         strokeWidth: 1,
-                                                        dashPattern: const [2.5, 2.5],
+                                                        dashPattern: const [
+                                                          2.5,
+                                                          2.5
+                                                        ],
                                                         child: Container(
                                                           height: 82,
                                                           width: 82,
-                                                          decoration: const BoxDecoration(shape: BoxShape.circle),
-                                                          clipBehavior: Clip.hardEdge,
-                                                          child: CachedNetworkImage(
-                                                            imageUrl: logic.getExpert[index].image ?? "",
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle),
+                                                          clipBehavior:
+                                                              Clip.hardEdge,
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            imageUrl: logic
+                                                                    .getExpert[
+                                                                        index]
+                                                                    .image ??
+                                                                "",
                                                             fit: BoxFit.cover,
-                                                            placeholder: (context, url) {
-                                                              return Image.asset(AppAsset.icPlaceHolder);
+                                                            placeholder:
+                                                                (context, url) {
+                                                              return Image.asset(
+                                                                  AppAsset
+                                                                      .icPlaceHolder);
                                                             },
-                                                            errorWidget: (context, url, error) {
+                                                            errorWidget:
+                                                                (context, url,
+                                                                    error) {
                                                               return Icon(
-                                                                Icons.error_outline,
-                                                                color: AppColors.blackColor,
+                                                                Icons
+                                                                    .error_outline,
+                                                                color: AppColors
+                                                                    .blackColor,
                                                                 size: 20,
                                                               );
                                                             },
@@ -257,44 +321,71 @@ class ViewAllCategoryScreen extends StatelessWidget {
                                                       Text(
                                                         "${logic.getExpert[index].fname} ${logic.getExpert[index].lname}",
                                                         maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         style: TextStyle(
-                                                          fontFamily: AppFontFamily.sfProDisplay,
+                                                          fontFamily:
+                                                              AppFontFamily
+                                                                  .sfProDisplay,
                                                           fontSize: 15,
-                                                          color: AppColors.primaryTextColor,
+                                                          color: AppColors
+                                                              .primaryTextColor,
                                                         ),
                                                       ),
                                                       const Spacer(),
                                                       Container(
                                                         height: 32,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(8),
-                                                          color: AppColors.yellow2,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          color:
+                                                              AppColors.yellow2,
                                                         ),
                                                         child: SizedBox(
                                                           height: 15,
-                                                          child: ListView.separated(
+                                                          child: ListView
+                                                              .separated(
                                                             shrinkWrap: true,
                                                             itemCount: 5,
-                                                            scrollDirection: Axis.horizontal,
-                                                            padding: const EdgeInsets.symmetric(horizontal: 13),
-                                                            itemBuilder: (context, index) {
-                                                              if (index < logic.filledStars!) {
-                                                                return Image.asset(
-                                                                  AppAsset.icStarFilled,
+                                                            scrollDirection:
+                                                                Axis.horizontal,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        13),
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              if (index <
+                                                                  logic
+                                                                      .filledStars!) {
+                                                                return Image
+                                                                    .asset(
+                                                                  AppAsset
+                                                                      .icStarFilled,
                                                                   height: 15,
                                                                   width: 15,
                                                                 );
                                                               } else {
-                                                                return Image.asset(
-                                                                  AppAsset.icStarOutline,
+                                                                return Image
+                                                                    .asset(
+                                                                  AppAsset
+                                                                      .icStarOutline,
                                                                   height: 15,
                                                                   width: 15,
                                                                 );
                                                               }
                                                             },
-                                                            separatorBuilder: (context, index) {
-                                                              return SizedBox(width: Get.width * 0.017);
+                                                            separatorBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              return SizedBox(
+                                                                  width:
+                                                                      Get.width *
+                                                                          0.017);
                                                             },
                                                           ),
                                                         ),

@@ -41,7 +41,10 @@ class EditProfileTopBarView extends StatelessWidget {
                     onTap: () {
                       Get.back();
                     },
-                    child: Image.asset(AppAsset.icBackArrow).paddingAll(16),
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: AppColors.blackColor,
+                    ).paddingAll(16),
                   ),
           );
         },
@@ -61,32 +64,40 @@ class EditProfileWidgetView extends StatelessWidget {
         children: [
           const EditProfileImageView().paddingOnly(bottom: 12, top: 15),
           const EditProfileDataView().paddingAll(15),
-          // Add extra padding at bottom to ensure button is visible when scrolling
-          GetBuilder<EditProfileScreenController>(
-            id: Constant.idUpdate,
-            builder: (logic) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: AppButton(
-                  buttonColor: AppColors.primaryAppColor,
-                  color: AppColors.whiteColor,
-                  fontSize: 16,
-                  fontFamily: AppFontFamily.heeBo700,
-                  buttonText: "txtUpdateProfile".tr,
-                  onTap: () async {
-                    FocusScopeNode currentFocus = FocusScope.of(context);
-                    if (!currentFocus.hasPrimaryFocus &&
-                        currentFocus.focusedChild != null) {
-                      currentFocus.focusedChild?.unfocus();
-                    }
-                    logic.onUpdateClick();
-                  },
-                ),
-              );
-            },
-          ).paddingOnly(bottom: 20),
+          // Add extra padding at bottom to ensure content is visible when scrolling
+          SizedBox(height: Get.height * 0.1), // Extra space for bottom button
         ],
       ),
+    );
+  }
+}
+
+class EditProfileBottomView extends StatelessWidget {
+  const EditProfileBottomView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<EditProfileScreenController>(
+      id: Constant.idUpdate,
+      builder: (logic) {
+        return AppButton(
+          height: 55,
+          width: Get.width,
+          fontFamily: AppFontFamily.sfProDisplayBold,
+          fontSize: 20,
+          color: AppColors.whiteColor,
+          buttonColor: AppColors.primaryAppColor,
+          buttonText: "txtUpdateProfile".tr,
+          onTap: () async {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus &&
+                currentFocus.focusedChild != null) {
+              currentFocus.focusedChild?.unfocus();
+            }
+            logic.onUpdateClick();
+          },
+        ).paddingOnly(left: 12, right: 12, bottom: 15);
+      },
     );
   }
 }

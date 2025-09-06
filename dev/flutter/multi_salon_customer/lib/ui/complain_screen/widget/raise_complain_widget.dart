@@ -26,7 +26,7 @@ class RaiseComplainTopView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -129,14 +129,17 @@ class RaiseComplainAddImageView extends StatelessWidget {
               onTap: () {
                 logic.onPickImage();
               },
-              child: Image.asset(AppAsset.icBrowse, height: 45).paddingOnly(bottom: 12),
+              child: Image.asset(AppAsset.icBrowse, height: 45)
+                  .paddingOnly(bottom: 12),
             );
           },
         ),
         GetBuilder<RaiseComplainController>(
           id: Constant.idComplainImage,
           builder: (logic) {
-            return logic.selectImageFile != null ? const RaiseComplainShowImageView() : const SizedBox();
+            return logic.selectImageFile != null
+                ? const RaiseComplainShowImageView()
+                : const SizedBox();
           },
         ),
       ],
@@ -194,10 +197,12 @@ class RaiseComplainBottomView extends StatelessWidget {
             );
 
             if (logic.raiseComplainCategory?.status == true) {
-              Utils.showToast(Get.context!, logic.raiseComplainCategory?.message ?? "");
+              Utils.showToast(
+                  Get.context!, logic.raiseComplainCategory?.message ?? "");
               Get.back();
             } else {
-              Utils.showToast(Get.context!, logic.raiseComplainCategory?.message ?? "");
+              Utils.showToast(
+                  Get.context!, logic.raiseComplainCategory?.message ?? "");
             }
           },
         ).paddingOnly(left: 12, right: 12, bottom: 15);

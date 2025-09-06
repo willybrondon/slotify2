@@ -48,16 +48,16 @@ const userFunction = async (user, data_) => {
 //check the user is exists or not with loginType 1 (email-password)
 exports.checkUser = async (req, res) => {
   try {
-    if (!req.query.email || !req.query.loginType || !req.query.password) return res.status(200).json({ status: false, message: "Oops ! Invalid details!" });
+    if (!req.body.email || !req.body.loginType || !req.body.password) return res.status(200).json({ status: false, message: "Oops ! Invalid details!" });
 
     const user = await User.findOne({
-      email: req.query.email,
+      email: req.body.email,
       loginType: 1,
       isDelete: false,
     });
 
     if (user) {
-      if (cryptr.decrypt(user.password.toString()) !== req.query.password) {
+      if (cryptr.decrypt(user.password.toString()) !== req.body.password) {
         return res.status(200).json({
           status: false,
           message: "Password doesn't match for this user.",
