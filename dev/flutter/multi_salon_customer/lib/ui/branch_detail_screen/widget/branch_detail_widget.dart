@@ -31,7 +31,7 @@ class BranchDetailTopView extends StatelessWidget {
           child: Stack(
             children: [
               Container(
-                height: Get.height * 0.3,
+                height: 230, // Match the PreferredSize height exactly
                 width: Get.width,
                 decoration: BoxDecoration(
                   color: AppColors.transparent,
@@ -41,11 +41,11 @@ class BranchDetailTopView extends StatelessWidget {
                   imageUrl: "${logic.getSalonDetailCategory?.salon?.mainImage}",
                   fit: BoxFit.cover,
                   width: Get.width,
-                  height: Get.height * 0.3,
+                  height: 230, // Match the container height
                   placeholder: (context, url) {
                     return Container(
                       width: Get.width,
-                      height: Get.height * 0.3,
+                      height: 230, // Match the container height
                       color: AppColors.grey.withOpacity(0.1),
                       child: Image.asset(AppAsset.icImagePlaceholder)
                           .paddingAll(25),
@@ -54,7 +54,7 @@ class BranchDetailTopView extends StatelessWidget {
                   errorWidget: (context, url, error) {
                     return Container(
                       width: Get.width,
-                      height: Get.height * 0.3,
+                      height: 230, // Match the container height
                       color: AppColors.grey.withOpacity(0.1),
                       child: Image.asset(AppAsset.icImagePlaceholder)
                           .paddingAll(30),
@@ -62,16 +62,29 @@ class BranchDetailTopView extends StatelessWidget {
                   },
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Get.back();
-                },
-                child: Image.asset(
-                  AppAsset.icBackArrow,
-                  height: 25,
-                  width: 25,
-                  color: AppColors.whiteColor,
-                ).paddingOnly(left: 20, top: 25),
+              Positioned(
+                top: 50, // Better positioning from top
+                left: 20,
+                child: GestureDetector(
+                  onTap: () {
+                    Get.back();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(
+                        8), // Add padding for better touch area
+                    decoration: BoxDecoration(
+                      color: AppColors.blackColor
+                          .withOpacity(0.3), // Semi-transparent background
+                      shape: BoxShape.circle,
+                    ),
+                    child: Image.asset(
+                      AppAsset.icBackArrow,
+                      height: 20,
+                      width: 20,
+                      color: AppColors.whiteColor,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

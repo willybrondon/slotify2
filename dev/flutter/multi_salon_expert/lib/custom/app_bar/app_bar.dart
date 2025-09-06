@@ -17,14 +17,16 @@ class AppBarCustom extends StatelessWidget {
       preferredSize: const Size.fromHeight(55),
       child: AppBar(
         elevation: 0,
-        backgroundColor: AppColors.primaryAppColor,
+        backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         leading: method,
         actions: method1,
         title: Text(
           title,
-          style:
-              TextStyle(fontFamily: AppFontFamily.sfProDisplayBold, fontSize: 20, color: AppColors.whiteColor),
+          style: TextStyle(
+              fontFamily: AppFontFamily.sfProDisplayBold,
+              fontSize: 20,
+              color: AppColors.blackColor),
         ).paddingOnly(top: 7),
       ),
     );

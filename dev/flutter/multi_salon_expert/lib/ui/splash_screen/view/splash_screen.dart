@@ -101,10 +101,25 @@ class _SplashScreenState extends State<SplashScreen> {
                 Get.offAllNamed(AppRoutes.bottom);
               } else {
                 log("Expert API failed: ${loginScreenController.getExpertCategory?.message}");
-                Utils.showToast(Get.context!,
-                    loginScreenController.getExpertCategory?.message ?? "");
-                // Navigate to login if expert API fails
-                Get.offAllNamed(AppRoutes.login);
+                // Only logout if it's a clear authentication error, not network issues
+                String errorMessage =
+                    loginScreenController.getExpertCategory?.message ?? "";
+                if (errorMessage.toLowerCase().contains('unauthorized') ||
+                    errorMessage.toLowerCase().contains('invalid') ||
+                    errorMessage.toLowerCase().contains('expired') ||
+                    errorMessage.toLowerCase().contains('forbidden')) {
+                  log("Authentication error detected, logging out user");
+                  Utils.showToast(
+                      Get.context!, "Session expired. Please login again.");
+                  // Clear login state
+                  Constant.storage.write('isLogIn', false);
+                  Get.offAllNamed(AppRoutes.login);
+                } else {
+                  log("Network or temporary error, keeping user logged in");
+                  // For network errors or temporary issues, keep user logged in
+                  // and navigate to main screen
+                  Get.offAllNamed(AppRoutes.bottom);
+                }
               }
             } else {
               log("User not logged in, navigating to login...");

@@ -46,7 +46,7 @@ class HomeScreenTopView extends StatelessWidget {
                     init: ProfileScreenController(),
                     builder: (logic) {
                       return Text(
-                        "${"txtHello".tr}, ${Constant.storage.read<String>("fName") ?? "txtGuest".tr} 👋",
+                        "SKEDISY",
                         style: TextStyle(
                           fontFamily: AppFontFamily.sfProDisplayBold,
                           fontSize: 20,
@@ -56,7 +56,7 @@ class HomeScreenTopView extends StatelessWidget {
                     },
                   ),
                   Text(
-                    "txtWelcomeService".tr,
+                    Constant.storage.read<String>("fName") ?? "txtGuest".tr,
                     style: TextStyle(
                       fontFamily: AppFontFamily.sfProDisplayRegular,
                       fontSize: 16,

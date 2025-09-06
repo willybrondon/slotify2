@@ -225,6 +225,8 @@ exports.salonData = async (req, res) => {
     console.log("Salon Data API - Service names:", finalServices.map(s => s.id?.name));
 
     console.log("Salon Data API - Fetching products for salon ID:", salon._id.toString());
+    console.log("Salon Data API - Salon ID type:", typeof salon._id);
+    console.log("Salon Data API - Salon ID:", salon._id);
     
     const [reviews, experts, product] = await Promise.all([
       Review.find({ salonId: salon._id }).populate({
@@ -238,8 +240,9 @@ exports.salonData = async (req, res) => {
       }).select("fname lname image review reviewCount serviceId"),
       Product.aggregate([
         { $match: { 
-          createStatus: "Approved",
-          salon: salon._id.toString() // Filter products by salon ID
+          createStatus: "Approved"
+          // Temporarily remove salon filter to see all products
+          // salon: salon._id // Filter products by salon ID (ObjectId)
         } },
         {
           $project: {
@@ -269,6 +272,14 @@ exports.salonData = async (req, res) => {
 
     console.log("Salon Data API - Products found:", product.length);
     console.log("Salon Data API - Product names:", product.map(p => p.productName));
+    
+    // Debug: Check if there are any products at all and their salon field
+    const allProducts = await Product.find({ createStatus: "Approved" }).limit(5);
+    console.log("Salon Data API - Sample products in database:", allProducts.map(p => ({
+      productName: p.productName,
+      salon: p.salon,
+      salonType: typeof p.salon
+    })));
 
     const tax = global.settingJSON.tax;
     if (!tax) {

@@ -23,7 +23,7 @@ class SettingScreen extends StatelessWidget {
             },
             child: Icon(
               Icons.arrow_back,
-              color: AppColors.whiteColor,
+              color: AppColors.blackColor,
             ),
           ),
         ),
@@ -33,8 +33,7 @@ class SettingScreen extends StatelessWidget {
           CustomMenu(
             leadingImage: AppAsset.icNotification,
             title: "txtNotification".tr,
-            onTap: () {
-            },
+            onTap: () {},
           ),
           CustomMenu(
             leadingImage: AppAsset.icLanguage,

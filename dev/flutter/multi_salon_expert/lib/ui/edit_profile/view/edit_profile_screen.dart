@@ -19,7 +19,8 @@ import 'package:salon_2/utils/utils.dart';
 class EditProfileScreen extends GetView<EditProfileController> {
   EditProfileScreen({super.key});
 
-  EditProfileController editProfileScreenController = Get.find<EditProfileController>();
+  EditProfileController editProfileScreenController =
+      Get.find<EditProfileController>();
 
   final formKey = GlobalKey<FormState>();
 
@@ -71,7 +72,7 @@ class EditProfileScreen extends GetView<EditProfileController> {
               },
               child: Icon(
                 Icons.arrow_back,
-                color: AppColors.whiteColor,
+                color: AppColors.blackColor,
               ),
             ),
           ),
@@ -83,7 +84,8 @@ class EditProfileScreen extends GetView<EditProfileController> {
               inAsyncCall: logic.isLoading.value,
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   child: Column(
                     children: [
                       GetBuilder<EditProfileController>(
@@ -98,8 +100,11 @@ class EditProfileScreen extends GetView<EditProfileController> {
                                     backgroundColor: AppColors.whiteColor,
                                     radius: 60,
                                     backgroundImage: logic.image?.path == null
-                                        ? NetworkImage(Constant.storage.read("hostImage"))
-                                        : FileImage(File(logic.image?.path ?? '')) as ImageProvider<Object>?,
+                                        ? NetworkImage(
+                                            Constant.storage.read("hostImage"))
+                                        : FileImage(
+                                                File(logic.image?.path ?? ''))
+                                            as ImageProvider<Object>?,
                                   ),
                                 ),
                               ),
@@ -125,7 +130,9 @@ class EditProfileScreen extends GetView<EditProfileController> {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: AppColors.primaryAppColor,
-                                        border: Border.all(color: AppColors.whiteColor, width: 1),
+                                        border: Border.all(
+                                            color: AppColors.whiteColor,
+                                            width: 1),
                                       ),
                                       child: Image.asset(
                                         AppAsset.icAddProfileImage,
@@ -143,8 +150,8 @@ class EditProfileScreen extends GetView<EditProfileController> {
                       ),
                       GetBuilder<EditProfileController>(
                         builder: (logic) {
-                          return  AddressTextField(
-                            labelText:  "txtEnterFirstName".tr,
+                          return AddressTextField(
+                            labelText: "txtEnterFirstName".tr,
                             controller: logic.fNameEditingController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -152,12 +159,12 @@ class EditProfileScreen extends GetView<EditProfileController> {
                               }
                               return null;
                             },
-                          ).paddingOnly(bottom: 25,top: 25);
+                          ).paddingOnly(bottom: 25, top: 25);
                         },
                       ),
                       GetBuilder<EditProfileController>(
                         builder: (logic) {
-                          return  AddressTextField(
+                          return AddressTextField(
                             labelText: "txtEnterLastName".tr,
                             controller: logic.lNameEditingController,
                             validator: (value) {

@@ -36,8 +36,9 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
         final isAvailable = await _inAppReview.isAvailable();
 
         setState(() {
-          availability =
-              isAvailable && !Platform.isAndroid ? Availability.available : Availability.unavailable;
+          availability = isAvailable && !Platform.isAndroid
+              ? Availability.available
+              : Availability.unavailable;
         });
       } catch (_) {
         setState(() => availability = Availability.unavailable);
@@ -76,7 +77,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
             },
             child: Icon(
               Icons.arrow_back,
-              color: AppColors.whiteColor,
+              color: AppColors.blackColor,
             ),
           ),
         ),

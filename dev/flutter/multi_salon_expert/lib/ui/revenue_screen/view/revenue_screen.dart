@@ -35,14 +35,26 @@ class _RevenueScreenState extends State<RevenueScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await loginScreenController.onGetExpertApiCall(
-          expertId: Constant.storage.read<String>("expertId").toString());
-      earning = loginScreenController.getExpertCategory?.data?.earning
-          ?.toStringAsFixed(2);
+      try {
+        await loginScreenController.onGetExpertApiCall(
+            expertId: Constant.storage.read<String>("expertId").toString());
 
-      loginScreenController.getExpertCategory?.data?.showDialog == false
-          ? showDialogIfNeeded()
-          : null;
+        if (loginScreenController.getExpertCategory?.status == true) {
+          earning = loginScreenController.getExpertCategory?.data?.earning
+              ?.toStringAsFixed(2);
+
+          loginScreenController.getExpertCategory?.data?.showDialog == false
+              ? showDialogIfNeeded()
+              : null;
+        } else {
+          log("Expert API failed in RevenueScreen: ${loginScreenController.getExpertCategory?.message}");
+          // Don't logout on API failure, just log the error
+          // The user should remain logged in for network issues
+        }
+      } catch (e) {
+        log("Error calling expert API in RevenueScreen: $e");
+        // Don't logout on network errors, just log the error
+      }
     });
   }
 
@@ -50,6 +62,36 @@ class _RevenueScreenState extends State<RevenueScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        log("App resumed - user is back to the app");
+        // App has come back to the foreground
+        // No need to logout or clear session
+        break;
+      case AppLifecycleState.inactive:
+        log("App inactive - user is interacting with another app");
+        // App is inactive but still visible
+        break;
+      case AppLifecycleState.paused:
+        log("App paused - app is in background");
+        // App is in background but not terminated
+        // Keep session active
+        break;
+      case AppLifecycleState.detached:
+        log("App detached - app is being terminated");
+        // App is being terminated
+        break;
+      case AppLifecycleState.hidden:
+        log("App hidden - app is hidden");
+        // App is hidden
+        break;
+    }
   }
 
   void showDialogIfNeeded() {
@@ -110,7 +152,7 @@ class _RevenueScreenState extends State<RevenueScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "${"txtHello".tr}, ${Constant.storage.read<String>('fName').toString()}",
+                            "SKEDISY",
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo800,
                               fontSize: 23,
@@ -118,7 +160,7 @@ class _RevenueScreenState extends State<RevenueScreen>
                             ),
                           ),
                           Text(
-                            "txtWelcomeService".tr,
+                            Constant.storage.read<String>('fName').toString(),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(

@@ -29,7 +29,7 @@ class RaiseComplainScreen extends StatelessWidget {
             },
             child: Icon(
               Icons.arrow_back,
-              color: AppColors.whiteColor,
+              color: AppColors.blackColor,
             ),
           ),
         ),
@@ -54,10 +54,12 @@ class RaiseComplainScreen extends StatelessWidget {
               );
 
               if (logic.raiseComplainCategory?.status == true) {
-                Utils.showToast(Get.context!, logic.raiseComplainCategory?.message ?? "");
+                Utils.showToast(
+                    Get.context!, logic.raiseComplainCategory?.message ?? "");
                 Get.back();
               } else {
-                Utils.showToast(Get.context!, logic.raiseComplainCategory?.message ?? "");
+                Utils.showToast(
+                    Get.context!, logic.raiseComplainCategory?.message ?? "");
               }
             },
           ).paddingOnly(left: 12, right: 12, bottom: 15);
@@ -78,7 +80,9 @@ class RaiseComplainScreen extends StatelessWidget {
                     Text(
                       "txtComplainOrSuggestion".tr,
                       style: TextStyle(
-                          color: AppColors.primaryTextColor, fontFamily: AppFontFamily.sfProDisplay, fontSize: 18),
+                          color: AppColors.primaryTextColor,
+                          fontFamily: AppFontFamily.sfProDisplay,
+                          fontSize: 18),
                     ).paddingOnly(left: 12, top: 15),
                     GetBuilder<RaiseComplainController>(
                       builder: (logic) {
@@ -93,13 +97,15 @@ class RaiseComplainScreen extends StatelessWidget {
                             ),
                           ),
                           title: '',
-                        ).paddingOnly(left: 12, right: 12,top: 10);
+                        ).paddingOnly(left: 12, right: 12, top: 10);
                       },
                     ),
                     Text(
                       "txtBookingId".tr,
                       style: TextStyle(
-                          color: AppColors.primaryTextColor, fontFamily: AppFontFamily.sfProDisplay, fontSize: 18),
+                          color: AppColors.primaryTextColor,
+                          fontFamily: AppFontFamily.sfProDisplay,
+                          fontSize: 18),
                     ).paddingOnly(left: 12, top: 15),
                     GetBuilder<RaiseComplainController>(
                       builder: (logic) {
@@ -107,12 +113,14 @@ class RaiseComplainScreen extends StatelessWidget {
                           method: TextFieldCustom(
                             hintText: "txtEnterBookingId".tr,
                             obscureText: false,
-                            inputFormatters: [LengthLimitingTextInputFormatter(10)],
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(10)
+                            ],
                             textInputType: TextInputType.number,
                             controller: logic.bookingIdController,
                           ),
                           title: '',
-                        ).paddingOnly(left: 12, right: 12,top: 10);
+                        ).paddingOnly(left: 12, right: 12, top: 10);
                       },
                     ),
                   ],
