@@ -155,7 +155,7 @@ exports.verify = async (req, res) => {
     }
 
     if (parseInt(req.query.otp) === otpUser.otp) {
-      otpUser.deleteOne();
+      await otpUser.deleteOne();
 
       return res.status(200).json({ status: true, message: "OTP Verified Successfully!" });
     } else {

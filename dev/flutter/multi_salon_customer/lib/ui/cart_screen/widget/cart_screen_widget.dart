@@ -25,7 +25,7 @@ class CartAppBarView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -42,7 +42,8 @@ class CartItemView extends StatelessWidget {
       builder: (logic) {
         return logic.isLoading.value
             ? Shimmers.cartProductShimmer()
-            : logic.getCartProductModel?.data?.items?.isEmpty == true || logic.getCartProductModel?.data == null
+            : logic.getCartProductModel?.data?.items?.isEmpty == true ||
+                    logic.getCartProductModel?.data == null
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -64,7 +65,8 @@ class CartItemView extends StatelessWidget {
                     ),
                   )
                 : ListView.builder(
-                    itemCount: logic.getCartProductModel?.data?.items?.length ?? 0,
+                    itemCount:
+                        logic.getCartProductModel?.data?.items?.length ?? 0,
                     itemBuilder: (context, index) {
                       return Container(
                         height: 145,
@@ -87,14 +89,24 @@ class CartItemView extends StatelessWidget {
                                   width: 72,
                                   color: AppColors.grey.withOpacity(0.04),
                                   child: CachedNetworkImage(
-                                    imageUrl: logic.getCartProductModel?.data?.items?[index].product?.mainImage ?? "",
+                                    imageUrl: logic
+                                            .getCartProductModel
+                                            ?.data
+                                            ?.items?[index]
+                                            .product
+                                            ?.mainImage ??
+                                        "",
                                     height: 60,
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) {
-                                      return Image.asset(AppAsset.icImagePlaceholder).paddingAll(10);
+                                      return Image.asset(
+                                              AppAsset.icImagePlaceholder)
+                                          .paddingAll(10);
                                     },
                                     errorWidget: (context, url, error) {
-                                      return Image.asset(AppAsset.icImagePlaceholder).paddingAll(10);
+                                      return Image.asset(
+                                              AppAsset.icImagePlaceholder)
+                                          .paddingAll(10);
                                     },
                                   ),
                                 ),
@@ -109,18 +121,21 @@ class CartItemView extends StatelessWidget {
                                         color: AppColors.whiteColor,
                                         boxShadow: Constant.boxShadow,
                                         border: Border.all(
-                                          color: AppColors.grey.withOpacity(0.1),
+                                          color:
+                                              AppColors.grey.withOpacity(0.1),
                                           width: 1,
                                         ),
                                       ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           InkWell(
                                             onTap: () {
                                               logic.decrementQuantity(index);
                                             },
-                                            overlayColor: WidgetStateColor.transparent,
+                                            overlayColor:
+                                                WidgetStateColor.transparent,
                                             child: SizedBox(
                                               height: 20,
                                               child: Image.asset(
@@ -133,7 +148,8 @@ class CartItemView extends StatelessWidget {
                                             '${logic.quantityList[index]}',
                                             style: TextStyle(
                                               fontSize: 13,
-                                              fontFamily: AppFontFamily.heeBo500,
+                                              fontFamily:
+                                                  AppFontFamily.heeBo500,
                                               color: AppColors.appText,
                                             ),
                                           ),
@@ -141,7 +157,8 @@ class CartItemView extends StatelessWidget {
                                             onTap: () {
                                               logic.incrementQuantity(index);
                                             },
-                                            overlayColor: WidgetStateColor.transparent,
+                                            overlayColor:
+                                                WidgetStateColor.transparent,
                                             child: SizedBox(
                                               height: 20,
                                               child: Image.asset(
@@ -163,8 +180,13 @@ class CartItemView extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    Constant.capitalizeFirstLetter(
-                                        logic.getCartProductModel?.data?.items?[index].product?.productName ?? ""),
+                                    Constant.capitalizeFirstLetter(logic
+                                            .getCartProductModel
+                                            ?.data
+                                            ?.items?[index]
+                                            .product
+                                            ?.productName ??
+                                        ""),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -174,23 +196,29 @@ class CartItemView extends StatelessWidget {
                                     ),
                                   ),
                                   Wrap(
-                                    children: logic.getCartProductModel?.data?.items?[index].attributesArray?.map(
+                                    children: logic.getCartProductModel?.data
+                                            ?.items?[index].attributesArray
+                                            ?.map(
                                           (attributes) {
-                                            if (attributes.value?.isNotEmpty == true) {
+                                            if (attributes.value?.isNotEmpty ==
+                                                true) {
                                               return Row(
                                                 children: [
                                                   Text(
                                                     "${attributes.name ?? " "}: ",
                                                     style: TextStyle(
-                                                      fontFamily: AppFontFamily.heeBo600,
+                                                      fontFamily: AppFontFamily
+                                                          .heeBo600,
                                                       fontSize: 12,
-                                                      color: AppColors.currencyGrey,
+                                                      color: AppColors
+                                                          .currencyGrey,
                                                     ),
                                                   ),
                                                   Text(
                                                     attributes.value ?? "",
                                                     style: TextStyle(
-                                                      fontFamily: AppFontFamily.heeBo600,
+                                                      fontFamily: AppFontFamily
+                                                          .heeBo600,
                                                       fontSize: 12,
                                                       color: AppColors.appText,
                                                     ),
@@ -224,10 +252,16 @@ class CartItemView extends StatelessWidget {
                             GestureDetector(
                               onTap: () {
                                 logic.onDeleteProduct(
-                                  userId: Constant.storage.read<String>('userId') ?? "",
-                                  productId: logic.getCartProductModel?.data?.items?[index].product?.id ?? "",
-                                  productQuantity: logic.quantityList[index].toString(),
-                                  attributesArray: logic.attributes?[index] ?? [],
+                                  userId:
+                                      Constant.storage.read<String>('userId') ??
+                                          "",
+                                  productId: logic.getCartProductModel?.data
+                                          ?.items?[index].product?.id ??
+                                      "",
+                                  productQuantity:
+                                      logic.quantityList[index].toString(),
+                                  attributesArray:
+                                      logic.attributes?[index] ?? [],
                                 );
                               },
                               child: Image.asset(
@@ -255,7 +289,8 @@ class CartBottomView extends StatelessWidget {
       builder: (logic) {
         return logic.isLoading.value
             ? const SizedBox()
-            : logic.getCartProductModel?.data?.items?.isEmpty == true || logic.getCartProductModel?.data == null
+            : logic.getCartProductModel?.data?.items?.isEmpty == true ||
+                    logic.getCartProductModel?.data == null
                 ? const SizedBox()
                 : Container(
                     height: 156,
@@ -271,7 +306,8 @@ class CartBottomView extends StatelessWidget {
                         width: 1,
                       ),
                     ),
-                    padding: const EdgeInsets.only(left: 18, right: 18, top: 17, bottom: 17),
+                    padding: const EdgeInsets.only(
+                        left: 18, right: 18, top: 17, bottom: 17),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -309,7 +345,8 @@ class CartBottomView extends StatelessWidget {
                             Get.toNamed(
                               AppRoutes.selectAddress,
                               arguments: [
-                                logic.getCartProductModel?.data?.total?.toStringAsFixed(1),
+                                logic.getCartProductModel?.data?.total
+                                    ?.toStringAsFixed(1),
                                 "",
                                 0,
                                 logic.attributes,

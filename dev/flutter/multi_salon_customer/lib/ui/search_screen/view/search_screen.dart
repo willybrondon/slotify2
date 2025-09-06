@@ -23,7 +23,8 @@ import 'package:salon_2/utils/shimmer.dart';
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
-  SearchScreenController searchScreenController = Get.find<SearchScreenController>();
+  SearchScreenController searchScreenController =
+      Get.find<SearchScreenController>();
 
   @override
   Widget build(BuildContext context) {
@@ -53,19 +54,20 @@ class SearchScreen extends StatelessWidget {
             (homeScreenController.getAllServiceCategory?.services?.length ?? 0),
             (index) => false,
           );
-          
+
           // Clear all search results when popping
           homeScreenController.getAllServiceCategory = null;
           homeScreenController.getAllSalonCategory = null;
-          
+
           // Reload nearby salons to restore original state
           await homeScreenController.onGetAllSalonApiCall(
             latitude: latitude ?? 0.0,
             longitude: longitude ?? 0.0,
             userId: Constant.storage.read<String>('userId') ?? "",
           );
-          
-          homeScreenController.update([Constant.idSearchService, Constant.idProgressView]);
+
+          homeScreenController
+              .update([Constant.idSearchService, Constant.idProgressView]);
         }
         if (didPop) {
           return;
@@ -89,27 +91,31 @@ class SearchScreen extends StatelessWidget {
                 homeScreenController.serviceName.clear();
 
                 homeScreenController.searchEditingController.clear();
-                homeScreenController.isSelected =
-                    List.generate((homeScreenController.getAllServiceCategory?.services?.length ?? 0), (index) => false);
-                
+                homeScreenController.isSelected = List.generate(
+                    (homeScreenController
+                            .getAllServiceCategory?.services?.length ??
+                        0),
+                    (index) => false);
+
                 // Clear all search results when going back
                 homeScreenController.getAllServiceCategory = null;
                 homeScreenController.getAllSalonCategory = null;
-                
+
                 // Reload nearby salons to restore original state
                 await homeScreenController.onGetAllSalonApiCall(
                   latitude: latitude ?? 0.0,
                   longitude: longitude ?? 0.0,
                   userId: Constant.storage.read<String>('userId') ?? "",
                 );
-                
-                homeScreenController.update([Constant.idSearchService, Constant.idProgressView]);
+
+                homeScreenController.update(
+                    [Constant.idSearchService, Constant.idProgressView]);
 
                 Get.back();
               },
               child: Icon(
                 Icons.arrow_back,
-                color: AppColors.whiteColor,
+                color: AppColors.blackColor,
               ),
             ),
           ),
@@ -173,7 +179,8 @@ class SearchScreen extends StatelessWidget {
                           fontFamily: AppFontFamily.sfProDisplayMedium,
                           fontSize: 15,
                           onTap: () async {
-                            if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                            if (Constant.storage.read<bool>('isLogIn') ??
+                                false) {
                               log("Total Minute :: ${logic.totalMinute}");
                               log("Service id searchh :: ${logic.serviceId}");
                               log("Service name searchh :: ${logic.checkItem}");
@@ -187,8 +194,10 @@ class SearchScreen extends StatelessWidget {
                                 0.0,
                               ]);
                             } else {
-                              Get.toNamed(AppRoutes.signIn, arguments: [logic.checkItem.isNotEmpty]);
-                              await Get.find<SignInController>().getDataFromArgs();
+                              Get.toNamed(AppRoutes.signIn,
+                                  arguments: [logic.checkItem.isNotEmpty]);
+                              await Get.find<SignInController>()
+                                  .getDataFromArgs();
                             }
                           },
                         )
@@ -206,9 +215,12 @@ class SearchScreen extends StatelessWidget {
                 // Search bar at the top
                 Container(
                   width: double.infinity,
-                  margin: const EdgeInsets.only(top: 15, left: 16, right: 16, bottom: 15),
+                  margin: const EdgeInsets.only(
+                      top: 15, left: 16, right: 16, bottom: 15),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12), color: AppColors.whiteColor, boxShadow: Constant.boxShadow),
+                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.whiteColor,
+                      boxShadow: Constant.boxShadow),
                   child: TextFieldCustom(
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(13.0),
@@ -225,12 +237,15 @@ class SearchScreen extends StatelessWidget {
                     controller: logic.searchEditingController,
                     onEditingComplete: () async {
                       FocusScopeNode currentFocus = FocusScope.of(context);
-                      if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+                      if (!currentFocus.hasPrimaryFocus &&
+                          currentFocus.focusedChild != null) {
                         currentFocus.focusedChild?.unfocus();
                       }
 
-                      logic.isSelected = List.generate((logic.getAllServiceCategory?.services?.length ?? 0),
-                          (index) => logic.checkItem.contains(logic.getAllServiceCategory?.services?[index].name));
+                      logic.isSelected = List.generate(
+                          (logic.getAllServiceCategory?.services?.length ?? 0),
+                          (index) => logic.checkItem.contains(logic
+                              .getAllServiceCategory?.services?[index].name));
                       log("Selected List is in Service :: ${logic.isSelected}");
                     },
                     onChanged: (text) {
@@ -242,20 +257,27 @@ class SearchScreen extends StatelessWidget {
                 // Content below search bar
                 Expanded(
                   child: logic.searchEditingController.text.trim().isEmpty
-                      ? _buildMostSearchedServices(logic) // Show most searched services when search bar is empty
-                      : logic.getAllServiceCategory?.services?.isEmpty == true &&
-                        logic.getAllSalonCategory?.data?.isEmpty == true
+                      ? _buildMostSearchedServices(
+                          logic) // Show most searched services when search bar is empty
+                      : logic.getAllServiceCategory?.services?.isEmpty ==
+                                  true &&
+                              logic.getAllSalonCategory?.data?.isEmpty == true
                           ? logic.isLoading.value
                               ? Shimmers.searchScreenShimmer()
-                              : _buildMostSearchedServices(logic) // Show most searched services if no search results
+                              : _buildMostSearchedServices(
+                                  logic) // Show most searched services if no search results
                           : Column(
                               children: [
                                 // Show salon results if available (location-based search)
-                                if (logic.getAllSalonCategory?.data?.isNotEmpty == true)
+                                if (logic.getAllSalonCategory?.data
+                                        ?.isNotEmpty ==
+                                    true)
                                   _buildSalonResults(logic),
-                                
+
                                 // Show service results if available
-                                if (logic.getAllServiceCategory?.services?.isNotEmpty == true)
+                                if (logic.getAllServiceCategory?.services
+                                        ?.isNotEmpty ==
+                                    true)
                                   _buildServiceResults(logic),
                               ],
                             ),
@@ -271,7 +293,7 @@ class SearchScreen extends StatelessWidget {
   // Helper method to build most searched services
   Widget _buildMostSearchedServices(HomeScreenController logic) {
     // If no services are loaded, show a message or load some default services
-    if (logic.getAllServiceCategory?.services?.isEmpty == true || 
+    if (logic.getAllServiceCategory?.services?.isEmpty == true ||
         logic.getAllServiceCategory?.services == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,35 +354,39 @@ class SearchScreen extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             children: List.generate(
-              (logic.getAllServiceCategory?.services?.length ?? 0) > 5 
-                  ? 5 
+              (logic.getAllServiceCategory?.services?.length ?? 0) > 5
+                  ? 5
                   : (logic.getAllServiceCategory?.services?.length ?? 0),
               (index) {
                 final service = logic.getAllServiceCategory?.services?[index];
                 if (service == null) return const SizedBox.shrink();
-                
+
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: AppColors.whiteColor,
                     boxShadow: Constant.boxShadow,
-                    border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+                    border: Border.all(
+                        color: AppColors.grey.withOpacity(0.1), width: 1),
                   ),
                   child: Row(
                     children: [
                       Container(
                         height: 60,
                         width: 60,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8)),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: CachedNetworkImage(
                             imageUrl: service.image ?? "",
                             fit: BoxFit.cover,
                             placeholder: (context, url) {
-                              return Image.asset(AppAsset.icServicePlaceholder).paddingAll(8);
+                              return Image.asset(AppAsset.icServicePlaceholder)
+                                  .paddingAll(8);
                             },
                             errorWidget: (context, url, error) {
                               return Icon(
@@ -450,7 +476,8 @@ class SearchScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   color: AppColors.whiteColor,
                   boxShadow: Constant.boxShadow,
-                  border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+                  border: Border.all(
+                      color: AppColors.grey.withOpacity(0.1), width: 1),
                 ),
                 child: InkWell(
                   onTap: () {
@@ -477,7 +504,8 @@ class SearchScreen extends StatelessWidget {
                           placeholder: (context, url) => Container(
                             height: 100,
                             color: AppColors.grey.withOpacity(0.3),
-                            child: const Center(child: CircularProgressIndicator()),
+                            child: const Center(
+                                child: CircularProgressIndicator()),
                           ),
                           errorWidget: (context, url, error) => Container(
                             height: 100,
@@ -515,12 +543,14 @@ class SearchScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                Icon(Icons.location_on, size: 12, color: AppColors.primaryAppColor),
+                                Icon(Icons.location_on,
+                                    size: 12, color: AppColors.primaryAppColor),
                                 const SizedBox(width: 4),
                                 Text(
                                   "${salon?.distance?.toStringAsFixed(1) ?? "0"} km",
                                   style: TextStyle(
-                                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                                    fontFamily:
+                                        AppFontFamily.sfProDisplayMedium,
                                     fontSize: 12,
                                     color: AppColors.primaryAppColor,
                                   ),
@@ -563,54 +593,75 @@ class SearchScreen extends StatelessWidget {
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
                   controller: logic.serviceScrollController,
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
                   itemBuilder: (context, index) {
                     return AnimationConfiguration.staggeredGrid(
                       position: index,
                       duration: const Duration(milliseconds: 800),
-                      columnCount: logic.getAllServiceCategory?.services?.length ?? 0,
+                      columnCount:
+                          logic.getAllServiceCategory?.services?.length ?? 0,
                       child: SlideAnimation(
                         child: FadeInAnimation(
                           child: GetBuilder<HomeScreenController>(
                             id: Constant.idServiceList,
                             builder: (logicService) {
                               return InkWell(
-                                overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                                overlayColor: WidgetStatePropertyAll(
+                                    AppColors.transparent),
                                 onTap: () {
                                   if (logicService.isSelected[index] == true) {
-                                    logicService.onServiceCheckBoxClick(false, index);
+                                    logicService.onServiceCheckBoxClick(
+                                        false, index);
                                   } else {
-                                    logicService.onServiceCheckBoxClick(true, index);
+                                    logicService.onServiceCheckBoxClick(
+                                        true, index);
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 6),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     color: AppColors.whiteColor,
                                     boxShadow: Constant.boxShadow,
-                                    border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+                                    border: Border.all(
+                                        color: AppColors.grey.withOpacity(0.1),
+                                        width: 1),
                                   ),
-                                  margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                                  margin: const EdgeInsets.only(
+                                      bottom: 10, left: 10, right: 10),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Container(
                                             height: 80,
                                             width: 80,
-                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(12)),
                                             child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(10),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                               child: CachedNetworkImage(
-                                                imageUrl: logic.getAllServiceCategory?.services?[index].image ?? "",
+                                                imageUrl: logic
+                                                        .getAllServiceCategory
+                                                        ?.services?[index]
+                                                        .image ??
+                                                    "",
                                                 fit: BoxFit.cover,
                                                 placeholder: (context, url) {
-                                                  return Image.asset(AppAsset.icServicePlaceholder).paddingAll(5);
+                                                  return Image.asset(AppAsset
+                                                          .icServicePlaceholder)
+                                                      .paddingAll(5);
                                                 },
-                                                errorWidget: (context, url, error) {
+                                                errorWidget:
+                                                    (context, url, error) {
                                                   return Icon(
                                                     Icons.error_outline,
                                                     color: AppColors.blackColor,
@@ -622,23 +673,32 @@ class SearchScreen extends StatelessWidget {
                                           ),
                                           SizedBox(width: Get.width * 0.03),
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               SizedBox(
                                                 width: 170,
                                                 child: Text(
-                                                  logic.getAllServiceCategory?.services?[index].name ?? "",
-                                                  overflow: TextOverflow.ellipsis,
+                                                  logic
+                                                          .getAllServiceCategory
+                                                          ?.services?[index]
+                                                          .name ??
+                                                      "",
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                      fontFamily: AppFontFamily.sfProDisplay,
+                                                      fontFamily: AppFontFamily
+                                                          .sfProDisplay,
                                                       fontSize: 17,
-                                                      color: AppColors.primaryTextColor),
+                                                      color: AppColors
+                                                          .primaryTextColor),
                                                 ),
                                               ),
                                               Text(
                                                 "${logic.getAllServiceCategory?.services?[index].duration ?? 0} ${"txtMinutes".tr}",
                                                 style: TextStyle(
-                                                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplayMedium,
                                                     fontSize: 13,
                                                     color: AppColors.darkGrey3),
                                               ),
@@ -651,10 +711,13 @@ class SearchScreen extends StatelessWidget {
                                         builder: (logic) {
                                           return GestureDetector(
                                             onTap: () {
-                                              if (logic.isSelected[index] == true) {
-                                                logic.onServiceCheckBoxClick(false, index);
+                                              if (logic.isSelected[index] ==
+                                                  true) {
+                                                logic.onServiceCheckBoxClick(
+                                                    false, index);
                                               } else {
-                                                logic.onServiceCheckBoxClick(true, index);
+                                                logic.onServiceCheckBoxClick(
+                                                    true, index);
                                               }
                                             },
                                             child: Container(
@@ -662,13 +725,17 @@ class SearchScreen extends StatelessWidget {
                                               width: 25,
                                               padding: const EdgeInsets.all(7),
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(6),
-                                                border: Border.all(color: AppColors.greyColor.withOpacity(0.5)),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                border: Border.all(
+                                                    color: AppColors.greyColor
+                                                        .withOpacity(0.5)),
                                               ),
                                               child: logic.isSelected[index]
                                                   ? Image.asset(
                                                       AppAsset.icCheck,
-                                                      color: AppColors.primaryAppColor,
+                                                      color: AppColors
+                                                          .primaryAppColor,
                                                     )
                                                   : const SizedBox(),
                                             ).paddingOnly(right: 10),
