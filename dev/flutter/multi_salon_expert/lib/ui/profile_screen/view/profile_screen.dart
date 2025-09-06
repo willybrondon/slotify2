@@ -23,10 +23,12 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
-    final LoginScreenController loginScreenController = Get.put(LoginScreenController());
+    final LoginScreenController loginScreenController =
+        Get.put(LoginScreenController());
     log("loginScreenController.emailController.text${loginScreenController.emailController.text}");
 
-    final ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
+    final ProfileScreenController profileScreenController =
+        Get.put(ProfileScreenController());
     log("profileScreenController.bookingIdController.text${profileScreenController.bookingIdController.text}");
 
     return PopScope(
@@ -52,7 +54,7 @@ class ProfileScreen extends StatelessWidget {
                         height: Get.height * 0.17 + statusBarHeight,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryAppColor,
+                          color: AppColors.whiteColor,
                         ),
                         child: Center(
                           child: Text(
@@ -60,7 +62,7 @@ class ProfileScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: AppFontFamily.sfProDisplayBold,
                               fontSize: 20,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ).paddingOnly(bottom: 35),
                         ),
@@ -74,7 +76,8 @@ class ProfileScreen extends StatelessWidget {
                             child: CircleAvatar(
                               backgroundColor: AppColors.whiteColor,
                               radius: 60,
-                              backgroundImage: NetworkImage(Constant.storage.read("hostImage") ??
+                              backgroundImage: NetworkImage(Constant.storage
+                                      .read("hostImage") ??
                                   '${ApiConstant.BASE_URL}static/media/male.459a8699b07b4b9bf3d6.png'),
                             ),
                           ),
@@ -92,8 +95,11 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    decoration: BoxDecoration(color: AppColors.idBg, borderRadius: BorderRadius.circular(8)),
-                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    decoration: BoxDecoration(
+                        color: AppColors.idBg,
+                        borderRadius: BorderRadius.circular(8)),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                     child: Text(
                       "ID :- ${Constant.storage.read("uniqueID")}",
                       style: TextStyle(
@@ -103,7 +109,8 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Divider(color: AppColors.greyColor.withOpacity(0.1)).paddingOnly(top: 10,bottom: 10,left: 15,right: 15),
+                  Divider(color: AppColors.greyColor.withOpacity(0.1))
+                      .paddingOnly(top: 10, bottom: 10, left: 15, right: 15),
                   CustomMenu(
                     leadingImage: AppAsset.icProfile,
                     title: "txtMyAccount".tr,

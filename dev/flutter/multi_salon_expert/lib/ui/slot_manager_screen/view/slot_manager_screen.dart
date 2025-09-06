@@ -24,11 +24,13 @@ import 'package:salon_2/utils/utils.dart';
 class SlotManagerScreen extends StatelessWidget {
   SlotManagerScreen({super.key});
 
-  final SlotManagerController slotManagerController = Get.find<SlotManagerController>();
+  final SlotManagerController slotManagerController =
+      Get.find<SlotManagerController>();
 
   @override
   Widget build(BuildContext context) {
-    LoginScreenController loginScreenController = Get.put(LoginScreenController());
+    LoginScreenController loginScreenController =
+        Get.put(LoginScreenController());
 
     log("loginScreenController.emailController.text${loginScreenController.emailController.text}");
 
@@ -53,7 +55,7 @@ class SlotManagerScreen extends StatelessWidget {
             flexibleSpace: Container(
               height: 90 + statusBarHeight,
               width: double.infinity,
-              color: AppColors.primaryAppColor,
+              color: AppColors.whiteColor,
               padding: EdgeInsets.only(top: statusBarHeight),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -70,7 +72,7 @@ class SlotManagerScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo800,
                               fontSize: 23,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ),
                           Text(
@@ -80,7 +82,7 @@ class SlotManagerScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo400,
                               fontSize: 15,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ),
                         ],
@@ -102,7 +104,8 @@ class SlotManagerScreen extends StatelessWidget {
                 logic.onClickUploadSlot(
                     selectSlots: logic.slotsString.toString(),
                     selectDate: logic.formattedDate.toString(),
-                    expertId: Constant.storage.read<String>("expertId").toString());
+                    expertId:
+                        Constant.storage.read<String>("expertId").toString());
               },
               child: logic.selectedSlotsList.isEmpty
                   ? const SizedBox()
@@ -117,7 +120,9 @@ class SlotManagerScreen extends StatelessWidget {
                           height: 51,
                           width: 350,
                           decoration: BoxDecoration(
-                            color: logic.currentIndex == true ? AppColors.cancelButton : AppColors.primaryAppColor,
+                            color: logic.currentIndex == true
+                                ? AppColors.cancelButton
+                                : AppColors.primaryAppColor,
                             borderRadius: BorderRadius.circular(45),
                           ),
                           child: Center(
@@ -163,23 +168,31 @@ class SlotManagerScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppColors.whiteColor,
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(width: 1, color: AppColors.grey.withOpacity(0.1)),
+                                border: Border.all(
+                                    width: 1,
+                                    color: AppColors.grey.withOpacity(0.1)),
                               ),
                               child: EasyDateTimeLine(
                                 initialDate: DateTime.now(),
                                 disabledDates: logic.getDisabledDates(),
                                 onDateChange: (selectedDate) async {
                                   logic.comparedList.clear();
-                                  logic.formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+                                  logic.formattedDate = DateFormat('yyyy-MM-dd')
+                                      .format(selectedDate);
                                   log("Selected Date :: ${logic.formattedDate}");
                                   log("salon Id :: ${Constant.storage.read<String>("salonId").toString()}");
                                   logic.selectedSlotsList.clear();
                                   logic.currentIndex = false;
 
                                   await logic.onGetBookingApiCall(
-                                    selectedDate: logic.formattedDate.toString(),
-                                    expertId: Constant.storage.read<String>("expertId").toString(),
-                                    salonId: Constant.storage.read<String>("salonId").toString(),
+                                    selectedDate:
+                                        logic.formattedDate.toString(),
+                                    expertId: Constant.storage
+                                        .read<String>("expertId")
+                                        .toString(),
+                                    salonId: Constant.storage
+                                        .read<String>("salonId")
+                                        .toString(),
                                   );
                                   logic.selectedAndBookSlot();
                                   logic.checkSlot();
@@ -188,14 +201,16 @@ class SlotManagerScreen extends StatelessWidget {
                                 headerProps: EasyHeaderProps(
                                   monthPickerType: MonthPickerType.switcher,
                                   showMonthPicker: true,
-                                  selectedDateFormat: SelectedDateFormat.fullDateMonthAsStrDY,
+                                  selectedDateFormat:
+                                      SelectedDateFormat.fullDateMonthAsStrDY,
                                   monthStyle: TextStyle(
                                     color: AppColors.primaryTextColor,
                                     fontFamily: AppFontFamily.sfProDisplay,
                                   ),
                                   selectedDateStyle: TextStyle(
                                     color: AppColors.darkGrey3,
-                                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                                    fontFamily:
+                                        AppFontFamily.sfProDisplayMedium,
                                   ),
                                 ),
                                 dayProps: EasyDayProps(
@@ -207,21 +222,25 @@ class SlotManagerScreen extends StatelessWidget {
                                   todayStyle: DayStyle(
                                     dayNumStyle: TextStyle(
                                       color: AppColors.dateUnSelect,
-                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayMedium,
                                     ),
                                     dayStrStyle: TextStyle(
                                       color: AppColors.dateUnSelect,
-                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayMedium,
                                     ),
                                   ),
                                   activeDayStyle: DayStyle(
                                     dayNumStyle: TextStyle(
                                       color: AppColors.primaryTextColor,
-                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
                                     ),
                                     dayStrStyle: TextStyle(
                                       color: AppColors.primaryTextColor,
-                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
                                     ),
                                     decoration: BoxDecoration(
                                       borderRadius: const BorderRadius.all(
@@ -232,11 +251,13 @@ class SlotManagerScreen extends StatelessWidget {
                                   ),
                                   inactiveDayStyle: DayStyle(
                                     dayNumStyle: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayMedium,
                                       color: AppColors.dateUnSelect,
                                     ),
                                     dayStrStyle: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplayMedium,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayMedium,
                                       color: AppColors.dateUnSelect,
                                     ),
                                   ),
@@ -252,9 +273,11 @@ class SlotManagerScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(14),
                                     ),
                                     padding: const EdgeInsets.all(13),
-                                    margin: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                                    margin: const EdgeInsets.only(
+                                        left: 12, right: 12, bottom: 12),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           "txtHolidayMode".tr,
@@ -266,15 +289,19 @@ class SlotManagerScreen extends StatelessWidget {
                                         ),
                                         Row(
                                           children: [
-                                            Image.asset(AppAsset.icHoliday, height: 22).paddingOnly(right: 8),
+                                            Image.asset(AppAsset.icHoliday,
+                                                    height: 22)
+                                                .paddingOnly(right: 8),
                                             SizedBox(
                                               width: Get.width * 0.62,
                                               child: Text(
                                                 "desNotAvailableWork".tr,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo600,
-                                                  color: AppColors.primaryAppColor,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo600,
+                                                  color:
+                                                      AppColors.primaryAppColor,
                                                   fontSize: 16,
                                                 ),
                                               ),
@@ -287,14 +314,30 @@ class SlotManagerScreen extends StatelessWidget {
                                                   height: 30,
                                                   child: Switch(
                                                     value: logic.isSwitchOn,
-                                                    activeColor: AppColors.greenColor,
-                                                    activeTrackColor: AppColors.whiteColor,
-                                                    inactiveThumbColor: AppColors.redColor,
-                                                    inactiveTrackColor: AppColors.whiteColor,
-                                                    trackOutlineColor: WidgetStatePropertyAll(AppColors.grey.withOpacity(0.15)),
-                                                    trackColor: WidgetStatePropertyAll(AppColors.switchBox),
+                                                    activeColor:
+                                                        AppColors.greenColor,
+                                                    activeTrackColor:
+                                                        AppColors.whiteColor,
+                                                    inactiveThumbColor:
+                                                        AppColors.redColor,
+                                                    inactiveTrackColor:
+                                                        AppColors.whiteColor,
+                                                    trackOutlineColor:
+                                                        WidgetStatePropertyAll(
+                                                            AppColors.grey
+                                                                .withOpacity(
+                                                                    0.15)),
+                                                    trackColor:
+                                                        WidgetStatePropertyAll(
+                                                            AppColors
+                                                                .switchBox),
                                                     onChanged: (value) {
-                                                      if (logic.comparedList.length != logic.getBookingModel?.timeSlots?.length) {
+                                                      if (logic.comparedList
+                                                              .length !=
+                                                          logic
+                                                              .getBookingModel
+                                                              ?.timeSlots
+                                                              ?.length) {
                                                         logic.onSwitch(value);
                                                       }
                                                     },
@@ -329,7 +372,8 @@ class SlotManagerScreen extends StatelessWidget {
                     child: Container(
                       height: Get.height,
                       width: Get.width,
-                      margin: const EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 10),
+                      margin: const EdgeInsets.only(
+                          top: 10, left: 15, right: 15, bottom: 10),
                       padding: const EdgeInsets.only(top: 15),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
@@ -367,7 +411,8 @@ class SlotManagerScreen extends StatelessWidget {
                                 Container(
                                   height: 18,
                                   width: 28,
-                                  margin: const EdgeInsets.only(right: 5, left: 10),
+                                  margin:
+                                      const EdgeInsets.only(right: 5, left: 10),
                                   decoration: BoxDecoration(
                                     color: AppColors.greenButton,
                                     borderRadius: BorderRadius.circular(5),
@@ -391,7 +436,8 @@ class SlotManagerScreen extends StatelessWidget {
                                             child: SizedBox(
                                               height: 220,
                                               width: 220,
-                                              child: Image.asset(AppAsset.imgSalonClosed),
+                                              child: Image.asset(
+                                                  AppAsset.imgSalonClosed),
                                             ).paddingOnly(top: 30),
                                           )
                                         : Column(
@@ -400,21 +446,28 @@ class SlotManagerScreen extends StatelessWidget {
                                                   ? const SizedBox()
                                                   : buildSlotCategory(
                                                       "txtMorning".tr,
-                                                      slotManagerController.morningSlots,
-                                                      logic.formattedDate.toString(),
+                                                      slotManagerController
+                                                          .morningSlots,
+                                                      logic.formattedDate
+                                                          .toString(),
                                                     ),
-                                              logic.getBookingModel?.allSlots?.evening?.isEmpty == true
+                                              logic.getBookingModel?.allSlots
+                                                          ?.evening?.isEmpty ==
+                                                      true
                                                   ? const SizedBox()
                                                   : !(logic.hasAfternoonSlots)
                                                       ? const SizedBox()
                                                       : buildSlotCategory(
                                                           "txtAfternoon".tr,
-                                                          slotManagerController.afternoonSlots,
-                                                          logic.formattedDate.toString(),
+                                                          slotManagerController
+                                                              .afternoonSlots,
+                                                          logic.formattedDate
+                                                              .toString(),
                                                         ),
                                             ],
                                           )
-                                    : Utils.showToast(Get.context!, logic.getBookingModel?.message ?? ""),
+                                    : Utils.showToast(Get.context!,
+                                        logic.getBookingModel?.message ?? ""),
                             SizedBox(height: Get.height * 0.08)
                           ],
                         ),
@@ -430,7 +483,8 @@ class SlotManagerScreen extends StatelessWidget {
     );
   }
 
-  Widget buildSlotCategory(String category, List<String> slots, String selectedDate) {
+  Widget buildSlotCategory(
+      String category, List<String> slots, String selectedDate) {
     slotManagerController.hasMorningSlots = slots.any((slot) {
       DateTime currentTime = DateTime.now();
       DateTime currentDate = DateTime.now();
@@ -453,7 +507,8 @@ class SlotManagerScreen extends StatelessWidget {
         slotTime.minute,
       );
 
-      return !currentDate.isAfter(slotDateTime) || !currentTimeWithDate.isAfter(slotTimeWithDate);
+      return !currentDate.isAfter(slotDateTime) ||
+          !currentTimeWithDate.isAfter(slotTimeWithDate);
     });
 
     if (!(slotManagerController.hasMorningSlots) && category == "Morning") {
@@ -491,29 +546,47 @@ class SlotManagerScreen extends StatelessWidget {
                           shrinkWrap: true,
                           padding: EdgeInsets.zero,
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3, childAspectRatio: 2, crossAxisSpacing: 5, mainAxisSpacing: 0.10),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  childAspectRatio: 2,
+                                  crossAxisSpacing: 5,
+                                  mainAxisSpacing: 0.10),
                           itemCount: slots.length,
                           itemBuilder: (context, index) {
                             DateTime currentTime = DateTime.now();
                             DateTime currentDate = DateTime.now();
-                            DateTime slotDateTime = DateFormat('yyyy-MM-dd').parse(selectedDate);
+                            DateTime slotDateTime =
+                                DateFormat('yyyy-MM-dd').parse(selectedDate);
 
                             DateTime currentTimeWithDate = DateTime(
-                                currentDate.year, currentDate.month, currentDate.day, currentTime.hour, currentTime.minute);
-                            bool isSelected = logic.selectedSlotsList.contains(slots[index]);
+                                currentDate.year,
+                                currentDate.month,
+                                currentDate.day,
+                                currentTime.hour,
+                                currentTime.minute);
+                            bool isSelected =
+                                logic.selectedSlotsList.contains(slots[index]);
 
-                            DateTime slotTime = DateFormat('hh:mm a').parse(slots[index]);
-                            DateTime slotTimeWithDate =
-                                DateTime(slotDateTime.year, slotDateTime.month, slotDateTime.day, slotTime.hour, slotTime.minute);
+                            DateTime slotTime =
+                                DateFormat('hh:mm a').parse(slots[index]);
+                            DateTime slotTimeWithDate = DateTime(
+                                slotDateTime.year,
+                                slotDateTime.month,
+                                slotDateTime.day,
+                                slotTime.hour,
+                                slotTime.minute);
 
                             ///   isSlotBooked
-                            List<String>? timeSlots = logic.getBookingModel?.timeSlots;
+                            List<String>? timeSlots =
+                                logic.getBookingModel?.timeSlots;
 
-                            bool isSlotBooked = timeSlots != null && timeSlots.contains(slots[index]);
+                            bool isSlotBooked = timeSlots != null &&
+                                timeSlots.contains(slots[index]);
 
-                            bool isSlotTimePassed =
-                                currentDate.isAfter(slotDateTime) && currentTimeWithDate.isAfter(slotTimeWithDate);
+                            bool isSlotTimePassed = currentDate
+                                    .isAfter(slotDateTime) &&
+                                currentTimeWithDate.isAfter(slotTimeWithDate);
                             logic.isFirstTap = true;
 
                             return AnimationConfiguration.staggeredGrid(
@@ -534,7 +607,8 @@ class SlotManagerScreen extends StatelessWidget {
                                                 logic.isFirstTap = true;
                                               },
                                             );
-                                            Utils.showToast(Get.context!, "desSlotBooked".tr);
+                                            Utils.showToast(Get.context!,
+                                                "desSlotBooked".tr);
                                           }
                                         } else if (isSlotTimePassed) {
                                           if (logic.isFirstTap) {
@@ -545,12 +619,14 @@ class SlotManagerScreen extends StatelessWidget {
                                                 logic.isFirstTap = true;
                                               },
                                             );
-                                            Utils.showToast(Get.context!, "desPreviousSlot".tr);
+                                            Utils.showToast(Get.context!,
+                                                "desPreviousSlot".tr);
                                           }
                                         } else {
                                           logic.selectSlot(slots[index]);
 
-                                          logic.slotsString = logic.selectedSlotsList.join(',');
+                                          logic.slotsString =
+                                              logic.selectedSlotsList.join(',');
                                           log("Slots String :: ${logic.slotsString}");
                                           log("selectedSlotsList :: ${logic.selectedSlotsList}");
                                         }
@@ -569,18 +645,23 @@ class SlotManagerScreen extends StatelessWidget {
                                               : isSlotTimePassed || isSlotBooked
                                                   ? AppColors.redButton
                                                   : AppColors.greenButton,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         child: Center(
                                           child: Text(
                                             slots[index],
                                             style: TextStyle(
-                                              fontFamily: isSlotBooked || isSlotTimePassed
-                                                  ? AppFontFamily.sfProDisplayRegular
+                                              fontFamily: isSlotBooked ||
+                                                      isSlotTimePassed
+                                                  ? AppFontFamily
+                                                      .sfProDisplayRegular
                                                   : AppFontFamily.sfProDisplay,
                                               fontSize: 14,
-                                              decorationColor: AppColors.slotText,
-                                              decoration: isSlotBooked || isSlotTimePassed
+                                              decorationColor:
+                                                  AppColors.slotText,
+                                              decoration: isSlotBooked ||
+                                                      isSlotTimePassed
                                                   ? TextDecoration.lineThrough
                                                   : TextDecoration.none,
                                               color: isSelected

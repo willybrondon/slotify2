@@ -36,7 +36,8 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    LoginScreenController loginScreenController = Get.put(LoginScreenController());
+    LoginScreenController loginScreenController =
+        Get.put(LoginScreenController());
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
     log("loginScreenController.emailController.text${loginScreenController.emailController.text}");
@@ -59,7 +60,7 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
             flexibleSpace: Container(
               height: 90 + statusBarHeight,
               width: double.infinity,
-              color: AppColors.primaryAppColor,
+              color: AppColors.whiteColor,
               padding: EdgeInsets.only(top: statusBarHeight),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +77,7 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo800,
                               fontSize: 23,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ),
                           Text(
@@ -86,7 +87,7 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo400,
                               fontSize: 15,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ),
                         ],
@@ -138,7 +139,8 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
                 ).paddingOnly(left: 13);
               },
             ),
-            Divider(color: AppColors.greyColor.withOpacity(0.15)).paddingOnly(top: 5, bottom: 10),
+            Divider(color: AppColors.greyColor.withOpacity(0.15))
+                .paddingOnly(top: 5, bottom: 10),
             GetBuilder<OrderReportController>(
               builder: (logic) {
                 return Expanded(
@@ -185,7 +187,8 @@ class OrderReportTabView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Image.asset(AppAsset.icNoService, height: 155, width: 155),
+                          Image.asset(AppAsset.icNoService,
+                              height: 155, width: 155),
                           Text(
                             "txtNoData".tr,
                             style: TextStyle(
@@ -209,12 +212,18 @@ class OrderReportTabView extends StatelessWidget {
                                 shrinkWrap: true,
                                 padding: EdgeInsets.zero,
                                 physics: const BouncingScrollPhysics(),
-                                itemCount: logic.getBookingStatusWiseCategory?.data?.length ?? 0,
+                                itemCount: logic.getBookingStatusWiseCategory
+                                        ?.data?.length ??
+                                    0,
                                 itemBuilder: (context, index) {
                                   return AnimationConfiguration.staggeredGrid(
                                     position: index,
                                     duration: const Duration(milliseconds: 800),
-                                    columnCount: logic.getBookingStatusWiseCategory?.data?.length ?? 0,
+                                    columnCount: logic
+                                            .getBookingStatusWiseCategory
+                                            ?.data
+                                            ?.length ??
+                                        0,
                                     child: SlideAnimation(
                                       child: FadeInAnimation(
                                         child: InkWell(
@@ -222,22 +231,30 @@ class OrderReportTabView extends StatelessWidget {
                                             Get.toNamed(
                                               AppRoutes.viewDetail,
                                               arguments: [
-                                                logic.getBookingStatusWiseCategory?.data?[index] ?? [],
-                                                logic.getBookingStatusWiseCategory?.reviews ?? [],
+                                                logic.getBookingStatusWiseCategory
+                                                        ?.data?[index] ??
+                                                    [],
+                                                logic.getBookingStatusWiseCategory
+                                                        ?.reviews ??
+                                                    [],
                                               ],
                                             );
                                           },
                                           child: Container(
                                             width: double.infinity,
-                                            margin: const EdgeInsets.only(left: 5, right: 5),
-                                            padding: const EdgeInsets.only(bottom: 10),
+                                            margin: const EdgeInsets.only(
+                                                left: 5, right: 5),
+                                            padding: const EdgeInsets.only(
+                                                bottom: 10),
                                             decoration: BoxDecoration(
                                               color: AppColors.whiteColor,
                                               border: Border.all(
                                                 width: 1,
-                                                color: AppColors.grey.withOpacity(0.1),
+                                                color: AppColors.grey
+                                                    .withOpacity(0.1),
                                               ),
-                                              borderRadius: BorderRadius.circular(18),
+                                              borderRadius:
+                                                  BorderRadius.circular(18),
                                               boxShadow: Constant.boxShadow,
                                             ),
                                             child: Stack(
@@ -246,20 +263,33 @@ class OrderReportTabView extends StatelessWidget {
                                                   alignment: Alignment.topRight,
                                                   child: GestureDetector(
                                                     onLongPress: () {
-                                                      String bookingId =
-                                                          logic.getBookingStatusWiseCategory!.data![index].bookingId ?? "";
-                                                      FlutterClipboard.copy(bookingId);
-                                                      Utils.showToast(Get.context!, "Copied $bookingId");
+                                                      String bookingId = logic
+                                                              .getBookingStatusWiseCategory!
+                                                              .data![index]
+                                                              .bookingId ??
+                                                          "";
+                                                      FlutterClipboard.copy(
+                                                          bookingId);
+                                                      Utils.showToast(
+                                                          Get.context!,
+                                                          "Copied $bookingId");
                                                       log("Copy Booking ID :: $bookingId");
                                                     },
                                                     child: Container(
                                                       height: 30,
                                                       width: Get.width * 0.2,
-                                                      alignment: Alignment.center,
+                                                      alignment:
+                                                          Alignment.center,
                                                       decoration: BoxDecoration(
-                                                        borderRadius: const BorderRadius.only(
-                                                          bottomLeft: Radius.circular(15),
-                                                          topRight: Radius.circular(12),
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .only(
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  15),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  12),
                                                         ),
                                                         color: AppColors.bgTime,
                                                       ),
@@ -267,64 +297,104 @@ class OrderReportTabView extends StatelessWidget {
                                                         "#${logic.getBookingStatusWiseCategory!.data![index].bookingId}",
                                                         style: TextStyle(
                                                           fontSize: 12,
-                                                          fontFamily: AppFontFamily.heeBo500,
-                                                          color: AppColors.idTextColor,
+                                                          fontFamily:
+                                                              AppFontFamily
+                                                                  .heeBo500,
+                                                          color: AppColors
+                                                              .idTextColor,
                                                         ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
                                                 Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
                                                     Row(
                                                       children: [
                                                         Container(
                                                           height: 45,
                                                           width: 45,
-                                                          decoration: BoxDecoration(
-                                                            color: AppColors.grey.withOpacity(0.05),
-                                                            shape: BoxShape.circle,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: AppColors
+                                                                .grey
+                                                                .withOpacity(
+                                                                    0.05),
+                                                            shape:
+                                                                BoxShape.circle,
                                                           ),
-                                                          clipBehavior: Clip.hardEdge,
-                                                          child: CachedNetworkImage(
-                                                            imageUrl: logic.getBookingStatusWiseCategory?.data?[index]
-                                                                    .serviceImage?.first ??
+                                                          clipBehavior:
+                                                              Clip.hardEdge,
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            imageUrl: logic
+                                                                    .getBookingStatusWiseCategory
+                                                                    ?.data?[
+                                                                        index]
+                                                                    .serviceImage
+                                                                    ?.first ??
                                                                 "",
                                                             fit: BoxFit.cover,
-                                                            placeholder: (context, url) {
-                                                              return Image.asset(
-                                                                AppAsset.icPlaceholder,
-                                                                color: AppColors.blackColor1,
+                                                            placeholder:
+                                                                (context, url) {
+                                                              return Image
+                                                                  .asset(
+                                                                AppAsset
+                                                                    .icPlaceholder,
+                                                                color: AppColors
+                                                                    .blackColor1,
                                                               ).paddingAll(10);
                                                             },
-                                                            errorWidget: (context, url, error) {
-                                                              return Image.asset(
-                                                                AppAsset.icPlaceholder,
-                                                                color: AppColors.blackColor1,
+                                                            errorWidget:
+                                                                (context, url,
+                                                                    error) {
+                                                              return Image
+                                                                  .asset(
+                                                                AppAsset
+                                                                    .icPlaceholder,
+                                                                color: AppColors
+                                                                    .blackColor1,
                                                               ).paddingAll(10);
                                                             },
                                                           ),
-                                                        ).paddingOnly(right: 13),
+                                                        ).paddingOnly(
+                                                            right: 13),
                                                         Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                               "${logic.getBookingStatusWiseCategory!.data![index].userFname} ${logic.getBookingStatusWiseCategory!.data![index].userLname}",
                                                               style: TextStyle(
                                                                 fontSize: 19,
-                                                                fontFamily: AppFontFamily.heeBo800,
-                                                                color: AppColors.primaryTextColor,
+                                                                fontFamily:
+                                                                    AppFontFamily
+                                                                        .heeBo800,
+                                                                color: AppColors
+                                                                    .primaryTextColor,
                                                               ),
                                                             ),
                                                             Text(
-                                                              logic.getBookingStatusWiseCategory!.data![index].service?.first ??
+                                                              logic
+                                                                      .getBookingStatusWiseCategory!
+                                                                      .data![
+                                                                          index]
+                                                                      .service
+                                                                      ?.first ??
                                                                   "",
                                                               style: TextStyle(
                                                                 fontSize: 14,
-                                                                fontFamily: AppFontFamily.heeBo600,
-                                                                color: AppColors.greyText,
+                                                                fontFamily:
+                                                                    AppFontFamily
+                                                                        .heeBo600,
+                                                                color: AppColors
+                                                                    .greyText,
                                                               ),
                                                             ),
                                                           ],
@@ -334,37 +404,65 @@ class OrderReportTabView extends StatelessWidget {
                                                     Container(
                                                       decoration: BoxDecoration(
                                                         color: AppColors.bgTime,
-                                                        borderRadius: BorderRadius.circular(12),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
                                                       ),
-                                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 9,
+                                                          vertical: 8),
                                                       child: Row(
                                                         children: [
                                                           Container(
                                                             height: 40,
                                                             width: 40,
-                                                            decoration: BoxDecoration(
-                                                              shape: BoxShape.circle,
-                                                              color: AppColors.bgCircle,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color: AppColors
+                                                                  .bgCircle,
                                                             ),
-                                                            child: Image.asset(AppAsset.icBooking).paddingAll(10),
-                                                          ).paddingOnly(right: 12),
+                                                            child: Image.asset(
+                                                                    AppAsset
+                                                                        .icBooking)
+                                                                .paddingAll(10),
+                                                          ).paddingOnly(
+                                                              right: 12),
                                                           Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             children: [
                                                               Text(
-                                                                logic.getBookingStatusWiseCategory?.data?[index].date ?? "",
-                                                                style: TextStyle(
-                                                                  fontFamily: AppFontFamily.heeBo700,
+                                                                logic
+                                                                        .getBookingStatusWiseCategory
+                                                                        ?.data?[
+                                                                            index]
+                                                                        .date ??
+                                                                    "",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      AppFontFamily
+                                                                          .heeBo700,
                                                                   fontSize: 14,
-                                                                  color: AppColors.primaryTextColor,
+                                                                  color: AppColors
+                                                                      .primaryTextColor,
                                                                 ),
                                                               ),
                                                               Text(
-                                                                "txtBookingDate".tr,
-                                                                style: TextStyle(
-                                                                  fontFamily: AppFontFamily.heeBo500,
+                                                                "txtBookingDate"
+                                                                    .tr,
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      AppFontFamily
+                                                                          .heeBo500,
                                                                   fontSize: 12,
-                                                                  color: AppColors.service,
+                                                                  color: AppColors
+                                                                      .service,
                                                                 ),
                                                               )
                                                             ],
@@ -373,37 +471,58 @@ class OrderReportTabView extends StatelessWidget {
                                                           Container(
                                                             height: 36,
                                                             width: 2,
-                                                            color: AppColors.serviceBorder,
+                                                            color: AppColors
+                                                                .serviceBorder,
                                                           ),
                                                           const Spacer(),
                                                           Container(
                                                             height: 40,
                                                             width: 40,
-                                                            decoration: BoxDecoration(
-                                                              shape: BoxShape.circle,
-                                                              color: AppColors.bgCircle,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color: AppColors
+                                                                  .bgCircle,
                                                             ),
                                                             child: Image.asset(
                                                               AppAsset.icClock,
                                                             ).paddingAll(10),
-                                                          ).paddingOnly(right: 12),
+                                                          ).paddingOnly(
+                                                              right: 12),
                                                           Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             children: [
                                                               Text(
-                                                                logic.getBookingStatusWiseCategory?.data?[index].startTime ?? '',
-                                                                style: TextStyle(
-                                                                  fontFamily: AppFontFamily.heeBo700,
+                                                                logic
+                                                                        .getBookingStatusWiseCategory
+                                                                        ?.data?[
+                                                                            index]
+                                                                        .startTime ??
+                                                                    '',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      AppFontFamily
+                                                                          .heeBo700,
                                                                   fontSize: 14,
-                                                                  color: AppColors.primaryTextColor,
+                                                                  color: AppColors
+                                                                      .primaryTextColor,
                                                                 ),
                                                               ),
                                                               Text(
-                                                                "txtBookingTiming".tr,
-                                                                style: TextStyle(
-                                                                  fontFamily: AppFontFamily.heeBo500,
+                                                                "txtBookingTiming"
+                                                                    .tr,
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      AppFontFamily
+                                                                          .heeBo500,
                                                                   fontSize: 12,
-                                                                  color: AppColors.service,
+                                                                  color: AppColors
+                                                                      .service,
                                                                 ),
                                                               )
                                                             ],
@@ -411,22 +530,40 @@ class OrderReportTabView extends StatelessWidget {
                                                           const Spacer(),
                                                         ],
                                                       ),
-                                                    ).paddingOnly(top: 12, bottom: 12, right: 12),
+                                                    ).paddingOnly(
+                                                        top: 12,
+                                                        bottom: 12,
+                                                        right: 12),
                                                     Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
                                                       children: [
                                                         Container(
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(6),
-                                                            color: AppColors.greenBg,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        6),
+                                                            color: AppColors
+                                                                .greenBg,
                                                           ),
-                                                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 9),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 5,
+                                                                  horizontal:
+                                                                      9),
                                                           child: Text(
                                                             '$currency ${logic.getBookingStatusWiseCategory?.data?[index].withoutTax?.toStringAsFixed(2)}',
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              fontFamily: AppFontFamily.heeBo700,
-                                                              color: AppColors.greenColor,
+                                                              fontFamily:
+                                                                  AppFontFamily
+                                                                      .heeBo700,
+                                                              color: AppColors
+                                                                  .greenColor,
                                                             ),
                                                           ),
                                                         ),
@@ -434,11 +571,19 @@ class OrderReportTabView extends StatelessWidget {
                                                           "txtViewDetails".tr,
                                                           style: TextStyle(
                                                               fontSize: 14,
-                                                              fontFamily: AppFontFamily.heeBo500,
-                                                              color: AppColors.greyText,
-                                                              decoration: TextDecoration.underline,
-                                                              decorationColor: AppColors.greyText),
-                                                        ).paddingOnly(right: 10),
+                                                              fontFamily:
+                                                                  AppFontFamily
+                                                                      .heeBo500,
+                                                              color: AppColors
+                                                                  .greyText,
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .underline,
+                                                              decorationColor:
+                                                                  AppColors
+                                                                      .greyText),
+                                                        ).paddingOnly(
+                                                            right: 10),
                                                       ],
                                                     ),
                                                   ],

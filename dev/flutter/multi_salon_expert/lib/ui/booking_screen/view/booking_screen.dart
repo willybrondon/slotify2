@@ -19,8 +19,10 @@ class BookingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BookingScreenController bookingScreenController = Get.find<BookingScreenController>();
-    LoginScreenController loginScreenController = Get.put(LoginScreenController());
+    final BookingScreenController bookingScreenController =
+        Get.find<BookingScreenController>();
+    LoginScreenController loginScreenController =
+        Get.put(LoginScreenController());
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
     log("bookingScreenController.isCheckOut${bookingScreenController.isSwitchOn}");
@@ -43,7 +45,7 @@ class BookingScreen extends StatelessWidget {
             flexibleSpace: Container(
               height: 90 + statusBarHeight,
               width: double.infinity,
-              color: AppColors.primaryAppColor,
+              color: AppColors.whiteColor,
               padding: EdgeInsets.only(top: statusBarHeight),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +62,7 @@ class BookingScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo800,
                               fontSize: 23,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ),
                           Text(
@@ -70,7 +72,7 @@ class BookingScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo400,
                               fontSize: 15,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ),
                         ],
@@ -111,8 +113,10 @@ class BookingScreen extends StatelessWidget {
                       fontSize: 15,
                       fontFamily: AppFontFamily.heeBo500,
                     ),
-                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     indicator: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: AppColors.primaryAppColor,

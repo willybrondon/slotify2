@@ -22,9 +22,12 @@ class RevenueScreen extends StatefulWidget {
   State<RevenueScreen> createState() => _RevenueScreenState();
 }
 
-class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserver {
-  RevenueScreenController revenueScreenController = Get.find<RevenueScreenController>();
-  LoginScreenController loginScreenController = Get.put(LoginScreenController());
+class _RevenueScreenState extends State<RevenueScreen>
+    with WidgetsBindingObserver {
+  RevenueScreenController revenueScreenController =
+      Get.find<RevenueScreenController>();
+  LoginScreenController loginScreenController =
+      Get.put(LoginScreenController());
   BottomBarController bottomBarController = Get.find<BottomBarController>();
 
   @override
@@ -32,10 +35,14 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await loginScreenController.onGetExpertApiCall(expertId: Constant.storage.read<String>("expertId").toString());
-      earning = loginScreenController.getExpertCategory?.data?.earning?.toStringAsFixed(2);
+      await loginScreenController.onGetExpertApiCall(
+          expertId: Constant.storage.read<String>("expertId").toString());
+      earning = loginScreenController.getExpertCategory?.data?.earning
+          ?.toStringAsFixed(2);
 
-      loginScreenController.getExpertCategory?.data?.showDialog == false ? showDialogIfNeeded() : null;
+      loginScreenController.getExpertCategory?.data?.showDialog == false
+          ? showDialogIfNeeded()
+          : null;
     });
   }
 
@@ -90,7 +97,7 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
             flexibleSpace: Container(
               height: 90 + statusBarHeight,
               width: double.infinity,
-              color: AppColors.primaryAppColor,
+              color: AppColors.whiteColor,
               padding: EdgeInsets.only(top: statusBarHeight),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -107,7 +114,7 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo800,
                               fontSize: 23,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ),
                           Text(
@@ -117,7 +124,7 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo400,
                               fontSize: 15,
-                              color: AppColors.whiteColor,
+                              color: AppColors.blackColor,
                             ),
                           ),
                         ],
@@ -179,19 +186,26 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
                                         logic.onSelectBooking(index);
                                       },
                                       child: Container(
-                                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 15),
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
-                                          color: logic.selectedIndex == index ? AppColors.primaryAppColor : AppColors.tabUnSelect,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          color: logic.selectedIndex == index
+                                              ? AppColors.primaryAppColor
+                                              : AppColors.tabUnSelect,
                                         ),
                                         child: Text(
                                           category[index],
                                           style: TextStyle(
                                             fontFamily: AppFontFamily.heeBo500,
                                             fontSize: 16,
-                                            color: logic.selectedIndex == index ? AppColors.whiteColor : AppColors.service,
+                                            color: logic.selectedIndex == index
+                                                ? AppColors.whiteColor
+                                                : AppColors.service,
                                           ),
                                         ),
                                       ),
@@ -240,12 +254,14 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
                             ],
                           ),
                         ),
-                        CustomTitles(title: "txtBookingDetails".tr).paddingOnly(left: 15),
+                        CustomTitles(title: "txtBookingDetails".tr)
+                            .paddingOnly(left: 15),
                         GetBuilder<RevenueScreenController>(
                           id: Constant.idMyEarnings,
                           builder: (logic) {
                             return Container(
-                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 12),
                               margin: const EdgeInsets.all(15),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(22),
@@ -260,31 +276,43 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
                                 children: [
                                   InkWell(
                                     onTap: () {
-                                      Get.find<BottomBarController>().onClick(1);
+                                      Get.find<BottomBarController>()
+                                          .onClick(1);
                                     },
                                     child: Container(
-                                      margin: const EdgeInsets.only(right: 5, bottom: 10, top: 5),
+                                      margin: const EdgeInsets.only(
+                                          right: 5, bottom: 10, top: 5),
                                       alignment: Alignment.center,
                                       height: 30,
                                       child: logic.isLoading.value == true
                                           ? Shimmers.myRevenueBooking()
                                           : Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 Text(
                                                   "txtPendingBooking".tr,
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.heeBo500,
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo500,
                                                     color: AppColors.service,
                                                     fontSize: 16,
                                                   ),
                                                 ),
                                                 const Spacer(),
                                                 Text(
-                                                  logic.getExpertEarningCategory?.bookingStats?.pendingBooking.toString() ?? '',
+                                                  logic
+                                                          .getExpertEarningCategory
+                                                          ?.bookingStats
+                                                          ?.pendingBooking
+                                                          .toString() ??
+                                                      '',
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.heeBo700,
-                                                    color: AppColors.primaryAppColor,
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo700,
+                                                    color: AppColors
+                                                        .primaryAppColor,
                                                     fontSize: 17,
                                                   ),
                                                 ).paddingOnly(right: 20),
@@ -298,36 +326,51 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                                    child: Divider(color: AppColors.greyColor.withOpacity(0.2)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 0),
+                                    child: Divider(
+                                        color: AppColors.greyColor
+                                            .withOpacity(0.2)),
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      Get.find<BottomBarController>().onClick(1);
+                                      Get.find<BottomBarController>()
+                                          .onClick(1);
                                     },
                                     child: Container(
-                                      margin: const EdgeInsets.only(top: 10, right: 5, bottom: 10),
+                                      margin: const EdgeInsets.only(
+                                          top: 10, right: 5, bottom: 10),
                                       alignment: Alignment.center,
                                       height: 30,
                                       child: logic.isLoading.value == true
                                           ? Shimmers.myRevenueBooking()
                                           : Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 Text(
                                                   "txtCompleteBooking".tr,
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.heeBo500,
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo500,
                                                     color: AppColors.service,
                                                     fontSize: 16,
                                                   ),
                                                 ),
                                                 const Spacer(),
                                                 Text(
-                                                  logic.getExpertEarningCategory?.bookingStats?.completedBooking.toString() ?? '',
+                                                  logic
+                                                          .getExpertEarningCategory
+                                                          ?.bookingStats
+                                                          ?.completedBooking
+                                                          .toString() ??
+                                                      '',
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.heeBo700,
-                                                    color: AppColors.primaryAppColor,
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo700,
+                                                    color: AppColors
+                                                        .primaryAppColor,
                                                     fontSize: 17,
                                                   ),
                                                 ).paddingOnly(right: 20),
@@ -341,15 +384,20 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                                    child: Divider(color: AppColors.greyColor.withOpacity(0.2)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 0),
+                                    child: Divider(
+                                        color: AppColors.greyColor
+                                            .withOpacity(0.2)),
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      Get.find<BottomBarController>().onClick(1);
+                                      Get.find<BottomBarController>()
+                                          .onClick(1);
                                     },
                                     child: Container(
-                                      margin: const EdgeInsets.only(top: 5, right: 5, bottom: 10),
+                                      margin: const EdgeInsets.only(
+                                          top: 5, right: 5, bottom: 10),
                                       alignment: Alignment.center,
                                       height: 30,
                                       child: logic.isLoading.value == true
@@ -359,17 +407,25 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
                                                 Text(
                                                   "txtCancelBooking".tr,
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.heeBo500,
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo500,
                                                     color: AppColors.service,
                                                     fontSize: 16,
                                                   ),
                                                 ),
                                                 const Spacer(),
                                                 Text(
-                                                  logic.getExpertEarningCategory?.bookingStats?.cancelBooking.toString() ?? '',
+                                                  logic
+                                                          .getExpertEarningCategory
+                                                          ?.bookingStats
+                                                          ?.cancelBooking
+                                                          .toString() ??
+                                                      '',
                                                   style: TextStyle(
-                                                      fontFamily: AppFontFamily.heeBo700,
-                                                      color: AppColors.primaryAppColor,
+                                                      fontFamily: AppFontFamily
+                                                          .heeBo700,
+                                                      color: AppColors
+                                                          .primaryAppColor,
                                                       fontSize: 17),
                                                 ).paddingOnly(right: 20),
                                                 Image.asset(
@@ -398,5 +454,10 @@ class _RevenueScreenState extends State<RevenueScreen> with WidgetsBindingObserv
     );
   }
 
-  List category = ["txtToday".tr, "txtYesterday".tr, "txtThisWeek".tr, "txtThisMonth".tr];
+  List category = [
+    "txtToday".tr,
+    "txtYesterday".tr,
+    "txtThisWeek".tr,
+    "txtThisMonth".tr
+  ];
 }

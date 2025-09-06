@@ -217,60 +217,15 @@ exports.salonData = async (req, res) => {
       allowCities: s.allowCities?.map(ac => ac.city)
     })));
 
-    const filteredServices = salon.serviceIds.filter((service) => {
-      const hasMatchingCity = service.allowCities.some((allowedCity) => {
-        const allowedCityName = allowedCity.city.toLowerCase().trim();
-        const requestedCityName = city.toLowerCase().trim();
-        
-        // Exact match
-        if (allowedCityName === requestedCityName) {
-          console.log(`Salon Data API - Exact match: '${allowedCity.city}' with '${city}'`);
-          return true;
-        }
-        
-        // Check if one contains the other (for cases like "New York" vs "NewYork")
-        if (allowedCityName.includes(requestedCityName) || requestedCityName.includes(allowedCityName)) {
-          console.log(`Salon Data API - Contains match: '${allowedCity.city}' contains or is contained in '${city}'`);
-          return true;
-        }
-        
-        // Check for common variations
-        const cityVariations = [
-          allowedCityName,
-          allowedCityName.replace(/\s+/g, ''), // Remove spaces
-          allowedCityName.replace(/[^a-zA-Z]/g, ''), // Remove special characters
-          requestedCityName,
-          requestedCityName.replace(/\s+/g, ''), // Remove spaces
-          requestedCityName.replace(/[^a-zA-Z]/g, ''), // Remove special characters
-        ];
-        
-        const hasVariationMatch = cityVariations.some(variation1 => 
-          cityVariations.some(variation2 => variation1 === variation2)
-        );
-        
-        if (hasVariationMatch) {
-          console.log(`Salon Data API - Variation match: '${allowedCity.city}' with '${city}'`);
-          return true;
-        }
-        
-        console.log(`Salon Data API - No match: '${allowedCity.city}' with '${city}'`);
-        return false;
-      });
-      
-      console.log(`Salon Data API - Service '${service.id?.name}' city match: ${hasMatchingCity}`);
-      return hasMatchingCity;
-    });
+    // Show all services for the salon regardless of city filtering
+    // This ensures all services are displayed as requested
+    let finalServices = salon.serviceIds;
+    
+    console.log("Salon Data API - Showing all services for salon:", finalServices.length);
+    console.log("Salon Data API - Service names:", finalServices.map(s => s.id?.name));
 
-    console.log("Salon Data API - Filtered services count:", filteredServices.length);
-    console.log("Salon Data API - Filtered service names:", filteredServices.map(s => s.id?.name));
-
-    // If no services found for the specific city, show all services as fallback
-    let finalServices = filteredServices;
-    if (filteredServices.length === 0 && salon.serviceIds.length > 0) {
-      console.log("Salon Data API - WARNING: No services found for city '" + city + "'. Showing all services as fallback.");
-      finalServices = salon.serviceIds;
-    }
-
+    console.log("Salon Data API - Fetching products for salon ID:", salon._id.toString());
+    
     const [reviews, experts, product] = await Promise.all([
       Review.find({ salonId: salon._id }).populate({
         path: "userId",
@@ -282,7 +237,10 @@ exports.salonData = async (req, res) => {
         isDelete: false,
       }).select("fname lname image review reviewCount serviceId"),
       Product.aggregate([
-        { $match: { createStatus: "Approved" } },
+        { $match: { 
+          createStatus: "Approved",
+          salon: salon._id.toString() // Filter products by salon ID
+        } },
         {
           $project: {
             salon: 1,
@@ -308,6 +266,9 @@ exports.salonData = async (req, res) => {
         { $sort: { createdAt: -1 } },
       ]),
     ]);
+
+    console.log("Salon Data API - Products found:", product.length);
+    console.log("Salon Data API - Product names:", product.map(p => p.productName));
 
     const tax = global.settingJSON.tax;
     if (!tax) {

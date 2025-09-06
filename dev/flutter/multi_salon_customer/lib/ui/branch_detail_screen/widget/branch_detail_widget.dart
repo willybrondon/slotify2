@@ -40,11 +40,25 @@ class BranchDetailTopView extends StatelessWidget {
                 child: CachedNetworkImage(
                   imageUrl: "${logic.getSalonDetailCategory?.salon?.mainImage}",
                   fit: BoxFit.cover,
+                  width: Get.width,
+                  height: Get.height * 0.3,
                   placeholder: (context, url) {
-                    return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                    return Container(
+                      width: Get.width,
+                      height: Get.height * 0.3,
+                      color: AppColors.grey.withOpacity(0.1),
+                      child: Image.asset(AppAsset.icImagePlaceholder)
+                          .paddingAll(25),
+                    );
                   },
                   errorWidget: (context, url, error) {
-                    return Image.asset(AppAsset.icImagePlaceholder).paddingAll(30);
+                    return Container(
+                      width: Get.width,
+                      height: Get.height * 0.3,
+                      color: AppColors.grey.withOpacity(0.1),
+                      child: Image.asset(AppAsset.icImagePlaceholder)
+                          .paddingAll(30),
+                    );
                   },
                 ),
               ),
@@ -149,7 +163,8 @@ class BranchDetailDataView extends StatelessWidget {
                   ).paddingOnly(right: 8),
                   RichText(
                     text: TextSpan(
-                      text: logic.getSalonDetailCategory?.salon?.distance == null
+                      text: logic.getSalonDetailCategory?.salon?.distance ==
+                              null
                           ? ""
                           : "${logic.getSalonDetailCategory?.salon?.distance?.toStringAsFixed(2)} ${"txtKMs".tr}  ",
                       style: TextStyle(
@@ -289,7 +304,8 @@ class BranchDetailTabView extends StatelessWidget {
     return Column(
       children: [
         const BranchDetailTabBarView(),
-        Divider(color: AppColors.greyColor.withOpacity(0.2)).paddingOnly(bottom: 5),
+        Divider(color: AppColors.greyColor.withOpacity(0.2))
+            .paddingOnly(bottom: 5),
         const BranchDetailTabBarItemView(),
       ],
     );
@@ -314,7 +330,8 @@ class BranchDetailTabBarView extends StatelessWidget {
               fontSize: 16,
               fontFamily: AppFontFamily.heeBo500,
             ),
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             indicatorPadding: const EdgeInsets.all(3),
             indicator: BoxDecoration(
@@ -347,7 +364,8 @@ class BranchDetailTabBarItemView extends StatelessWidget {
       child: GetBuilder<BranchDetailController>(
         builder: (logic) {
           return TabBarView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
             controller: logic.tabController,
             children: const [
               BranchDetailTabBarServiceView(),
@@ -396,12 +414,19 @@ class BranchDetailTabBarAboutView extends StatelessWidget {
                     fontSize: 18,
                   ),
                 ),
-                for (logic.index = 0; logic.index < (logic.getSalonDetailCategory?.salon?.salonTime?.length ?? 0); logic.index++)
+                for (logic.index = 0;
+                    logic.index <
+                        (logic.getSalonDetailCategory?.salon?.salonTime
+                                ?.length ??
+                            0);
+                    logic.index++)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        logic.getSalonDetailCategory?.salon?.salonTime?[logic.index].day ?? "",
+                        logic.getSalonDetailCategory?.salon
+                                ?.salonTime?[logic.index].day ??
+                            "",
                         style: TextStyle(
                           fontSize: 15,
                           fontFamily: AppFontFamily.heeBo500,
@@ -500,20 +525,25 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                   style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 15,
-                                      color: AppColors.currency.withOpacity(0.9)),
+                                      color:
+                                          AppColors.currency.withOpacity(0.9)),
                                 ),
                                 Text(
                                   " ($currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr})",
                                   style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 12,
-                                      color: AppColors.currency.withOpacity(0.9)),
+                                      color:
+                                          AppColors.currency.withOpacity(0.9)),
                                 ),
                                 SizedBox(width: Get.width * 0.02),
                                 Text(
                                   "= $currency ${logic.totalPrice.toStringAsFixed(2)}",
                                   style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplayBold, fontSize: 17, color: AppColors.currency),
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
+                                      fontSize: 17,
+                                      color: AppColors.currency),
                                 ),
                               ],
                             ).paddingOnly(left: 5),
@@ -534,15 +564,18 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                             Get.toNamed(AppRoutes.booking, arguments: [
                               logic.checkItem,
                               double.parse(logic.totalPrice.toStringAsFixed(2)),
-                              double.parse(logic.finalTaxRupee.toStringAsFixed(2)),
+                              double.parse(
+                                  logic.finalTaxRupee.toStringAsFixed(2)),
                               logic.totalMinute,
                               logic.serviceId,
                               logic.withOutTaxRupee,
                               logic.salonId
                             ]);
                           } else {
-                            Get.toNamed(AppRoutes.signIn, arguments: [logic.checkItem.isNotEmpty]);
-                            await Get.find<SignInController>().getDataFromArgs();
+                            Get.toNamed(AppRoutes.signIn,
+                                arguments: [logic.checkItem.isNotEmpty]);
+                            await Get.find<SignInController>()
+                                .getDataFromArgs();
                           }
                         },
                       )
@@ -581,11 +614,14 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                       id: Constant.idServiceList,
                       builder: (logic) {
                         return GridView.builder(
-                          itemCount: logic.getSalonDetailCategory?.salon?.serviceIds?.length ?? 0,
+                          itemCount: logic.getSalonDetailCategory?.salon
+                                  ?.serviceIds?.length ??
+                              0,
                           shrinkWrap: true,
                           padding: EdgeInsets.zero,
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             childAspectRatio: 0.87,
                             crossAxisSpacing: 10,
@@ -615,8 +651,9 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                       child: Container(
                                         width: Get.width,
                                         decoration: const BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(16),
+                                              topRight: Radius.circular(16)),
                                         ),
                                         clipBehavior: Clip.hardEdge,
                                         child: CachedNetworkImage(
@@ -624,10 +661,14 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                               "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
                                           fit: BoxFit.cover,
                                           placeholder: (context, url) {
-                                            return Image.asset(AppAsset.icServicePlaceholder).paddingAll(11);
+                                            return Image.asset(AppAsset
+                                                    .icServicePlaceholder)
+                                                .paddingAll(11);
                                           },
                                           errorWidget: (context, url, error) {
-                                            return Image.asset(AppAsset.icServicePlaceholder).paddingAll(11);
+                                            return Image.asset(AppAsset
+                                                    .icServicePlaceholder)
+                                                .paddingAll(11);
                                           },
                                         ),
                                       ).paddingOnly(left: 3, right: 3, top: 3),
@@ -635,17 +676,26 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             children: [
                                               SizedBox(
                                                 width: Get.width * 0.3,
                                                 child: Text(
-                                                  logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.name ?? "",
-                                                  overflow: TextOverflow.ellipsis,
+                                                  logic
+                                                          .getSalonDetailCategory
+                                                          ?.salon
+                                                          ?.serviceIds?[index]
+                                                          .serviceIdId
+                                                          ?.name ??
+                                                      "",
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.heeBo700,
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo700,
                                                     fontSize: 13.5,
                                                     color: AppColors.appText,
                                                   ),
@@ -662,7 +712,8 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                 style: TextStyle(
                                                   color: AppColors.ratingYellow,
                                                   fontSize: 12,
-                                                  fontFamily: AppFontFamily.heeBo700,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo700,
                                                 ),
                                               ).paddingOnly(top: 3),
                                             ],
@@ -670,33 +721,46 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                           Text(
                                             "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.duration} ${"txtMinutes".tr}",
                                             style: TextStyle(
-                                              fontFamily: AppFontFamily.heeBo600,
+                                              fontFamily:
+                                                  AppFontFamily.heeBo600,
                                               fontSize: 13,
                                               color: AppColors.service,
                                             ),
                                           ).paddingOnly(top: 4, bottom: 4),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 "$currency ${logic.getSalonDetailCategory?.salon?.serviceIds?[index].price?.toStringAsFixed(2)}",
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo800,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo800,
                                                   fontSize: 14.5,
-                                                  color: AppColors.primaryAppColor,
+                                                  color:
+                                                      AppColors.primaryAppColor,
                                                 ),
                                               ),
                                               GestureDetector(
                                                 onTap: () {
-                                                  if (logic.isBranchSelected[index] == true) {
-                                                    logic.onCheckBoxClick(false, index);
+                                                  if (logic.isBranchSelected[
+                                                          index] ==
+                                                      true) {
+                                                    logic.onCheckBoxClick(
+                                                        false, index);
                                                   } else {
-                                                    logic.onCheckBoxClick(true, index);
+                                                    logic.onCheckBoxClick(
+                                                        true, index);
                                                   }
                                                 },
-                                                child: logic.isBranchSelected[index]
-                                                    ? Image.asset(AppAsset.icCheckRound, height: 28)
-                                                    : Image.asset(AppAsset.icPlusRound, height: 28),
+                                                child: logic
+                                                        .isBranchSelected[index]
+                                                    ? Image.asset(
+                                                        AppAsset.icCheckRound,
+                                                        height: 28)
+                                                    : Image.asset(
+                                                        AppAsset.icPlusRound,
+                                                        height: 28),
                                               ),
                                             ],
                                           ),
@@ -770,7 +834,8 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                             ],
                           );
                         } else {
-                          Get.toNamed(AppRoutes.signIn, arguments: [logic.checkItem.isNotEmpty]);
+                          Get.toNamed(AppRoutes.signIn,
+                              arguments: [logic.checkItem.isNotEmpty]);
                           await Get.find<SignInController>().getDataFromArgs();
                         }
                       },
@@ -794,22 +859,31 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                                 const Spacer(),
                                 const Spacer(),
                                 CachedNetworkImage(
-                                  imageUrl: logic.getSalonDetailCategory?.product?[index].mainImage ?? "",
+                                  imageUrl: logic.getSalonDetailCategory
+                                          ?.product?[index].mainImage ??
+                                      "",
                                   height: 80,
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) {
-                                    return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                    return Image.asset(
+                                            AppAsset.icImagePlaceholder)
+                                        .paddingAll(25);
                                   },
                                   errorWidget: (context, url, error) {
-                                    return Image.asset(AppAsset.icImagePlaceholder).paddingAll(30);
+                                    return Image.asset(
+                                            AppAsset.icImagePlaceholder)
+                                        .paddingAll(30);
                                   },
                                 ),
                                 const Spacer(),
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    Constant.capitalizeFirstLetter(
-                                        logic.getSalonDetailCategory?.product?[index].productName ?? ""),
+                                    Constant.capitalizeFirstLetter(logic
+                                            .getSalonDetailCategory
+                                            ?.product?[index]
+                                            .productName ??
+                                        ""),
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontFamily: AppFontFamily.heeBo700,
@@ -826,7 +900,8 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                                         color: AppColors.currencyBg,
                                         borderRadius: BorderRadius.circular(34),
                                       ),
-                                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 9),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 9),
                                       child: Text(
                                         "$currency ${logic.getSalonDetailCategory?.product?[index].price ?? ""}",
                                         style: TextStyle(
@@ -841,7 +916,8 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                                 const Spacer(),
                               ],
                             ),
-                            logic.getSalonDetailCategory?.salon?.isBestSeller == true
+                            logic.getSalonDetailCategory?.salon?.isBestSeller ==
+                                    true
                                 ? Container(
                                     height: 22,
                                     width: Get.width * 0.18,
@@ -883,7 +959,8 @@ class BranchDetailTabBarStaffView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    HomeScreenController homeScreenController = Get.find<HomeScreenController>();
+    HomeScreenController homeScreenController =
+        Get.find<HomeScreenController>();
 
     return Scaffold(
       body: GetBuilder<BranchDetailController>(
@@ -895,7 +972,9 @@ class BranchDetailTabBarStaffView extends StatelessWidget {
                   ? Center(
                       child: Column(
                         children: [
-                          Image.asset(AppAsset.icNoExpert, height: 150, width: 150).paddingOnly(bottom: 7),
+                          Image.asset(AppAsset.icNoExpert,
+                                  height: 150, width: 150)
+                              .paddingOnly(bottom: 7),
                           Text(
                             "txtNoFoundExpert".tr,
                             style: TextStyle(
@@ -913,36 +992,44 @@ class BranchDetailTabBarStaffView extends StatelessWidget {
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       itemCount: logic.getSalonDetailCategory?.experts?.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         childAspectRatio: 0.80,
                         crossAxisSpacing: 13.5,
                         mainAxisSpacing: 2,
                       ),
                       itemBuilder: (BuildContext context, int index) {
-                        logic.rating = logic.getSalonDetailCategory?.experts?[index].review;
+                        logic.rating = logic
+                            .getSalonDetailCategory?.experts?[index].review;
                         logic.roundedRating = logic.rating?.round();
                         logic.filledStars = logic.roundedRating?.clamp(0, 5);
 
                         return InkWell(
-                          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                          overlayColor:
+                              WidgetStatePropertyAll(AppColors.transparent),
                           onTap: () {
                             homeScreenController.onGetExpertApiCall(
-                                expertId: logic.getSalonDetailCategory?.experts?[index].id ?? "");
+                                expertId: logic.getSalonDetailCategory
+                                        ?.experts?[index].id ??
+                                    "");
 
                             Get.toNamed(
                               AppRoutes.expertDetail,
                               arguments: [
-                                logic.getSalonDetailCategory?.experts?[index].id,
+                                logic
+                                    .getSalonDetailCategory?.experts?[index].id,
                                 index,
-                                logic.getSalonDetailCategory?.experts?[index].review
+                                logic.getSalonDetailCategory?.experts?[index]
+                                    .review
                               ],
                             );
                           },
                           child: Container(
                             width: Get.width * 0.45,
                             margin: const EdgeInsets.only(top: 10),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18),
                               color: AppColors.whiteColor,
@@ -962,16 +1049,20 @@ class BranchDetailTabBarStaffView extends StatelessWidget {
                                     child: Container(
                                       height: 80,
                                       width: 80,
-                                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                                      decoration: const BoxDecoration(
+                                          shape: BoxShape.circle),
                                       clipBehavior: Clip.hardEdge,
                                       child: CachedNetworkImage(
-                                        imageUrl: "${logic.getSalonDetailCategory?.experts?[index].image}",
+                                        imageUrl:
+                                            "${logic.getSalonDetailCategory?.experts?[index].image}",
                                         fit: BoxFit.cover,
                                         placeholder: (context, url) {
-                                          return Image.asset(AppAsset.icPlaceHolder);
+                                          return Image.asset(
+                                              AppAsset.icPlaceHolder);
                                         },
                                         errorWidget: (context, url, error) {
-                                          return Image.asset(AppAsset.icPlaceHolder);
+                                          return Image.asset(
+                                              AppAsset.icPlaceHolder);
                                         },
                                       ),
                                     ),
@@ -1000,9 +1091,11 @@ class BranchDetailTabBarStaffView extends StatelessWidget {
                                         shrinkWrap: true,
                                         itemCount: 5,
                                         scrollDirection: Axis.horizontal,
-                                        padding: const EdgeInsets.symmetric(horizontal: 13),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 13),
                                         itemBuilder: (context, index) {
-                                          if (index < (logic.filledStars ?? 0)) {
+                                          if (index <
+                                              (logic.filledStars ?? 0)) {
                                             return Image.asset(
                                               AppAsset.icStarFilled,
                                               height: 15,
@@ -1017,7 +1110,8 @@ class BranchDetailTabBarStaffView extends StatelessWidget {
                                           }
                                         },
                                         separatorBuilder: (context, index) {
-                                          return SizedBox(width: Get.width * 0.017);
+                                          return SizedBox(
+                                              width: Get.width * 0.017);
                                         },
                                       ),
                                     ),
@@ -1064,16 +1158,21 @@ class BranchDetailTabBarReviewView extends StatelessWidget {
               : ListView.separated(
                   itemCount: logic.getSalonDetailCategory?.reviews?.length ?? 0,
                   shrinkWrap: true,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   itemBuilder: (context, index) {
-                    String dateTimeString = logic.getSalonDetailCategory?.reviews?[index].createdAt.toString() ?? "";
+                    String dateTimeString = logic
+                            .getSalonDetailCategory?.reviews?[index].createdAt
+                            .toString() ??
+                        "";
                     DateTime dateTime = DateTime.parse(dateTimeString);
                     logic.date = DateFormat('yyyy-MM-dd').format(dateTime);
 
                     log("The date is :: ${logic.date}");
 
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 15),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         color: AppColors.whiteColor,
@@ -1106,7 +1205,12 @@ class BranchDetailTabBarReviewView extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      (logic.getSalonDetailCategory?.reviews?[index].rating ?? 0) >= 4
+                                      (logic
+                                                      .getSalonDetailCategory
+                                                      ?.reviews?[index]
+                                                      .rating ??
+                                                  0) >=
+                                              4
                                           ? AppAsset.icGreenStar
                                           : AppAsset.icRedStar,
                                       height: 15,
@@ -1118,7 +1222,8 @@ class BranchDetailTabBarReviewView extends StatelessWidget {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayBold,
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayBold,
                                         fontSize: 15,
                                         color: AppColors.blackColor,
                                       ),
@@ -1132,7 +1237,9 @@ class BranchDetailTabBarReviewView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                logic.getSalonDetailCategory?.reviews?[index].review ?? "",
+                                logic.getSalonDetailCategory?.reviews?[index]
+                                        .review ??
+                                    "",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -1204,13 +1311,16 @@ class BranchDetailTabBarGalleryView extends StatelessWidget {
                 ),
                 clipBehavior: Clip.hardEdge,
                 child: CachedNetworkImage(
-                  imageUrl: logic.getSalonDetailCategory?.salon?.image?[index] ?? "",
+                  imageUrl:
+                      logic.getSalonDetailCategory?.salon?.image?[index] ?? "",
                   fit: BoxFit.cover,
                   placeholder: (context, url) {
-                    return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                    return Image.asset(AppAsset.icImagePlaceholder)
+                        .paddingAll(25);
                   },
                   errorWidget: (context, url, error) {
-                    return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                    return Image.asset(AppAsset.icImagePlaceholder)
+                        .paddingAll(25);
                   },
                 ),
               );
