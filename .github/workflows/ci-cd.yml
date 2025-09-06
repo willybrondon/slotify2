@@ -346,25 +346,25 @@ jobs:
           
          
 
-      - name: Configure Production Signing
-        run: |
-          # Configure signing for customer app
-          cd "dev/flutter/multi_salon_customer/ios"
-          sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
-          sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
-          sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = "";/g' Runner.xcodeproj/project.pbxproj
-          # Use iPhone Distribution for production builds
-          sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "iPhone Distribution";/g' Runner.xcodeproj/project.pbxproj
+      # - name: Configure Production Signing
+      #   run: |
+      #     # Configure signing for customer app
+      #     cd "dev/flutter/multi_salon_customer/ios"
+      #     sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
+      #     sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
+      #     sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = "";/g' Runner.xcodeproj/project.pbxproj
+      #     # Use iPhone Distribution for production builds
+      #     sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "iPhone Distribution";/g' Runner.xcodeproj/project.pbxproj
           
-          # Configure signing for expert app
-          cd "../../multi_salon_expert/ios"
-          sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
-          sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
-          sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = "";/g' Runner.xcodeproj/project.pbxproj
-          # Use iPhone Distribution for production builds
-          sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "iPhone Distribution";/g' Runner.xcodeproj/project.pbxproj
+      #     # Configure signing for expert app
+      #     cd "../../multi_salon_expert/ios"
+      #     sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
+      #     sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
+      #     sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = "";/g' Runner.xcodeproj/project.pbxproj
+      #     # Use iPhone Distribution for production builds
+      #     sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "iPhone Distribution";/g' Runner.xcodeproj/project.pbxproj
           
-          echo "Production signing configured for distribution builds"
+      #     echo "Production signing configured for distribution builds"
 
       - name: install pod ios for testting 
         run: |
