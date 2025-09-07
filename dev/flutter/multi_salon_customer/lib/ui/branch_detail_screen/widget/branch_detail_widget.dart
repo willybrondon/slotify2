@@ -146,7 +146,7 @@ class BranchDetailDataView extends StatelessWidget {
                     ),
                   ),
                 ],
-              ).paddingOnly(top: 10, left: 15, right: 15, bottom: 10),
+              ).paddingOnly(left: 15, right: 15, bottom: 10),
               Row(
                 children: [
                   Image.asset(

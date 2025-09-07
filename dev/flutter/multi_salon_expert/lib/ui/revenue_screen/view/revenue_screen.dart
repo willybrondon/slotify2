@@ -152,7 +152,7 @@ class _RevenueScreenState extends State<RevenueScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "SKEDISY",
+                            "Skedisy",
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo800,
                               fontSize: 23,

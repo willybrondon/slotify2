@@ -46,7 +46,7 @@ class HomeScreenTopView extends StatelessWidget {
                     init: ProfileScreenController(),
                     builder: (logic) {
                       return Text(
-                        "SKEDISY",
+                        "Skedisy",
                         style: TextStyle(
                           fontFamily: AppFontFamily.sfProDisplayBold,
                           fontSize: 20,

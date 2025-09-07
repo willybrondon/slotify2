@@ -22,7 +22,8 @@ import 'package:salon_2/utils/shimmer.dart';
 class NotificationScreen extends StatelessWidget {
   NotificationScreen({super.key});
 
-  NotificationController notificationController = Get.find<NotificationController>();
+  NotificationController notificationController =
+      Get.find<NotificationController>();
 
   @override
   Widget build(BuildContext context) {
@@ -45,226 +46,283 @@ class NotificationScreen extends StatelessWidget {
             log("is LogIn Variable :: ${logic.isLogIn}");
             log("is Update Variable :: ${logic.isUpdate}");
 
-          return Scaffold(
-            backgroundColor: AppColors.backGround,
-            appBar:  PreferredSize(
-              preferredSize: const Size.fromHeight(200),
-              child: logic.isLogIn == true && logic.isUpdate == false
-                  ? Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "txtPleaseMakeYour".tr,
-                      style:
-                      TextStyle(fontFamily: AppFontFamily.sfProDisplayMedium, color: AppColors.blackColor, fontSize: 16),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.toNamed(AppRoutes.editProfile);
-                      },
-                      child: Text(
-                        "txtProfile!".tr,
-                        style: TextStyle(
-                            fontFamily: AppFontFamily.sfProDisplayBold,
-                            color: AppColors.primaryAppColor,
-                            decoration: TextDecoration.underline,
-                            fontSize: 17),
-                      ),
-                    )
-                  ],
-                ),
-              )
-                  : logic.isLogIn != true
-                  ? const SizedBox()
-                  :  const NotificationTopView(),
-            ),
-            body: logic.isLogIn == true && logic.isUpdate == false
-                ? Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    "txtPleaseMakeYour".tr,
-                    style:
-                    TextStyle(fontFamily: AppFontFamily.sfProDisplayMedium, color: AppColors.blackColor, fontSize: 16),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Get.toNamed(AppRoutes.editProfile);
-                    },
-                    child: Text(
-                      "txtProfile!".tr,
-                      style: TextStyle(
-                          fontFamily: AppFontFamily.sfProDisplayBold,
-                          color: AppColors.primaryAppColor,
-                          decoration: TextDecoration.underline,
-                          fontSize: 17),
-                    ),
-                  )
-                ],
-              ),
-            )
-                : logic.isLogIn != true
-                ? SignInScreen()
-                : GetBuilder<NotificationController>(
-              id: Constant.idProgressView,
-              builder: (logic) {
-                return logic.isLoading.value
-                    ? Shimmers.notificationShimmer()
-                    : logic.notificationCategory?.notification?.isEmpty ?? true
-                        ? Column(
-                            children: [
-                              Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(height: Get.height * 0.3),
-                                    Image.asset(AppAsset.icNoNotification, height: 150, width: 150),
-                                    Text(
-                                      "txtNoNotifications".tr,
-                                      style: TextStyle(
-                                          fontFamily: AppFontFamily.sfProDisplayBold,
-                                          fontSize: 20,
-                                          color: AppColors.primaryTextColor),
-                                    ),
-                                    SizedBox(height: Get.height * 0.005),
-                                    Text(
-                                      "desNotification".tr,
-                                      style: TextStyle(
-                                          fontFamily: AppFontFamily.sfProDisplayRegular, fontSize: 14, color: AppColors.email),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          )
-                        : SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                AnimationLimiter(
-                                  child: ListView.builder(
-                                    itemCount: logic.notificationCategory?.notification?.length ?? 0,
-                                    padding: const EdgeInsets.all(10),
-                                    physics: const BouncingScrollPhysics(),
-                                    shrinkWrap: true,
-                                    scrollDirection: Axis.vertical,
-                                    itemBuilder: (context, index) {
-                                      logic.str = logic.notificationCategory?.notification?[index].date;
-                                      logic.parts = logic.str?.split(', ');
-                                      logic.date = logic.parts?[0];
-                                      logic.time = logic.parts![1].trim();
-
-                                      log("date :: ${logic.date}");
-                                      log("time :: ${logic.time}");
-
-                                      ///Remove AM-PM
-                                      logic.timeParts = logic.time?.split(':');
-                                      logic.hour = logic.timeParts?[0];
-                                      logic.minute = logic.timeParts?[1].split(' ')[0];
-                                      logic.formattedTime = '${logic.hour}:${logic.minute}';
-
-                                      log("Formatted time: ${logic.formattedTime}");
-
-                                      return AnimationConfiguration.staggeredGrid(
-                                        position: index,
-                                        duration: const Duration(milliseconds: 800),
-                                        columnCount: logic.notificationCategory?.notification?.length ?? 0,
-                                        child: SlideAnimation(
-                                          child: FadeInAnimation(
-                                            child: Container(
-                                              width: Get.width,
-                                              decoration: BoxDecoration(
-                                                  color: AppColors.whiteColor,
-                                                  border: Border.all(
-                                                    color: AppColors.grey.withOpacity(0.1),
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(15)),
-                                              margin: const EdgeInsets.only(bottom: 10),
-                                              padding: const EdgeInsets.only(right: 10, top: 7, bottom: 7),
-                                              child: Row(
+            return Scaffold(
+              backgroundColor: AppColors.backGround,
+              body: logic.isLogIn != true
+                  ? SignInScreen()
+                  : Column(
+                      children: [
+                        const NotificationTopView(),
+                        Expanded(
+                          child: GetBuilder<NotificationController>(
+                            id: Constant.idProgressView,
+                            builder: (logic) {
+                              return logic.isLoading.value
+                                  ? Shimmers.notificationShimmer()
+                                  : logic.notificationCategory?.notification
+                                              ?.isEmpty ??
+                                          true
+                                      ? Column(
+                                          children: [
+                                            Center(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
-                                                  DottedBorder(
-                                                    color: AppColors.roundBorder,
-                                                    borderType: BorderType.RRect,
-                                                    radius: const Radius.circular(35),
-                                                    strokeWidth: 1,
-                                                    dashPattern: const [2.5, 2.5],
-                                                    child: Container(
-                                                      height: 55,
-                                                      width: 55,
-                                                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                                                      clipBehavior: Clip.hardEdge,
-                                                      child: CachedNetworkImage(
-                                                        imageUrl: logic.notificationCategory?.notification?[index].image ?? "",
-                                                        fit: BoxFit.cover,
-                                                        placeholder: (context, url) {
-                                                          return Image.asset(AppAsset.icImagePlaceholder).paddingAll(10);
-                                                        },
-                                                        errorWidget: (context, url, error) {
-                                                          return Image.asset(AppAsset.icImagePlaceholder).paddingAll(10);
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ).paddingOnly(left: 10, right: 10),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: [
-                                                        Text(
-                                                          logic.notificationCategory?.notification?[index].title ?? "",
-                                                          style: TextStyle(
-                                                              color: AppColors.primaryTextColor,
-                                                              fontSize: 16,
-                                                              fontFamily: AppFontFamily.sfProDisplayBold),
-                                                        ).paddingOnly(bottom: 4),
-                                                        SizedBox(
-                                                          width: Get.width * 0.85,
-                                                          child: Text(
-                                                            logic.notificationCategory?.notification?[index].message ?? "",
-                                                            maxLines: 2,
-                                                            style: TextStyle(
-                                                              color: AppColors.service,
-                                                              fontSize: 13,
-                                                              fontFamily: AppFontFamily.sfProDisplayMedium,
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                                  SizedBox(
+                                                      height: Get.height * 0.3),
+                                                  Image.asset(
+                                                      AppAsset.icNoNotification,
+                                                      height: 150,
+                                                      width: 150),
+                                                  Text(
+                                                    "txtNoNotifications".tr,
+                                                    style: TextStyle(
+                                                        fontFamily: AppFontFamily
+                                                            .sfProDisplayBold,
+                                                        fontSize: 20,
+                                                        color: AppColors
+                                                            .primaryTextColor),
                                                   ),
-                                                  Align(
-                                                    alignment: Alignment.bottomRight,
-                                                    child: Text(
-                                                      "${logic.date}  ${logic.formattedTime}",
-                                                      style: TextStyle(
-                                                          color: AppColors.roundBorder,
-                                                          fontSize: 10,
-                                                          fontFamily: AppFontFamily.sfProDisplay),
-                                                    ).paddingOnly(bottom: 3),
+                                                  SizedBox(
+                                                      height:
+                                                          Get.height * 0.005),
+                                                  Text(
+                                                    "desNotification".tr,
+                                                    style: TextStyle(
+                                                        fontFamily: AppFontFamily
+                                                            .sfProDisplayRegular,
+                                                        fontSize: 14,
+                                                        color: AppColors.email),
                                                   ),
                                                 ],
                                               ),
                                             ),
+                                          ],
+                                        )
+                                      : SingleChildScrollView(
+                                          child: Column(
+                                            children: [
+                                              AnimationLimiter(
+                                                child: ListView.builder(
+                                                  itemCount: logic
+                                                          .notificationCategory
+                                                          ?.notification
+                                                          ?.length ??
+                                                      0,
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  physics:
+                                                      const BouncingScrollPhysics(),
+                                                  shrinkWrap: true,
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    logic.str = logic
+                                                        .notificationCategory
+                                                        ?.notification?[index]
+                                                        .date;
+                                                    logic.parts =
+                                                        logic.str?.split(', ');
+                                                    logic.date =
+                                                        logic.parts?[0];
+                                                    logic.time =
+                                                        logic.parts![1].trim();
+
+                                                    log("date :: ${logic.date}");
+                                                    log("time :: ${logic.time}");
+
+                                                    ///Remove AM-PM
+                                                    logic.timeParts =
+                                                        logic.time?.split(':');
+                                                    logic.hour =
+                                                        logic.timeParts?[0];
+                                                    logic.minute = logic
+                                                        .timeParts?[1]
+                                                        .split(' ')[0];
+                                                    logic.formattedTime =
+                                                        '${logic.hour}:${logic.minute}';
+
+                                                    log("Formatted time: ${logic.formattedTime}");
+
+                                                    return AnimationConfiguration
+                                                        .staggeredGrid(
+                                                      position: index,
+                                                      duration: const Duration(
+                                                          milliseconds: 800),
+                                                      columnCount: logic
+                                                              .notificationCategory
+                                                              ?.notification
+                                                              ?.length ??
+                                                          0,
+                                                      child: SlideAnimation(
+                                                        child: FadeInAnimation(
+                                                          child: Container(
+                                                            width: Get.width,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                                    color: AppColors
+                                                                        .whiteColor,
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: AppColors
+                                                                          .grey
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                      width: 1,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15)),
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    bottom: 10),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    right: 10,
+                                                                    top: 7,
+                                                                    bottom: 7),
+                                                            child: Row(
+                                                              children: [
+                                                                DottedBorder(
+                                                                  color: AppColors
+                                                                      .roundBorder,
+                                                                  borderType:
+                                                                      BorderType
+                                                                          .RRect,
+                                                                  radius: const Radius
+                                                                      .circular(
+                                                                      35),
+                                                                  strokeWidth:
+                                                                      1,
+                                                                  dashPattern: const [
+                                                                    2.5,
+                                                                    2.5
+                                                                  ],
+                                                                  child:
+                                                                      Container(
+                                                                    height: 55,
+                                                                    width: 55,
+                                                                    decoration:
+                                                                        const BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.circle),
+                                                                    clipBehavior:
+                                                                        Clip.hardEdge,
+                                                                    child:
+                                                                        CachedNetworkImage(
+                                                                      imageUrl: logic
+                                                                              .notificationCategory
+                                                                              ?.notification?[index]
+                                                                              .image ??
+                                                                          "",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      placeholder:
+                                                                          (context,
+                                                                              url) {
+                                                                        return Image.asset(AppAsset.icImagePlaceholder)
+                                                                            .paddingAll(10);
+                                                                      },
+                                                                      errorWidget:
+                                                                          (context,
+                                                                              url,
+                                                                              error) {
+                                                                        return Image.asset(AppAsset.icImagePlaceholder)
+                                                                            .paddingAll(10);
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                ).paddingOnly(
+                                                                    left: 10,
+                                                                    right: 10),
+                                                                Expanded(
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Text(
+                                                                        logic.notificationCategory?.notification?[index].title ??
+                                                                            "",
+                                                                        style: TextStyle(
+                                                                            color: AppColors
+                                                                                .primaryTextColor,
+                                                                            fontSize:
+                                                                                16,
+                                                                            fontFamily:
+                                                                                AppFontFamily.sfProDisplayBold),
+                                                                      ).paddingOnly(
+                                                                          bottom:
+                                                                              4),
+                                                                      SizedBox(
+                                                                        width: Get.width *
+                                                                            0.85,
+                                                                        child:
+                                                                            Text(
+                                                                          logic.notificationCategory?.notification?[index].message ??
+                                                                              "",
+                                                                          maxLines:
+                                                                              2,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                AppColors.service,
+                                                                            fontSize:
+                                                                                13,
+                                                                            fontFamily:
+                                                                                AppFontFamily.sfProDisplayMedium,
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .bottomRight,
+                                                                  child: Text(
+                                                                    "${logic.date}  ${logic.formattedTime}",
+                                                                    style: TextStyle(
+                                                                        color: AppColors
+                                                                            .roundBorder,
+                                                                        fontSize:
+                                                                            10,
+                                                                        fontFamily:
+                                                                            AppFontFamily.sfProDisplay),
+                                                                  ).paddingOnly(
+                                                                      bottom:
+                                                                          3),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                )
-                              ],
-                            ),
-                          );
-              },
-            ),
-          );
-        }
-      ),
+                                        );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+            );
+          }),
     );
   }
 }

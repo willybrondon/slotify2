@@ -58,7 +58,7 @@ class BookingScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "${"txtHello".tr}, ${Constant.storage.read<String>('fName').toString()}",
+                            "Skedisy",
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo800,
                               fontSize: 23,
@@ -66,7 +66,7 @@ class BookingScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "txtWelcomeService".tr,
+                            "Welcome to our best services, ${Constant.storage.read<String>('fName').toString()}",
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(

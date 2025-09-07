@@ -34,10 +34,14 @@ class ProductScreenView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const ProductProductCategoryView(),
-                    logic.homeScreenController.getNewProductModel?.data?.isEmpty == true
+                    logic.homeScreenController.getNewProductModel?.data
+                                ?.isEmpty ==
+                            true
                         ? const SizedBox()
                         : const ProductNewProductView(),
-                    logic.homeScreenController.getTrendingProductModel?.data?.isEmpty == true
+                    logic.homeScreenController.getTrendingProductModel?.data
+                                ?.isEmpty ==
+                            true
                         ? const SizedBox()
                         : const ProductTrendingProduct(),
                   ],
@@ -47,6 +51,57 @@ class ProductScreenView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class ProductWelcomeHeader extends StatelessWidget {
+  const ProductWelcomeHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    double statusBarHeight = MediaQuery.of(context).padding.top;
+
+    return Container(
+      padding: EdgeInsets.only(top: statusBarHeight),
+      height: 100 + statusBarHeight,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.whiteColor,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle, color: AppColors.whiteColor),
+            clipBehavior: Clip.hardEdge,
+            child: Image.asset(AppAsset.icProduct).paddingAll(11),
+          ).paddingOnly(left: 15, right: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "txtWelcomeBack".tr,
+                style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplay,
+                    fontSize: 18,
+                    color: AppColors.blackColor),
+              ),
+              Text(
+                "txtLongTime".tr,
+                style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    fontSize: 13,
+                    color: AppColors.blackColor),
+              ),
+            ],
+          ),
+        ],
+      ).paddingOnly(bottom: 13),
     );
   }
 }
@@ -71,7 +126,8 @@ class ProductScreenTopView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 color: AppColors.whiteColor,
                 boxShadow: Constant.boxShadow,
-                border: Border.all(color: AppColors.grey.withOpacity(0.2), width: 1),
+                border: Border.all(
+                    color: AppColors.grey.withOpacity(0.2), width: 1),
               ),
               child: Row(
                 children: [
@@ -140,10 +196,12 @@ class ProductProductCategoryView extends StatelessWidget {
                 : GridView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    itemCount: (logic.getProductCategoryModel?.data?.length ?? 0) >= 6
-                        ? 6
-                        : logic.getProductCategoryModel?.data?.length ?? 0,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    itemCount:
+                        (logic.getProductCategoryModel?.data?.length ?? 0) >= 6
+                            ? 6
+                            : logic.getProductCategoryModel?.data?.length ?? 0,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       childAspectRatio: 0.8,
                       crossAxisSpacing: 10,
@@ -175,13 +233,19 @@ class ProductProductCategoryView extends StatelessWidget {
                                 child: AspectRatio(
                                   aspectRatio: 1.2,
                                   child: CachedNetworkImage(
-                                    imageUrl: logic.getProductCategoryModel?.data?[index].image ?? "",
+                                    imageUrl: logic.getProductCategoryModel
+                                            ?.data?[index].image ??
+                                        "",
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) {
-                                      return Image.asset(AppAsset.icImagePlaceholder).paddingAll(10);
+                                      return Image.asset(
+                                              AppAsset.icImagePlaceholder)
+                                          .paddingAll(10);
                                     },
                                     errorWidget: (context, url, error) {
-                                      return Image.asset(AppAsset.icImagePlaceholder).paddingAll(10);
+                                      return Image.asset(
+                                              AppAsset.icImagePlaceholder)
+                                          .paddingAll(10);
                                     },
                                   ),
                                 ),
@@ -197,7 +261,9 @@ class ProductProductCategoryView extends StatelessWidget {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    logic.getProductCategoryModel?.data?[index].name ?? "",
+                                    logic.getProductCategoryModel?.data?[index]
+                                            .name ??
+                                        "",
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontFamily: AppFontFamily.heeBo700,
@@ -257,9 +323,12 @@ class ProductNewProductView extends StatelessWidget {
                           return AnimationConfiguration.staggeredGrid(
                             position: index,
                             duration: const Duration(milliseconds: 700),
-                            columnCount: (logic.getNewProductModel?.data?.length ?? 0) >= 3
-                                ? 3
-                                : logic.getNewProductModel?.data?.length ?? 0,
+                            columnCount:
+                                (logic.getNewProductModel?.data?.length ?? 0) >=
+                                        3
+                                    ? 3
+                                    : logic.getNewProductModel?.data?.length ??
+                                        0,
                             child: FadeInAnimation(
                               child: ScaleAnimation(
                                 child: InkWell(
@@ -267,7 +336,8 @@ class ProductNewProductView extends StatelessWidget {
                                     Get.toNamed(
                                       AppRoutes.productDetail,
                                       arguments: [
-                                        logic.getNewProductModel?.data?[index].id,
+                                        logic.getNewProductModel?.data?[index]
+                                            .id,
                                       ],
                                     );
                                   },
@@ -275,7 +345,8 @@ class ProductNewProductView extends StatelessWidget {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(21),
-                                      color: RandomColorGenerator.getRandomColor(),
+                                      color:
+                                          RandomColorGenerator.getRandomColor(),
                                       boxShadow: Constant.boxShadow,
                                     ),
                                     width: 110,
@@ -288,14 +359,23 @@ class ProductNewProductView extends StatelessWidget {
                                             const Spacer(),
                                             const Spacer(),
                                             CachedNetworkImage(
-                                              imageUrl: logic.getNewProductModel?.data?[index].mainImage ?? "",
+                                              imageUrl: logic
+                                                      .getNewProductModel
+                                                      ?.data?[index]
+                                                      .mainImage ??
+                                                  "",
                                               height: 80,
                                               fit: BoxFit.cover,
                                               placeholder: (context, url) {
-                                                return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                                return Image.asset(AppAsset
+                                                        .icImagePlaceholder)
+                                                    .paddingAll(5);
                                               },
-                                              errorWidget: (context, url, error) {
-                                                return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                              errorWidget:
+                                                  (context, url, error) {
+                                                return Image.asset(AppAsset
+                                                        .icImagePlaceholder)
+                                                    .paddingAll(5);
                                               },
                                             ),
                                             const Spacer(),
@@ -303,10 +383,15 @@ class ProductNewProductView extends StatelessWidget {
                                               alignment: Alignment.centerLeft,
                                               child: Text(
                                                 Constant.capitalizeFirstLetter(
-                                                    logic.getNewProductModel?.data?[index].productName ?? ""),
+                                                    logic
+                                                            .getNewProductModel
+                                                            ?.data?[index]
+                                                            .productName ??
+                                                        ""),
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo700,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo700,
                                                   fontSize: 14,
                                                   color: AppColors.appText,
                                                 ),
@@ -318,22 +403,36 @@ class ProductNewProductView extends StatelessWidget {
                                                 Text(
                                                   "$currency ${logic.getNewProductModel?.data?[index].price ?? ""}",
                                                   style: TextStyle(
-                                                    fontFamily: AppFontFamily.heeBo800,
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo800,
                                                     fontSize: 14,
-                                                    color: AppColors.primaryAppColor,
+                                                    color: AppColors
+                                                        .primaryAppColor,
                                                   ),
                                                 ).paddingOnly(right: 7),
-                                                logic.getNewProductModel?.data?[index].mrp == null
+                                                logic
+                                                            .getNewProductModel
+                                                            ?.data?[index]
+                                                            .mrp ==
+                                                        null
                                                     ? Container()
                                                     : Text(
                                                         "$currency ${logic.getNewProductModel?.data?[index].mrp ?? ""}",
                                                         style: TextStyle(
-                                                          fontFamily: AppFontFamily.heeBo700,
+                                                          fontFamily:
+                                                              AppFontFamily
+                                                                  .heeBo700,
                                                           fontSize: 14,
-                                                          decoration: TextDecoration.lineThrough,
-                                                          decorationColor: AppColors.currencyRed,
-                                                          color: AppColors.currencyRed,
-                                                          decorationThickness: 1.5,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .lineThrough,
+                                                          decorationColor:
+                                                              AppColors
+                                                                  .currencyRed,
+                                                          color: AppColors
+                                                              .currencyRed,
+                                                          decorationThickness:
+                                                              1.5,
                                                         ),
                                                       ),
                                               ],
@@ -348,14 +447,31 @@ class ProductNewProductView extends StatelessWidget {
                                           child: GestureDetector(
                                             onTap: () {
                                               logic.onNewProductSaved(
-                                                userId: Constant.storage.read<String>('userId') ?? "",
-                                                categoryId: logic.getNewProductModel?.data?[index].category ?? "",
-                                                productId: logic.getNewProductModel?.data?[index].id ?? "",
+                                                userId: Constant.storage
+                                                        .read<String>(
+                                                            'userId') ??
+                                                    "",
+                                                categoryId: logic
+                                                        .getNewProductModel
+                                                        ?.data?[index]
+                                                        .category ??
+                                                    "",
+                                                productId: logic
+                                                        .getNewProductModel
+                                                        ?.data?[index]
+                                                        .id ??
+                                                    "",
                                               );
                                             },
-                                            child: logic.isNewProductSaved[index] == true
-                                                ? Image.asset(AppAsset.icLikeFilled, height: 30)
-                                                : Image.asset(AppAsset.icLikeOutline, height: 30),
+                                            child: logic.isNewProductSaved[
+                                                        index] ==
+                                                    true
+                                                ? Image.asset(
+                                                    AppAsset.icLikeFilled,
+                                                    height: 30)
+                                                : Image.asset(
+                                                    AppAsset.icLikeOutline,
+                                                    height: 30),
                                           ),
                                         ),
                                       ],
@@ -405,14 +521,19 @@ class ProductTrendingProduct extends StatelessWidget {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
-                      itemCount: logic.getTrendingProductModel?.data?.length ?? 0,
+                      itemCount:
+                          logic.getTrendingProductModel?.data?.length ?? 0,
                       itemBuilder: (BuildContext context, int index) {
                         return AnimationConfiguration.staggeredGrid(
                           position: index,
                           duration: const Duration(milliseconds: 650),
-                          columnCount: (logic.getTrendingProductModel?.data?.length ?? 0) >= 3
+                          columnCount: (logic.getTrendingProductModel?.data
+                                          ?.length ??
+                                      0) >=
+                                  3
                               ? 3
-                              : logic.getTrendingProductModel?.data?.length ?? 0,
+                              : logic.getTrendingProductModel?.data?.length ??
+                                  0,
                           child: FadeInAnimation(
                             child: ScaleAnimation(
                               child: InkWell(
@@ -420,7 +541,8 @@ class ProductTrendingProduct extends StatelessWidget {
                                   Get.toNamed(
                                     AppRoutes.productDetail,
                                     arguments: [
-                                      logic.getTrendingProductModel?.data?[index].id,
+                                      logic.getTrendingProductModel
+                                          ?.data?[index].id,
                                     ],
                                   );
                                 },
@@ -428,7 +550,8 @@ class ProductTrendingProduct extends StatelessWidget {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(21),
-                                    color: RandomColorGenerator.getRandomColor(),
+                                    color:
+                                        RandomColorGenerator.getRandomColor(),
                                     boxShadow: Constant.boxShadow,
                                     border: Border.all(
                                       color: AppColors.grey.withOpacity(0.1),
@@ -446,14 +569,22 @@ class ProductTrendingProduct extends StatelessWidget {
                                           const Spacer(),
                                           const Spacer(),
                                           CachedNetworkImage(
-                                            imageUrl: logic.getTrendingProductModel?.data?[index].mainImage ?? "",
+                                            imageUrl: logic
+                                                    .getTrendingProductModel
+                                                    ?.data?[index]
+                                                    .mainImage ??
+                                                "",
                                             height: 85,
                                             fit: BoxFit.cover,
                                             placeholder: (context, url) {
-                                              return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                              return Image.asset(AppAsset
+                                                      .icImagePlaceholder)
+                                                  .paddingAll(5);
                                             },
                                             errorWidget: (context, url, error) {
-                                              return Image.asset(AppAsset.icImagePlaceholder).paddingAll(5);
+                                              return Image.asset(AppAsset
+                                                      .icImagePlaceholder)
+                                                  .paddingAll(5);
                                             },
                                           ),
                                           const Spacer(),
@@ -461,11 +592,15 @@ class ProductTrendingProduct extends StatelessWidget {
                                           Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              Constant.capitalizeFirstLetter(
-                                                  logic.getTrendingProductModel?.data?[index].productName ?? ""),
+                                              Constant.capitalizeFirstLetter(logic
+                                                      .getTrendingProductModel
+                                                      ?.data?[index]
+                                                      .productName ??
+                                                  ""),
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.heeBo700,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo700,
                                                 fontSize: 14,
                                                 color: AppColors.appText,
                                               ),
@@ -473,11 +608,14 @@ class ProductTrendingProduct extends StatelessWidget {
                                           ),
                                           Row(
                                             children: [
-                                              Image.asset(AppAsset.icRedStar, height: 12, color: AppColors.yellow3),
+                                              Image.asset(AppAsset.icRedStar,
+                                                  height: 12,
+                                                  color: AppColors.yellow3),
                                               Text(
                                                 "${logic.getTrendingProductModel?.data?[index].rating?.toStringAsFixed(1) ?? ""} | ${logic.getTrendingProductModel?.data?[index].sold ?? ""} Sold",
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo700,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo700,
                                                   fontSize: 12,
                                                   color: AppColors.ratingBlack,
                                                 ),
@@ -489,22 +627,34 @@ class ProductTrendingProduct extends StatelessWidget {
                                               Text(
                                                 "$currency ${logic.getTrendingProductModel?.data?[index].price ?? ""}",
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo800,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo800,
                                                   fontSize: 14,
-                                                  color: AppColors.primaryAppColor,
+                                                  color:
+                                                      AppColors.primaryAppColor,
                                                 ),
                                               ).paddingOnly(right: 7),
-                                              logic.getTrendingProductModel?.data?[index].mrp == null
+                                              logic.getTrendingProductModel
+                                                          ?.data?[index].mrp ==
+                                                      null
                                                   ? Container()
                                                   : Text(
                                                       "$currency ${logic.getTrendingProductModel?.data?[index].mrp ?? ""}",
                                                       style: TextStyle(
-                                                        fontFamily: AppFontFamily.heeBo700,
+                                                        fontFamily:
+                                                            AppFontFamily
+                                                                .heeBo700,
                                                         fontSize: 14,
-                                                        decoration: TextDecoration.lineThrough,
-                                                        decorationColor: AppColors.currencyRed,
-                                                        color: AppColors.currencyRed,
-                                                        decorationThickness: 1.5,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
+                                                        decorationColor:
+                                                            AppColors
+                                                                .currencyRed,
+                                                        color: AppColors
+                                                            .currencyRed,
+                                                        decorationThickness:
+                                                            1.5,
                                                       ),
                                                     ),
                                             ],
@@ -513,15 +663,19 @@ class ProductTrendingProduct extends StatelessWidget {
                                           const Spacer(),
                                         ],
                                       ),
-                                      logic.getTrendingProductModel?.data?[index].isBestSeller == true
+                                      logic.getTrendingProductModel
+                                                  ?.data?[index].isBestSeller ==
+                                              true
                                           ? Container(
                                               height: 22,
                                               width: Get.width * 0.17,
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
-                                                borderRadius: const BorderRadius.only(
+                                                borderRadius:
+                                                    const BorderRadius.only(
                                                   topLeft: Radius.circular(21),
-                                                  bottomRight: Radius.circular(21),
+                                                  bottomRight:
+                                                      Radius.circular(21),
                                                   topRight: Radius.circular(21),
                                                 ),
                                                 color: AppColors.sellerBg,
@@ -530,7 +684,8 @@ class ProductTrendingProduct extends StatelessWidget {
                                                 "txtBestSeller".tr,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
-                                                  fontFamily: AppFontFamily.heeBo700,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo700,
                                                   fontSize: 10,
                                                   color: AppColors.sellerYellow,
                                                 ),
@@ -543,14 +698,30 @@ class ProductTrendingProduct extends StatelessWidget {
                                         child: GestureDetector(
                                           onTap: () {
                                             logic.onTrendingProductSaved(
-                                              userId: Constant.storage.read<String>('userId') ?? "",
-                                              categoryId: logic.getTrendingProductModel?.data?[index].category ?? "",
-                                              productId: logic.getTrendingProductModel?.data?[index].id ?? "",
+                                              userId: Constant.storage
+                                                      .read<String>('userId') ??
+                                                  "",
+                                              categoryId: logic
+                                                      .getTrendingProductModel
+                                                      ?.data?[index]
+                                                      .category ??
+                                                  "",
+                                              productId: logic
+                                                      .getTrendingProductModel
+                                                      ?.data?[index]
+                                                      .id ??
+                                                  "",
                                             );
                                           },
-                                          child: logic.isTrendingProductSaved[index] == true
-                                              ? Image.asset(AppAsset.icLikeFilled, height: 30)
-                                              : Image.asset(AppAsset.icLikeOutline, height: 30),
+                                          child: logic.isTrendingProductSaved[
+                                                      index] ==
+                                                  true
+                                              ? Image.asset(
+                                                  AppAsset.icLikeFilled,
+                                                  height: 30)
+                                              : Image.asset(
+                                                  AppAsset.icLikeOutline,
+                                                  height: 30),
                                         ),
                                       ),
                                     ],
@@ -999,7 +1170,8 @@ class ProductScreenBestDealView extends StatelessWidget {
                                 color: AppColors.primaryAppColor,
                                 borderRadius: BorderRadius.circular(36),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 9),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 9),
                               child: Text(
                                 "\$ 120",
                                 style: TextStyle(

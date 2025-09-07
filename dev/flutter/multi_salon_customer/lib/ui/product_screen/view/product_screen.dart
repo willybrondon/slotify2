@@ -36,72 +36,17 @@ class ProductScreen extends StatelessWidget {
           log("is Update Variable :: ${logic.isUpdate}");
           return Scaffold(
             backgroundColor: AppColors.whiteColor,
-            appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(200),
-              child: logic.isLogIn == true && logic.isUpdate == false
-                  ? Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            "txtPleaseMakeYour".tr,
-                            style: TextStyle(
-                              fontFamily: AppFontFamily.sfProDisplayMedium,
-                              color: AppColors.blackColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Get.toNamed(AppRoutes.editProfile);
-                            },
-                            child: Text(
-                              "txtProfile!".tr,
-                              style: TextStyle(
-                                  fontFamily: AppFontFamily.sfProDisplayBold,
-                                  color: AppColors.primaryAppColor,
-                                  decoration: TextDecoration.underline,
-                                  fontSize: 17),
-                            ),
-                          )
-                        ],
+            body: logic.isLogIn != true
+                ? SignInScreen()
+                : Column(
+                    children: [
+                      const ProductWelcomeHeader(),
+                      const ProductScreenTopView(),
+                      Expanded(
+                        child: const ProductScreenView(),
                       ),
-                    )
-                  : logic.isLogIn != true
-                      ? const SizedBox()
-                      : const ProductScreenTopView(),
-            ),
-            body: logic.isLogIn == true && logic.isUpdate == false
-                ? Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "txtPleaseMakeYour".tr,
-                          style:
-                              TextStyle(fontFamily: AppFontFamily.sfProDisplayMedium, color: AppColors.blackColor, fontSize: 16),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.toNamed(AppRoutes.editProfile);
-                          },
-                          child: Text(
-                            "txtProfile!".tr,
-                            style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold,
-                                color: AppColors.primaryAppColor,
-                                decoration: TextDecoration.underline,
-                                fontSize: 17),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                : logic.isLogIn != true
-                    ? SignInScreen()
-                    : const ProductScreenView(),
+                    ],
+                  ),
           );
         },
       ),
