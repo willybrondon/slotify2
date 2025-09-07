@@ -36,7 +36,8 @@ final Map<String, String> deat = {
   "txtExit": "Ausfahrt",
   "txtContinue": "Weitermachen",
   "txtUnderMaintenance": "Wird gewartet",
-  "txtSorryUnderMaintenance": "Entschuldigung, die App befindet sich derzeit in der Wartung!!",
+  "txtSorryUnderMaintenance":
+      "Entschuldigung, die App befindet sich derzeit in der Wartung!!",
   "txtCloseApp": "App schließen",
   "txtNearbyBranches": "Salons in der Nähe",
   "txtNearBranches": "In der Nähe von Salons",
@@ -87,7 +88,8 @@ final Map<String, String> deat = {
   "txtSelectDate": "Datum auswählen",
   "txtAvailableSlots": "Verfügbare Plätze",
   "txtMorning": "Morgen",
-  "txtPleaseConfirmPassword": "Bitte geben Sie Ihr Passwort ein und bestätigen Sie es",
+  "txtPleaseConfirmPassword":
+      "Bitte geben Sie Ihr Passwort ein und bestätigen Sie es",
   "txtAfternoon": "Nachmittag",
   "txtEvening": "Abend",
   "txtPaymentMethod": "Bezahlverfahren",
@@ -178,17 +180,23 @@ final Map<String, String> deat = {
   "txtTaxIncluded": "Steuern inklusive",
   "txtMinutes": "Protokoll",
   "txtPleaseSelectService": "Bitte wählen Sie zuerst Service",
-  "txtWelcomeBack": "Willkommen zurück!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "Benachrichtigungen",
+  "txtProductCategoryHeader": "Produktkategorie",
   "txtLongTime": "Sie wurden schon lange vermisst",
   "txtSearchService": "Suchdienst",
   "txtNotAvailableServices": "Service nicht verfügbar...!!",
   "desUnderRequirement": "Bitte füllen Sie Details wie bei Anforderung aus",
-  "desNotification": "Wir werden Sie benachrichtigen, sobald wir etwas für Sie haben",
-  "desDisclaimerAgree": "Ich habe den Haftungsausschluss gelesen und stimmte auf die Allgemeinen Geschäftsbedingungen zu.",
+  "desNotification":
+      "Wir werden Sie benachrichtigen, sobald wir etwas für Sie haben",
+  "desDisclaimerAgree":
+      "Ich habe den Haftungsausschluss gelesen und stimmte auf die Allgemeinen Geschäftsbedingungen zu.",
   "desSuccessfullyBooked": "Ihre Buchung wurde erfolgreich gebucht",
   "desCancelBooking": "Möchten Sie diesen Buchungstermin stornieren?",
-  "desDeletedPermanently": "Ihr Konto wird dauerhaft gelöscht. Ihre Daten werden nicht wieder wiederhergestellt.",
-  "desPleaseAcceptConditions": "Bitte akzeptieren Sie zuerst Bedingungen und Bedingung",
+  "desDeletedPermanently":
+      "Ihr Konto wird dauerhaft gelöscht. Ihre Daten werden nicht wieder wiederhergestellt.",
+  "desPleaseAcceptConditions":
+      "Bitte akzeptieren Sie zuerst Bedingungen und Bedingung",
   "desLogOut": "Sind Sie sicher, dass Sie sich abmelden möchten?",
   "desSlotBooked": "Dieser Slot ist bereits gebucht",
   "desPreviousSlot": "Sie können frühere Slots nicht buchen",
@@ -199,7 +207,8 @@ final Map<String, String> deat = {
   "desSetPassword":
       "Legen Sie das neue Passwort für Ihr Konto fest, damit Sie sich anmelden und auf alle Funktionen zugreifen können.",
   "desPasswordNotMatch": "Passwort stimmt nicht überein",
-  "desInvalidSlot": "Die von Ihnen ausgewählte Zeit ist ungültig.\n Bitte wählen Sie eine andere Zeit aus.",
+  "desInvalidSlot":
+      "Die von Ihnen ausgewählte Zeit ist ungültig.\n Bitte wählen Sie eine andere Zeit aus.",
   "desForgotPassword":
       "Geben Sie unten Ihre E-Mail-Adresse ein,\num Ihre Anweisungen zum Zurücksetzen Ihres Passworts zu erhalten",
   "txtAddNewAddress": "Neue Adresse hinzufügen",
@@ -247,7 +256,8 @@ final Map<String, String> deat = {
   "txtServiceName": "Dienstname",
   "txtTrackingID": "Tracking-ID",
   "txtTrackingLink": "Tracking-Link",
-  "txtCancellation1": "Durch die Stornierung dieser Bestellung werden insgesamt",
+  "txtCancellation1":
+      "Durch die Stornierung dieser Bestellung werden insgesamt",
   "txtCancellation2": " wird von Ihrem Wallet-Konto abgebucht.",
   "txtCancelOrder": "Bestellung stornieren",
   "txtGiveReview": "Geben Sie eine Bewertung ab",
@@ -295,7 +305,8 @@ final Map<String, String> deat = {
   "desPleaseAddressLine2": "Bitte geben Sie die Adresszeile 2 ein",
   "desNoProductFound": "Für diesen Salon wurde kein Produkt gefunden",
   "desNoDataCart": "Für den Warenkorb wurden keine Daten gefunden!!",
-  "desNoDataCategoryProduct": "Für diese Kategorie wurde kein Produkt gefunden!!",
+  "desNoDataCategoryProduct":
+      "Für diese Kategorie wurde kein Produkt gefunden!!",
   "desPleaseEnterContact": "Bitte geben Sie Ihre Kontaktdaten ein",
   "desNoDataFoundWallet": "Keine Daten zum Wallet-Verlauf gefunden!!",
   "desNoOrderPlaced": "Keine Bestellung aufgegeben!!",
@@ -314,6 +325,7 @@ final Map<String, String> deat = {
   "desNoDataFoundWishlistSalon": "Keine Wunschliste für Salon!!",
   "desNoDataFoundWishlistProduct": "Keine Wunschliste für Produkt!!",
   "txtOrderPlacedSuccessfully": "Bestellung erfolgreich aufgegeben!",
-  "txtYourOrderHasSuccessfully": "Ihre Bestellung wurde erfolgreich aufgegeben!!",
+  "txtYourOrderHasSuccessfully":
+      "Ihre Bestellung wurde erfolgreich aufgegeben!!",
   "txtGoToOrderDetails": "Gehen Sie zu den Bestelldetails",
 };

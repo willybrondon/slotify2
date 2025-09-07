@@ -237,6 +237,8 @@ class LoginScreen extends StatelessWidget {
                               },
                             ),
                             const SizedBox(height: 30),
+                            // Demo Login button commented out
+                            /*
                             Row(
                               children: [
                                 Expanded(
@@ -375,6 +377,38 @@ class LoginScreen extends StatelessWidget {
                                   ),
                                 ),
                               ],
+                            ),
+                            */
+                            // Centered Login button
+                            Center(
+                              child: GestureDetector(
+                                onTap: () async {
+                                  FocusScopeNode currentFocus =
+                                      FocusScope.of(context);
+                                  currentFocus.focusedChild?.unfocus();
+
+                                  logic.onContinueClick();
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(top: 20),
+                                  height: 50,
+                                  width: Get.width * 0.8,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryAppColor,
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "txtLogIn".tr,
+                                      style: TextStyle(
+                                        fontFamily: AppFontFamily.sfProDisplay,
+                                        fontSize: 16,
+                                        color: AppColors.whiteColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),

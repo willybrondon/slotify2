@@ -105,17 +105,13 @@ class BranchDetailInfoView extends StatelessWidget {
       builder: (logic) {
         return logic.isLoading.value
             ? Shimmers.branchDetailShimmer()
-            : NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    const SliverList(
-                      delegate: SliverChildListDelegate.fixed(
-                        [BranchDetailDataView()],
-                      ),
-                    ),
-                  ];
-                },
-                body: const BranchDetailTabView(),
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const BranchDetailDataView(),
+                    const BranchDetailTabView(),
+                  ],
+                ),
               );
       },
     );
@@ -635,7 +631,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                            crossAxisCount: 3,
                             childAspectRatio: 0.87,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,

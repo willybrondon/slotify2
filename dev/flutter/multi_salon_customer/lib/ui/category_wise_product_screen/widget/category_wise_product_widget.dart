@@ -27,7 +27,7 @@ class CategoryWiseProductAppBarView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -70,8 +70,10 @@ class CategoryWiseProductItemView extends StatelessWidget {
                     physics: const ScrollPhysics(),
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    itemCount: logic.getCategoryWiseProductModel?.data?.length ?? 0,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    itemCount:
+                        logic.getCategoryWiseProductModel?.data?.length ?? 0,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       childAspectRatio: 0.68,
                       crossAxisSpacing: 8,
@@ -80,7 +82,9 @@ class CategoryWiseProductItemView extends StatelessWidget {
                       return AnimationConfiguration.staggeredGrid(
                         position: index,
                         duration: const Duration(milliseconds: 650),
-                        columnCount: logic.getCategoryWiseProductModel?.data?.length ?? 0,
+                        columnCount:
+                            logic.getCategoryWiseProductModel?.data?.length ??
+                                0,
                         child: FadeInAnimation(
                           child: ScaleAnimation(
                             child: InkWell(
@@ -88,7 +92,8 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                 Get.toNamed(
                                   AppRoutes.productDetail,
                                   arguments: [
-                                    logic.getCategoryWiseProductModel?.data?[index].id,
+                                    logic.getCategoryWiseProductModel
+                                        ?.data?[index].id,
                                   ],
                                 );
                               },
@@ -113,14 +118,22 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                         const Spacer(),
                                         const Spacer(),
                                         CachedNetworkImage(
-                                          imageUrl: logic.getCategoryWiseProductModel?.data?[index].mainImage ?? "",
+                                          imageUrl: logic
+                                                  .getCategoryWiseProductModel
+                                                  ?.data?[index]
+                                                  .mainImage ??
+                                              "",
                                           height: 85,
                                           fit: BoxFit.cover,
                                           placeholder: (context, url) {
-                                            return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                            return Image.asset(
+                                                    AppAsset.icImagePlaceholder)
+                                                .paddingAll(25);
                                           },
                                           errorWidget: (context, url, error) {
-                                            return Image.asset(AppAsset.icImagePlaceholder).paddingAll(30);
+                                            return Image.asset(
+                                                    AppAsset.icImagePlaceholder)
+                                                .paddingAll(30);
                                           },
                                         ),
                                         const Spacer(),
@@ -128,11 +141,15 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: Text(
-                                            Constant.capitalizeFirstLetter(
-                                                logic.getCategoryWiseProductModel?.data?[index].productName ?? ""),
+                                            Constant.capitalizeFirstLetter(logic
+                                                    .getCategoryWiseProductModel
+                                                    ?.data?[index]
+                                                    .productName ??
+                                                ""),
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
-                                              fontFamily: AppFontFamily.heeBo700,
+                                              fontFamily:
+                                                  AppFontFamily.heeBo700,
                                               fontSize: 14,
                                               color: AppColors.appText,
                                             ),
@@ -140,11 +157,14 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                         ),
                                         Row(
                                           children: [
-                                            Image.asset(AppAsset.icRedStar, height: 12, color: AppColors.yellow3),
+                                            Image.asset(AppAsset.icRedStar,
+                                                height: 12,
+                                                color: AppColors.yellow3),
                                             Text(
                                               "${logic.getCategoryWiseProductModel?.data?[index].rating?.toStringAsFixed(1) ?? ""} | ${logic.getCategoryWiseProductModel?.data?[index].sold ?? ""} Sold",
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.heeBo700,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo700,
                                                 fontSize: 12,
                                                 color: AppColors.ratingBlack,
                                               ),
@@ -156,21 +176,29 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                             Text(
                                               "$currency ${logic.getCategoryWiseProductModel?.data?[index].price ?? ""}",
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.heeBo800,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo800,
                                                 fontSize: 14,
-                                                color: AppColors.primaryAppColor,
+                                                color:
+                                                    AppColors.primaryAppColor,
                                               ),
                                             ).paddingOnly(right: 7),
-                                            logic.getCategoryWiseProductModel?.data?[index].mrp == null
+                                            logic.getCategoryWiseProductModel
+                                                        ?.data?[index].mrp ==
+                                                    null
                                                 ? Container()
                                                 : Text(
                                                     "$currency ${logic.getCategoryWiseProductModel?.data?[index].mrp ?? ""}",
                                                     style: TextStyle(
-                                                      fontFamily: AppFontFamily.heeBo700,
+                                                      fontFamily: AppFontFamily
+                                                          .heeBo700,
                                                       fontSize: 14,
-                                                      decoration: TextDecoration.lineThrough,
-                                                      decorationColor: AppColors.currencyRed,
-                                                      color: AppColors.currencyRed,
+                                                      decoration: TextDecoration
+                                                          .lineThrough,
+                                                      decorationColor:
+                                                          AppColors.currencyRed,
+                                                      color:
+                                                          AppColors.currencyRed,
                                                       decorationThickness: 1.5,
                                                     ),
                                                   ),
@@ -180,15 +208,19 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                         const Spacer(),
                                       ],
                                     ),
-                                    logic.getCategoryWiseProductModel?.data?[index].isBestSeller == true
+                                    logic.getCategoryWiseProductModel
+                                                ?.data?[index].isBestSeller ==
+                                            true
                                         ? Container(
                                             height: 22,
                                             width: Get.width * 0.17,
                                             alignment: Alignment.center,
                                             decoration: BoxDecoration(
-                                              borderRadius: const BorderRadius.only(
+                                              borderRadius:
+                                                  const BorderRadius.only(
                                                 topLeft: Radius.circular(21),
-                                                bottomRight: Radius.circular(21),
+                                                bottomRight:
+                                                    Radius.circular(21),
                                                 topRight: Radius.circular(21),
                                               ),
                                               color: AppColors.sellerBg,
@@ -197,7 +229,8 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                               "txtBestSeller".tr,
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontFamily: AppFontFamily.heeBo700,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo700,
                                                 fontSize: 10,
                                                 color: AppColors.sellerYellow,
                                               ),
@@ -210,14 +243,25 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                       child: GestureDetector(
                                         onTap: () {
                                           logic.onCategoryWiseProductSaved(
-                                            userId: Constant.storage.read<String>('userId') ?? "",
+                                            userId: Constant.storage
+                                                    .read<String>('userId') ??
+                                                "",
                                             categoryId: logic.categoryId ?? "",
-                                            productId: logic.getCategoryWiseProductModel?.data?[index].id ?? "",
+                                            productId: logic
+                                                    .getCategoryWiseProductModel
+                                                    ?.data?[index]
+                                                    .id ??
+                                                "",
                                           );
                                         },
-                                        child: logic.isCategoryWiseProductSaved[index] == true
-                                            ? Image.asset(AppAsset.icLikeFilled, height: 30)
-                                            : Image.asset(AppAsset.icLikeOutline, height: 30),
+                                        child: logic.isCategoryWiseProductSaved[
+                                                    index] ==
+                                                true
+                                            ? Image.asset(AppAsset.icLikeFilled,
+                                                height: 30)
+                                            : Image.asset(
+                                                AppAsset.icLikeOutline,
+                                                height: 30),
                                       ),
                                     ),
                                   ],

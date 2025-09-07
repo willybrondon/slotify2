@@ -39,10 +39,12 @@ final Map<String, String> esES = {
   "txtCategory": "Categoría",
   "txtViewAll": "Ver todo",
   "txtEnterUsername": "Ingrese su nombre de usuario o regístrese",
-  "txtFillDetails": "Por favor complete los detalles como se indica en el requisito",
+  "txtFillDetails":
+      "Por favor complete los detalles como se indica en el requisito",
   "txtPassword": "Contraseña",
   "txtEnterPassword": "Ingresa tu contraseña",
-  "txtPasswordCharacters": "La contraseña debe contener 6 caracteres como mínimo",
+  "txtPasswordCharacters":
+      "La contraseña debe contener 6 caracteres como mínimo",
   "txtRememberMe": "Acuérdate de mí",
   "txtPleaseEnterPassword": "porfavor ingrese una contraseña",
   "txtForgotPassword": "¿Olvidaste tu contraseña?",
@@ -70,7 +72,8 @@ final Map<String, String> esES = {
   "txtImage": "Adjunte su imagen o captura de pantalla",
   "txtShare": "Compartir",
   "txtUnderMaintenance": "En mantenimiento",
-  "txtSorryUnderMaintenance": "Lo sentimos, ¡la aplicación se encuentra actualmente en mantenimiento!",
+  "txtSorryUnderMaintenance":
+      "Lo sentimos, ¡la aplicación se encuentra actualmente en mantenimiento!",
   "txtBrowse": "Navegar",
   "txtCloseApp": "Cerrar app",
   "txtTopExperts": "Mejores expertos",
@@ -178,29 +181,38 @@ final Map<String, String> esES = {
   "txtTaxIncluded": "impuesto incluido",
   "txtMinutes": "Minutos",
   "txtPleaseSelectService": "Por favor seleccione el servicio primero",
-  "txtWelcomeBack": "¡Bienvenido de nuevo!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "Notificaciones",
+  "txtProductCategoryHeader": "Categoría de producto",
   "txtLongTime": "Te han extrañado por mucho tiempo",
   "txtSearchService": "Servicio de búsqueda",
   "txtNotAvailableServices": "Servicio no disponible...!!",
-  "desUnderRequirement": "Por favor complete los detalles como se indica en el requisito",
+  "desUnderRequirement":
+      "Por favor complete los detalles como se indica en el requisito",
   "desNotification": "Te avisaremos cuando tengamos algo para ti.",
-  "desDisclaimerAgree": "He leído el descargo de responsabilidad y acepto los términos y condiciones.",
+  "desDisclaimerAgree":
+      "He leído el descargo de responsabilidad y acepto los términos y condiciones.",
   "desSuccessfullyBooked": "Tu reserva se ha realizado correctamente.",
   "desCancelBooking": "¿Quieres cancelar esta cita de reserva?",
-  "desDeletedPermanently": "Su cuenta será eliminada permanentemente. Sus datos no se restaurarán nuevamente.",
-  "desPleaseAcceptConditions": "Por favor acepte los términos y condiciones primero",
+  "desDeletedPermanently":
+      "Su cuenta será eliminada permanentemente. Sus datos no se restaurarán nuevamente.",
+  "desPleaseAcceptConditions":
+      "Por favor acepte los términos y condiciones primero",
   "desLogOut": "¿Está seguro de que desea cerrar sesión?",
   "desSlotBooked": "Este espacio ya está reservado.",
   "desPreviousSlot": "No se pueden reservar plazas anteriores",
   "desExit": "Seguro que quieres salir ?",
   "desEnterEmail": "Por favor introduzca su correo electrónico",
-  "desEnterValidEmail": "Por favor, introduce una dirección de correo electrónico válida",
+  "desEnterValidEmail":
+      "Por favor, introduce una dirección de correo electrónico válida",
   "desGiveReview": "¡¡No puedes dar una reseña!!",
-  "desSetPassword": "Establezca la nueva contraseña para su cuenta para\n poder iniciar sesión y acceder a todas las funciones.",
+  "desSetPassword":
+      "Establezca la nueva contraseña para su cuenta para\n poder iniciar sesión y acceder a todas las funciones.",
   "desPasswordNotMatch": "Las contraseñas no coinciden",
   "desForgotPassword":
       "Ingrese su correo electrónico a continuación para recibir las instrucciones para restablecer su contraseña.",
-  "desInvalidSlot": "La hora que seleccionó no es válida.\n Seleccione otra hora.",
+  "desInvalidSlot":
+      "La hora que seleccionó no es válida.\n Seleccione otra hora.",
   "txtAddNewAddress": "Agregar nueva dirección",
   "txtEnterAddressDetails": "Ingrese los detalles de la dirección",
   "txtAddressLine1": "Dirección Línea 1",
@@ -268,7 +280,8 @@ final Map<String, String> esES = {
   "txtPayNow": "Paga ahora",
   "txtSearchForProducts": "Buscar productos...",
   "txtMyAccount": "Mi cuenta",
-  "txtAccountDetails": "Detalles de la cuenta, ID de correo electrónico, detalles de contacto",
+  "txtAccountDetails":
+      "Detalles de la cuenta, ID de correo electrónico, detalles de contacto",
   "txtMyWalletTransactionHistory": "Mi billetera, historial de transacciones",
   "txtMyOrderOrderHistory": "Mi pedido, Historial de pedidos",
   "txtPrivacyPolicyTC": "Política de privacidad, términos y condiciones",
@@ -294,9 +307,11 @@ final Map<String, String> esES = {
   "desPleaseAddressLine2": "Por favor ingrese la dirección en la línea 2",
   "desNoProductFound": "No se encontró ningún producto para este salón.",
   "desNoDataCart": "¡No se encontraron datos para el carrito!",
-  "desNoDataCategoryProduct": "¡¡No se encontró ningún producto para esta categoría!!",
+  "desNoDataCategoryProduct":
+      "¡¡No se encontró ningún producto para esta categoría!!",
   "desPleaseEnterContact": "Por favor introduzca los datos de contacto",
-  "desNoDataFoundWallet": "¡No se encontraron datos para el historial de la billetera!",
+  "desNoDataFoundWallet":
+      "¡No se encontraron datos para el historial de la billetera!",
   "desNoOrderPlaced": "¡¡No se ha realizado ningún pedido!!",
   "desNoReviewFound": "¡No se encontró ninguna reseña!",
   "desEnterSalonName": "Introduce el nombre de tu salón",
@@ -311,7 +326,8 @@ final Map<String, String> esES = {
   "desNoDataFoundSearch": "No se encontraron datos para esta búsqueda.",
   "desNoDataFoundAddress": "¡No se encontró ninguna dirección!",
   "desNoDataFoundWishlistSalon": "¡¡No hay lista de deseos para el salón !!",
-  "desNoDataFoundWishlistProduct": "¡¡No hay lista de deseos para el producto!!",
+  "desNoDataFoundWishlistProduct":
+      "¡¡No hay lista de deseos para el producto!!",
   "txtOrderPlacedSuccessfully": "¡Pedido realizado con éxito!",
   "txtYourOrderHasSuccessfully": "¡¡Tu pedido se ha realizado con éxito!!",
   "txtGoToOrderDetails": "Ir a los detalles del pedido",

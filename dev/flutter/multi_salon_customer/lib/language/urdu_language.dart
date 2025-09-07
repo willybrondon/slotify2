@@ -178,16 +178,21 @@ final Map<String, String> urPK = {
   "txtTaxIncluded": "ٹیکس شامل ہے",
   "txtMinutes": "منٹس",
   "txtPleaseSelectService": "براہ کرم پہلے سروس کو منتخب کریں۔",
-  "txtWelcomeBack": "خوش آمدید!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "اطلاعات",
+  "txtProductCategoryHeader": "پروڈکٹ کیٹیگری",
   "txtLongTime": "آپ کو طویل عرصے سے یاد کیا گیا ہے۔",
   "txtSearchService": "سرچ سروس",
   "txtNotAvailableServices": "سروس دستیاب نہیں...!!",
   "desUnderRequirement": "براہ کرم ضرورت کے مطابق تفصیلات پُر کریں۔",
-  "desNotification": "ہمارے پاس آپ کے لیے کچھ ہونے کے بعد ہم آپ کو مطلع کریں گے۔",
-  "desDisclaimerAgree": "میں نے دستبرداری کو پڑھ لیا ہے اور میں نے شرائط و ضوابط سے اتفاق کیا ہے۔",
+  "desNotification":
+      "ہمارے پاس آپ کے لیے کچھ ہونے کے بعد ہم آپ کو مطلع کریں گے۔",
+  "desDisclaimerAgree":
+      "میں نے دستبرداری کو پڑھ لیا ہے اور میں نے شرائط و ضوابط سے اتفاق کیا ہے۔",
   "desSuccessfullyBooked": "آپ کی بکنگ کامیابی سے بک گئی ہے۔",
   "desCancelBooking": "کیا آپ اس بکنگ اپائنٹمنٹ کو منسوخ کرنا چاہتے ہیں؟",
-  "desDeletedPermanently": "آپ کا اکاؤنٹ مستقل طور پر حذف کر دیا جائے گا۔ آپ کا ڈیٹا دوبارہ بحال نہیں ہوگا۔",
+  "desDeletedPermanently":
+      "آپ کا اکاؤنٹ مستقل طور پر حذف کر دیا جائے گا۔ آپ کا ڈیٹا دوبارہ بحال نہیں ہوگا۔",
   "desPleaseAcceptConditions": "براہ کرم پہلے شرائط و ضوابط کو قبول کریں۔",
   "desLogOut": "کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟",
   "desSlotBooked": "یہ سلاٹ پہلے ہی بک ہے۔",
@@ -196,10 +201,13 @@ final Map<String, String> urPK = {
   "desEnterEmail": "براہ کرم اپنا ای میل درج کریں۔",
   "desEnterValidEmail": "برائے مہربانی قابل قبول ای میل ایڈریس لکھیں",
   "desGiveReview": "آپ جائزہ لینے کے قابل نہیں ہیں !!",
-  "desSetPassword": "اپنے اکاؤنٹ کے لیے نیا پاس ورڈ سیٹ کریں تاکہ\n آپ لاگ ان ہو سکیں اور تمام خصوصیات تک رسائی حاصل کر سکیں۔",
+  "desSetPassword":
+      "اپنے اکاؤنٹ کے لیے نیا پاس ورڈ سیٹ کریں تاکہ\n آپ لاگ ان ہو سکیں اور تمام خصوصیات تک رسائی حاصل کر سکیں۔",
   "desPasswordNotMatch": "پاس ورڈ میچ نہیں کرتا",
-  "desForgotPassword": "اپنا پاس ورڈ دوبارہ ترتیب دینے کی ہدایت\nحاصل کرنے کے لیے نیچے اپنا ای میل درج کریں۔",
-  "desInvalidSlot": "آپ کا منتخب کردہ وقت غلط ہے۔\n براہ کرم کوئی اور وقت منتخب کریں۔",
+  "desForgotPassword":
+      "اپنا پاس ورڈ دوبارہ ترتیب دینے کی ہدایت\nحاصل کرنے کے لیے نیچے اپنا ای میل درج کریں۔",
+  "desInvalidSlot":
+      "آپ کا منتخب کردہ وقت غلط ہے۔\n براہ کرم کوئی اور وقت منتخب کریں۔",
   "txtAddNewAddress": "نیا پتہ شامل کریں۔",
   "txtEnterAddressDetails": "ایڈریس کی تفصیلات درج کریں۔",
   "txtAddressLine1": "ایڈریس لائن 1",

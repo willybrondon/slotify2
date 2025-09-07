@@ -178,17 +178,22 @@ final Map<String, String> ptPT = {
   "txtTaxIncluded": "Taxas incluídas",
   "txtMinutes": "Minutos",
   "txtPleaseSelectService": "Selecione o serviço primeiro",
-  "txtWelcomeBack": "Bem vindo de volta!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "Notificações",
+  "txtProductCategoryHeader": "Categoria de produto",
   "txtLongTime": "Você está desaparecido há muito tempo",
   "txtSearchService": "Serviço de pesquisa",
   "txtNotAvailableServices": "Serviço não disponível...!!",
   "desUnderRequirement": "Por favor, preencha os detalhes conforme exigido",
   "desNotification": "Iremos notificá-lo assim que tivermos algo para você",
-  "desDisclaimerAgree": "Li o aviso legal e concordo com os termos e condições.",
+  "desDisclaimerAgree":
+      "Li o aviso legal e concordo com os termos e condições.",
   "desSuccessfullyBooked": "Sua reserva foi reservada com sucesso",
   "desCancelBooking": "Deseja cancelar esta consulta de reserva?",
-  "desDeletedPermanently": "Sua conta será excluída permanentemente. Seus dados não serão restaurados novamente.",
-  "desPleaseAcceptConditions": "Por favor, aceite os termos e condições primeiro",
+  "desDeletedPermanently":
+      "Sua conta será excluída permanentemente. Seus dados não serão restaurados novamente.",
+  "desPleaseAcceptConditions":
+      "Por favor, aceite os termos e condições primeiro",
   "desLogOut": "Tem certeza que deseja sair ?",
   "desSlotBooked": "Esta vaga já está reservada",
   "desPreviousSlot": "Você não pode reservar vagas anteriores",
@@ -196,10 +201,13 @@ final Map<String, String> ptPT = {
   "desEnterEmail": "Por favor introduza o seu e-mail",
   "desEnterValidEmail": "Por favor insira um endereço de e-mail válido",
   "desGiveReview": "Você não pode dar uma avaliação!!",
-  "desSetPassword": "Defina a nova senha da sua conta para\n poder fazer login e acessar todos os recursos.",
+  "desSetPassword":
+      "Defina a nova senha da sua conta para\n poder fazer login e acessar todos os recursos.",
   "desPasswordNotMatch": "Senha não corresponde",
-  "desForgotPassword": "Digite seu e-mail abaixo para\nreceber instruções de redefinição de senha",
-  "desInvalidSlot": "O horário selecionado é inválido.\n Selecione outro horário.",
+  "desForgotPassword":
+      "Digite seu e-mail abaixo para\nreceber instruções de redefinição de senha",
+  "desInvalidSlot":
+      "O horário selecionado é inválido.\n Selecione outro horário.",
   "txtAddNewAddress": "Adicionar novo endereço",
   "txtEnterAddressDetails": "Insira os detalhes do endereço",
   "txtAddressLine1": "Endereço Linha 1",
@@ -295,7 +303,8 @@ final Map<String, String> ptPT = {
   "desNoDataCart": "Nenhum dado encontrado para o carrinho!!",
   "desNoDataCategoryProduct": "Nenhum produto encontrado nesta categoria!!",
   "desPleaseEnterContact": "Por favor insira detalhes de contato",
-  "desNoDataFoundWallet": "Nenhum dado encontrado para o histórico da carteira!!",
+  "desNoDataFoundWallet":
+      "Nenhum dado encontrado para o histórico da carteira!!",
   "desNoOrderPlaced": "Nenhum pedido feito!!",
   "desNoReviewFound": "Nenhuma avaliação encontrada!!",
   "desEnterSalonName": "Digite o nome do seu salão",

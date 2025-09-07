@@ -178,17 +178,23 @@ final Map<String, String> idID = {
   "txtTaxIncluded": "termasuk pajak",
   "txtMinutes": "Menit",
   "txtPleaseSelectService": "Silakan Pilih Layanan Terlebih Dahulu",
-  "txtWelcomeBack": "Selamat Datang kembali!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "Notifikasi",
+  "txtProductCategoryHeader": "Kategori Produk",
   "txtLongTime": "Kamu Sudah Lama Dirindukan",
   "txtSearchService": "Layanan Pencarian",
   "txtNotAvailableServices": "Layanan tidak tersedia...!!",
   "desUnderRequirement": "Silakan isi rincian sesuai kebutuhan",
-  "desNotification": "Kami akan memberi tahu Anda setelah kami memiliki sesuatu untuk Anda",
-  "desDisclaimerAgree": "Saya telah membaca penafian dan menyetujui syarat dan ketentuan.",
+  "desNotification":
+      "Kami akan memberi tahu Anda setelah kami memiliki sesuatu untuk Anda",
+  "desDisclaimerAgree":
+      "Saya telah membaca penafian dan menyetujui syarat dan ketentuan.",
   "desSuccessfullyBooked": "Pemesanan Anda telah berhasil dipesan",
   "desCancelBooking": "Apakah Anda ingin membatalkan Janji Pemesanan ini?",
-  "desDeletedPermanently": "Akun Anda akan dihapus secara permanen. Data Anda tidak akan dipulihkan lagi.",
-  "desPleaseAcceptConditions": "Harap Terima Syarat dan Ketentuan Terlebih Dahulu",
+  "desDeletedPermanently":
+      "Akun Anda akan dihapus secara permanen. Data Anda tidak akan dipulihkan lagi.",
+  "desPleaseAcceptConditions":
+      "Harap Terima Syarat dan Ketentuan Terlebih Dahulu",
   "desLogOut": "Apakah Anda yakin ingin Keluar?",
   "desSlotBooked": "Slot ini sudah dipesan",
   "desPreviousSlot": "Anda tidak dapat memesan slot sebelumnya",
@@ -196,10 +202,13 @@ final Map<String, String> idID = {
   "desEnterEmail": "Masukkan email Anda",
   "desEnterValidEmail": "silakan isi alamat email",
   "desGiveReview": "Anda tidak dapat memberikan ulasan!!",
-  "desSetPassword": "Tetapkan kata sandi baru untuk akun Anda sehingga\n Anda dapat masuk dan mengakses semua fitur.",
+  "desSetPassword":
+      "Tetapkan kata sandi baru untuk akun Anda sehingga\n Anda dapat masuk dan mengakses semua fitur.",
   "desPasswordNotMatch": "Kata sandi tidak cocok",
-  "desForgotPassword": "Masukkan email Anda di bawah ini untuk\nmenerima instruksi pengaturan ulang kata sandi Anda",
-  "desInvalidSlot": "Waktu yang Anda pilih Tidak Valid.\n Silakan pilih waktu lain.",
+  "desForgotPassword":
+      "Masukkan email Anda di bawah ini untuk\nmenerima instruksi pengaturan ulang kata sandi Anda",
+  "desInvalidSlot":
+      "Waktu yang Anda pilih Tidak Valid.\n Silakan pilih waktu lain.",
   "txtAddNewAddress": "Tambahkan Alamat Baru",
   "txtEnterAddressDetails": "Masukkan Detail Alamat",
   "txtAddressLine1": "Jalur Alamat 1",
@@ -293,9 +302,11 @@ final Map<String, String> idID = {
   "desPleaseAddressLine2": "Silakan masukkan baris alamat 2",
   "desNoProductFound": "Tidak ada produk yang ditemukan untuk salon ini",
   "desNoDataCart": "Tidak ada data yang ditemukan untuk keranjang!!",
-  "desNoDataCategoryProduct": "Tidak ada produk yang ditemukan untuk kategori ini!!",
+  "desNoDataCategoryProduct":
+      "Tidak ada produk yang ditemukan untuk kategori ini!!",
   "desPleaseEnterContact": "Silakan masukkan rincian kontak",
-  "desNoDataFoundWallet": "Tidak ada data yang ditemukan untuk riwayat dompet!!",
+  "desNoDataFoundWallet":
+      "Tidak ada data yang ditemukan untuk riwayat dompet!!",
   "desNoOrderPlaced": "Tidak ada pesanan yang dilakukan!!",
   "desNoReviewFound": "Tidak ada ulasan yang ditemukan!!",
   "desEnterSalonName": "Masukkan nama salon Anda",

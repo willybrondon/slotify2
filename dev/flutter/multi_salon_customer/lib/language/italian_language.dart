@@ -70,7 +70,8 @@ final Map<String, String> itIT = {
   "txtImage": "Allega la tua immagine o screenshot",
   "txtShare": "Condividere",
   "txtUnderMaintenance": "In manutenzione",
-  "txtSorryUnderMaintenance": "Siamo spiacenti, l'app è attualmente in manutenzione!!",
+  "txtSorryUnderMaintenance":
+      "Siamo spiacenti, l'app è attualmente in manutenzione!!",
   "txtBrowse": "Navigare",
   "txtCloseApp": "Chiudi l'app",
   "txtTopExperts": "I migliori esperti",
@@ -178,17 +179,23 @@ final Map<String, String> itIT = {
   "txtTaxIncluded": "tasse incluse",
   "txtMinutes": "Minuti",
   "txtPleaseSelectService": "Selezionare prima il servizio",
-  "txtWelcomeBack": "Bentornato!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "Notifiche",
+  "txtProductCategoryHeader": "Categoria di prodotto",
   "txtLongTime": "Sei mancato da molto tempo",
   "txtSearchService": "Servizio di ricerca",
   "txtNotAvailableServices": "Servizio non disponibile...!!",
   "desUnderRequirement": "Si prega di compilare i dettagli come richiesto",
   "desNotification": "Ti avviseremo non appena avremo qualcosa per te",
-  "desDisclaimerAgree": "Ho letto il disclaimer e accetto i termini e le condizioni.",
-  "desSuccessfullyBooked": "La tua prenotazione è stata effettuata con successo",
+  "desDisclaimerAgree":
+      "Ho letto il disclaimer e accetto i termini e le condizioni.",
+  "desSuccessfullyBooked":
+      "La tua prenotazione è stata effettuata con successo",
   "desCancelBooking": "Vuoi cancellare questo appuntamento di prenotazione?",
-  "desDeletedPermanently": "Il tuo account verrà eliminato definitivamente. I tuoi dati non verranno ripristinati nuovamente.",
-  "desPleaseAcceptConditions": "Si prega di accettare prima i Termini e le Condizioni",
+  "desDeletedPermanently":
+      "Il tuo account verrà eliminato definitivamente. I tuoi dati non verranno ripristinati nuovamente.",
+  "desPleaseAcceptConditions":
+      "Si prega di accettare prima i Termini e le Condizioni",
   "desLogOut": "Sei sicuro di voler uscire ?",
   "desSlotBooked": "Questo slot è già prenotato",
   "desPreviousSlot": "Non è possibile prenotare slot precedenti",
@@ -199,8 +206,10 @@ final Map<String, String> itIT = {
   "desSetPassword":
       "Imposta la nuova password per il tuo account così\n potrai effettuare il login e accedere a tutte le funzionalità.",
   "desPasswordNotMatch": "La password non corrisponde",
-  "desForgotPassword": "Inserisci la tua email qui sotto per\nricevere le istruzioni per la reimpostazione della password",
-  "desInvalidSlot": "L'orario selezionato non è valido.\n Seleziona un altro orario.",
+  "desForgotPassword":
+      "Inserisci la tua email qui sotto per\nricevere le istruzioni per la reimpostazione della password",
+  "desInvalidSlot":
+      "L'orario selezionato non è valido.\n Seleziona un altro orario.",
   "txtAddNewAddress": "Aggiungi nuovo indirizzo",
   "txtEnterAddressDetails": "Inserisci i dettagli dell'indirizzo",
   "txtAddressLine1": "Indirizzo Linea 1",
@@ -220,7 +229,8 @@ final Map<String, String> itIT = {
   "txtProductPriceDetails": "Dettagli sul prezzo del prodotto",
   "txtProducts": "Prodotti",
   "txtEnterContactDetails": "Inserisci i dettagli di contatto",
-  "txtEnterNumberOrEmail": "Inserisci il tuo numero di cellulare o la tua email",
+  "txtEnterNumberOrEmail":
+      "Inserisci il tuo numero di cellulare o la tua email",
   "txtEnterComplaint": "Inserisci reclamo",
   "txtUpdateProfile": "Aggiorna profilo",
   "txtHistory": "Storia",
@@ -269,7 +279,8 @@ final Map<String, String> itIT = {
   "txtSearchForProducts": "Cerca prodotti...",
   "txtMyAccount": "Il mio conto",
   "txtAccountDetails": "Dettagli account, ID e-mail, dettagli di contatto",
-  "txtMyWalletTransactionHistory": "Il mio portafoglio, cronologia delle transazioni",
+  "txtMyWalletTransactionHistory":
+      "Il mio portafoglio, cronologia delle transazioni",
   "txtMyOrderOrderHistory": "Il mio ordine, Cronologia ordini",
   "txtPrivacyPolicyTC": "Informativa sulla privacy, termini e condizioni",
   "txtRegisterYourSalon": "Registra il tuo salone",
@@ -296,7 +307,8 @@ final Map<String, String> itIT = {
   "desNoDataCart": "Nessun dato trovato per il carrello!!",
   "desNoDataCategoryProduct": "Nessun prodotto trovato per questa categoria!!",
   "desPleaseEnterContact": "Inserisci i dettagli di contatto",
-  "desNoDataFoundWallet": "Nessun dato trovato per la cronologia del portafoglio!!",
+  "desNoDataFoundWallet":
+      "Nessun dato trovato per la cronologia del portafoglio!!",
   "desNoOrderPlaced": "Nessun ordine effettuato!!",
   "desNoReviewFound": "Nessuna recensione trovata!!",
   "desEnterSalonName": "Inserisci il nome del tuo salone",
@@ -311,8 +323,10 @@ final Map<String, String> itIT = {
   "desNoDataFoundSearch": "Nessun dato trovato per questa ricerca",
   "desNoDataFoundAddress": "Nessun indirizzo trovato!!",
   "desNoDataFoundWishlistSalon": "Nessuna lista dei desideri per il salone!!",
-  "desNoDataFoundWishlistProduct": "Nessuna lista dei desideri per il prodotto!!",
+  "desNoDataFoundWishlistProduct":
+      "Nessuna lista dei desideri per il prodotto!!",
   "txtOrderPlacedSuccessfully": "Ordine effettuato con successo!",
-  "txtYourOrderHasSuccessfully": "Il tuo ordine è stato effettuato con successo!!",
+  "txtYourOrderHasSuccessfully":
+      "Il tuo ordine è stato effettuato con successo!!",
   "txtGoToOrderDetails": "Vai ai dettagli dell'ordine",
 };

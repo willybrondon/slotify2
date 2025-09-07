@@ -34,7 +34,7 @@ class NotificationTopView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "txtWelcomeBack".tr,
+                "txtNotifications".tr,
                 style: TextStyle(
                     fontFamily: AppFontFamily.sfProDisplay,
                     fontSize: 18,

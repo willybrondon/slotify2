@@ -178,7 +178,9 @@ final Map<String, String> hiIN = {
   "txtTaxIncluded": "टैक्स शामिल",
   "txtMinutes": "मिनट",
   "txtPleaseSelectService": "कृपया पहले सेवा का चयन करें",
-  "txtWelcomeBack": "वापसी पर स्वागत है!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "सूचनाएं",
+  "txtProductCategoryHeader": "उत्पाद श्रेणी",
   "txtLongTime": "आप लंबे समय से चूक गए हैं",
   "txtSearchService": "खोज सेवा",
   "txtNotAvailableServices": "सेवा उपलब्ध नहीं है...!!",
@@ -187,7 +189,8 @@ final Map<String, String> hiIN = {
   "desDisclaimerAgree": "मैंने अस्वीकरण पढ़ा है और नियम और शर्तों पर सहमत है।",
   "desSuccessfullyBooked": "आपकी बुकिंग सफलतापूर्वक बुक हो गई है",
   "desCancelBooking": "क्या आप इस बुकिंग नियुक्ति को रद्द करना चाहते हैं?",
-  "desDeletedPermanently": "आपका खाता स्थायी रूप से हटा दिया जाएगा। आपका डेटा wil फिर से बहाल नहीं किया गया है।",
+  "desDeletedPermanently":
+      "आपका खाता स्थायी रूप से हटा दिया जाएगा। आपका डेटा wil फिर से बहाल नहीं किया गया है।",
   "desPleaseAcceptConditions": "कृपया पहले नियम और शर्त स्वीकार करें",
   "desLogOut": "क्या आप लॉग आउट करना चाहते हैं ?",
   "desSlotBooked": "यह स्लॉट पहले से ही बुक है",
@@ -197,9 +200,12 @@ final Map<String, String> hiIN = {
   "desEnterEmail": "अपना ईमेल दर्ज करें",
   "desEnterValidEmail": "कृपया एक मान्य ईमेल पता प्रविष्ट करें",
   "desGiveReview": "आप समीक्षा देने में सक्षम नहीं हैं !!",
-  "desSetPassword": "अपने खाते के लिए नया पासवर्ड सेट करें ताकि\n आप लॉग इन कर सकें और सभी सुविधाओं तक पहुंच सकें।",
-  "desForgotPassword": "अपना पासवर्ड रीसेट निर्देश प्राप्त करने\nके लिए नीचे अपना ईमेल दर्ज करें",
-  "desInvalidSlot": "आपके द्वारा चुना गया समय अमान्य है।\nकृपया कोई अन्य समय चुनें।",
+  "desSetPassword":
+      "अपने खाते के लिए नया पासवर्ड सेट करें ताकि\n आप लॉग इन कर सकें और सभी सुविधाओं तक पहुंच सकें।",
+  "desForgotPassword":
+      "अपना पासवर्ड रीसेट निर्देश प्राप्त करने\nके लिए नीचे अपना ईमेल दर्ज करें",
+  "desInvalidSlot":
+      "आपके द्वारा चुना गया समय अमान्य है।\nकृपया कोई अन्य समय चुनें।",
   "txtAddNewAddress": "नया पता जोड़ें",
   "txtEnterAddressDetails": "पता विवरण दर्ज करें",
   "txtAddressLine1": "पता पंक्ति 1",

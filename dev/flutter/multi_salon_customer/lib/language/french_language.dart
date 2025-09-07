@@ -13,7 +13,8 @@ final Map<String, String> frCH = {
   "txtUnderMaintenance": "En maintenance",
   "txtNotVerificationCode": "Vous n'avez pas reçu le code de vérification?",
   "txtHaveAccount": "Vous avez déjà un compte?",
-  "txtSorryUnderMaintenance": "Désolé, l'application est actuellement en maintenance !!",
+  "txtSorryUnderMaintenance":
+      "Désolé, l'application est actuellement en maintenance !!",
   "txtCloseApp": "Fermer l'application",
   "txtNotPayment": "Mode de paiement non disponible !!",
   "txtBookingId": "ID de réservation",
@@ -113,7 +114,8 @@ final Map<String, String> frCH = {
   "txtPassword": "Mot de passe",
   "txtEnterPassword": "Tapez votre mot de passe",
   "txtPleaseEnterPassword": "Veuillez entrer un mot de passe",
-  "txtPasswordCharacters": "Le mot de passe doit contenir au moins 6 caractères",
+  "txtPasswordCharacters":
+      "Le mot de passe doit contenir au moins 6 caractères",
   "txtRememberMe": "Souviens-toi de moi",
   "txtForgetPassword": "Mot de passe oublié?",
   "txtNotMember": "Pas un membre?",
@@ -178,28 +180,37 @@ final Map<String, String> frCH = {
   "txtTaxIncluded": "taxe inclu",
   "txtMinutes": "Minutes",
   "txtPleaseSelectService": "Veuillez sélectionner d'abord le service",
-  "txtWelcomeBack": "Content de te revoir!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "Notifications",
+  "txtProductCategoryHeader": "Catégorie de produit",
   "txtLongTime": "Vous manquez depuis longtemps",
   "txtSearchService": "Service de recherche",
   "txtNotAvailableServices": "Service non disponible...!!",
   "desUnderRequirement": "Veuillez remplir les détails en vertu de l'exigence",
-  "desNotification": "Nous vous informerons une fois que nous aurons quelque chose pour vous",
-  "desDisclaimerAgree": "J'ai lu l'avertissement et je suis d'accord sur les termes et conditions.",
+  "desNotification":
+      "Nous vous informerons une fois que nous aurons quelque chose pour vous",
+  "desDisclaimerAgree":
+      "J'ai lu l'avertissement et je suis d'accord sur les termes et conditions.",
   "desSuccessfullyBooked": "Votre réservation a été effectuée avec succès",
   "desCancelBooking": "Voulez-vous annuler ce rendez-vous de réservation?",
-  "desDeletedPermanently": "Votre compte sera supprimé en permanence. Vos données ne seront plus restaurées.",
+  "desDeletedPermanently":
+      "Votre compte sera supprimé en permanence. Vos données ne seront plus restaurées.",
   "desPleaseAcceptConditions": "Veuillez d'abord accepter les termes et l'état",
   "desLogOut": "Êtes-vous sûr de vouloir vous déconnecter ?",
   "desSlotBooked": "Cette fente est déjà réservée",
-  "desPreviousSlot": "Vous ne pouvez pas réserver des machines à sous précédents",
+  "desPreviousSlot":
+      "Vous ne pouvez pas réserver des machines à sous précédents",
   "desExit": "Êtes-vous sûr de vouloir quitter ?",
   "desEnterEmail": "Veuillez entrer votre email",
   "desGiveReview": "Vous n'êtes pas en mesure de donner votre avis !!",
   "desEnterValidEmail": "S'il vous plaît, mettez une adresse email valide",
-  "desSetPassword": "Définissez le nouveau mot de passe de votre compte afin\n de pouvoir vous connecter et accéder à toutes les fonctionnalités.",
+  "desSetPassword":
+      "Définissez le nouveau mot de passe de votre compte afin\n de pouvoir vous connecter et accéder à toutes les fonctionnalités.",
   "desPasswordNotMatch": "Le mot de passe ne correspond pas",
-  "desForgotPassword": "Entrez votre e-mail ci-dessous pour\nrecevoir vos instructions de réinitialisation de mot de passe",
-  "desInvalidSlot": "L'heure que vous avez sélectionnée est invalide.\n Veuillez sélectionner une autre heure.",
+  "desForgotPassword":
+      "Entrez votre e-mail ci-dessous pour\nrecevoir vos instructions de réinitialisation de mot de passe",
+  "desInvalidSlot":
+      "L'heure que vous avez sélectionnée est invalide.\n Veuillez sélectionner une autre heure.",
   "txtAddNewAddress": "Ajouter une nouvelle adresse",
   "txtEnterAddressDetails": "Entrez les détails de l'adresse",
   "txtAddressLine1": "Adresse Ligne 1",
@@ -267,8 +278,10 @@ final Map<String, String> frCH = {
   "txtPayNow": "Payez maintenant",
   "txtSearchForProducts": "Rechercher des produits...",
   "txtMyAccount": "Mon compte",
-  "txtAccountDetails": "Détails du compte, identifiant de messagerie, coordonnées",
-  "txtMyWalletTransactionHistory": "Mon portefeuille, historique des transactions",
+  "txtAccountDetails":
+      "Détails du compte, identifiant de messagerie, coordonnées",
+  "txtMyWalletTransactionHistory":
+      "Mon portefeuille, historique des transactions",
   "txtMyOrderOrderHistory": "Ma commande, historique des commandes",
   "txtPrivacyPolicyTC": "Politique de confidentialité, CGU",
   "txtRegisterYourSalon": "Enregistrez votre salon",
@@ -295,7 +308,8 @@ final Map<String, String> frCH = {
   "desNoDataCart": "Aucune donnée trouvée pour le panier !!",
   "desNoDataCategoryProduct": "Aucun produit trouvé pour cette catégorie !!",
   "desPleaseEnterContact": "Veuillez entrer les coordonnées",
-  "desNoDataFoundWallet": "Aucune donnée trouvée pour l'historique du portefeuille !!",
+  "desNoDataFoundWallet":
+      "Aucune donnée trouvée pour l'historique du portefeuille !!",
   "desNoOrderPlaced": "Aucune commande passée !!",
   "desNoReviewFound": "Aucun avis trouvé !!",
   "desEnterSalonName": "Entrez le nom de votre salon",
@@ -310,7 +324,8 @@ final Map<String, String> frCH = {
   "desNoDataFoundSearch": "Aucune donnée trouvée pour cette recherche",
   "desNoDataFoundAddress": "Aucune adresse trouvée !!",
   "desNoDataFoundWishlistSalon": "Aucune liste de souhaits pour le salon !!",
-  "desNoDataFoundWishlistProduct": "Aucune liste de souhaits pour le produit !!",
+  "desNoDataFoundWishlistProduct":
+      "Aucune liste de souhaits pour le produit !!",
   "txtOrderPlacedSuccessfully": "Commande passée avec succès!",
   "txtYourOrderHasSuccessfully": "Votre commande a été passée avec succès !!",
   "txtGoToOrderDetails": "Aller aux détails de la commande",

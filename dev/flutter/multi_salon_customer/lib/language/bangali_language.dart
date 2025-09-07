@@ -70,7 +70,8 @@ final Map<String, String> bnIN = {
   "txtImage": "আপনার ছবি বা স্ক্রিনশট সংযুক্ত করুন",
   "txtShare": "শেয়ার করুন",
   "txtUnderMaintenance": "রক্ষণাবেক্ষণের অধীনে",
-  "txtSorryUnderMaintenance": "দুঃখিত, অ্যাপটি বর্তমানে রক্ষণাবেক্ষণের অধীনে রয়েছে !!",
+  "txtSorryUnderMaintenance":
+      "দুঃখিত, অ্যাপটি বর্তমানে রক্ষণাবেক্ষণের অধীনে রয়েছে !!",
   "txtBrowse": "ব্রাউজ করুন",
   "txtCloseApp": "অ্যাপ বন্ধ করুন",
   "txtTopExperts": "শীর্ষ বিশেষজ্ঞ",
@@ -178,7 +179,9 @@ final Map<String, String> bnIN = {
   "txtTaxIncluded": "কর সংযুক্তি",
   "txtMinutes": "মিনিট",
   "txtPleaseSelectService": "অনুগ্রহ করে প্রথমে পরিষেবা নির্বাচন করুন",
-  "txtWelcomeBack": "ফিরে আসার জন্য স্বাগতম!",
+  "txtWelcomeBack": "Skedisy",
+  "txtNotifications": "বিজ্ঞপ্তি",
+  "txtProductCategoryHeader": "পণ্য বিভাগ",
   "txtLongTime": "আপনি দীর্ঘ সময়ের জন্য মিস করা হয়েছে",
   "txtSearchService": "সার্চ সার্ভিস",
   "txtNotAvailableServices": "কর্ম খালি নাই...!!",
@@ -187,7 +190,8 @@ final Map<String, String> bnIN = {
   "desDisclaimerAgree": "আমি দাবিত্যাগটি পড়েছি এবং শর্তাবলীতে সম্মত।",
   "desSuccessfullyBooked": "আপনার বুকিং সফলভাবে বুক করা হয়েছে",
   "desCancelBooking": "আপনি কি এই বুকিং অ্যাপয়েন্টমেন্ট বাতিল করতে চান?",
-  "desDeletedPermanently": "আপনার অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলা হবে. আপনার ডেটা আবার পুনরুদ্ধার করা হবে না।",
+  "desDeletedPermanently":
+      "আপনার অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলা হবে. আপনার ডেটা আবার পুনরুদ্ধার করা হবে না।",
   "desPleaseAcceptConditions": "অনুগ্রহ করে প্রথমে শর্তাবলী স্বীকার করুন",
   "desLogOut": "আপনি লগ আউট করতে চান ?",
   "desSlotBooked": "এই স্লট ইতিমধ্যেই বুক করা আছে",
@@ -199,8 +203,10 @@ final Map<String, String> bnIN = {
   "desSetPassword":
       "আপনার অ্যাকাউন্টের জন্য নতুন পাসওয়ার্ড সেট করুন যাতে\n আপনি লগইন করতে এবং সমস্ত বৈশিষ্ট্য অ্যাক্সেস করতে পারেন৷",
   "desPasswordNotMatch": "পাসওয়ার্ড মেলে না",
-  "desForgotPassword": "আপনার পাসওয়ার্ড পুনরায় সেট করার নির্দেশনা পেতে\nনিচে আপনার ইমেল লিখুন",
-  "desInvalidSlot": "আপনার নির্বাচিত সময়টি অবৈধ৷\n অনুগ্রহ করে অন্য সময় নির্বাচন করুন৷",
+  "desForgotPassword":
+      "আপনার পাসওয়ার্ড পুনরায় সেট করার নির্দেশনা পেতে\nনিচে আপনার ইমেল লিখুন",
+  "desInvalidSlot":
+      "আপনার নির্বাচিত সময়টি অবৈধ৷\n অনুগ্রহ করে অন্য সময় নির্বাচন করুন৷",
   "txtAddNewAddress": "নতুন ঠিকানা যোগ করুন",
   "txtEnterAddressDetails": "ঠিকানার বিবরণ লিখুন",
   "txtAddressLine1": "ঠিকানা লাইন 1",

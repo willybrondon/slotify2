@@ -85,7 +85,7 @@ class ProductWelcomeHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "txtWelcomeBack".tr,
+                "txtProductCategoryHeader".tr,
                 style: TextStyle(
                     fontFamily: AppFontFamily.sfProDisplay,
                     fontSize: 18,
@@ -179,15 +179,6 @@ class ProductProductCategoryView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ViewAll(
-          title: "txtProductCategory".tr,
-          subtitle: "txtViewAll".tr,
-          onTap: () {
-            Get.toNamed(
-              AppRoutes.productCategory,
-            );
-          },
-        ).paddingOnly(bottom: 10),
         GetBuilder<HomeScreenController>(
           id: Constant.idProgressView,
           builder: (logic) {
