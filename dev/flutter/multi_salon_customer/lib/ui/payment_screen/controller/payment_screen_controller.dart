@@ -194,7 +194,6 @@ class PaymentScreenController extends GetxController {
 
   //----------- API Variables -----------//
   DepositToWalletModel? depositToWalletModel;
-  RxBool isLoading = false.obs;
 
   onDepositToWalletApiCall(
       {required String userId,
