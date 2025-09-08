@@ -25,7 +25,7 @@ class WithdrawMethodAppBarView extends StatelessWidget {
         },
         child: Icon(
           Icons.arrow_back,
-          color: AppColors.whiteColor,
+          color: AppColors.blackColor,
         ),
       ),
     );
@@ -135,7 +135,9 @@ class SelectWithdrawMethodBottomSheetView extends StatelessWidget {
                   return Column(
                     children: [
                       const SizedBox(height: 15),
-                      for (int index = 0; index < logic.withdrawMethods.length; index++)
+                      for (int index = 0;
+                          index < logic.withdrawMethods.length;
+                          index++)
                         GestureDetector(
                           onTap: () {
                             logic.onChangePaymentMethod(
@@ -162,12 +164,18 @@ class SelectWithdrawMethodBottomSheetView extends StatelessWidget {
                                   width: 40,
                                   child: Center(
                                     child: CachedNetworkImage(
-                                      imageUrl: logic.getWithdrawMethodModel?.data?[index].image ?? "",
+                                      imageUrl: logic.getWithdrawMethodModel
+                                              ?.data?[index].image ??
+                                          "",
                                       placeholder: (context, url) {
-                                        return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
+                                        return Image.asset(
+                                                AppAsset.icPlaceholder)
+                                            .paddingAll(10);
                                       },
                                       errorWidget: (context, url, error) {
-                                        return Image.asset(AppAsset.icPlaceholder).paddingAll(10);
+                                        return Image.asset(
+                                                AppAsset.icPlaceholder)
+                                            .paddingAll(10);
                                       },
                                     ),
                                   ),
@@ -186,7 +194,10 @@ class SelectWithdrawMethodBottomSheetView extends StatelessWidget {
                                   width: Get.width * 0.06,
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: logic.selectedPaymentMethod == index ? AppColors.service : AppColors.border,
+                                      color:
+                                          logic.selectedPaymentMethod == index
+                                              ? AppColors.service
+                                              : AppColors.border,
                                       width: 1.3,
                                     ),
                                     shape: BoxShape.circle,
@@ -240,11 +251,23 @@ class AddBankDetailInfoView extends StatelessWidget {
                       : Column(
                           children: [
                             for (int i = 0;
-                                i < controller.withdrawMethods[controller.selectedPaymentMethod ?? 0].details!.length;
+                                i <
+                                    controller
+                                        .withdrawMethods[
+                                            controller.selectedPaymentMethod ??
+                                                0]
+                                        .details!
+                                        .length;
                                 i++)
                               WithdrawDetailsItemView(
-                                title: controller.withdrawMethods[controller.selectedPaymentMethod ?? 0].details?[i] ?? "",
-                                controller: controller.withdrawPaymentDetails[i],
+                                title: controller
+                                        .withdrawMethods[
+                                            controller.selectedPaymentMethod ??
+                                                0]
+                                        .details?[i] ??
+                                    "",
+                                controller:
+                                    controller.withdrawPaymentDetails[i],
                               ),
                           ],
                         );

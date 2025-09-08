@@ -44,7 +44,7 @@ class OrderSummary extends StatelessWidget {
             },
             child: Icon(
               Icons.arrow_back,
-              color: AppColors.whiteColor,
+              color: AppColors.blackColor,
             ),
           ),
         ),
@@ -71,7 +71,9 @@ class OrderSummary extends StatelessWidget {
                     child: Container(
                       height: 35,
                       width: 100,
-                      decoration: BoxDecoration(color: AppColors.tabUnSelect, borderRadius: BorderRadius.circular(40)),
+                      decoration: BoxDecoration(
+                          color: AppColors.tabUnSelect,
+                          borderRadius: BorderRadius.circular(40)),
                       child: Center(
                         child: Text(
                           logic.selectedDate.toString(),
@@ -91,7 +93,8 @@ class OrderSummary extends StatelessWidget {
           GetBuilder<OrderSummaryController>(
             id: Constant.idProgressView,
             builder: (logic) {
-              String currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
+              String currentMonth =
+                  DateFormat('yyyy-MM').format(DateTime.now());
               log("The current month :: $currentMonth");
               return logic.selectedDate == currentMonth
                   ? TabBar(
@@ -113,7 +116,8 @@ class OrderSummary extends StatelessWidget {
                       isScrollable: true,
                       unselectedLabelColor: AppColors.service,
                       dividerColor: Colors.transparent,
-                      overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                      overlayColor:
+                          WidgetStatePropertyAll(AppColors.transparent),
                     )
                   : const OrderSummaryTabView();
             },
@@ -126,7 +130,8 @@ class OrderSummary extends StatelessWidget {
                       child: TabBarView(
                         controller: logic.tabController,
                         physics: const BouncingScrollPhysics(),
-                        children: List.generate(4, (index) => const OrderSummaryTabView()),
+                        children: List.generate(
+                            4, (index) => const OrderSummaryTabView()),
                       ),
                     )
                   : const SizedBox.shrink();
@@ -162,20 +167,29 @@ class OrderSummaryTabView extends StatelessWidget {
                       }
                     },
                     child: Container(
-                      margin: const EdgeInsets.only(top: 5, right: 5, bottom: 10),
+                      margin:
+                          const EdgeInsets.only(top: 5, right: 5, bottom: 10),
                       alignment: Alignment.center,
                       height: 30,
                       child: Row(
                         children: [
                           Text(
                             "txtPendingBooking".tr,
-                            style: TextStyle(fontFamily: AppFontFamily.sfProDisplayMedium, color: AppColors.title, fontSize: 15),
+                            style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplayMedium,
+                                color: AppColors.title,
+                                fontSize: 15),
                           ),
                           const Spacer(),
                           Text(
-                            logic.getOrderSummaryData?.bookingStats?.pendingBooking.toString() ?? "",
+                            logic.getOrderSummaryData?.bookingStats
+                                    ?.pendingBooking
+                                    .toString() ??
+                                "",
                             style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
+                                fontFamily: AppFontFamily.sfProDisplayBold,
+                                color: AppColors.primaryTextColor,
+                                fontSize: 17),
                           ).paddingOnly(right: Get.width * 0.05),
                           Image.asset(
                             AppAsset.icArrowRight,
@@ -197,7 +211,8 @@ class OrderSummaryTabView extends StatelessWidget {
                       }
                     },
                     child: Container(
-                      margin: const EdgeInsets.only(top: 5, right: 5, bottom: 10),
+                      margin:
+                          const EdgeInsets.only(top: 5, right: 5, bottom: 10),
                       alignment: Alignment.center,
                       height: 30,
                       child: Row(
@@ -212,9 +227,14 @@ class OrderSummaryTabView extends StatelessWidget {
                           ),
                           const Spacer(),
                           Text(
-                            logic.getOrderSummaryData?.bookingStats?.completedBooking.toString() ?? "",
+                            logic.getOrderSummaryData?.bookingStats
+                                    ?.completedBooking
+                                    .toString() ??
+                                "",
                             style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
+                                fontFamily: AppFontFamily.sfProDisplayBold,
+                                color: AppColors.primaryTextColor,
+                                fontSize: 17),
                           ).paddingOnly(right: Get.width * 0.05),
                           Image.asset(
                             AppAsset.icArrowRight,
@@ -236,7 +256,8 @@ class OrderSummaryTabView extends StatelessWidget {
                       }
                     },
                     child: Container(
-                      margin: const EdgeInsets.only(top: 5, right: 5, bottom: 10),
+                      margin:
+                          const EdgeInsets.only(top: 5, right: 5, bottom: 10),
                       alignment: Alignment.center,
                       height: 30,
                       child: Row(
@@ -251,9 +272,14 @@ class OrderSummaryTabView extends StatelessWidget {
                           ),
                           const Spacer(),
                           Text(
-                            logic.getOrderSummaryData?.bookingStats?.cancelBooking.toString() ?? "",
+                            logic.getOrderSummaryData?.bookingStats
+                                    ?.cancelBooking
+                                    .toString() ??
+                                "",
                             style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 17),
+                                fontFamily: AppFontFamily.sfProDisplayBold,
+                                color: AppColors.primaryTextColor,
+                                fontSize: 17),
                           ).paddingOnly(right: Get.width * 0.05),
                           Image.asset(
                             AppAsset.icArrowRight,

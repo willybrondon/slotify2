@@ -12,7 +12,8 @@ import 'package:salon_2/utils/shimmer.dart';
 class AttendanceScreen extends StatelessWidget {
   AttendanceScreen({super.key});
 
-  final AttendanceController attendanceController = Get.find<AttendanceController>();
+  final AttendanceController attendanceController =
+      Get.find<AttendanceController>();
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class AttendanceScreen extends StatelessWidget {
             },
             child: Icon(
               Icons.arrow_back,
-              color: AppColors.whiteColor,
+              color: AppColors.blackColor,
             ),
           ),
         ),
@@ -78,7 +79,8 @@ class AttendanceScreen extends StatelessWidget {
                   return logic.isLoading.value
                       ? Shimmers.attendanceShimmer()
                       : Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 12),
                           margin: const EdgeInsets.only(top: 15),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(22),
@@ -92,26 +94,34 @@ class AttendanceScreen extends StatelessWidget {
                           child: Column(
                             children: [
                               Container(
-                                margin: const EdgeInsets.only(top: 5, right: 10, bottom: 10),
+                                margin: const EdgeInsets.only(
+                                    top: 5, right: 10, bottom: 10),
                                 alignment: Alignment.center,
                                 height: 30,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "txtTotalAvailableDay".tr,
                                       style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayMedium,
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayMedium,
                                         color: AppColors.title,
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      logic.getAttendanceMonthModel != null && logic.getAttendanceMonthModel!.data!.isNotEmpty
-                                          ? (logic.getAttendanceMonthModel!.data!.first.attendCount.toString())
+                                      logic.getAttendanceMonthModel != null &&
+                                              logic.getAttendanceMonthModel!
+                                                  .data!.isNotEmpty
+                                          ? (logic.getAttendanceMonthModel!
+                                              .data!.first.attendCount
+                                              .toString())
                                           : "0",
                                       style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayBold,
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayBold,
                                         color: AppColors.primaryTextColor,
                                         fontSize: 17,
                                       ),
@@ -119,56 +129,74 @@ class AttendanceScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              Divider(color: AppColors.greyColor.withOpacity(0.1)),
+                              Divider(
+                                  color: AppColors.greyColor.withOpacity(0.1)),
                               Container(
-                                margin: const EdgeInsets.only(top: 5, right: 10, bottom: 10),
+                                margin: const EdgeInsets.only(
+                                    top: 5, right: 10, bottom: 10),
                                 alignment: Alignment.center,
                                 height: 30,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "txtNotAvailableDay".tr,
                                       style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayMedium,
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayMedium,
                                         color: AppColors.title,
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      logic.getAttendanceMonthModel != null && logic.getAttendanceMonthModel!.data!.isNotEmpty
-                                          ? (logic.getAttendanceMonthModel!.data!.first.absentCount.toString())
+                                      logic.getAttendanceMonthModel != null &&
+                                              logic.getAttendanceMonthModel!
+                                                  .data!.isNotEmpty
+                                          ? (logic.getAttendanceMonthModel!
+                                              .data!.first.absentCount
+                                              .toString())
                                           : "0",
                                       style: TextStyle(
-                                          fontFamily: AppFontFamily.sfProDisplayBold,
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayBold,
                                           color: AppColors.primaryTextColor,
                                           fontSize: 17),
                                     )
                                   ],
                                 ),
                               ),
-                              Divider(color: AppColors.greyColor.withOpacity(0.1)),
+                              Divider(
+                                  color: AppColors.greyColor.withOpacity(0.1)),
                               Container(
-                                margin: const EdgeInsets.only(top: 5, right: 10, bottom: 10),
+                                margin: const EdgeInsets.only(
+                                    top: 5, right: 10, bottom: 10),
                                 alignment: Alignment.center,
                                 height: 30,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "txtTotalDay".tr,
                                       style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayMedium,
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayMedium,
                                         color: AppColors.title,
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      logic.getAttendanceMonthModel != null && logic.getAttendanceMonthModel!.data!.isNotEmpty
-                                          ? (logic.getAttendanceMonthModel!.data!.first.totalDays.toString())
+                                      logic.getAttendanceMonthModel != null &&
+                                              logic.getAttendanceMonthModel!
+                                                  .data!.isNotEmpty
+                                          ? (logic.getAttendanceMonthModel!
+                                              .data!.first.totalDays
+                                              .toString())
                                           : "0",
                                       style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayBold,
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayBold,
                                         color: AppColors.primaryTextColor,
                                         fontSize: 17,
                                       ),
