@@ -629,7 +629,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                            crossAxisCount: 3,
                             childAspectRatio: 0.87,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
@@ -704,7 +704,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                     fontFamily:
                                                         AppFontFamily.heeBo700,
                                                     fontSize: 13.5,
-                                                    color: AppColors.blackColor,
+                                                    color: AppColors.appText,
                                                   ),
                                                 ),
                                               ),
@@ -765,23 +765,9 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                     ? Image.asset(
                                                         AppAsset.icCheckRound,
                                                         height: 28)
-                                                    : Container(
-                                                        height: 28,
-                                                        width: 28,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: AppColors
-                                                              .blackColor,
-                                                          shape:
-                                                              BoxShape.circle,
-                                                        ),
-                                                        child: Image.asset(
-                                                          AppAsset.icPlusRound,
-                                                          height: 28,
-                                                          color: AppColors
-                                                              .whiteColor,
-                                                        ),
-                                                      ),
+                                                    : Image.asset(
+                                                        AppAsset.icPlusRound,
+                                                        height: 28),
                                               ),
                                             ],
                                           ),
