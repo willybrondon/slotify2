@@ -40,12 +40,10 @@ class BranchDetailTopView extends StatelessWidget {
                 child: CachedNetworkImage(
                   imageUrl: "${logic.getSalonDetailCategory?.salon?.mainImage}",
                   fit: BoxFit.cover,
-                  width: Get.width,
-                  height: 230, // Match the container height
                   placeholder: (context, url) {
                     return Container(
                       width: Get.width,
-                      height: 230, // Match the container height
+                      height: 230,
                       color: AppColors.grey.withOpacity(0.1),
                       child: Image.asset(AppAsset.icImagePlaceholder)
                           .paddingAll(25),
@@ -54,7 +52,7 @@ class BranchDetailTopView extends StatelessWidget {
                   errorWidget: (context, url, error) {
                     return Container(
                       width: Get.width,
-                      height: 230, // Match the container height
+                      height: 230,
                       color: AppColors.grey.withOpacity(0.1),
                       child: Image.asset(AppAsset.icImagePlaceholder)
                           .paddingAll(30),
@@ -236,7 +234,7 @@ class BranchDetailDataView extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: AppColors.appText,
+                          color: AppColors.blackColor,
                           boxShadow: Constant.boxShadow,
                         ),
                         child: Row(
@@ -270,7 +268,7 @@ class BranchDetailDataView extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: AppColors.callBox,
+                          color: AppColors.blackColor,
                           boxShadow: Constant.boxShadow,
                         ),
                         child: Row(
@@ -631,7 +629,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
+                            crossAxisCount: 2,
                             childAspectRatio: 0.87,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
@@ -706,7 +704,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                     fontFamily:
                                                         AppFontFamily.heeBo700,
                                                     fontSize: 13.5,
-                                                    color: AppColors.appText,
+                                                    color: AppColors.blackColor,
                                                   ),
                                                 ),
                                               ),
@@ -767,9 +765,23 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                     ? Image.asset(
                                                         AppAsset.icCheckRound,
                                                         height: 28)
-                                                    : Image.asset(
-                                                        AppAsset.icPlusRound,
-                                                        height: 28),
+                                                    : Container(
+                                                        height: 28,
+                                                        width: 28,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: AppColors
+                                                              .blackColor,
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                        child: Image.asset(
+                                                          AppAsset.icPlusRound,
+                                                          height: 28,
+                                                          color: AppColors
+                                                              .whiteColor,
+                                                        ),
+                                                      ),
                                               ),
                                             ],
                                           ),

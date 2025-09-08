@@ -22,6 +22,9 @@ class ProductPaymentAppBarView extends StatelessWidget {
       method: InkWell(
         overlayColor: WidgetStatePropertyAll(AppColors.transparent),
         onTap: () {
+          // Stop any ongoing loading states and go back immediately
+          final productPaymentController = Get.find<ProductPaymentController>();
+          productPaymentController.isLoading.value = false;
           Get.back();
         },
         child: Icon(

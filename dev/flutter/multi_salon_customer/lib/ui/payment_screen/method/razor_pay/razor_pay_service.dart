@@ -36,12 +36,18 @@ class RazorPayService {
 
   SplashController splashController = Get.put(SplashController());
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
-  SearchScreenController searchScreenController = Get.put(SearchScreenController());
-  CategoryDetailController categoryDetailController = Get.put(CategoryDetailController());
-  BookingScreenController bookingScreenController = Get.put(BookingScreenController());
-  BranchDetailController branchDetailController = Get.put(BranchDetailController());
-  SelectBranchController selectBranchController = Get.put(SelectBranchController());
-  PaymentScreenController paymentScreenController = Get.put(PaymentScreenController());
+  SearchScreenController searchScreenController =
+      Get.put(SearchScreenController());
+  CategoryDetailController categoryDetailController =
+      Get.put(CategoryDetailController());
+  BookingScreenController bookingScreenController =
+      Get.put(BookingScreenController());
+  BranchDetailController branchDetailController =
+      Get.put(BranchDetailController());
+  SelectBranchController selectBranchController =
+      Get.put(SelectBranchController());
+  PaymentScreenController paymentScreenController =
+      Get.put(PaymentScreenController());
 
   init({
     String? razorKey,
@@ -94,10 +100,12 @@ class RazorPayService {
       );
 
       if (paymentScreenController.depositToWalletModel?.status == true) {
-        Utils.showToast(Get.context!, paymentScreenController.depositToWalletModel?.message ?? "");
+        Utils.showToast(Get.context!,
+            paymentScreenController.depositToWalletModel?.message ?? "");
         Get.back();
       } else {
-        Utils.showToast(Get.context!, paymentScreenController.depositToWalletModel?.message ?? "");
+        Utils.showToast(Get.context!,
+            paymentScreenController.depositToWalletModel?.message ?? "");
       }
     } else {
       await bookingScreenController.onCreateBookingApiCall(
@@ -121,19 +129,38 @@ class RazorPayService {
         bookingScreenController.withOutTaxRupee = 0.0;
         bookingScreenController.totalPrice = 0.0;
 
-        for (var i = 0; i < (categoryDetailController.getServiceCategory?.services?.length ?? 0); i++) {
+        for (var i = 0;
+            i <
+                (categoryDetailController
+                        .getServiceCategory?.services?.length ??
+                    0);
+            i++) {
           categoryDetailController.onCheckBoxClick(false, i);
         }
 
-        for (var i = 0; i < (homeScreenController.getAllServiceCategory?.services?.length ?? 0); i++) {
+        for (var i = 0;
+            i <
+                (homeScreenController.getAllServiceCategory?.services?.length ??
+                    0);
+            i++) {
           homeScreenController.onServiceCheckBoxClick(false, i);
         }
 
-        for (var i = 0; i < (homeScreenController.getExpertCategory?.data?.services?.length ?? 0); i++) {
+        for (var i = 0;
+            i <
+                (homeScreenController
+                        .getExpertCategory?.data?.services?.length ??
+                    0);
+            i++) {
           homeScreenController.onCheckBoxClick(false, i);
         }
 
-        for (var i = 0; i < (branchDetailController.getSalonDetailCategory?.salon?.serviceIds?.length ?? 0); i++) {
+        for (var i = 0;
+            i <
+                (branchDetailController
+                        .getSalonDetailCategory?.salon?.serviceIds?.length ??
+                    0);
+            i++) {
           branchDetailController.onCheckBoxClick(false, i);
         }
 
@@ -181,7 +208,6 @@ class RazorPayService {
         log("checkItem :: home ${homeScreenController.checkItem} :: category ${categoryDetailController.checkItem} :: branch ${branchDetailController.checkItem} :: search ${searchScreenController.checkItem} ");
         log("serviceId :: home ${homeScreenController.serviceId} :: category ${categoryDetailController.serviceId} :: branch ${branchDetailController.serviceId} :: search ${searchScreenController.serviceId} ");
 
-        1.seconds.delay();
         Get.delete<CategoryDetailController>();
         Get.delete<BranchDetailController>();
         Get.delete<SelectBranchController>();
@@ -197,7 +223,8 @@ class RazorPayService {
           ),
         );
       } else {
-        Utils.showToast(Get.context!, bookingScreenController.createBookingCategory?.message ?? "");
+        Utils.showToast(Get.context!,
+            bookingScreenController.createBookingCategory?.message ?? "");
       }
     }
   }
@@ -212,7 +239,8 @@ class RazorPayService {
 
   void razorPayCheckout() async {
     String userEmail = Constant.storage.read<String>('UserEmail') ?? "";
-    String userContactNumber = Constant.storage.read<String>('UserContactNumber') ?? "";
+    String userContactNumber =
+        Constant.storage.read<String>('UserContactNumber') ?? "";
 
     int amountInPaise = totalAmountWithOutTaxs;
     log("Razor Pay Amount :: $amountInPaise");

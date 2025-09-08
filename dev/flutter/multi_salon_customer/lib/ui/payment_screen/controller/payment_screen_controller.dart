@@ -24,6 +24,9 @@ class PaymentScreenController extends GetxController {
   Map<String, dynamic>?
       bookingData; // Additional booking data for direct payments
 
+  // Loading state management
+  RxBool isLoading = false.obs;
+
   @override
   void onInit() async {
     await getDataFromArgs();
@@ -54,7 +57,9 @@ class PaymentScreenController extends GetxController {
       }
 
       // Set default payment method if not specified
-      selectedPayment ??= isWalletAdd == true ? "Stripe" : "wallet"; // Changed from "Razorpay" to "Stripe" for wallet recharge
+      selectedPayment ??= isWalletAdd == true
+          ? "Stripe"
+          : "wallet"; // Changed from "Razorpay" to "Stripe" for wallet recharge
 
       log("Payment Screen - Is Wallet Add :: $isWalletAdd");
       log("Payment Screen - Is Create Order :: $isCreateOrder");
@@ -92,7 +97,7 @@ class PaymentScreenController extends GetxController {
     //   isLoading(false);
 
     //   RazorPayService().razorPayCheckout();
-    // } else 
+    // } else
     if (selectedPayment == "Stripe") {
       log("it's Stripe");
       isLoading(true);
@@ -140,7 +145,6 @@ class PaymentScreenController extends GetxController {
 
         log("Called stripe Init");
 
-        1.seconds.delay;
         await StripeService().stripePay().then((value) {
           isLoading(false);
           update([Constant.idProgressView]);
@@ -166,7 +170,8 @@ class PaymentScreenController extends GetxController {
         log("Processing Cash After Service payment for direct booking");
         // You can add logic here to handle cash after service if needed
         // For now, just show a success message
-        Utils.showToast(Get.context!, "Cash After Service selected. Please pay at the salon.");
+        Utils.showToast(Get.context!,
+            "Cash After Service selected. Please pay at the salon.");
         Get.back(); // Go back to previous screen
       }
     } else if (selectedPayment == "wallet") {
