@@ -103,13 +103,11 @@ class BranchDetailInfoView extends StatelessWidget {
       builder: (logic) {
         return logic.isLoading.value
             ? Shimmers.branchDetailShimmer()
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const BranchDetailDataView(),
-                    const BranchDetailTabView(),
-                  ],
-                ),
+            : Column(
+                children: [
+                  const BranchDetailDataView(),
+                  const Expanded(child: BranchDetailTabView()),
+                ],
               );
       },
     );
@@ -313,7 +311,7 @@ class BranchDetailTabView extends StatelessWidget {
         const BranchDetailTabBarView(),
         Divider(color: AppColors.greyColor.withOpacity(0.2))
             .paddingOnly(bottom: 5),
-        const BranchDetailTabBarItemView(),
+        const Expanded(child: BranchDetailTabBarItemView()),
       ],
     );
   }
@@ -367,24 +365,22 @@ class BranchDetailTabBarItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: GetBuilder<BranchDetailController>(
-        builder: (logic) {
-          return TabBarView(
-            physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics()),
-            controller: logic.tabController,
-            children: const [
-              BranchDetailTabBarServiceView(),
-              BranchDetailTabBarProductView(),
-              BranchDetailTabBarStaffView(),
-              BranchDetailTabBarGalleryView(),
-              BranchDetailTabBarReviewView(),
-              BranchDetailTabBarAboutView(),
-            ],
-          );
-        },
-      ),
+    return GetBuilder<BranchDetailController>(
+      builder: (logic) {
+        return TabBarView(
+          physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics()),
+          controller: logic.tabController,
+          children: const [
+            BranchDetailTabBarServiceView(),
+            BranchDetailTabBarProductView(),
+            BranchDetailTabBarStaffView(),
+            BranchDetailTabBarGalleryView(),
+            BranchDetailTabBarReviewView(),
+            BranchDetailTabBarAboutView(),
+          ],
+        );
+      },
     );
   }
 }
