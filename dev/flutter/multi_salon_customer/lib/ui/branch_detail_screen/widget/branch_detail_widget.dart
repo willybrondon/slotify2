@@ -27,12 +27,11 @@ class BranchDetailTopView extends StatelessWidget {
       id: Constant.idProgressView,
       builder: (logic) {
         return PreferredSize(
-          preferredSize: const Size.fromHeight(
-              200), // Reduced height for better proportions
+          preferredSize: const Size.fromHeight(230),
           child: Stack(
             children: [
               Container(
-                height: 200, // Reduced height to create gap
+                height: Get.height * 0.3,
                 width: Get.width,
                 decoration: BoxDecoration(
                   color: AppColors.transparent,
@@ -42,48 +41,25 @@ class BranchDetailTopView extends StatelessWidget {
                   imageUrl: "${logic.getSalonDetailCategory?.salon?.mainImage}",
                   fit: BoxFit.cover,
                   placeholder: (context, url) {
-                    return Container(
-                      width: Get.width,
-                      height: 200,
-                      color: AppColors.grey.withOpacity(0.1),
-                      child: Image.asset(AppAsset.icImagePlaceholder)
-                          .paddingAll(25),
-                    );
+                    return Image.asset(AppAsset.icImagePlaceholder)
+                        .paddingAll(25);
                   },
                   errorWidget: (context, url, error) {
-                    return Container(
-                      width: Get.width,
-                      height: 200,
-                      color: AppColors.grey.withOpacity(0.1),
-                      child: Image.asset(AppAsset.icImagePlaceholder)
-                          .paddingAll(30),
-                    );
+                    return Image.asset(AppAsset.icImagePlaceholder)
+                        .paddingAll(30);
                   },
                 ),
               ),
-              Positioned(
-                top: 50, // Better positioning from top
-                left: 20,
-                child: GestureDetector(
-                  onTap: () {
-                    Get.back();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(
-                        8), // Add padding for better touch area
-                    decoration: BoxDecoration(
-                      color: AppColors.blackColor
-                          .withOpacity(0.3), // Semi-transparent background
-                      shape: BoxShape.circle,
-                    ),
-                    child: Image.asset(
-                      AppAsset.icBackArrow,
-                      height: 20,
-                      width: 20,
-                      color: AppColors.whiteColor,
-                    ),
-                  ),
-                ),
+              GestureDetector(
+                onTap: () {
+                  Get.back();
+                },
+                child: Image.asset(
+                  AppAsset.icBackArrow,
+                  height: 25,
+                  width: 25,
+                  color: AppColors.whiteColor,
+                ).paddingOnly(left: 20, top: 25),
               ),
             ],
           ),
@@ -104,13 +80,17 @@ class BranchDetailInfoView extends StatelessWidget {
       builder: (logic) {
         return logic.isLoading.value
             ? Shimmers.branchDetailShimmer()
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const BranchDetailDataView(),
-                    const BranchDetailTabView(),
-                  ],
-                ),
+            : NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
+                    const SliverList(
+                      delegate: SliverChildListDelegate.fixed(
+                        [BranchDetailDataView()],
+                      ),
+                    ),
+                  ];
+                },
+                body: const BranchDetailTabView(),
               );
       },
     );
@@ -129,8 +109,6 @@ class BranchDetailDataView extends StatelessWidget {
           color: AppColors.detailBg,
           child: Column(
             children: [
-              // Add gap between photo and salon details
-              SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -143,7 +121,7 @@ class BranchDetailDataView extends StatelessWidget {
                     ),
                   ),
                 ],
-              ).paddingOnly(left: 15, right: 15, bottom: 10),
+              ).paddingOnly(top: 10, left: 15, right: 15, bottom: 10),
               Row(
                 children: [
                   Image.asset(
@@ -237,7 +215,7 @@ class BranchDetailDataView extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: AppColors.blackColor,
+                          color: AppColors.appText,
                           boxShadow: Constant.boxShadow,
                         ),
                         child: Row(
@@ -271,7 +249,7 @@ class BranchDetailDataView extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: AppColors.blackColor,
+                          color: AppColors.callBox,
                           boxShadow: Constant.boxShadow,
                         ),
                         child: Row(
@@ -370,22 +348,24 @@ class BranchDetailTabBarItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<BranchDetailController>(
-      builder: (logic) {
-        return TabBarView(
-          physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics()),
-          controller: logic.tabController,
-          children: const [
-            BranchDetailTabBarServiceView(),
-            BranchDetailTabBarProductView(),
-            BranchDetailTabBarStaffView(),
-            BranchDetailTabBarGalleryView(),
-            BranchDetailTabBarReviewView(),
-            BranchDetailTabBarAboutView(),
-          ],
-        );
-      },
+    return Expanded(
+      child: GetBuilder<BranchDetailController>(
+        builder: (logic) {
+          return TabBarView(
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
+            controller: logic.tabController,
+            children: const [
+              BranchDetailTabBarServiceView(),
+              BranchDetailTabBarProductView(),
+              BranchDetailTabBarStaffView(),
+              BranchDetailTabBarGalleryView(),
+              BranchDetailTabBarReviewView(),
+              BranchDetailTabBarAboutView(),
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -467,6 +447,132 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: GetBuilder<BranchDetailController>(
+        id: Constant.idBottomService,
+        builder: (logic) {
+          return logic.checkItem.isNotEmpty
+              ? Container(
+                  height: Get.height * 0.120,
+                  width: double.infinity,
+                  alignment: Alignment.bottomLeft,
+                  decoration: BoxDecoration(
+                    color: AppColors.categoryBottom,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.blackColor.withOpacity(0.05),
+                        offset: const Offset(
+                          0.0,
+                          1.0,
+                        ),
+                        blurRadius: 2.0,
+                        spreadRadius: 2.0,
+                      ), //BoxShadow
+                      const BoxShadow(
+                        color: Colors.black12,
+                        offset: Offset(0.0, 0.0),
+                        blurRadius: 0.0,
+                        spreadRadius: 0.0,
+                      ),
+                    ],
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 23,
+                              width: Get.width * 0.61,
+                              child: SizedBox(
+                                height: 20,
+                                width: Get.width * 0.02,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Text(
+                                    logic.checkItem.join(", "),
+                                    style: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                      fontSize: 17,
+                                      color: AppColors.categoryService,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ).paddingOnly(left: 5, bottom: 7),
+                            Row(
+                              children: [
+                                Text(
+                                  "$currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
+                                  style: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                      fontSize: 15,
+                                      color:
+                                          AppColors.currency.withOpacity(0.9)),
+                                ),
+                                Text(
+                                  " ($currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr})",
+                                  style: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                      fontSize: 12,
+                                      color:
+                                          AppColors.currency.withOpacity(0.9)),
+                                ),
+                                SizedBox(width: Get.width * 0.02),
+                                Text(
+                                  "= $currency ${logic.totalPrice.toStringAsFixed(2)}",
+                                  style: TextStyle(
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
+                                      fontSize: 17,
+                                      color: AppColors.currency),
+                                ),
+                              ],
+                            ).paddingOnly(left: 5),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      AppButton(
+                        height: 50,
+                        buttonColor: AppColors.primaryAppColor,
+                        buttonText: "txtBookNow".tr,
+                        width: Get.width * 0.28,
+                        fontFamily: AppFontFamily.sfProDisplay,
+                        color: AppColors.whiteColor,
+                        onTap: () async {
+                          if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                            log("Total Minute :: ${logic.totalMinute}");
+                            Get.toNamed(AppRoutes.booking, arguments: [
+                              logic.checkItem,
+                              double.parse(logic.totalPrice.toStringAsFixed(2)),
+                              double.parse(
+                                  logic.finalTaxRupee.toStringAsFixed(2)),
+                              logic.totalMinute,
+                              logic.serviceId,
+                              logic.withOutTaxRupee,
+                              logic.salonId
+                            ]);
+                          } else {
+                            Get.toNamed(AppRoutes.signIn,
+                                arguments: [logic.checkItem.isNotEmpty]);
+                            await Get.find<SignInController>()
+                                .getDataFromArgs();
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                )
+              : const SizedBox();
+        },
+      ),
       body: GetBuilder<BranchDetailController>(
         id: Constant.idProgressView,
         builder: (logic) {
@@ -492,338 +598,170 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                         ],
                       ),
                     )
-                  : Column(
-                      children: [
-                        GetBuilder<BranchDetailController>(
-                          id: Constant.idServiceList,
-                          builder: (logic) {
-                            return GridView.builder(
-                              itemCount: logic.getSalonDetailCategory?.salon
-                                      ?.serviceIds?.length ??
-                                  0,
-                              shrinkWrap: true,
-                              padding: EdgeInsets.zero,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 0.87,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                              ),
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (logic.isBranchSelected[index] == true) {
-                                      logic.onCheckBoxClick(false, index);
-                                    } else {
-                                      logic.onCheckBoxClick(true, index);
-                                    }
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(18),
-                                      color: AppColors.whiteColor,
-                                      border: Border.all(
-                                        color: AppColors.serviceBgBorder,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            width: Get.width,
-                                            decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(16),
-                                                  topRight:
-                                                      Radius.circular(16)),
-                                            ),
-                                            clipBehavior: Clip.hardEdge,
-                                            child: CachedNetworkImage(
-                                              imageUrl:
-                                                  "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
-                                              fit: BoxFit.cover,
-                                              placeholder: (context, url) {
-                                                return Image.asset(AppAsset
-                                                        .icServicePlaceholder)
-                                                    .paddingAll(11);
-                                              },
-                                              errorWidget:
-                                                  (context, url, error) {
-                                                return Image.asset(AppAsset
-                                                        .icServicePlaceholder)
-                                                    .paddingAll(11);
-                                              },
-                                            ),
-                                          ).paddingOnly(
-                                              left: 3, right: 3, top: 3),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  SizedBox(
-                                                    width: Get.width * 0.3,
-                                                    child: Text(
-                                                      logic
-                                                              .getSalonDetailCategory
-                                                              ?.salon
-                                                              ?.serviceIds?[
-                                                                  index]
-                                                              .serviceIdId
-                                                              ?.name ??
-                                                          "",
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            AppFontFamily
-                                                                .heeBo700,
-                                                        fontSize: 13.5,
-                                                        color:
-                                                            AppColors.appText,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const Spacer(),
-                                                  Image.asset(
-                                                    AppAsset.icStarFilled,
-                                                    height: 14,
-                                                    width: 14,
-                                                  ).paddingOnly(right: 5),
-                                                  Text(
-                                                    "4.8",
-                                                    style: TextStyle(
-                                                      color: AppColors
-                                                          .ratingYellow,
-                                                      fontSize: 12,
-                                                      fontFamily: AppFontFamily
-                                                          .heeBo700,
-                                                    ),
-                                                  ).paddingOnly(top: 3),
-                                                ],
-                                              ),
-                                              Text(
-                                                "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.duration} ${"txtMinutes".tr}",
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      AppFontFamily.heeBo600,
-                                                  fontSize: 13,
-                                                  color: AppColors.service,
-                                                ),
-                                              ).paddingOnly(top: 4, bottom: 4),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "$currency ${logic.getSalonDetailCategory?.salon?.serviceIds?[index].price?.toStringAsFixed(2)}",
-                                                    style: TextStyle(
-                                                      fontFamily: AppFontFamily
-                                                          .heeBo800,
-                                                      fontSize: 14.5,
-                                                      color: AppColors
-                                                          .primaryAppColor,
-                                                    ),
-                                                  ),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      if (logic.isBranchSelected[
-                                                              index] ==
-                                                          true) {
-                                                        logic.onCheckBoxClick(
-                                                            false, index);
-                                                      } else {
-                                                        logic.onCheckBoxClick(
-                                                            true, index);
-                                                      }
-                                                    },
-                                                    child: logic.isBranchSelected[
-                                                            index]
-                                                        ? Image.asset(
-                                                            AppAsset
-                                                                .icCheckRound,
-                                                            height: 28)
-                                                        : Image.asset(
-                                                            AppAsset
-                                                                .icPlusRound,
-                                                            height: 28),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
+                  : GetBuilder<BranchDetailController>(
+                      id: Constant.idServiceList,
+                      builder: (logic) {
+                        return GridView.builder(
+                          itemCount: logic.getSalonDetailCategory?.salon
+                                  ?.serviceIds?.length ??
+                              0,
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.87,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () {
+                                if (logic.isBranchSelected[index] == true) {
+                                  logic.onCheckBoxClick(false, index);
+                                } else {
+                                  logic.onCheckBoxClick(true, index);
+                                }
                               },
-                            ).paddingOnly(left: 12, right: 12, bottom: 12);
-                          },
-                        ),
-                        // Service selection and booking section below the grid
-                        GetBuilder<BranchDetailController>(
-                          id: Constant.idBottomService,
-                          builder: (logic) {
-                            return logic.checkItem.isNotEmpty
-                                ? Container(
-                                    height: Get.height * 0.120,
-                                    width: double.infinity,
-                                    alignment: Alignment.bottomLeft,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.categoryBottom,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.blackColor
-                                              .withOpacity(0.05),
-                                          offset: const Offset(
-                                            0.0,
-                                            1.0,
-                                          ),
-                                          blurRadius: 2.0,
-                                          spreadRadius: 2.0,
-                                        ), //BoxShadow
-                                        const BoxShadow(
-                                          color: Colors.black12,
-                                          offset: Offset(0.0, 0.0),
-                                          blurRadius: 0.0,
-                                          spreadRadius: 0.0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  color: AppColors.whiteColor,
+                                  border: Border.all(
+                                    color: AppColors.serviceBgBorder,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        width: Get.width,
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(16),
+                                              topRight: Radius.circular(16)),
                                         ),
-                                      ],
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) {
+                                            return Image.asset(AppAsset
+                                                    .icServicePlaceholder)
+                                                .paddingAll(11);
+                                          },
+                                          errorWidget: (context, url, error) {
+                                            return Image.asset(AppAsset
+                                                    .icServicePlaceholder)
+                                                .paddingAll(11);
+                                          },
+                                        ),
+                                      ).paddingOnly(left: 3, right: 3, top: 3),
                                     ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Row(
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
                                             children: [
                                               SizedBox(
-                                                height: 23,
-                                                width: Get.width * 0.61,
-                                                child: SizedBox(
-                                                  height: 20,
-                                                  width: Get.width * 0.02,
-                                                  child: SingleChildScrollView(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    child: Text(
-                                                      logic.checkItem
-                                                          .join(", "),
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            AppFontFamily
-                                                                .sfProDisplay,
-                                                        fontSize: 17,
-                                                        color: AppColors
-                                                            .categoryService,
-                                                      ),
-                                                    ),
+                                                width: Get.width * 0.3,
+                                                child: Text(
+                                                  logic
+                                                          .getSalonDetailCategory
+                                                          ?.salon
+                                                          ?.serviceIds?[index]
+                                                          .serviceIdId
+                                                          ?.name ??
+                                                      "",
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        AppFontFamily.heeBo700,
+                                                    fontSize: 13.5,
+                                                    color: AppColors.appText,
                                                   ),
                                                 ),
-                                              ).paddingOnly(left: 5, bottom: 7),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    "$currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
-                                                    style: TextStyle(
-                                                        fontFamily:
-                                                            AppFontFamily
-                                                                .sfProDisplay,
-                                                        fontSize: 15,
-                                                        color: AppColors
-                                                            .currency
-                                                            .withOpacity(0.9)),
-                                                  ),
-                                                  Text(
-                                                    " ($currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr})",
-                                                    style: TextStyle(
-                                                        fontFamily:
-                                                            AppFontFamily
-                                                                .sfProDisplay,
-                                                        fontSize: 12,
-                                                        color: AppColors
-                                                            .currency
-                                                            .withOpacity(0.9)),
-                                                  ),
-                                                  SizedBox(
-                                                      width: Get.width * 0.02),
-                                                  Text(
-                                                    "= $currency ${logic.totalPrice.toStringAsFixed(2)}",
-                                                    style: TextStyle(
-                                                        fontFamily: AppFontFamily
-                                                            .sfProDisplayBold,
-                                                        fontSize: 17,
-                                                        color:
-                                                            AppColors.currency),
-                                                  ),
-                                                ],
-                                              ).paddingOnly(left: 5),
+                                              ),
+                                              const Spacer(),
+                                              Image.asset(
+                                                AppAsset.icStarFilled,
+                                                height: 14,
+                                                width: 14,
+                                              ).paddingOnly(right: 5),
+                                              Text(
+                                                "4.8",
+                                                style: TextStyle(
+                                                  color: AppColors.ratingYellow,
+                                                  fontSize: 12,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo700,
+                                                ),
+                                              ).paddingOnly(top: 3),
                                             ],
                                           ),
-                                        ),
-                                        const Spacer(),
-                                        AppButton(
-                                          height: 50,
-                                          buttonColor:
-                                              AppColors.primaryAppColor,
-                                          buttonText: "txtBookNow".tr,
-                                          width: Get.width * 0.28,
-                                          fontFamily:
-                                              AppFontFamily.sfProDisplay,
-                                          color: AppColors.whiteColor,
-                                          onTap: () async {
-                                            if (Constant.storage
-                                                    .read<bool>('isLogIn') ??
-                                                false) {
-                                              log("Total Minute :: ${logic.totalMinute}");
-                                              Get.toNamed(AppRoutes.booking,
-                                                  arguments: [
-                                                    logic.checkItem,
-                                                    double.parse(logic
-                                                        .totalPrice
-                                                        .toStringAsFixed(2)),
-                                                    double.parse(logic
-                                                        .finalTaxRupee
-                                                        .toStringAsFixed(2)),
-                                                    logic.totalMinute,
-                                                    logic.serviceId,
-                                                    logic.withOutTaxRupee,
-                                                    logic.salonId
-                                                  ]);
-                                            } else {
-                                              Get.toNamed(AppRoutes.signIn,
-                                                  arguments: [
-                                                    logic.checkItem.isNotEmpty
-                                                  ]);
-                                              await Get.find<SignInController>()
-                                                  .getDataFromArgs();
-                                            }
-                                          },
-                                        )
-                                      ],
+                                          Text(
+                                            "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.duration} ${"txtMinutes".tr}",
+                                            style: TextStyle(
+                                              fontFamily:
+                                                  AppFontFamily.heeBo600,
+                                              fontSize: 13,
+                                              color: AppColors.service,
+                                            ),
+                                          ).paddingOnly(top: 4, bottom: 4),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "$currency ${logic.getSalonDetailCategory?.salon?.serviceIds?[index].price?.toStringAsFixed(2)}",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo800,
+                                                  fontSize: 14.5,
+                                                  color:
+                                                      AppColors.primaryAppColor,
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  if (logic.isBranchSelected[
+                                                          index] ==
+                                                      true) {
+                                                    logic.onCheckBoxClick(
+                                                        false, index);
+                                                  } else {
+                                                    logic.onCheckBoxClick(
+                                                        true, index);
+                                                  }
+                                                },
+                                                child: logic
+                                                        .isBranchSelected[index]
+                                                    ? Image.asset(
+                                                        AppAsset.icCheckRound,
+                                                        height: 28)
+                                                    : Image.asset(
+                                                        AppAsset.icPlusRound,
+                                                        height: 28),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  )
-                                : const SizedBox();
+                                  ],
+                                ),
+                              ),
+                            );
                           },
-                        ),
-                      ],
+                        ).paddingOnly(left: 12, right: 12, bottom: 12);
+                      },
                     );
         },
       ),
