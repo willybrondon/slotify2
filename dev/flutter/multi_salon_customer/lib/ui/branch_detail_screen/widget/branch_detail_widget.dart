@@ -103,17 +103,15 @@ class BranchDetailInfoView extends StatelessWidget {
       builder: (logic) {
         return logic.isLoading.value
             ? Shimmers.branchDetailShimmer()
-            : NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    const SliverList(
-                      delegate: SliverChildListDelegate.fixed(
-                        [BranchDetailDataView()],
-                      ),
-                    ),
-                  ];
-                },
-                body: const BranchDetailTabView(),
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const BranchDetailDataView(),
+                    const BranchDetailTabView(),
+                    // Add bottom padding to prevent over-scrolling
+                    SizedBox(height: Get.height * 0.1),
+                  ],
+                ),
               );
       },
     );
@@ -371,10 +369,11 @@ class BranchDetailTabBarItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: GetBuilder<BranchDetailController>(
-        builder: (logic) {
-          return TabBarView(
+    return GetBuilder<BranchDetailController>(
+      builder: (logic) {
+        return SizedBox(
+          height: Get.height * 0.7, // Increased height to accommodate content
+          child: TabBarView(
             physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
             controller: logic.tabController,
@@ -386,9 +385,9 @@ class BranchDetailTabBarItemView extends StatelessWidget {
               BranchDetailTabBarReviewView(),
               BranchDetailTabBarAboutView(),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
