@@ -27,11 +27,12 @@ class BranchDetailTopView extends StatelessWidget {
       id: Constant.idProgressView,
       builder: (logic) {
         return PreferredSize(
-          preferredSize: const Size.fromHeight(230),
+          preferredSize: const Size.fromHeight(
+              200), // Reduced height for better proportions
           child: Stack(
             children: [
               Container(
-                height: 230, // Match the PreferredSize height exactly
+                height: 200, // Reduced height to create gap
                 width: Get.width,
                 decoration: BoxDecoration(
                   color: AppColors.transparent,
@@ -43,7 +44,7 @@ class BranchDetailTopView extends StatelessWidget {
                   placeholder: (context, url) {
                     return Container(
                       width: Get.width,
-                      height: 230,
+                      height: 200,
                       color: AppColors.grey.withOpacity(0.1),
                       child: Image.asset(AppAsset.icImagePlaceholder)
                           .paddingAll(25),
@@ -52,7 +53,7 @@ class BranchDetailTopView extends StatelessWidget {
                   errorWidget: (context, url, error) {
                     return Container(
                       width: Get.width,
-                      height: 230,
+                      height: 200,
                       color: AppColors.grey.withOpacity(0.1),
                       child: Image.asset(AppAsset.icImagePlaceholder)
                           .paddingAll(30),
@@ -128,6 +129,8 @@ class BranchDetailDataView extends StatelessWidget {
           color: AppColors.detailBg,
           child: Column(
             children: [
+              // Add gap between photo and salon details
+              SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
