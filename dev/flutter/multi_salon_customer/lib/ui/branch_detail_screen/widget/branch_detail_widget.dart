@@ -108,8 +108,6 @@ class BranchDetailInfoView extends StatelessWidget {
                   children: [
                     const BranchDetailDataView(),
                     const BranchDetailTabView(),
-                    // Add bottom padding to prevent over-scrolling
-                    SizedBox(height: Get.height * 0.1),
                   ],
                 ),
               );
@@ -371,21 +369,18 @@ class BranchDetailTabBarItemView extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<BranchDetailController>(
       builder: (logic) {
-        return SizedBox(
-          height: Get.height * 0.7, // Increased height to accommodate content
-          child: TabBarView(
-            physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics()),
-            controller: logic.tabController,
-            children: const [
-              BranchDetailTabBarServiceView(),
-              BranchDetailTabBarProductView(),
-              BranchDetailTabBarStaffView(),
-              BranchDetailTabBarGalleryView(),
-              BranchDetailTabBarReviewView(),
-              BranchDetailTabBarAboutView(),
-            ],
-          ),
+        return TabBarView(
+          physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics()),
+          controller: logic.tabController,
+          children: const [
+            BranchDetailTabBarServiceView(),
+            BranchDetailTabBarProductView(),
+            BranchDetailTabBarStaffView(),
+            BranchDetailTabBarGalleryView(),
+            BranchDetailTabBarReviewView(),
+            BranchDetailTabBarAboutView(),
+          ],
         );
       },
     );
