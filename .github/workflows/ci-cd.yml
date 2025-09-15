@@ -215,13 +215,39 @@ jobs:
       run: |
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
         flutter build apk --release
-    
+
+    - name: Setup Android Keystore
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        # Create keystore directory if it doesn't exist
+        mkdir -p android/app
+        # Generate keystore for signing (you can replace this with your existing keystore)
+        keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass android -keypass android -dname "CN=Slotify, OU=Mobile, O=Slotify, L=City, S=State, C=US"
+        
+        # Create key.properties file
+        echo "storePassword=android" > android/key.properties
+        echo "keyPassword=android" >> android/key.properties
+        echo "keyAlias=upload" >> android/key.properties
+        echo "storeFile=upload-keystore.jks" >> android/key.properties
+
+    - name: Build Flutter AAB (Android App Bundle)
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        flutter build appbundle --release
     
     - name: Upload Android APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: android-app-release-apk-${{ matrix.environment }}-${{ matrix.app }}
         path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk
+        overwrite: false
+        retention-days: 3
+
+    - name: Upload Android AAB artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-app-release-aab-${{ matrix.environment }}-${{ matrix.app }}
+        path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/bundle/release/app-release.aab
         overwrite: false
         retention-days: 3
 
