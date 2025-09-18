@@ -221,12 +221,12 @@ jobs:
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
         # Create keystore directory if it doesn't exist
         mkdir -p android/app
-        # Generate keystore for signing (you can replace this with your existing keystore)
-        keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass android -keypass android -dname "CN=Slotify, OU=Mobile, O=Slotify, L=City, S=State, C=US"
+        # Generate production keystore for Play Store upload
+        keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -dname "CN=Slotify, OU=Mobile, O=Slotify, L=City, S=State, C=US"
         
-        # Create key.properties file okayy
-        echo "storePassword=android" > android/key.properties
-        echo "keyPassword=android" >> android/key.properties
+        # Create key.properties file with secure passwords
+        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
         echo "keyAlias=upload" >> android/key.properties
         echo "storeFile=upload-keystore.jks" >> android/key.properties
 
