@@ -224,7 +224,7 @@ jobs:
         # Generate keystore for signing (you can replace this with your existing keystore)
         keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass android -keypass android -dname "CN=Slotify, OU=Mobile, O=Slotify, L=City, S=State, C=US"
         
-        # Create key.properties file
+        # Create key.properties file okayy
         echo "storePassword=android" > android/key.properties
         echo "keyPassword=android" >> android/key.properties
         echo "keyAlias=upload" >> android/key.properties
