@@ -319,7 +319,7 @@ class _MyAppState extends State<MyApp> {
       },
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        locale: const Locale("en"),
+        locale: const Locale("fr"),
         translations: AppLanguages(),
         initialRoute: AppRoutes.initial,
         getPages: AppPages.list,

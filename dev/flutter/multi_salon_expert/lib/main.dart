@@ -195,7 +195,7 @@ class _MyAppState extends State<MyApp> {
       },
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        locale: const Locale("en"),
+        locale: const Locale("fr"),
         translations: AppLanguages(),
         defaultTransition: Transition.fade,
         fallbackLocale:
