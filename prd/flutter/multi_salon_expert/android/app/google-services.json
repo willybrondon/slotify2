@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:146071533101:android:2aaaecd38d64f509c7eaa4",
         "android_client_info": {
-          "package_name": "com.multisalon.expert"
+          "package_name": "com.skedisy.expert"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "146071533101-m0m8ddo6ub7l5h72mkth5mh1dmpeg3e6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.multisalon.expert",
+            "package_name": "com.skedisy.expert",
             "certificate_hash": "570a146742cb743a057990eced480cd7199a7b43"
           }
         },
