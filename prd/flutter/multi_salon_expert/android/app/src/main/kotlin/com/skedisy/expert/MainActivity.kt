@@ -1,4 +1,4 @@
-package com.multisalon.user
+package com.skedisy.expert
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

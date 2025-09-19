@@ -39,10 +39,10 @@
               "client_type": 3
             },
             {
-              "client_id": "146071533101-afkgbrcakutp63sodukjankjsm2msbjl.apps.googleusercontent.com",
+              "client_id": "146071533101-s7a5mm5l0itmcp6v9s7f8p7frfimnh0u.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.multisalon.experts"
+                "bundle_id": "com.multisalon.customer"
               }
             }
           ]
@@ -83,54 +83,10 @@
               "client_type": 3
             },
             {
-              "client_id": "146071533101-afkgbrcakutp63sodukjankjsm2msbjl.apps.googleusercontent.com",
+              "client_id": "146071533101-s7a5mm5l0itmcp6v9s7f8p7frfimnh0u.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.multisalon.experts"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:146071533101:android:916af50183626aa5c7eaa4",
-        "android_client_info": {
-          "package_name": "com.skedisy.customer"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "146071533101-1kd3o7hhatk8ktqjda92ae84tcef349o.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.skedisy.customer",
-            "certificate_hash": "5f40d36a1494df8220904274009f65cc3df0cec2"
-          }
-        },
-        {
-          "client_id": "146071533101-bej7oionfeotlq9i87jsl37mq6r69bo3.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAs5wSw7eSnrbdUIPTu5mASHG5wuoZl8sM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "146071533101-bej7oionfeotlq9i87jsl37mq6r69bo3.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "146071533101-afkgbrcakutp63sodukjankjsm2msbjl.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.multisalon.experts"
+                "bundle_id": "com.multisalon.customer"
               }
             }
           ]
