@@ -133,6 +133,12 @@ jobs:
         app: [customer, expert]
         environment: [dev, prd]
     
+    env:
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -211,29 +217,36 @@ jobs:
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android"
         ./gradlew clean
 
-    - name: Build Flutter APK (Android)
-      run: |
-        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-        flutter build apk --release
-
     - name: Setup Android Keystore
       run: |
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
         # Create keystore directory if it doesn't exist
         mkdir -p android/app
-        # Generate production keystore for Play Store upload
-        keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -dname "CN=Slotify, OU=Mobile, O=Slotify, L=City, S=State, C=US"
+        
+        # Decode base64 keystore if provided, otherwise generate new one
+        if [ -n "$KEYSTORE_BASE64" ]; then
+          echo "Using existing keystore from secrets..."
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+        else
+          echo "Generating new keystore..."
+          keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias ${KEY_ALIAS:-upload} -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" -dname "CN=skedisy, O=skedisy, L=boissy-saint-leger, S=unknown, C=FR"
+        fi
         
         # Create key.properties file with secure passwords
-        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
-        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-        echo "keyAlias=upload" >> android/key.properties
+        echo "storePassword=$KEYSTORE_PASSWORD" > android/key.properties
+        echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+        echo "keyAlias=${KEY_ALIAS:-upload}" >> android/key.properties
         echo "storeFile=upload-keystore.jks" >> android/key.properties
+
+    - name: Build Flutter APK (Android)
+      run: |
+        cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
+        flutter build apk --release --build-name=1.0.0 --build-number=${{ github.run_number }}
 
     - name: Build Flutter AAB (Android App Bundle)
       run: |
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-        flutter build appbundle --release
+        flutter build appbundle --release --build-name=1.0.0 --build-number=${{ github.run_number }}
     
     - name: Upload Android APK artifact
       uses: actions/upload-artifact@v4
