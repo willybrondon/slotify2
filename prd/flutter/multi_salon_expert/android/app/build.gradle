@@ -35,7 +35,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.multisalon.expert"
+    namespace "com.skedisy.expert"
     compileSdkVersion 35
     ndkVersion flutter.ndkVersion
 
