@@ -10,12 +10,6 @@
 -keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }
 
-# Gson (if used)
--keepattributes Signature
--keepattributes *Annotation*
--keep class sun.misc.Unsafe { *; }
--keep class com.google.gson.** { *; }
-
 # Keep native methods
 -keepclasseswithmembernames class * {
     native <methods>;
@@ -51,3 +45,16 @@
 -dontwarn io.flutter.embedding.**
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
+-dontwarn com.google.gson.**
+-dontwarn sun.misc.Unsafe
+
+# Keep all classes with native methods
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+# Keep all classes that have @Keep annotation
+-keep @androidx.annotation.Keep class * { *; }
+-keepclassmembers class * {
+    @androidx.annotation.Keep *;
+}
