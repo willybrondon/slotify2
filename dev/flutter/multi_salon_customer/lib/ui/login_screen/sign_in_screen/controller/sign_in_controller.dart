@@ -112,10 +112,10 @@ class SignInController extends GetxController {
             log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
 
             if (loginScreenController.loginCategory!.status == true) {
-              Utils.showToast(Get.context!,
-                  ">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
-              log(">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
-              Utils.showToast(Get.context!, "User Login SuccessFully..!");
+              // Utils.showToast(Get.context!,
+              //     ">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
+              // log(">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
+              Utils.showToast(Get.context!, "Login SuccessFully..!");
               Constant.storage.write('isLogIn', true);
               Constant.storage.write(
                   'userId', loginScreenController.loginCategory?.user?.id);

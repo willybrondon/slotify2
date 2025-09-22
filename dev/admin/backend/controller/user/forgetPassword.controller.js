@@ -11,7 +11,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 exports.store = async (req, res) => {
   try {
     if (!req.body.email) {
-      return res.status(200).json({ status: false, message: "Email must be requried!!" });
+      return res.status(200).json({ status: false, message: "Email must be required!!" });
     }
 
     var newOtp = Math.floor(Math.random() * 8999) + 1000;
@@ -74,7 +74,7 @@ exports.store = async (req, res) => {
 exports.otplogin = async (req, res) => {
   try {
     if (!req.body.email) {
-      return res.status(200).json({ status: false, message: "Email must be requried!!" });
+      return res.status(200).json({ status: false, message: "Email must be required!!" });
     }
 
     var newOtp = Math.floor(Math.random() * 8999) + 1000;
@@ -145,7 +145,7 @@ exports.verify = async (req, res) => {
     if (!req.body.email || !req.body.otp) {
       return res
         .status(200)
-        .json({ status: false, message: "OTP and email must be requried." });
+        .json({ status: false, message: "OTP and email must be required." });
     }
 
     const otpUser = await OTP.findOne({ email: req.body.email });

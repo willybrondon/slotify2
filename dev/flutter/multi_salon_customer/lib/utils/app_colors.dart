@@ -91,7 +91,7 @@ class AppColors {
   static Color greyColor3 = const Color(0xffCBCBCB);
   static Color buttonColor = const Color(0xff6F42E5);
   static Color directionBox = const Color(0xff488FED);
-  static Color callBox = const Color(0xff0FBA16);
+  static Color callBox = const Color(0xff000000);
   static Color greenColor = const Color(0xff2EB62C);
   static Color greenBox = const Color(0xffEFFEEE);
   static Color greenBg = const Color(0xffEBF7ED);

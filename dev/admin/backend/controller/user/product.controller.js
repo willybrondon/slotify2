@@ -629,7 +629,7 @@ exports.filterWiseProduct = async (req, res) => {
     if (!req.query.userId) {
       return res
         .status(200)
-        .json({ status: true, message: "userId must be requried." });
+        .json({ status: true, message: "userId must be required." });
     }
 
     if (!req.body.category || !req.body.minPrice || !req.body.maxPrice)

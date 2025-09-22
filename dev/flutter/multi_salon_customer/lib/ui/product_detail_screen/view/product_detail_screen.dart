@@ -18,11 +18,17 @@ class ProductDetailScreen extends StatelessWidget {
           inAsyncCall: logic.isLoading1.value,
           child: Scaffold(
             appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(220),
-              child: logic.isLoading.value ? Shimmers.productDetailImageShimmer() : const ProviderDetailAppBarView(),
+              preferredSize: Size.fromHeight(Get.height * 0.35),
+              child: logic.isLoading.value
+                  ? Shimmers.productDetailImageShimmer()
+                  : const ProviderDetailAppBarView(),
             ),
-            bottomNavigationBar: logic.isLoading.value ? const SizedBox() : const ProductDetailBottomView(),
-            body: logic.isLoading.value ? Shimmers.productDetailShimmer() : const ProductDetailWidget(),
+            bottomNavigationBar: logic.isLoading.value
+                ? const SizedBox()
+                : const ProductDetailBottomView(),
+            body: logic.isLoading.value
+                ? Shimmers.productDetailShimmer()
+                : const ProductDetailWidget(),
           ),
         );
       },

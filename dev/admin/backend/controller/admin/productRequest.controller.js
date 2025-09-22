@@ -7,7 +7,7 @@ const Product = require("../../models/product.model");
 exports.acceptUpdateRequest = async (req, res) => {
   try {
     if (!req.query.requestId || !req.query.type) {
-      return res.status(200).json({ status: false, message: "requestId must be requried." });
+      return res.status(200).json({ status: false, message: "requestId must be required." });
     }
 
     const type = req.query.type.trim();
@@ -108,7 +108,7 @@ exports.acceptUpdateRequest = async (req, res) => {
 exports.updateProductRequestStatusWise = async (req, res) => {
   try {
     if (!req.query.status) {
-      return res.status(200).json({ status: true, message: "status must be requried." });
+      return res.status(200).json({ status: true, message: "status must be required." });
     }
 
     const status = req.query.status.trim();

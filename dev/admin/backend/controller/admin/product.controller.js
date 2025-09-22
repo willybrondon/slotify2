@@ -23,7 +23,7 @@ const { deleteFiles } = require("../../middleware/deleteFile");
 exports.acceptCreateRequest = async (req, res) => {
   try {
     if (!req.query.productId || !req.query.type) {
-      return res.status(200).json({ status: false, message: "ProductId and type must be requried." });
+      return res.status(200).json({ status: false, message: "ProductId and type must be required." });
     }
 
     const type = req.query.type.trim();
@@ -270,7 +270,7 @@ exports.updateProduct = async (req, res) => {
 exports.manageProduct = async (req, res) => {
   try {
     if (!req.query.productId || !req.query.type) {
-      return res.status(200).json({ status: false, message: "productId must be requried." });
+      return res.status(200).json({ status: false, message: "productId must be required." });
     }
 
     const product = await Product.findById(req.query.productId);
@@ -342,7 +342,7 @@ exports.productDetails = async (req, res) => {
 exports.getProducts = async (req, res) => {
   try {
     if (!req.query.status) {
-      return res.status(200).json({ status: false, message: "status must be requried." });
+      return res.status(200).json({ status: false, message: "status must be required." });
     }
 
     const start = req.query.start ? parseInt(req.query.start) : 0;
@@ -399,7 +399,7 @@ exports.getProducts = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     if (!req.query.productId) {
-      return res.status(200).json({ status: false, message: "productId must be requried!" });
+      return res.status(200).json({ status: false, message: "productId must be required!" });
     }
 
     const productId = new mongoose.Types.ObjectId(req.query.productId);

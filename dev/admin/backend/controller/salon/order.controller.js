@@ -689,7 +689,7 @@ exports.updateOrderBySalon = async (req, res) => {
       }
     } else if (status === "Out Of Delivery") {
       if (!req.body.deliveredServiceName || !req.body.trackingId || !req.body.trackingLink) {
-        return res.status(200).json({ status: false, message: "trackingId,trackingLink,deliveredServiceName must be requried!" });
+        return res.status(200).json({ status: false, message: "trackingId,trackingLink,deliveredServiceName must be required!" });
       }
 
       if (itemToUpdate.status !== "Confirmed")

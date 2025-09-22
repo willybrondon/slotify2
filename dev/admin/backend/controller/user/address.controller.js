@@ -70,13 +70,13 @@ exports.update = async (req, res) => {
     if (!req.query.addressId) {
       return res
         .status(200)
-        .json({ status: false, message: "addressId must be requried." });
+        .json({ status: false, message: "addressId must be required." });
     }
 
     if (!req.body.userId) {
       return res
         .status(200)
-        .json({ status: false, message: "userId must be requried." });
+        .json({ status: false, message: "userId must be required." });
     }
 
     const [user, address] = await Promise.all([
@@ -185,7 +185,7 @@ exports.selectedOrNot = async (req, res) => {
         .status(200)
         .json({
           status: false,
-          massage: "addressId and userId must be required.",
+          message: "addressId and userId must be required.",
         });
     }
 
@@ -245,7 +245,7 @@ exports.getSelectedAddress = async (req, res) => {
     if (!req.query.userId) {
       return res
         .status(200)
-        .json({ status: false, message: "userId must be requried." });
+        .json({ status: false, message: "userId must be required." });
     }
 
     const userId = new mongoose.Types.ObjectId(req.query.userId);
@@ -299,7 +299,7 @@ exports.destroy = async (req, res) => {
         .status(200)
         .json({
           status: false,
-          massage: "addressId and userId must be requried.",
+          message: "addressId and userId must be required.",
         });
     }
 
