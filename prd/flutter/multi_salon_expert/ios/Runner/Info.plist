@@ -39,6 +39,12 @@
 	<string>$(PRODUCT_NAME) camera description.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>To add sounds to the videos you record.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to help you find nearby salons and provide location-based services.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs location access to help you find nearby salons and provide location-based services.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs location access to help you find nearby salons and provide location-based services.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>App needs access to photo lib for profile images</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
