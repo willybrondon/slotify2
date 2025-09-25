@@ -145,7 +145,7 @@ class SelectWithdrawMethodBottomSheetView extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.payment,
                             size: 64,
                             color: AppColors.greyColor,
