@@ -132,6 +132,47 @@ class SelectWithdrawMethodBottomSheetView extends StatelessWidget {
               child: GetBuilder<PaymentMethodController>(
                 id: Constant.idGetWithdrawMethods,
                 builder: (logic) {
+                  // Show loading state
+                  if (logic.isLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  // Show empty state
+                  if (logic.withdrawMethods.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.payment,
+                            size: 64,
+                            color: AppColors.greyColor,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "No withdrawal methods available",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: AppFontFamily.heeBo700,
+                              color: AppColors.greyColor,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Please contact support",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: AppFontFamily.heeBo400,
+                              color: AppColors.greyColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
                   return Column(
                     children: [
                       const SizedBox(height: 15),
@@ -246,31 +287,48 @@ class AddBankDetailInfoView extends StatelessWidget {
               GetBuilder<PaymentMethodController>(
                 id: Constant.idChangePaymentMethod,
                 builder: (controller) {
-                  return controller.selectedPaymentMethod == null
-                      ? const Offstage()
-                      : Column(
-                          children: [
-                            for (int i = 0;
-                                i <
-                                    controller
-                                        .withdrawMethods[
-                                            controller.selectedPaymentMethod ??
-                                                0]
-                                        .details!
-                                        .length;
-                                i++)
-                              WithdrawDetailsItemView(
-                                title: controller
-                                        .withdrawMethods[
-                                            controller.selectedPaymentMethod ??
-                                                0]
-                                        .details?[i] ??
-                                    "",
-                                controller:
-                                    controller.withdrawPaymentDetails[i],
-                              ),
-                          ],
-                        );
+                  // Show loading state
+                  if (controller.isLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  // Show message if no payment method selected
+                  if (controller.selectedPaymentMethod == null) {
+                    return Center(
+                      child: Text(
+                        "Please select a withdrawal method",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: AppFontFamily.heeBo700,
+                          color: AppColors.greyColor,
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Show details form
+                  return Column(
+                    children: [
+                      for (int i = 0;
+                          i <
+                              controller
+                                  .withdrawMethods[
+                                      controller.selectedPaymentMethod ?? 0]
+                                  .details!
+                                  .length;
+                          i++)
+                        WithdrawDetailsItemView(
+                          title: controller
+                                  .withdrawMethods[
+                                      controller.selectedPaymentMethod ?? 0]
+                                  .details?[i] ??
+                              "",
+                          controller: controller.withdrawPaymentDetails[i],
+                        ),
+                    ],
+                  );
                 },
               ),
             ],

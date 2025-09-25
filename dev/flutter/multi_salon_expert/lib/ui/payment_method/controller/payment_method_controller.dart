@@ -30,8 +30,9 @@ class PaymentMethodController extends GetxController {
     if (withdrawMethods.isNotEmpty) {
       selectedPaymentMethod = 0;
       paymentMethodName = withdrawMethods[0].name;
-      withdrawPaymentDetails =
-          List<TextEditingController>.generate(withdrawMethods[0].details?.length ?? 0, (counter) => TextEditingController());
+      withdrawPaymentDetails = List<TextEditingController>.generate(
+          withdrawMethods[0].details?.length ?? 0,
+          (counter) => TextEditingController());
 
       populateWithdrawPaymentDetails();
 
@@ -49,10 +50,12 @@ class PaymentMethodController extends GetxController {
 
       if (i == selectedPaymentMethod) {
         for (int j = 0; j < (withdrawMethods[i].details?.length ?? 0); j++) {
-          details.add("${withdrawMethods[i].details?[j]}: ${withdrawPaymentDetails[j].text}");
+          details.add(
+              "${withdrawMethods[i].details?[j]}: ${withdrawPaymentDetails[j].text}");
         }
       } else {
-        for (var paymentDetail in getPaymentDetailsModel?.data?.paymentMethods ?? []) {
+        for (var paymentDetail
+            in getPaymentDetailsModel?.data?.paymentMethods ?? []) {
           if (paymentDetail.paymentGateway == withdrawMethods[i].name) {
             details = paymentDetail.paymentDetails ?? [];
             break;
@@ -93,7 +96,8 @@ class PaymentMethodController extends GetxController {
       for (var method in getPaymentDetailsModel!.data!.paymentMethods!) {
         if (method.paymentGateway == paymentMethodName) {
           for (int i = 0; i < method.paymentDetails!.length; i++) {
-            withdrawPaymentDetails[i].text = method.paymentDetails![i].split(': ').last;
+            withdrawPaymentDetails[i].text =
+                method.paymentDetails![i].split(': ').last;
           }
           break;
         }
@@ -103,28 +107,54 @@ class PaymentMethodController extends GetxController {
 
   Future<void> onGetWithdrawMethods() async {
     isLoading = true;
+    update([Constant.idProgressView, Constant.idGetWithdrawMethods]);
+
     getWithdrawMethodModel = await onGetWithdrawMethodApiCall();
-    if (getWithdrawMethodModel?.data != null) {
+    if (getWithdrawMethodModel?.data != null &&
+        getWithdrawMethodModel!.data!.isNotEmpty) {
+      withdrawMethods.clear(); // Clear existing methods
       withdrawMethods.addAll(getWithdrawMethodModel?.data ?? []);
-      isLoading = false;
-      update([Constant.idGetWithdrawMethods]);
+
+      // Set default selection if methods are available
+      if (withdrawMethods.isNotEmpty) {
+        selectedPaymentMethod = 0;
+        paymentMethodName = withdrawMethods[0].name;
+        withdrawPaymentDetails = List<TextEditingController>.generate(
+            withdrawMethods[0].details?.length ?? 0,
+            (counter) => TextEditingController());
+        populateWithdrawPaymentDetails();
+      }
+    } else {
+      // Handle empty response
+      withdrawMethods.clear();
+      selectedPaymentMethod = null;
+      paymentMethodName = null;
     }
+
+    isLoading = false;
+    update([Constant.idProgressView, Constant.idGetWithdrawMethods]);
   }
 
   Future<void> onSwitchWithdrawMethod() async {
     isShowPaymentMethod = !isShowPaymentMethod;
-    update([Constant.idSwitchWithdrawMethod, Constant.idChangePaymentMethod, Constant.idGetWithdrawMethods]);
+    update([
+      Constant.idSwitchWithdrawMethod,
+      Constant.idChangePaymentMethod,
+      Constant.idGetWithdrawMethods
+    ]);
   }
 
-  Future<void> onChangePaymentMethod({required int index, required String name}) async {
+  Future<void> onChangePaymentMethod(
+      {required int index, required String name}) async {
     selectedPaymentMethod = index;
     paymentMethodName = name;
     if (isShowPaymentMethod) {
       onSwitchWithdrawMethod();
     }
 
-    withdrawPaymentDetails =
-        List<TextEditingController>.generate(withdrawMethods[index].details?.length ?? 0, (counter) => TextEditingController());
+    withdrawPaymentDetails = List<TextEditingController>.generate(
+        withdrawMethods[index].details?.length ?? 0,
+        (counter) => TextEditingController());
 
     populateWithdrawPaymentDetails();
 
@@ -141,10 +171,14 @@ class PaymentMethodController extends GetxController {
       isLoading = true;
       update([Constant.idProgressView, Constant.idGetWithdrawMethods]);
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getWithdrawMethod);
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.getWithdrawMethod);
       log("Get Withdraw Method Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get Withdraw Method Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -169,7 +203,8 @@ class PaymentMethodController extends GetxController {
     return null;
   }
 
-  onUpdateWithdrawMethodApiCall({required Map<String, dynamic> withdrawDetail}) async {
+  onUpdateWithdrawMethodApiCall(
+      {required Map<String, dynamic> withdrawDetail}) async {
     try {
       isLoading = true;
       update([Constant.idProgressView]);
@@ -178,10 +213,14 @@ class PaymentMethodController extends GetxController {
 
       log("Update Withdraw Body :: $body");
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.updateWithdrawMethod);
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.updateWithdrawMethod);
       log("Update Withdraw Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Update Withdraw Headers :: $headers");
 
       final response = await http.post(url, headers: headers, body: body);
@@ -191,7 +230,8 @@ class PaymentMethodController extends GetxController {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        updateWithdrawMethodModel = UpdateWithdrawMethodModel.fromJson(jsonResponse);
+        updateWithdrawMethodModel =
+            UpdateWithdrawMethodModel.fromJson(jsonResponse);
       }
       log("Update Withdraw Api Called Successfully");
     } on AppException catch (exception) {
@@ -217,10 +257,14 @@ class PaymentMethodController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getPaymentDetails + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getPaymentDetails + queryString);
       log("Get Payment Details Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get Payment Details Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
