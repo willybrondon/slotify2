@@ -1871,6 +1871,10 @@ body {
     max-width: 400px;
     text-align: center;
     margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .phone-options {
@@ -1949,6 +1953,8 @@ body {
     gap: 0.3rem;
     transition: all 0.3s ease;
     font-size: 0.9rem;
+    white-space: nowrap;
+    min-width: fit-content;
 }
 
 .phone-option[data-platform="android"] .download-link {
@@ -1988,6 +1994,10 @@ body {
     .phone-selection {
         max-width: 320px;
         margin: 0 10px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
     
     .phone-options {
@@ -2021,6 +2031,8 @@ body {
         padding: 0.5rem 0.8rem;
         font-size: 0.8rem;
         border-radius: 15px;
+        white-space: nowrap;
+        min-width: fit-content;
     }
 }
 
@@ -2028,6 +2040,10 @@ body {
     .phone-selection {
         max-width: 300px;
         margin: 0 5px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
     
     .phone-options {
@@ -2054,6 +2070,8 @@ body {
     .download-link {
         padding: 0.4rem 0.6rem;
         font-size: 0.75rem;
+        white-space: nowrap;
+        min-width: fit-content;
     }
 }
 
