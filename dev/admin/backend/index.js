@@ -247,20 +247,29 @@ app.use("/salonpanel/storage", express.static(path.join(__dirname, "storage")));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "salon")));
 
-// Serve static files for salonportal : for solon portal new edited 22/07/2025
-app.use("/salonportal", express.static(path.join(__dirname, "salonportal")));
-// Direct route for salonportal index.html edited 22/07/2025
+// Serve static files for admin dashboard at /admin/ path
+app.use("/admin", express.static(path.join(__dirname, "public")));
+// Direct route for admin dashboard
+app.get("/admin/*", function (req, res) {
+  res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Serve static files for salonportal at root path (main page)
+app.use("/", express.static(path.join(__dirname, "..", "salonportal")));
+// Direct route for salonportal as main page
+app.get("/", function (req, res) {
+  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "index.html"));
+});
+
+// Serve static files for salonportal at /salonportal/ path (backward compatibility)
+app.use("/salonportal", express.static(path.join(__dirname, "..", "salonportal")));
+// Direct route for salonportal index.html (backward compatibility)
 app.get("/salonportal/*", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "salonportal", "index.html"));
+  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "index.html"));
 });
 
 app.get("/SalonPanel/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
-});
-
-
-app.get("/*", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(port, () => {
