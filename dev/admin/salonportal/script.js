@@ -264,6 +264,92 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 }); 
 
+// App download links configuration
+const APP_DOWNLOAD_LINKS = {
+    customer: {
+        android: 'https://play.google.com/store/apps/details?id=com.skedisy.customer',
+        ios: 'https://apps.apple.com/app/id1234567890'
+    },
+    expert: {
+        android: 'https://play.google.com/store/apps/details?id=com.skedisy.expert',
+        ios: 'https://apps.apple.com/app/id1234567891'
+    }
+};
+
+// Global variable to store current app type
+let currentAppType = 'customer';
+
+// Phone Selection Modal Functions
+function openPhoneSelection(appType) {
+    currentAppType = appType;
+    const modal = document.getElementById('phone-selection-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+    
+    // Update modal content based on app type
+    if (appType === 'customer') {
+        modalTitle.textContent = 'Download Customer App';
+        modalDescription.textContent = 'Choose your device to download the Skedisy Customer App';
+    } else if (appType === 'expert') {
+        modalTitle.textContent = 'Download Expert App';
+        modalDescription.textContent = 'Choose your device to download the Skedisy Expert App';
+    }
+    
+    // Update download links
+    updateDownloadLinks(appType);
+    
+    // Show modal
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function updateDownloadLinks(appType) {
+    const androidLink = document.getElementById('android-link');
+    const iosLink = document.getElementById('ios-link');
+    
+    if (androidLink && iosLink) {
+        androidLink.onclick = function() {
+            window.open(APP_DOWNLOAD_LINKS[appType].android, '_blank');
+        };
+        
+        iosLink.onclick = function() {
+            window.open(APP_DOWNLOAD_LINKS[appType].ios, '_blank');
+        };
+    }
+}
+
+// Phone Selection Modal Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const phoneModal = document.getElementById('phone-selection-modal');
+    const phoneModalClose = phoneModal.querySelector('.close');
+    
+    // Close phone selection modal
+    phoneModalClose.addEventListener('click', function() {
+        phoneModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target === phoneModal) {
+            phoneModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+    
+    // Handle phone option clicks
+    const phoneOptions = document.querySelectorAll('.phone-option');
+    phoneOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const platform = this.getAttribute('data-platform');
+            const downloadLink = APP_DOWNLOAD_LINKS[currentAppType][platform];
+            window.open(downloadLink, '_blank');
+            phoneModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+    });
+});
+
 // QR code generation (using qrcodejs CDN)
 window.addEventListener('DOMContentLoaded', function() {
     // Load QRCode.js dynamically if not present
@@ -279,9 +365,11 @@ window.addEventListener('DOMContentLoaded', function() {
     function generateQRCodes() {
         var customerQR = document.getElementById('qr-customer-top');
         var expertQR = document.getElementById('qr-expert-top');
+        
+        // Generate QR codes that trigger phone selection modal
         if (customerQR) {
             new QRCode(customerQR, {
-                text: 'https://skedisy/salonpanel',
+                text: 'https://skedisy.com/#download-customer',
                 width: 128,
                 height: 128,
                 colorDark : '#111',
@@ -291,7 +379,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }
         if (expertQR) {
             new QRCode(expertQR, {
-                text: 'https://skedisy/salonpanel',
+                text: 'https://skedisy.com/#download-expert',
                 width: 128,
                 height: 128,
                 colorDark : '#111',

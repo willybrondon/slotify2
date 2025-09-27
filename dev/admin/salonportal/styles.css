@@ -1866,4 +1866,136 @@ body {
   }
 } 
 
+/* Phone Selection Modal Styles */
+.phone-selection {
+    max-width: 500px;
+    text-align: center;
+}
+
+.phone-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.phone-option {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.phone-option:hover {
+    border-color: #3498db;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.2);
+}
+
+.phone-option[data-platform="android"]:hover {
+    border-color: #34a853;
+    box-shadow: 0 10px 30px rgba(52, 168, 83, 0.2);
+}
+
+.phone-option[data-platform="ios"]:hover {
+    border-color: #000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.store-logo {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.phone-option[data-platform="android"] .store-logo {
+    color: #34a853;
+}
+
+.phone-option[data-platform="ios"] .store-logo {
+    color: #000;
+}
+
+.phone-option h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.phone-option p {
+    color: #7f8c8d;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.download-link {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.phone-option[data-platform="android"] .download-link {
+    background: linear-gradient(135deg, #34a853, #2e7d32);
+}
+
+.phone-option[data-platform="ios"] .download-link {
+    background: linear-gradient(135deg, #000, #333);
+}
+
+.download-link:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.download-link i {
+    font-size: 1.1rem;
+}
+
+/* QR Code Clickable Enhancement */
+.qr-top-block {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.qr-top-block:hover {
+    transform: scale(1.05);
+}
+
+.qr-top-block:hover .qr-label {
+    color: #3498db;
+    font-weight: 600;
+}
+
+/* Phone Selection Modal Mobile Responsive */
+@media (max-width: 768px) {
+    .phone-options {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .phone-option {
+        padding: 1.5rem 1rem;
+    }
+    
+    .store-logo {
+        font-size: 2.5rem;
+        height: 50px;
+    }
+}
+
  

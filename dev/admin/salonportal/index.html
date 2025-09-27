@@ -17,11 +17,11 @@
     <!-- QR Code Top Right Floating -->
     <div class="qr-topright">
         <div class="qr-top-flex">
-            <div class="qr-top-block">
+            <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
                 <div id="qr-customer-top"></div>
                 <div class="qr-label">Download Customer App</div>
             </div>
-            <div class="qr-top-block">
+            <div class="qr-top-block" data-app-type="expert" onclick="openPhoneSelection('expert')">
                 <div id="qr-expert-top"></div>
                 <div class="qr-label">Download the Expert App</div>
             </div>
@@ -42,11 +42,11 @@
         </div>
     </nav>
     <!-- Download App Button for Mobile -->
-    <a href="https://skedisy/salonpanel" id="download-app-btn" class="download-app-btn">Download the App</a>
+    <a href="#" id="download-app-btn" class="download-app-btn" onclick="openPhoneSelection('customer'); return false;">Download the App</a>
     <!-- Mobile Fixed Download Buttons (only visible on mobile) -->
     <div class="mobile-download-btns">
-      <a href="https://skedisy/salonpanel" class="mobile-download-btn customer">Download Customer App</a>
-      <a href="https://skedisy/salonpanel" class="mobile-download-btn expert">Download Expert App</a>
+      <a href="#" class="mobile-download-btn customer" onclick="openPhoneSelection('customer'); return false;">Download Customer App</a>
+      <a href="#" class="mobile-download-btn expert" onclick="openPhoneSelection('expert'); return false;">Download Expert App</a>
     </div>
     <!-- Hero Section -->
     <section class="hero">
@@ -310,6 +310,39 @@
             </div>
         </div>
     </footer>
+
+    <!-- Phone Selection Modal -->
+    <div id="phone-selection-modal" class="modal">
+        <div class="modal-content phone-selection">
+            <span class="close">&times;</span>
+            <h2 id="modal-title">Choose Your Platform</h2>
+            <p id="modal-description">Select your device to download the app</p>
+            <div class="phone-options">
+                <div class="phone-option" data-platform="android">
+                    <div class="store-logo">
+                        <i class="fab fa-google-play"></i>
+                    </div>
+                    <h3>Android</h3>
+                    <p>Download from Google Play Store</p>
+                    <div class="download-link" id="android-link">
+                        <i class="fas fa-download"></i>
+                        <span>Download Now</span>
+                    </div>
+                </div>
+                <div class="phone-option" data-platform="ios">
+                    <div class="store-logo">
+                        <i class="fab fa-apple"></i>
+                    </div>
+                    <h3>iPhone</h3>
+                    <p>Download from App Store</p>
+                    <div class="download-link" id="ios-link">
+                        <i class="fas fa-download"></i>
+                        <span>Download Now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Demo Modal -->
     <div id="demo" class="modal">
