@@ -247,7 +247,11 @@ app.use("/salonpanel/storage", express.static(path.join(__dirname, "storage")));
 
 // Serve static files for admin dashboard at /admin/ path
 app.use("/admin", express.static(path.join(__dirname, "public")));
-// Direct route for admin dashboard
+// Direct route for admin dashboard (exact /admin path)
+app.get("/admin", function (req, res) {
+  res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
+});
+// Direct route for admin dashboard (all /admin/* paths)
 app.get("/admin/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
 });
