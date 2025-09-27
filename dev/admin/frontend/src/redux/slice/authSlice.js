@@ -115,7 +115,7 @@ const authSlice = createSlice({
       state.isLoading = false;
       Success("Code Update Successfully");
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = "/admin";
       }, 10);
     });
     builder.addCase(updateCode.rejected, (state, action) => {

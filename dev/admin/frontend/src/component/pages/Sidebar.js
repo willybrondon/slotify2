@@ -21,7 +21,7 @@ const Sidebar = () => {
         const yes = logouts.isConfirmed;
         if (yes) {
           dispatch(logout());
-          navigate("/");
+          navigate("/admin");
         }
       })
       .catch((err) => console.log(err));
