@@ -35,7 +35,7 @@ function App() {
         activityTimeout = setTimeout(() => {
             window.sessionStorage.clear();
             window.sessionStorage.clear();
-            window.location.href = "/";
+            window.location.href = "/admin/";
         }, sessionTimeout);
     }, [activityTimeout, sessionTimeout]);
 
@@ -81,7 +81,6 @@ function App() {
             <div className="App">
                 <Routes>
                     <Route path="/" element={login ? <Login /> : <Registration />} />
-                    <Route path="/" element={<Login />} />
                     <Route path="/code" element={<UpdateCode />} />
                     {login && <Route path="/login" element={<Login />} />}
                     <Route

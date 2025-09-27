@@ -246,10 +246,10 @@ app.use("/storage", express.static(path.join(__dirname, "storage")));
 app.use("/salonpanel/storage", express.static(path.join(__dirname, "storage")));
 
 // Serve static files for admin dashboard at /admin/ path
-app.use("/admin", express.static(path.join(__dirname, "public")));
+app.use("/admin", express.static(path.join(__dirname, "..", "frontend", "public")));
 // Direct route for admin dashboard
 app.get("/admin/*", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
+  res.status(200).sendFile(path.join(__dirname, "..", "frontend", "public", "index.html"));
 });
 
 // Serve static files for salonportal at /salonportal/ path (backward compatibility)
