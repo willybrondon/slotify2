@@ -2031,14 +2031,17 @@ body {
     }
     
     .download-link {
-        padding: 0.5rem 0.8rem;
+        padding: 0.6rem 1rem;
         font-size: 0.8rem;
         border-radius: 15px;
         white-space: nowrap;
         min-width: fit-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
         width: 100%;
         text-align: center;
-        margin: 0 auto;
     }
 }
 
@@ -2074,13 +2077,16 @@ body {
     }
     
     .download-link {
-        padding: 0.4rem 0.6rem;
+        padding: 0.5rem 0.8rem;
         font-size: 0.75rem;
         white-space: nowrap;
         min-width: fit-content;
         width: 100%;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         margin: 0 auto;
+        text-align: center;
     }
 }
 
