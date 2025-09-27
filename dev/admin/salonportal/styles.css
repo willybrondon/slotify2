@@ -1892,7 +1892,11 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .phone-option:hover {
@@ -1958,6 +1962,8 @@ body {
     width: 100%;
     text-align: center;
     margin: 0 auto;
+    margin-top: auto;
+    box-sizing: border-box;
 }
 
 .phone-option[data-platform="android"] .download-link {
@@ -2012,6 +2018,8 @@ body {
     .phone-option {
         padding: 1rem 0.8rem;
         border-radius: 10px;
+        min-height: 180px;
+        overflow: visible;
     }
     
     .store-logo {
@@ -2061,6 +2069,8 @@ body {
     
     .phone-option {
         padding: 0.8rem 0.6rem;
+        min-height: 160px;
+        overflow: visible;
     }
     
     .store-logo {
