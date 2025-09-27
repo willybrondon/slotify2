@@ -1955,6 +1955,9 @@ body {
     font-size: 0.9rem;
     white-space: nowrap;
     min-width: fit-content;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
 }
 
 .phone-option[data-platform="android"] .download-link {
@@ -2033,6 +2036,9 @@ body {
         border-radius: 15px;
         white-space: nowrap;
         min-width: fit-content;
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
     }
 }
 
@@ -2072,6 +2078,9 @@ body {
         font-size: 0.75rem;
         white-space: nowrap;
         min-width: fit-content;
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
     }
 }
 
