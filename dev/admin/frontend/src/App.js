@@ -35,7 +35,12 @@ function App() {
         activityTimeout = setTimeout(() => {
             window.sessionStorage.clear();
             window.sessionStorage.clear();
-            window.location.href = "/";
+            // Stay on admin page instead of redirecting to root
+            if (window.location.pathname.startsWith('/admin')) {
+                window.location.href = "/admin";
+            } else {
+                window.location.href = "/";
+            }
         }, sessionTimeout);
     }, [activityTimeout, sessionTimeout]);
 
@@ -81,9 +86,16 @@ function App() {
             <div className="App">
                 <Routes>
                     <Route path="/" element={login ? <Login /> : <Registration />} />
-                    <Route path="/" element={<Login />} />
                     <Route path="/code" element={<UpdateCode />} />
                     {login && <Route path="/login" element={<Login />} />}
+                    <Route
+                        path="/admin"
+                        element={
+                            <AuthRoute>
+                                <Admin />
+                            </AuthRoute>
+                        }
+                    />
                     <Route
                         path="/admin/*"
                         element={
