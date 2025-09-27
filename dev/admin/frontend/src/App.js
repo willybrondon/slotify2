@@ -90,19 +90,11 @@ function App() {
                     {login && <Route path="/login" element={<Login />} />}
                     <Route
                         path="/admin"
-                        element={
-                            <AuthRoute>
-                                <Admin />
-                            </AuthRoute>
-                        }
+                        element={isAuth ? <Admin /> : <Login />}
                     />
                     <Route
                         path="/admin/*"
-                        element={
-                            <AuthRoute>
-                                <Admin />
-                            </AuthRoute>
-                        }
+                        element={isAuth ? <Admin /> : <Login />}
                     />
                 </Routes>
             </div>
