@@ -30,7 +30,8 @@ final Map<String, String> frCH = {
   "txtProfile": "Profil",
   "txtNooAttendance": "Pas de fréquentation !!",
   "txtUnderMaintenance": "En maintenance",
-  "txtSorryUnderMaintenance": "Désolé, l'application est actuellement en maintenance !!",
+  "txtSorryUnderMaintenance":
+      "Désolé, l'application est actuellement en maintenance !!",
   "txtCloseApp": "Fermer l'application",
   "txtPrivacyPolicy": "politique de confidentialité",
   "txtBookingId": "ID de réservation",
@@ -119,7 +120,8 @@ final Map<String, String> frCH = {
   "txtUpdate": "Mise à jour",
   "desTerms": "J'accepte le",
   "desLogOut": "Êtes-vous sûr de vouloir vous déconnecter ?",
-  "desAccountDeleted": "Votre compte sera supprimé en permanence. Vos données ne seront plus restaurées.",
+  "desAccountDeleted":
+      "Votre compte sera supprimé en permanence. Vos données ne seront plus restaurées.",
   "txtEnterSpecificReason": "Entrez le motif de l'annulation",
   "txtPleaseEnterSpecificReason": "Veuillez saisir une raison spécifique",
   "txtEnterBookingId": "Entrez l'ID de réservation",
@@ -153,6 +155,6 @@ final Map<String, String> frCH = {
   "txtComplain": "Se plaindre",
   "txtComplainSection": "Section de plainte",
   "desSlotBooked": "Ce créneau est réservé",
-  "desPreviousSlot": "Vous ne pouvez pas réserver des machines à sous précédents",
+  "desPreviousSlot": "Vous ne pouvez pas réserver des crénaux précédents",
   "desExit": "Êtes-vous sûr de vouloir quitter ?",
 };

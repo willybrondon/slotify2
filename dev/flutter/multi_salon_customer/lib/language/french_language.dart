@@ -198,8 +198,7 @@ final Map<String, String> frCH = {
   "desPleaseAcceptConditions": "Veuillez d'abord accepter les termes et l'état",
   "desLogOut": "Êtes-vous sûr de vouloir vous déconnecter ?",
   "desSlotBooked": "Cette fente est déjà réservée",
-  "desPreviousSlot":
-      "Vous ne pouvez pas réserver des machines à sous précédents",
+  "desPreviousSlot": "Vous ne pouvez pas réserver des crénaux précédents",
   "desExit": "Êtes-vous sûr de vouloir quitter ?",
   "desEnterEmail": "Veuillez entrer votre email",
   "desGiveReview": "Vous n'êtes pas en mesure de donner votre avis !!",
