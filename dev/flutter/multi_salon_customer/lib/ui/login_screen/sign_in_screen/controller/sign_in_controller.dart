@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
@@ -59,8 +59,8 @@ class SignInController extends GetxController {
   getDataFromArgs() {
     dynamic args = Get.arguments;
 
-    log("Sign In Args :: $args");
-    log("Sign In Arguments :: ${Get.arguments}");
+    dev.log("Sign In Args :: $args");
+    dev.log("Sign In Arguments :: ${Get.arguments}");
 
     if (args != null) {
       if (args[0] != null) {
@@ -69,7 +69,7 @@ class SignInController extends GetxController {
     } else {
       isDataSelected = false;
 
-      log("Sign in Controller args :: $isDataSelected");
+      dev.log("Sign in Controller args :: $isDataSelected");
     }
     update([Constant.idProgressView]);
   }
@@ -111,8 +111,10 @@ class SignInController extends GetxController {
               fcmToken: fcmToken!,
               password: passwordController.text,
             );
-            log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
-            log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
+            dev.log(
+                "isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
+            dev.log(
+                "isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
 
             if (loginScreenController.loginCategory!.status == true) {
               // Utils.showToast(Get.context!,
@@ -127,8 +129,10 @@ class SignInController extends GetxController {
               Constant.storage.write('isUpdate',
                   loginScreenController.loginCategory?.user?.isUpdate);
 
-              log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
-              log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
+              dev.log(
+                  "is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
+              dev.log(
+                  "is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
 
               await profileScreenController.onGetUserApiCall(loginType: 1);
               if (profileScreenController.getUserCategory?.status == true) {
@@ -162,7 +166,7 @@ class SignInController extends GetxController {
                   loginScreenController.loginCategory?.message ?? "");
             }
 
-            log("Log in Successfully");
+            dev.log("Log in Successfully");
           } else {
             Utils.showToast(Get.context!, checkUserCategory?.message ?? "");
           }
@@ -170,7 +174,7 @@ class SignInController extends GetxController {
           Utils.showToast(Get.context!, checkUserCategory?.message ?? "");
         }
       } catch (e) {
-        log("Error in Sign In :: $e");
+        dev.log("Error in Sign In :: $e");
       } finally {
         isLoading(false);
         update([Constant.idProgressView]);
@@ -189,10 +193,10 @@ class SignInController extends GetxController {
       final body = json.encode(
           {"email": email, "loginType": loginType, "password": password});
 
-      log("Check User Body :: $body");
+      dev.log("Check User Body :: $body");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.checkUser);
-      log("Check User Url :: $url");
+      dev.log("Check User Url :: $url");
 
       final headers = {
         "key": ApiConstant.SECRET_KEY,
@@ -201,39 +205,39 @@ class SignInController extends GetxController {
         'User-Agent': 'MultiSalonCustomer/1.0',
       };
 
-      log("Check User Headers :: $headers");
+      dev.log("Check User Headers :: $headers");
 
       final response = await http
           .post(url, headers: headers, body: body)
           .timeout(const Duration(seconds: 30));
 
-      log("Check User Status Code :: ${response.statusCode}");
-      log("Check User Response :: ${response.body}");
+      dev.log("Check User Status Code :: ${response.statusCode}");
+      dev.log("Check User Response :: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         checkUserCategory = CheckUserModel.fromJson(jsonResponse);
-        log("Check User successful: ${checkUserCategory?.status}");
+        dev.log("Check User successful: ${checkUserCategory?.status}");
       } else {
-        log("Check User failed with status code: ${response.statusCode}");
+        dev.log("Check User failed with status code: ${response.statusCode}");
         Utils.showToast(Get.context!, "Check user failed. Please try again.");
       }
     } on AppException catch (exception) {
-      log("App Exception in Check User: ${exception.message}");
+      dev.log("App Exception in Check User: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
     } on SocketException catch (e) {
-      log("Network error in Check User: $e");
+      dev.log("Network error in Check User: $e");
       Utils.showToast(Get.context!,
           "Network connection error. Please check your internet connection.");
     } on HandshakeException catch (e) {
-      log("SSL Handshake error in Check User: $e");
+      dev.log("SSL Handshake error in Check User: $e");
       Utils.showToast(Get.context!, "SSL connection error. Please try again.");
     } on TimeoutException catch (e) {
-      log("Timeout error in Check User: $e");
+      dev.log("Timeout error in Check User: $e");
       Utils.showToast(Get.context!,
           "Request timeout. Please check your connection and try again.");
     } catch (e) {
-      log("Error call Check User Api :: $e");
+      dev.log("Error call Check User Api :: $e");
       Utils.showToast(Get.context!, 'Connection error. Please try again.');
     } finally {
       isLoading(false);
@@ -257,7 +261,8 @@ class SignInController extends GetxController {
         GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
 
-        log("googleSignInAuthentication.accessToken :: ${googleSignInAuthentication.accessToken}");
+        dev.log(
+            "googleSignInAuthentication.accessToken :: ${googleSignInAuthentication.accessToken}");
 
         AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleSignInAuthentication.accessToken,
@@ -278,7 +283,8 @@ class SignInController extends GetxController {
               age: "");
 
           if (loginScreenController.loginCategory?.status == true) {
-            log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
+            dev.log(
+                "isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
             Utils.showToast(Get.context!, "User Login SuccessFully..!");
 
             await Constant.storage.write('isGoogle', true);
@@ -287,10 +293,13 @@ class SignInController extends GetxController {
             Constant.storage.write(
                 'email', loginScreenController.loginCategory?.user?.email);
 
-            log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
-            log("Email is :: ${Constant.storage.read<String>('email')}");
-            log("Google Login is :: ${Constant.storage.read<bool>('isGoogle')}");
-            log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
+            dev.log(
+                "is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
+            dev.log("Email is :: ${Constant.storage.read<String>('email')}");
+            dev.log(
+                "Google Login is :: ${Constant.storage.read<bool>('isGoogle')}");
+            dev.log(
+                "is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
 
             if (loginScreenController.loginCategory?.user?.isUpdate == false) {
               Constant.storage.write('userImage',
@@ -335,14 +344,14 @@ class SignInController extends GetxController {
                         profileScreenController.getUserCategory?.user?.lname);
 
                     if (isDataSelected == true) {
-                      log("enter first google service selected if");
+                      dev.log("enter first google service selected if");
 
                       Get.back();
                       Constant.storage.write('isLogIn', true);
                       Constant.storage.write('isUpdate', true);
                       // isLogIn = true;
                     } else {
-                      log("enter first google service else");
+                      dev.log("enter first google service else");
                       Get.offAllNamed(AppRoutes.bottom);
                       Constant.storage.write('isLogIn', true);
                       Constant.storage.write('isUpdate', true);
@@ -366,7 +375,7 @@ class SignInController extends GetxController {
                           "");
                 }
               } catch (e) {
-                log("Error In Google Login Update :: $e");
+                dev.log("Error In Google Login Update :: $e");
               } finally {
                 editProfileScreenController.isLoading(false);
                 update([Constant.idBookingAndLogin, Constant.idProgressView]);
@@ -387,15 +396,15 @@ class SignInController extends GetxController {
                     profileScreenController
                         .getUserCategory?.user?.salonRequestSent);
 
-                log("Sign in data selected :: $isDataSelected");
+                dev.log("Sign in data selected :: $isDataSelected");
                 if (isDataSelected == true) {
-                  log("enter second google service selected if");
+                  dev.log("enter second google service selected if");
 
                   Get.back();
                   Constant.storage.write('isLogIn', true);
                   Constant.storage.write('isUpdate', true);
                 } else {
-                  log("enter second google service else");
+                  dev.log("enter second google service else");
 
                   Get.offAllNamed(AppRoutes.bottom);
                   Constant.storage.write('isLogIn', true);
@@ -413,12 +422,12 @@ class SignInController extends GetxController {
               profileScreenController.getUserCategory?.message ?? "");
         }
 
-        log('success signing in with Google');
+        dev.log('success signing in with Google');
       } else {
-        log('Error signing in with Google');
+        dev.log('Error signing in with Google');
       }
     } catch (error) {
-      log('Error signing in with Google: $error');
+      dev.log('Error signing in with Google: $error');
       return null;
     } finally {
       isLoading(false);
@@ -471,10 +480,10 @@ class SignInController extends GetxController {
         nonce: nonce,
       );
 
-      log("Apple Credential :: $appleCredential");
-      log("Apple Email :: ${appleCredential.email}");
-      log("Apple Given Name :: ${appleCredential.givenName}");
-      log("Apple Family Name :: ${appleCredential.familyName}");
+      dev.log("Apple Credential :: $appleCredential");
+      dev.log("Apple Email :: ${appleCredential.email}");
+      dev.log("Apple Given Name :: ${appleCredential.givenName}");
+      dev.log("Apple Family Name :: ${appleCredential.familyName}");
 
       // Create Firebase credential
       final oauthCredential = OAuthProvider("apple.com").credential(
@@ -501,8 +510,8 @@ class SignInController extends GetxController {
                   .trim();
         }
 
-        log("Apple User Email :: $email");
-        log("Apple User Name :: $fullName");
+        dev.log("Apple User Email :: $email");
+        dev.log("Apple User Name :: $fullName");
 
         // Call login API with loginType "4" for Apple
         await loginScreenController.onLoginApiCall(
@@ -515,7 +524,8 @@ class SignInController extends GetxController {
         );
 
         if (loginScreenController.loginCategory?.status == true) {
-          log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
+          dev.log(
+              "isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
           Utils.showToast(Get.context!, "Successfully signed in with Apple!");
 
           await Constant.storage.write('isApple', true);
@@ -524,10 +534,13 @@ class SignInController extends GetxController {
           Constant.storage
               .write('email', loginScreenController.loginCategory?.user?.email);
 
-          log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
-          log("Email is :: ${Constant.storage.read<String>('email')}");
-          log("Apple Login is :: ${Constant.storage.read<bool>('isApple')}");
-          log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
+          dev.log(
+              "is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
+          dev.log("Email is :: ${Constant.storage.read<String>('email')}");
+          dev.log(
+              "Apple Login is :: ${Constant.storage.read<bool>('isApple')}");
+          dev.log(
+              "is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
 
           // Handle profile update flow
           if (loginScreenController.loginCategory?.user?.isUpdate == false) {
@@ -541,16 +554,16 @@ class SignInController extends GetxController {
               // If Apple provided a name, pre-fill it
               if (fullName != null && fullName.isNotEmpty) {
                 List<String> nameParts = fullName.split(' ');
-                editProfileScreenController.firstNameController.text =
+                editProfileScreenController.fNameEditingController.text =
                     nameParts.first;
                 if (nameParts.length > 1) {
-                  editProfileScreenController.lastNameController.text =
+                  editProfileScreenController.lNameEditingController.text =
                       nameParts.sublist(1).join(' ');
                 }
               }
 
               if (email != null) {
-                editProfileScreenController.emailController.text = email;
+                editProfileScreenController.emailEditingController.text = email;
               }
 
               editProfileScreenController.isLoading(false);
@@ -562,7 +575,7 @@ class SignInController extends GetxController {
               Constant.storage.write('isUpdate',
                   loginScreenController.loginCategory?.user?.isUpdate);
             } catch (e) {
-              log("Error in Edit Profile :: $e");
+              dev.log("Error in Edit Profile :: $e");
               editProfileScreenController.isLoading(false);
               editProfileScreenController.update(
                   [Constant.idBookingAndLogin, Constant.idProgressView]);
@@ -584,14 +597,14 @@ class SignInController extends GetxController {
                   profileScreenController
                       .getUserCategory?.user?.salonRequestSent);
 
-              log("Sign in data selected :: $isDataSelected");
+              dev.log("Sign in data selected :: $isDataSelected");
               if (isDataSelected == true) {
-                log("enter second apple service selected if");
+                dev.log("enter second apple service selected if");
                 Get.back();
                 Constant.storage.write('isLogIn', true);
                 Constant.storage.write('isUpdate', true);
               } else {
-                log("enter second apple service else");
+                dev.log("enter second apple service else");
                 Get.offAllNamed(AppRoutes.bottom);
                 Constant.storage.write('isLogIn', true);
                 Constant.storage.write('isUpdate',
@@ -604,15 +617,15 @@ class SignInController extends GetxController {
               loginScreenController.loginCategory?.message ?? "Login failed");
         }
 
-        log('Success signing in with Apple');
+        dev.log('Success signing in with Apple');
         return user;
       } else {
         Utils.showToast(Get.context!, "Apple sign in failed");
-        log('Apple sign in failed - no user');
+        dev.log('Apple sign in failed - no user');
         return null;
       }
     } on SignInWithAppleAuthorizationException catch (e) {
-      log('Apple Sign In Authorization Error: ${e.code} - ${e.message}');
+      dev.log('Apple Sign In Authorization Error: ${e.code} - ${e.message}');
 
       if (e.code == AuthorizationErrorCode.canceled) {
         Utils.showToast(Get.context!, "Sign in cancelled");
@@ -627,11 +640,11 @@ class SignInController extends GetxController {
       }
       return null;
     } on FirebaseAuthException catch (e) {
-      log('Firebase Auth Error: ${e.code} - ${e.message}');
+      dev.log('Firebase Auth Error: ${e.code} - ${e.message}');
       Utils.showToast(Get.context!, "Authentication error: ${e.message}");
       return null;
     } catch (error) {
-      log('Error signing in with Apple: $error');
+      dev.log('Error signing in with Apple: $error');
       Utils.showToast(Get.context!, "An error occurred. Please try again.");
       return null;
     } finally {
@@ -645,7 +658,7 @@ class SignInController extends GetxController {
       await googleSignIn.signOut();
       _user = null;
     } catch (error) {
-      log('Error signing out: $error');
+      dev.log('Error signing out: $error');
     }
   }
 }

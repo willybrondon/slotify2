@@ -601,8 +601,6 @@ class SignInScreen extends StatelessWidget {
                                 ),
                               ),
                             ).paddingOnly(bottom: 20, top: 10),
-                          ],
-                        ),
                       ),
                     ],
                   ),
