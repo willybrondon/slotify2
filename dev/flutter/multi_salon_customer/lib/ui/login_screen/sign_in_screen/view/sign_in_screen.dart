@@ -460,7 +460,84 @@ class SignInScreen extends StatelessWidget {
                                 ).paddingOnly(bottom: 20, top: 10);
                               },
                             ),
-                            InkWell(
+                            GetBuilder<SignInController>(
+                              id: Constant.idProgressView,
+                              builder: (logic) {
+                                return InkWell(
+                                  overlayColor: WidgetStatePropertyAll(
+                                      AppColors.transparent),
+                                  onTap: () async {
+                                    await logic.signInWithApple();
+                                  },
+                                  child: Container(
+                                    height: 60,
+                                    width: (Get.width - 45) *
+                                        0.48, // Adjusted width to prevent overflow
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.blackColor,
+                                      borderRadius: BorderRadius.circular(60),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.blackColor
+                                              .withOpacity(0.03),
+                                          offset: const Offset(
+                                            0.0,
+                                            1.0,
+                                          ),
+                                          blurRadius: 3.0,
+                                          spreadRadius: 2.0,
+                                        ),
+                                        const BoxShadow(
+                                          color: Colors.black12,
+                                          offset: Offset(0.0, 0.0),
+                                          blurRadius: 0.0,
+                                          spreadRadius: 0.0,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          height: 47,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: AppColors.whiteColor,
+                                          ),
+                                          padding: const EdgeInsets.all(10),
+                                          child: Icon(
+                                            Icons.apple,
+                                            color: AppColors.blackColor,
+                                            size: 27,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "Apple",
+                                            style: TextStyle(
+                                              color: AppColors.whiteColor,
+                                              fontFamily:
+                                                  AppFontFamily.sfProDisplay,
+                                              fontSize: 15,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ).paddingOnly(left: 10),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ).paddingOnly(bottom: 20, top: 10);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: InkWell(
                               overlayColor:
                                   WidgetStatePropertyAll(AppColors.transparent),
                               onTap: () async {
@@ -471,8 +548,7 @@ class SignInScreen extends StatelessWidget {
                               },
                               child: Container(
                                 height: 60,
-                                width: (Get.width - 45) *
-                                    0.48, // Adjusted width to prevent overflow
+                                width: Get.width - 30, // Full width for mobile button
                                 padding:
                                     const EdgeInsets.only(left: 10, right: 10),
                                 decoration: BoxDecoration(

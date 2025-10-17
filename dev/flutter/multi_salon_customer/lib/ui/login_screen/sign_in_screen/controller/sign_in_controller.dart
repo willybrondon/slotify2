@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/edit_profile_screen/controller/edit_profile_controller.dart';
@@ -422,6 +425,219 @@ class SignInController extends GetxController {
       update([Constant.idProgressView]);
     }
     return null;
+  }
+
+  /// Apple Sign In Controller ===========================>
+
+  /// Generates a cryptographically secure random nonce
+  String generateNonce([int length = 32]) {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
+        .join();
+  }
+
+  /// Returns the sha256 hash of [input] in hex notation
+  String sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
+  Future<User?> signInWithApple() async {
+    try {
+      isLoading(true);
+      update([Constant.idProgressView]);
+
+      // Check if Sign in with Apple is available
+      final isAvailable = await SignInWithApple.isAvailable();
+      if (!isAvailable) {
+        Utils.showToast(
+            Get.context!, "Sign in with Apple is not available on this device");
+        return null;
+      }
+
+      // Generate nonce for security
+      final rawNonce = generateNonce();
+      final nonce = sha256ofString(rawNonce);
+
+      // Request Apple ID credential
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      log("Apple Credential :: $appleCredential");
+      log("Apple Email :: ${appleCredential.email}");
+      log("Apple Given Name :: ${appleCredential.givenName}");
+      log("Apple Family Name :: ${appleCredential.familyName}");
+
+      // Create Firebase credential
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      // Sign in to Firebase
+      UserCredential userCredential =
+          await _auth.signInWithCredential(oauthCredential);
+
+      if (userCredential.user != null) {
+        User user = userCredential.user!;
+
+        // Apple may not always provide email on subsequent logins
+        String? email = appleCredential.email ?? user.email;
+
+        // Construct full name from Apple credentials
+        String? fullName;
+        if (appleCredential.givenName != null ||
+            appleCredential.familyName != null) {
+          fullName =
+              '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'
+                  .trim();
+        }
+
+        log("Apple User Email :: $email");
+        log("Apple User Name :: $fullName");
+
+        // Call login API with loginType "4" for Apple
+        await loginScreenController.onLoginApiCall(
+          loginType: "4", // Apple login type
+          email: email ?? user.uid, // Use UID if email is not available
+          fcmToken: fcmToken!,
+          password: "",
+          mobile: "",
+          age: "",
+        );
+
+        if (loginScreenController.loginCategory?.status == true) {
+          log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
+          Utils.showToast(Get.context!, "Successfully signed in with Apple!");
+
+          await Constant.storage.write('isApple', true);
+          await Constant.storage
+              .write('userId', loginScreenController.loginCategory?.user?.id);
+          Constant.storage
+              .write('email', loginScreenController.loginCategory?.user?.email);
+
+          log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
+          log("Email is :: ${Constant.storage.read<String>('email')}");
+          log("Apple Login is :: ${Constant.storage.read<bool>('isApple')}");
+          log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
+
+          // Handle profile update flow
+          if (loginScreenController.loginCategory?.user?.isUpdate == false) {
+            Constant.storage.write('userImage',
+                profileScreenController.getUserCategory?.user?.image);
+
+            try {
+              editProfileScreenController.isLoading(true);
+              editProfileScreenController.update([Constant.idProgressView]);
+
+              // If Apple provided a name, pre-fill it
+              if (fullName != null && fullName.isNotEmpty) {
+                List<String> nameParts = fullName.split(' ');
+                editProfileScreenController.firstNameController.text =
+                    nameParts.first;
+                if (nameParts.length > 1) {
+                  editProfileScreenController.lastNameController.text =
+                      nameParts.sublist(1).join(' ');
+                }
+              }
+
+              if (email != null) {
+                editProfileScreenController.emailController.text = email;
+              }
+
+              editProfileScreenController.isLoading(false);
+              editProfileScreenController.update([Constant.idProgressView]);
+
+              Get.offAllNamed(AppRoutes.editProfile);
+
+              Constant.storage.write('isLogIn', true);
+              Constant.storage.write('isUpdate',
+                  loginScreenController.loginCategory?.user?.isUpdate);
+            } catch (e) {
+              log("Error in Edit Profile :: $e");
+              editProfileScreenController.isLoading(false);
+              editProfileScreenController.update(
+                  [Constant.idBookingAndLogin, Constant.idProgressView]);
+            }
+          } else {
+            // User profile is already complete
+            await profileScreenController.onGetUserApiCall();
+            if (profileScreenController.getUserCategory?.status == true) {
+              Constant.storage.write(
+                  'userId', profileScreenController.getUserCategory?.user?.id);
+              Constant.storage.write('userImage',
+                  profileScreenController.getUserCategory?.user?.image);
+              Constant.storage.write('fName',
+                  profileScreenController.getUserCategory?.user?.fname);
+              Constant.storage.write('lName',
+                  profileScreenController.getUserCategory?.user?.lname);
+              Constant.storage.write(
+                  'salonRequestSent',
+                  profileScreenController
+                      .getUserCategory?.user?.salonRequestSent);
+
+              log("Sign in data selected :: $isDataSelected");
+              if (isDataSelected == true) {
+                log("enter second apple service selected if");
+                Get.back();
+                Constant.storage.write('isLogIn', true);
+                Constant.storage.write('isUpdate', true);
+              } else {
+                log("enter second apple service else");
+                Get.offAllNamed(AppRoutes.bottom);
+                Constant.storage.write('isLogIn', true);
+                Constant.storage.write('isUpdate',
+                    loginScreenController.loginCategory?.user?.isUpdate);
+              }
+            }
+          }
+        } else {
+          Utils.showToast(Get.context!,
+              loginScreenController.loginCategory?.message ?? "Login failed");
+        }
+
+        log('Success signing in with Apple');
+        return user;
+      } else {
+        Utils.showToast(Get.context!, "Apple sign in failed");
+        log('Apple sign in failed - no user');
+        return null;
+      }
+    } on SignInWithAppleAuthorizationException catch (e) {
+      log('Apple Sign In Authorization Error: ${e.code} - ${e.message}');
+
+      if (e.code == AuthorizationErrorCode.canceled) {
+        Utils.showToast(Get.context!, "Sign in cancelled");
+      } else if (e.code == AuthorizationErrorCode.failed) {
+        Utils.showToast(Get.context!, "Sign in failed. Please try again.");
+      } else if (e.code == AuthorizationErrorCode.invalidResponse) {
+        Utils.showToast(Get.context!, "Invalid response from Apple");
+      } else if (e.code == AuthorizationErrorCode.notHandled) {
+        Utils.showToast(Get.context!, "Sign in not handled");
+      } else if (e.code == AuthorizationErrorCode.unknown) {
+        Utils.showToast(Get.context!, "Unknown error occurred");
+      }
+      return null;
+    } on FirebaseAuthException catch (e) {
+      log('Firebase Auth Error: ${e.code} - ${e.message}');
+      Utils.showToast(Get.context!, "Authentication error: ${e.message}");
+      return null;
+    } catch (error) {
+      log('Error signing in with Apple: $error');
+      Utils.showToast(Get.context!, "An error occurred. Please try again.");
+      return null;
+    } finally {
+      isLoading(false);
+      update([Constant.idProgressView]);
+    }
   }
 
   Future<void> signOut() async {

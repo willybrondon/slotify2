@@ -164,6 +164,18 @@ exports.loginSignup = async (req, res) => {
           signup: true,
         });
       }
+    } else if (req.body.loginType == 4) {
+      // Apple Sign In
+      if (!req.body.email) {
+        return res.status(200).json({ status: false, message: "Email must be required!" });
+      }
+
+      if (req.body.email) {
+        userQuery = await User.findOne({
+          email: req.body.email,
+          isDelete: false,
+        });
+      }
     } else if (req.body.loginType == 2) {
       if (!req.body.email) {
         return res.status(200).json({ status: false, message: "Email must be required!" });
