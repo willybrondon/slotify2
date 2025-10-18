@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -55,18 +55,18 @@ class ResetPasswordController extends GetxController {
       final body =
           json.encode({"email": email, "newPassword": newPassword, "confirmPassword": confirmPassword});
 
-      log("Reset Password Body :: $body");
+      dev.log("Reset Password Body :: $body");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.resetPassword);
 
-      log("Reset Password Url :: $url");
+      dev.log("Reset Password Url :: $url");
 
       final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
 
       final response = await http.patch(url, headers: headers, body: body);
 
-      log("Reset Password Status Code :: ${response.statusCode}");
-      log("Reset Password Response :: ${response.body}");
+      dev.log("Reset Password Status Code :: ${response.statusCode}");
+      dev.log("Reset Password Response :: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -75,7 +75,7 @@ class ResetPasswordController extends GetxController {
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
-      log("Error call Reset Password Api :: $e");
+      dev.log("Error call Reset Password Api :: $e");
       Utils.showToast(Get.context!, resetPasswordCategory?.message ?? "");
     } finally {
       isLoading(false);

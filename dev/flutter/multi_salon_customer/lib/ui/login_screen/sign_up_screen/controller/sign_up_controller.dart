@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -70,8 +70,8 @@ class SignUpController extends GetxController {
   getDataFromArgs() {
     dynamic args = Get.arguments;
 
-    log("args::$args");
-    log("Arguments::${Get.arguments}");
+    dev.log("args::$args");
+    dev.log("Arguments::${Get.arguments}");
 
     if (args != null) {
       if (args[0] != null) {
@@ -112,7 +112,7 @@ class SignUpController extends GetxController {
         // var auth = await _auth.createUserWithEmailAndPassword(
         //     email: emailController.text.trim(), password: confirmPasswordController.text.trim());
         // if (auth.user != null) {
-        //   log("message log in successful :::::${auth.user}");
+        //   dev.log("message log in successful :::::${auth.user}");
         //   await loginScreenController.onLoginApiCall(
         //     loginType: "1",
         //     mobile: mobileController.text.trim(),
@@ -120,13 +120,13 @@ class SignUpController extends GetxController {
         //     password: confirmPasswordController.text.trim(),
         //     email: emailController.text.trim(),
         //   );
-        //   log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
+        //   dev.log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
         //
         //   if (loginScreenController.loginCategory?.status == true) {
         //     Constant.storage.write('isLogIn', true);
         //     Constant.storage.write('userId', loginScreenController.loginCategory?.user?.id);
-        //     log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
-        //     log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
+        //     dev.log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
+        //     dev.log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
         //
         //     await editProfileScreenController.onUpdateUserApiCall(
         //         fName: fNameController.text.trim(),
@@ -168,7 +168,7 @@ class SignUpController extends GetxController {
         //     }
         //   }
         // }
-        // log("message :::::sf");
+        // dev.log("message :::::sf");
         await onSignUpOtpLoginApiCall(email: emailController.text.trim());
 
         if (signUpOtpLoginCategory?.status == true) {
@@ -178,7 +178,7 @@ class SignUpController extends GetxController {
           Utils.showToast(Get.context!, signUpOtpLoginCategory?.message ?? "");
         }
       } catch (e) {
-        log("Sign Up Otp Errorr :: $e");
+        dev.log("Sign Up Otp Errorr :: $e");
       } finally {
         isLoading(false);
         update([Constant.idProgressView, Constant.idBookingAndLogin]);
@@ -195,19 +195,19 @@ class SignUpController extends GetxController {
 
       final queryParameters = {"email": email};
 
-      log("Sign Up Otp Login Params :: $queryParameters");
+      dev.log("Sign Up Otp Login Params :: $queryParameters");
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.signUpOtpLogin + queryString);
-      log("Sign Up Otp Login Url :: $url");
+      dev.log("Sign Up Otp Login Url :: $url");
 
       final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
 
       final response = await http.post(url, headers: headers);
 
-      log("Sign Up Otp Login Status Code :: ${response.statusCode}");
-      log("Sign Up Otp Login Response :: ${response.body}");
+      dev.log("Sign Up Otp Login Status Code :: ${response.statusCode}");
+      dev.log("Sign Up Otp Login Response :: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -216,7 +216,7 @@ class SignUpController extends GetxController {
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
-      log("Error call Sign Up Otp Login Api :: $e");
+      dev.log("Error call Sign Up Otp Login Api :: $e");
       Utils.showToast(Get.context!, '$e');
     } finally {
       isLoading(false);
@@ -231,19 +231,19 @@ class SignUpController extends GetxController {
 
       final queryParameters = {"email": email, "loginType": loginType, "password": password};
 
-      log("Check Sign Up User Params :: $queryParameters");
+      dev.log("Check Sign Up User Params :: $queryParameters");
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.checkSignUpUser + queryString);
-      log("Check Sign Up User Url :: $url");
+      dev.log("Check Sign Up User Url :: $url");
 
       final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
 
       final response = await http.get(url, headers: headers);
 
-      log("Check Sign Up User Status Code :: ${response.statusCode}");
-      log("Check Sign Up User Response :: ${response.body}");
+      dev.log("Check Sign Up User Status Code :: ${response.statusCode}");
+      dev.log("Check Sign Up User Response :: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -252,7 +252,7 @@ class SignUpController extends GetxController {
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
-      log("Error call Check Sign Up User Api :: $e");
+      dev.log("Error call Check Sign Up User Api :: $e");
       Utils.showToast(Get.context!, '$e');
     } finally {
       isLoading(false);

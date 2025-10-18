@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,7 +38,7 @@ class LoginScreenController extends GetxController {
 
   @override
   void onInit() async {
-    log("Enter in Login Screen Controller");
+    dev.log("Enter in Login Screen Controller");
     await getDataFromArgs();
     super.onInit();
   }
@@ -46,13 +46,13 @@ class LoginScreenController extends GetxController {
   getDataFromArgs() {
     dynamic args = Get.arguments;
 
-    log("Login Args::$args");
-    log("Login Arguments::${Get.arguments}");
+    dev.log("Login Args::$args");
+    dev.log("Login Arguments::${Get.arguments}");
 
     if (args != null) {
       if (args[0] != null) {
         isDataSelected = args[0];
-        log("Login Arguments isDataSelected::$isDataSelected");
+        dev.log("Login Arguments isDataSelected::$isDataSelected");
       }
     } else {
       isDataSelected = false;
@@ -93,18 +93,18 @@ class LoginScreenController extends GetxController {
 
   onVerification() {
     verification = true;
-    log("Verification == $verification");
+    dev.log("Verification == $verification");
     update([Constant.idVerification]);
   }
 
   onChangeNumber() {
     verification = false;
-    log("Change on Verification :: $verification");
+    dev.log("Change on Verification :: $verification");
     update([Constant.idChangeNumber, Constant.idVerification]);
   }
 
   void verifyPhone() async {
-    log('---- number ---- ${mobileEditingController.text}');
+    dev.log('---- number ---- ${mobileEditingController.text}');
 
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: '$selectedCountryCode${mobileEditingController.text}',
@@ -151,8 +151,8 @@ class LoginScreenController extends GetxController {
         }
 
         Utils.showToast(Get.context!, errorMessage);
-        log("Mobile number Verification :: ${e.code}");
-        log("Mobile number verification :: ${e.message}");
+        dev.log("Mobile number Verification :: ${e.code}");
+        dev.log("Mobile number verification :: ${e.message}");
       },
       codeSent: (String verificationID, int? resendToken) {
         verificationCode = verificationID;
@@ -162,8 +162,8 @@ class LoginScreenController extends GetxController {
   }
 
   verifyOTP({required String mobileNumber}) async {
-    log("Mobile Number :: $mobileNumber");
-    log("otpEditingController :: ${otpEditingController.text}");
+    dev.log("Mobile Number :: $mobileNumber");
+    dev.log("otpEditingController :: ${otpEditingController.text}");
     try {
       isLoading(true);
       update([Constant.idProgressView]);
@@ -174,7 +174,7 @@ class LoginScreenController extends GetxController {
 
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
-      log("User Credential :: $userCredential");
+      dev.log("User Credential :: $userCredential");
     } on FirebaseAuthException catch (e) {
       String errorMessage;
 
@@ -216,8 +216,8 @@ class LoginScreenController extends GetxController {
       }
 
       Utils.showToast(Get.context!, errorMessage);
-      log("Verify OTP :: ${e.code}");
-      log("Verify OTP ::  ${e.message}");
+      dev.log("Verify OTP :: ${e.code}");
+      dev.log("Verify OTP ::  ${e.message}");
       throw Exception("Error occurred during OTP verification.");
     } finally {
       isLoading(false);
@@ -251,11 +251,11 @@ class LoginScreenController extends GetxController {
         "age": age
       });
 
-      log("Login Body :: $body");
-      log("FCM Token being sent :: $safeFcmToken");
+      dev.log("Login Body :: $body");
+      dev.log("FCM Token being sent :: $safeFcmToken");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.loginUser);
-      log("Login Url :: $url");
+      dev.log("Login Url :: $url");
 
       final headers = {
         "key": ApiConstant.SECRET_KEY,
@@ -264,39 +264,39 @@ class LoginScreenController extends GetxController {
         'User-Agent': 'MultiSalonCustomer/1.0',
       };
 
-      log("Login Headers :: $headers");
+      dev.log("Login Headers :: $headers");
 
       final response = await http
           .post(url, headers: headers, body: body)
           .timeout(const Duration(seconds: 30));
 
-      log("Login Status Code :: ${response.statusCode}");
-      log("Login Response :: ${response.body}");
+      dev.log("Login Status Code :: ${response.statusCode}");
+      dev.log("Login Response :: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         loginCategory = LoginModel.fromJson(jsonResponse);
-        log("Login successful: ${loginCategory?.status}");
+        dev.log("Login successful: ${loginCategory?.status}");
       } else {
-        log("Login failed with status code: ${response.statusCode}");
+        dev.log("Login failed with status code: ${response.statusCode}");
         Utils.showToast(Get.context!, "Login failed. Please try again.");
       }
     } on AppException catch (exception) {
-      log("App Exception: ${exception.message}");
+      dev.log("App Exception: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
     } on SocketException catch (e) {
-      log("Network error: $e");
+      dev.log("Network error: $e");
       Utils.showToast(Get.context!,
           "Network connection error. Please check your internet connection.");
     } on HandshakeException catch (e) {
-      log("SSL Handshake error: $e");
+      dev.log("SSL Handshake error: $e");
       Utils.showToast(Get.context!, "SSL connection error. Please try again.");
     } on TimeoutException catch (e) {
-      log("Timeout error: $e");
+      dev.log("Timeout error: $e");
       Utils.showToast(Get.context!,
           "Request timeout. Please check your connection and try again.");
     } catch (e) {
-      log("Error call Login Api :: $e");
+      dev.log("Error call Login Api :: $e");
       Utils.showToast(Get.context!, 'Connection error. Please try again.');
     } finally {
       isLoading(false);

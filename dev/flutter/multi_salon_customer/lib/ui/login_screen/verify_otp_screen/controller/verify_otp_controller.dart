@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -40,17 +40,17 @@ class VerifyOtpController extends GetxController {
 
       final body = json.encode({"email": email, "otp": otp});
 
-      log("Verify OTP Body :: $body");
+      dev.log("Verify OTP Body :: $body");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.verifyOtp);
-      log("Verify OTP Url :: $url");
+      dev.log("Verify OTP Url :: $url");
 
       final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
 
       final response = await http.post(url, headers: headers, body: body);
 
-      log("Verify OTP Status Code :: ${response.statusCode}");
-      log("Verify OTP Response :: ${response.body}");
+      dev.log("Verify OTP Status Code :: ${response.statusCode}");
+      dev.log("Verify OTP Response :: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -59,7 +59,7 @@ class VerifyOtpController extends GetxController {
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
-      log("Error call Verify OTP Api :: $e");
+      dev.log("Error call Verify OTP Api :: $e");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);

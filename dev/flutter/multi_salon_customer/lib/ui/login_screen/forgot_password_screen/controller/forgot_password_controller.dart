@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
@@ -43,23 +43,23 @@ class ForgotPasswordController extends GetxController {
 
       // final queryParameters = {"email": email};
       //
-      // log("Create Otp Params :: $queryParameters");
+      // dev.log("Create Otp Params :: $queryParameters");
       //
       // String queryString = Uri(queryParameters: queryParameters).query;
 
       final body = json.encode({"email": email});
 
-      log("Create OTP Body :: $body");
+      dev.log("Create OTP Body :: $body");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.createOtp);
-      log("Create OTP Url :: $url");
+      dev.log("Create OTP Url :: $url");
 
       final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
 
       final response = await http.post(url, headers: headers,body: body);
 
-      log("Create OTP Status Code :: ${response.statusCode}");
-      log("Create OTP Response :: ${response.body}");
+      dev.log("Create OTP Status Code :: ${response.statusCode}");
+      dev.log("Create OTP Response :: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -68,7 +68,7 @@ class ForgotPasswordController extends GetxController {
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
-      log("Error call Create OTP Api :: $e");
+      dev.log("Error call Create OTP Api :: $e");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);

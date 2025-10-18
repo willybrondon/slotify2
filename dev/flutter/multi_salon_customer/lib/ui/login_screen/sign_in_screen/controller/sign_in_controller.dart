@@ -459,11 +459,22 @@ class SignInController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
+      dev.log("Starting Apple Sign In process...");
+
+      // Check if we're on iOS
+      if (!Platform.isIOS) {
+        Utils.showToast(Get.context!,
+            "Sign in with Apple is only available on iOS devices");
+        return null;
+      }
+
       // Check if Sign in with Apple is available
       final isAvailable = await SignInWithApple.isAvailable();
+      dev.log("Apple Sign In available: $isAvailable");
+
       if (!isAvailable) {
-        Utils.showToast(
-            Get.context!, "Sign in with Apple is not available on this device");
+        Utils.showToast(Get.context!,
+            "Sign in with Apple is not available on this device. Please ensure you're signed into iCloud.");
         return null;
       }
 
@@ -626,26 +637,47 @@ class SignInController extends GetxController {
       }
     } on SignInWithAppleAuthorizationException catch (e) {
       dev.log('Apple Sign In Authorization Error: ${e.code} - ${e.message}');
+      dev.log('Error details: $e');
 
       if (e.code == AuthorizationErrorCode.canceled) {
         Utils.showToast(Get.context!, "Sign in cancelled");
       } else if (e.code == AuthorizationErrorCode.failed) {
-        Utils.showToast(Get.context!, "Sign in failed. Please try again.");
+        Utils.showToast(Get.context!,
+            "Sign in failed. Please ensure Sign in with Apple is enabled in Settings.");
       } else if (e.code == AuthorizationErrorCode.invalidResponse) {
-        Utils.showToast(Get.context!, "Invalid response from Apple");
+        Utils.showToast(
+            Get.context!, "Invalid response from Apple. Please try again.");
       } else if (e.code == AuthorizationErrorCode.notHandled) {
-        Utils.showToast(Get.context!, "Sign in not handled");
+        Utils.showToast(
+            Get.context!, "Sign in not handled. Please contact support.");
       } else if (e.code == AuthorizationErrorCode.unknown) {
-        Utils.showToast(Get.context!, "Unknown error occurred");
+        Utils.showToast(Get.context!,
+            "Apple Sign In error. Please check: 1) You're on real device 2) Signed into iCloud 3) iOS 13+");
+      } else {
+        Utils.showToast(Get.context!, "Error: ${e.message}");
       }
       return null;
     } on FirebaseAuthException catch (e) {
       dev.log('Firebase Auth Error: ${e.code} - ${e.message}');
-      Utils.showToast(Get.context!, "Authentication error: ${e.message}");
+      String errorMessage = "Authentication error";
+
+      if (e.code == 'invalid-credential') {
+        errorMessage = "Invalid Apple credentials. Please try again.";
+      } else if (e.code == 'user-disabled') {
+        errorMessage = "This account has been disabled.";
+      } else if (e.code == 'operation-not-allowed') {
+        errorMessage = "Apple Sign In is not enabled. Please contact support.";
+      } else {
+        errorMessage = e.message ?? "Authentication failed";
+      }
+
+      Utils.showToast(Get.context!, errorMessage);
       return null;
     } catch (error) {
-      dev.log('Error signing in with Apple: $error');
-      Utils.showToast(Get.context!, "An error occurred. Please try again.");
+      dev.log('Unexpected error signing in with Apple: $error');
+      dev.log('Error type: ${error.runtimeType}');
+      Utils.showToast(Get.context!,
+          "Error: ${error.toString()}. Please check logs or contact support.");
       return null;
     } finally {
       isLoading(false);
