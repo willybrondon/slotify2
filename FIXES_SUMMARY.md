@@ -1,4 +1,4 @@
-# ✅ Résumé des Corrections - Login Issues
+# ✅ Résumé des Corrections - Login Issues (Updated Oct 18, 2025)
 
 ## 🐛 Problèmes Identifiés
 
@@ -6,7 +6,7 @@
 **Cause:** Conflit entre `dart:developer` et `dart:math` pour la fonction `log()`
 
 ### 2. **App Crash lors de l'entrée du numéro OTP**
-**Cause:** Même conflit `log()` dans les controllers de login
+**Cause:** Même conflit `log()` dans les controllers de login ET dans la vue login_screen.dart
 
 ### 3. **"Unknown Error" lors du clic sur Apple Sign In**
 **Cause:** Messages d'erreur peu informatifs + configuration manquante
@@ -17,7 +17,7 @@
 
 ### 1. **Résolution du Conflit `log()`**
 
-**Fichiers Corrigés:**
+**Fichiers Corrigés (Round 1 - Précédemment):**
 - ✅ `sign_in_controller.dart`
 - ✅ `login_screen_controller.dart`
 - ✅ `verify_otp_controller.dart`
@@ -25,6 +25,12 @@
 - ✅ `sign_up_otp_verify_controller.dart`
 - ✅ `reset_password_controller.dart`
 - ✅ `forgot_password_controller.dart`
+
+**Fichiers Corrigés (Round 2 - Oct 18, 2025):**
+- ✅ `login_screen/view/login_screen.dart` - **NOUVEAU FIX**
+  - Changed `import 'dart:developer';` to `import 'dart:developer' as dev;`
+  - Updated 14 `log()` calls to `dev.log()`
+  - This was the missing fix causing OTP crashes!
 
 **Solution:**
 ```dart

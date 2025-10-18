@@ -1,6 +1,6 @@
 // ignore_for_file: must_be_immutable
 
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
@@ -22,8 +22,10 @@ import 'package:salon_2/utils/utils.dart';
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
-  final LoginScreenController loginScreenController = Get.put(LoginScreenController());
-  ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
+  final LoginScreenController loginScreenController =
+      Get.put(LoginScreenController());
+  ProfileScreenController profileScreenController =
+      Get.put(ProfileScreenController());
 
   double? statusBarHeight;
 
@@ -59,11 +61,17 @@ class LoginScreen extends StatelessWidget {
             children: [
               Text(
                 "${"txtHello".tr}, ${"txtGuest".tr}👋",
-                style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 18, color: AppColors.whiteColor),
+                style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplay,
+                    fontSize: 18,
+                    color: AppColors.whiteColor),
               ),
               Text(
                 "txtWelcomeService".tr,
-                style: TextStyle(fontFamily: AppFontFamily.sfProDisplayRegular, fontSize: 13, color: AppColors.whiteColor),
+                style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    fontSize: 13,
+                    color: AppColors.whiteColor),
               ),
             ],
           ).paddingOnly(left: 18, bottom: 13),
@@ -82,8 +90,10 @@ class LoginScreen extends StatelessWidget {
             ),
             Center(
               child: Text("txtMobileNumberVerification".tr,
-                  style:
-                      TextStyle(fontFamily: AppFontFamily.sfProDisplayBold, color: AppColors.primaryTextColor, fontSize: 21.5)),
+                  style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      color: AppColors.primaryTextColor,
+                      fontSize: 21.5)),
             ),
             Center(
               child: Text(
@@ -145,13 +155,13 @@ class LoginScreen extends StatelessWidget {
               ),
               initialCountryCode: countryCode ?? "IN",
               onCountryChanged: (value) {
-                log("message :: ${value.code}");
+                dev.log("message :: ${value.code}");
                 countryCode = value.code;
 
                 getDialCode();
               },
               onChanged: (phone) {
-                log("Phone :: ${phone.completeNumber}");
+                dev.log("Phone :: ${phone.completeNumber}");
               },
             ).paddingOnly(left: 15, right: 15, bottom: 15),
             GetBuilder<LoginScreenController>(
@@ -200,11 +210,17 @@ class LoginScreen extends StatelessWidget {
             children: [
               Text(
                 "${"txtHello".tr}, ${"txtGuest".tr}👋",
-                style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 18, color: AppColors.whiteColor),
+                style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplay,
+                    fontSize: 18,
+                    color: AppColors.whiteColor),
               ),
               Text(
                 "txtWelcomeService".tr,
-                style: TextStyle(fontFamily: AppFontFamily.sfProDisplayRegular, fontSize: 13, color: AppColors.whiteColor),
+                style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    fontSize: 13,
+                    color: AppColors.whiteColor),
               ),
             ],
           ).paddingOnly(left: 18, bottom: 13),
@@ -280,11 +296,13 @@ class LoginScreen extends StatelessWidget {
                     id: Constant.idProgressView,
                     builder: (logic) {
                       return Padding(
-                        padding: const EdgeInsets.only(top: 30, right: 15, left: 15, bottom: 15),
+                        padding: const EdgeInsets.only(
+                            top: 30, right: 15, left: 15, bottom: 15),
                         child: Pinput(
                           length: 6,
                           defaultPinTheme: defaultPinTheme,
-                          controller: loginScreenController.otpEditingController,
+                          controller:
+                              loginScreenController.otpEditingController,
                           pinAnimationType: PinAnimationType.fade,
                         ),
                       );
@@ -298,7 +316,8 @@ class LoginScreen extends StatelessWidget {
                         builder: (logic) {
                           return InkWell(
                             splashColor: AppColors.blackColor.withOpacity(0.1),
-                            highlightColor: AppColors.blackColor.withOpacity(0.1),
+                            highlightColor:
+                                AppColors.blackColor.withOpacity(0.1),
                             onTap: () {
                               logic.onChangeNumber();
                               logic.otpEditingController.clear();
@@ -347,7 +366,8 @@ class LoginScreen extends StatelessWidget {
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     margin: const EdgeInsets.only(top: 70),
                     height: 65,
                     width: double.infinity,
@@ -360,30 +380,56 @@ class LoginScreen extends StatelessWidget {
                       buttonColor: AppColors.primaryAppColor,
                       buttonText: "txtVerify".tr,
                       onTap: () async {
-                        await logic.verifyOTP(mobileNumber: Constant.storage.read('mobileNumber'));
+                        await logic.verifyOTP(
+                            mobileNumber:
+                                Constant.storage.read('mobileNumber'));
 
                         await logic.onLoginApiCall(
-                            loginType: "3", mobile: Constant.storage.read('mobileNumber'), fcmToken: fcmToken!);
-                        log("isLogin :: ${logic.loginCategory?.user?.isUpdate}");
+                            loginType: "3",
+                            mobile: Constant.storage.read('mobileNumber'),
+                            fcmToken: fcmToken!);
+                        dev.log(
+                            "isLogin :: ${logic.loginCategory?.user?.isUpdate}");
 
                         if (logic.loginCategory!.status == true) {
-                          Utils.showToast(Get.context!, "User Login SuccessFully..!");
+                          Utils.showToast(
+                              Get.context!, "User Login SuccessFully..!");
                           Constant.storage.write('isLogIn', true);
                           Constant.storage.write('isMobile', true);
-                          Constant.storage.write('userId', logic.loginCategory?.user?.id);
-                          Constant.storage.write('mobileNumber', logic.loginCategory?.user?.mobile.toString());
-                          Constant.storage.write('isUpdate', logic.loginCategory?.user?.isUpdate);
+                          Constant.storage
+                              .write('userId', logic.loginCategory?.user?.id);
+                          Constant.storage.write('mobileNumber',
+                              logic.loginCategory?.user?.mobile.toString());
+                          Constant.storage.write(
+                              'isUpdate', logic.loginCategory?.user?.isUpdate);
 
-                          log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
-                          log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
-                          log("is isMobile Controller :: ${Constant.storage.read<bool>('isMobile')}");
+                          dev.log(
+                              "is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
+                          dev.log(
+                              "is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
+                          dev.log(
+                              "is isMobile Controller :: ${Constant.storage.read<bool>('isMobile')}");
 
-                          await profileScreenController.onGetUserApiCall(loginType: 3);
-                          if (profileScreenController.getUserCategory?.status == true) {
-                            Constant.storage.write('userId', profileScreenController.getUserCategory?.user?.id);
-                            Constant.storage.write('userImage', profileScreenController.getUserCategory?.user?.image);
-                            Constant.storage.write('fName', profileScreenController.getUserCategory?.user?.fname);
-                            Constant.storage.write('lName', profileScreenController.getUserCategory?.user?.lname);
+                          await profileScreenController.onGetUserApiCall(
+                              loginType: 3);
+                          if (profileScreenController.getUserCategory?.status ==
+                              true) {
+                            Constant.storage.write(
+                                'userId',
+                                profileScreenController
+                                    .getUserCategory?.user?.id);
+                            Constant.storage.write(
+                                'userImage',
+                                profileScreenController
+                                    .getUserCategory?.user?.image);
+                            Constant.storage.write(
+                                'fName',
+                                profileScreenController
+                                    .getUserCategory?.user?.fname);
+                            Constant.storage.write(
+                                'lName',
+                                profileScreenController
+                                    .getUserCategory?.user?.lname);
 
                             logic.isLogIn = true;
 
@@ -396,29 +442,50 @@ class LoginScreen extends StatelessWidget {
                             }
                             logic.update([Constant.idBookingAndLogin]);
                           } else {
-                            Utils.showToast(Get.context!, profileScreenController.getUserCategory?.message ?? "");
+                            Utils.showToast(
+                                Get.context!,
+                                profileScreenController
+                                        .getUserCategory?.message ??
+                                    "");
                           }
                           if (logic.loginCategory?.user?.isUpdate == false) {
-                            log("profileScreenController.getUserCategory?.user?.fname::${profileScreenController.getUserCategory?.user?.fname}");
-                            log("profileScreenController.getUserCategory?.user?.lname::${profileScreenController.getUserCategory?.user?.lname}");
-                            log("profileScreenController.getUserCategory?.user?.email::${profileScreenController.getUserCategory?.user?.email}");
-                            log("profileScreenController.getUserCategory?.user?.mobile::${profileScreenController.getUserCategory?.user?.mobile}");
-                            log("profileScreenController.getUserCategory?.user?.bio::${profileScreenController.getUserCategory?.user?.bio}");
-                            log("profileScreenController.getUserCategory?.user?.loginType::${profileScreenController.getUserCategory?.user?.loginType}");
-                            log("logic.isDataSelected::${logic.isDataSelected}");
+                            dev.log(
+                                "profileScreenController.getUserCategory?.user?.fname::${profileScreenController.getUserCategory?.user?.fname}");
+                            dev.log(
+                                "profileScreenController.getUserCategory?.user?.lname::${profileScreenController.getUserCategory?.user?.lname}");
+                            dev.log(
+                                "profileScreenController.getUserCategory?.user?.email::${profileScreenController.getUserCategory?.user?.email}");
+                            dev.log(
+                                "profileScreenController.getUserCategory?.user?.mobile::${profileScreenController.getUserCategory?.user?.mobile}");
+                            dev.log(
+                                "profileScreenController.getUserCategory?.user?.bio::${profileScreenController.getUserCategory?.user?.bio}");
+                            dev.log(
+                                "profileScreenController.getUserCategory?.user?.loginType::${profileScreenController.getUserCategory?.user?.loginType}");
+                            dev.log(
+                                "logic.isDataSelected::${logic.isDataSelected}");
 
                             Get.toNamed(AppRoutes.editProfile, arguments: [
-                              profileScreenController.getUserCategory?.user?.fname,
-                              profileScreenController.getUserCategory?.user?.lname,
-                              profileScreenController.getUserCategory?.user?.email,
-                              profileScreenController.getUserCategory?.user?.mobile,
+                              profileScreenController
+                                  .getUserCategory?.user?.fname,
+                              profileScreenController
+                                  .getUserCategory?.user?.lname,
+                              profileScreenController
+                                  .getUserCategory?.user?.email,
+                              profileScreenController
+                                  .getUserCategory?.user?.mobile,
                               0,
-                              profileScreenController.getUserCategory?.user?.bio,
-                              profileScreenController.getUserCategory?.user?.loginType,
+                              profileScreenController
+                                  .getUserCategory?.user?.bio,
+                              profileScreenController
+                                  .getUserCategory?.user?.loginType,
                               logic.isDataSelected
                             ]);
-                            await Get.put<EditProfileScreenController>(EditProfileScreenController()).getDataFromArgs();
-                            await Get.put<EditProfileScreenController>(EditProfileScreenController()).getArgumentsData();
+                            await Get.put<EditProfileScreenController>(
+                                    EditProfileScreenController())
+                                .getDataFromArgs();
+                            await Get.put<EditProfileScreenController>(
+                                    EditProfileScreenController())
+                                .getArgumentsData();
                           } else {
                             if (logic.isDataSelected == true) {
                               Constant.storage.write('isUpdate', true);
@@ -428,9 +495,10 @@ class LoginScreen extends StatelessWidget {
                             }
                           }
                         } else {
-                          Utils.showToast(Get.context!, logic.loginCategory?.message ?? "");
+                          Utils.showToast(
+                              Get.context!, logic.loginCategory?.message ?? "");
                         }
-                        log("Log in Successfully");
+                        dev.log("Log in Successfully");
                       },
                     ),
                   ),
