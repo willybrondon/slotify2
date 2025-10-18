@@ -329,6 +329,8 @@ class SignInScreen extends StatelessWidget {
                           ),
                         ).paddingOnly(top: 5, bottom: 20),
                       ),
+                      // TEMPORARILY DISABLED - Google, Apple, and OTP login not working
+                      /* 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -352,6 +354,7 @@ class SignInScreen extends StatelessWidget {
                           ),
                         ],
                       ).paddingOnly(left: 16, right: 16, bottom: 17),
+                      */
                       InkWell(
                         overlayColor:
                             WidgetStatePropertyAll(AppColors.transparent),
@@ -387,6 +390,7 @@ class SignInScreen extends StatelessWidget {
                           ),
                         ).paddingOnly(bottom: 20),
                       ),
+                      /* TEMPORARILY DISABLED - Google and Apple Sign In not working
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Row(
@@ -535,6 +539,8 @@ class SignInScreen extends StatelessWidget {
                           ],
                         ),
                       ),
+                      */ // END Google and Apple Sign In
+                      /* TEMPORARILY DISABLED - Mobile/OTP login not working
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: InkWell(
@@ -602,6 +608,7 @@ class SignInScreen extends StatelessWidget {
                               ),
                             ).paddingOnly(bottom: 20, top: 10),
                       ),
+                      */ // END Mobile/OTP login
                     ],
                   ),
                 ),
