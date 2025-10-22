@@ -88,10 +88,10 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
   @override
   Widget build(BuildContext context) {
     // Get the existing SplashController instance
-    final splashController = Get.isRegistered<SplashController>() 
-        ? Get.find<SplashController>() 
+    final splashController = Get.isRegistered<SplashController>()
+        ? Get.find<SplashController>()
         : Get.put(SplashController());
-    
+
     return Scaffold(
       backgroundColor: AppColors.backGround,
       appBar: AppBar(
@@ -111,273 +111,282 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
         ),
       ),
       body: SingleChildScrollView(
-            child: Column(
-              children: [
-                // App Logo and Name Section
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 30),
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    boxShadow: Constant.boxShadow,
-                  ),
-                  child: Column(
-                    children: [
-                      // App Icon
-                      Container(
-                        height: 100,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: AppColors.buttonColor,
+        child: Column(
+          children: [
+            // App Logo and Name Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 30),
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                boxShadow: Constant.boxShadow,
+              ),
+              child: Column(
+                children: [
+                  // App Icon
+                  Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: AppColors.whiteColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.blackColor.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
                         ),
-                        child: Center(
-                          child: Icon(
-                            Icons.content_cut,
-                            size: 50,
-                            color: AppColors.whiteColor,
-                          ),
-                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        AppAsset.icSkedisyLogo,
+                        height: 60,
+                        width: 60,
+                        fit: BoxFit.contain,
                       ),
-                      const SizedBox(height: 15),
-                      // App Name
-                      Text(
-                        "txtAppName".tr,
-                        style: TextStyle(
-                          fontFamily: AppFontFamily.sfProDisplayBold,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.blackColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // Version
-                      Text(
-                        "${"txtVersion".tr} $appVersion${buildNumber.isNotEmpty ? " ($buildNumber)" : ""}",
-                        style: TextStyle(
-                          fontFamily: AppFontFamily.sfProDisplayRegular,
-                          fontSize: 14,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 15),
-
-                // Description Section
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    boxShadow: Constant.boxShadow,
+                  const SizedBox(height: 15),
+                  // App Name
+                  Text(
+                    "txtAppName".tr,
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.blackColor,
+                    ),
                   ),
-                  child: Text(
-                    "txtAboutAppDescription".tr,
-                    textAlign: TextAlign.center,
+                  const SizedBox(height: 8),
+                  // Version
+                  Text(
+                    "${"txtVersion".tr} $appVersion${buildNumber.isNotEmpty ? " ($buildNumber)" : ""}",
                     style: TextStyle(
                       fontFamily: AppFontFamily.sfProDisplayRegular,
                       fontSize: 14,
-                      height: 1.5,
-                      color: AppColors.blackColor.withOpacity(0.7),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15),
-
-                // Features Section
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    boxShadow: Constant.boxShadow,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "txtAppFeatures".tr,
-                        style: TextStyle(
-                          fontFamily: AppFontFamily.sfProDisplayBold,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.blackColor,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      _buildFeatureItem("txtFeature1".tr),
-                      _buildFeatureItem("txtFeature2".tr),
-                      _buildFeatureItem("txtFeature3".tr),
-                      _buildFeatureItem("txtFeature4".tr),
-                      _buildFeatureItem("txtFeature5".tr),
-                      _buildFeatureItem("txtFeature6".tr),
-                      _buildFeatureItem("txtFeature7".tr),
-                      _buildFeatureItem("txtFeature8".tr),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-
-                // Legal Information Section
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    boxShadow: Constant.boxShadow,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                        child: Text(
-                          "txtLegalInformation".tr,
-                          style: TextStyle(
-                            fontFamily: AppFontFamily.sfProDisplayBold,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.blackColor,
-                          ),
-                        ),
-                      ),
-                      CustomMenu(
-                        leadingImage: AppAsset.icPrivacyPolicy,
-                        imageHeight: 20,
-                        imageWidth: 20,
-                        title: "txtPrivacyPolicy".tr,
-                        fontFamily: AppFontFamily.sfProDisplayMedium,
-                        fontSize: 14.5,
-                        onTap: () {
-                          log("PRIVACY_POLICY_URL link  :: ${splashController.settingCategory?.setting?.privacyPolicyLink ?? ""}");
-                          Utils.launchURL(splashController.settingCategory?.setting
-                                  ?.privacyPolicyLink ??
-                              "https://skedisy.com/privacy-policy");
-                        },
-                      ),
-                      CustomMenu(
-                        leadingImage: AppAsset.icTerms,
-                        imageHeight: 20,
-                        imageWidth: 20,
-                        title: "txtTermsCondition".tr,
-                        fontFamily: AppFontFamily.sfProDisplayMedium,
-                        fontSize: 14.5,
-                        onTap: () {
-                          log("TC link  :: ${splashController.settingCategory?.setting?.tnc ?? ""}");
-                          Utils.launchURL(splashController.settingCategory?.setting?.tnc ??
-                              "https://skedisy.com/terms-conditions");
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-
-                // Rate & Share Section
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    boxShadow: Constant.boxShadow,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                        child: Text(
-                          "txtRateShare".tr,
-                          style: TextStyle(
-                            fontFamily: AppFontFamily.sfProDisplayBold,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.blackColor,
-                          ),
-                        ),
-                      ),
-                      CustomMenu(
-                        leadingImage: AppAsset.icShare,
-                        imageHeight: 20,
-                        imageWidth: 20,
-                        title: "txtShare".tr,
-                        fontFamily: AppFontFamily.sfProDisplayMedium,
-                        fontSize: 14.5,
-                        onTap: () {
-                          _shareApp();
-                        },
-                      ),
-                      CustomMenu(
-                        leadingImage: AppAsset.icRate,
-                        imageHeight: 20,
-                        imageWidth: 20,
-                        title: "txtRate".tr,
-                        fontFamily: AppFontFamily.sfProDisplayMedium,
-                        fontSize: 14.5,
-                        onTap: () {
-                          _requestReview();
-                          _openStoreListing();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-
-                // Website Section
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    boxShadow: Constant.boxShadow,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      Utils.launchURL("https://skedisy.com");
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.language,
-                            color: AppColors.buttonColor,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            "txtWebsite".tr,
-                            style: TextStyle(
-                              fontFamily: AppFontFamily.sfProDisplayMedium,
-                              fontSize: 16,
-                              color: AppColors.buttonColor,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-
-                // Copyright Section
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Text(
-                    "txtCopyright".tr,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: AppFontFamily.sfProDisplayRegular,
-                      fontSize: 12,
                       color: AppColors.grey,
                     ),
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 15),
+
+            // Description Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                boxShadow: Constant.boxShadow,
+              ),
+              child: Text(
+                "txtAboutAppDescription".tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayRegular,
+                  fontSize: 14,
+                  height: 1.5,
+                  color: AppColors.blackColor.withOpacity(0.7),
                 ),
-                const SizedBox(height: 20),
-              ],
-            ).paddingOnly(left: 12, right: 12, top: 12),
+              ),
+            ),
+            const SizedBox(height: 15),
+
+            // Features Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                boxShadow: Constant.boxShadow,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "txtAppFeatures".tr,
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.blackColor,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  _buildFeatureItem("txtFeature1".tr),
+                  _buildFeatureItem("txtFeature2".tr),
+                  _buildFeatureItem("txtFeature3".tr),
+                  _buildFeatureItem("txtFeature4".tr),
+                  _buildFeatureItem("txtFeature5".tr),
+                  _buildFeatureItem("txtFeature6".tr),
+                  _buildFeatureItem("txtFeature7".tr),
+                  _buildFeatureItem("txtFeature8".tr),
+                ],
+              ),
+            ),
+            const SizedBox(height: 15),
+
+            // Legal Information Section
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                boxShadow: Constant.boxShadow,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                    child: Text(
+                      "txtLegalInformation".tr,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplayBold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.blackColor,
+                      ),
+                    ),
+                  ),
+                  CustomMenu(
+                    leadingImage: AppAsset.icPrivacyPolicy,
+                    imageHeight: 20,
+                    imageWidth: 20,
+                    title: "txtPrivacyPolicy".tr,
+                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                    fontSize: 14.5,
+                    onTap: () {
+                      log("PRIVACY_POLICY_URL link  :: ${splashController.settingCategory?.setting?.privacyPolicyLink ?? ""}");
+                      Utils.launchURL(splashController
+                              .settingCategory?.setting?.privacyPolicyLink ??
+                          "https://skedisy.com/privacy-policy");
+                    },
+                  ),
+                  CustomMenu(
+                    leadingImage: AppAsset.icTerms,
+                    imageHeight: 20,
+                    imageWidth: 20,
+                    title: "txtTermsCondition".tr,
+                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                    fontSize: 14.5,
+                    onTap: () {
+                      log("TC link  :: ${splashController.settingCategory?.setting?.tnc ?? ""}");
+                      Utils.launchURL(
+                          splashController.settingCategory?.setting?.tnc ??
+                              "https://skedisy.com/terms-conditions");
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 15),
+
+            // Rate & Share Section
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                boxShadow: Constant.boxShadow,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                    child: Text(
+                      "txtRateShare".tr,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplayBold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.blackColor,
+                      ),
+                    ),
+                  ),
+                  CustomMenu(
+                    leadingImage: AppAsset.icShare,
+                    imageHeight: 20,
+                    imageWidth: 20,
+                    title: "txtShare".tr,
+                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                    fontSize: 14.5,
+                    onTap: () {
+                      _shareApp();
+                    },
+                  ),
+                  CustomMenu(
+                    leadingImage: AppAsset.icRate,
+                    imageHeight: 20,
+                    imageWidth: 20,
+                    title: "txtRate".tr,
+                    fontFamily: AppFontFamily.sfProDisplayMedium,
+                    fontSize: 14.5,
+                    onTap: () {
+                      _requestReview();
+                      _openStoreListing();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 15),
+
+            // Website Section
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                boxShadow: Constant.boxShadow,
+              ),
+              child: InkWell(
+                onTap: () {
+                  Utils.launchURL("https://skedisy.com");
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.language,
+                        color: AppColors.buttonColor,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "txtWebsite".tr,
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplayMedium,
+                          fontSize: 16,
+                          color: AppColors.buttonColor,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            // Copyright Section
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                "txtCopyright".tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayRegular,
+                  fontSize: 12,
+                  color: AppColors.grey,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ).paddingOnly(left: 12, right: 12, top: 12),
       ),
     );
   }

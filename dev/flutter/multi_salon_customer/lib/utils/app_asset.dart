@@ -23,7 +23,8 @@ class AppAsset {
   static const icCallFilled = "${getIconsPath}call_filled.png";
   static const icCart = "${getIconsPath}cart.png";
   static const icCashAfterService = "${getIconsPath}cash_after_service.png";
-  static const icCategoryPlaceholder = "${getIconsPath}category_placeholder.png";
+  static const icCategoryPlaceholder =
+      "${getIconsPath}category_placeholder.png";
   static const icCheck = "${getIconsPath}check.png";
   static const icCheck1 = "${getIconsPath}check_1.png";
   static const icCheckIn = "${getIconsPath}check_in.png";
@@ -102,6 +103,7 @@ class AppAsset {
   static const icShare = "${getIconsPath}share.png";
   static const icSignIn = "${getIconsPath}sign_in.png";
   static const icSplash = "${getIconsPath}splash.png";
+  static const icSkedisyLogo = "${getIconsPath}logo.png";
   static const icStaff = "${getIconsPath}staff.png";
   static const icStarFilled = "${getIconsPath}star_filled.png";
   static const icStarOutline = "${getIconsPath}star_outline.png";
