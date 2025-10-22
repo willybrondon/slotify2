@@ -36,7 +36,8 @@ final Map<String, String> enUS = {
   "txtConfirmBooking": "Confirm Booking",
   "txtPendingOrder": "Pending Order",
   "txtUnderMaintenance": "Under Maintenance",
-  "txtSorryUnderMaintenance": "Sorry, The app is currently Under Maintenance !!",
+  "txtSorryUnderMaintenance":
+      "Sorry, The app is currently Under Maintenance !!",
   "txtCloseApp": "Close App",
   "txtNotPendingOrder": "Pending booking not available...!",
   "txtExit": "Exit",
@@ -145,7 +146,8 @@ final Map<String, String> enUS = {
   "desTerms": "I accept the ",
   "desPolicy": "Terms of Services and Privacy Policy",
   "desLogOut": "Are you sure you want to Log Out ?",
-  "desAccountDeleted": "Your account will be deleted permanently. Your Data wil not be restored again.",
+  "desAccountDeleted":
+      "Your account will be deleted permanently. Your Data wil not be restored again.",
   "desEnterDetail": "Please Enter Details First",
   "desCheckEmail": "Please Check Your Email",
   "desAcceptTerms": "Please accept terms and condition",
@@ -155,7 +157,6 @@ final Map<String, String> enUS = {
   "desSlotBooked": "This slot is booked",
   "desPreviousSlot": "You cannot book previous slots",
   "desExit": "Are you sure You want to Exit ?",
-
   "txtCancelledBy": "CancelledBy",
   "txtHistory": "History",
   "txtBookingCompleted": "Booking Completed",

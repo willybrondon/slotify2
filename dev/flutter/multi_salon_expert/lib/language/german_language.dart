@@ -186,4 +186,21 @@ final Map<String, String> deAT = {
   "desPleaseEnterAmount": "Bitte Betrag eingeben...",
   "desDataNoAdd": "Diese Daten wurden noch nicht hinzugefügt!!",
   "desNotAvailableWork": "Jetzt bei Nicht verfügbar für Arbeit",
+
+  // About App
+  "txtAppName": "Multi Salon Expert",
+  "txtVersion": "Version",
+  "txtAboutAppDescription": "Multi Salon Expert ist eine umfassende Plattform für Salonprofis zur effizienten Verwaltung von Buchungen, Einnahmen und Anwesenheit. Verbinden Sie sich mit Kunden, verwalten Sie Ihren Zeitplan und lassen Sie Ihr Geschäft mit Leichtigkeit wachsen.",
+  "txtDeveloperInfo": "Entwicklerinformationen",
+  "txtContactSupport": "Support kontaktieren",
+  "txtWebsite": "Webseite",
+  "txtCopyright": "© 2025 Skedisy. Alle Rechte vorbehalten.",
+  "txtLegalInformation": "Rechtliche Informationen",
+  "txtAppFeatures": "App-Funktionen",
+  "txtFeature1": "• Buchungen und Termine verwalten",
+  "txtFeature2": "• Einnahmen und Gewinne verfolgen",
+  "txtFeature3": "• Anwesenheitsverwaltung",
+  "txtFeature4": "• Echtzeit-Benachrichtigungen",
+  "txtFeature5": "• Mehrere Zahlungsmethoden",
+  "txtFeature6": "• Mehrsprachige Unterstützung",
 };

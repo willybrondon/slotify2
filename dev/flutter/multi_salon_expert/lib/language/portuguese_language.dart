@@ -145,7 +145,8 @@ final Map<String, String> ptPT = {
   "desTerms": "Eu aceito o",
   "desPolicy": "Termos de Serviços e Política de Privacidade",
   "desLogOut": "Tem certeza que deseja sair ?",
-  "desAccountDeleted": "Sua conta será excluída permanentemente. Seus dados não serão restaurados novamente.",
+  "desAccountDeleted":
+      "Sua conta será excluída permanentemente. Seus dados não serão restaurados novamente.",
   "desEnterDetail": "Por favor, insira os detalhes primeiro",
   "desCheckEmail": "Por favor verifique seu email",
   "desAcceptTerms": "Por favor, aceite os termos e condições",
@@ -155,7 +156,6 @@ final Map<String, String> ptPT = {
   "desSlotBooked": "Esta vaga está reservada",
   "desPreviousSlot": "Você não pode reservar vagas anteriores",
   "desExit": "Você tem certeza que quer sair ?",
-
   "txtCancelledBy": "Cancelado por",
   "txtHistory": "História",
   "txtBookingCompleted": "Reserva concluída",
@@ -182,7 +182,8 @@ final Map<String, String> ptPT = {
   "txtHolidayMode": "Modo Férias",
   "desPleaseEnterFirstName": "Por favor insira o primeiro nome",
   "desPleaseEnterLastName": "Por favor insira o sobrenome",
-  "desNoDataFoundWalletHistory": "Nenhum dado encontrado para o histórico da carteira!!",
+  "desNoDataFoundWalletHistory":
+      "Nenhum dado encontrado para o histórico da carteira!!",
   "desPleaseEnterAmount": "Por favor insira o valor...",
   "desDataNoAdd": "Esses dados ainda não foram adicionados !!",
   "desNotAvailableWork": "Agora não disponível para trabalho",

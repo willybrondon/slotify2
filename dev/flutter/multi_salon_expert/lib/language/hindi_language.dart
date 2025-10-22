@@ -186,4 +186,21 @@ final Map<String, String> hiIN = {
   "desPleaseEnterAmount": "कृपया राशि दर्ज करें...",
   "desDataNoAdd": "यह डेटा अभी तक नहीं जोड़ा गया है!!",
   "desNotAvailableWork": "अभी काम के लिए उपलब्ध नहीं है",
+
+  // About App
+  "txtAppName": "Multi Salon Expert",
+  "txtVersion": "संस्करण",
+  "txtAboutAppDescription": "Multi Salon Expert सैलून पेशेवरों के लिए अपनी बुकिंग, राजस्व और उपस्थिति को कुशलतापूर्वक प्रबंधित करने के लिए डिज़ाइन किया गया एक व्यापक मंच है। ग्राहकों से जुड़ें, अपने शेड्यूल का प्रबंधन करें और अपने व्यवसाय को आसानी से बढ़ाएं।",
+  "txtDeveloperInfo": "डेवलपर जानकारी",
+  "txtContactSupport": "सहायता से संपर्क करें",
+  "txtWebsite": "वेबसाइट",
+  "txtCopyright": "© 2025 Skedisy. सर्वाधिकार सुरक्षित।",
+  "txtLegalInformation": "कानूनी जानकारी",
+  "txtAppFeatures": "ऐप की विशेषताएं",
+  "txtFeature1": "• बुकिंग और अपॉइंटमेंट प्रबंधित करें",
+  "txtFeature2": "• राजस्व और कमाई ट्रैक करें",
+  "txtFeature3": "• उपस्थिति प्रबंधन",
+  "txtFeature4": "• रीयल-टाइम सूचनाएं",
+  "txtFeature5": "• एकाधिक भुगतान विधियाँ",
+  "txtFeature6": "• बहुभाषी समर्थन",
 };

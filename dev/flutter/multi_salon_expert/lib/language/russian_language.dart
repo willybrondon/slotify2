@@ -186,4 +186,21 @@ final Map<String, String> ruRU = {
   "desPleaseEnterAmount": "Пожалуйста, введите сумму...",
   "desDataNoAdd": "Эти данные еще не добавлены !!",
   "desNotAvailableWork": "Сейчас недоступен для работы",
+
+  // About App
+  "txtAppName": "Multi Salon Expert",
+  "txtVersion": "Версия",
+  "txtAboutAppDescription": "Multi Salon Expert — это комплексная платформа, разработанная для специалистов салонов для эффективного управления бронированиями, доходами и посещаемостью. Связывайтесь с клиентами, управляйте своим расписанием и развивайте свой бизнес с легкостью.",
+  "txtDeveloperInfo": "Информация о разработчике",
+  "txtContactSupport": "Связаться с поддержкой",
+  "txtWebsite": "Веб-сайт",
+  "txtCopyright": "© 2025 Skedisy. Все права защищены.",
+  "txtLegalInformation": "Юридическая информация",
+  "txtAppFeatures": "Функции приложения",
+  "txtFeature1": "• Управление бронированиями и встречами",
+  "txtFeature2": "• Отслеживание доходов и заработков",
+  "txtFeature3": "• Управление посещаемостью",
+  "txtFeature4": "• Уведомления в реальном времени",
+  "txtFeature5": "• Несколько способов оплаты",
+  "txtFeature6": "• Многоязычная поддержка",
 };

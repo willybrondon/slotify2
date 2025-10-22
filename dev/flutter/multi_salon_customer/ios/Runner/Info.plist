@@ -53,19 +53,19 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) camera description.</string>
+	<string>Skedisy needs access to your camera to take photos for your profile picture. For example, you can capture a new profile photo directly within the app.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs location access to help you find nearby salons and provide location-based services.</string>
+	<string>Skedisy uses your location to help you discover nearby salons and beauty service providers. For example, when you search for services, we'll show you the closest available salons sorted by distance from your current location.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This application requires location services to work</string>
+	<string>Skedisy uses your location to help you discover nearby salons and beauty service providers. For example, when you search for services, we'll show you the closest available salons sorted by distance from your current location, even when the app is in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This application requires location services to work</string>
+	<string>Skedisy uses your location to help you discover nearby salons and beauty service providers. For example, when you search for services, we'll show you the closest available salons sorted by distance from your current location.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>To add sounds to the videos you record.</string>
+	<string>Skedisy may request microphone access for voice search features. For example, you can use voice commands to search for salon services by saying "haircut near me" instead of typing.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>App needs access to photo lib for profile images</string>
+	<string>Skedisy needs access to your photo library to select photos for your profile picture or when submitting feedback with screenshots. For example, you can choose an existing photo from your gallery to set as your profile image.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>This app uses speech recognition to provide a better user experience.</string>
+	<string>Skedisy uses speech recognition to enable voice search for salon services. For example, you can speak "find hair salons near me" and the app will convert your speech to text to search for relevant services.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

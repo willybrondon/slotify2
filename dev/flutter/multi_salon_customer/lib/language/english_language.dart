@@ -323,4 +323,23 @@ final Map<String, String> enUS = {
   "txtOrderPlacedSuccessfully": "Order placed Successfully!",
   "txtYourOrderHasSuccessfully": "Your order has been successfully placed !!",
   "txtGoToOrderDetails": "Go to order details",
+
+  // About App
+  "txtAppName": "Skedisy",
+  "txtVersion": "Version",
+  "txtAboutAppDescription":
+      "Skedisy is your one-stop solution for booking salon and beauty services. Discover nearby salons, browse services, book appointments, and manage your beauty routine effortlessly with our easy-to-use platform.",
+  "txtAppFeatures": "App Features",
+  "txtFeature1": "• Browse and book salon services near you",
+  "txtFeature2": "• View detailed service prices and duration",
+  "txtFeature3": "• Multiple payment methods (card, wallet, cash)",
+  "txtFeature4": "• Real-time booking confirmations",
+  "txtFeature5": "• Track appointment history and upcoming bookings",
+  "txtFeature6": "• Rate and review salons and services",
+  "txtFeature7": "• Exclusive offers and discounts",
+  "txtFeature8": "• Multi-language support for global users",
+  "txtWebsite": "Website",
+  "txtCopyright": "© 2025 Skedisy. All rights reserved.",
+  "txtLegalInformation": "Legal Information",
+  "txtRateShare": "Rate & Share",
 };

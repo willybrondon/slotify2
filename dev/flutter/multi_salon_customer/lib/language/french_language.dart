@@ -328,4 +328,24 @@ final Map<String, String> frCH = {
   "txtOrderPlacedSuccessfully": "Commande passée avec succès!",
   "txtYourOrderHasSuccessfully": "Votre commande a été passée avec succès !!",
   "txtGoToOrderDetails": "Aller aux détails de la commande",
+
+  // About App
+  "txtAppName": "Skedisy",
+  "txtVersion": "Version",
+  "txtAboutAppDescription":
+      "Skedisy est votre solution tout-en-un pour réserver des services de salon et de beauté. Découvrez les salons à proximité, parcourez les services, réservez des rendez-vous et gérez votre routine beauté sans effort avec notre plateforme facile à utiliser.",
+  "txtAppFeatures": "Fonctionnalités de l'application",
+  "txtFeature1": "• Parcourir et réserver des services de salon près de chez vous",
+  "txtFeature2": "• Afficher les prix et la durée des services en détail",
+  "txtFeature3": "• Plusieurs méthodes de paiement (carte, portefeuille, espèces)",
+  "txtFeature4": "• Confirmations de réservation en temps réel",
+  "txtFeature5":
+      "• Suivre l'historique des rendez-vous et les réservations à venir",
+  "txtFeature6": "• Noter et évaluer les salons et services",
+  "txtFeature7": "• Offres et réductions exclusives",
+  "txtFeature8": "• Support multilingue pour les utilisateurs mondiaux",
+  "txtWebsite": "Site Web",
+  "txtCopyright": "© 2025 Skedisy. Tous droits réservés.",
+  "txtLegalInformation": "Informations légales",
+  "txtRateShare": "Noter et partager",
 };

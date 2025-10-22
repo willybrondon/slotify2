@@ -155,7 +155,6 @@ final Map<String, String> zhCN = {
   "desSlotBooked": "该时段已被预订",
   "desPreviousSlot": "您无法预订之前的时段",
   "desExit": "你确定要离开 ？",
-
   "txtCancelledBy": "取消者",
   "txtHistory": "历史",
   "txtBookingCompleted": "预订完成",
