@@ -87,6 +87,11 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the existing SplashController instance
+    final splashController = Get.isRegistered<SplashController>() 
+        ? Get.find<SplashController>() 
+        : Get.put(SplashController());
+    
     return Scaffold(
       backgroundColor: AppColors.backGround,
       appBar: AppBar(
@@ -105,9 +110,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
           ),
         ),
       ),
-      body: GetBuilder<SplashController>(
-        builder: (logic) {
-          return SingleChildScrollView(
+      body: SingleChildScrollView(
             child: Column(
               children: [
                 // App Logo and Name Section
@@ -247,8 +250,8 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
                         fontFamily: AppFontFamily.sfProDisplayMedium,
                         fontSize: 14.5,
                         onTap: () {
-                          log("PRIVACY_POLICY_URL link  :: ${logic.settingCategory?.setting?.privacyPolicyLink ?? ""}");
-                          Utils.launchURL(logic.settingCategory?.setting
+                          log("PRIVACY_POLICY_URL link  :: ${splashController.settingCategory?.setting?.privacyPolicyLink ?? ""}");
+                          Utils.launchURL(splashController.settingCategory?.setting
                                   ?.privacyPolicyLink ??
                               "https://skedisy.com/privacy-policy");
                         },
@@ -261,8 +264,8 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
                         fontFamily: AppFontFamily.sfProDisplayMedium,
                         fontSize: 14.5,
                         onTap: () {
-                          log("TC link  :: ${logic.settingCategory?.setting?.tnc ?? ""}");
-                          Utils.launchURL(logic.settingCategory?.setting?.tnc ??
+                          log("TC link  :: ${splashController.settingCategory?.setting?.tnc ?? ""}");
+                          Utils.launchURL(splashController.settingCategory?.setting?.tnc ??
                               "https://skedisy.com/terms-conditions");
                         },
                       ),
@@ -375,8 +378,6 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
                 const SizedBox(height: 20),
               ],
             ).paddingOnly(left: 12, right: 12, top: 12),
-          );
-        },
       ),
     );
   }
