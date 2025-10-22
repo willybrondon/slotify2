@@ -316,4 +316,23 @@ final Map<String, String> koKR = {
   "txtOrderPlacedSuccessfully": "주문이 성공적으로 완료되었습니다!",
   "txtYourOrderHasSuccessfully": "주문이 성공적으로 완료되었습니다!!",
   "txtGoToOrderDetails": "주문 세부정보로 이동",
+
+  // About App
+  "txtAppName": "Skedisy",
+  "txtVersion": "버전",
+  "txtAboutAppDescription":
+      "Skedisy는 살롱 및 뷰티 서비스 예약을 위한 원스톱 솔루션입니다. 인근 살롱을 발견하고, 서비스를 탐색하고, 예약하고, 사용하기 쉬운 플랫폼으로 뷰티 루틴을 손쉽게 관리하세요.",
+  "txtAppFeatures": "앱 기능",
+  "txtFeature1": "• 주변 살롱 서비스 검색 및 예약",
+  "txtFeature2": "• 자세한 서비스 가격 및 소요 시간 확인",
+  "txtFeature3": "• 다양한 결제 방법 (카드, 지갑, 현금)",
+  "txtFeature4": "• 실시간 예약 확인",
+  "txtFeature5": "• 예약 기록 및 예정된 예약 추적",
+  "txtFeature6": "• 살롱 및 서비스 평가 및 리뷰",
+  "txtFeature7": "• 독점 제안 및 할인",
+  "txtFeature8": "• 전 세계 사용자를 위한 다국어 지원",
+  "txtWebsite": "웹사이트",
+  "txtCopyright": "© 2025 Skedisy. 모든 권리 보유.",
+  "txtLegalInformation": "법적 정보",
+  "txtRateShare": "평가 및 공유",
 };

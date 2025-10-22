@@ -325,4 +325,23 @@ final Map<String, String> idID = {
   "txtOrderPlacedSuccessfully": "Pesanan berhasil dilakukan!",
   "txtYourOrderHasSuccessfully": "Pesanan Anda telah berhasil dilakukan!!",
   "txtGoToOrderDetails": "Buka detail pesanan",
+
+  // About App
+  "txtAppName": "Skedisy",
+  "txtVersion": "Versi",
+  "txtAboutAppDescription":
+      "Skedisy adalah solusi satu atap untuk memesan layanan salon dan kecantikan. Temukan salon terdekat, jelajahi layanan, pesan janji temu, dan kelola rutinitas kecantikan Anda dengan mudah menggunakan platform kami yang mudah digunakan.",
+  "txtAppFeatures": "Fitur Aplikasi",
+  "txtFeature1": "• Jelajahi dan pesan layanan salon di dekat Anda",
+  "txtFeature2": "• Lihat harga dan durasi layanan secara detail",
+  "txtFeature3": "• Beberapa metode pembayaran (kartu, dompet, tunai)",
+  "txtFeature4": "• Konfirmasi pemesanan waktu nyata",
+  "txtFeature5": "• Lacak riwayat janji temu dan pemesanan mendatang",
+  "txtFeature6": "• Beri nilai dan ulas salon dan layanan",
+  "txtFeature7": "• Penawaran dan diskon eksklusif",
+  "txtFeature8": "• Dukungan multi-bahasa untuk pengguna global",
+  "txtWebsite": "Situs web",
+  "txtCopyright": "© 2025 Skedisy. Semua hak dilindungi.",
+  "txtLegalInformation": "Informasi Hukum",
+  "txtRateShare": "Beri Nilai & Bagikan",
 };

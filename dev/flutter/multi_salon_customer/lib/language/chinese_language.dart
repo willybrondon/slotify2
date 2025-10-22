@@ -316,4 +316,23 @@ final Map<String, String> zhCN = {
   "txtOrderPlacedSuccessfully": "下单成功！",
   "txtYourOrderHasSuccessfully": "您的订单已成功下达！！",
   "txtGoToOrderDetails": "前往订单详情",
+
+  // About App
+  "txtAppName": "Skedisy",
+  "txtVersion": "版本",
+  "txtAboutAppDescription":
+      "Skedisy是您预订沙龙和美容服务的一站式解决方案。发现附近的沙龙、浏览服务、预约并通过我们易于使用的平台轻松管理您的美容日常。",
+  "txtAppFeatures": "应用功能",
+  "txtFeature1": "• 浏览并预订您附近的沙龙服务",
+  "txtFeature2": "• 查看详细的服务价格和时长",
+  "txtFeature3": "• 多种支付方式（卡、钱包、现金）",
+  "txtFeature4": "• 实时预订确认",
+  "txtFeature5": "• 跟踪预约历史和即将到来的预订",
+  "txtFeature6": "• 评价和评论沙龙和服务",
+  "txtFeature7": "• 独家优惠和折扣",
+  "txtFeature8": "• 为全球用户提供多语言支持",
+  "txtWebsite": "网站",
+  "txtCopyright": "© 2025 Skedisy. 保留所有权利。",
+  "txtLegalInformation": "法律信息",
+  "txtRateShare": "评价和分享",
 };

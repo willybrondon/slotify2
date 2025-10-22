@@ -324,4 +324,23 @@ final Map<String, String> swKE = {
   "txtOrderPlacedSuccessfully": "Agizo limefaulu!",
   "txtYourOrderHasSuccessfully": "Agizo lako limefaulu kufanywa !!",
   "txtGoToOrderDetails": "Nenda kwa maelezo ya agizo",
+
+  // About App
+  "txtAppName": "Skedisy",
+  "txtVersion": "Toleo",
+  "txtAboutAppDescription":
+      "Skedisy ni suluhisho lako la kituo kimoja la kuhifadhi huduma za saluni na uzuri. Gundua masaluni ya karibu, vinjari huduma, weka miadi, na usimamie utaratibu wako wa uzuri bila shida na jukwaa letu rahisi kutumia.",
+  "txtAppFeatures": "Vipengele vya Programu",
+  "txtFeature1": "• Vinjari na uhifadhi huduma za saluni karibu nawe",
+  "txtFeature2": "• Angalia bei kamili za huduma na muda",
+  "txtFeature3": "• Njia nyingi za malipo (kadi, mkoba, pesa taslimu)",
+  "txtFeature4": "• Uthibitisho wa hifadhi wa wakati halisi",
+  "txtFeature5": "• Fuatilia historia ya miadi na hifadhi zinazokuja",
+  "txtFeature6": "• Kadiria na utathmini masaluni na huduma",
+  "txtFeature7": "• Ofa na punguzo za kipekee",
+  "txtFeature8": "• Usaidizi wa lugha nyingi kwa watumiaji wa kimataifa",
+  "txtWebsite": "Tovuti",
+  "txtCopyright": "© 2025 Skedisy. Haki zote zimehifadhiwa.",
+  "txtLegalInformation": "Maelezo ya Kisheria",
+  "txtRateShare": "Kadiria na Shiriki",
 };

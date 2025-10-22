@@ -320,4 +320,23 @@ final Map<String, String> ardz = {
   "txtOrderPlacedSuccessfully": "تم تقديم الطلب بنجاح!",
   "txtYourOrderHasSuccessfully": "لقد تم تقديم طلبك بنجاح !!",
   "txtGoToOrderDetails": "انتقل إلى تفاصيل الطلب",
+
+  // About App
+  "txtAppName": "Skedisy",
+  "txtVersion": "إصدار",
+  "txtAboutAppDescription":
+      "Skedisy هو الحل الشامل لحجز خدمات الصالون والتجميل. اكتشف الصالونات القريبة، تصفح الخدمات، احجز المواعيد، وأدر روتين الجمال الخاص بك بسهولة مع منصتنا سهلة الاستخدام.",
+  "txtAppFeatures": "ميزات التطبيق",
+  "txtFeature1": "• تصفح وحجز خدمات الصالون بالقرب منك",
+  "txtFeature2": "• عرض تفاصيل أسعار الخدمات ومدتها",
+  "txtFeature3": "• طرق دفع متعددة (بطاقة، محفظة، نقدي)",
+  "txtFeature4": "• تأكيدات الحجز في الوقت الفعلي",
+  "txtFeature5": "• تتبع سجل المواعيد والحجوزات القادمة",
+  "txtFeature6": "• تقييم ومراجعة الصالونات والخدمات",
+  "txtFeature7": "• عروض وخصومات حصرية",
+  "txtFeature8": "• دعم متعدد اللغات للمستخدمين العالميين",
+  "txtWebsite": "موقع إلكتروني",
+  "txtCopyright": "© 2025 Skedisy. جميع الحقوق محفوظة.",
+  "txtLegalInformation": "المعلومات القانونية",
+  "txtRateShare": "التقييم والمشاركة",
 };

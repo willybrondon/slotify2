@@ -321,4 +321,23 @@ final Map<String, String> trTR = {
   "txtOrderPlacedSuccessfully": "Sipariş başarıyla verildi!",
   "txtYourOrderHasSuccessfully": "Siparişiniz başarıyla verildi!!",
   "txtGoToOrderDetails": "Sipariş ayrıntılarına git",
+
+  // About App
+  "txtAppName": "Skedisy",
+  "txtVersion": "Sürüm",
+  "txtAboutAppDescription":
+      "Skedisy, kuaför ve güzellik hizmetlerini rezerve etmek için tek noktadan çözümünüzdür. Yakındaki salonları keşfedin, hizmetlere göz atın, randevu alın ve kullanımı kolay platformumuzla güzellik rutininizi zahmetsizce yönetin.",
+  "txtAppFeatures": "Uygulama Özellikleri",
+  "txtFeature1": "• Yakınınızdaki kuaför hizmetlerine göz atın ve rezervasyon yapın",
+  "txtFeature2": "• Detaylı hizmet fiyatlarını ve süresini görüntüleyin",
+  "txtFeature3": "• Çoklu ödeme yöntemleri (kart, cüzdan, nakit)",
+  "txtFeature4": "• Gerçek zamanlı rezervasyon onayları",
+  "txtFeature5": "• Randevu geçmişini ve yaklaşan rezervasyonları takip edin",
+  "txtFeature6": "• Salonları ve hizmetleri değerlendirin ve inceleyin",
+  "txtFeature7": "• Özel teklifler ve indirimler",
+  "txtFeature8": "• Küresel kullanıcılar için çok dilli destek",
+  "txtWebsite": "İnternet sitesi",
+  "txtCopyright": "© 2025 Skedisy. Tüm hakları saklıdır.",
+  "txtLegalInformation": "Yasal Bilgiler",
+  "txtRateShare": "Değerlendirin ve paylaşın",
 };
