@@ -126,7 +126,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
                         width: 100,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          color: AppColors.primary,
+                          color: AppColors.buttonColor,
                         ),
                         child: Center(
                           child: Icon(
@@ -339,7 +339,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
                         children: [
                           Icon(
                             Icons.language,
-                            color: AppColors.primary,
+                            color: AppColors.buttonColor,
                             size: 20,
                           ),
                           const SizedBox(width: 10),
@@ -348,7 +348,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
                             style: TextStyle(
                               fontFamily: AppFontFamily.sfProDisplayMedium,
                               fontSize: 16,
-                              color: AppColors.primary,
+                              color: AppColors.buttonColor,
                               decoration: TextDecoration.underline,
                             ),
                           ),
