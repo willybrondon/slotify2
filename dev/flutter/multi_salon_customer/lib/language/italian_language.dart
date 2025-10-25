@@ -194,6 +194,18 @@ final Map<String, String> itIT = {
   "desCancelBooking": "Vuoi cancellare questo appuntamento di prenotazione?",
   "desDeletedPermanently":
       "Il tuo account verrà eliminato definitivamente. I tuoi dati non verranno ripristinati nuovamente.",
+  "desDeleteAccountWarning": "Questa azione è permanente e non può essere annullata!",
+  "txtWhatWillBeDeleted": "Cosa verrà eliminato:",
+  "desPersonalInfo": "Informazioni personali (nome, email, telefono)",
+  "desBookingHistory": "Cronologia prenotazioni e appuntamenti",
+  "desWalletBalance": "Saldo portafoglio e transazioni",
+  "desFavoritesWishlist": "Preferiti e articoli della lista dei desideri",
+  "desOrderHistory": "Cronologia ordini e ricevute",
+  "desCannotBeUndone": "Questa azione non può essere annullata. Tutti i tuoi dati verranno eliminati in modo permanente.",
+  "txtDeletePermanently": "Elimina definitivamente",
+  "txtDeletingAccount": "Eliminazione account in corso...",
+  "desAccountDeletedSuccess": "Account eliminato con successo",
+  "desDeleteAccountFailed": "Eliminazione account non riuscita. Riprova.",
   "desPleaseAcceptConditions":
       "Si prega di accettare prima i Termini e le Condizioni",
   "desLogOut": "Sei sicuro di voler uscire ?",

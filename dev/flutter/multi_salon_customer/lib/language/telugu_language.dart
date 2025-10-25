@@ -194,6 +194,18 @@ final Map<String, String> teIN = {
       "మీరు ఈ బుకింగ్ అపాయింట్‌మెంట్‌ని రద్దు చేయాలనుకుంటున్నారా?",
   "desDeletedPermanently":
       "మీ ఖాతా శాశ్వతంగా తొలగించబడుతుంది. మీ డేటా మళ్లీ పునరుద్ధరించబడదు.",
+  "desDeleteAccountWarning": "ఈ చర్య శాశ్వతమైనది మరియు రద్దు చేయబడదు!",
+  "txtWhatWillBeDeleted": "ఏమి తొలగించబడుతుంది:",
+  "desPersonalInfo": "వ్యక్తిగత సమాచారం (పేరు, ఇమెయిల్, ఫోన్)",
+  "desBookingHistory": "బుకింగ్ చరిత్ర మరియు అపాయింట్‌మెంట్‌లు",
+  "desWalletBalance": "వాలెట్ బ్యాలెన్స్ మరియు లావాదేవీలు",
+  "desFavoritesWishlist": "ఇష్టమైనవి మరియు విష్లిస్ట్ అంశాలు",
+  "desOrderHistory": "ఆర్డర్ చరిత్ర మరియు రసీదులు",
+  "desCannotBeUndone": "ఈ చర్యను రద్దు చేయలేము. మీ మొత్తం డేటా శాశ్వతంగా తొలగించబడుతుంది.",
+  "txtDeletePermanently": "శాశ్వతంగా తొలగించు",
+  "txtDeletingAccount": "ఖాతా తొలగించబడుతోంది...",
+  "desAccountDeletedSuccess": "ఖాతా విజయవంతంగా తొలగించబడింది",
+  "desDeleteAccountFailed": "ఖాతా తొలగింపు విఫలమైంది. మళ్లీ ప్రయత్నించండి.",
   "desPleaseAcceptConditions":
       "దయచేసి ముందుగా నిబంధనలు మరియు షరతులను అంగీకరించండి",
   "desLogOut": "మీరు ఖచ్చితంగా లాగ్ అవుట్ చేయాలనుకుంటున్నారా?",

@@ -70,7 +70,8 @@ final Map<String, String> enUS = {
   "txtImage": "Attach Your Image or Screenshot",
   "txtShare": "Share",
   "txtUnderMaintenance": "Under Maintenance",
-  "txtSorryUnderMaintenance": "Sorry, The app is currently Under Maintenance !!",
+  "txtSorryUnderMaintenance":
+      "Sorry, The app is currently Under Maintenance !!",
   "txtBrowse": "Browse",
   "txtCloseApp": "Close App",
   "txtTopExperts": "Top Experts",
@@ -185,10 +186,25 @@ final Map<String, String> enUS = {
   "txtNotAvailableServices": "Service not available...!!",
   "desUnderRequirement": "Please fill up details as under requirement",
   "desNotification": "We’ll notify you once we have something for you",
-  "desDisclaimerAgree": "I have read the disclaimer and agree upon the terms and conditions.",
+  "desDisclaimerAgree":
+      "I have read the disclaimer and agree upon the terms and conditions.",
   "desSuccessfullyBooked": "Your booking has been successfully booked",
   "desCancelBooking": "Do you want to cancel this Booking Appointment?",
-  "desDeletedPermanently": "Your account will be deleted permanently. Your Data wil not be restored again.",
+  "desDeletedPermanently":
+      "Your account will be deleted permanently. Your Data wil not be restored again.",
+  "desDeleteAccountWarning": "This action is permanent and cannot be undone!",
+  "txtWhatWillBeDeleted": "What will be deleted:",
+  "desPersonalInfo": "Personal information (name, email, phone)",
+  "desBookingHistory": "Booking history and appointments",
+  "desWalletBalance": "Wallet balance and transactions",
+  "desFavoritesWishlist": "Favorites and wishlist items",
+  "desOrderHistory": "Order history and receipts",
+  "desCannotBeUndone":
+      "This action cannot be undone. All your data will be permanently deleted.",
+  "txtDeletePermanently": "Delete Permanently",
+  "txtDeletingAccount": "Deleting Account...",
+  "desAccountDeletedSuccess": "Account deleted successfully",
+  "desDeleteAccountFailed": "Failed to delete account. Please try again.",
   "desPleaseAcceptConditions": "Please Accept Terms And Condition First",
   "desLogOut": "Are you sure you want to Log Out ?",
   "desSlotBooked": "This slot is already booked",
@@ -197,8 +213,11 @@ final Map<String, String> enUS = {
   "desEnterEmail": "Please enter your email",
   "desEnterValidEmail": "Please enter a valid email address",
   "desGiveReview": "You are not able for give review !!",
-  "desSetPassword": "Set the new password for your account so\n you can login and access all the features.",
+  "desSetPassword":
+      "Set the new password for your account so\n you can login and access all the features.",
   "desPasswordNotMatch": "Password does not match",
-  "desForgotPassword": "Enter your email below to\nreceive your password reset instruction",
-  "desInvalidSlot": "The time you selected is Invalid.\n Please select another time.",
+  "desForgotPassword":
+      "Enter your email below to\nreceive your password reset instruction",
+  "desInvalidSlot":
+      "The time you selected is Invalid.\n Please select another time.",
 };

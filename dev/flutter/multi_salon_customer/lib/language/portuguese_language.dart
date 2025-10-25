@@ -192,6 +192,18 @@ final Map<String, String> ptPT = {
   "desCancelBooking": "Deseja cancelar esta consulta de reserva?",
   "desDeletedPermanently":
       "Sua conta será excluída permanentemente. Seus dados não serão restaurados novamente.",
+  "desDeleteAccountWarning": "Esta ação é permanente e não pode ser desfeita!",
+  "txtWhatWillBeDeleted": "O que será excluído:",
+  "desPersonalInfo": "Informações pessoais (nome, e-mail, telefone)",
+  "desBookingHistory": "Histórico de reservas e compromissos",
+  "desWalletBalance": "Saldo da carteira e transações",
+  "desFavoritesWishlist": "Favoritos e itens da lista de desejos",
+  "desOrderHistory": "Histórico de pedidos e recibos",
+  "desCannotBeUndone": "Esta ação não pode ser desfeita. Todos os seus dados serão excluídos permanentemente.",
+  "txtDeletePermanently": "Excluir permanentemente",
+  "txtDeletingAccount": "Excluindo conta...",
+  "desAccountDeletedSuccess": "Conta excluída com sucesso",
+  "desDeleteAccountFailed": "Falha ao excluir conta. Tente novamente.",
   "desPleaseAcceptConditions":
       "Por favor, aceite os termos e condições primeiro",
   "desLogOut": "Tem certeza que deseja sair ?",

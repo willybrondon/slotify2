@@ -193,6 +193,18 @@ final Map<String, String> idID = {
   "desCancelBooking": "Apakah Anda ingin membatalkan Janji Pemesanan ini?",
   "desDeletedPermanently":
       "Akun Anda akan dihapus secara permanen. Data Anda tidak akan dipulihkan lagi.",
+  "desDeleteAccountWarning": "Tindakan ini bersifat permanen dan tidak dapat dibatalkan!",
+  "txtWhatWillBeDeleted": "Apa yang akan dihapus:",
+  "desPersonalInfo": "Informasi pribadi (nama, email, telepon)",
+  "desBookingHistory": "Riwayat pemesanan dan janji temu",
+  "desWalletBalance": "Saldo dompet dan transaksi",
+  "desFavoritesWishlist": "Favorit dan item daftar keinginan",
+  "desOrderHistory": "Riwayat pesanan dan kuitansi",
+  "desCannotBeUndone": "Tindakan ini tidak dapat dibatalkan. Semua data Anda akan dihapus secara permanen.",
+  "txtDeletePermanently": "Hapus Permanen",
+  "txtDeletingAccount": "Menghapus akun...",
+  "desAccountDeletedSuccess": "Akun berhasil dihapus",
+  "desDeleteAccountFailed": "Gagal menghapus akun. Silakan coba lagi.",
   "desPleaseAcceptConditions":
       "Harap Terima Syarat dan Ketentuan Terlebih Dahulu",
   "desLogOut": "Apakah Anda yakin ingin Keluar?",

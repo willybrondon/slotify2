@@ -195,6 +195,18 @@ final Map<String, String> deat = {
   "desCancelBooking": "Möchten Sie diesen Buchungstermin stornieren?",
   "desDeletedPermanently":
       "Ihr Konto wird dauerhaft gelöscht. Ihre Daten werden nicht wieder wiederhergestellt.",
+  "desDeleteAccountWarning": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden!",
+  "txtWhatWillBeDeleted": "Was wird gelöscht:",
+  "desPersonalInfo": "Persönliche Daten (Name, E-Mail, Telefon)",
+  "desBookingHistory": "Buchungshistorie und Termine",
+  "desWalletBalance": "Wallet-Guthaben und Transaktionen",
+  "desFavoritesWishlist": "Favoriten und Wunschliste",
+  "desOrderHistory": "Bestellverlauf und Belege",
+  "desCannotBeUndone": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Ihre Daten werden dauerhaft gelöscht.",
+  "txtDeletePermanently": "Dauerhaft löschen",
+  "txtDeletingAccount": "Konto wird gelöscht...",
+  "desAccountDeletedSuccess": "Konto erfolgreich gelöscht",
+  "desDeleteAccountFailed": "Fehler beim Löschen des Kontos. Bitte versuchen Sie es erneut.",
   "desPleaseAcceptConditions":
       "Bitte akzeptieren Sie zuerst Bedingungen und Bedingung",
   "desLogOut": "Sind Sie sicher, dass Sie sich abmelden möchten?",

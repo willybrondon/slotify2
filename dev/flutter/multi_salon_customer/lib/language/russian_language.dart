@@ -193,6 +193,18 @@ final Map<String, String> ruRU = {
   "desCancelBooking": "Вы хотите отменить эту встречу?",
   "desDeletedPermanently":
       "Ваша учетная запись будет удалена навсегда. Ваши данные больше не будут восстановлены.",
+  "desDeleteAccountWarning": "Это действие необратимо и не может быть отменено!",
+  "txtWhatWillBeDeleted": "Что будет удалено:",
+  "desPersonalInfo": "Личная информация (имя, электронная почта, телефон)",
+  "desBookingHistory": "История бронирований и встреч",
+  "desWalletBalance": "Баланс кошелька и транзакции",
+  "desFavoritesWishlist": "Избранное и список желаний",
+  "desOrderHistory": "История заказов и квитанции",
+  "desCannotBeUndone": "Это действие нельзя отменить. Все ваши данные будут безвозвратно удалены.",
+  "txtDeletePermanently": "Удалить навсегда",
+  "txtDeletingAccount": "Удаление учетной записи...",
+  "desAccountDeletedSuccess": "Учетная запись успешно удалена",
+  "desDeleteAccountFailed": "Не удалось удалить учетную запись. Попробуйте еще раз.",
   "desPleaseAcceptConditions":
       "Пожалуйста, сначала примите Условия использования",
   "desLogOut": "Вы действительно хотите выйти ?",

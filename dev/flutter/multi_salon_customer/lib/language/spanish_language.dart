@@ -196,6 +196,18 @@ final Map<String, String> esES = {
   "desCancelBooking": "¿Quieres cancelar esta cita de reserva?",
   "desDeletedPermanently":
       "Su cuenta será eliminada permanentemente. Sus datos no se restaurarán nuevamente.",
+  "desDeleteAccountWarning": "¡Esta acción es permanente y no se puede deshacer!",
+  "txtWhatWillBeDeleted": "Lo que se eliminará:",
+  "desPersonalInfo": "Información personal (nombre, correo electrónico, teléfono)",
+  "desBookingHistory": "Historial de reservas y citas",
+  "desWalletBalance": "Saldo y transacciones de billetera",
+  "desFavoritesWishlist": "Favoritos y artículos de lista de deseos",
+  "desOrderHistory": "Historial de pedidos y recibos",
+  "desCannotBeUndone": "Esta acción no se puede deshacer. Todos sus datos se eliminarán permanentemente.",
+  "txtDeletePermanently": "Eliminar permanentemente",
+  "txtDeletingAccount": "Eliminando cuenta...",
+  "desAccountDeletedSuccess": "Cuenta eliminada exitosamente",
+  "desDeleteAccountFailed": "Error al eliminar la cuenta. Inténtalo de nuevo.",
   "desPleaseAcceptConditions":
       "Por favor acepte los términos y condiciones primero",
   "desLogOut": "¿Está seguro de que desea cerrar sesión?",
