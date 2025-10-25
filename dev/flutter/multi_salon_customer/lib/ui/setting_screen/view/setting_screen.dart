@@ -74,11 +74,14 @@ class SettingScreen extends StatelessWidget {
                         onTap: () {
                           Get.dialog(
                             barrierColor: AppColors.blackColor.withOpacity(0.8),
+                            barrierDismissible: true,
+                            useSafeArea: true,
                             Dialog(
                               backgroundColor: AppColors.transparent,
                               surfaceTintColor: AppColors.transparent,
                               shadowColor: AppColors.transparent,
                               elevation: 0,
+                              insetPadding: EdgeInsets.zero,
                               child: DeleteAccountDialog(),
                             ),
                           );

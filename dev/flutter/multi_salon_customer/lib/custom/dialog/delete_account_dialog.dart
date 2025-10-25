@@ -23,7 +23,12 @@ class DeleteAccountDialog extends StatelessWidget {
       builder: (logic) {
         return Container(
           constraints: BoxConstraints(
-            maxHeight: Get.height * 0.75,
+            maxHeight: Get.height * 0.85,
+            maxWidth: Get.width * 0.9,
+          ),
+          margin: EdgeInsets.symmetric(
+            vertical: Get.height * 0.05,
+            horizontal: 16,
           ),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -31,6 +36,7 @@ class DeleteAccountDialog extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
           ),
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
