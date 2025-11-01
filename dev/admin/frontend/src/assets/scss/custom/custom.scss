@@ -923,7 +923,7 @@ tr{
   }
 }
 thead{
-  color: white !important;
+  color: black !important;
 }
 
 tbody {
@@ -994,7 +994,7 @@ thead {
     
     & th,
     & thead {
-      background-color: $theme;
+      background-color: white;
       position: sticky;
       top: 0;
       text-align: center !important;

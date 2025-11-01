@@ -428,10 +428,9 @@
           
           & i {
             font-size: 45px !important;
-            color: white !important;
+            color: black !important;
             text-align: center;
             align-self: center;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
             transition: all 0.3s ease;
           }
         }
@@ -531,6 +530,24 @@
           color: black !important;
           background: white !important;
           font-weight: 700;
+        }
+        
+        & tr:first-child th:first-child {
+          border-top-left-radius: 15px;
+        }
+        
+        & tr:first-child th:last-child {
+          border-top-right-radius: 15px;
+        }
+      }
+      
+      & tbody {
+        & tr:last-child td:first-child {
+          border-bottom-left-radius: 15px;
+        }
+        
+        & tr:last-child td:last-child {
+          border-bottom-right-radius: 15px;
         }
       }
     }

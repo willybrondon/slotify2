@@ -445,21 +445,94 @@ body {
 .mainAdminGrid .mainDashboard .mainDashbox .dashBox {
   background-color: #ffffff;
   border-radius: 20px;
-  border: 1px solid #D6D6D6;
+  border: 1px solid white;
   height: 110px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.mainAdminGrid .mainDashboard .mainDashbox .dashBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .mainAdminGrid .mainDashboard .mainDashbox .dashBox .dashIconBox {
-  background-color: #1C2B20;
+  background-color: white !important;
   border-radius: 20px 0 0 20px;
   height: 100%;
 }
 
 .mainAdminGrid .mainDashboard .mainDashbox .dashBox .dashIconBox .dashIcon i {
   font-size: 40px !important;
-  color: white !important;
+  color: black !important;
   text-align: center;
   align-self: center;
+}
+
+/* Table Container Styles */
+.mainAdminGrid .mainDashboard .table-container {
+  background: white;
+  border-radius: 25px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid white;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainAdminGrid .mainDashboard .table-container table {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.mainAdminGrid .mainDashboard .table-container table thead {
+  background: white;
+}
+
+.mainAdminGrid .mainDashboard .table-container table thead th {
+  color: black !important;
+  background: white !important;
+  font-weight: 700;
+}
+
+.mainAdminGrid .mainDashboard .table-container table thead tr:first-child th:first-child {
+  border-top-left-radius: 15px;
+}
+
+.mainAdminGrid .mainDashboard .table-container table thead tr:first-child th:last-child {
+  border-top-right-radius: 15px;
+}
+
+.mainAdminGrid .mainDashboard .table-container table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 15px;
+}
+
+.mainAdminGrid .mainDashboard .table-container table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 15px;
+}
+
+.mainAdminGrid .mainDashboard .table-container .table-responsive {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.mainAdminGrid .mainDashboard .table-container .show-more-btn {
+  background: white;
+  color: black;
+  border: 1px solid white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.mainAdminGrid .mainDashboard .table-container .show-more-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .mainAdminGrid .mainDashboard .mainDashbox .dashBox .boxContent .boxTitle p {

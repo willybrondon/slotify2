@@ -904,7 +904,7 @@ tr {
 }
 
 thead {
-  color: white !important;
+  color: black !important;
 }
 
 tbody td {
@@ -954,7 +954,7 @@ thead th:first-child > div {
   font-weight: 500;
 }
 .mainTable .primeTable th, .mainTable .primeTable thead {
-  background-color: #1C2B20;
+  background-color: white;
   position: sticky;
   top: 0;
   text-align: center !important;
