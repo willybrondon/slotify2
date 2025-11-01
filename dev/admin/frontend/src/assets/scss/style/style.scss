@@ -373,14 +373,15 @@
 
   & .mainDashbox {
     & .dashBox {
-      background: rgba(255, 255, 255, 0.9);
+      background: white;
       backdrop-filter: blur(15px);
       border-radius: 25px;
-      border: 1px solid rgba(147, 51, 234, 0.1);
+      border: 1px solid white;
       height: 140px;
       box-shadow: 
-        0 20px 40px -10px rgba(147, 51, 234, 0.15),
-        0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        0 10px 15px -3px rgba(0, 0, 0, 0.1);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
@@ -442,7 +443,7 @@
       }
       
       & .dashIconBox {
-        background: linear-gradient(135deg, #9333EA 0%, #EC4899 100%);
+        background: white;
         border-radius: 25px 0 0 25px;
         height: 100%;
         position: relative;
@@ -564,17 +565,39 @@
   }
 
   & .table-container {
-    background: rgba(255, 255, 255, 0.9);
+    background: white;
     backdrop-filter: blur(15px);
     border-radius: 25px;
     padding: 2rem;
     box-shadow: 
-      0 20px 40px -10px rgba(147, 51, 234, 0.15),
-      0 10px 20px -5px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(147, 51, 234, 0.1);
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border: 1px solid white;
     margin-bottom: 2rem;
     position: relative;
     overflow: hidden;
+    
+    & table {
+      border-radius: 15px;
+      overflow: hidden;
+      
+      & thead {
+        background: white;
+        
+        & th {
+          color: black !important;
+          background: white !important;
+          font-weight: 700;
+        }
+      }
+    }
+    
+    & .table-responsive {
+      border-radius: 15px;
+      overflow: hidden;
+    }
     
     &::before {
       content: '';
@@ -640,9 +663,9 @@
       }
       
       & .show-more-btn {
-        background: linear-gradient(135deg, #9333EA 0%, #EC4899 100%);
-        color: white;
-        border: none;
+        background: white;
+        color: black;
+        border: 1px solid white;
         padding: 0.75rem 1.5rem;
         border-radius: 15px;
         font-weight: 700;
@@ -650,8 +673,9 @@
         cursor: pointer;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 
-          0 8px 25px rgba(147, 51, 234, 0.3),
-          0 4px 12px rgba(0, 0, 0, 0.1);
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06),
+          0 10px 15px -3px rgba(0, 0, 0, 0.1);
         position: relative;
         overflow: hidden;
         
@@ -670,10 +694,12 @@
         }
         
         &:hover {
-          transform: translateY(-3px) scale(1.05);
+          transform: translateY(-2px);
           box-shadow: 
-            0 12px 35px rgba(147, 51, 234, 0.4),
-            0 6px 15px rgba(0, 0, 0, 0.15);
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06),
+            0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 20px 25px -5px rgba(0, 0, 0, 0.1);
           
           &::before {
             left: 100%;

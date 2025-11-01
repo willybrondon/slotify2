@@ -725,14 +725,15 @@ body {
       margin-top: 15px;
 
       & .dashBox {
-        background: rgba(255, 255, 255, 0.9);
+        background: white;
         backdrop-filter: blur(15px);
         border-radius: 25px;
-        border: 1px solid rgba(147, 51, 234, 0.1);
+        border: 1px solid white;
         height: 140px;
         box-shadow: 
-          0 20px 40px -10px rgba(147, 51, 234, 0.15),
-          0 10px 20px -5px rgba(0, 0, 0, 0.1);
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06),
+          0 10px 15px -3px rgba(0, 0, 0, 0.1);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
@@ -793,12 +794,12 @@ body {
           }
         }
 
-        & .dashIconBox {
-          background: linear-gradient(135deg, #9333EA 0%, #EC4899 100%);
-          border-radius: 25px 0 0 25px;
-          height: 100%;
-          position: relative;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      & .dashIconBox {
+        background: white;
+        border-radius: 25px 0 0 25px;
+        height: 100%;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           
           &::before {
             content: '';
@@ -914,13 +915,39 @@ body {
       & .apexcharts-toolbar {
         z-index: 3 !important;
       }
+    }
       
     & .table-container {
       background: white;
       border-radius: 15px;
       padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 20px 25px -5px rgba(0, 0, 0, 0.1);
       margin-bottom: 1.5rem;
+      overflow: hidden;
+      
+      & table {
+        border-radius: 15px;
+        overflow: hidden;
+        
+        & thead {
+          background: white;
+          
+          & th {
+            color: black !important;
+            background: white !important;
+            font-weight: 700;
+          }
+        }
+      }
+      
+      & .table-responsive {
+        border-radius: 15px;
+        overflow: hidden;
+      }
       
       & .table-title {
         display: flex;
@@ -943,60 +970,68 @@ body {
         }
         
         & .show-more-btn {
-          background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-          color: white;
-          border: none;
+          background: white;
+          color: black;
+          border: 1px solid white;
           padding: 0.5rem 1rem;
           border-radius: 8px;
           font-weight: 600;
           font-size: 0.875rem;
           cursor: pointer;
           transition: all 0.3s ease;
+          box-shadow: 
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06),
+            0 10px 15px -3px rgba(0, 0, 0, 0.1);
           
           &:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            box-shadow: 
+              0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06),
+              0 10px 15px -3px rgba(0, 0, 0, 0.1),
+              0 20px 25px -5px rgba(0, 0, 0, 0.1);
           }
         }
       }
     }
-      & .apexcharts-title-text {
-        font-size: 18px !important;
-        @include maxMediaQuery($md) {
-          font-size: 15px !important;
+    
+    & .apexcharts-title-text {
+      font-size: 18px !important;
+      @include maxMediaQuery($md) {
+        font-size: 15px !important;
 
-          @include maxMediaQuery($md) {
-            font-size: 12px !important;
-          }
+        @include maxMediaQuery($md) {
+          font-size: 12px !important;
+        }
+      }
+    }
+
+    & .apexcharts-toolbar {
+      & div[title="Selection Zoom"],
+      & div[title="Panning"],
+      & .apexcharts-zoomin-icon,
+      .apexcharts-zoomout-icon,
+      .apexcharts-reset-icon {
+        display: none;
+      }
+      .apexcharts-menu-icon {
+        @include maxMediaQuery($md) {
+          display: none;
         }
       }
 
-      & .apexcharts-toolbar {
-        & div[title="Selection Zoom"],
-        & div[title="Panning"],
-        & .apexcharts-zoomin-icon,
-        .apexcharts-zoomout-icon,
-        .apexcharts-reset-icon {
-          display: none;
-        }
-        .apexcharts-menu-icon {
+      & > div {
+        margin: 0 5px;
+
+        & svg {
+          fill: $second;
+          height: 30px;
+          width: 30px;
+
           @include maxMediaQuery($md) {
-            display: none;
-          }
-        }
-
-        & > div {
-          margin: 0 5px;
-
-          & svg {
-            fill: $second;
-            height: 30px;
-            width: 30px;
-
-            @include maxMediaQuery($md) {
-              width: 24px;
-              height: 24px;
-            }
+            width: 24px;
+            height: 24px;
           }
         }
       }
@@ -1039,7 +1074,6 @@ body {
       }
     }
   }
-}
 
 /* ============= Product CSS ============= */
 .productShowColorDetails {
