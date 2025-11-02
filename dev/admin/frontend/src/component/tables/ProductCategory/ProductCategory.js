@@ -115,7 +115,7 @@ const ProductCategory = () => {
     <div className="mainCategory">
       <Title name="Product Category" />
       <Button
-        className={`bg-button p-10 text-white m20-bottom`}
+        className={`bg-button p-10 text-black m20-bottom`}
         text={`Add Product Category`}
         bIcon={`fa-solid fa-user-plus`}
         onClick={() => {

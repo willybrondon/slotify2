@@ -84,7 +84,7 @@ const Attribute = () => {
     <div className="mainCategory">
       <Title name="Attribute" />
       <Button
-        className={`bg-button p-10 text-white m20-bottom`}
+        className={`bg-button p-10 text-black m20-bottom`}
         text={`Add Attribute`}
         bIcon={`fa-solid fa-user-plus`}
         onClick={() => {

@@ -132,7 +132,7 @@ const Holiday = () => {
         </div>
         <div className="d-flex">
           <Button
-            className={`bg-button p-8 text-white my-2 me-3`}
+            className={`bg-button p-8 text-black my-2 me-3`}
             text={`New holiday`}
             bIcon={`fa-solid fa-user-plus`}
             onClick={() => {

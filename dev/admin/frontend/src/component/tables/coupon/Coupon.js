@@ -145,7 +145,7 @@ const Coupon = () => {
         <div className="row">
           <div className="col-3">
             <Button
-              className={`bg-button p-10 text-white m10-bottom `}
+              className={`bg-button p-10 text-black m10-bottom `}
               bIcon={`fa-solid fa-user-plus`}
               text="Add coupon"
               onClick={() => {

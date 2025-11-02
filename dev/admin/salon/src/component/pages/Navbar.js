@@ -37,7 +37,7 @@ const Navbar = () => {
               <i
                 className={`${`ri-bar-chart-horizontal-line`} cursor-pointer fs-20 navToggle`}
               ></i>
-              <a onClick={enterFullscreen} className="ms-4 text-white cursor">
+              <a onClick={enterFullscreen} className="ms-4 text-black cursor">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"

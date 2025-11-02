@@ -319,7 +319,7 @@ export const Salon = () => {
 
       <div className="betBox">
         <Button
-          className={`bg-button p-10 text-white m10-bottom`}
+          className={`bg-button p-10 text-black m10-bottom`}
           text={`Add salon`}
           bIcon={`fa-solid fa-user-plus`}
           onClick={() => handleAddSalon()}

@@ -337,7 +337,7 @@ export const Expert = () => {
       )}
       <div className="betBox">
         <Button
-          className={`bg-button p-10 text-white m8-bottom`}
+          className={`bg-button p-10 text-black m8-bottom`}
           text={`Add expert`}
           bIcon={`fa-solid fa-user-plus`}
           onClick={() => handleAddExpert()}
