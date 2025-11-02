@@ -113,7 +113,7 @@ const Analytics = (props) => {
             width: "85%",
             fontWeight: 600,
             cursor: "pointer",
-            border: "1px solid black",
+            border: "1px solid white",
             display: "flex",
             justifyContent: "center",
             fontSize: "14px",
@@ -121,6 +121,8 @@ const Analytics = (props) => {
             borderRadius: "6px",
             height: "48px !important",
             color: "#000",
+            background: "white",
+            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
           }}
         />
       </DateRangePicker>
