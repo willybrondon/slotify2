@@ -307,14 +307,13 @@ body {
   }
 }
 .mainAdminGrid .mainAdmin .mainNavbar .navBar .innerNavbar {
-  background-color: #1C2B20;
+  background-color: #fcfffc;
   height: 100%;
   padding: 13px 30px;
-  box-shadow: 0 0 5px rgba(28, 43, 32, 0.3882352941);
   border-radius: 15px;
 }
 .mainAdminGrid .mainAdmin .mainNavbar .navBar .innerNavbar .leftNav i {
-  color: #ffffff;
+  color: black;
 }
 .mainAdminGrid .mainAdmin .mainNavbar .navBar .innerNavbar .rightNav .adminProfile .adminPic {
   height: 45px;
@@ -326,16 +325,16 @@ body {
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.616);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   padding: 2px;
 }
 .mainAdminGrid .mainAdmin .mainNavbar .navBar .innerNavbar .rightNav .adminProfile .adminDetails h6 {
   font-size: 16px;
-  color: #ffffff;
+  color: black;
 }
 .mainAdminGrid .mainAdmin .mainNavbar .navBar .innerNavbar .rightNav .adminProfile .adminDetails p {
   font-size: 14px;
-  color: #ffffff;
+  color: black;
 }
 @media screen and (max-width: 768px) {
   .mainAdminGrid .mainAdmin .mainNavbar .navBar .innerNavbar {

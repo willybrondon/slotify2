@@ -532,24 +532,23 @@ body {
 
       & .navBar {
         & .innerNavbar {
-          background: white;
+          background: #fcfffc;
           height: 100%;
           padding: 15px 30px;
-          box-shadow: none;
-          border-radius: 0;
+          border-radius: 15px;
           display: flex;
           align-items: center;
           justify-content: space-between;
 
           & .leftNav {
             & i {
-              color: $dark;
+              color: black;
               font-size: 1.5rem;
               cursor: pointer;
               transition: all 0.3s ease;
               
               &:hover {
-                color: $theme;
+                color: black;
                 transform: scale(1.1);
               }
             }
@@ -560,14 +559,11 @@ body {
               align-items: center;
               gap: 1rem;
               padding: 0.5rem 1rem;
-              border-radius: 12px;
-              background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
               cursor: pointer;
               transition: all 0.3s ease;
               
               &:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
               }
               
               & .adminPic {
@@ -575,8 +571,7 @@ body {
                 width: 45px;
                 border-radius: 50%;
                 overflow: hidden;
-                border: 3px solid white;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                border: 1px solid rgba(0, 0, 0, 0.2);
 
                 img {
                   height: 100%;
@@ -589,14 +584,14 @@ body {
               & .adminDetails {
                 & h6 {
                   font-size: 16px;
-                  color: $dark;
+                  color: black;
                   font-weight: 600;
                   margin: 0;
                 }
 
                 & p {
                   font-size: 14px;
-                  color: $darkGray;
+                  color: black;
                   margin: 0;
                 }
               }
