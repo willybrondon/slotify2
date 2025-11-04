@@ -143,14 +143,15 @@ const Service = () => {
       <div className="row">
         <div className="col-lg-4 col-md-6 col-12">
           <div className="m40-top">
-            <div className="card" style={{ borderRadius: "10px" }}>
+            <div className="card" style={{ borderRadius: "10px", boxShadow: "0 2px 4px rgba(15, 34, 58, 0.12)" }}>
               <div
                 className="card-head text-center fw-bold"
                 style={{
-                  backgroundColor: "#1C2B20",
+                  backgroundColor: "#ffffff",
                   padding: "10px 0px",
                   borderRadius: "10px 10px 0 0",
-                  color: "#fff",
+                  color: "#000000",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                 }}
               >
                 SELECT ADMIN SERVICES
@@ -204,14 +205,15 @@ const Service = () => {
         </div>
         <div className="col-lg-8 col-md-6 col-12">
           <div className="m40-top">
-            <div className="card" style={{ borderRadius: "10px" }}>
+            <div className="card" style={{ borderRadius: "10px", boxShadow: "0 2px 4px rgba(15, 34, 58, 0.12)" }}>
               <div
                 className="card-head text-center fw-bold"
                 style={{
-                  backgroundColor: "#1C2B20",
+                  backgroundColor: "#ffffff",
                   padding: "10px 0px",
                   borderRadius: "10px 10px 0 0",
-                  color: "#fff",
+                  color: "#000000",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                 }}
               >
                 EDIT OUR SERVICES & REMOVE SERVICES

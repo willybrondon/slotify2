@@ -283,7 +283,7 @@ const Order = () => {
 
             <div>
                 <div className="tableMain">
-                    <div className="primeMain">
+                    <div className="primeMain" style={{ boxShadow: "0 2px 4px rgba(15, 34, 58, 0.12)", borderRadius: "15px" }}>
                         <table
                             width="100%"
                             border
