@@ -969,6 +969,22 @@ thead {
   }
 }
 
+.tableMain {
+  & .primeMain {
+    & .primeTable {
+      & th,
+      & thead {
+        background-color: white !important;
+        position: sticky;
+        top: 0;
+        text-align: center !important;
+        z-index: 2;
+        font-weight: 600 !important;
+      }
+    }
+  }
+}
+
 .mainTable {
   max-height: calc(100vh - 117px - 250px);
   min-height: calc(100vh - 117px - 250px);
