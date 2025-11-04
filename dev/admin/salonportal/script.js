@@ -268,11 +268,11 @@ document.addEventListener('DOMContentLoaded', function() {
 const APP_DOWNLOAD_LINKS = {
     customer: {
         android: 'https://play.google.com/store/apps/details?id=com.skedisy.customer',
-        ios: 'https://apps.apple.com/app/id1234567890'
+        ios: 'https://apps.apple.com/fr/app/skedisy/id6752954525'
     },
     expert: {
         android: 'https://play.google.com/store/apps/details?id=com.skedisy.expert',
-        ios: 'https://apps.apple.com/app/id1234567891'
+        ios: 'https://apps.apple.com/fr/app/skedisy-xp/id6752965522'
     }
 };
 
