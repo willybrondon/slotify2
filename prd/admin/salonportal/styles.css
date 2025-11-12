@@ -5,10 +5,23 @@
     box-sizing: border-box;
 }
 
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
     color: #333;
+    overflow-x: hidden;
+}
+
+html {
     overflow-x: hidden;
 }
 
