@@ -207,12 +207,12 @@ EOF
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
-nvm install node
-npm install --f
+nvm use 18.20.2
+npm install
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
-nvm install node
+nvm use 18.20.2
 npm run build
 sudo rm -rf /home/admin/backend/public
 mkdir -p /home/admin/backend/public
@@ -233,11 +233,12 @@ EOF
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
-nvm install node
-npm install --f
+nvm use 18.20.2
+npm install
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
+nvm use 18.20.2
 PUBLIC_URL=/salonpanel npm run build
 sudo rm -rf /home/admin/backend/salon
 mkdir -p /home/admin/backend/salon
@@ -354,7 +355,7 @@ clear
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
-nvm install node
+nvm use 18.20.2
 node -v
 pm2 restart backend --interpreter $(which node)
 
