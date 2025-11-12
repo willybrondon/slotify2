@@ -823,6 +823,30 @@ body {
     .hero-container {
         grid-template-columns: 1fr;
         text-align: center;
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    .hero-content,
+    .hero-image {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-image img {
+        margin: 0 auto;
+        width: 100%;
+        height: auto;
     }
 
     .hero-content h1 {
@@ -834,12 +858,37 @@ body {
         gap: 1rem;
     }
 
+    .hero {
+        padding: 100px 0 60px;
+        text-align: center;
+        justify-content: center;
+    }
+
     .hero-features {
         justify-content: center;
     }
 
+    .hero-feature-flex {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        padding: 0 20px;
+        text-align: center;
+    }
+
+    .hero-feature-content {
+        align-items: center;
+        text-align: center;
+    }
+
+    .hero-feature-img {
+        max-width: 420px;
+    }
+
     .stats-container {
         grid-template-columns: 1fr;
+        padding: 0 20px;
     }
 
     .features-grid {
@@ -851,10 +900,98 @@ body {
     .payment .container {
         grid-template-columns: 1fr;
         gap: 2rem;
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
     .benefit-item.reverse {
         direction: ltr;
+    }
+
+    .planity-features-flex,
+    .platform-features-flex,
+    .cta-flex {
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .planity-feature-block,
+    .platform-feature-card,
+    .cta-content {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .clients-content,
+    .benefit-content,
+    .payment-content,
+    .pro-stats-content {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .clients-image,
+    .benefit-image,
+    .payment-demo {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .clients-image img,
+    .benefit-image img,
+    .payment-interface {
+        margin: 0 auto;
+        width: 100%;
+        height: auto;
+    }
+
+    .pro-stats-flex {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        padding: 0 20px;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .pro-stats-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .pro-stats-cell {
+        width: 100%;
+        text-align: center;
     }
 
     .faq-grid {
