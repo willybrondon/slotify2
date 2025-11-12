@@ -14,6 +14,10 @@ route.post("/create", checkAccessWithSecretKey(), OTPController.store);
 route.post("/otplogin", checkAccessWithSecretKey(), OTPController.otplogin);
 
 //verify the OTP
-route.post("/verify", checkAccessWithSecretKey(), OTPController.verify);
+route
+  .route("/verify")
+  .post(checkAccessWithSecretKey(), OTPController.verify)
+  .get(checkAccessWithSecretKey(), OTPController.verify);
+route.get("/verify", checkAccessWithSecretKey(), OTPController.verify);
 
 module.exports = route;

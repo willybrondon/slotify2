@@ -72,7 +72,8 @@ class SignUpOtpVerifyController extends GetxController {
             email: signUpController.emailController.text.trim(),
             age: signUpController.ageController.text.trim(),
           );
-          dev.log("isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
+          dev.log(
+              "isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
 
           if (loginScreenController.loginCategory?.status == true) {
             isLoading(true);
@@ -81,7 +82,8 @@ class SignUpOtpVerifyController extends GetxController {
             Constant.storage.write('isLogIn', true);
             Constant.storage
                 .write('userId', loginScreenController.loginCategory?.user?.id);
-            dev.log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
+            dev.log(
+                "is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
 
             await editProfileScreenController.onUpdateUserApiCall(
                 fName: signUpController.fNameController.text.trim(),
@@ -105,7 +107,8 @@ class SignUpOtpVerifyController extends GetxController {
               Constant.storage.write('isUpdate', true);
               loginScreenController.isUpdate =
                   Constant.storage.read<bool>('isUpdate')!;
-              dev.log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
+              dev.log(
+                  "is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
 
               await profileScreenController.onGetUserApiCall(loginType: 1);
               if (profileScreenController.getUserCategory?.status == true) {

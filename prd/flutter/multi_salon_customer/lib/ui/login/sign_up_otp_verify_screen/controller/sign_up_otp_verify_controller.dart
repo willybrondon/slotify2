@@ -22,9 +22,12 @@ class SignUpOtpVerifyController extends GetxController {
   dynamic args = Get.arguments;
   TextEditingController otpEditingController = TextEditingController();
   final SignUpController signUpController = Get.find<SignUpController>();
-  final LoginScreenController loginScreenController = Get.find<LoginScreenController>();
-  final ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
-  final EditProfileScreenController editProfileScreenController = Get.put(EditProfileScreenController());
+  final LoginScreenController loginScreenController =
+      Get.find<LoginScreenController>();
+  final ProfileScreenController profileScreenController =
+      Get.put(ProfileScreenController());
+  final EditProfileScreenController editProfileScreenController =
+      Get.put(EditProfileScreenController());
 
   //----------- API Variables -----------//
   SignUpOtpVerifyModel? signUpOtpVerifyCategory;
@@ -76,7 +79,8 @@ class SignUpOtpVerifyController extends GetxController {
             update([Constant.idProgressView]);
             Utils.showToast(Get.context!, "User Login SuccessFully..!");
             Constant.storage.write('isLogIn', true);
-            Constant.storage.write('UserId', loginScreenController.loginCategory?.user?.id);
+            Constant.storage
+                .write('UserId', loginScreenController.loginCategory?.user?.id);
             log("is LogIn Controller :: ${Constant.storage.read<bool>('isLogIn')}");
 
             await editProfileScreenController.onUpdateUserApiCall(
@@ -96,9 +100,11 @@ class SignUpOtpVerifyController extends GetxController {
                             : " ");
 
             if (editProfileScreenController.updateUserCategory != null &&
-                editProfileScreenController.updateUserCategory?.status == true) {
+                editProfileScreenController.updateUserCategory?.status ==
+                    true) {
               Constant.storage.write('isUpdate', true);
-              loginScreenController.isUpdate = Constant.storage.read<bool>('isUpdate')!;
+              loginScreenController.isUpdate =
+                  Constant.storage.read<bool>('isUpdate')!;
               log("is Update Controller :: ${Constant.storage.read<bool>('isUpdate')}");
 
               await profileScreenController.onGetUserApiCall(loginType: 1);
@@ -107,14 +113,22 @@ class SignUpOtpVerifyController extends GetxController {
                 update([Constant.idProgressView]);
 
                 Future.delayed(const Duration(milliseconds: 100), () async {
-                  await Get.put<EditProfileScreenController>(EditProfileScreenController()).getDataFromArgs();
-                  await Get.put<EditProfileScreenController>(EditProfileScreenController()).getArgumentsData();
+                  await Get.put<EditProfileScreenController>(
+                          EditProfileScreenController())
+                      .getDataFromArgs();
+                  await Get.put<EditProfileScreenController>(
+                          EditProfileScreenController())
+                      .getArgumentsData();
                 });
 
-                Constant.storage.write('isGetUserId', profileScreenController.getUserCategory?.user?.id);
-                Constant.storage.write('userImage', profileScreenController.getUserCategory?.user?.image);
-                Constant.storage.write('fName', profileScreenController.getUserCategory?.user?.fname);
-                Constant.storage.write('lName', profileScreenController.getUserCategory?.user?.lname);
+                Constant.storage.write('isGetUserId',
+                    profileScreenController.getUserCategory?.user?.id);
+                Constant.storage.write('userImage',
+                    profileScreenController.getUserCategory?.user?.image);
+                Constant.storage.write('fName',
+                    profileScreenController.getUserCategory?.user?.fname);
+                Constant.storage.write('lName',
+                    profileScreenController.getUserCategory?.user?.lname);
 
                 if (isDataSelected == true) {
                   Constant.storage.write('isUpdate', true);
@@ -131,17 +145,26 @@ class SignUpOtpVerifyController extends GetxController {
               } else {
                 isLoading(false);
                 update([Constant.idProgressView]);
-                Utils.showToast(Get.context!, profileScreenController.getUserCategory?.message.toString() ?? "");
+                Utils.showToast(
+                    Get.context!,
+                    profileScreenController.getUserCategory?.message
+                            .toString() ??
+                        "");
               }
             } else {
               isLoading(false);
               update([Constant.idProgressView]);
-              Utils.showToast(Get.context!, editProfileScreenController.updateUserCategory?.message.toString() ?? "");
+              Utils.showToast(
+                  Get.context!,
+                  editProfileScreenController.updateUserCategory?.message
+                          .toString() ??
+                      "");
             }
           } else {
             isLoading(false);
             update([Constant.idProgressView]);
-            Utils.showToast(Get.context!, loginScreenController.loginCategory?.message ?? "");
+            Utils.showToast(Get.context!,
+                loginScreenController.loginCategory?.message ?? "");
           }
         } else {
           Utils.showToast(Get.context!, signUpOtpVerifyCategory?.message ?? "");
@@ -168,10 +191,14 @@ class SignUpOtpVerifyController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.signUpOtpVerify + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.signUpOtpVerify + queryString);
       log("Sign Up Otp Verify  Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.post(url, headers: headers);
 
@@ -181,6 +208,10 @@ class SignUpOtpVerifyController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         signUpOtpVerifyCategory = SignUpOtpVerifyModel.fromJson(jsonResponse);
+      } else {
+        log("Sign Up Otp Verify  Failed :: ${response.statusCode}");
+        Utils.showToast(
+            Get.context!, "Failed to verify OTP. Please try again.");
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
