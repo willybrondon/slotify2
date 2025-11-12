@@ -79,10 +79,10 @@ jobs:
       run: |
         ssh-keyscan -H 46.101.229.176 >> ~/.ssh/known_hosts
 # # we compress the admin file to be light when copy
-    - name: backup storage file 
-      run: |
-        ssh root@46.101.229.176 "mkdir -p /home/storage_backup"
-        ssh root@46.101.229.176 "scp -r /home/admin/backend/storage /home/storage_backup"
+    # - name: backup storage file 
+    #   run: |
+    #     ssh root@46.101.229.176 "mkdir -p /home/storage_backup"
+    #     ssh root@46.101.229.176 "scp -r /home/admin/backend/storage /home/storage_backup"
         
     - name: copy file to vps 
       run: |
