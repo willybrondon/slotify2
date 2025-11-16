@@ -12,6 +12,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 const moment = require("moment");
 const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
 
 require("./middleware/mongodb");
 const fs = require("fs");
@@ -244,6 +245,35 @@ cron.schedule("55 23 28-31 * *", async () => {
 
 app.use("/storage", express.static(path.join(__dirname, "storage")));
 app.use("/salonpanel/storage", express.static(path.join(__dirname, "storage")));
+
+// Demo request email endpoint
+app.post("/api/send-demo-request", express.json(), async (req, res) => {
+  const { name, phone, email, salonType } = req.body;
+  if (!name || !phone || !email) {
+    return res.status(400).json({ success: false, error: "Missing required fields." });
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.DEMO_MAIL_USER || "your_email@gmail.com",
+        pass: process.env.DEMO_MAIL_PASS || "your_email_password",
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.DEMO_MAIL_USER || "your_email@gmail.com",
+      to: "support@skedisy.com",
+      subject: "New Salon Demo Request",
+      text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\nSalon Type: ${salonType || ""}`,
+    });
+
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // Serve static files for admin dashboard at /admin/ path
 app.use("/admin", express.static(path.join(__dirname, "public")));
