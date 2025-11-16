@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modal functionality
     const modal = document.getElementById('demo');
     const modalTriggers = document.querySelectorAll('a[href="#demo"]');
-    const closeBtn = document.querySelector('.close');
+    const closeBtn = modal ? modal.querySelector('.close') : null;
 
     // Open modal
     modalTriggers.forEach(trigger => {
@@ -50,10 +50,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Close modal
-    closeBtn.addEventListener('click', function() {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    });
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+    }
 
     // Close modal when clicking outside
     window.addEventListener('click', function(e) {
@@ -86,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch('https://skedisy.com/api/send-demo-request', {
+        fetch('/api/send-demo-request', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, phone, email, salonType })
