@@ -847,7 +847,7 @@ html {
     .hero-content,
     .hero-image {
         width: 100%;
-        max-width: 420px;
+        max-width: min(420px, 90vw);
         margin: 0 auto;
         text-align: center;
         display: flex;
@@ -939,37 +939,27 @@ html {
 
     .planity-feature-block,
     .platform-feature-card,
-    .cta-content {
-        width: 100%;
-        max-width: 420px;
-        margin: 0 auto;
-        text-align: center;
-        align-items: center;
-        justify-content: center;
-        display: flex;
-        flex-direction: column;
-    }
-
+    .cta-content,
     .clients-content,
     .benefit-content,
     .payment-content,
-    .pro-stats-content {
+    .pro-stats-content,
+    .hero-feature-content {
         width: 100%;
-        max-width: 420px;
+        max-width: min(420px, 90vw);
         margin: 0 auto;
         text-align: center;
-        display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 1rem;
+        display: flex;
+        flex-direction: column;
     }
 
     .clients-image,
     .benefit-image,
     .payment-demo {
         width: 100%;
-        max-width: 420px;
+        max-width: min(420px, 90vw);
         margin: 0 auto;
         display: flex;
         align-items: center;
@@ -1029,19 +1019,18 @@ html {
         font-size: 2rem;
     }
 
-    .benefit-content h2 {
-        font-size: 2rem;
-    }
-
-    .payment-content h2 {
-        font-size: 2rem;
-    }
-
-    .testimonials h2 {
-        font-size: 2rem;
-    }
-
+    .benefit-content h2,
+    .payment-content h2,
+    .testimonials h2,
     .faq h2 {
         font-size: 2rem;
+    }
+
+    .planity-feature-block h2,
+    .planity-feature-block p,
+    .planity-feature-block .btn-secondary {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
     }
 } 
