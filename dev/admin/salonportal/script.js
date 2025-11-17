@@ -65,49 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Form submission
-    const demoForm = document.querySelector('.demo-form');
-    demoForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const email = document.getElementById('email').value;
-        const salonType = document.getElementById('salon-type').value;
-
-        // Basic validation
-        if (!name || !phone || !email) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            alert('Please enter a valid email address.');
-            return;
-        }
-
-        fetch('/api/send-demo-request', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, phone, email, salonType })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert('Thank you for your interest! We will contact you soon to schedule your demo.');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            demoForm.reset();
-          } else {
-            alert('There was an error sending your request. Please try again later.');
-          }
-        })
-        .catch(() => {
-          alert('There was an error sending your request. Please try again later.');
-        });
-    });
 
     // Animate elements on scroll
     const observerOptions = {
