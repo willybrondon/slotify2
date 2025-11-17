@@ -788,6 +788,8 @@ html {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .modal-content {
@@ -798,6 +800,11 @@ html {
     width: 90%;
     max-width: 500px;
     position: relative;
+    overflow: visible;
+}
+
+.modal-content.phone-selection {
+    overflow: visible;
 }
 
 .close {
@@ -821,6 +828,11 @@ html {
 .modal-content p {
     margin-bottom: 2rem;
     color: #666;
+}
+
+.modal-content p a {
+    word-break: break-all;
+    word-wrap: break-word;
 }
 
 .demo-form {
@@ -1074,6 +1086,22 @@ html {
     .final-cta h2 {
         font-size: 1.5rem;
     }
+
+    .modal-content {
+        padding: 1.5rem;
+    }
+
+    .modal-content p {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-content p a {
+        font-size: 0.85rem;
+        font-weight: 500;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1098,6 +1126,42 @@ html {
         margin-left: auto;
         margin-right: auto;
         text-align: center;
+    }
+
+    .modal-content {
+        padding: 1.2rem;
+        max-width: 95%;
+    }
+
+    .modal-content h2 {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .modal-content p {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .modal-content p a {
+        font-size: 0.75rem;
+        font-weight: 500;
+        word-break: break-all;
+        word-wrap: break-word;
+        display: inline-block;
+        max-width: 100%;
+    }
+
+    .modal-content ul {
+        font-size: 0.8rem;
+        margin: 15px 0;
+        padding-left: 18px;
+    }
+
+    .modal-content ul li {
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
     }
 } 
 
@@ -2143,11 +2207,26 @@ html {
 
 /* Phone Selection Modal Mobile Responsive */
 @media (max-width: 768px) {
+    .modal-content.phone-selection {
+        max-width: 95%;
+        width: 95%;
+        padding: 1.5rem 1rem;
+        margin: 10% auto;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     .phone-selection {
         max-width: 100%;
         margin: 0 auto;
         position: relative;
-        padding: 1rem;
+        padding: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
     
     .phone-options {
@@ -2159,6 +2238,7 @@ html {
         margin-top: 1rem;
         max-width: 100%;
         width: 100%;
+        flex-wrap: nowrap;
     }
     
     .phone-option {
@@ -2166,8 +2246,9 @@ html {
         border-radius: 10px;
         min-height: 150px;
         max-width: 140px;
+        min-width: 120px;
         overflow: visible;
-        flex: 1;
+        flex: 1 1 auto;
     }
     
     .store-logo {
@@ -2202,11 +2283,26 @@ html {
 }
 
 @media (max-width: 480px) {
+    .modal-content.phone-selection {
+        max-width: 98%;
+        width: 98%;
+        padding: 1.2rem 0.8rem;
+        margin: 5% auto;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     .phone-selection {
         max-width: 100%;
         margin: 0 auto;
         position: relative;
-        padding: 0.8rem;
+        padding: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
     
     .phone-options {
@@ -2214,17 +2310,20 @@ html {
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        gap: 0.6rem;
+        gap: 0.5rem;
         max-width: 100%;
         width: 100%;
+        flex-wrap: nowrap;
+        padding: 0 0.5rem;
     }
     
     .phone-option {
         padding: 0.7rem 0.5rem;
         min-height: 140px;
-        max-width: 120px;
+        max-width: 110px;
+        min-width: 100px;
         overflow: visible;
-        flex: 1;
+        flex: 1 1 auto;
     }
     
     .store-logo {
