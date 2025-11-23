@@ -157,6 +157,7 @@ cd /home/admin/backend || exit
 npm install
 # npm install nodemailer
 npm install @sendgrid/mail
+npm install twilio
 cat > .env << EOF
 #Port
 PORT = 5000
