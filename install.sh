@@ -177,6 +177,11 @@ EMAIL = $EMAIL
 # no need to use password for sendgrid
 PASSWORD = $PASSWORD
 
+# sms reminder credentials
+TWILIO_ACCOUNT_SID =$TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN = $TWILIO_AUTH_TOKEN
+TWILIO_PHONE_NUMBER = $TWILIO_PHONE_NUMBER
+
 #Server URL
 baseURL = https://$app_domain/ #https://${public_ip}:5000/
 

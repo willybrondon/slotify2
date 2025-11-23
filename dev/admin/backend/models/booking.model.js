@@ -56,6 +56,10 @@ const bookingSchema = new mongoose.Schema(
     isDelete: { type: Boolean, default: false },
     isSettle: { type: Boolean, default: false }, //at the end of the month it will be true after settlement
 
+    // SMS Reminder tracking
+    smsReminder24hSent: { type: Boolean, default: false }, // 24 hours before appointment
+    smsReminder2hSent: { type: Boolean, default: false }, // 2 hours before appointment
+
     cancel: {
       reason: String,
       person: {

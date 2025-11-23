@@ -30,6 +30,8 @@ const SalonSettlement = require("./models/salonSettlement.model");
 const ExpertSettlement = require("./models/expertSettlement.model");
 const Attendance = require("./models/attendance.model");
 const Setting = require("./models/setting.model");
+const User = require("./models/user.model");
+const { sendAppointmentReminder } = require("./services/sms.service");
 
 
 const settingJson = require("./setting");
@@ -240,6 +242,126 @@ cron.schedule("55 23 28-31 * *", async () => {
     console.log("Monthly settlement completed successfully.");
   } catch (error) {
     console.error("Error occurred during monthly settlement:", error);
+  }
+});
+
+// SMS Reminder: Send 24-hour appointment reminders
+// Runs every hour at minute 0 to check for appointments 24 hours from now
+cron.schedule("0 * * * *", async () => {
+  try {
+    const now = moment();
+    const tomorrow = moment().add(24, "hours");
+    const tomorrowDate = tomorrow.format("YYYY-MM-DD");
+
+    const bookings = await Booking.find({
+      date: tomorrowDate,
+      status: { $in: ["pending", "confirm"] },
+      smsReminder24hSent: false,
+      isDelete: false,
+    })
+      .populate("userId", "fname lname mobile")
+      .populate("salonId", "name")
+      .populate("expertId", "fname lname");
+
+    console.log(`Found ${bookings.length} bookings for 24-hour SMS reminders on ${tomorrowDate}`);
+
+    for (const booking of bookings) {
+      try {
+        // Calculate appointment datetime
+        const bookingStartTime = booking.startTime || booking.time[0] || "";
+        if (!bookingStartTime) {
+          console.log(`Skipping booking ${booking.bookingId} - no start time`);
+          continue;
+        }
+
+        // Parse booking datetime
+        const bookingDateTime = moment(`${booking.date} ${bookingStartTime}`, ["YYYY-MM-DD hh:mm A", "YYYY-MM-DD HH:mm A", "YYYY-MM-DD HH:mm", "YYYY-MM-DD hh:mm"]);
+        
+        // Check if appointment is approximately 24 hours away (within 1 hour window)
+        const hoursUntilAppointment = bookingDateTime.diff(now, "hours", true);
+        
+        if (hoursUntilAppointment >= 23 && hoursUntilAppointment <= 25) {
+          // Skip if user is blocked or doesn't have mobile
+          if (booking.userId && booking.userId.mobile && booking.userId.mobile.trim() !== "") {
+            const result = await sendAppointmentReminder(booking, "24h");
+
+            if (result.success) {
+              booking.smsReminder24hSent = true;
+              await booking.save();
+              console.log(`24h SMS reminder sent successfully for booking ${booking.bookingId}`);
+            } else {
+              console.error(`Failed to send 24h SMS reminder for booking ${booking.bookingId}:`, result.error);
+            }
+          } else {
+            console.log(`Skipping booking ${booking.bookingId} - user has no mobile number`);
+          }
+        }
+      } catch (error) {
+        console.error(`Error processing 24h SMS reminder for booking ${booking.bookingId}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error("Error executing 24-hour SMS reminder cron job:", error);
+  }
+});
+
+// SMS Reminder: Send 2-hour appointment reminders
+// Runs every 15 minutes to check for appointments 2 hours from now
+cron.schedule("*/15 * * * *", async () => {
+  try {
+    const twoHoursLater = moment().add(2, "hours");
+    const targetDate = twoHoursLater.format("YYYY-MM-DD");
+    const targetTime = twoHoursLater.format("HH:mm");
+
+    // Find bookings that are approximately 2 hours away
+    const bookings = await Booking.find({
+      date: targetDate,
+      status: { $in: ["pending", "confirm"] },
+      smsReminder2hSent: false,
+      isDelete: false,
+    })
+      .populate("userId", "fname lname mobile")
+      .populate("salonId", "name")
+      .populate("expertId", "fname lname");
+
+    // Filter bookings where the start time is close to 2 hours from now
+    const filteredBookings = bookings.filter((booking) => {
+      const bookingStartTime = booking.startTime || booking.time[0] || "";
+      if (!bookingStartTime) return false;
+
+      // Parse booking time (format: "HH:mm A" or "HH:mm")
+      const bookingTime = moment(bookingStartTime, ["hh:mm A", "HH:mm A", "HH:mm", "hh:mm"]);
+      const currentTime = moment(targetTime, "HH:mm");
+
+      // Check if booking time is within 15 minutes of target time (2 hours from now)
+      const timeDiff = Math.abs(bookingTime.diff(currentTime, "minutes"));
+      return timeDiff <= 15;
+    });
+
+    console.log(`Found ${filteredBookings.length} bookings for 2-hour SMS reminders on ${targetDate}`);
+
+    for (const booking of filteredBookings) {
+      try {
+        // Skip if user is blocked or doesn't have mobile
+        if (booking.userId && booking.userId.mobile && booking.userId.mobile.trim() !== "") {
+          const result = await sendAppointmentReminder(booking, "2h");
+
+          if (result.success) {
+            booking.smsReminder2hSent = true;
+            await booking.save();
+            console.log(`2h SMS reminder sent successfully for booking ${booking.bookingId}`);
+          } else {
+            console.error(`Failed to send 2h SMS reminder for booking ${booking.bookingId}:`, result.error);
+          }
+        } else {
+          console.log(`Skipping booking ${booking.bookingId} - user has no mobile number`);
+        }
+      } catch (error) {
+        console.error(`Error processing 2h SMS reminder for booking ${booking.bookingId}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error("Error executing 2-hour SMS reminder cron job:", error);
   }
 });
 

@@ -113,10 +113,13 @@ jobs:
         SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
         DOMAIN: ${{ secrets.DOMAIN }}
         APP_NAME: ${{ secrets.APP_NAME }}
+        TWILIO_ACCOUNT_SID: ${{secrets.TWILIO_ACCOUNT_SID}}
+        TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+        TWILIO_PHONE_NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
       run: |
         ssh root@46.101.229.176 "sudo apt install dos2unix"
         ssh root@46.101.229.176 "cd / && chmod +x install.sh"
-        ssh root@46.101.229.176 "PUBLIC_IP='$PUBLIC_IP' DOMAIN='$DOMAIN' DB_NAME='$DB_NAME' APP_NAME='$APP_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' EMAIL='$EMAIL' PASSWORD='$PASSWORD' SENDGRID_API_KEY='$SENDGRID_API_KEY' bash -c 'cd / && ./install.sh'"
+        ssh root@46.101.229.176 "TWILIO_ACCOUNT_SID='$TWILIO_ACCOUNT_SID' TWILIO_AUTH_TOKEN='$TWILIO_AUTH_TOKEN' TWILIO_PHONE_NUMBER='$TWILIO_PHONE_NUMBER' PUBLIC_IP='$PUBLIC_IP' DOMAIN='$DOMAIN' DB_NAME='$DB_NAME' APP_NAME='$APP_NAME' SECRET_KEY='$SECRET_KEY' JWT_SECRET='$JWT_SECRET' EMAIL='$EMAIL' PASSWORD='$PASSWORD' SENDGRID_API_KEY='$SENDGRID_API_KEY' bash -c 'cd / && ./install.sh'"
       
     - name: backup storage file 
       run: |
