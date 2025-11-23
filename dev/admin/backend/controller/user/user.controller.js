@@ -30,7 +30,7 @@ const userFunction = async (user, data_) => {
 
   user.loginType = data?.loginType ? data?.loginType : user.loginType;
   user.age = data?.age ? data.age : user?.age;
-  user.mobile = data?.mobile ? data.mobile : user?.mobile;
+  user.mobile = data?.mobile ? data.mobile.trim() : user?.mobile;
   user.gender = data?.gender ? data.gender : user?.gender;
   user.analyticDate = new Date().toLocaleString();
   user.bio = data?.bio ? data.bio : user?.bio;
@@ -90,6 +90,14 @@ exports.checkUser = async (req, res) => {
 exports.checkUserForSignup = async (req, res) => {
   try {
     if (!req.query.email || !req.query.loginType || !req.query.password) return res.status(200).json({ status: false, message: "Oops ! Invalid details!" });
+
+    // Require mobile number for email-password signup (loginType 1)
+    if (req.query.loginType == 1 && (!req.query.mobile || req.query.mobile.trim() === "")) {
+      return res.status(200).json({ 
+        status: false, 
+        message: "Mobile number is required for registration. Please provide your mobile number to receive appointment reminders." 
+      });
+    }
 
     const user = await User.findOne({
       email: req.query.email,
@@ -249,6 +257,14 @@ exports.loginSignup = async (req, res) => {
 
       if (emailExists) {
         return res.status(200).json({ status: false, message: "Email already exists!" });
+      }
+
+      // Require mobile number for email-password signup (loginType 1)
+      if (req.body.loginType == 1 && (!req.body.mobile || req.body.mobile.trim() === "")) {
+        return res.status(200).json({ 
+          status: false, 
+          message: "Mobile number is required for registration. Please provide your mobile number to receive appointment reminders." 
+        });
       }
 
       const newUser = new User();
