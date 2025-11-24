@@ -249,6 +249,12 @@ cron.schedule("55 23 28-31 * *", async () => {
 // Runs every hour at minute 0 to check for appointments 24 hours from now
 cron.schedule("0 * * * *", async () => {
   try {
+    // Check Twilio configuration
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
+      console.log("[SMS Cron] 24h reminder job skipped - Twilio not configured");
+      return;
+    }
+
     const now = moment();
     const tomorrow = moment().add(24, "hours");
     const tomorrowDate = tomorrow.format("YYYY-MM-DD");
@@ -263,7 +269,7 @@ cron.schedule("0 * * * *", async () => {
       .populate("salonId", "name")
       .populate("expertId", "fname lname");
 
-    console.log(`Found ${bookings.length} bookings for 24-hour SMS reminders on ${tomorrowDate}`);
+    console.log(`[SMS Cron] Found ${bookings.length} bookings for 24-hour SMS reminders on ${tomorrowDate}`);
 
     for (const booking of bookings) {
       try {
@@ -309,6 +315,12 @@ cron.schedule("0 * * * *", async () => {
 // Runs every 15 minutes to check for appointments 2 hours from now
 cron.schedule("*/15 * * * *", async () => {
   try {
+    // Check Twilio configuration
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
+      console.log("[SMS Cron] 2h reminder job skipped - Twilio not configured");
+      return;
+    }
+
     const twoHoursLater = moment().add(2, "hours");
     const targetDate = twoHoursLater.format("YYYY-MM-DD");
     const targetTime = twoHoursLater.format("HH:mm");
@@ -338,7 +350,7 @@ cron.schedule("*/15 * * * *", async () => {
       return timeDiff <= 15;
     });
 
-    console.log(`Found ${filteredBookings.length} bookings for 2-hour SMS reminders on ${targetDate}`);
+    console.log(`[SMS Cron] Found ${filteredBookings.length} bookings for 2-hour SMS reminders on ${targetDate}`);
 
     for (const booking of filteredBookings) {
       try {
@@ -428,4 +440,16 @@ app.get("/", function (req, res) {
 
 app.listen(port, () => {
   console.log(`magic happen on ${port}`);
+  
+  // Check SMS/Twilio configuration on startup
+  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
+    console.log("[SMS Service] ✓ Twilio SMS service is configured and ready");
+    console.log(`[SMS Service] Phone Number: ${process.env.TWILIO_PHONE_NUMBER}`);
+  } else {
+    console.warn("[SMS Service] ⚠ WARNING: Twilio SMS service is NOT configured");
+    console.warn("[SMS Service] SMS reminders will not be sent. Please configure:");
+    console.warn("[SMS Service]   - TWILIO_ACCOUNT_SID");
+    console.warn("[SMS Service]   - TWILIO_AUTH_TOKEN");
+    console.warn("[SMS Service]   - TWILIO_PHONE_NUMBER");
+  }
 });

@@ -19,7 +19,24 @@ async function sendSMS(to, message) {
   try {
     // Validate Twilio credentials
     if (!client || !process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
-      console.error("Twilio credentials not configured. Please set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER in environment variables.");
+      console.error("[SMS Service] ERROR: Twilio credentials not configured.");
+      console.error("[SMS Service] Current status:");
+      console.error("   - Account SID:", process.env.TWILIO_ACCOUNT_SID ? `✓ Set (${process.env.TWILIO_ACCOUNT_SID.substring(0, 10)}...)` : "✗ Missing");
+      console.error("   - Auth Token:", process.env.TWILIO_AUTH_TOKEN ? "✓ Set" : "✗ Missing");
+      console.error("   - Phone Number:", process.env.TWILIO_PHONE_NUMBER ? `✓ Set (${process.env.TWILIO_PHONE_NUMBER})` : "✗ Missing");
+      
+      // Check for common .env format issues
+      if (process.env.TWILIO_PHONE_NUMBER && process.env.TWILIO_PHONE_NUMBER.endsWith(';')) {
+        console.error("[SMS Service] ⚠ WARNING: TWILIO_PHONE_NUMBER ends with semicolon (;). Remove it from .env file!");
+      }
+      if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_ACCOUNT_SID.includes(' =')) {
+        console.error("[SMS Service] ⚠ WARNING: Spaces detected in TWILIO_ACCOUNT_SID. Remove spaces around = in .env file!");
+      }
+      
+      console.error("[SMS Service] Please ensure .env file has correct format (no spaces around =, no semicolons):");
+      console.error("[SMS Service]   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+      console.error("[SMS Service]   TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+      console.error("[SMS Service]   TWILIO_PHONE_NUMBER=+1234567890");
       return { success: false, error: "SMS service not configured" };
     }
 
@@ -80,9 +97,11 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
     ]);
 
     if (!user || !user.mobile || user.mobile.trim() === "") {
-      console.log(`User ${user?._id} does not have a mobile number. Skipping SMS reminder.`);
+      console.log(`[SMS Reminder] User ${user?._id || booking.userId} does not have a mobile number. Skipping SMS reminder for booking ${booking.bookingId || booking._id}.`);
       return { success: false, error: "User mobile number not found" };
     }
+
+    console.log(`[SMS Reminder] Attempting to send ${reminderType} reminder to user ${user._id} (mobile: ${user.mobile}) for booking ${booking.bookingId || booking._id}`);
 
     if (!salon) {
       return { success: false, error: "Salon not found" };
@@ -107,6 +126,13 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
 
     // Send SMS
     const result = await sendSMS(user.mobile, message);
+    
+    if (result.success) {
+      console.log(`[SMS Reminder] Successfully sent ${reminderType} reminder to ${user.mobile} for booking ${booking.bookingId || booking._id}`);
+    } else {
+      console.error(`[SMS Reminder] Failed to send ${reminderType} reminder to ${user.mobile} for booking ${booking.bookingId || booking._id}: ${result.error}`);
+    }
+    
     return result;
   } catch (error) {
     console.error("Error in sendAppointmentReminder:", error);

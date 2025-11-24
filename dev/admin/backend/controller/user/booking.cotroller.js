@@ -265,7 +265,7 @@ exports.newBooking = async (req, res, next) => {
 
     let coupon, discountAmount, totalAmount;
 
-    const taxAmount = (req.body.withoutTax * settingJSON.tax) / 100;
+    const taxAmount = (req.body.withoutTax * global.settingJSON.tax) / 100;
     const withTaxAmount = (taxAmount + req.body.withoutTax).toFixed(2);
     const bookingAmount = req?.body?.amount.toFixed(2);
 
