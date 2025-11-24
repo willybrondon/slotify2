@@ -28,6 +28,7 @@ class ApiConstant {
 
   /// =================== Coupon =================== ///
   static const getCoupon = "user/coupon/retriveCoupons?";
+  static const validateCoupon = "user/coupon/retriveValidateCoupon?";
 
   /// ---------- Products ---------- ///
   static const getTrendingProduct = "user/product/trending?";

@@ -28,6 +28,7 @@ import 'package:salon_2/ui/select_branch_screen/controller/select_branch_control
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/ui/view_all_category/controller/view_all_category_controller.dart';
 import 'package:salon_2/ui/wallet_screen/controller/wallet_screen_controller.dart';
+import 'package:salon_2/ui/wallet_screen/model/get_coupon_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/utils/app_colors.dart';
@@ -107,6 +108,13 @@ class BookingScreenController extends GetxController {
 
   //----------- API Variables -----------//
   GetBookingModel? getBookingModel;
+
+  //----------- Coupon Variables -----------//
+  GetCouponModel? getCouponModel;
+  int applyCoupon = -1;
+  String? selectedCouponId;
+  double couponDiscountAmount = 0.0;
+  double totalPriceAfterDiscount = 0.0;
   GetCheckBookingModel? getCheckBookingCategory;
   CreateBookingModel? createBookingCategory;
   GetExpertServiceBaseSalonModel? getExpertServiceBaseSalonCategory;
@@ -250,6 +258,16 @@ class BookingScreenController extends GetxController {
     log("Booking add WithOutTaxRupee :: $withOutTaxRupee");
     log("Booking add Total Price :: $totalPrice");
     log("Booking add FinalTaxRupee :: $finalTaxRupee");
+
+    // Fetch available coupons when booking amount is calculated
+    if (withOutTaxRupee > 0) {
+      String userId = Constant.storage.read<String>('userId') ?? "";
+      getCouponApiCall(
+        userId: userId,
+        type: "2", // Type 2 for booking
+        amount: withOutTaxRupee.toInt().toString(),
+      );
+    }
 
     update(
         [Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
@@ -759,6 +777,8 @@ class BookingScreenController extends GetxController {
         "paymentType": paymentType,
         "atPlace": atPlace,
         "address": address,
+        if (selectedCouponId != null && selectedCouponId!.isNotEmpty)
+          "couponId": selectedCouponId,
       });
 
       log("Create Booking Body :: $body");
@@ -793,6 +813,186 @@ class BookingScreenController extends GetxController {
     }
   }
 
+  //----------- Coupon API Methods -----------//
+  getCouponApiCall(
+      {required String userId,
+      required String type,
+      required String amount}) async {
+    try {
+      isLoading(true);
+      update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+
+      final queryParameters = {
+        "userId": userId,
+        "type": type,
+        "amount": amount,
+      };
+
+      log("Get Coupon Params :: $queryParameters");
+
+      String queryString = Uri(queryParameters: queryParameters).query;
+
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.getCoupon + queryString);
+      log("Get Coupon Url :: $url");
+
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
+      log("Get Coupon Headers :: $headers");
+
+      final response = await http.get(url, headers: headers);
+
+      log("Get Coupon Status Code :: ${response.statusCode}");
+      log("Get Coupon Response :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        getCouponModel = GetCouponModel.fromJson(jsonResponse);
+      }
+
+      log("Get Coupon Api Call Successfully");
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+    } catch (e) {
+      log("Error call Get Coupon Api :: $e");
+    } finally {
+      isLoading(false);
+      update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+    }
+  }
+
+  validateCouponApiCall(
+      {required String userId,
+      required String couponId,
+      required String type,
+      required String amount}) async {
+    try {
+      isLoading(true);
+      update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+
+      final queryParameters = {
+        "userId": userId,
+        "couponId": couponId,
+        "type": type,
+        "amount": amount,
+      };
+
+      log("Validate Coupon Params :: $queryParameters");
+
+      String queryString = Uri(queryParameters: queryParameters).query;
+
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.validateCoupon + queryString);
+      log("Validate Coupon Url :: $url");
+
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      log("Validate Coupon Status Code :: ${response.statusCode}");
+      log("Validate Coupon Response :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == true) {
+          couponDiscountAmount = (jsonResponse['data'] ?? 0.0).toDouble();
+          calculateTotalWithDiscount();
+          return true;
+        } else {
+          Utils.showToast(
+              Get.context!, jsonResponse['message'] ?? "Invalid coupon");
+          return false;
+        }
+      }
+      return false;
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+      return false;
+    } catch (e) {
+      log("Error call Validate Coupon Api :: $e");
+      Utils.showToast(Get.context!, "Error validating coupon");
+      return false;
+    } finally {
+      isLoading(false);
+      update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+    }
+  }
+
+  onSelectCoupon(int index) async {
+    if (getCouponModel?.data == null ||
+        index >= (getCouponModel?.data?.length ?? 0)) {
+      return;
+    }
+
+    final coupon = getCouponModel!.data![index];
+    String userId = Constant.storage.read<String>('userId') ?? "";
+
+    if (applyCoupon == index) {
+      // Deselect coupon
+      applyCoupon = -1;
+      selectedCouponId = null;
+      couponDiscountAmount = 0.0;
+      calculateTotalWithDiscount();
+    } else {
+      // Select and validate coupon
+      applyCoupon = index;
+      selectedCouponId = coupon.id;
+
+      bool isValid = await validateCouponApiCall(
+        userId: userId,
+        couponId: coupon.code ?? "",
+        type: "2", // Type 2 for booking
+        amount: withOutTaxRupee.toInt().toString(),
+      );
+
+      if (!isValid) {
+        applyCoupon = -1;
+        selectedCouponId = null;
+        couponDiscountAmount = 0.0;
+      }
+    }
+
+    update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+  }
+
+  calculateTotalWithDiscount() {
+    // Keep original withoutTax for backend (backend calculates discount on this)
+    // Calculate tax on original amount (before discount)
+    if (tax != null && tax! > 0) {
+      finalTaxRupee = (withOutTaxRupee * tax!) / 100;
+    } else {
+      finalTaxRupee = 0.0;
+    }
+
+    // Calculate total with tax
+    double withTaxAmount = withOutTaxRupee + finalTaxRupee;
+
+    // Apply discount to get final total
+    totalPriceAfterDiscount = withTaxAmount - couponDiscountAmount;
+    if (totalPriceAfterDiscount < 0) totalPriceAfterDiscount = 0;
+
+    totalPrice = totalPriceAfterDiscount;
+
+    update([
+      Constant.idProgressView,
+      Constant.idGetCoupon,
+      Constant.idApplyCoupon
+    ]);
+  }
+
+  void resetCoupon() {
+    applyCoupon = -1;
+    selectedCouponId = null;
+    couponDiscountAmount = 0.0;
+    calculateTotalWithDiscount();
+    update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+  }
+
   confirmDialogButton(BuildContext context) async {
     String userId = Constant.storage.read<String>('userId') ?? "";
 
@@ -822,6 +1022,7 @@ class BookingScreenController extends GetxController {
           finalTaxRupee = 0.0;
           withOutTaxRupee = 0.0;
           totalPrice = 0.0;
+          resetCoupon();
 
           for (var i = 0;
               i <
@@ -947,6 +1148,7 @@ class BookingScreenController extends GetxController {
             finalTaxRupee = 0.0;
             withOutTaxRupee = 0.0;
             totalPrice = 0.0;
+            resetCoupon();
 
             for (var i = 0;
                 i <
