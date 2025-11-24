@@ -39,7 +39,6 @@ async function sendSMS(to, message) {
       console.error("[SMS Service]   TWILIO_PHONE_NUMBER=+1234567890");
       return { success: false, error: "SMS service not configured" };
     }
-
     // Validate phone number
     if (!to || to.trim() === "") {
       console.error("Phone number is required");
