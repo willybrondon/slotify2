@@ -234,6 +234,8 @@ class LoginScreenController extends GetxController {
     String? email,
     String? password,
     String? age,
+    String? fname,
+    String? lname,
   }) async {
     try {
       isLoading(true);
@@ -248,7 +250,9 @@ class LoginScreenController extends GetxController {
         "fcmToken": safeFcmToken,
         "email": email,
         "password": password,
-        "age": age
+        "age": age,
+        "fname": fname,
+        "lname": lname,
       });
 
       dev.log("Login Body :: $body");

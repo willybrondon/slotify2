@@ -41,9 +41,11 @@ class SignUpScreen extends StatelessWidget {
               Container(
                 height: 64,
                 width: 64,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.whiteColor),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: AppColors.whiteColor),
                 clipBehavior: Clip.hardEdge,
-                child: Image.network("${ApiConstant.BASE_URL}storage/male.png", fit: BoxFit.cover),
+                child: Image.network("${ApiConstant.BASE_URL}storage/male.png",
+                    fit: BoxFit.cover),
               ).paddingOnly(
                 left: 15,
                 right: 12,
@@ -54,11 +56,17 @@ class SignUpScreen extends StatelessWidget {
                 children: [
                   Text(
                     "txtHelloUser".tr,
-                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplay, fontSize: 18, color: AppColors.whiteColor),
+                    style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplay,
+                        fontSize: 18,
+                        color: AppColors.whiteColor),
                   ),
                   Text(
                     "txtCreateAccount".tr,
-                    style: TextStyle(fontFamily: AppFontFamily.sfProDisplayRegular, fontSize: 13, color: AppColors.whiteColor),
+                    style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplayRegular,
+                        fontSize: 13,
+                        color: AppColors.whiteColor),
                   ),
                 ],
               ),
@@ -81,13 +89,18 @@ class SignUpScreen extends StatelessWidget {
                       child: Text(
                         "txtCreateYourAccount".tr,
                         style: TextStyle(
-                            color: AppColors.primaryTextColor, fontSize: 21, fontFamily: AppFontFamily.sfProDisplayBold),
+                            color: AppColors.primaryTextColor,
+                            fontSize: 21,
+                            fontFamily: AppFontFamily.sfProDisplayBold),
                       ),
                     ).paddingOnly(top: 20),
                     Center(
                       child: Text(
                         "txtFillDetails".tr,
-                        style: TextStyle(color: AppColors.email, fontSize: 13.5, fontFamily: AppFontFamily.sfProDisplayRegular),
+                        style: TextStyle(
+                            color: AppColors.email,
+                            fontSize: 13.5,
+                            fontFamily: AppFontFamily.sfProDisplayRegular),
                       ),
                     ),
                     GetBuilder<SignUpController>(
@@ -176,6 +189,35 @@ class SignUpScreen extends StatelessWidget {
                     GetBuilder<SignUpController>(
                       builder: (logic) {
                         return TextFormFieldCustom(
+                          title: "txtMobileNumber".tr,
+                          hintTextColor: AppColors.subTitle,
+                          hintTextSize: 16,
+                          hintTextStyle: AppFontFamily.sfProDisplayRegular,
+                          borderWidth: 1,
+                          borderColor: AppColors.grey.withOpacity(0.1),
+                          method: TextFieldCustom(
+                            height: 50,
+                            width: Get.width,
+                            hintText: "txtEnterMobileNumber".tr,
+                            obscureText: false,
+                            textInputType: TextInputType.phone,
+                            textInputAction: TextInputAction.next,
+                            controller: logic.mobileController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter mobile number';
+                              } else if (value.length < 10) {
+                                return 'Mobile number must be at least 10 digits';
+                              }
+                              return null;
+                            },
+                          ),
+                        );
+                      },
+                    ).paddingOnly(left: 15, right: 15, top: 15),
+                    GetBuilder<SignUpController>(
+                      builder: (logic) {
+                        return TextFormFieldCustom(
                           title: "txtPassword".tr,
                           hintTextColor: AppColors.subTitle,
                           hintTextSize: 16,
@@ -188,7 +230,8 @@ class SignUpScreen extends StatelessWidget {
                             width: Get.width,
                             suffixIcon: logic.isObscure
                                 ? InkWell(
-                                    overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                                    overlayColor: WidgetStatePropertyAll(
+                                        AppColors.transparent),
                                     onTap: () {
                                       logic.onClickObscure();
                                     },
@@ -198,11 +241,13 @@ class SignUpScreen extends StatelessWidget {
                                     ),
                                   )
                                 : InkWell(
-                                    overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                                    overlayColor: WidgetStatePropertyAll(
+                                        AppColors.transparent),
                                     onTap: () {
                                       logic.onClickObscure();
                                     },
-                                    child: Image.asset(AppAsset.icVisible, cacheHeight: 22)),
+                                    child: Image.asset(AppAsset.icVisible,
+                                        cacheHeight: 22)),
                             hintText: "txtEnterPassword".tr,
                             obscureText: logic.isObscure,
                             textInputType: TextInputType.emailAddress,
@@ -241,7 +286,8 @@ class SignUpScreen extends StatelessWidget {
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'txtPleaseConfirmPassword'.tr;
-                              } else if (value != logic.passwordController.text) {
+                              } else if (value !=
+                                  logic.passwordController.text) {
                                 return 'desPasswordNotMatch'.tr;
                               }
                               return null;
@@ -258,7 +304,9 @@ class SignUpScreen extends StatelessWidget {
                             obscureText: false,
                             fieldName: "MobileNumber",
                             textInputType: TextInputType.number,
-                            inputFormatters: [LengthLimitingTextInputFormatter(2)],
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(2)
+                            ],
                             controller: logic.ageController,
                             textInputAction: TextInputAction.next,
                           ),
@@ -283,7 +331,8 @@ class SignUpScreen extends StatelessWidget {
                             id: Constant.idChangeGender,
                             builder: (logic) {
                               return Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   logic.checkedValue != index
                                       ? GestureDetector(
@@ -294,7 +343,10 @@ class SignUpScreen extends StatelessWidget {
                                             height: 20,
                                             width: 20,
                                             decoration: BoxDecoration(
-                                                shape: BoxShape.circle, border: Border.all(color: AppColors.greyColor2)),
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color:
+                                                        AppColors.greyColor2)),
                                           ),
                                         )
                                       : GestureDetector(
@@ -312,8 +364,9 @@ class SignUpScreen extends StatelessWidget {
                                                 color: AppColors.service,
                                               ),
                                             ),
-                                            child:
-                                                logic.checkedValue == index ? Image.asset(AppAsset.icRound) : const SizedBox(),
+                                            child: logic.checkedValue == index
+                                                ? Image.asset(AppAsset.icRound)
+                                                : const SizedBox(),
                                           ),
                                         ),
                                   SizedBox(width: Get.width * 0.03),
@@ -326,7 +379,8 @@ class SignUpScreen extends StatelessWidget {
                                       style: TextStyle(
                                           fontSize: 16,
                                           color: AppColors.primaryTextColor,
-                                          fontFamily: AppFontFamily.sfProDisplayMedium),
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayMedium),
                                     ),
                                   ),
                                 ],
@@ -346,8 +400,10 @@ class SignUpScreen extends StatelessWidget {
                       builder: (logic) {
                         return AppButton(
                           onTap: () async {
-                            FocusScopeNode currentFocus = FocusScope.of(context);
-                            if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+                            FocusScopeNode currentFocus =
+                                FocusScope.of(context);
+                            if (!currentFocus.hasPrimaryFocus &&
+                                currentFocus.focusedChild != null) {
                               currentFocus.focusedChild?.unfocus();
                             }
 
@@ -355,12 +411,14 @@ class SignUpScreen extends StatelessWidget {
                               email: logic.emailController.text,
                               loginType: "1",
                               password: logic.confirmPasswordController.text,
+                              mobile: logic.mobileController.text.trim(),
                             );
 
                             if (logic.checkSignUpCategory?.status == true) {
                               logic.onClickSignup();
                             } else {
-                              Utils.showToast(Get.context!, logic.checkSignUpCategory?.message ?? "");
+                              Utils.showToast(Get.context!,
+                                  logic.checkSignUpCategory?.message ?? "");
                             }
                           },
                           height: 55,
@@ -375,7 +433,8 @@ class SignUpScreen extends StatelessWidget {
                     ),
                     Center(
                       child: InkWell(
-                        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
                         onTap: () {
                           Get.back();
                         },

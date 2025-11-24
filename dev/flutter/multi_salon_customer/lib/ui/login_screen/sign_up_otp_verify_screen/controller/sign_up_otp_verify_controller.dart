@@ -66,11 +66,13 @@ class SignUpOtpVerifyController extends GetxController {
           update([Constant.idProgressView]);
           await loginScreenController.onLoginApiCall(
             loginType: "1",
-            mobile: "",
+            mobile: signUpController.mobileController.text.trim(),
             fcmToken: fcmToken!,
             password: signUpController.confirmPasswordController.text.trim(),
             email: signUpController.emailController.text.trim(),
             age: signUpController.ageController.text.trim(),
+            fname: signUpController.fNameController.text.trim(),
+            lname: signUpController.lNameController.text.trim(),
           );
           dev.log(
               "isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
@@ -89,7 +91,7 @@ class SignUpOtpVerifyController extends GetxController {
                 fName: signUpController.fNameController.text.trim(),
                 lName: signUpController.lNameController.text.trim(),
                 email: "",
-                mobile: "",
+                mobile: signUpController.mobileController.text.trim(),
                 age: "",
                 bio: "",
                 selectImageFile: "",

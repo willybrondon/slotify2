@@ -17,13 +17,17 @@ import 'package:salon_2/utils/utils.dart';
 
 class SignUpController extends GetxController {
   final formKey = GlobalKey<FormState>();
-  final LoginScreenController loginScreenController = Get.find<LoginScreenController>();
-  final ProfileScreenController profileScreenController = Get.put(ProfileScreenController());
-  final EditProfileScreenController editProfileScreenController = Get.put(EditProfileScreenController());
+  final LoginScreenController loginScreenController =
+      Get.find<LoginScreenController>();
+  final ProfileScreenController profileScreenController =
+      Get.put(ProfileScreenController());
+  final EditProfileScreenController editProfileScreenController =
+      Get.put(EditProfileScreenController());
 
   TextEditingController fNameController = TextEditingController();
   TextEditingController lNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController mobileController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController ageController = TextEditingController();
@@ -172,7 +176,8 @@ class SignUpController extends GetxController {
         await onSignUpOtpLoginApiCall(email: emailController.text.trim());
 
         if (signUpOtpLoginCategory?.status == true) {
-          Get.toNamed(AppRoutes.signUpVerifyOtp, arguments: [emailController.text.trim(), isDataSelected]);
+          Get.toNamed(AppRoutes.signUpVerifyOtp,
+              arguments: [emailController.text.trim(), isDataSelected]);
           Utils.showToast(Get.context!, "txtCheckMail".tr);
         } else {
           Utils.showToast(Get.context!, signUpOtpLoginCategory?.message ?? "");
@@ -199,10 +204,14 @@ class SignUpController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.signUpOtpLogin + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.signUpOtpLogin + queryString);
       dev.log("Sign Up Otp Login Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.post(url, headers: headers);
 
@@ -224,21 +233,34 @@ class SignUpController extends GetxController {
     }
   }
 
-  onCheckSignUpUserApiCall({required String email, required String loginType, required String password}) async {
+  onCheckSignUpUserApiCall(
+      {required String email,
+      required String loginType,
+      required String password,
+      required String mobile}) async {
     try {
       isLoading(true);
       update([Constant.idProgressView, Constant.idBookingAndLogin]);
 
-      final queryParameters = {"email": email, "loginType": loginType, "password": password};
+      final queryParameters = {
+        "email": email,
+        "loginType": loginType,
+        "password": password,
+        "mobile": mobile
+      };
 
       dev.log("Check Sign Up User Params :: $queryParameters");
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.checkSignUpUser + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.checkSignUpUser + queryString);
       dev.log("Check Sign Up User Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
 
       final response = await http.get(url, headers: headers);
 
