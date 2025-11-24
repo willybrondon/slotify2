@@ -13,10 +13,11 @@ async function testTwilio() {
 
   if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
     console.error("❌ ERROR: Twilio credentials are not properly configured in .env file");
-    console.error("\nPlease ensure your .env file has:");
+    console.error("\nPlease ensure your .env file has (replace with your actual credentials):");
     console.error("TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     console.error("TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     console.error("TWILIO_PHONE_NUMBER=+1234567890");
+    console.error("\n⚠️  IMPORTANT: No spaces around = sign, no semicolons at the end!");
     process.exit(1);
   }
 
