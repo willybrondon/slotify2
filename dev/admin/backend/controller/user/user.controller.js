@@ -169,7 +169,7 @@ exports.verifyMobileForSignup = async (req, res) => {
       if (smsResult.error.includes("unverified")) {
         errorMessage = "This mobile number needs to be verified in our system. Please contact support or use a verified number.";
       } else if (smsResult.error.includes("invalid")) {
-        errorMessage = "Invalid mobile number format. Please enter a valid number with country code (e.g., +330766160394).";
+        errorMessage = "Invalid mobile number format. Please enter a valid number with country code (e.g., +330623769877).";
       } else if (smsResult.error.includes("not configured")) {
         errorMessage = "SMS service is temporarily unavailable. Please try again later or contact support.";
       }
