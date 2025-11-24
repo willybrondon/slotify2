@@ -11,6 +11,7 @@ const checkAccessWithSecretKey = require("../../middleware/checkAccess");
 route.post("/checkUser", checkAccessWithSecretKey(), userController.checkUser);
 route.post("/loginSignup", checkAccessWithSecretKey(), userController.loginSignup);
 route.get("/checkUserForSignup", checkAccessWithSecretKey(), userController.checkUserForSignup);
+route.get("/verifyMobileForSignup", checkAccessWithSecretKey(), userController.verifyMobileForSignup);
 route.get("/profile", checkAccessWithSecretKey(), userController.getProfile);
 route.patch("/update", upload.single("image"), checkAccessWithSecretKey(), userController.updateUser);
 route.put("/delete", checkAccessWithSecretKey(), userController.deleteUser);

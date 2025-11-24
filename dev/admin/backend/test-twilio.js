@@ -24,7 +24,7 @@ async function testTwilio() {
   // Test phone number - Update this with your actual phone number
   // Note: French numbers are typically 10 digits after country code (+33)
   // If +337660394 doesn't work, try +3376603940 or your full number
-  const testPhoneNumber = "+337660394"; // Your phone number
+  const testPhoneNumber = "+3307660394"; // Your phone number
   
   console.log("2. Testing SMS Send:");
   console.log(`   From: ${process.env.TWILIO_PHONE_NUMBER}`);

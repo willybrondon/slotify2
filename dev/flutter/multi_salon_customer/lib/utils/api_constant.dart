@@ -11,6 +11,7 @@ class ApiConstant {
   static const updateUser = "user/update?";
   static const checkUser = "user/checkUser?";
   static const checkSignUpUser = "user/checkUserForSignup?";
+  static const verifyMobileForSignup = "user/verifyMobileForSignup?";
 
   /// ---------- OTP ---------- ///
   static const createOtp = "user/forgetPassword/create";

@@ -14,6 +14,7 @@ import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/utils.dart';
+import 'package:salon_2/custom/mobile_number_formatter/mobile_number_formatter.dart';
 
 class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
@@ -203,11 +204,14 @@ class SignUpScreen extends StatelessWidget {
                             textInputType: TextInputType.phone,
                             textInputAction: TextInputAction.next,
                             controller: logic.mobileController,
+                            inputFormatters: [
+                              MobileNumberFormatter(),
+                            ],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter mobile number';
-                              } else if (value.length < 10) {
-                                return 'Mobile number must be at least 10 digits';
+                              } else if (!logic.isMobileValid(value)) {
+                                return 'Please enter a valid mobile number (10-15 digits)';
                               }
                               return null;
                             },
@@ -414,6 +418,17 @@ class SignUpScreen extends StatelessWidget {
                               mobile: logic.mobileController.text.trim(),
                             );
 
+                            // Check if mobile verification failed
+                            if (logic.verifyMobileCategory?.status != true) {
+                              Utils.showToast(
+                                  Get.context!,
+                                  logic.verifyMobileCategory?.message ??
+                                      logic.verifyMobileCategory?.error ??
+                                      "Mobile number verification failed. Please check your number and try again.");
+                              return;
+                            }
+
+                            // Mobile verified successfully, continue with signup
                             if (logic.checkSignUpCategory?.status == true) {
                               logic.onClickSignup();
                             } else {

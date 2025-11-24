@@ -125,6 +125,70 @@ exports.checkUserForSignup = async (req, res) => {
   }
 };
 
+// Verify mobile number by sending SMS during signup
+exports.verifyMobileForSignup = async (req, res) => {
+  try {
+    const { sendSMS } = require("../../services/sms.service");
+
+    if (!req.query.mobile || req.query.mobile.trim() === "") {
+      return res.status(200).json({
+        status: false,
+        message: "Mobile number is required",
+      });
+    }
+
+    const mobile = req.query.mobile.trim();
+
+    // Format mobile number - ensure it starts with +
+    let formattedMobile = mobile;
+    if (!formattedMobile.startsWith("+")) {
+      // If no + prefix, add it (assuming it's a valid number)
+      formattedMobile = `+${formattedMobile}`;
+    }
+
+    // Send welcome SMS to verify the number is valid
+    const welcomeMessage = `Welcome to ${process.env.projectName || "our platform"}! Your mobile number has been verified. This number will be used for appointment reminders and notifications. Thank you for joining us!`;
+
+    console.log(`[Mobile Verification] Attempting to send SMS to ${formattedMobile} for signup verification`);
+
+    const smsResult = await sendSMS(formattedMobile, welcomeMessage);
+
+    if (smsResult.success) {
+      console.log(`[Mobile Verification] SMS sent successfully to ${formattedMobile}. Message SID: ${smsResult.messageSid}`);
+      return res.status(200).json({
+        status: true,
+        message: "Mobile number verified successfully. Welcome SMS sent!",
+        messageSid: smsResult.messageSid,
+      });
+    } else {
+      console.error(`[Mobile Verification] Failed to send SMS to ${formattedMobile}: ${smsResult.error}`);
+      
+      // Provide user-friendly error messages
+      let errorMessage = "Mobile number verification failed. Please check your number and try again.";
+      
+      if (smsResult.error.includes("unverified")) {
+        errorMessage = "This mobile number needs to be verified in our system. Please contact support or use a verified number.";
+      } else if (smsResult.error.includes("invalid")) {
+        errorMessage = "Invalid mobile number format. Please enter a valid number with country code (e.g., +330766160394).";
+      } else if (smsResult.error.includes("not configured")) {
+        errorMessage = "SMS service is temporarily unavailable. Please try again later or contact support.";
+      }
+
+      return res.status(200).json({
+        status: false,
+        message: errorMessage,
+        error: smsResult.error,
+      });
+    }
+  } catch (error) {
+    console.error("[Mobile Verification] Error:", error);
+    return res.status(500).json({
+      status: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
 exports.loginSignup = async (req, res) => {
   try {
     if (!req.body.loginType) {

@@ -9,6 +9,7 @@ import 'package:salon_2/ui/edit_profile_screen/controller/edit_profile_controlle
 import 'package:salon_2/ui/login_screen/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/login_screen/sign_up_screen/model/check_sign_up_model.dart';
 import 'package:salon_2/ui/login_screen/sign_up_screen/model/sign_up_otp_login_model.dart';
+import 'package:salon_2/ui/login_screen/sign_up_screen/model/verify_mobile_model.dart';
 import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
@@ -40,6 +41,7 @@ class SignUpController extends GetxController {
   //----------- API Variables -----------//
   SignUpOtpLoginModel? signUpOtpLoginCategory;
   CheckSignUpModel? checkSignUpCategory;
+  VerifyMobileModel? verifyMobileCategory;
   RxBool isLoading = false.obs;
 
   @override
@@ -105,6 +107,41 @@ class SignUpController extends GetxController {
   bool isEmailValid(String email) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email);
+  }
+
+  bool isMobileValid(String mobile) {
+    // Remove any spaces, dashes, or parentheses
+    String cleanedMobile = mobile.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+
+    // Check if it starts with + (international format)
+    bool hasPlusPrefix = cleanedMobile.startsWith('+');
+
+    if (hasPlusPrefix) {
+      // Remove the + sign for validation
+      cleanedMobile = cleanedMobile.substring(1);
+
+      // After removing +, it should contain only digits
+      if (!RegExp(r'^\d+$').hasMatch(cleanedMobile)) {
+        return false;
+      }
+
+      // For international format: 10-15 digits (not counting the +)
+      if (cleanedMobile.length < 10 || cleanedMobile.length > 15) {
+        return false;
+      }
+    } else {
+      // For local format: should contain only digits
+      if (!RegExp(r'^\d+$').hasMatch(cleanedMobile)) {
+        return false;
+      }
+
+      // For local format: 10-15 digits
+      if (cleanedMobile.length < 10 || cleanedMobile.length > 15) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   onClickSignup() async {
@@ -242,6 +279,20 @@ class SignUpController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView, Constant.idBookingAndLogin]);
 
+      // Step 1: Verify mobile number by sending SMS
+      dev.log("Step 1: Verifying mobile number by sending SMS...");
+      await onVerifyMobileForSignupApiCall(mobile: mobile);
+
+      if (verifyMobileCategory?.status != true) {
+        // SMS verification failed, stop the signup process
+        dev.log(
+            "Mobile verification failed: ${verifyMobileCategory?.message ?? verifyMobileCategory?.error}");
+        return;
+      }
+
+      dev.log("Mobile number verified successfully. SMS sent to ${mobile}");
+
+      // Step 2: Check if user can sign up (email check)
       final queryParameters = {
         "email": email,
         "loginType": loginType,
@@ -249,7 +300,7 @@ class SignUpController extends GetxController {
         "mobile": mobile
       };
 
-      dev.log("Check Sign Up User Params :: $queryParameters");
+      dev.log("Step 2: Check Sign Up User Params :: $queryParameters");
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
@@ -276,6 +327,51 @@ class SignUpController extends GetxController {
     } catch (e) {
       dev.log("Error call Check Sign Up User Api :: $e");
       Utils.showToast(Get.context!, '$e');
+    } finally {
+      isLoading(false);
+      update([Constant.idProgressView, Constant.idBookingAndLogin]);
+    }
+  }
+
+  onVerifyMobileForSignupApiCall({required String mobile}) async {
+    try {
+      isLoading(true);
+      update([Constant.idProgressView, Constant.idBookingAndLogin]);
+
+      final queryParameters = {"mobile": mobile.trim()};
+
+      dev.log("Verify Mobile For Signup Params :: $queryParameters");
+
+      String queryString = Uri(queryParameters: queryParameters).query;
+
+      final url = Uri.parse(ApiConstant.BASE_URL +
+          ApiConstant.verifyMobileForSignup +
+          queryString);
+      dev.log("Verify Mobile For Signup Url :: $url");
+
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      dev.log("Verify Mobile For Signup Status Code :: ${response.statusCode}");
+      dev.log("Verify Mobile For Signup Response :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        verifyMobileCategory = VerifyMobileModel.fromJson(jsonResponse);
+      }
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+      verifyMobileCategory =
+          VerifyMobileModel(status: false, error: exception.message);
+    } catch (e) {
+      dev.log("Error call Verify Mobile For Signup Api :: $e");
+      Utils.showToast(Get.context!, 'Error verifying mobile number: $e');
+      verifyMobileCategory =
+          VerifyMobileModel(status: false, error: e.toString());
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idBookingAndLogin]);
