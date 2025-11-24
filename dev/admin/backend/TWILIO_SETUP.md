@@ -10,7 +10,6 @@ TWILIO_ACCOUNT_SID =ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_PHONE_NUMBER = +1234567890;
 ```
-
 ### ✅ CORRECT Format (no spaces, no semicolons):
 ```
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
