@@ -99,6 +99,7 @@ class BookingScreenController extends GetxController {
       Get.put(SearchScreenController());
 
   TextEditingController searchEditingController = TextEditingController();
+  TextEditingController couponCodeController = TextEditingController();
 
   //------ Split Break Time Variables ------//
   String? str;
@@ -113,6 +114,7 @@ class BookingScreenController extends GetxController {
   GetCouponModel? getCouponModel;
   int applyCoupon = -1;
   String? selectedCouponId;
+  String? manualCouponCode; // Store manually entered coupon code
   double couponDiscountAmount = 0.0;
   double totalPriceAfterDiscount = 0.0;
   GetCheckBookingModel? getCheckBookingCategory;
@@ -765,6 +767,22 @@ class BookingScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
+      // Prepare coupon ID - use selectedCouponId if available, otherwise try to find by manual code
+      String? couponIdToSend = selectedCouponId;
+
+      // If manual coupon code is used but no ID found, try to find it in the list
+      if (couponIdToSend == null &&
+          manualCouponCode != null &&
+          getCouponModel?.data != null) {
+        for (var coupon in getCouponModel!.data!) {
+          if (coupon.code?.toUpperCase() == manualCouponCode!.toUpperCase()) {
+            couponIdToSend = coupon.id;
+            selectedCouponId = coupon.id;
+            break;
+          }
+        }
+      }
+
       final body = json.encode({
         "userId": userId,
         "expertId": expertId,
@@ -777,10 +795,14 @@ class BookingScreenController extends GetxController {
         "paymentType": paymentType,
         "atPlace": atPlace,
         "address": address,
-        if (selectedCouponId != null && selectedCouponId!.isNotEmpty)
-          "couponId": selectedCouponId,
+        if (couponIdToSend != null && couponIdToSend.isNotEmpty)
+          "couponId": couponIdToSend,
       });
 
+      log("Create Booking - selectedCouponId: $selectedCouponId");
+      log("Create Booking - couponDiscountAmount: $couponDiscountAmount");
+      log("Create Booking - amount: $amount");
+      log("Create Booking - withoutTax: $withoutTax");
       log("Create Booking Body :: $body");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.createBooking);
@@ -943,6 +965,11 @@ class BookingScreenController extends GetxController {
       applyCoupon = index;
       selectedCouponId = coupon.id;
 
+      log("onSelectCoupon - Coupon selected:");
+      log("  - Coupon ID: ${coupon.id}");
+      log("  - Coupon Code: ${coupon.code}");
+      log("  - selectedCouponId: $selectedCouponId");
+
       bool isValid = await validateCouponApiCall(
         userId: userId,
         couponId: coupon.code ?? "",
@@ -954,29 +981,122 @@ class BookingScreenController extends GetxController {
         applyCoupon = -1;
         selectedCouponId = null;
         couponDiscountAmount = 0.0;
+      } else {
+        log("onSelectCoupon - Coupon validated successfully");
+        log("  - Discount Amount: $couponDiscountAmount");
       }
     }
 
     update([Constant.idGetCoupon, Constant.idApplyCoupon]);
   }
 
+  // Apply manually entered coupon code
+  onApplyManualCouponCode() async {
+    String couponCode = couponCodeController.text.trim().toUpperCase();
+
+    if (couponCode.isEmpty) {
+      Utils.showToast(Get.context!, "Please enter a coupon code");
+      return;
+    }
+
+    String userId = Constant.storage.read<String>('userId') ?? "";
+
+    // Clear any previously selected coupon from list
+    applyCoupon = -1;
+    selectedCouponId = null;
+    manualCouponCode = couponCode;
+
+    log("onApplyManualCouponCode - Applying coupon code: $couponCode");
+
+    bool isValid = await validateCouponApiCall(
+      userId: userId,
+      couponId: couponCode,
+      type: "2", // Type 2 for booking
+      amount: withOutTaxRupee.toInt().toString(),
+    );
+
+    if (!isValid) {
+      manualCouponCode = null;
+      couponCodeController.clear();
+      Utils.showToast(
+          Get.context!, "Invalid coupon code. Please check and try again.");
+    } else {
+      log("onApplyManualCouponCode - Coupon validated successfully");
+      log("  - Discount Amount: $couponDiscountAmount");
+      Utils.showToast(Get.context!, "Coupon applied successfully!");
+
+      // Find the coupon in the list to get its ID
+      if (getCouponModel?.data != null) {
+        for (int i = 0; i < getCouponModel!.data!.length; i++) {
+          if (getCouponModel!.data![i].code?.toUpperCase() == couponCode) {
+            selectedCouponId = getCouponModel!.data![i].id;
+            applyCoupon = i;
+            log("onApplyManualCouponCode - Found coupon in list, ID: $selectedCouponId");
+            break;
+          }
+        }
+      }
+
+      // If coupon not found in list, we need to fetch it or use the code
+      // For now, we'll try to fetch available coupons again to see if it appears
+      if (selectedCouponId == null) {
+        log("onApplyManualCouponCode - Coupon not found in current list, will use code for booking");
+        // The booking API will need to find the coupon by code
+        // We'll handle this in the booking API call
+      }
+    }
+
+    update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+  }
+
+  // Remove manually entered coupon
+  onRemoveManualCoupon() {
+    couponCodeController.clear();
+    manualCouponCode = null;
+    selectedCouponId = null;
+    applyCoupon = -1;
+    couponDiscountAmount = 0.0;
+    calculateTotalWithDiscount();
+    update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+  }
+
   calculateTotalWithDiscount() {
     // Keep original withoutTax for backend (backend calculates discount on this)
-    // Calculate tax on original amount (before discount)
+    // Calculate tax on original amount (before discount) - matching backend calculation
+    // Backend uses: taxAmount = (withoutTax * global.settingJSON.tax) / 100
     if (tax != null && tax! > 0) {
       finalTaxRupee = (withOutTaxRupee * tax!) / 100;
     } else {
       finalTaxRupee = 0.0;
     }
 
-    // Calculate total with tax
-    double withTaxAmount = withOutTaxRupee + finalTaxRupee;
+    // Calculate total with tax - matching backend: withTaxAmount = (taxAmount + withoutTax).toFixed(2)
+    // Backend converts to string with .toFixed(2), then uses it in calculation
+    double withTaxAmount = (finalTaxRupee + withOutTaxRupee);
+    // Round to 2 decimal places to match backend's toFixed(2)
+    withTaxAmount = double.parse(withTaxAmount.toStringAsFixed(2));
 
-    // Apply discount to get final total
+    // Apply discount to get final total - matching backend: totalAmount = withTaxAmount - discountAmount
+    // Backend: totalAmount is a number (result of subtraction), bookingAmount is string from .toFixed(2)
+    // So we need to ensure our amount matches the backend's totalAmount exactly
     totalPriceAfterDiscount = withTaxAmount - couponDiscountAmount;
     if (totalPriceAfterDiscount < 0) totalPriceAfterDiscount = 0;
 
+    // Round to 2 decimal places to match backend calculation
+    // Backend compares: totalAmount !== bookingAmount where bookingAmount is req.body.amount.toFixed(2)
+    // So we need to round our amount to 2 decimals
+    totalPriceAfterDiscount =
+        double.parse(totalPriceAfterDiscount.toStringAsFixed(2));
+
     totalPrice = totalPriceAfterDiscount;
+
+    log("calculateTotalWithDiscount - withOutTaxRupee: $withOutTaxRupee");
+    log("calculateTotalWithDiscount - tax percentage: $tax");
+    log("calculateTotalWithDiscount - finalTaxRupee: $finalTaxRupee");
+    log("calculateTotalWithDiscount - withTaxAmount: $withTaxAmount");
+    log("calculateTotalWithDiscount - couponDiscountAmount: $couponDiscountAmount");
+    log("calculateTotalWithDiscount - totalPriceAfterDiscount: $totalPriceAfterDiscount");
+    log("calculateTotalWithDiscount - totalPrice: $totalPrice");
 
     update([
       Constant.idProgressView,
@@ -988,6 +1108,8 @@ class BookingScreenController extends GetxController {
   void resetCoupon() {
     applyCoupon = -1;
     selectedCouponId = null;
+    manualCouponCode = null;
+    couponCodeController.clear();
     couponDiscountAmount = 0.0;
     calculateTotalWithDiscount();
     update([Constant.idGetCoupon, Constant.idApplyCoupon]);

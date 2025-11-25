@@ -429,6 +429,37 @@ class PaymentBottomSheet extends StatelessWidget {
                                               ),
                                             ),
                                           ),
+                                          // Discount Display
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: logic.applyCoupon == index
+                                                  ? AppColors.whiteColor
+                                                      .withOpacity(0.2)
+                                                  : AppColors.primaryAppColor
+                                                      .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              logic.getCouponModel?.data?[index]
+                                                          ?.discountType ==
+                                                      1
+                                                  ? "$currency ${logic.getCouponModel?.data?[index]?.maxDiscount ?? 0} OFF"
+                                                  : "${logic.getCouponModel?.data?[index]?.discountPercent ?? 0}% OFF${logic.getCouponModel?.data?[index]?.maxDiscount != null && logic.getCouponModel!.data![index].maxDiscount! > 0 ? " (Up to $currency ${logic.getCouponModel!.data![index].maxDiscount})" : ""}",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: logic.applyCoupon ==
+                                                        index
+                                                    ? AppColors.whiteColor
+                                                    : AppColors.primaryAppColor,
+                                                fontFamily:
+                                                    AppFontFamily.heeBo900,
+                                              ),
+                                            ),
+                                          ),
                                           Container(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 8, vertical: 6),

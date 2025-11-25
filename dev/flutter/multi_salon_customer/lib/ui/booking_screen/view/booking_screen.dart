@@ -2051,6 +2051,114 @@ class BookingScreen extends StatelessWidget {
                               color: AppColors.primaryTextColor,
                             ),
                           ).paddingOnly(top: 15, bottom: 13),
+                          // Manual Coupon Code Input
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.whiteColor,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: AppColors.grey.withOpacity(0.2),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: TextField(
+                                    controller: logic.couponCodeController,
+                                    decoration: InputDecoration(
+                                      hintText: "Enter coupon code",
+                                      hintStyle: TextStyle(
+                                        fontSize: 14,
+                                        color: AppColors.currencyGrey,
+                                        fontFamily: AppFontFamily.sfProDisplay,
+                                      ),
+                                      border: InputBorder.none,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                        vertical: 12,
+                                      ),
+                                      suffixIcon: logic.manualCouponCode != null
+                                          ? IconButton(
+                                              icon: Icon(
+                                                Icons.close,
+                                                color:
+                                                    AppColors.primaryAppColor,
+                                                size: 20,
+                                              ),
+                                              onPressed: () {
+                                                logic.onRemoveManualCoupon();
+                                              },
+                                            )
+                                          : null,
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.primaryTextColor,
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                    ),
+                                    textCapitalization:
+                                        TextCapitalization.characters,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              AppButton(
+                                height: 48,
+                                width: 100,
+                                buttonColor: AppColors.primaryAppColor,
+                                color: AppColors.whiteColor,
+                                fontFamily: AppFontFamily.sfProDisplayBold,
+                                fontSize: 14,
+                                buttonText: logic.manualCouponCode != null
+                                    ? "Applied"
+                                    : "Apply",
+                                onTap: () {
+                                  if (logic.manualCouponCode == null) {
+                                    logic.onApplyManualCouponCode();
+                                  }
+                                },
+                              ),
+                            ],
+                          ).paddingOnly(bottom: 15),
+                          // Show applied coupon code if manually entered
+                          if (logic.manualCouponCode != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.primaryAppColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: AppColors.primaryAppColor
+                                      .withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: AppColors.primaryAppColor,
+                                    size: 18,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "Coupon '${logic.manualCouponCode}' applied",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.primaryAppColor,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayMedium,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ).paddingOnly(bottom: 15),
                           SizedBox(
                             height: Get.height * 0.16,
                             child: ListView.builder(
@@ -2100,6 +2208,39 @@ class BookingScreen extends StatelessWidget {
                                                               .primaryTextColor,
                                                   fontFamily:
                                                       AppFontFamily.heeBo800,
+                                                ),
+                                              ),
+                                            ),
+                                            // Discount Display
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 6),
+                                              decoration: BoxDecoration(
+                                                color: logic.applyCoupon ==
+                                                        index
+                                                    ? AppColors.whiteColor
+                                                        .withOpacity(0.2)
+                                                    : AppColors.primaryAppColor
+                                                        .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                coupon?.discountType == 1
+                                                    ? "$currency ${coupon?.maxDiscount ?? 0} OFF"
+                                                    : "${coupon?.discountPercent ?? 0}% OFF${coupon?.maxDiscount != null && coupon!.maxDiscount! > 0 ? " (Up to $currency ${coupon.maxDiscount})" : ""}",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:
+                                                      logic.applyCoupon == index
+                                                          ? AppColors.whiteColor
+                                                          : AppColors
+                                                              .primaryAppColor,
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo900,
                                                 ),
                                               ),
                                             ),
