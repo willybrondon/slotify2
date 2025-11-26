@@ -2198,8 +2198,9 @@ class BookingScreen extends StatelessWidget {
                                               child: Text(
                                                 coupon?.title ?? "",
                                                 overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
                                                 style: TextStyle(
-                                                  fontSize: 21,
+                                                  fontSize: 15,
                                                   color:
                                                       logic.applyCoupon == index
                                                           ? AppColors
@@ -2215,8 +2216,8 @@ class BookingScreen extends StatelessWidget {
                                             Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 6),
+                                                      horizontal: 8,
+                                                      vertical: 4),
                                               decoration: BoxDecoration(
                                                 color: logic.applyCoupon ==
                                                         index
@@ -2225,14 +2226,14 @@ class BookingScreen extends StatelessWidget {
                                                     : AppColors.primaryAppColor
                                                         .withOpacity(0.1),
                                                 borderRadius:
-                                                    BorderRadius.circular(8),
+                                                    BorderRadius.circular(6),
                                               ),
                                               child: Text(
                                                 coupon?.discountType == 1
                                                     ? "$currency ${coupon?.maxDiscount ?? 0} OFF"
                                                     : "${coupon?.discountPercent ?? 0}% OFF${coupon?.maxDiscount != null && coupon!.maxDiscount! > 0 ? " (Up to $currency ${coupon.maxDiscount})" : ""}",
                                                 style: TextStyle(
-                                                  fontSize: 16,
+                                                  fontSize: 12,
                                                   fontWeight: FontWeight.bold,
                                                   color:
                                                       logic.applyCoupon == index
@@ -2247,8 +2248,8 @@ class BookingScreen extends StatelessWidget {
                                             Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 6),
+                                                      horizontal: 6,
+                                                      vertical: 4),
                                               decoration: BoxDecoration(
                                                 color: logic.applyCoupon ==
                                                         index
@@ -2261,7 +2262,7 @@ class BookingScreen extends StatelessWidget {
                                                 text: TextSpan(
                                                   text: 'Offer Validity  ',
                                                   style: TextStyle(
-                                                    fontSize: 13,
+                                                    fontSize: 10,
                                                     color: AppColors
                                                         .primaryTextColor,
                                                     fontFamily:
@@ -2273,7 +2274,7 @@ class BookingScreen extends StatelessWidget {
                                                           coupon?.expiryDate ??
                                                               "",
                                                       style: TextStyle(
-                                                        fontSize: 13,
+                                                        fontSize: 10,
                                                         color: AppColors
                                                             .primaryTextColor,
                                                         fontFamily:
@@ -2287,8 +2288,10 @@ class BookingScreen extends StatelessWidget {
                                             ),
                                             Text(
                                               coupon?.description ?? "",
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 10,
                                                 color:
                                                     logic.applyCoupon == index
                                                         ? AppColors.whiteColor
@@ -2299,7 +2302,7 @@ class BookingScreen extends StatelessWidget {
                                             ),
                                           ],
                                         ).paddingOnly(
-                                            top: 13, bottom: 13, left: 28),
+                                            top: 10, bottom: 10, left: 20),
                                         Container(
                                           height: 22,
                                           width: 22,

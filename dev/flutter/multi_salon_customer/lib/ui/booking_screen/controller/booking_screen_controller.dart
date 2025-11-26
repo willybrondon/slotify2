@@ -767,6 +767,13 @@ class BookingScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
+      // Recalculate amount right before sending to ensure accuracy
+      // This matches the backend calculation exactly
+      calculateTotalWithDiscount();
+
+      // Use the recalculated totalPrice as the final amount
+      double finalAmount = totalPrice;
+
       // Prepare coupon ID - use selectedCouponId if available, otherwise try to find by manual code
       String? couponIdToSend = selectedCouponId;
 
@@ -790,7 +797,7 @@ class BookingScreenController extends GetxController {
         "salonId": salonId,
         "date": date,
         "time": time,
-        "amount": amount,
+        "amount": finalAmount,
         "withoutTax": withoutTax,
         "paymentType": paymentType,
         "atPlace": atPlace,
@@ -801,8 +808,12 @@ class BookingScreenController extends GetxController {
 
       log("Create Booking - selectedCouponId: $selectedCouponId");
       log("Create Booking - couponDiscountAmount: $couponDiscountAmount");
-      log("Create Booking - amount: $amount");
+      log("Create Booking - finalAmount: $finalAmount");
+      log("Create Booking - amount (original param): $amount");
       log("Create Booking - withoutTax: $withoutTax");
+      log("Create Booking - withOutTaxRupee: $withOutTaxRupee");
+      log("Create Booking - finalTaxRupee: $finalTaxRupee");
+      log("Create Booking - totalPrice: $totalPrice");
       log("Create Booking Body :: $body");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.createBooking);
@@ -1071,20 +1082,26 @@ class BookingScreenController extends GetxController {
     }
 
     // Calculate total with tax - matching backend: withTaxAmount = (taxAmount + withoutTax).toFixed(2)
-    // Backend converts to string with .toFixed(2), then uses it in calculation
-    double withTaxAmount = (finalTaxRupee + withOutTaxRupee);
-    // Round to 2 decimal places to match backend's toFixed(2)
-    withTaxAmount = double.parse(withTaxAmount.toStringAsFixed(2));
+    // Backend: withTaxAmount is a STRING from .toFixed(2)
+    // But when backend does: totalAmount = withTaxAmount - discountAmount, it converts string to number
+    // So we need to match that exact calculation
+    double withTaxAmountNum = (finalTaxRupee + withOutTaxRupee);
+    // Convert to string with .toFixed(2) then back to number to match backend's precision
+    String withTaxAmountStr = withTaxAmountNum.toStringAsFixed(2);
+    double withTaxAmount = double.parse(withTaxAmountStr);
 
     // Apply discount to get final total - matching backend: totalAmount = withTaxAmount - discountAmount
-    // Backend: totalAmount is a number (result of subtraction), bookingAmount is string from .toFixed(2)
-    // So we need to ensure our amount matches the backend's totalAmount exactly
+    // Backend: when it does "10.50" - 2, JavaScript converts string to number, so result is 8.5 (number)
+    // We need to match that exact calculation
     totalPriceAfterDiscount = withTaxAmount - couponDiscountAmount;
     if (totalPriceAfterDiscount < 0) totalPriceAfterDiscount = 0;
 
     // Round to 2 decimal places to match backend calculation
-    // Backend compares: totalAmount !== bookingAmount where bookingAmount is req.body.amount.toFixed(2)
-    // So we need to round our amount to 2 decimals
+    // Backend compares: totalAmount (NUMBER) !== bookingAmount (STRING from req.body.amount.toFixed(2))
+    // Since backend does: totalAmount = parseFloat("10.50") - 2 = 8.5
+    // And compares: 8.5 !== "8.50" (which is always true in strict comparison)
+    // But the backend might be doing loose comparison or type coercion
+    // We need to ensure our amount, when converted to string with .toFixed(2), matches backend's calculation
     totalPriceAfterDiscount =
         double.parse(totalPriceAfterDiscount.toStringAsFixed(2));
 
@@ -1093,10 +1110,12 @@ class BookingScreenController extends GetxController {
     log("calculateTotalWithDiscount - withOutTaxRupee: $withOutTaxRupee");
     log("calculateTotalWithDiscount - tax percentage: $tax");
     log("calculateTotalWithDiscount - finalTaxRupee: $finalTaxRupee");
-    log("calculateTotalWithDiscount - withTaxAmount: $withTaxAmount");
+    log("calculateTotalWithDiscount - withTaxAmount (number): $withTaxAmount");
+    log("calculateTotalWithDiscount - withTaxAmount (string): $withTaxAmountStr");
     log("calculateTotalWithDiscount - couponDiscountAmount: $couponDiscountAmount");
     log("calculateTotalWithDiscount - totalPriceAfterDiscount: $totalPriceAfterDiscount");
     log("calculateTotalWithDiscount - totalPrice: $totalPrice");
+    log("calculateTotalWithDiscount - totalPrice as string (.toFixed(2)): ${totalPrice.toStringAsFixed(2)}");
 
     update([
       Constant.idProgressView,
@@ -1249,6 +1268,9 @@ class BookingScreenController extends GetxController {
 
         if (selectedPayment == "cashAfterService") {
           // For Cash After Service, create booking directly
+          // Recalculate amount right before sending (same as Stripe does)
+          calculateTotalWithDiscount();
+
           await onCreateBookingApiCall(
             userId: Constant.storage.read<String>('userId') ?? "",
             expertId: Constant.storage.read<String>('expertDetail') != null
@@ -1258,8 +1280,9 @@ class BookingScreenController extends GetxController {
             salonId: salonId.toString(),
             date: formattedDate.toString(),
             time: slotsString.toString(),
-            amount: totalPrice,
-            withoutTax: withOutTaxRupee.toInt(),
+            amount: totalPrice, // Use recalculated totalPrice
+            withoutTax:
+                withOutTaxRupee.round(), // Use .round() like Stripe does
             paymentType: selectedPayment,
             atPlace: selectedVenue == "At Salon" ? 1 : 2,
             address: searchEditingController.text,

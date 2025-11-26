@@ -417,8 +417,9 @@ class PaymentBottomSheet extends StatelessWidget {
                                                       .title ??
                                                   "",
                                               overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
                                               style: TextStyle(
-                                                fontSize: 21,
+                                                fontSize: 15,
                                                 color: logic.applyCoupon ==
                                                         index
                                                     ? AppColors.primaryAppColor
@@ -432,7 +433,7 @@ class PaymentBottomSheet extends StatelessWidget {
                                           // Discount Display
                                           Container(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 6),
+                                                horizontal: 8, vertical: 4),
                                             decoration: BoxDecoration(
                                               color: logic.applyCoupon == index
                                                   ? AppColors.whiteColor
@@ -440,7 +441,7 @@ class PaymentBottomSheet extends StatelessWidget {
                                                   : AppColors.primaryAppColor
                                                       .withOpacity(0.1),
                                               borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  BorderRadius.circular(6),
                                             ),
                                             child: Text(
                                               logic.getCouponModel?.data?[index]
@@ -449,7 +450,7 @@ class PaymentBottomSheet extends StatelessWidget {
                                                   ? "$currency ${logic.getCouponModel?.data?[index]?.maxDiscount ?? 0} OFF"
                                                   : "${logic.getCouponModel?.data?[index]?.discountPercent ?? 0}% OFF${logic.getCouponModel?.data?[index]?.maxDiscount != null && logic.getCouponModel!.data![index].maxDiscount! > 0 ? " (Up to $currency ${logic.getCouponModel!.data![index].maxDiscount})" : ""}",
                                               style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 12,
                                                 fontWeight: FontWeight.bold,
                                                 color: logic.applyCoupon ==
                                                         index
@@ -462,7 +463,7 @@ class PaymentBottomSheet extends StatelessWidget {
                                           ),
                                           Container(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 6),
+                                                horizontal: 6, vertical: 4),
                                             decoration: BoxDecoration(
                                               color: logic.applyCoupon == index
                                                   ? AppColors.primaryAppColor
@@ -474,7 +475,7 @@ class PaymentBottomSheet extends StatelessWidget {
                                               text: TextSpan(
                                                 text: 'Offer Validity  ',
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 10,
                                                   color:
                                                       logic.applyCoupon == index
                                                           ? AppColors
@@ -492,7 +493,7 @@ class PaymentBottomSheet extends StatelessWidget {
                                                             .expiryDate ??
                                                         "",
                                                     style: TextStyle(
-                                                      fontSize: 13,
+                                                      fontSize: 10,
                                                       color: logic
                                                                   .applyCoupon ==
                                                               index
@@ -512,8 +513,10 @@ class PaymentBottomSheet extends StatelessWidget {
                                             logic.getCouponModel?.data?[index]
                                                     .description ??
                                                 "",
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 10,
                                               color: logic.applyCoupon == index
                                                   ? AppColors.whiteColor
                                                   : AppColors.paymentText,
