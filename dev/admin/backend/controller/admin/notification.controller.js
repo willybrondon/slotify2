@@ -3,6 +3,7 @@ const User = require("../../models/user.model");
 const Expert = require("../../models/expert.model");
 
 const admin = require("../../firebase");
+const { sendSMS } = require("../../services/sms.service");
 
 exports.particularUserNotification = async (req, res) => {
   try {
@@ -44,6 +45,25 @@ exports.particularUserNotification = async (req, res) => {
       } catch (error) {
         console.log("Error sending message:", error);
       }
+    }
+
+    // Send SMS notification to customer's mobile number
+    if (user && user.mobile && user.mobile.trim() !== "") {
+      try {
+        const smsMessage = `${req.body.title}\n\n${req.body.message}`;
+        const smsResult = await sendSMS(user.mobile, smsMessage);
+        
+        if (smsResult.success) {
+          console.log(`[Notification] SMS sent successfully to ${user.mobile} for user ${user._id}`);
+        } else {
+          console.error(`[Notification] Failed to send SMS to ${user.mobile} for user ${user._id}: ${smsResult.error}`);
+        }
+      } catch (error) {
+        console.error(`[Notification] Error sending SMS to ${user.mobile} for user ${user._id}:`, error.message);
+        // Don't fail the request if SMS fails, just log the error
+      }
+    } else {
+      console.log(`[Notification] User ${user?._id || req.query.userId} does not have a mobile number. Skipping SMS notification.`);
     }
 
     return res.status(200).json({ status: true, message: "Success" });
@@ -166,6 +186,45 @@ exports.allUserNotification = async (req, res) => {
       .catch((error) => {
         console.log("Error sending message:", error);
       });
+
+    // Send SMS notifications to all users with mobile numbers
+    try {
+      const usersWithMobile = await User.find({
+        isDelete: false,
+        isBlock: false,
+        mobile: { $exists: true, $ne: null, $ne: "" }
+      }).select("_id mobile");
+
+      const smsMessage = `${req.body.title}\n\n${req.body.message}`;
+      let smsSuccessCount = 0;
+      let smsFailureCount = 0;
+
+      // Send SMS to each user (with a small delay to avoid rate limiting)
+      for (const user of usersWithMobile) {
+        if (user.mobile && user.mobile.trim() !== "") {
+          try {
+            const smsResult = await sendSMS(user.mobile, smsMessage);
+            if (smsResult.success) {
+              smsSuccessCount++;
+              console.log(`[Notification] SMS sent successfully to ${user.mobile} for user ${user._id}`);
+            } else {
+              smsFailureCount++;
+              console.error(`[Notification] Failed to send SMS to ${user.mobile} for user ${user._id}: ${smsResult.error}`);
+            }
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100));
+          } catch (error) {
+            smsFailureCount++;
+            console.error(`[Notification] Error sending SMS to ${user.mobile} for user ${user._id}:`, error.message);
+          }
+        }
+      }
+
+      console.log(`[Notification] SMS summary: ${smsSuccessCount} sent successfully, ${smsFailureCount} failed out of ${usersWithMobile.length} users`);
+    } catch (error) {
+      console.error("[Notification] Error processing SMS notifications for all users:", error.message);
+      // Don't fail the request if SMS fails, just log the error
+    }
 
     return res.status(200).json({ status: true, message: "Success" });
   } catch (error) {
