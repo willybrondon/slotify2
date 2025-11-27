@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:app_links/app_links.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -274,6 +275,10 @@ Future<void> main() async {
 
     /// Preference
     await Preference().instance();
+
+    // Initialize deep link handling
+    _initializeDeepLinks();
+
     runApp(const MyApp());
   } catch (e) {
     log("Error in main initialization: $e");
@@ -330,5 +335,71 @@ class _MyAppState extends State<MyApp> {
         transitionDuration: const Duration(milliseconds: 200),
       ),
     );
+  }
+}
+
+// Handle incoming deep links
+void _initializeDeepLinks() {
+  try {
+    final appLinks = AppLinks();
+
+    // Listen for incoming links when app is running
+    appLinks.uriLinkStream.listen((uri) {
+      log("Deep Link received (app running): $uri");
+      _handleIncomingLink(uri);
+    }, onError: (err) {
+      log("Error handling deep link: $err");
+    });
+
+    // Handle link when app is opened from closed state
+    appLinks.getInitialLink().then((uri) {
+      if (uri != null) {
+        log("Deep Link received (app closed): $uri");
+        _handleIncomingLink(uri);
+      }
+    }).catchError((err) {
+      log("Error getting initial deep link: $err");
+    });
+  } catch (e) {
+    log("Error initializing deep links: $e");
+  }
+}
+
+void _handleIncomingLink(Uri uri) {
+  try {
+    log("Handling incoming link: $uri");
+
+    // Handle custom scheme: slotify://salon/{salonId}
+    if (uri.scheme == 'slotify' && uri.host == 'salon') {
+      final salonId = uri.pathSegments.isNotEmpty ? uri.pathSegments[0] : null;
+      if (salonId != null && salonId.isNotEmpty) {
+        log("Navigating to salon detail: $salonId");
+        // Navigate to salon detail page
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.toNamed(AppRoutes.branchDetail, arguments: [salonId]);
+        });
+        return;
+      }
+    }
+
+    // Handle App Links/Universal Links (https://skedisy.com/salon/{salonId})
+    if (uri.scheme == 'https' && uri.host.contains('skedisy.com')) {
+      log("App Link detected: $uri");
+      // Extract salon ID from path: /salon/{salonId}
+      if (uri.pathSegments.length >= 2 && uri.pathSegments[0] == 'salon') {
+        final salonId = uri.pathSegments[1];
+        if (salonId.isNotEmpty) {
+          log("Navigating to salon detail from App Link: $salonId");
+          Future.delayed(const Duration(milliseconds: 500), () {
+            Get.toNamed(AppRoutes.branchDetail, arguments: [salonId]);
+          });
+          return;
+        }
+      }
+    }
+
+    log("No valid salon deep link found in: $uri");
+  } catch (e) {
+    log("Error handling incoming link: $e");
   }
 }

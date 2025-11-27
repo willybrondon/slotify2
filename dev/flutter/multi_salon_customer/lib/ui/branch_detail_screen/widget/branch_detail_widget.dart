@@ -5,6 +5,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:salon_2/custom/app_button/app_button.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
@@ -16,6 +17,91 @@ import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+// QR Code Dialog
+void _showQRCodeDialog(BuildContext context, BranchDetailController logic) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Scan QR Code',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: AppFontFamily.heeBo800,
+                  color: AppColors.primaryAppColor,
+                ),
+              ),
+              const SizedBox(height: 20),
+              FutureBuilder<String?>(
+                future: logic.getShareUrl(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+                  if (snapshot.hasData && snapshot.data != null) {
+                    return QrImageView(
+                      data: snapshot.data!,
+                      version: QrVersions.auto,
+                      size: 250.0,
+                      backgroundColor: AppColors.whiteColor,
+                    );
+                  }
+                  return Text(
+                    'Unable to generate QR code',
+                    style: TextStyle(
+                      color: AppColors.primaryTextColor,
+                      fontFamily: AppFontFamily.heeBo600,
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+              Text(
+                logic.getSalonDetailCategory?.salon?.name ?? 'Salon',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: AppFontFamily.heeBo700,
+                  color: AppColors.primaryTextColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryAppColor,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Close',
+                  style: TextStyle(
+                    color: AppColors.whiteColor,
+                    fontFamily: AppFontFamily.heeBo700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 
 /// =================== Branch Detail Top view =================== ///
 class BranchDetailTopView extends StatelessWidget {
@@ -50,17 +136,79 @@ class BranchDetailTopView extends StatelessWidget {
                   },
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Get.back();
-                },
-                child: Image.asset(
-                  AppAsset.icBackArrow,
-                  height: 25,
-                  width: 25,
-                  color: AppColors.whiteColor,
-                ).paddingOnly(left: 20, top: 25),
-              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Image.asset(
+                      AppAsset.icBackArrow,
+                      height: 25,
+                      width: 25,
+                      color: AppColors.whiteColor,
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.whiteColor.withOpacity(0.3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.share,
+                        color: AppColors.whiteColor,
+                        size: 22,
+                      ),
+                    ),
+                    color: AppColors.whiteColor,
+                    onSelected: (value) async {
+                      if (value == 'share') {
+                        await logic.shareSalonLink();
+                      } else if (value == 'copy') {
+                        await logic.copySalonLink();
+                      } else if (value == 'qr') {
+                        _showQRCodeDialog(context, logic);
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem<String>(
+                        value: 'share',
+                        child: Row(
+                          children: [
+                            Icon(Icons.share, color: AppColors.primaryAppColor),
+                            const SizedBox(width: 10),
+                            Text('Share Link'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'copy',
+                        child: Row(
+                          children: [
+                            Icon(Icons.copy, color: AppColors.primaryAppColor),
+                            const SizedBox(width: 10),
+                            Text('Copy Link'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'qr',
+                        child: Row(
+                          children: [
+                            Icon(Icons.qr_code,
+                                color: AppColors.primaryAppColor),
+                            const SizedBox(width: 10),
+                            Text('Show QR Code'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ).paddingOnly(left: 20, right: 20, top: 25),
             ],
           ),
         );

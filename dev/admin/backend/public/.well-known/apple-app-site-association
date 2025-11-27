@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "7B755FRMAM.com.skedisy.customer",
+        "paths": [
+          "/salon/*"
+        ]
+      }
+    ]
+  }
+}
+

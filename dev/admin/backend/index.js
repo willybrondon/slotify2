@@ -67,6 +67,21 @@ global.updateSettingFile = (settingData) => {
 const indexRoute = require("./route/index");
 app.use(indexRoute);
 
+// Public web route for salon pages (for sharing and deep linking)
+const salonController = require("./controller/user/salon.controller");
+app.get("/salon/:salonId", salonController.serveSalonWebPage);
+
+// Serve .well-known files for App Links verification (must be before other static routes)
+app.get("/.well-known/assetlinks.json", (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(path.join(__dirname, "public", ".well-known", "assetlinks.json"));
+});
+
+app.get("/.well-known/apple-app-site-association", (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(path.join(__dirname, "public", ".well-known", "apple-app-site-association"));
+});
+
 async function updateAttendance(expertId, action) {
   try {
     const todayDate = moment().format("YYYY-MM-DD");

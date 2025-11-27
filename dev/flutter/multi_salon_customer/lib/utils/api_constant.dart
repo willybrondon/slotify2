@@ -74,6 +74,7 @@ class ApiConstant {
   static const getAllSalon = "user/salon/getAll?";
   static const getServiceBasedSalon = "user/salon/serviceBaseSalon";
   static const getSalonDetail = "user/salon/salonData?";
+  static const getSalonShareUrl = "user/salon/getShareUrl?";
   static const salonRegistration = "user/salonrequest/createSalonRequest";
   static const salonFavourite = "user/favourite/salon";
   static const getFavouriteSalonList = "user/favourite/favouriteSalonList?";

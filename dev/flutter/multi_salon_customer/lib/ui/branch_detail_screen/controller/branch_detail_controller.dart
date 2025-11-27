@@ -11,6 +11,8 @@ import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter/services.dart';
 
 class BranchDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -228,5 +230,113 @@ class BranchDetailController extends GetxController
       isLoading(false);
       update([Constant.idProgressView, Constant.idServiceList]);
     }
+  }
+
+  // Share URL for salon
+  String? salonShareUrl;
+
+  // Get salon share URL from backend
+  Future<void> getSalonShareUrlApiCall() async {
+    try {
+      if (salonId == null || salonId!.isEmpty) {
+        log("Get Salon Share URL - Salon ID is null or empty");
+        return;
+      }
+
+      final queryParameters = {
+        "salonId": salonId!,
+      };
+
+      log("Get Salon Share URL Params :: $queryParameters");
+
+      String queryString = Uri(queryParameters: queryParameters).query;
+
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getSalonShareUrl + queryString);
+      log("Get Salon Share URL Url :: $url");
+
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      log("Get Salon Share URL Status Code :: ${response.statusCode}");
+      log("Get Salon Share URL Response :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == true) {
+          salonShareUrl = jsonResponse['shareUrl'];
+          log("Get Salon Share URL - URL retrieved: $salonShareUrl");
+        } else {
+          log("Get Salon Share URL - Failed: ${jsonResponse['message']}");
+        }
+      }
+    } on AppException catch (exception) {
+      log("Get Salon Share URL - AppException: ${exception.message}");
+    } catch (e) {
+      log("Error call Get Salon Share URL Api :: $e");
+    }
+  }
+
+  // Share salon link
+  Future<void> shareSalonLink() async {
+    try {
+      // Get share URL if not already fetched
+      if (salonShareUrl == null || salonShareUrl!.isEmpty) {
+        await getSalonShareUrlApiCall();
+      }
+
+      if (salonShareUrl != null && salonShareUrl!.isNotEmpty) {
+        final salonName = getSalonDetailCategory?.salon?.name ?? "Salon";
+        final shareText = "Check out $salonName on Skedisy!\n\n$salonShareUrl";
+
+        await Share.share(
+          shareText,
+          subject: "Check out $salonName",
+        );
+        log("Share Salon Link - Shared successfully: $salonShareUrl");
+      } else {
+        Utils.showToast(
+            Get.context!, "Unable to generate share link. Please try again.");
+        log("Share Salon Link - Share URL is null or empty");
+      }
+    } catch (e) {
+      log("Error sharing salon link :: $e");
+      Utils.showToast(Get.context!, "Error sharing salon link");
+    }
+  }
+
+  // Copy salon link to clipboard
+  Future<void> copySalonLink() async {
+    try {
+      // Get share URL if not already fetched
+      if (salonShareUrl == null || salonShareUrl!.isEmpty) {
+        await getSalonShareUrlApiCall();
+      }
+
+      if (salonShareUrl != null && salonShareUrl!.isNotEmpty) {
+        await Clipboard.setData(ClipboardData(text: salonShareUrl!));
+        Utils.showToast(Get.context!, "Link copied to clipboard!");
+        log("Copy Salon Link - Copied: $salonShareUrl");
+      } else {
+        Utils.showToast(
+            Get.context!, "Unable to generate share link. Please try again.");
+        log("Copy Salon Link - Share URL is null or empty");
+      }
+    } catch (e) {
+      log("Error copying salon link :: $e");
+      Utils.showToast(Get.context!, "Error copying salon link");
+    }
+  }
+
+  // Get share URL (for QR code generation)
+  Future<String?> getShareUrl() async {
+    if (salonShareUrl == null || salonShareUrl!.isEmpty) {
+      await getSalonShareUrlApiCall();
+    }
+    return salonShareUrl;
   }
 }
