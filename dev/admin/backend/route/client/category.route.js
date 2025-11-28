@@ -6,6 +6,7 @@ const checkAccessWithSecretKey = require("../../middleware/checkAccess");
 
 
 route.get("/getAll", checkAccessWithSecretKey(), categoryController.getAll);
+route.get("/getSalonsByCategory", checkAccessWithSecretKey(), categoryController.getSalonsByCategory);
 
 
 module.exports = route;

@@ -33,12 +33,31 @@
             <div class="nav-logo">
                 <h2>Skedisy</h2>
             </div>
-            <div class="hamburger mobile-hide">
-                <span></span>
-                <span></span>
-                <span></span>
+            <!-- Desktop Categories Menu -->
+            <div class="nav-menu-center desktop-only" id="categoriesMenu">
+                <!-- Categories will be loaded dynamically -->
             </div>
-            <a href="https://skedisy/salonpanel" class="btn-login-mobile">Login</a>
+            <!-- Desktop Login Button -->
+            <div class="nav-right desktop-only">
+                <a href="https://skedisy.com/salonpanel/" class="btn-login">Login</a>
+            </div>
+            <!-- Mobile Menu -->
+            <div class="mobile-menu-wrapper">
+                <div class="hamburger mobile-only" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile mobile-only">Login</a>
+            </div>
+        </div>
+        <!-- Mobile Dropdown Menu -->
+        <div class="mobile-dropdown" id="mobileDropdown">
+            <div class="mobile-dropdown-content">
+                <div class="mobile-categories" id="mobileCategories">
+                    <!-- Categories will be loaded dynamically -->
+                </div>
+            </div>
         </div>
     </nav>
     <!-- Download App Button for Mobile -->

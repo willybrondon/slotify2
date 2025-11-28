@@ -72,6 +72,34 @@ app.use(indexRoute);
 const salonController = require("./controller/user/salon.controller");
 app.get("/salon/:slugWithId", salonController.serveSalonWebPage);
 
+// Public web route for category pages
+const categoryController = require("./controller/user/category.controller");
+app.get("/category/:categoryId", categoryController.serveCategoryPage);
+
+// Public API endpoint for categories (for frontend)
+app.get("/api/public/categories", async (req, res) => {
+  try {
+    const Category = require("./models/category.model");
+    const categories = await Category.find({ isDelete: false, status: true })
+      .select("name image _id")
+      .sort({ createdAt: -1 });
+    
+    return res.json({
+      status: true,
+      data: categories,
+    });
+  } catch (error) {
+    console.error("[Public Categories] Error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+});
+
+// Public API endpoint for salons by category (for category page)
+app.get("/api/public/salons-by-category", categoryController.getSalonsByCategory);
+
 // Serve .well-known files for App Links verification (must be before other static routes)
 app.get("/.well-known/assetlinks.json", (req, res) => {
   res.setHeader('Content-Type', 'application/json');

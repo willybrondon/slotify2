@@ -1,12 +1,27 @@
 // Navigation functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile menu toggle
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
+    // Load categories
+    loadCategories();
     
-    hamburger.addEventListener('click', function() {
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
+    // Mobile menu toggle
+    const hamburger = document.getElementById('mobileMenuToggle');
+    const mobileDropdown = document.getElementById('mobileDropdown');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            mobileDropdown.classList.toggle('active');
+        });
+    }
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (mobileDropdown && hamburger && 
+            !mobileDropdown.contains(e.target) && 
+            !hamburger.contains(e.target)) {
+            hamburger.classList.remove('active');
+            mobileDropdown.classList.remove('active');
+        }
     });
 
     // Smooth scrolling for navigation links
@@ -221,7 +236,44 @@ document.addEventListener('DOMContentLoaded', function() {
         const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
         progressBar.style.width = scrolled + '%';
     });
-}); 
+});
+
+// Load categories from API
+function loadCategories() {
+    const baseURL = window.location.origin;
+    const apiUrl = `${baseURL}/api/public/categories`;
+    
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status && data.data && data.data.length > 0) {
+                renderCategories(data.data);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading categories:', error);
+        });
+}
+
+// Render categories in header
+function renderCategories(categories) {
+    const desktopMenu = document.getElementById('categoriesMenu');
+    const mobileMenu = document.getElementById('mobileCategories');
+    
+    if (!desktopMenu || !mobileMenu) return;
+    
+    // Desktop menu
+    desktopMenu.innerHTML = categories.map(category => {
+        const categoryUrl = `/category/${category._id}`;
+        return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
+    }).join('');
+    
+    // Mobile menu
+    mobileMenu.innerHTML = categories.map(category => {
+        const categoryUrl = `/category/${category._id}`;
+        return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
+    }).join('');
+} 
 
 // App download links configuration
 const APP_DOWNLOAD_LINKS = {
