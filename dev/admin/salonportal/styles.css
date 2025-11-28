@@ -199,6 +199,31 @@ html {
     padding: 20px;
 }
 
+.btn-login-mobile-dropdown {
+    display: block;
+    background: #111 !important;
+    color: #fff !important;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    box-shadow: none;
+    padding: 14px 20px;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+.btn-login-mobile-dropdown:hover {
+    background: #333 !important;
+    color: #fff !important;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 .mobile-categories {
     display: flex;
     flex-direction: column;
