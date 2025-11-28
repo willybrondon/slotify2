@@ -26,11 +26,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (hamburger) {
+        console.log('Hamburger menu found and initialized');
         hamburger.addEventListener('click', function(e) {
             e.stopPropagation();
             hamburger.classList.toggle('active');
             openMobileMenu();
         });
+    } else {
+        console.error('Hamburger menu element not found!');
     }
     
     if (mobileMenuClose) {
