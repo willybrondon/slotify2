@@ -255,6 +255,18 @@ function loadCategories() {
         });
 }
 
+// Generate slug from category name
+function generateCategorySlug(name) {
+    if (!name) return "";
+    return name
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
 // Render categories in header
 function renderCategories(categories) {
     const desktopMenu = document.getElementById('categoriesMenu');
@@ -264,13 +276,17 @@ function renderCategories(categories) {
     
     // Desktop menu
     desktopMenu.innerHTML = categories.map(category => {
-        const categoryUrl = `/category/${category._id}`;
+        const slug = generateCategorySlug(category.name);
+        const shortId = category._id.toString().substring(0, 6);
+        const categoryUrl = `/category/${slug}-${shortId}`;
         return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
     }).join('');
     
     // Mobile menu
     mobileMenu.innerHTML = categories.map(category => {
-        const categoryUrl = `/category/${category._id}`;
+        const slug = generateCategorySlug(category.name);
+        const shortId = category._id.toString().substring(0, 6);
+        const categoryUrl = `/category/${slug}-${shortId}`;
         return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
     }).join('');
 } 

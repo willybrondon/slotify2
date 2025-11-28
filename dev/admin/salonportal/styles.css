@@ -134,6 +134,7 @@ html {
 .mobile-menu-wrapper {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 12px;
 }
 
@@ -187,13 +188,14 @@ html {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition: all 0.3s ease;
     opacity: 0;
     visibility: hidden;
+    z-index: 1002;
 }
 
 .mobile-dropdown.active {
-    max-height: 500px;
+    max-height: 600px;
     overflow-y: auto;
     opacity: 1;
     visibility: visible;
@@ -273,7 +275,7 @@ html {
     }
     
     .mobile-dropdown {
-        display: block;
+        display: block !important;
         opacity: 0;
         visibility: hidden;
         max-height: 0;
@@ -282,11 +284,16 @@ html {
     .mobile-dropdown.active {
         opacity: 1;
         visibility: visible;
-        max-height: 500px;
+        max-height: 600px;
     }
     
     .nav-menu-center {
         display: none;
+    }
+    
+    .mobile-menu-wrapper {
+        display: flex;
+        justify-content: flex-end;
     }
 }
 

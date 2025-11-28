@@ -16,6 +16,22 @@ const generateSlug = (name) => {
     .replace(/^-+|-+$/g, "");
 };
 
+// Find category by short ID (first 6 characters of ObjectId)
+const findCategoryByShortId = async (shortId) => {
+  try {
+    // Try to find category where ObjectId starts with shortId
+    const category = await Category.findOne({
+      _id: new RegExp(`^${shortId}`, 'i'), // Case-insensitive search for ObjectId starting with shortId
+      isDelete: false,
+      status: true,
+    });
+    return category ? category._id : null;
+  } catch (error) {
+    console.error("Error finding category by short ID:", error);
+    return null;
+  }
+};
+
 //get all category
 exports.getAll = async (req, res) => {
   try {
@@ -219,24 +235,51 @@ exports.getSalonsByCategory = async (req, res) => {
 // Serve category page with salon listings
 exports.serveCategoryPage = async (req, res) => {
   try {
-    const categoryId = req.params.categoryId;
+    const slugWithId = req.params.slugWithId; // Now expecting /category/:slugWithId
+
+    if (!slugWithId) {
+      return res.status(404).send("Category not found");
+    }
+
+    // Skip if it's a known API route or static file path
+    const excludedPaths = ['admin', 'user', 'api', '.well-known', 'favicon.ico', 'robots.txt', 'salon'];
+    if (excludedPaths.includes(slugWithId.toLowerCase())) {
+      return res.status(404).send("Not found");
+    }
+
+    // Extract short ID (last part after hyphen, should be 6 hex characters)
+    const parts = slugWithId.split("-");
+    const shortId = parts[parts.length - 1];
+    
+    // Validate short ID format (6 hex characters)
+    if (!/^[0-9a-fA-F]{6}$/.test(shortId)) {
+      return res.status(404).send("Category not found");
+    }
+    
+    const fullCategoryId = await findCategoryByShortId(shortId);
+    
+    if (!fullCategoryId) {
+      return res.status(404).send("Category not found");
+    }
+
     const search = req.query.search || "";
     const latitude = req.query.latitude;
     const longitude = req.query.longitude;
 
-    if (!categoryId) {
-      return res.status(404).send("Category not found");
-    }
-
     // Get category details
-    const category = await Category.findById(categoryId);
-    if (!category || category.isDelete || !category.status) {
+    const category = await Category.findOne({
+      _id: fullCategoryId,
+      isDelete: false,
+      status: true,
+    });
+    
+    if (!category) {
       return res.status(404).send("Category not found");
     }
 
     // Get salons for this category (limit to 50 for initial load)
     const serviceIds = await Service.find({
-      categoryId: categoryId,
+      categoryId: fullCategoryId,
       isDelete: false,
       status: true,
     }).select("_id");
@@ -263,7 +306,7 @@ exports.serveCategoryPage = async (req, res) => {
     let salons = await Salon.find(searchQuery)
       .populate({
         path: "serviceIds.id",
-        match: { categoryId: categoryId, isDelete: false, status: true },
+        match: { categoryId: fullCategoryId, isDelete: false, status: true },
         select: "name duration price",
       })
       .select("name mainImage review reviewCount addressDetails locationCoordinates about serviceIds")
@@ -331,7 +374,11 @@ exports.serveCategoryPage = async (req, res) => {
     });
 
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
-    const categoryUrl = `${baseURL}/category/${categoryId}`;
+    // Generate the new slug format for category URL
+    const categorySlug = generateSlug(category.name);
+    const categoryShortId = category._id.toString().substring(0, 6);
+    const categorySlugWithId = `${categorySlug}-${categoryShortId}`;
+    const categoryUrl = `${baseURL}/category/${categorySlugWithId}`;
     const currency = global.settingJSON?.currencySymbol || "$";
 
     // Generate HTML page
@@ -552,7 +599,8 @@ exports.serveCategoryPage = async (req, res) => {
     </div>
 
     <script>
-        const categoryId = "${categoryId}";
+        const categoryId = "${category._id}";
+        const categorySlugWithId = "${categorySlugWithId}";
         const searchInput = document.getElementById('searchInput');
         let searchTimeout;
 
