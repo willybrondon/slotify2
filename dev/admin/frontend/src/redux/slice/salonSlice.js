@@ -11,6 +11,7 @@ const initialState = {
   salonProduct: [],
   isLoading: false,
   total: 0,
+  shareLink: null,
 };
 
 export const getAllSalons = createAsyncThunk(
@@ -25,6 +26,13 @@ export const getSalonDetail = createAsyncThunk(
   "admin/salon/getSalon",
   async (id) => {
     return apiInstanceFetch.get(`admin/salon/getSalon?salonId=${id}`);
+  }
+);
+
+export const getSalonShareLink = createAsyncThunk(
+  "admin/salon/getShareLink",
+  async (salonId) => {
+    return apiInstanceFetch.get(`admin/salon/getShareLink?salonId=${salonId}`);
   }
 );
 export const getSalonProductDetails = createAsyncThunk(
@@ -337,6 +345,22 @@ const salonSlice = createSlice({
     builder.addCase(getSalonDetail.rejected, (state, action) => {
       state.isLoading = false;
     });
+
+    builder.addCase(getSalonShareLink.pending, (state, action) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(getSalonShareLink.fulfilled, (state, action) => {
+      state.isLoading = false;
+      if (action.payload?.status) {
+        state.shareLink = action.payload?.shareUrl;
+      }
+    });
+
+    builder.addCase(getSalonShareLink.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+
     builder.addCase(getSalonReview.pending, (state, action) => {
       state.isLoading = true;
     });

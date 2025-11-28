@@ -8,6 +8,7 @@ import {
   getSalonProductDetails,
   getSalonReview,
   salonReviewDelete,
+  getSalonShareLink,
 } from "../../../redux/slice/salonSlice";
 import { useLocation } from "react-router-dom";
 import Table from "../../extras/Table";
@@ -20,9 +21,10 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { ReactComponent as Delete } from "../../../assets/icon/delete.svg";
 import dayjs from "dayjs";
 import Pagination from "../../extras/Pagination";
+import { toast } from "react-toastify";
 
 const SalonProfile = () => {
-  const { salonDetail, review, salonProduct, total } = useSelector((state) => state.salon);
+  const { salonDetail, review, salonProduct, total, shareLink } = useSelector((state) => state.salon);
   const { setting } = useSelector((state) => state.setting);
 ;
   const loader = useSelector(isLoading);
@@ -49,7 +51,8 @@ const SalonProfile = () => {
   useEffect(() => {
     dispatch(getSalonDetail(state?.state?.id));
     dispatch(getSalonReview(state?.state?.id));
-    dispatch(getSalonProductDetails({ salonId: state?.state?.id, start: page, limit: rowsPerPage }))
+    dispatch(getSalonProductDetails({ salonId: state?.state?.id, start: page, limit: rowsPerPage }));
+    dispatch(getSalonShareLink(state?.state?.id));
   }, [dispatch, state, page, rowsPerPage, type]);
   // useEffect(() => {
   //   dispatch(getSalonOrderDetails({ salonId: state?.state?.id, start: page, limit: rowsPerPage, status: orderType }))
@@ -192,6 +195,13 @@ const SalonProfile = () => {
   const capitalizeFirstLetter = (string) => {
     if (!string) return "";
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
+  const handleCopyLink = () => {
+    if (shareLink) {
+      navigator.clipboard.writeText(shareLink);
+      toast.success("Link copied to clipboard!");
+    }
   };
 
   const productTableData = [
@@ -453,6 +463,49 @@ const SalonProfile = () => {
                       placeholder={`city`}
                       readOnly
                     />
+                  )}
+                </div>
+                <div className="col-md-12 mt-3">
+                  {loader === true ? (
+                    <>
+                      <SkeletonTheme
+                        baseColor="#e2e5e7"
+                        highlightColor="#fff"
+                      >
+                        <p className="d-flex justify-content-center my-3">
+                          <Skeleton
+                            height={40}
+                            width={850}
+                            style={{
+                              borderRadius: "10px",
+                            }}
+                          />
+                        </p>
+                      </SkeletonTheme>
+                    </>
+                  ) : (
+                    <div className="d-flex align-items-end gap-2">
+                      <div className="flex-grow-1">
+                        <ExInput
+                          id={`shareLink`}
+                          name={`shareLink`}
+                          value={shareLink || ""}
+                          label={`Share Link`}
+                          placeholder={`Share Link`}
+                          readOnly
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={handleCopyLink}
+                        style={{ height: "40px", marginBottom: "0" }}
+                        disabled={!shareLink}
+                      >
+                        <i className="fa-solid fa-copy me-2"></i>
+                        Copy Link
+                      </button>
+                    </div>
                   )}
                 </div>
 

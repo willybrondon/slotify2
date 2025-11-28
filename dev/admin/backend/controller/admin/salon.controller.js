@@ -544,3 +544,46 @@ exports.fetchSalonWalletHistoryByAdmin = async (req, res) => {
     return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
   }
 };
+
+// Get salon share link for admin
+exports.getSalonShareLink = async (req, res) => {
+  try {
+    if (!req.query.salonId) {
+      return res.status(200).json({
+        status: false,
+        message: "Salon ID is required",
+      });
+    }
+
+    const salon = await Salon.findOne({
+      _id: req.query.salonId,
+      isActive: true,
+      isDelete: false,
+    });
+
+    if (!salon) {
+      return res.status(200).json({
+        status: false,
+        message: "Salon not found",
+      });
+    }
+
+    // Ensure baseURL doesn't have trailing slash to avoid double slashes
+    const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
+    const shareUrl = `${baseURL}/salon/${salon._id}`;
+
+    return res.status(200).json({
+      status: true,
+      message: "Share URL generated successfully",
+      shareUrl: shareUrl,
+      salonId: salon._id,
+      salonName: salon.name,
+    });
+  } catch (error) {
+    console.error("[Admin Share URL] Error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};

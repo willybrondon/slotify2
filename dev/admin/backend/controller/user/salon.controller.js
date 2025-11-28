@@ -344,7 +344,9 @@ exports.getSalonShareUrl = async (req, res) => {
       });
     }
 
-    const shareUrl = `${process.env.baseURL || "https://skedisy.com"}/salon/${salon._id}`;
+    // Ensure baseURL doesn't have trailing slash to avoid double slashes
+    const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
+    const shareUrl = `${baseURL}/salon/${salon._id}`;
     
     return res.status(200).json({
       status: true,
@@ -381,7 +383,28 @@ exports.serveSalonWebPage = async (req, res) => {
       return res.status(404).send("Salon not found");
     }
 
-    const baseURL = process.env.baseURL || "https://skedisy.com";
+    // Fetch additional data: products, experts, reviews
+    const [products, experts, reviews] = await Promise.all([
+      Product.find({
+        salon: salon._id,
+        createStatus: "Approved"
+      }).select("productName description price mainImage review rating").limit(10),
+      Expert.find({
+        salonId: salon._id,
+        isBlock: false,
+        isDelete: false,
+      }).select("fname lname image review reviewCount").limit(10),
+      Review.find({ salonId: salon._id })
+        .populate({
+          path: "userId",
+          select: "fname lname image",
+        })
+        .sort({ createdAt: -1 })
+        .limit(10),
+    ]);
+
+    // Ensure baseURL doesn't have trailing slash to avoid double slashes
+    const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
     const shareUrl = `${baseURL}/salon/${salon._id}`;
     const salonImage = salon.mainImage || (salon.image && salon.image.length > 0 ? salon.image[0] : "");
     const salonName = salon.name || "Salon";
@@ -389,6 +412,9 @@ exports.serveSalonWebPage = async (req, res) => {
     const salonAddress = salon.addressDetails 
       ? `${salon.addressDetails.addressLine1}, ${salon.addressDetails.city || ""}, ${salon.addressDetails.country || ""}`.replace(/,\s*,/g, ',').replace(/^,|,$/g, '')
       : "";
+    const salonMobile = salon.mobile || "";
+    const salonRating = salon.review || 0;
+    const salonReviewCount = salon.reviewCount || 0;
 
     // Android package name and iOS bundle ID
     const androidPackage = process.env.ANDROID_PACKAGE_NAME || "com.skedisy.customer";
@@ -396,6 +422,90 @@ exports.serveSalonWebPage = async (req, res) => {
     const iosAppStoreId = process.env.IOS_APP_STORE_ID || "";
     const deepLinkScheme = process.env.APP_DEEP_LINK_SCHEME || "slotify";
     const deepLink = `${deepLinkScheme}://salon/${salon._id}`;
+    const currency = global.settingJSON?.currencySymbol || "$";
+
+    // Build HTML sections
+    // Opening Hours Section
+    let openingHoursHtml = '';
+    if (salon.salonTime && salon.salonTime.length > 0) {
+      openingHoursHtml = salon.salonTime.map(time => {
+        const isClosed = !time.isActive || (time.openTime === "" && time.closedTime === "");
+        const timeDisplay = isClosed ? '<span class="hours-closed">Closed</span>' : `${time.openTime || 'N/A'} - ${time.closedTime || 'N/A'}`;
+        return `<div class="hours-item"><span class="hours-day">${time.day || 'N/A'}</span><span class="hours-time">${timeDisplay}</span></div>`;
+      }).join('');
+      openingHoursHtml = `<div class="section"><h3 class="section-title">⏰ Opening Hours</h3>${openingHoursHtml}</div>`;
+    }
+
+    // Services Section
+    let servicesHtml = '';
+    if (salon.serviceIds && salon.serviceIds.length > 0) {
+      servicesHtml = salon.serviceIds.slice(0, 10).map(service => {
+        const serviceName = (service.id?.name || 'Service').replace(/"/g, '&quot;');
+        const servicePrice = service.price || 0;
+        return `<div class="service-item"><div class="service-name">${serviceName}</div><div class="service-price">${currency}${servicePrice}</div></div>`;
+      }).join('');
+      const moreServices = salon.serviceIds.length > 10 ? `<p style="text-align: center; color: #666; margin-top: 10px;">+ ${salon.serviceIds.length - 10} more services</p>` : '';
+      servicesHtml = `<div class="section"><h3 class="section-title">💇 Services</h3>${servicesHtml}${moreServices}</div>`;
+    } else {
+      servicesHtml = '<div class="section"><h3 class="section-title">💇 Services</h3><p class="empty-state">No services available</p></div>';
+    }
+
+    // Products Section
+    let productsHtml = '';
+    if (products && products.length > 0) {
+      productsHtml = products.map(product => {
+        const productName = (product.productName || 'Product').replace(/"/g, '&quot;');
+        const productDesc = (product.description || '').replace(/"/g, '&quot;').substring(0, 100);
+        const productImage = product.mainImage || '';
+        const productPrice = product.price || 0;
+        const imageHtml = productImage ? `<img src="${productImage}" alt="${productName}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; float: left; margin-right: 12px;" onerror="this.style.display='none'">` : '';
+        return `<div class="product-item">${imageHtml}<div class="product-name">${productName}</div><div style="color: #666; font-size: 14px; margin: 5px 0;">${productDesc}</div><div class="product-price">${currency}${productPrice}</div><div style="clear: both;"></div></div>`;
+      }).join('');
+      productsHtml = `<div class="section"><h3 class="section-title">🛍️ Products</h3>${productsHtml}</div>`;
+    } else {
+      productsHtml = '<div class="section"><h3 class="section-title">🛍️ Products</h3><p class="empty-state">No products available</p></div>';
+    }
+
+    // Staff Section
+    let staffHtml = '';
+    if (experts && experts.length > 0) {
+      staffHtml = experts.map(expert => {
+        const expertFname = (expert.fname || '').replace(/"/g, '&quot;');
+        const expertLname = (expert.lname || '').replace(/"/g, '&quot;');
+        const expertName = `${expertFname} ${expertLname}`.trim() || 'Staff Member';
+        const expertImage = expert.image || '';
+        const expertRating = expert.review || 0;
+        const imageHtml = expertImage ? `<img src="${expertImage}" alt="${expertName}" style="width: 50px; height: 50px; border-radius: 50%; float: left; margin-right: 12px; object-fit: cover;" onerror="this.style.display='none'">` : '';
+        const ratingHtml = expertRating > 0 ? `<div style="color: #ffa500; font-size: 14px;">⭐ ${expertRating.toFixed(1)}</div>` : '';
+        return `<div class="staff-item">${imageHtml}<div class="staff-name">${expertName}</div>${ratingHtml}<div style="clear: both;"></div></div>`;
+      }).join('');
+      staffHtml = `<div class="section"><h3 class="section-title">👤 Staff</h3>${staffHtml}</div>`;
+    } else {
+      staffHtml = '<div class="section"><h3 class="section-title">👤 Staff</h3><p class="empty-state">No staff information available</p></div>';
+    }
+
+    // Reviews Section
+    let reviewsHtml = '';
+    if (reviews && reviews.length > 0) {
+      reviewsHtml = reviews.map(review => {
+        const userFname = (review.userId?.fname || '').replace(/"/g, '&quot;');
+        const userLname = (review.userId?.lname || '').replace(/"/g, '&quot;');
+        const userName = `${userFname} ${userLname}`.trim() || 'Anonymous';
+        const userImage = review.userId?.image || '';
+        const reviewRating = review.rating || 0;
+        const reviewComment = ((review.comment || review.message || '').replace(/"/g, '&quot;').replace(/\n/g, '<br>'));
+        const imageHtml = userImage ? `<img src="${userImage}" alt="${userName}" class="review-avatar" onerror="this.style.display='none'">` : `<div class="review-avatar" style="background: #ddd; display: flex; align-items: center; justify-content: center; color: #999;">${userName.charAt(0).toUpperCase()}</div>`;
+        const ratingHtml = reviewRating > 0 ? `<div class="review-rating">${'⭐'.repeat(Math.round(reviewRating))} ${reviewRating.toFixed(1)}</div>` : '';
+        const commentHtml = reviewComment ? `<div class="review-text">${reviewComment}</div>` : '';
+        return `<div class="review-item"><div class="review-header">${imageHtml}<div><div class="review-name">${userName}</div>${ratingHtml}</div></div>${commentHtml}</div>`;
+      }).join('');
+      reviewsHtml = `<div class="section"><h3 class="section-title">💬 Reviews</h3>${reviewsHtml}</div>`;
+    } else {
+      reviewsHtml = '<div class="section"><h3 class="section-title">💬 Reviews</h3><p class="empty-state">No reviews yet</p></div>';
+    }
+
+    // Rating badge HTML
+    const ratingBadgeHtml = salonRating > 0 ? `<div class="rating-badge"><span class="rating-stars">⭐</span><span>${salonRating.toFixed(1)} (${salonReviewCount} reviews)</span></div>` : '';
 
     // Generate HTML with Open Graph and App Links meta tags
     const html = `<!DOCTYPE html>
@@ -563,6 +673,97 @@ exports.serveSalonWebPage = async (req, res) => {
             width: 100%;
             margin-top: 20px;
         }
+        .section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .service-item, .product-item, .staff-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .service-name, .product-name, .staff-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .service-price, .product-price {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .review-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .review-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .review-rating {
+            color: #ffa500;
+            margin-left: auto;
+        }
+        .review-text {
+            color: #666;
+            line-height: 1.6;
+        }
+        .hours-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .hours-day {
+            font-weight: 600;
+            color: #333;
+        }
+        .hours-time {
+            color: #666;
+        }
+        .hours-closed {
+            color: #999;
+            font-style: italic;
+        }
+        .rating-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+        .rating-stars {
+            color: #ffa500;
+            margin-right: 5px;
+        }
+        .empty-state {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -575,9 +776,17 @@ exports.serveSalonWebPage = async (req, res) => {
             ${salonImage ? `<img src="${salonImage}" alt="${salonName}" class="salon-image" onerror="this.style.display='none'">` : ''}
             <div class="salon-info">
                 <h2>${salonName}</h2>
+                ${ratingBadgeHtml}
                 <p>${salonDescription}</p>
                 ${salonAddress ? `<p class="address">📍 ${salonAddress}</p>` : ''}
+                ${salonMobile ? `<p class="address">📞 ${salonMobile}</p>` : ''}
             </div>
+            
+            ${openingHoursHtml}
+            ${servicesHtml}
+            ${productsHtml}
+            ${staffHtml}
+            ${reviewsHtml}
             
             <button onclick="openApp()" class="open-app-btn">
                 Open in Skedisy App
