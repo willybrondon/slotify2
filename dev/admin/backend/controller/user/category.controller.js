@@ -425,12 +425,57 @@ exports.serveCategoryPage = async (req, res) => {
         }).join('')
       : '<div class="no-results"><p>No salons found for this category.</p></div>';
 
+    const categoryDescription = category.description || `Find the best ${category.name} services at top-rated salons near you. Book your appointment today!`;
+    const categoryImage = category.image || `${baseURL}/logo.png`;
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${category.name} - Skedisy</title>
+    <title>${category.name} - Skedisy | Book ${category.name} Services Online</title>
+    <meta name="description" content="${categoryDescription.replace(/"/g, '&quot;')}">
+    <meta name="keywords" content="${category.name}, salon services, beauty services, book appointment, ${category.name.toLowerCase()}">
+    <link rel="canonical" href="${categoryUrl}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${categoryUrl}">
+    <meta property="og:title" content="${category.name} - Skedisy">
+    <meta property="og:description" content="${categoryDescription.replace(/"/g, '&quot;')}">
+    <meta property="og:image" content="${categoryImage}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="${categoryUrl}">
+    <meta property="twitter:title" content="${category.name} - Skedisy">
+    <meta property="twitter:description" content="${categoryDescription.replace(/"/g, '&quot;')}">
+    <meta property="twitter:image" content="${categoryImage}">
+    
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "${category.name} Services",
+      "description": "${categoryDescription.replace(/"/g, '\\"')}",
+      "url": "${categoryUrl}",
+      "image": "${categoryImage}",
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": ${JSON.stringify(formattedSalons.slice(0, 10).map((salon, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "LocalBusiness",
+            "name": salon.name,
+            "url": salon.shareUrl
+          }
+        })))}
+      }
+    }
+    </script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>

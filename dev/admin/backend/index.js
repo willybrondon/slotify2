@@ -101,6 +101,11 @@ app.get("/api/public/categories", async (req, res) => {
 // Public API endpoint for salons by category (for category page)
 app.get("/api/public/salons-by-category", categoryController.getSalonsByCategory);
 
+// SEO: Sitemap and Robots.txt
+const sitemapController = require("./controller/user/sitemap.controller");
+app.get("/sitemap.xml", sitemapController.generateSitemap);
+app.get("/robots.txt", sitemapController.generateRobots);
+
 // Serve .well-known files for App Links verification (must be before other static routes)
 app.get("/.well-known/assetlinks.json", (req, res) => {
   res.setHeader('Content-Type', 'application/json');

@@ -637,6 +637,10 @@ exports.serveSalonWebPage = async (req, res) => {
             </div>
             <div class="footer-bottom">
                 <p>&copy; ${new Date().getFullYear()} Skedisy. All rights reserved.</p>
+                <p style="margin-top: 10px; font-size: 0.9rem;">
+                    <a href="${baseURL}/sitemap.xml" style="color: #999; text-decoration: none;">Sitemap</a> | 
+                    <a href="${baseURL}/robots.txt" style="color: #999; text-decoration: none;">Robots.txt</a>
+                </p>
             </div>
         </div>
     </footer>`;
@@ -647,7 +651,10 @@ exports.serveSalonWebPage = async (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${salonName} - Skedisy</title>
+    <title>${salonName} - Skedisy | Book Appointment Online</title>
+    <meta name="description" content="${salonDescription.replace(/"/g, '&quot;')}">
+    <meta name="keywords" content="${salonName}, salon, beauty services, book appointment, ${salonAddress ? salonAddress.split(',').join(', ') : ''}">
+    <link rel="canonical" href="${shareUrl}">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -676,6 +683,43 @@ exports.serveSalonWebPage = async (req, res) => {
     
     <!-- Apple Smart App Banner -->
     ${iosAppStoreId ? `<meta name="apple-itunes-app" content="app-id=${iosAppStoreId}">` : ''}
+    
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BeautySalon",
+      "name": "${salonName.replace(/"/g, '\\"')}",
+      "description": "${salonDescription.replace(/"/g, '\\"')}",
+      "url": "${shareUrl}",
+      "image": "${salonImage || ''}",
+      "telephone": "${salonMobile || ''}",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "${(salon.addressDetails?.addressLine1 || '').replace(/"/g, '\\"')}",
+        "addressLocality": "${(salon.addressDetails?.city || '').replace(/"/g, '\\"')}",
+        "addressRegion": "${(salon.addressDetails?.state || '').replace(/"/g, '\\"')}",
+        "addressCountry": "${(salon.addressDetails?.country || '').replace(/"/g, '\\"')}"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "${salon.locationCoordinates?.latitude || ''}",
+        "longitude": "${salon.locationCoordinates?.longitude || ''}"
+      },
+      "aggregateRating": ${salonRating > 0 ? `{
+        "@type": "AggregateRating",
+        "ratingValue": "${salonRating}",
+        "reviewCount": "${salonReviewCount}"
+      }` : 'null'},
+      "priceRange": "${salon.serviceIds && salon.serviceIds.length > 0 ? '$$' : ''}",
+      "openingHoursSpecification": ${salon.salonTime && salon.salonTime.length > 0 ? JSON.stringify(salon.salonTime.filter(t => t.isActive && t.openTime && t.closedTime).map(t => ({
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": t.day,
+        "opens": t.openTime,
+        "closes": t.closedTime
+      }))) : '[]'}
+    }
+    </script>
     
     <!-- Fallback redirect to app store or app -->
     <script>
