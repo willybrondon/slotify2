@@ -68,8 +68,9 @@ const indexRoute = require("./route/index");
 app.use(indexRoute);
 
 // Public web route for salon pages (for sharing and deep linking)
+// New format: /salon/slug-shortId (e.g., /salon/coiffure-beaute-brasil-6885e2)
 const salonController = require("./controller/user/salon.controller");
-app.get("/salon/:salonId", salonController.serveSalonWebPage);
+app.get("/salon/:slugWithId", salonController.serveSalonWebPage);
 
 // Serve .well-known files for App Links verification (must be before other static routes)
 app.get("/.well-known/assetlinks.json", (req, res) => {

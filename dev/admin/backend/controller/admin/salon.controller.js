@@ -545,6 +545,18 @@ exports.fetchSalonWalletHistoryByAdmin = async (req, res) => {
   }
 };
 
+// Generate slug from salon name (same as user controller)
+const generateSlug = (name) => {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+};
+
 // Get salon share link for admin
 exports.getSalonShareLink = async (req, res) => {
   try {
@@ -568,9 +580,16 @@ exports.getSalonShareLink = async (req, res) => {
       });
     }
 
+    // Generate slug from salon name
+    const slug = generateSlug(salon.name);
+    // Get short ID (first 6 characters of ObjectId)
+    const shortId = salon._id.toString().substring(0, 6);
+    // Combine slug and short ID
+    const slugWithId = `${slug}-${shortId}`;
+
     // Ensure baseURL doesn't have trailing slash to avoid double slashes
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
-    const shareUrl = `${baseURL}/salon/${salon._id}`;
+    const shareUrl = `${baseURL}/salon/${slugWithId}`;
 
     return res.status(200).json({
       status: true,

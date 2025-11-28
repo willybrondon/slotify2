@@ -382,18 +382,30 @@ void _handleIncomingLink(Uri uri) {
       }
     }
 
-    // Handle App Links/Universal Links (https://skedisy.com/salon/{salonId})
+    // Handle App Links/Universal Links
+    // New format: https://skedisy.com/salon/{slug-shortId} (e.g., /salon/coiffure-beaute-brasil-6885e2)
     if (uri.scheme == 'https' && uri.host.contains('skedisy.com')) {
       log("App Link detected: $uri");
-      // Extract salon ID from path: /salon/{salonId}
+
+      // New format: /salon/{slug-shortId} (e.g., /salon/coiffure-beaute-brasil-6885e2)
       if (uri.pathSegments.length >= 2 && uri.pathSegments[0] == 'salon') {
-        final salonId = uri.pathSegments[1];
-        if (salonId.isNotEmpty) {
-          log("Navigating to salon detail from App Link: $salonId");
-          Future.delayed(const Duration(milliseconds: 500), () {
-            Get.toNamed(AppRoutes.branchDetail, arguments: [salonId]);
-          });
-          return;
+        final slugWithId = uri.pathSegments[1];
+        if (slugWithId.isNotEmpty) {
+          final parts = slugWithId.split('-');
+          if (parts.isNotEmpty) {
+            final shortId = parts.last;
+            // Short ID should be 6 hex characters
+            if (shortId.length == 6 &&
+                RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(shortId)) {
+              log("Navigating to salon detail from App Link: $slugWithId (shortId: $shortId)");
+              // Pass the slug to the backend, which will resolve it to full salon ID
+              // The backend will handle the lookup by short ID
+              Future.delayed(const Duration(milliseconds: 500), () {
+                Get.toNamed(AppRoutes.branchDetail, arguments: [slugWithId]);
+              });
+              return;
+            }
+          }
         }
       }
     }
