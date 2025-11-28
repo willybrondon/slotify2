@@ -116,24 +116,57 @@ class BranchDetailTopView extends StatelessWidget {
           preferredSize: const Size.fromHeight(230),
           child: Stack(
             children: [
+              // Container with padding to center the dashed box
               Container(
                 height: Get.height * 0.3,
                 width: Get.width,
                 decoration: BoxDecoration(
                   color: AppColors.transparent,
                 ),
-                clipBehavior: Clip.hardEdge,
-                child: CachedNetworkImage(
-                  imageUrl: "${logic.getSalonDetailCategory?.salon?.mainImage}",
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) {
-                    return Image.asset(AppAsset.icImagePlaceholder)
-                        .paddingAll(25);
-                  },
-                  errorWidget: (context, url, error) {
-                    return Image.asset(AppAsset.icImagePlaceholder)
-                        .paddingAll(30);
-                  },
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    child: DottedBorder(
+                      color: AppColors.roundBorder,
+                      borderType: BorderType.RRect,
+                      radius: const Radius.circular(12),
+                      strokeWidth: 1.5,
+                      dashPattern: const [5, 5],
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "${logic.getSalonDetailCategory?.salon?.mainImage}",
+                          fit: BoxFit.cover,
+                          width: Get.width * 0.85,
+                          height: Get.height * 0.25,
+                          placeholder: (context, url) {
+                            return Container(
+                              width: Get.width * 0.85,
+                              height: Get.height * 0.25,
+                              color: AppColors.grey.withOpacity(0.2),
+                              child: Center(
+                                child: Image.asset(AppAsset.icImagePlaceholder)
+                                    .paddingAll(25),
+                              ),
+                            );
+                          },
+                          errorWidget: (context, url, error) {
+                            return Container(
+                              width: Get.width * 0.85,
+                              height: Get.height * 0.25,
+                              color: AppColors.grey.withOpacity(0.2),
+                              child: Center(
+                                child: Image.asset(AppAsset.icImagePlaceholder)
+                                    .paddingAll(30),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Row(

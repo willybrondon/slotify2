@@ -162,7 +162,9 @@ class PaymentMyWalletView extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: Get.width * 0.04),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           "txtMyWallet".tr,
@@ -171,7 +173,7 @@ class PaymentMyWalletView extends StatelessWidget {
                             fontSize: 16.5,
                             color: AppColors.primaryTextColor,
                           ),
-                        ).paddingOnly(right: 5),
+                        ),
                         GetBuilder<WalletScreenController>(
                           id: Constant.idProgressView,
                           builder: (logic) {
