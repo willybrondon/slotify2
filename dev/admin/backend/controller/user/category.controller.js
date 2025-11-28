@@ -19,12 +19,14 @@ const generateSlug = (name) => {
 // Find category by short ID (first 6 characters of ObjectId)
 const findCategoryByShortId = async (shortId) => {
   try {
-    // Try to find category where ObjectId starts with shortId
-    const category = await Category.findOne({
-      _id: new RegExp(`^${shortId}`, 'i'), // Case-insensitive search for ObjectId starting with shortId
+    // Get all active categories and find one where ObjectId starts with shortId
+    const categories = await Category.find({
       isDelete: false,
       status: true,
-    });
+    }).select("_id");
+    
+    // Find category where _id starts with shortId
+    const category = categories.find(c => c._id.toString().toLowerCase().startsWith(shortId.toLowerCase()));
     return category ? category._id : null;
   } catch (error) {
     console.error("Error finding category by short ID:", error);
@@ -247,20 +249,31 @@ exports.serveCategoryPage = async (req, res) => {
       return res.status(404).send("Not found");
     }
 
+    // Check if it's the old format (24-character ObjectId) - reject it
+    if (/^[0-9a-fA-F]{24}$/i.test(slugWithId)) {
+      console.log("[Category Page] Old format detected, rejecting:", slugWithId);
+      return res.status(404).send("Category not found. Please use the new URL format.");
+    }
+
     // Extract short ID (last part after hyphen, should be 6 hex characters)
     const parts = slugWithId.split("-");
     const shortId = parts[parts.length - 1];
     
     // Validate short ID format (6 hex characters)
     if (!/^[0-9a-fA-F]{6}$/.test(shortId)) {
+      console.log("[Category Page] Invalid short ID format:", shortId, "from slug:", slugWithId);
       return res.status(404).send("Category not found");
     }
     
+    console.log("[Category Page] Looking for category with short ID:", shortId);
     const fullCategoryId = await findCategoryByShortId(shortId);
     
     if (!fullCategoryId) {
+      console.log("[Category Page] Category not found for short ID:", shortId);
       return res.status(404).send("Category not found");
     }
+    
+    console.log("[Category Page] Found category:", fullCategoryId);
 
     const search = req.query.search || "";
     const latitude = req.query.latitude;
