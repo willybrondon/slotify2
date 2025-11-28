@@ -5,22 +5,57 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Mobile menu toggle
     const hamburger = document.getElementById('mobileMenuToggle');
-    const mobileDropdown = document.getElementById('mobileDropdown');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+    
+    function openMobileMenu() {
+        if (mobileMenu && mobileMenuOverlay) {
+            mobileMenu.classList.add('active');
+            mobileMenuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closeMobileMenu() {
+        if (mobileMenu && mobileMenuOverlay) {
+            mobileMenu.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    }
     
     if (hamburger) {
-        hamburger.addEventListener('click', function() {
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation();
             hamburger.classList.toggle('active');
-            mobileDropdown.classList.toggle('active');
+            openMobileMenu();
+        });
+    }
+    
+    if (mobileMenuClose) {
+        mobileMenuClose.addEventListener('click', function() {
+            closeMobileMenu();
+            if (hamburger) hamburger.classList.remove('active');
+        });
+    }
+    
+    // Close mobile menu when clicking overlay
+    if (mobileMenuOverlay) {
+        mobileMenuOverlay.addEventListener('click', function() {
+            closeMobileMenu();
+            if (hamburger) hamburger.classList.remove('active');
         });
     }
     
     // Close mobile menu when clicking outside
     document.addEventListener('click', function(e) {
-        if (mobileDropdown && hamburger && 
-            !mobileDropdown.contains(e.target) && 
-            !hamburger.contains(e.target)) {
+        if (mobileMenu && mobileMenuOverlay && hamburger && 
+            !mobileMenu.contains(e.target) && 
+            !hamburger.contains(e.target) &&
+            mobileMenu.classList.contains('active')) {
+            closeMobileMenu();
             hamburger.classList.remove('active');
-            mobileDropdown.classList.remove('active');
         }
     });
 
