@@ -9,15 +9,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
     const mobileMenuClose = document.getElementById('mobileMenuClose');
     
+    // Debug: Log all elements
+    console.log('Mobile Menu Debug:', {
+        hamburger: hamburger ? 'Found' : 'NOT FOUND',
+        mobileMenu: mobileMenu ? 'Found' : 'NOT FOUND',
+        mobileMenuOverlay: mobileMenuOverlay ? 'Found' : 'NOT FOUND',
+        mobileMenuClose: mobileMenuClose ? 'Found' : 'NOT FOUND'
+    });
+    
     function openMobileMenu() {
+        console.log('openMobileMenu called');
         if (mobileMenu && mobileMenuOverlay) {
+            console.log('Adding active classes');
             mobileMenu.classList.add('active');
             mobileMenuOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            console.log('Menu should be open now. mobileMenu classes:', mobileMenu.className);
+        } else {
+            console.error('Cannot open menu - elements missing:', {
+                mobileMenu: !!mobileMenu,
+                mobileMenuOverlay: !!mobileMenuOverlay
+            });
         }
     }
     
     function closeMobileMenu() {
+        console.log('closeMobileMenu called');
         if (mobileMenu && mobileMenuOverlay) {
             mobileMenu.classList.remove('active');
             mobileMenuOverlay.classList.remove('active');
@@ -26,12 +43,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (hamburger) {
-        console.log('Hamburger menu found and initialized');
+        console.log('Hamburger menu found and initializing...');
         hamburger.addEventListener('click', function(e) {
+            console.log('Hamburger clicked!', e);
+            e.preventDefault();
             e.stopPropagation();
             hamburger.classList.toggle('active');
+            console.log('Hamburger active class toggled. Calling openMobileMenu...');
             openMobileMenu();
         });
+        console.log('Hamburger click listener attached');
     } else {
         console.error('Hamburger menu element not found!');
     }
@@ -51,16 +72,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Close mobile menu when clicking outside
+    // Close mobile menu when clicking outside (but not on hamburger)
     document.addEventListener('click', function(e) {
         if (mobileMenu && mobileMenuOverlay && hamburger && 
             !mobileMenu.contains(e.target) && 
             !hamburger.contains(e.target) &&
+            !mobileMenuOverlay.contains(e.target) &&
             mobileMenu.classList.contains('active')) {
             closeMobileMenu();
             hamburger.classList.remove('active');
         }
     });
+    
+    // Test function to manually trigger menu (for debugging)
+    window.testMobileMenu = function() {
+        console.log('Testing mobile menu manually');
+        if (hamburger) {
+            openMobileMenu();
+        }
+    };
 
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

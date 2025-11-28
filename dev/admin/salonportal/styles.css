@@ -151,6 +151,8 @@ html {
     position: relative;
     background: transparent;
     border: none;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Hamburger visibility is controlled by media query below */
@@ -162,6 +164,7 @@ html {
     margin: 3px 0;
     transition: all 0.3s ease;
     display: block;
+    pointer-events: none;
 }
 
 .hamburger.active span:nth-child(1) {
@@ -201,11 +204,13 @@ html {
     z-index: 9998;
     opacity: 0;
     transition: opacity 0.3s ease;
+    visibility: hidden;
 }
 
 .mobile-menu-overlay.active {
     display: block;
     opacity: 1;
+    visibility: visible;
 }
 
 .mobile-menu {
@@ -220,6 +225,8 @@ html {
     z-index: 9999;
     transition: right 0.3s ease;
     overflow-y: auto;
+    display: block;
+    visibility: visible;
 }
 
 .mobile-menu.active {
