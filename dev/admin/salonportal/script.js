@@ -314,12 +314,25 @@ function loadCategories() {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
+            console.log('Categories loaded:', data);
             if (data.status && data.data && data.data.length > 0) {
                 renderCategories(data.data);
+            } else {
+                console.warn('No categories found');
+                // Show message if no categories
+                const mobileMenu = document.getElementById('mobileCategories');
+                if (mobileMenu) {
+                    mobileMenu.innerHTML = '<p style="padding: 12px; color: #666; text-align: center;">No categories available</p>';
+                }
             }
         })
         .catch(error => {
             console.error('Error loading categories:', error);
+            // Show error message
+            const mobileMenu = document.getElementById('mobileCategories');
+            if (mobileMenu) {
+                mobileMenu.innerHTML = '<p style="padding: 12px; color: #999; text-align: center;">Unable to load categories</p>';
+            }
         });
 }
 
