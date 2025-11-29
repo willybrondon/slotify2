@@ -816,31 +816,42 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                 ),
                                 child: Column(
                                   children: [
-                                    Expanded(
-                                      child: Container(
-                                        width: Get.width,
-                                        decoration: const BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(16),
-                                              topRight: Radius.circular(16)),
+                                    // Service image with dashed square border (similar to personnel but square)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 15),
+                                      alignment: Alignment.center,
+                                      child: DottedBorder(
+                                        color: AppColors.roundBorder,
+                                        borderType: BorderType.RRect,
+                                        radius: const Radius.circular(12),
+                                        strokeWidth: 1,
+                                        dashPattern: const [3, 3],
+                                        child: Container(
+                                          height: 80,
+                                          width: 80,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          clipBehavior: Clip.hardEdge,
+                                          child: CachedNetworkImage(
+                                            imageUrl:
+                                                "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) {
+                                              return Image.asset(AppAsset
+                                                      .icServicePlaceholder)
+                                                  .paddingAll(11);
+                                            },
+                                            errorWidget: (context, url, error) {
+                                              return Image.asset(AppAsset
+                                                      .icServicePlaceholder)
+                                                  .paddingAll(11);
+                                            },
+                                          ),
                                         ),
-                                        clipBehavior: Clip.hardEdge,
-                                        child: CachedNetworkImage(
-                                          imageUrl:
-                                              "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) {
-                                            return Image.asset(AppAsset
-                                                    .icServicePlaceholder)
-                                                .paddingAll(11);
-                                          },
-                                          errorWidget: (context, url, error) {
-                                            return Image.asset(AppAsset
-                                                    .icServicePlaceholder)
-                                                .paddingAll(11);
-                                          },
-                                        ),
-                                      ).paddingOnly(left: 3, right: 3, top: 3),
+                                      ),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.all(8),
@@ -1027,22 +1038,39 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                                 const Spacer(),
                                 const Spacer(),
                                 const Spacer(),
-                                CachedNetworkImage(
-                                  imageUrl: logic.getSalonDetailCategory
-                                          ?.product?[index].mainImage ??
-                                      "",
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) {
-                                    return Image.asset(
-                                            AppAsset.icImagePlaceholder)
-                                        .paddingAll(25);
-                                  },
-                                  errorWidget: (context, url, error) {
-                                    return Image.asset(
-                                            AppAsset.icImagePlaceholder)
-                                        .paddingAll(30);
-                                  },
+                                // Product image with dashed square border (similar to services)
+                                Center(
+                                  child: DottedBorder(
+                                    color: AppColors.roundBorder,
+                                    borderType: BorderType.RRect,
+                                    radius: const Radius.circular(12),
+                                    strokeWidth: 1,
+                                    dashPattern: const [3, 3],
+                                    child: Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      clipBehavior: Clip.hardEdge,
+                                      child: CachedNetworkImage(
+                                        imageUrl: logic.getSalonDetailCategory
+                                                ?.product?[index].mainImage ??
+                                            "",
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) {
+                                          return Image.asset(
+                                                  AppAsset.icImagePlaceholder)
+                                              .paddingAll(25);
+                                        },
+                                        errorWidget: (context, url, error) {
+                                          return Image.asset(
+                                                  AppAsset.icImagePlaceholder)
+                                              .paddingAll(30);
+                                        },
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 const Spacer(),
                                 Align(
