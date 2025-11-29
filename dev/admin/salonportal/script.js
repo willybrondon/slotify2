@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('openMobileMenu called');
         if (mobileMenu && mobileMenuOverlay) {
             console.log('Adding active classes');
+            
+            // Store current scroll position
+            const scrollY = window.scrollY;
+            document.body.style.top = `-${scrollY}px`;
+            
             mobileMenu.classList.add('active');
             mobileMenuOverlay.classList.add('active');
             document.body.classList.add('menu-open');
@@ -28,7 +33,36 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.style.position = 'fixed';
             document.body.style.width = '100%';
             document.body.style.height = '100%';
+            document.body.style.top = '0';
+            document.body.style.left = '0';
+            
+            // Force visibility of menu content
+            const menuContent = document.querySelector('.mobile-menu-content');
+            const loginBtn = document.querySelector('.btn-login-mobile-menu');
+            const categories = document.getElementById('mobileCategories');
+            
+            if (menuContent) {
+                menuContent.style.display = 'flex';
+                menuContent.style.visibility = 'visible';
+                menuContent.style.opacity = '1';
+            }
+            if (loginBtn) {
+                loginBtn.style.display = 'block';
+                loginBtn.style.visibility = 'visible';
+                loginBtn.style.opacity = '1';
+            }
+            if (categories) {
+                categories.style.display = 'flex';
+                categories.style.visibility = 'visible';
+                categories.style.opacity = '1';
+            }
+            
             console.log('Menu should be open now. mobileMenu classes:', mobileMenu.className);
+            console.log('Menu content visibility:', {
+                menuContent: menuContent ? 'Found' : 'NOT FOUND',
+                loginBtn: loginBtn ? 'Found' : 'NOT FOUND',
+                categories: categories ? 'Found' : 'NOT FOUND'
+            });
         } else {
             console.error('Cannot open menu - elements missing:', {
                 mobileMenu: !!mobileMenu,
@@ -43,10 +77,19 @@ document.addEventListener('DOMContentLoaded', function() {
             mobileMenu.classList.remove('active');
             mobileMenuOverlay.classList.remove('active');
             document.body.classList.remove('menu-open');
-            document.body.style.overflow = 'auto';
+            
+            // Restore scroll position
+            const scrollY = document.body.style.top;
+            document.body.style.overflow = '';
             document.body.style.position = '';
             document.body.style.width = '';
             document.body.style.height = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            }
         }
     }
     
