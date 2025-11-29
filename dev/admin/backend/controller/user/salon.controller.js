@@ -761,10 +761,12 @@ exports.serveSalonWebPage = async (req, res) => {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-top: 80px; /* Account for fixed navbar */
         }
         .main-wrapper {
             flex: 1;
             width: 100%;
+            margin-top: 0;
         }
         .container {
             max-width: 1200px;
@@ -1152,6 +1154,9 @@ exports.serveSalonWebPage = async (req, res) => {
             }
         }
         @media (max-width: 768px) {
+            body {
+                padding-top: 70px; /* Slightly less padding on mobile */
+            }
             .salon-info-header h1 {
                 font-size: 2rem;
             }

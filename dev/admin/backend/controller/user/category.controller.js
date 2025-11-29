@@ -490,11 +490,13 @@ exports.serveCategoryPage = async (req, res) => {
             background: #fff;
             color: #111;
             line-height: 1.6;
+            padding-top: 80px; /* Account for fixed navbar */
         }
         .category-header {
             background: #fff;
             padding: 40px 0;
             border-bottom: 1px solid #eee;
+            margin-top: 0;
         }
         .category-header-content {
             max-width: 1200px;
@@ -626,6 +628,9 @@ exports.serveCategoryPage = async (req, res) => {
             font-size: 1.1rem;
         }
         @media (max-width: 768px) {
+            body {
+                padding-top: 70px; /* Slightly less padding on mobile */
+            }
             .category-title {
                 font-size: 2rem;
             }
