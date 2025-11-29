@@ -295,8 +295,9 @@ class StripeService {
                       amount: rupees > 0
                           ? rupees
                           : bookingScreenController.totalPrice.toDouble(),
-                      withoutTax:
-                          bookingScreenController.withOutTaxRupee.round(),
+                      withoutTax: double.parse(bookingScreenController
+                          .withOutTaxRupee
+                          .toStringAsFixed(2)),
                       paymentType: "Stripe", // Use Stripe as payment type
                       atPlace:
                           bookingScreenController.selectedVenue == "At Salon"

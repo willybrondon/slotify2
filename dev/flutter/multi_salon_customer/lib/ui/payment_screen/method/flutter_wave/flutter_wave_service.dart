@@ -22,12 +22,18 @@ import 'package:salon_2/utils/utils.dart';
 class FlutterWaveService {
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
   SplashController splashController = Get.put(SplashController());
-  CategoryDetailController categoryDetailController = Get.put(CategoryDetailController());
-  BookingScreenController bookingScreenController = Get.put(BookingScreenController());
-  SearchScreenController searchScreenController = Get.put(SearchScreenController());
-  BranchDetailController branchDetailController = Get.put(BranchDetailController());
-  SelectBranchController selectBranchController = Get.put(SelectBranchController());
-  PaymentScreenController paymentScreenController = Get.put(PaymentScreenController());
+  CategoryDetailController categoryDetailController =
+      Get.put(CategoryDetailController());
+  BookingScreenController bookingScreenController =
+      Get.put(BookingScreenController());
+  SearchScreenController searchScreenController =
+      Get.put(SearchScreenController());
+  BranchDetailController branchDetailController =
+      Get.put(BranchDetailController());
+  SelectBranchController selectBranchController =
+      Get.put(SelectBranchController());
+  PaymentScreenController paymentScreenController =
+      Get.put(PaymentScreenController());
   num discountAmount = 0;
   num discountPercentage = 0;
   String date = "";
@@ -40,7 +46,8 @@ class FlutterWaveService {
   String paymentType = "";
   Function(Map<String, dynamic>)? onComplete;
   String userEmail = Constant.storage.read<String>('UserEmail') ?? "";
-  String userContactNumber = Constant.storage.read<String>('UserContactNumber') ?? "";
+  String userContactNumber =
+      Constant.storage.read<String>('UserContactNumber') ?? "";
 
   init({
     String? flutterWavePublishKey,
@@ -85,21 +92,26 @@ class FlutterWaveService {
       );
 
       if (paymentScreenController.depositToWalletModel?.status == true) {
-        Utils.showToast(Get.context!, paymentScreenController.depositToWalletModel?.message ?? "");
+        Utils.showToast(Get.context!,
+            paymentScreenController.depositToWalletModel?.message ?? "");
         Get.back();
       } else {
-        Utils.showToast(Get.context!, paymentScreenController.depositToWalletModel?.message ?? "");
+        Utils.showToast(Get.context!,
+            paymentScreenController.depositToWalletModel?.message ?? "");
       }
     } else {
       await bookingScreenController.onCreateBookingApiCall(
         userId: Constant.storage.read<String>('userId') ?? "",
-        expertId: Constant.storage.read<String>('expertDetail') != null ? Constant.storage.read<String>('expertDetail').toString() : Constant.storage.read<String>('expertId').toString(),
+        expertId: Constant.storage.read<String>('expertDetail') != null
+            ? Constant.storage.read<String>('expertDetail').toString()
+            : Constant.storage.read<String>('expertId').toString(),
         serviceId: bookingScreenController.serviceId.join(","),
         salonId: bookingScreenController.salonId.toString(),
         date: bookingScreenController.formattedDate.toString(),
         time: bookingScreenController.slotsString.toString(),
         amount: bookingScreenController.totalPrice,
-        withoutTax: bookingScreenController.withOutTaxRupee.toInt(),
+        withoutTax: double.parse(
+            bookingScreenController.withOutTaxRupee.toStringAsFixed(2)),
         paymentType: bookingScreenController.selectedPayment,
         atPlace: bookingScreenController.selectedVenue == "At Salon" ? 1 : 2,
         address: bookingScreenController.searchEditingController.text,
@@ -110,19 +122,38 @@ class FlutterWaveService {
         bookingScreenController.withOutTaxRupee = 0.0;
         bookingScreenController.totalPrice = 0.0;
 
-        for (var i = 0; i < (categoryDetailController.getServiceCategory?.services?.length ?? 0); i++) {
+        for (var i = 0;
+            i <
+                (categoryDetailController
+                        .getServiceCategory?.services?.length ??
+                    0);
+            i++) {
           categoryDetailController.onCheckBoxClick(false, i);
         }
 
-        for (var i = 0; i < (homeScreenController.getAllServiceCategory?.services?.length ?? 0); i++) {
+        for (var i = 0;
+            i <
+                (homeScreenController.getAllServiceCategory?.services?.length ??
+                    0);
+            i++) {
           homeScreenController.onServiceCheckBoxClick(false, i);
         }
 
-        for (var i = 0; i < (homeScreenController.getExpertCategory?.data?.services?.length ?? 0); i++) {
+        for (var i = 0;
+            i <
+                (homeScreenController
+                        .getExpertCategory?.data?.services?.length ??
+                    0);
+            i++) {
           homeScreenController.onCheckBoxClick(false, i);
         }
 
-        for (var i = 0; i < (branchDetailController.getSalonDetailCategory?.salon?.serviceIds?.length ?? 0); i++) {
+        for (var i = 0;
+            i <
+                (branchDetailController
+                        .getSalonDetailCategory?.salon?.serviceIds?.length ??
+                    0);
+            i++) {
           branchDetailController.onCheckBoxClick(false, i);
         }
 
@@ -186,7 +217,8 @@ class FlutterWaveService {
           ),
         );
       } else {
-        Utils.showToast(Get.context!, bookingScreenController.createBookingCategory?.message ?? "");
+        Utils.showToast(Get.context!,
+            bookingScreenController.createBookingCategory?.message ?? "");
       }
     }
   }
@@ -194,12 +226,16 @@ class FlutterWaveService {
   void handlePaymentInitialization() async {
     log("Flutter Wave Stripe Key :: ${splashController.settingCategory?.setting?.flutterWaveKey}");
 
-    final Customer customer = Customer(name: "Salon User", phoneNumber: userContactNumber.toString(), email: userEmail);
+    final Customer customer = Customer(
+        name: "Salon User",
+        phoneNumber: userContactNumber.toString(),
+        email: userEmail);
 
     log("Flutter Wave Start");
     final Flutterwave flutterWave = Flutterwave(
         // context: Get.context!,
-        publicKey: splashController.settingCategory?.setting?.flutterWaveKey ?? "",
+        publicKey:
+            splashController.settingCategory?.setting?.flutterWaveKey ?? "",
         currency: splashController.settingCategory?.setting?.currencyName ?? "",
         redirectUrl: "https://www.google.com/",
         txRef: DateTime.now().microsecond.toString(),
