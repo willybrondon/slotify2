@@ -272,15 +272,17 @@ html {
 
 .mobile-menu-content {
     padding: 20px;
-    display: block;
+    display: flex;
+    flex-direction: column;
     visibility: visible;
     min-height: auto;
     overflow-y: auto;
     flex: 1;
+    gap: 0;
 }
 
 .btn-login-mobile-menu {
-    display: block;
+    display: block !important;
     background: #111 !important;
     color: #fff !important;
     font-size: 1rem;
@@ -295,6 +297,8 @@ html {
     margin-bottom: 24px;
     transition: all 0.2s;
     width: 100%;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .btn-login-mobile-menu:hover {
@@ -306,9 +310,13 @@ html {
 }
 
 .mobile-categories {
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     gap: 12px;
+    width: 100%;
+    margin-top: 0;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .mobile-categories .category-link {
@@ -358,7 +366,12 @@ html {
     }
     
     .mobile-menu {
-        display: block;
+        display: flex;
+    }
+    
+    .mobile-menu-content {
+        display: flex;
+        flex-direction: column;
     }
     
     .nav-menu-center {
@@ -375,7 +388,7 @@ html {
 
 /* Hero Section */
 .hero {
-    padding: 120px 0 40px;
+    padding: 120px 0 64px;
     background: #000000;
     color: white;
     min-height: 100vh;
@@ -466,7 +479,7 @@ html {
 
 /* Request Buttons Section */
 .request-buttons-section {
-    padding: 40px 0;
+    padding: 64px 0;
     background: #fff;
 }
 
@@ -1252,7 +1265,7 @@ html {
     }
 
     .hero {
-        padding: 100px 0 60px;
+        padding: 100px 0 64px;
         text-align: center;
         justify-content: center;
     }

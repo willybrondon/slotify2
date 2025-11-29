@@ -176,23 +176,44 @@ class BranchDetailTopView extends StatelessWidget {
                     onTap: () {
                       Get.back();
                     },
-                    child: Image.asset(
-                      AppAsset.icBackArrow,
-                      height: 25,
-                      width: 25,
-                      color: AppColors.whiteColor,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.whiteColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.blackColor.withOpacity(0.1),
+                            offset: const Offset(0, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        AppAsset.icBackArrow,
+                        height: 20,
+                        width: 20,
+                        color: AppColors.blackColor,
+                      ),
                     ),
-                  ),
+                  ).paddingOnly(left: 15, right: 12),
                   PopupMenuButton<String>(
                     icon: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.whiteColor.withOpacity(0.3),
+                        color: AppColors.whiteColor,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.blackColor.withOpacity(0.1),
+                            offset: const Offset(0, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
                       child: Icon(
                         Icons.share,
-                        color: AppColors.whiteColor,
+                        color: AppColors.blackColor,
                         size: 22,
                       ),
                     ),

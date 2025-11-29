@@ -374,47 +374,83 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                             },
                                           ),
                                         ),
-                                        GestureDetector(
-                                          onTap: () async {
-                                            if (Constant.storage
-                                                    .read<bool>('isLogIn') ??
-                                                false) {
-                                              logic.onLikeSalon(
-                                                userId: Constant.storage
-                                                        .read<String>(
-                                                            'userId') ??
-                                                    "",
-                                                salonId: logic
-                                                        .getAllSalonCategory
-                                                        ?.data?[index]
-                                                        .id ??
-                                                    "",
-                                                latitude: latitude.toString(),
-                                                longitude: longitude.toString(),
-                                              );
-                                            } else {
-                                              Get.toNamed(AppRoutes.signIn,
-                                                  arguments: [
-                                                    logic.checkItem.isNotEmpty
-                                                  ]);
-                                              await Get.find<SignInController>()
-                                                  .getDataFromArgs();
-                                            }
-                                          },
-                                          child: Align(
-                                            alignment: Alignment.topRight,
-                                            child: logic.isSalonSaved[index] ==
-                                                    true
-                                                ? Image.asset(
-                                                    AppAsset.icLikeFilled,
-                                                    height: 32,
-                                                  ).paddingOnly(
-                                                    right: 7, top: 7)
-                                                : Image.asset(
-                                                    AppAsset.icLikeOutline,
-                                                    height: 32,
-                                                  ).paddingOnly(
-                                                    right: 7, top: 7),
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              // Heart (Like) Button
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  if (Constant.storage
+                                                          .read<bool>(
+                                                              'isLogIn') ??
+                                                      false) {
+                                                    logic.onLikeSalon(
+                                                      userId: Constant.storage
+                                                              .read<String>(
+                                                                  'userId') ??
+                                                          "",
+                                                      salonId: logic
+                                                              .getAllSalonCategory
+                                                              ?.data?[index]
+                                                              .id ??
+                                                          "",
+                                                      latitude:
+                                                          latitude.toString(),
+                                                      longitude:
+                                                          longitude.toString(),
+                                                    );
+                                                  } else {
+                                                    Get.toNamed(
+                                                        AppRoutes.signIn,
+                                                        arguments: [
+                                                          logic.checkItem
+                                                              .isNotEmpty
+                                                        ]);
+                                                    await Get.find<
+                                                            SignInController>()
+                                                        .getDataFromArgs();
+                                                  }
+                                                },
+                                                child: logic.isSalonSaved[
+                                                            index] ==
+                                                        true
+                                                    ? Image.asset(
+                                                        AppAsset.icLikeFilled,
+                                                        height: 32,
+                                                      ).paddingOnly(
+                                                        right: 7, top: 7)
+                                                    : Image.asset(
+                                                        AppAsset.icLikeOutline,
+                                                        height: 32,
+                                                      ).paddingOnly(
+                                                        right: 7, top: 7),
+                                              ),
+                                              // Share Button
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  final salonId = logic
+                                                          .getAllSalonCategory
+                                                          ?.data?[index]
+                                                          .id ??
+                                                      "";
+                                                  final salonName = logic
+                                                          .getAllSalonCategory
+                                                          ?.data?[index]
+                                                          .name ??
+                                                      "Salon";
+                                                  await logic.shareSalonLink(
+                                                    salonId: salonId,
+                                                    salonName: salonName,
+                                                  );
+                                                },
+                                                child: Image.asset(
+                                                  AppAsset.icShare,
+                                                  height: 32,
+                                                ).paddingOnly(right: 7, top: 7),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],

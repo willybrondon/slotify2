@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_2/main.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
 
 import 'package:salon_2/ui/expert/expert_detail/model/get_expert_model.dart';
@@ -1130,6 +1131,55 @@ class HomeScreenController extends GetxController {
       log("Error call Favourite Salon Api :: $e");
     } finally {
       update([Constant.idProgressView]);
+    }
+  }
+
+  // Share salon link from home screen
+  Future<void> shareSalonLink(
+      {required String salonId, required String salonName}) async {
+    try {
+      final queryParameters = {
+        "salonId": salonId,
+      };
+
+      String queryString = Uri(queryParameters: queryParameters).query;
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getSalonShareUrl + queryString);
+      log("Get Salon Share URL Url :: $url");
+
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      log("Get Salon Share URL Status Code :: ${response.statusCode}");
+      log("Get Salon Share URL Response :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == true &&
+            jsonResponse['shareUrl'] != null) {
+          final shareUrl = jsonResponse['shareUrl'];
+          final shareText = "Check out $salonName on Skedisy!\n\n$shareUrl";
+
+          await Share.share(
+            shareText,
+            subject: "Check out $salonName",
+          );
+          log("Share Salon Link - Shared successfully: $shareUrl");
+        } else {
+          Utils.showToast(
+              Get.context!, "Unable to generate share link. Please try again.");
+          log("Share Salon Link - Share URL is null or empty");
+        }
+      }
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+    } catch (e) {
+      log("Error sharing salon link :: $e");
+      Utils.showToast(Get.context!, "Error sharing salon link");
     }
   }
 }
