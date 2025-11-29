@@ -300,7 +300,7 @@ exports.newBooking = async (req, res, next) => {
       if (coupon.discountType == 1) {
         discountAmount = coupon.maxDiscount;
       } else if (coupon.discountType == 2) {
-        const discount = (parseInt(req.body.withoutTax) * coupon.discountPercent) / 100;
+        const discount = (parseFloat(req.body.withoutTax) * coupon.discountPercent) / 100;
         const formatedDiscount = parseFloat(discount.toFixed(2));
 
         discountAmount = formatedDiscount > coupon.maxDiscount ? coupon.maxDiscount : formatedDiscount;
@@ -313,12 +313,16 @@ exports.newBooking = async (req, res, next) => {
         });
       }
 
-      totalAmount = withTaxAmount - discountAmount;
+      totalAmount = parseFloat(withTaxAmount) - discountAmount;
     }
 
     console.log("totalAmount after add tax and deduct the discount (if any)", totalAmount);
 
-    if (totalAmount !== bookingAmount) {
+    // Convert both to strings with 2 decimal places for consistent comparison
+    const totalAmountStr = totalAmount.toFixed(2);
+    const bookingAmountStr = bookingAmount;
+
+    if (totalAmountStr !== bookingAmountStr) {
       return res.status(200).send({ status: false, message: "Invalid amount after add tax and deduct the discount (if any)" });
     }
 

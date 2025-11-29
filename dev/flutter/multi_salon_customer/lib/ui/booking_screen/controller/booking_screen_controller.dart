@@ -758,7 +758,7 @@ class BookingScreenController extends GetxController {
     required String date,
     required String time,
     required double amount,
-    required int withoutTax,
+    required double withoutTax,
     required String paymentType,
     required int atPlace,
     required String address,
@@ -1143,6 +1143,10 @@ class BookingScreenController extends GetxController {
       if (selectedPayment == "wallet") {
         log("it's wallet ");
 
+        // Ensure withoutTax is sent as double with 2 decimal places to match backend expectation
+        double withoutTaxValue =
+            double.parse(withOutTaxRupee.toStringAsFixed(2));
+
         await onCreateBookingApiCall(
           userId: Constant.storage.read<String>('userId') ?? "",
           expertId: Constant.storage.read<String>('expertDetail') != null
@@ -1153,7 +1157,7 @@ class BookingScreenController extends GetxController {
           date: formattedDate.toString(),
           time: slotsString.toString(),
           amount: totalPrice,
-          withoutTax: withOutTaxRupee.toInt(),
+          withoutTax: withoutTaxValue, // Send as double with 2 decimal places
           paymentType: "",
           atPlace: selectedVenue == "At Salon" ? 1 : 2,
           address: searchEditingController.text,
@@ -1271,6 +1275,10 @@ class BookingScreenController extends GetxController {
           // Recalculate amount right before sending (same as Stripe does)
           calculateTotalWithDiscount();
 
+          // Ensure withoutTax is sent as double with 2 decimal places to match backend expectation
+          double withoutTaxValue =
+              double.parse(withOutTaxRupee.toStringAsFixed(2));
+
           await onCreateBookingApiCall(
             userId: Constant.storage.read<String>('userId') ?? "",
             expertId: Constant.storage.read<String>('expertDetail') != null
@@ -1281,8 +1289,7 @@ class BookingScreenController extends GetxController {
             date: formattedDate.toString(),
             time: slotsString.toString(),
             amount: totalPrice, // Use recalculated totalPrice
-            withoutTax:
-                withOutTaxRupee.round(), // Use .round() like Stripe does
+            withoutTax: withoutTaxValue, // Send as double with 2 decimal places
             paymentType: selectedPayment,
             atPlace: selectedVenue == "At Salon" ? 1 : 2,
             address: searchEditingController.text,
@@ -1400,7 +1407,8 @@ class BookingScreenController extends GetxController {
             'date': formattedDate.toString(),
             'time': slotsString.toString(),
             'amount': totalPrice,
-            'withoutTax': withOutTaxRupee.toInt(),
+            'withoutTax': double.parse(withOutTaxRupee
+                .toStringAsFixed(2)), // Send as double with 2 decimal places
             'atPlace': selectedVenue == "At Salon" ? 1 : 2,
             'address': searchEditingController.text,
             'totalMinute': totalMinute,
