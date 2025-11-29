@@ -464,6 +464,90 @@ html {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
+/* Request Buttons Section */
+.request-buttons-section {
+    padding: 60px 0;
+    background: #fff;
+}
+
+.request-buttons-container {
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+    justify-content: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.request-button-card {
+    flex: 1;
+    background: #f8f9fa;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.request-button-card:hover {
+    border-color: #111;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.request-button-card h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+.btn-request {
+    background: #111;
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border: 2px solid #111;
+}
+
+.btn-request:hover {
+    background: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile styles for request buttons */
+@media (max-width: 768px) {
+    .request-buttons-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .request-button-card {
+        padding: 30px 20px;
+    }
+    
+    .request-button-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+    }
+    
+    .btn-request {
+        padding: 12px 28px;
+        font-size: 0.95rem;
+    }
+}
+
 /* Stats Section */
 .stats {
     padding: 4rem 0;

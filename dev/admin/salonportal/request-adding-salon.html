@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Adding Salon - Skedisy</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .salon-request-container {
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 40px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .salon-request-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #111;
+        }
+        .file-upload {
+            position: relative;
+            display: inline-block;
+        }
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-upload-label:hover {
+            border-color: #111;
+            background: #f9f9f9;
+        }
+        .file-preview {
+            margin-top: 10px;
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            display: none;
+        }
+        .file-preview.show {
+            display: block;
+        }
+        .btn-submit {
+            background: #111;
+            color: #fff;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            background: #333;
+        }
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .error-message.show {
+            display: block;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .success-message.show {
+            display: block;
+        }
+        .location-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 768px) {
+            .salon-request-container {
+                margin: 20px;
+                padding: 20px;
+            }
+            .location-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/" style="text-decoration: none; color: inherit;">
+                    <h2>Skedisy</h2>
+                </a>
+            </div>
+            <div class="nav-menu-center desktop-only" id="categoriesMenu">
+                <!-- Categories will be loaded dynamically -->
+            </div>
+        </div>
+    </nav>
+
+    <div class="salon-request-container">
+        <h1 style="margin-bottom: 10px; font-size: 32px;">Request Adding Your Salon</h1>
+        <p style="color: #666; margin-bottom: 30px;">Fill out the form below to request adding your salon to the Skedisy platform.</p>
+        
+        <div class="success-message" id="successMessage"></div>
+        
+        <form class="salon-request-form" id="salonRequestForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Salon Name *</label>
+                <input type="text" id="name" name="name" required>
+                <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+                <span class="error-message" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="mobile">Mobile Number *</label>
+                <input type="tel" id="mobile" name="mobile" required>
+                <span class="error-message" id="mobileError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address *</label>
+                <textarea id="address" name="address" required></textarea>
+                <span class="error-message" id="addressError"></span>
+            </div>
+
+            <div class="location-group">
+                <div class="form-group">
+                    <label for="latitude">Latitude *</label>
+                    <input type="number" id="latitude" name="latitude" step="any" required>
+                    <span class="error-message" id="latitudeError"></span>
+                    <small style="color: #666; font-size: 12px;">Click "Get Location" to auto-fill</small>
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude *</label>
+                    <input type="number" id="longitude" name="longitude" step="any" required>
+                    <span class="error-message" id="longitudeError"></span>
+                </div>
+            </div>
+
+            <button type="button" id="getLocationBtn" class="btn-submit" style="background: #666; margin-top: -10px;">
+                <i class="fas fa-map-marker-alt"></i> Get My Location
+            </button>
+
+            <div class="form-group">
+                <label for="about">About Your Salon *</label>
+                <textarea id="about" name="about" required placeholder="Describe your salon, services offered, etc."></textarea>
+                <span class="error-message" id="aboutError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="expertCount">Number of Experts/Staff *</label>
+                <input type="number" id="expertCount" name="expertCount" min="1" required>
+                <span class="error-message" id="expertCountError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Salon Image *</label>
+                <div class="file-upload">
+                    <input type="file" id="image" name="image" accept="image/*" required>
+                    <label for="image" class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span id="fileLabel">Choose an image file</span>
+                    </label>
+                </div>
+                <img id="imagePreview" class="file-preview" alt="Preview">
+                <span class="error-message" id="imageError"></span>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Submit Request
+            </button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Get location
+        document.getElementById('getLocationBtn').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('latitude').value = position.coords.latitude;
+                        document.getElementById('longitude').value = position.coords.longitude;
+                    },
+                    function(error) {
+                        alert('Unable to get your location. Please enter manually.');
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser. Please enter manually.');
+            }
+        });
+
+        // Image preview
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.classList.add('show');
+                    document.getElementById('fileLabel').textContent = file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form submission
+        document.getElementById('salonRequestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Hide previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            document.getElementById('successMessage').classList.remove('show');
+            
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const baseURL = window.location.origin;
+                const response = await fetch(`${baseURL}/user/salonrequest/createSalonRequest`, {
+                    method: 'POST',
+                    headers: {
+                        'key': 'r8Cs1WcSI9' // SECRET_KEY from API
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === true) {
+                    document.getElementById('successMessage').textContent = result.message || 'Request submitted successfully! We will contact you soon.';
+                    document.getElementById('successMessage').classList.add('show');
+                    document.getElementById('salonRequestForm').reset();
+                    document.getElementById('imagePreview').classList.remove('show');
+                    document.getElementById('fileLabel').textContent = 'Choose an image file';
+                } else {
+                    // Show error messages
+                    if (result.message) {
+                        alert(result.message);
+                    }
+                    if (result.errors) {
+                        Object.keys(result.errors).forEach(key => {
+                            const errorEl = document.getElementById(key + 'Error');
+                            if (errorEl) {
+                                errorEl.textContent = result.errors[key];
+                                errorEl.classList.add('show');
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Request';
+            }
+        });
+    </script>
+</body>
+</html>
+
