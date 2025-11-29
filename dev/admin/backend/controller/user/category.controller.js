@@ -478,6 +478,7 @@ exports.serveCategoryPage = async (req, res) => {
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="${baseURL}/styles.css">
     <style>
         * {
             margin: 0;
@@ -636,6 +637,63 @@ exports.serveCategoryPage = async (req, res) => {
     </style>
 </head>
 <body>
+    <!-- Login Button Above QR Code -->
+    <div class="login-above-qr">
+        <a href="${baseURL}/salonpanel/" class="btn-login-above">Login</a>
+    </div>
+    
+    <!-- QR Code Top Right Floating -->
+    <div class="qr-topright">
+        <div class="qr-top-flex">
+            <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
+                <div id="qr-customer-top"></div>
+                <div class="qr-label">Download Customer App</div>
+            </div>
+            <div class="qr-top-block" data-app-type="expert" onclick="openPhoneSelection('expert')">
+                <div id="qr-expert-top"></div>
+                <div class="qr-label">Download the Expert App</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="${baseURL}" style="text-decoration: none; color: inherit;">
+                    <h2>Skedisy</h2>
+                </a>
+            </div>
+            <!-- Desktop Categories Menu -->
+            <div class="nav-menu-center desktop-only" id="categoriesMenu">
+                <!-- Categories will be loaded dynamically -->
+            </div>
+            <!-- Mobile Menu - Hamburger positioned where login button was -->
+            <div class="mobile-menu-wrapper">
+                <div class="hamburger mobile-only" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Slide-in Menu -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3>Menu</h3>
+                <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+            </div>
+            <div class="mobile-menu-content">
+                <!-- Mobile Login Button -->
+                <a href="${baseURL}/salonpanel/" class="btn-login-mobile-menu">Login</a>
+                <div class="mobile-categories" id="mobileCategories">
+                    <!-- Categories will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </nav>
+    
     <div class="category-header">
         <div class="category-header-content">
             <h1 class="category-title">${category.name}</h1>
@@ -736,6 +794,7 @@ exports.serveCategoryPage = async (req, res) => {
             }).join('');
         }
     </script>
+    <script src="${baseURL}/script.js"></script>
 </body>
 </html>`;
 
