@@ -116,23 +116,26 @@ class BranchDetailTopView extends StatelessWidget {
           preferredSize: const Size.fromHeight(230),
           child: Stack(
             children: [
-              // Container with padding to center the dashed box
+              // Container with padding to center the photo box
               Container(
                 height: Get.height * 0.3,
                 width: Get.width,
                 decoration: BoxDecoration(
-                  color: AppColors.transparent,
+                  color: AppColors.whiteColor,
                 ),
-                child: Center(
+                child: Align(
+                  alignment: Alignment.center,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 20),
-                    child: DottedBorder(
-                      color: AppColors.roundBorder,
-                      borderType: BorderType.RRect,
-                      radius: const Radius.circular(12),
-                      strokeWidth: 1.5,
-                      dashPattern: const [5, 5],
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 40, bottom: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.roundBorder,
+                          width: 1.5,
+                        ),
+                      ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: CachedNetworkImage(
@@ -837,40 +840,37 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                 ),
                                 child: Column(
                                   children: [
-                                    // Service image with dashed square border (similar to personnel but square)
+                                    // Service image with solid square border
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 15),
                                       alignment: Alignment.center,
-                                      child: DottedBorder(
-                                        color: AppColors.roundBorder,
-                                        borderType: BorderType.RRect,
-                                        radius: const Radius.circular(12),
-                                        strokeWidth: 1,
-                                        dashPattern: const [3, 3],
-                                        child: Container(
-                                          height: 80,
-                                          width: 80,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                      child: Container(
+                                        height: 80,
+                                        width: 80,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: AppColors.roundBorder,
+                                            width: 1,
                                           ),
-                                          clipBehavior: Clip.hardEdge,
-                                          child: CachedNetworkImage(
-                                            imageUrl:
-                                                "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) {
-                                              return Image.asset(AppAsset
-                                                      .icServicePlaceholder)
-                                                  .paddingAll(11);
-                                            },
-                                            errorWidget: (context, url, error) {
-                                              return Image.asset(AppAsset
-                                                      .icServicePlaceholder)
-                                                  .paddingAll(11);
-                                            },
-                                          ),
+                                        ),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) {
+                                            return Image.asset(AppAsset
+                                                    .icServicePlaceholder)
+                                                .paddingAll(11);
+                                          },
+                                          errorWidget: (context, url, error) {
+                                            return Image.asset(AppAsset
+                                                    .icServicePlaceholder)
+                                                .paddingAll(11);
+                                          },
                                         ),
                                       ),
                                     ),
@@ -1059,37 +1059,34 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                                 const Spacer(),
                                 const Spacer(),
                                 const Spacer(),
-                                // Product image with dashed square border (similar to services)
+                                // Product image with solid square border
                                 Center(
-                                  child: DottedBorder(
-                                    color: AppColors.roundBorder,
-                                    borderType: BorderType.RRect,
-                                    radius: const Radius.circular(12),
-                                    strokeWidth: 1,
-                                    dashPattern: const [3, 3],
-                                    child: Container(
-                                      height: 80,
-                                      width: 80,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    height: 80,
+                                    width: 80,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: AppColors.roundBorder,
+                                        width: 1,
                                       ),
-                                      clipBehavior: Clip.hardEdge,
-                                      child: CachedNetworkImage(
-                                        imageUrl: logic.getSalonDetailCategory
-                                                ?.product?[index].mainImage ??
-                                            "",
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) {
-                                          return Image.asset(
-                                                  AppAsset.icImagePlaceholder)
-                                              .paddingAll(25);
-                                        },
-                                        errorWidget: (context, url, error) {
-                                          return Image.asset(
-                                                  AppAsset.icImagePlaceholder)
-                                              .paddingAll(30);
-                                        },
-                                      ),
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
+                                    child: CachedNetworkImage(
+                                      imageUrl: logic.getSalonDetailCategory
+                                              ?.product?[index].mainImage ??
+                                          "",
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) {
+                                        return Image.asset(
+                                                AppAsset.icImagePlaceholder)
+                                            .paddingAll(25);
+                                      },
+                                      errorWidget: (context, url, error) {
+                                        return Image.asset(
+                                                AppAsset.icImagePlaceholder)
+                                            .paddingAll(30);
+                                      },
                                     ),
                                   ),
                                 ),

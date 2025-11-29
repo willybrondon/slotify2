@@ -129,7 +129,7 @@ class BookingScreenController extends GetxController {
 
   void selectVenue(String venue) {
     selectedVenue = venue;
-    update([Constant.idProgressView, Constant.idConfirm]);
+    update([Constant.idProgressView, Constant.idConfirm, Constant.idCurrentStep]);
   }
 
   void onAddressSelected() {
@@ -162,14 +162,23 @@ class BookingScreenController extends GetxController {
             homeScreenController.getExpertCategory!.data!.expert!.salonId!.name;
         log("Salon name from home controller: $salonName");
       }
+    } else {
+      // When coming from salon detail (not from expert), ensure currentStep is 0
+      currentStep = 0;
+      stepCount = 0;
     }
 
     // Salon address will be fetched from API when needed
 
     onCheckBoxClick();
     onGetSlotsList();
-    update(
-        [Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
+    update([
+      Constant.idServiceList,
+      Constant.idBottomService,
+      Constant.idConfirm,
+      Constant.idCurrentStep,
+      Constant.idProgressView
+    ]);
 
     Stripe.publishableKey =
         splashController.settingCategory?.setting?.stripePublishableKey ?? "";

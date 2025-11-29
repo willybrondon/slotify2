@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/random_color_generator/random_color_generator.dart';
@@ -28,18 +27,21 @@ class ProviderDetailAppBarView extends StatelessWidget {
               height: Get.height * 0.3,
               width: Get.width,
               decoration: BoxDecoration(
-                color: AppColors.transparent,
+                color: AppColors.whiteColor,
               ),
-              child: Center(
+              child: Align(
+                alignment: Alignment.center,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  child: DottedBorder(
-                    color: AppColors.roundBorder,
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(12),
-                    strokeWidth: 1.5,
-                    dashPattern: const [5, 5],
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 20, top: 40, bottom: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.roundBorder,
+                        width: 1.5,
+                      ),
+                    ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: CachedNetworkImage(
