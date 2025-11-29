@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/random_color_generator/random_color_generator.dart';
@@ -24,49 +25,122 @@ class ProviderDetailAppBarView extends StatelessWidget {
           id: Constant.idProgressView,
           builder: (logic) {
             return Container(
-              height: Get.height * 0.35,
+              height: Get.height * 0.3,
               width: Get.width,
               decoration: BoxDecoration(
-                color: AppColors.currencyGrey.withOpacity(0.5),
+                color: AppColors.transparent,
               ),
-              child: CachedNetworkImage(
-                imageUrl: logic.getProductDetailModel?.product?.mainImage ?? "",
-                fit: BoxFit.cover,
-                placeholder: (context, url) {
-                  return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
-                },
-                errorWidget: (context, url, error) {
-                  return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
-                },
+              child: Center(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: DottedBorder(
+                    color: AppColors.roundBorder,
+                    borderType: BorderType.RRect,
+                    radius: const Radius.circular(12),
+                    strokeWidth: 1.5,
+                    dashPattern: const [5, 5],
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            logic.getProductDetailModel?.product?.mainImage ??
+                                "",
+                        fit: BoxFit.cover,
+                        width: Get.width * 0.85,
+                        height: Get.height * 0.25,
+                        placeholder: (context, url) {
+                          return Container(
+                            width: Get.width * 0.85,
+                            height: Get.height * 0.25,
+                            color: AppColors.grey.withOpacity(0.2),
+                            child: Center(
+                              child: Image.asset(AppAsset.icImagePlaceholder)
+                                  .paddingAll(25),
+                            ),
+                          );
+                        },
+                        errorWidget: (context, url, error) {
+                          return Container(
+                            width: Get.width * 0.85,
+                            height: Get.height * 0.25,
+                            color: AppColors.grey.withOpacity(0.2),
+                            child: Center(
+                              child: Image.asset(AppAsset.icImagePlaceholder)
+                                  .paddingAll(30),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
               ),
             );
           },
         ),
-        GestureDetector(
-          onTap: () {
-            Get.back();
-          },
-          child: Image.asset(
-            AppAsset.icBack,
-            height: 35,
-          ).paddingOnly(top: 30, left: 15),
-        ),
-        Align(
-          alignment: Alignment.topRight,
-          child: GetBuilder<ProductDetailController>(
-            id: Constant.idProgressView,
-            builder: (logic) {
-              return logic.getProductDetailModel?.product?.isFavourite == true
-                  ? Image.asset(
-                      AppAsset.icLikeFilled,
-                      height: 35,
-                    ).paddingOnly(top: 30, right: 15)
-                  : Image.asset(
-                      AppAsset.icLikeOutline,
-                      height: 35,
-                    ).paddingOnly(top: 30, right: 15);
-            },
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.blackColor.withOpacity(0.1),
+                      offset: const Offset(0, 2),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  AppAsset.icBackArrow,
+                  height: 20,
+                  width: 20,
+                  color: AppColors.blackColor,
+                ),
+              ),
+            ).paddingOnly(left: 15, right: 12, top: 30),
+            GetBuilder<ProductDetailController>(
+              id: Constant.idProgressView,
+              builder: (logic) {
+                return Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.whiteColor,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.blackColor.withOpacity(0.1),
+                        offset: const Offset(0, 2),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                  child:
+                      logic.getProductDetailModel?.product?.isFavourite == true
+                          ? Image.asset(
+                              AppAsset.icLikeFilled,
+                              height: 22,
+                              width: 22,
+                              color: AppColors.blackColor,
+                            )
+                          : Image.asset(
+                              AppAsset.icLikeOutline,
+                              height: 22,
+                              width: 22,
+                              color: AppColors.blackColor,
+                            ),
+                ).paddingOnly(right: 15, top: 30);
+              },
+            ),
+          ],
         ),
       ],
     );
@@ -109,7 +183,8 @@ class ProductDetailNameView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              Constant.capitalizeFirstLetter(logic.getProductDetailModel?.product?.productName ?? ""),
+              Constant.capitalizeFirstLetter(
+                  logic.getProductDetailModel?.product?.productName ?? ""),
               style: TextStyle(
                 fontFamily: AppFontFamily.heeBo700,
                 fontSize: 19,
@@ -120,11 +195,13 @@ class ProductDetailNameView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.orangeBg,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.orange.withOpacity(0.04), width: 1),
+                border: Border.all(
+                    color: AppColors.orange.withOpacity(0.04), width: 1),
               ),
               padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 9),
               child: Text(
-                logic.getProductDetailModel?.product?.brand?.toUpperCase() ?? "",
+                logic.getProductDetailModel?.product?.brand?.toUpperCase() ??
+                    "",
                 style: TextStyle(
                   fontFamily: AppFontFamily.heeBo600,
                   fontSize: 14,
@@ -139,7 +216,8 @@ class ProductDetailNameView extends StatelessWidget {
                     color: AppColors.primaryAppColor,
                     borderRadius: BorderRadius.circular(36),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
                   child: Text(
                     "$currency ${logic.getProductDetailModel?.product?.price ?? ""}",
                     style: TextStyle(
@@ -217,7 +295,8 @@ class ProductDetailNameView extends StatelessWidget {
                 ),
               ],
             ).paddingOnly(top: 10),
-            Divider(color: AppColors.grey.withOpacity(0.2)).paddingOnly(top: 10, bottom: 10),
+            Divider(color: AppColors.grey.withOpacity(0.2))
+                .paddingOnly(top: 10, bottom: 10),
           ],
         ).paddingOnly(left: 15, right: 15, top: 15);
       },
@@ -241,7 +320,8 @@ class ProductDetailSelectSizeView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ViewAll(
-                          title: "Select Product ${attributes.name!.capitalizeFirst.toString()}",
+                          title:
+                              "Select Product ${attributes.name!.capitalizeFirst.toString()}",
                           subtitle: "",
                           fontSize: 14,
                           fontFamily: AppFontFamily.heeBo700,
@@ -252,33 +332,48 @@ class ProductDetailSelectSizeView extends StatelessWidget {
                           children: attributes.value!.map(
                             (value) {
                               return FilterChip(
-                                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 3, horizontal: 4),
                                 onSelected: (selected) {
-                                  logic.onAttributeSelect(value, attributes.name.toString(), attributes.id.toString());
+                                  logic.onAttributeSelect(
+                                      value,
+                                      attributes.name.toString(),
+                                      attributes.id.toString());
 
                                   log("Selected :: $selected Value :: $value Attribute Name :: ${attributes.name} Attribute Id :: ${attributes.id}");
                                   log("Selected Values By Type :: ${logic.selectedValuesByName}");
                                 },
-                                backgroundColor: logic.selectedValuesByName.containsKey(attributes.name) &&
-                                        logic.selectedValuesByName[attributes.name]!.contains(value)
+                                backgroundColor: logic.selectedValuesByName
+                                            .containsKey(attributes.name) &&
+                                        logic.selectedValuesByName[
+                                                attributes.name]!
+                                            .contains(value)
                                     ? AppColors.primaryAppColor
                                     : AppColors.whiteColor,
                                 side: BorderSide(
                                   width: 0,
-                                  color: logic.selectedValuesByName.containsKey(attributes.name) &&
-                                          logic.selectedValuesByName[attributes.name]!.contains(value)
+                                  color: logic.selectedValuesByName
+                                              .containsKey(attributes.name) &&
+                                          logic.selectedValuesByName[
+                                                  attributes.name]!
+                                              .contains(value)
                                       ? AppColors.primaryAppColor
                                       : AppColors.whiteColor,
                                 ),
                                 label: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8, horizontal: 10),
                                   child: Text(
                                     value,
                                     style: TextStyle(
                                       fontFamily: AppFontFamily.heeBo700,
                                       fontSize: 13,
-                                      color: logic.selectedValuesByName.containsKey(attributes.name) &&
-                                              logic.selectedValuesByName[attributes.name]!.contains(value)
+                                      color: logic.selectedValuesByName
+                                                  .containsKey(
+                                                      attributes.name) &&
+                                              logic.selectedValuesByName[
+                                                      attributes.name]!
+                                                  .contains(value)
                                           ? AppColors.whiteColor
                                           : AppColors.greyText,
                                     ),
@@ -464,15 +559,21 @@ class ProductDetailRatingView extends StatelessWidget {
                         Container(
                           height: 28,
                           width: 28,
-                          decoration: BoxDecoration(color: AppColors.brandColor, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                              color: AppColors.brandColor,
+                              shape: BoxShape.circle),
                           child: CachedNetworkImage(
-                            imageUrl: logic.getProductDetailModel?.reviews?.first.userId?.image ?? "",
+                            imageUrl: logic.getProductDetailModel?.reviews
+                                    ?.first.userId?.image ??
+                                "",
                             fit: BoxFit.cover,
                             placeholder: (context, url) {
-                              return Image.asset(AppAsset.icImagePlaceholder).paddingAll(2);
+                              return Image.asset(AppAsset.icImagePlaceholder)
+                                  .paddingAll(2);
                             },
                             errorWidget: (context, url, error) {
-                              return Image.asset(AppAsset.icImagePlaceholder).paddingAll(2);
+                              return Image.asset(AppAsset.icImagePlaceholder)
+                                  .paddingAll(2);
                             },
                           ),
                         ),
@@ -490,8 +591,13 @@ class ProductDetailRatingView extends StatelessWidget {
                             SizedBox(
                               width: Get.width * 0.75,
                               child: Text(
-                                Constant.capitalizeFirstLetter(
-                                    logic.getProductDetailModel?.reviews?.first.review.toString() ?? ""),
+                                Constant.capitalizeFirstLetter(logic
+                                        .getProductDetailModel
+                                        ?.reviews
+                                        ?.first
+                                        .review
+                                        .toString() ??
+                                    ""),
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 11.5,
@@ -503,9 +609,12 @@ class ProductDetailRatingView extends StatelessWidget {
                           ],
                         ),
                         const Spacer(),
-                        Image.asset(AppAsset.icRedStar, height: 10, color: AppColors.yellow3),
+                        Image.asset(AppAsset.icRedStar,
+                            height: 10, color: AppColors.yellow3),
                         Text(
-                          logic.getProductDetailModel?.reviews?.first.rating?.toStringAsFixed(1) ?? "",
+                          logic.getProductDetailModel?.reviews?.first.rating
+                                  ?.toStringAsFixed(1) ??
+                              "",
                           style: TextStyle(
                             fontFamily: AppFontFamily.heeBo700,
                             fontSize: 10,
@@ -546,7 +655,8 @@ class ProductDetailPopularProductView extends StatelessWidget {
               physics: const ScrollPhysics(),
               padding: EdgeInsets.zero,
               shrinkWrap: true,
-              itemCount: logic.getProductDetailModel?.popularProducts?.length ?? 0,
+              itemCount:
+                  logic.getProductDetailModel?.popularProducts?.length ?? 0,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 childAspectRatio: 0.75,
@@ -557,7 +667,9 @@ class ProductDetailPopularProductView extends StatelessWidget {
                   onTap: () {
                     logic.onGetProductDetailApiCall(
                       userId: Constant.storage.read<String>('userId') ?? "",
-                      productId: logic.getProductDetailModel?.popularProducts?[index].id ?? "",
+                      productId: logic.getProductDetailModel
+                              ?.popularProducts?[index].id ??
+                          "",
                     );
                   },
                   child: Container(
@@ -579,22 +691,29 @@ class ProductDetailPopularProductView extends StatelessWidget {
                             const Spacer(),
                             const Spacer(),
                             CachedNetworkImage(
-                              imageUrl: logic.getProductDetailModel?.popularProducts?[index].mainImage ?? "",
+                              imageUrl: logic.getProductDetailModel
+                                      ?.popularProducts?[index].mainImage ??
+                                  "",
                               fit: BoxFit.cover,
                               height: 85,
                               placeholder: (context, url) {
-                                return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                return Image.asset(AppAsset.icImagePlaceholder)
+                                    .paddingAll(25);
                               },
                               errorWidget: (context, url, error) {
-                                return Image.asset(AppAsset.icImagePlaceholder).paddingAll(25);
+                                return Image.asset(AppAsset.icImagePlaceholder)
+                                    .paddingAll(25);
                               },
                             ),
                             const Spacer(),
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                Constant.capitalizeFirstLetter(
-                                    logic.getProductDetailModel?.popularProducts?[index].productName ?? ""),
+                                Constant.capitalizeFirstLetter(logic
+                                        .getProductDetailModel
+                                        ?.popularProducts?[index]
+                                        .productName ??
+                                    ""),
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontFamily: AppFontFamily.heeBo700,
@@ -629,7 +748,9 @@ class ProductDetailPopularProductView extends StatelessWidget {
                             ).paddingOnly(left: 12, right: 12, bottom: 12),
                           ],
                         ),
-                        logic.getProductDetailModel?.popularProducts?[index].isFavorite == true
+                        logic.getProductDetailModel?.popularProducts?[index]
+                                    .isFavorite ==
+                                true
                             ? Container(
                                 height: 22,
                                 width: Get.width * 0.17,
@@ -658,9 +779,13 @@ class ProductDetailPopularProductView extends StatelessWidget {
                           top: 6,
                           child: Row(
                             children: [
-                              Image.asset(AppAsset.icRedStar, height: 10, color: AppColors.yellow3),
+                              Image.asset(AppAsset.icRedStar,
+                                  height: 10, color: AppColors.yellow3),
                               Text(
-                                logic.getProductDetailModel?.popularProducts?[index].rating?.toStringAsFixed(1) ?? "",
+                                logic.getProductDetailModel
+                                        ?.popularProducts?[index].rating
+                                        ?.toStringAsFixed(1) ??
+                                    "",
                                 style: TextStyle(
                                   fontFamily: AppFontFamily.heeBo700,
                                   fontSize: 10,
@@ -722,13 +847,19 @@ class ProductDetailBottomView extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(44),
-                      color: logic.isAnyAttributeSelected() ? AppColors.primaryAppColor : AppColors.grey.withOpacity(0.4),
+                      color: logic.isAnyAttributeSelected()
+                          ? AppColors.primaryAppColor
+                          : AppColors.grey.withOpacity(0.4),
                     ),
                     child: Center(
                       child: Text(
-                        logic.addCartModel?.status == true ? "txtGoToCart".tr : "txtAddToCart".tr,
+                        logic.addCartModel?.status == true
+                            ? "txtGoToCart".tr
+                            : "txtAddToCart".tr,
                         style: TextStyle(
-                          color: logic.isAnyAttributeSelected() ? AppColors.whiteColor : AppColors.grey,
+                          color: logic.isAnyAttributeSelected()
+                              ? AppColors.whiteColor
+                              : AppColors.grey,
                           fontFamily: AppFontFamily.heeBo700,
                           fontSize: 16,
                         ),
@@ -746,13 +877,17 @@ class ProductDetailBottomView extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(44),
-                      color: logic.isAnyAttributeSelected() ? AppColors.primaryAppColor : AppColors.grey.withOpacity(0.4),
+                      color: logic.isAnyAttributeSelected()
+                          ? AppColors.primaryAppColor
+                          : AppColors.grey.withOpacity(0.4),
                     ),
                     child: Center(
                       child: Text(
                         "txtContinue".tr,
                         style: TextStyle(
-                          color: logic.isAnyAttributeSelected() ? AppColors.whiteColor : AppColors.grey,
+                          color: logic.isAnyAttributeSelected()
+                              ? AppColors.whiteColor
+                              : AppColors.grey,
                           fontFamily: AppFontFamily.heeBo700,
                           fontSize: 16,
                         ),

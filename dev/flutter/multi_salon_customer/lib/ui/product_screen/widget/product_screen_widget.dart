@@ -210,19 +210,32 @@ class ProductProductCategoryView extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
-                            color: RandomColorGenerator.getRandomColor(),
+                            color: AppColors.whiteColor,
                             boxShadow: Constant.boxShadow,
                             border: Border.all(
                               color: AppColors.grey.withOpacity(0.1),
                               width: 1,
                             ),
                           ),
-                          clipBehavior: Clip.hardEdge,
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Expanded(
-                                child: AspectRatio(
-                                  aspectRatio: 1.2,
+                              // Category image in small square container with solid border
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 15),
+                                alignment: Alignment.center,
+                                child: Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppColors.roundBorder,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
                                   child: CachedNetworkImage(
                                     imageUrl: logic.getProductCategoryModel
                                             ?.data?[index].image ??
@@ -231,39 +244,35 @@ class ProductProductCategoryView extends StatelessWidget {
                                     placeholder: (context, url) {
                                       return Image.asset(
                                               AppAsset.icImagePlaceholder)
-                                          .paddingAll(10);
+                                          .paddingAll(11);
                                     },
                                     errorWidget: (context, url, error) {
                                       return Image.asset(
                                               AppAsset.icImagePlaceholder)
-                                          .paddingAll(10);
+                                          .paddingAll(11);
                                     },
                                   ),
                                 ),
                               ),
-                              Container(
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: AppColors.whiteColor,
-                                  borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(14),
-                                    bottomRight: Radius.circular(14),
+                              SizedBox(height: Get.height * 0.01),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  logic.getProductCategoryModel?.data?[index]
+                                          .name ??
+                                      "",
+                                  maxLines: 2,
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.heeBo700,
+                                    fontSize: 12.5,
+                                    color: AppColors.appText,
                                   ),
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    logic.getProductCategoryModel?.data?[index]
-                                            .name ??
-                                        "",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontFamily: AppFontFamily.heeBo700,
-                                      fontSize: 12.5,
-                                      color: AppColors.appText,
-                                    ),
-                                  ).paddingOnly(left: 7, right: 7),
-                                ),
                               ),
+                              SizedBox(height: Get.height * 0.01),
                             ],
                           ),
                         ).paddingOnly(bottom: 8),
