@@ -7,5 +7,6 @@ const checkAccessWithSecretKey = require("../../middleware/checkAccess");
 
 
 route.get('/getForUser', checkAccessWithSecretKey(), notificationController.getNotificationForUser)
+route.delete('/delete', checkAccessWithSecretKey(), notificationController.deleteNotification)
 
 module.exports = route;

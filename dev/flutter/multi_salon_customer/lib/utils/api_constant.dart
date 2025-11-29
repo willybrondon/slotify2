@@ -89,6 +89,7 @@ class ApiConstant {
 
   /// ---------- Notification ---------- ///
   static const getAllNotification = "user/notification/getForUser?";
+  static const deleteNotification = "user/notification/delete?";
 
   /// ---------- Setting ---------- ///
   static const setting = "user/setting/get";

@@ -146,6 +146,18 @@ class NotificationScreen extends StatelessWidget {
 
                                                     log("Formatted time: ${logic.formattedTime}");
 
+                                                    final notificationId = logic
+                                                            .notificationCategory
+                                                            ?.notification?[
+                                                                index]
+                                                            .id ??
+                                                        "";
+                                                    final userId = Constant
+                                                            .storage
+                                                            .read<String>(
+                                                                'userId') ??
+                                                        "";
+
                                                     return AnimationConfiguration
                                                         .staggeredGrid(
                                                       position: index,
@@ -158,153 +170,189 @@ class NotificationScreen extends StatelessWidget {
                                                           0,
                                                       child: SlideAnimation(
                                                         child: FadeInAnimation(
-                                                          child: Container(
-                                                            width: Get.width,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    color: AppColors
-                                                                        .whiteColor,
-                                                                    border:
-                                                                        Border
-                                                                            .all(
+                                                          child: Dismissible(
+                                                            key: Key(
+                                                                notificationId),
+                                                            direction:
+                                                                DismissDirection
+                                                                    .endToStart,
+                                                            background:
+                                                                Container(
+                                                              alignment: Alignment
+                                                                  .centerRight,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      right:
+                                                                          20),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color:
+                                                                    Colors.red,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15),
+                                                              ),
+                                                              child: const Icon(
+                                                                Icons.delete,
+                                                                color: Colors
+                                                                    .white,
+                                                                size: 30,
+                                                              ),
+                                                            ),
+                                                            onDismissed:
+                                                                (direction) {
+                                                              logic
+                                                                  .onDeleteNotificationApiCall(
+                                                                notificationId:
+                                                                    notificationId,
+                                                                userId: userId,
+                                                                index: index,
+                                                              );
+                                                            },
+                                                            child: Container(
+                                                              width: Get.width,
+                                                              decoration:
+                                                                  BoxDecoration(
                                                                       color: AppColors
-                                                                          .grey
-                                                                          .withOpacity(
-                                                                              0.1),
-                                                                      width: 1,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            15)),
-                                                            margin:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    bottom: 10),
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    right: 10,
-                                                                    top: 7,
-                                                                    bottom: 7),
-                                                            child: Row(
-                                                              children: [
-                                                                DottedBorder(
-                                                                  color: AppColors
-                                                                      .roundBorder,
-                                                                  borderType:
-                                                                      BorderType
-                                                                          .RRect,
-                                                                  radius: const Radius
-                                                                      .circular(
-                                                                      35),
-                                                                  strokeWidth:
-                                                                      1,
-                                                                  dashPattern: const [
-                                                                    2.5,
-                                                                    2.5
-                                                                  ],
-                                                                  child:
-                                                                      Container(
-                                                                    height: 55,
-                                                                    width: 55,
-                                                                    decoration:
-                                                                        const BoxDecoration(
-                                                                            shape:
-                                                                                BoxShape.circle),
-                                                                    clipBehavior:
-                                                                        Clip.hardEdge,
+                                                                          .whiteColor,
+                                                                      border:
+                                                                          Border
+                                                                              .all(
+                                                                        color: AppColors
+                                                                            .grey
+                                                                            .withOpacity(0.1),
+                                                                        width:
+                                                                            1,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15)),
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      bottom:
+                                                                          10),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      right: 10,
+                                                                      top: 7,
+                                                                      bottom:
+                                                                          7),
+                                                              child: Row(
+                                                                children: [
+                                                                  DottedBorder(
+                                                                    color: AppColors
+                                                                        .roundBorder,
+                                                                    borderType:
+                                                                        BorderType
+                                                                            .RRect,
+                                                                    radius: const Radius
+                                                                        .circular(
+                                                                        35),
+                                                                    strokeWidth:
+                                                                        1,
+                                                                    dashPattern: const [
+                                                                      2.5,
+                                                                      2.5
+                                                                    ],
                                                                     child:
-                                                                        CachedNetworkImage(
-                                                                      imageUrl: logic
-                                                                              .notificationCategory
-                                                                              ?.notification?[index]
-                                                                              .image ??
-                                                                          "",
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                      placeholder:
-                                                                          (context,
-                                                                              url) {
-                                                                        return Image.asset(AppAsset.icImagePlaceholder)
-                                                                            .paddingAll(10);
-                                                                      },
-                                                                      errorWidget:
-                                                                          (context,
-                                                                              url,
-                                                                              error) {
-                                                                        return Image.asset(AppAsset.icImagePlaceholder)
-                                                                            .paddingAll(10);
-                                                                      },
+                                                                        Container(
+                                                                      height:
+                                                                          55,
+                                                                      width: 55,
+                                                                      decoration:
+                                                                          const BoxDecoration(
+                                                                              shape: BoxShape.circle),
+                                                                      clipBehavior:
+                                                                          Clip.hardEdge,
+                                                                      child:
+                                                                          CachedNetworkImage(
+                                                                        imageUrl:
+                                                                            logic.notificationCategory?.notification?[index].image ??
+                                                                                "",
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                        placeholder:
+                                                                            (context,
+                                                                                url) {
+                                                                          return Image.asset(AppAsset.icImagePlaceholder)
+                                                                              .paddingAll(10);
+                                                                        },
+                                                                        errorWidget: (context,
+                                                                            url,
+                                                                            error) {
+                                                                          return Image.asset(AppAsset.icImagePlaceholder)
+                                                                              .paddingAll(10);
+                                                                        },
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ).paddingOnly(
-                                                                    left: 10,
-                                                                    right: 10),
-                                                                Expanded(
-                                                                  child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Text(
-                                                                        logic.notificationCategory?.notification?[index].title ??
-                                                                            "",
-                                                                        style: TextStyle(
-                                                                            color: AppColors
-                                                                                .primaryTextColor,
-                                                                            fontSize:
-                                                                                16,
-                                                                            fontFamily:
-                                                                                AppFontFamily.sfProDisplayBold),
-                                                                      ).paddingOnly(
-                                                                          bottom:
-                                                                              4),
-                                                                      SizedBox(
-                                                                        width: Get.width *
-                                                                            0.85,
-                                                                        child:
-                                                                            Text(
-                                                                          logic.notificationCategory?.notification?[index].message ??
+                                                                  ).paddingOnly(
+                                                                      left: 10,
+                                                                      right:
+                                                                          10),
+                                                                  Expanded(
+                                                                    child:
+                                                                        Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        Text(
+                                                                          logic.notificationCategory?.notification?[index].title ??
                                                                               "",
-                                                                          maxLines:
-                                                                              2,
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                AppColors.service,
-                                                                            fontSize:
-                                                                                13,
-                                                                            fontFamily:
-                                                                                AppFontFamily.sfProDisplayMedium,
-                                                                            overflow:
-                                                                                TextOverflow.ellipsis,
+                                                                          style: TextStyle(
+                                                                              color: AppColors.primaryTextColor,
+                                                                              fontSize: 16,
+                                                                              fontFamily: AppFontFamily.sfProDisplayBold),
+                                                                        ).paddingOnly(
+                                                                            bottom:
+                                                                                4),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              Get.width * 0.85,
+                                                                          child:
+                                                                              Text(
+                                                                            logic.notificationCategory?.notification?[index].message ??
+                                                                                "",
+                                                                            maxLines:
+                                                                                2,
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: AppColors.service,
+                                                                              fontSize: 13,
+                                                                              fontFamily: AppFontFamily.sfProDisplayMedium,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                            ),
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                    ],
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                                Align(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .bottomRight,
-                                                                  child: Text(
-                                                                    "${logic.date}  ${logic.formattedTime}",
-                                                                    style: TextStyle(
-                                                                        color: AppColors
-                                                                            .roundBorder,
-                                                                        fontSize:
-                                                                            10,
-                                                                        fontFamily:
-                                                                            AppFontFamily.sfProDisplay),
-                                                                  ).paddingOnly(
-                                                                      bottom:
-                                                                          3),
-                                                                ),
-                                                              ],
+                                                                  Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .bottomRight,
+                                                                    child: Text(
+                                                                      "${logic.date}  ${logic.formattedTime}",
+                                                                      style: TextStyle(
+                                                                          color: AppColors
+                                                                              .roundBorder,
+                                                                          fontSize:
+                                                                              10,
+                                                                          fontFamily:
+                                                                              AppFontFamily.sfProDisplay),
+                                                                    ).paddingOnly(
+                                                                        bottom:
+                                                                            3),
+                                                                  ),
+                                                                ],
+                                                              ),
                                                             ),
                                                           ),
                                                         ),

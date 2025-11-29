@@ -27,7 +27,8 @@ class NotificationController extends GetxController {
   @override
   void onInit() {
     log("Enter Notification Controller");
-    onGetNotificationApiCall(userId: Constant.storage.read<String>('userId') ?? "");
+    onGetNotificationApiCall(
+        userId: Constant.storage.read<String>('userId') ?? "");
     super.onInit();
   }
 
@@ -44,11 +45,15 @@ class NotificationController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getAllNotification + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getAllNotification + queryString);
 
       log("Get All Notification Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get All Notification Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -68,6 +73,59 @@ class NotificationController extends GetxController {
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idServiceList]);
+    }
+  }
+
+  onDeleteNotificationApiCall(
+      {required String notificationId,
+      required String userId,
+      required int index}) async {
+    try {
+      final queryParameters = {
+        "notificationId": notificationId,
+        "userId": userId,
+      };
+
+      log("Delete Notification Parameters :: $queryParameters");
+
+      String queryString = Uri(queryParameters: queryParameters).query;
+
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.deleteNotification + queryString);
+
+      log("Delete Notification Url :: $url");
+
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
+      log("Delete Notification Headers :: $headers");
+
+      final response = await http.delete(url, headers: headers);
+
+      log("Delete Notification StatusCode :: ${response.statusCode}");
+      log("Delete Notification Body :: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == true) {
+          // Remove notification from local list
+          if (notificationCategory?.notification != null &&
+              index < notificationCategory!.notification!.length) {
+            notificationCategory!.notification!.removeAt(index);
+            update([Constant.idProgressView]);
+            Utils.showToast(Get.context!, "Notification deleted successfully");
+          }
+        } else {
+          Utils.showToast(Get.context!,
+              jsonResponse['message'] ?? "Failed to delete notification");
+        }
+      }
+    } on AppException catch (exception) {
+      Utils.showToast(Get.context!, exception.message);
+    } catch (e) {
+      log("Error call Delete Notification Api :: $e");
+      Utils.showToast(Get.context!, "Error deleting notification");
     }
   }
 }

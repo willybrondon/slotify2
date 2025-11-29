@@ -388,7 +388,7 @@ html {
 
 /* Hero Section */
 .hero {
-    padding: 120px 0 64px;
+    padding: 120px 0 0;
     background: #000000;
     color: white;
     min-height: 100vh;
@@ -1265,7 +1265,7 @@ html {
     }
 
     .hero {
-        padding: 100px 0 64px;
+        padding: 100px 0 0;
         text-align: center;
         justify-content: center;
     }
