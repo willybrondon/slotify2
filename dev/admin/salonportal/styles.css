@@ -21,6 +21,13 @@ body {
     overflow-x: hidden;
 }
 
+body.menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
 html {
     overflow-x: hidden;
 }
@@ -201,7 +208,7 @@ html {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 9998;
+    z-index: 99998;
     opacity: 0;
     transition: opacity 0.3s ease;
     visibility: hidden;
@@ -214,20 +221,20 @@ html {
 }
 
 .mobile-menu {
-    position: fixed;
-    top: 0;
+    position: fixed !important;
+    top: 0 !important;
     right: -100%;
     width: 85%;
     max-width: 320px;
-    height: 100%;
-    background: #fff;
+    height: 100% !important;
+    background: #fff !important;
     box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-    z-index: 9999;
+    z-index: 99999 !important;
     transition: right 0.3s ease;
     overflow: hidden;
-    display: flex;
+    display: flex !important;
     flex-direction: column;
-    visibility: visible;
+    visibility: visible !important;
 }
 
 .mobile-menu.active {
@@ -235,7 +242,7 @@ html {
 }
 
 .mobile-menu-header {
-    display: flex;
+    display: flex !important;
     justify-content: space-between;
     align-items: center;
     padding: 20px;
@@ -243,6 +250,8 @@ html {
     background: #111;
     color: #fff;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .mobile-menu-header h3 {
@@ -272,13 +281,15 @@ html {
 
 .mobile-menu-content {
     padding: 20px;
-    display: flex;
+    display: flex !important;
     flex-direction: column;
-    visibility: visible;
+    visibility: visible !important;
     min-height: auto;
     overflow-y: auto;
     flex: 1;
     gap: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .btn-login-mobile-menu {

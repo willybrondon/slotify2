@@ -23,7 +23,11 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Adding active classes');
             mobileMenu.classList.add('active');
             mobileMenuOverlay.classList.add('active');
+            document.body.classList.add('menu-open');
             document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.height = '100%';
             console.log('Menu should be open now. mobileMenu classes:', mobileMenu.className);
         } else {
             console.error('Cannot open menu - elements missing:', {
@@ -38,7 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mobileMenu && mobileMenuOverlay) {
             mobileMenu.classList.remove('active');
             mobileMenuOverlay.classList.remove('active');
+            document.body.classList.remove('menu-open');
             document.body.style.overflow = 'auto';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.height = '';
         }
     }
     
