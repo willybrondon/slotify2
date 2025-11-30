@@ -33,7 +33,7 @@ class ProviderDetailAppBarView extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Padding(
                   padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 40, bottom: 20),
+                      left: 20, right: 20, top: 40, bottom: 0),
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -300,7 +300,7 @@ class ProductDetailNameView extends StatelessWidget {
             Divider(color: AppColors.grey.withOpacity(0.2))
                 .paddingOnly(top: 10, bottom: 10),
           ],
-        ).paddingOnly(left: 15, right: 15, top: 15);
+        ).paddingOnly(left: 15, right: 15, top: 0);
       },
     );
   }
