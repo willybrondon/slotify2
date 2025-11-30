@@ -118,8 +118,7 @@ class RazorPayService {
         date: bookingScreenController.formattedDate.toString(),
         time: bookingScreenController.slotsString.toString(),
         amount: bookingScreenController.totalPrice,
-        withoutTax: double.parse(
-            bookingScreenController.withOutTaxRupee.toStringAsFixed(2)),
+        withoutTax: bookingScreenController.withOutTaxRupee.toInt(),
         paymentType: bookingScreenController.selectedPayment,
         atPlace: bookingScreenController.selectedVenue == "At Salon" ? 1 : 2,
         address: bookingScreenController.searchEditingController.text,

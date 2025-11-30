@@ -34,6 +34,7 @@ class FlutterWaveService {
       Get.put(SelectBranchController());
   PaymentScreenController paymentScreenController =
       Get.put(PaymentScreenController());
+
   num discountAmount = 0;
   num discountPercentage = 0;
   String date = "";
@@ -94,6 +95,7 @@ class FlutterWaveService {
       if (paymentScreenController.depositToWalletModel?.status == true) {
         Utils.showToast(Get.context!,
             paymentScreenController.depositToWalletModel?.message ?? "");
+
         Get.back();
       } else {
         Utils.showToast(Get.context!,
@@ -110,8 +112,7 @@ class FlutterWaveService {
         date: bookingScreenController.formattedDate.toString(),
         time: bookingScreenController.slotsString.toString(),
         amount: bookingScreenController.totalPrice,
-        withoutTax: double.parse(
-            bookingScreenController.withOutTaxRupee.toStringAsFixed(2)),
+        withoutTax: bookingScreenController.withOutTaxRupee.toInt(),
         paymentType: bookingScreenController.selectedPayment,
         atPlace: bookingScreenController.selectedVenue == "At Salon" ? 1 : 2,
         address: bookingScreenController.searchEditingController.text,

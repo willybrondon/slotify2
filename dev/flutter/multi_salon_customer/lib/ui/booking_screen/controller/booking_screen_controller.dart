@@ -129,7 +129,7 @@ class BookingScreenController extends GetxController {
 
   void selectVenue(String venue) {
     selectedVenue = venue;
-    update([Constant.idProgressView, Constant.idConfirm, Constant.idCurrentStep]);
+    update([Constant.idProgressView, Constant.idConfirm]);
   }
 
   void onAddressSelected() {
@@ -162,23 +162,21 @@ class BookingScreenController extends GetxController {
             homeScreenController.getExpertCategory!.data!.expert!.salonId!.name;
         log("Salon name from home controller: $salonName");
       }
-    } else {
-      // When coming from salon detail (not from expert), ensure currentStep is 0
-      currentStep = 0;
-      stepCount = 0;
     }
 
     // Salon address will be fetched from API when needed
 
     onCheckBoxClick();
-    onGetSlotsList();
-    update([
-      Constant.idServiceList,
-      Constant.idBottomService,
-      Constant.idConfirm,
-      Constant.idCurrentStep,
-      Constant.idProgressView
-    ]);
+
+    // Only call onGetSlotsList and splitBreakTime if getBookingModel exists
+    // For regular salon bookings, these will be called after booking API is triggered
+    if (getBookingModel != null) {
+      onGetSlotsList();
+      splitBreakTime();
+    }
+
+    update(
+        [Constant.idServiceList, Constant.idBottomService, Constant.idConfirm]);
 
     Stripe.publishableKey =
         splashController.settingCategory?.setting?.stripePublishableKey ?? "";
@@ -186,7 +184,6 @@ class BookingScreenController extends GetxController {
     log("Stripe Publishable Key:Stripe.publishableKey ${Stripe.publishableKey}");
 
     await Stripe.instance.applySettings();
-    await splitBreakTime();
 
     super.onInit();
   }
@@ -254,6 +251,9 @@ class BookingScreenController extends GetxController {
     double taxPercentage =
         getExpertServiceBaseSalonCategory?.tax?.toDouble() ?? 0.0;
 
+    // Set tax variable for use in calculateTotalWithDiscount
+    tax = getExpertServiceBaseSalonCategory?.tax?.toInt();
+
     for (int i = 0;
         i < (getExpertServiceBaseSalonCategory?.matchedServices?.length ?? 0);
         i++) {
@@ -269,6 +269,7 @@ class BookingScreenController extends GetxController {
     log("Booking add WithOutTaxRupee :: $withOutTaxRupee");
     log("Booking add Total Price :: $totalPrice");
     log("Booking add FinalTaxRupee :: $finalTaxRupee");
+    log("Booking add Tax Percentage :: $tax");
 
     // Fetch available coupons when booking amount is calculated
     if (withOutTaxRupee > 0) {
@@ -361,6 +362,26 @@ class BookingScreenController extends GetxController {
           log("Top Experts: Moving to date/time selection");
           _triggerBookingApiCall();
         }
+      } else {
+        // For regular salon bookings: trigger booking API call when moving to date/time step (step 1)
+        // Step 0: Select Expert, Step 1: Select Date/Time, Step 2: Select Payment
+        if (currentStep == 1) {
+          // Validate that an expert is selected before proceeding
+          if (selectExpert < 0 ||
+              getExpertServiceBaseSalonCategory?.data == null ||
+              selectExpert >=
+                  (getExpertServiceBaseSalonCategory!.data!.length)) {
+            Utils.showToast(Get.context!, "Please select an expert first");
+            // Go back to previous step
+            stepCount--;
+            currentStep -= 1;
+            update([Constant.idCurrentStep, Constant.idStep1]);
+            return;
+          }
+          // Moving to date/time selection - trigger booking API call
+          log("Regular Salon Booking: Moving to date/time selection (step 1)");
+          _triggerBookingApiCall();
+        }
       }
     }
     update([
@@ -374,11 +395,37 @@ class BookingScreenController extends GetxController {
   // Helper method to trigger booking API call
   _triggerBookingApiCall() async {
     try {
+      // Get expert ID - for regular salon bookings, use selected expert from step 1
+      String expertIdToUse = "";
+      if (expertDetail != null) {
+        // Expert pre-selected (Top Experts flow)
+        expertIdToUse = expertDetail!;
+      } else if (selectExpert >= 0 &&
+          getExpertServiceBaseSalonCategory?.data != null &&
+          selectExpert < (getExpertServiceBaseSalonCategory!.data!.length)) {
+        // Regular salon booking - use selected expert from step 1
+        expertIdToUse =
+            getExpertServiceBaseSalonCategory!.data![selectExpert].id ?? "";
+        log("Using selected expert ID: $expertIdToUse");
+      } else {
+        // Fallback to stored expert ID
+        expertIdToUse = Constant.storage.read<String>('expertDetail') != null
+            ? Constant.storage.read<String>('expertDetail').toString()
+            : Constant.storage.read<String>('expertId')?.toString() ?? "";
+      }
+
+      if (expertIdToUse.isEmpty) {
+        Utils.showToast(Get.context!, "Please select an expert first");
+        // Go back to previous step
+        stepCount--;
+        currentStep -= 1;
+        update([Constant.idCurrentStep, Constant.idStep1]);
+        return;
+      }
+
       await onGetBookingApiCall(
         selectedDate: date,
-        expertId: Constant.storage.read<String>('expertDetail') != null
-            ? Constant.storage.read<String>('expertDetail').toString()
-            : Constant.storage.read<String>('expertId').toString(),
+        expertId: expertIdToUse,
         salonId: salonId.toString(),
       );
 
@@ -393,8 +440,20 @@ class BookingScreenController extends GetxController {
 
       rupee = (totalPrice.toDouble() + finalTaxRupee.toDouble());
       log("rupee :: $rupee");
+
+      // Update UI after getting slots
+      update([
+        Constant.idUpdateSlots,
+        Constant.idUpdateSlots0,
+        Constant.idProgressView
+      ]);
     } catch (e) {
       log("Error triggering booking API call: $e");
+      Utils.showToast(
+          Get.context!, "Error loading available slots: ${e.toString()}");
+      // Ensure loading is cleared on error
+      isLoading1(false);
+      update([Constant.idProgressView]);
     }
   }
 
@@ -1152,6 +1211,9 @@ class BookingScreenController extends GetxController {
       if (selectedPayment == "wallet") {
         log("it's wallet ");
 
+        // Recalculate amount with discount before creating booking
+        calculateTotalWithDiscount();
+
         // Ensure withoutTax is sent as double with 2 decimal places to match backend expectation
         double withoutTaxValue =
             double.parse(withOutTaxRupee.toStringAsFixed(2));
@@ -1165,7 +1227,8 @@ class BookingScreenController extends GetxController {
           salonId: salonId.toString(),
           date: formattedDate.toString(),
           time: slotsString.toString(),
-          amount: totalPrice,
+          amount:
+              totalPrice, // Use recalculated totalPrice with coupon discount
           withoutTax: withoutTaxValue, // Send as double with 2 decimal places
           paymentType: "",
           atPlace: selectedVenue == "At Salon" ? 1 : 2,
@@ -1422,11 +1485,55 @@ class BookingScreenController extends GetxController {
             'address': searchEditingController.text,
             'totalMinute': totalMinute,
             'finalTaxRupee': finalTaxRupee,
+            // Pass coupon data
+            'selectedCouponId': selectedCouponId,
+            'manualCouponCode': manualCouponCode,
+            'couponDiscountAmount': couponDiscountAmount,
+            'withOutTaxRupee': withOutTaxRupee,
+            'tax': tax,
           };
 
           log("Navigating to payment screen with booking data: $bookingData");
 
           // Navigate to payment screen with all booking data as secure arguments
+          Get.toNamed(AppRoutes.payment, arguments: [
+            false, // isWalletAdd
+            totalPrice.toString(), // totalAmount
+            true, // isCreateOrder
+            selectedPayment, // selectedPayment
+            bookingData, // Additional booking data
+          ]);
+        } else if (selectedPayment == "cashAfterService") {
+          // For Cash After Service, navigate to payment screen to show confirmation
+          Map<String, dynamic> bookingData = {
+            'isWalletAdd': false,
+            'totalAmount': totalPrice.toString(),
+            'isCreateOrder': true,
+            'selectedPayment': selectedPayment,
+            'serviceId': serviceId.join(","),
+            'expertId': Constant.storage.read<String>('expertDetail') != null
+                ? Constant.storage.read<String>('expertDetail').toString()
+                : Constant.storage.read<String>('expertId').toString(),
+            'salonId': salonId.toString(),
+            'date': formattedDate.toString(),
+            'time': slotsString.toString(),
+            'amount': totalPrice,
+            'withoutTax': double.parse(withOutTaxRupee.toStringAsFixed(2)),
+            'atPlace': selectedVenue == "At Salon" ? 1 : 2,
+            'address': searchEditingController.text,
+            'totalMinute': totalMinute,
+            'finalTaxRupee': finalTaxRupee,
+            // Pass coupon data
+            'selectedCouponId': selectedCouponId,
+            'manualCouponCode': manualCouponCode,
+            'couponDiscountAmount': couponDiscountAmount,
+            'withOutTaxRupee': withOutTaxRupee,
+            'tax': tax,
+          };
+
+          log("Navigating to payment screen for cash after service: $bookingData");
+
+          // Navigate to payment screen
           Get.toNamed(AppRoutes.payment, arguments: [
             false, // isWalletAdd
             totalPrice.toString(), // totalAmount

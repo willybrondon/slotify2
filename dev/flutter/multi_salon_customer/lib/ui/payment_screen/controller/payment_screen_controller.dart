@@ -6,8 +6,13 @@ import 'package:salon_2/main.dart';
 import 'package:salon_2/services/app_exception/app_exception.dart';
 // import 'package:salon_2/ui/payment_screen/method/flutter_wave/flutter_wave_service.dart'; // Commented out - not used for wallet recharge
 // import 'package:salon_2/ui/payment_screen/method/razor_pay/razor_pay_service.dart'; // Commented out - not used for wallet recharge
+import 'package:flutter/material.dart';
+import 'package:salon_2/custom/dialog/success_dialog.dart';
+import 'package:salon_2/routes/app_routes.dart';
+import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
 import 'package:salon_2/ui/payment_screen/model/deposit_to_wallet_model.dart';
+import 'package:salon_2/utils/app_colors.dart';
 
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
@@ -26,10 +31,59 @@ class PaymentScreenController extends GetxController {
 
   // Loading state management
   RxBool isLoading = false.obs;
+  
+  // Booking controller reference for creating bookings
+  BookingScreenController? bookingScreenController;
 
   @override
   void onInit() async {
     await getDataFromArgs();
+    // Sync coupon data from bookingData to booking controller if available
+    if (bookingData != null && isWalletAdd == false) {
+      try {
+        bookingScreenController = Get.find<BookingScreenController>();
+        // Sync coupon data if present
+        if (bookingData!['selectedCouponId'] != null) {
+          bookingScreenController!.selectedCouponId = bookingData!['selectedCouponId'];
+        }
+        if (bookingData!['manualCouponCode'] != null) {
+          bookingScreenController!.manualCouponCode = bookingData!['manualCouponCode'];
+          bookingScreenController!.couponCodeController.text = bookingData!['manualCouponCode'];
+        }
+        if (bookingData!['couponDiscountAmount'] != null) {
+          bookingScreenController!.couponDiscountAmount = 
+              (bookingData!['couponDiscountAmount'] as num).toDouble();
+        }
+        if (bookingData!['withOutTaxRupee'] != null) {
+          bookingScreenController!.withOutTaxRupee = 
+              (bookingData!['withOutTaxRupee'] as num).toDouble();
+        }
+        if (bookingData!['tax'] != null) {
+          bookingScreenController!.tax = bookingData!['tax'] as int?;
+        }
+        // Recalculate total with discount
+        bookingScreenController!.calculateTotalWithDiscount();
+        // Update total amount if it changed
+        if (bookingScreenController!.totalPrice.toString() != totalAmount) {
+          totalAmount = bookingScreenController!.totalPrice.toString();
+        }
+        
+        // Fetch coupons if not already fetched (for payment screen)
+        if (bookingScreenController!.getCouponModel == null && 
+            bookingScreenController!.withOutTaxRupee > 0) {
+          String userId = Constant.storage.read<String>('userId') ?? "";
+          bookingScreenController!.getCouponApiCall(
+            userId: userId,
+            type: "2", // Type 2 for booking
+            amount: bookingScreenController!.withOutTaxRupee.toInt().toString(),
+          );
+        }
+        
+        log("Synced coupon data from bookingData to booking controller");
+      } catch (e) {
+        log("Error syncing coupon data: $e");
+      }
+    }
     super.onInit();
   }
 
@@ -127,6 +181,15 @@ class PaymentScreenController extends GetxController {
           );
         } else {
           // For direct payment - use passed booking data instead of accessing booking controller
+          // Get updated amount from booking controller (includes coupon discount)
+          double paymentAmount = (bookingData?['amount'] ?? 0.0).toDouble();
+          if (bookingScreenController != null) {
+            // Recalculate to get latest total with coupon
+            bookingScreenController!.calculateTotalWithDiscount();
+            paymentAmount = bookingScreenController!.totalPrice;
+            parsedAmount = paymentAmount.toInt();
+          }
+          
           await StripeService().init(
             totalAmountWithOutTax: parsedAmount,
             stripePaymentPublishKey: stripePublishableKey ?? "",
@@ -138,7 +201,7 @@ class PaymentScreenController extends GetxController {
             expertId: bookingData?['expertId'] ?? "",
             date: bookingData?['date'] ?? "",
             time: bookingData?['time'] ?? "",
-            rupee: (bookingData?['amount'] ?? 0.0).toDouble(),
+            rupee: paymentAmount, // Use updated amount with coupon discount
             userId: Constant.storage.read<String>('userId') ?? "",
           );
         }
@@ -168,11 +231,79 @@ class PaymentScreenController extends GetxController {
         // This is a direct service payment, not wallet recharge
         // The booking should be created directly without going through wallet
         log("Processing Cash After Service payment for direct booking");
-        // You can add logic here to handle cash after service if needed
-        // For now, just show a success message
-        Utils.showToast(Get.context!,
-            "Cash After Service selected. Please pay at the salon.");
-        Get.back(); // Go back to previous screen
+        
+        isLoading(true);
+        update([Constant.idProgressView]);
+        
+        try {
+          // Get booking controller
+          if (bookingScreenController == null) {
+            bookingScreenController = Get.find<BookingScreenController>();
+          }
+          
+          // Recalculate amount with discount before creating booking
+          bookingScreenController!.calculateTotalWithDiscount();
+          
+          // Ensure withoutTax is sent as double with 2 decimal places
+          double withoutTaxValue = double.parse(
+              bookingScreenController!.withOutTaxRupee.toStringAsFixed(2));
+          
+          // Set loading state
+          bookingScreenController!.isLoading(true);
+          bookingScreenController!.update([Constant.idProgressView]);
+          
+          await bookingScreenController!.onCreateBookingApiCall(
+            userId: Constant.storage.read<String>('userId') ?? "",
+            expertId: bookingData!['expertId'] ?? "",
+            serviceId: bookingData!['serviceId'] ?? "",
+            salonId: bookingData!['salonId'] ?? "",
+            date: bookingData!['date'] ?? "",
+            time: bookingData!['time'] ?? "",
+            amount: bookingScreenController!.totalPrice, // Use recalculated totalPrice
+            withoutTax: withoutTaxValue,
+            paymentType: "cashAfterService",
+            atPlace: bookingData!['atPlace'] ?? 1,
+            address: bookingData!['address'] ?? "",
+          );
+          
+          // Clear loading state
+          bookingScreenController!.isLoading(false);
+          bookingScreenController!.update([Constant.idProgressView]);
+          
+          if (bookingScreenController!.createBookingCategory?.status == true) {
+            // Clear all data and show success
+            bookingScreenController!.finalTaxRupee = 0.0;
+            bookingScreenController!.withOutTaxRupee = 0.0;
+            bookingScreenController!.totalPrice = 0.0;
+            bookingScreenController!.resetCoupon();
+            
+            // Navigate back to home screen
+            Get.offAllNamed(AppRoutes.bottom);
+            
+            // Show success dialog
+            Get.dialog(
+              barrierColor: AppColors.blackColor.withOpacity(0.8),
+              Material(
+                color: AppColors.transparent,
+                child: SuccessDialog(),
+              ),
+            );
+          } else {
+            Utils.showToast(Get.context!,
+                bookingScreenController!.createBookingCategory?.message ?? "Booking failed");
+          }
+        } catch (e) {
+          log("Error creating booking for cash after service: $e");
+          Utils.showToast(Get.context!, "Error creating booking: ${e.toString()}");
+          // Ensure loading is cleared on error
+          if (bookingScreenController != null) {
+            bookingScreenController!.isLoading(false);
+            bookingScreenController!.update([Constant.idProgressView]);
+          }
+        } finally {
+          isLoading(false);
+          update([Constant.idProgressView]);
+        }
       }
     } else if (selectedPayment == "wallet") {
       log("it's My Wallet");

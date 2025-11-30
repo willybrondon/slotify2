@@ -270,6 +270,17 @@ class StripeService {
                     }
                   } else {
                     // Direct payment - use passed data from payment controller
+                    // Recalculate total with discount before creating booking
+                    bookingScreenController.calculateTotalWithDiscount();
+
+                    // Use the recalculated totalPrice (includes coupon discount)
+                    double finalAmount = bookingScreenController.totalPrice;
+
+                    // Ensure withoutTax is sent as double with 2 decimal places
+                    double withoutTaxValue = double.parse(
+                        bookingScreenController.withOutTaxRupee
+                            .toStringAsFixed(2));
+
                     await bookingScreenController.onCreateBookingApiCall(
                       userId: Constant.storage.read<String>('userId') ?? "",
                       expertId: expertIds.isNotEmpty
@@ -292,12 +303,11 @@ class StripeService {
                       time: times.isNotEmpty
                           ? times
                           : bookingScreenController.slotsString.toString(),
-                      amount: rupees > 0
-                          ? rupees
-                          : bookingScreenController.totalPrice.toDouble(),
-                      withoutTax: double.parse(bookingScreenController
-                          .withOutTaxRupee
-                          .toStringAsFixed(2)),
+                      amount:
+                          finalAmount, // Use recalculated totalPrice with coupon discount
+                      withoutTax:
+                          withoutTaxValue, // Send as double with 2 decimal places
+
                       paymentType: "Stripe", // Use Stripe as payment type
                       atPlace:
                           bookingScreenController.selectedVenue == "At Salon"
