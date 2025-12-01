@@ -100,7 +100,7 @@ class PaymentMethodView extends StatelessWidget {
                   ),
 
                   // Coupon Section - Show if not wallet add and this is a booking (not wallet recharge)
-                  if (logic.isWalletAdd == false && logic.isCreateOrder == true)
+                  if (logic.isWalletAdd != true && logic.isCreateOrder == true)
                     PaymentCouponSection(),
                 ],
               ).paddingAll(15);
@@ -130,12 +130,7 @@ class PaymentCouponSection extends StatelessWidget {
           });
         }
 
-        // Check if coupons are available
-        if (bookingLogic.getCouponModel?.data?.isEmpty == true &&
-            bookingLogic.manualCouponCode == null) {
-          return const SizedBox();
-        }
-
+        // Always show coupon section - even if no coupons available, user can enter manual code
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

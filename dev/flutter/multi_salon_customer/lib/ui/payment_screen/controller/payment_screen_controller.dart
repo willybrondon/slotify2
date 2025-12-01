@@ -84,8 +84,12 @@ class PaymentScreenController extends GetxController {
         }
         
         log("Initialized booking controller and synced coupon data for payment screen");
+        // Update UI to show coupon section
+        update([Constant.idSelectPaymentMethod]);
       } catch (e) {
         log("Error initializing booking controller or syncing coupon data: $e");
+        // Still update UI even if there's an error
+        update([Constant.idSelectPaymentMethod]);
       }
     }
     super.onInit();
