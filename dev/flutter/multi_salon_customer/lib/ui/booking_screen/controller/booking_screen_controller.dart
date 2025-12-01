@@ -363,10 +363,10 @@ class BookingScreenController extends GetxController {
           _triggerBookingApiCall();
         }
       } else {
-        // For regular salon bookings: trigger booking API call when moving to date/time step (step 1)
-        // Step 0: Select Expert, Step 1: Select Date/Time, Step 2: Select Payment
-        if (currentStep == 1) {
-          // Validate that an expert is selected before proceeding
+        // For regular salon bookings:
+        // Step 0: Select Venue, Step 1: Select Expert, Step 2: Select Date/Time, Step 3: Payment
+        if (currentStep == 2) {
+          // Validate that an expert is selected before proceeding to date/time step
           if (selectExpert < 0 ||
               getExpertServiceBaseSalonCategory?.data == null ||
               selectExpert >=
@@ -379,7 +379,7 @@ class BookingScreenController extends GetxController {
             return;
           }
           // Moving to date/time selection - trigger booking API call
-          log("Regular Salon Booking: Moving to date/time selection (step 1)");
+          log("Regular Salon Booking: Moving to date/time selection (step 2)");
           _triggerBookingApiCall();
         }
       }

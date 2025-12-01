@@ -38,29 +38,33 @@ class PaymentScreenController extends GetxController {
   @override
   void onInit() async {
     await getDataFromArgs();
-    // Sync coupon data from bookingData to booking controller if available
-    if (bookingData != null && isWalletAdd == false) {
+    // Initialize booking controller and sync coupon data for booking payments
+    if (isWalletAdd == false && isCreateOrder == true) {
       try {
         bookingScreenController = Get.find<BookingScreenController>();
-        // Sync coupon data if present
-        if (bookingData!['selectedCouponId'] != null) {
-          bookingScreenController!.selectedCouponId = bookingData!['selectedCouponId'];
+        
+        // Sync coupon data from bookingData if available
+        if (bookingData != null) {
+          if (bookingData!['selectedCouponId'] != null) {
+            bookingScreenController!.selectedCouponId = bookingData!['selectedCouponId'];
+          }
+          if (bookingData!['manualCouponCode'] != null) {
+            bookingScreenController!.manualCouponCode = bookingData!['manualCouponCode'];
+            bookingScreenController!.couponCodeController.text = bookingData!['manualCouponCode'];
+          }
+          if (bookingData!['couponDiscountAmount'] != null) {
+            bookingScreenController!.couponDiscountAmount = 
+                (bookingData!['couponDiscountAmount'] as num).toDouble();
+          }
+          if (bookingData!['withOutTaxRupee'] != null) {
+            bookingScreenController!.withOutTaxRupee = 
+                (bookingData!['withOutTaxRupee'] as num).toDouble();
+          }
+          if (bookingData!['tax'] != null) {
+            bookingScreenController!.tax = bookingData!['tax'] as int?;
+          }
         }
-        if (bookingData!['manualCouponCode'] != null) {
-          bookingScreenController!.manualCouponCode = bookingData!['manualCouponCode'];
-          bookingScreenController!.couponCodeController.text = bookingData!['manualCouponCode'];
-        }
-        if (bookingData!['couponDiscountAmount'] != null) {
-          bookingScreenController!.couponDiscountAmount = 
-              (bookingData!['couponDiscountAmount'] as num).toDouble();
-        }
-        if (bookingData!['withOutTaxRupee'] != null) {
-          bookingScreenController!.withOutTaxRupee = 
-              (bookingData!['withOutTaxRupee'] as num).toDouble();
-        }
-        if (bookingData!['tax'] != null) {
-          bookingScreenController!.tax = bookingData!['tax'] as int?;
-        }
+        
         // Recalculate total with discount
         bookingScreenController!.calculateTotalWithDiscount();
         // Update total amount if it changed
@@ -79,9 +83,9 @@ class PaymentScreenController extends GetxController {
           );
         }
         
-        log("Synced coupon data from bookingData to booking controller");
+        log("Initialized booking controller and synced coupon data for payment screen");
       } catch (e) {
-        log("Error syncing coupon data: $e");
+        log("Error initializing booking controller or syncing coupon data: $e");
       }
     }
     super.onInit();
@@ -307,8 +311,100 @@ class PaymentScreenController extends GetxController {
       }
     } else if (selectedPayment == "wallet") {
       log("it's My Wallet");
-      // Handle wallet payment logic here
-      // This should proceed to wallet payment processing
+      // For wallet payment, create booking directly
+      if (isWalletAdd == false && isCreateOrder == true) {
+        isLoading(true);
+        update([Constant.idProgressView]);
+        
+        try {
+          // Get booking controller if not already available
+          if (bookingScreenController == null) {
+            bookingScreenController = Get.find<BookingScreenController>();
+          }
+          
+          // Recalculate amount with discount before creating booking
+          bookingScreenController!.calculateTotalWithDiscount();
+          
+          // Ensure withoutTax is sent as double with 2 decimal places
+          double withoutTaxValue = double.parse(
+              bookingScreenController!.withOutTaxRupee.toStringAsFixed(2));
+          
+          // Check wallet balance
+          double walletBalance = double.parse(walletAmount?.toString() ?? "0");
+          double finalAmount = bookingScreenController!.totalPrice;
+          
+          if (finalAmount > walletBalance) {
+            Utils.showToast(Get.context!, "Insufficient wallet balance. Please recharge your wallet.");
+            isLoading(false);
+            update([Constant.idProgressView]);
+            return;
+          }
+          
+          // Set loading state
+          bookingScreenController!.isLoading(true);
+          bookingScreenController!.update([Constant.idProgressView]);
+          
+          // Use bookingData if available, otherwise use booking controller data
+          String expertId = bookingData?['expertId'] ?? 
+              (Constant.storage.read<String>('expertDetail') != null
+                  ? Constant.storage.read<String>('expertDetail').toString()
+                  : Constant.storage.read<String>('expertId').toString());
+          
+          await bookingScreenController!.onCreateBookingApiCall(
+            userId: Constant.storage.read<String>('userId') ?? "",
+            expertId: expertId,
+            serviceId: bookingData?['serviceId'] ?? bookingScreenController!.serviceId.join(","),
+            salonId: bookingData?['salonId'] ?? bookingScreenController!.salonId.toString(),
+            date: bookingData?['date'] ?? bookingScreenController!.formattedDate.toString(),
+            time: bookingData?['time'] ?? bookingScreenController!.slotsString.toString(),
+            amount: finalAmount, // Use recalculated totalPrice with coupon discount
+            withoutTax: withoutTaxValue,
+            paymentType: "",
+            atPlace: bookingData?['atPlace'] ?? 
+                (bookingScreenController!.selectedVenue == "At Salon" ? 1 : 2),
+            address: bookingData?['address'] ?? 
+                bookingScreenController!.searchEditingController.text,
+          );
+          
+          // Clear loading state
+          bookingScreenController!.isLoading(false);
+          bookingScreenController!.update([Constant.idProgressView]);
+          
+          if (bookingScreenController!.createBookingCategory?.status == true) {
+            // Clear all data and show success
+            bookingScreenController!.finalTaxRupee = 0.0;
+            bookingScreenController!.withOutTaxRupee = 0.0;
+            bookingScreenController!.totalPrice = 0.0;
+            bookingScreenController!.resetCoupon();
+            
+            // Navigate back to home screen
+            Get.offAllNamed(AppRoutes.bottom);
+            
+            // Show success dialog
+            Get.dialog(
+              barrierColor: AppColors.blackColor.withOpacity(0.8),
+              Material(
+                color: AppColors.transparent,
+                child: SuccessDialog(),
+              ),
+            );
+          } else {
+            Utils.showToast(Get.context!,
+                bookingScreenController!.createBookingCategory?.message ?? "Booking failed");
+          }
+        } catch (e) {
+          log("Error creating booking for wallet payment: $e");
+          Utils.showToast(Get.context!, "Error creating booking: ${e.toString()}");
+          // Ensure loading is cleared on error
+          if (bookingScreenController != null) {
+            bookingScreenController!.isLoading(false);
+            bookingScreenController!.update([Constant.idProgressView]);
+          }
+        } finally {
+          isLoading(false);
+          update([Constant.idProgressView]);
+        }
+      }
     }
     // else if (selectedPayment == "flutterWave") {
     //   FlutterWaveService().init(
