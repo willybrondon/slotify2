@@ -902,6 +902,20 @@ class BookingScreenController extends GetxController {
         createBookingCategory = CreateBookingModel.fromJson(jsonResponse);
       }
 
+      // Check if booking failed due to inactive/invalid coupon
+      if (createBookingCategory?.status == false) {
+        String errorMessage = createBookingCategory?.message.toString() ?? "";
+        // If error is about inactive/invalid coupon, reset the coupon
+        if (errorMessage.toLowerCase().contains("inactive coupon") ||
+            errorMessage.toLowerCase().contains("invalid coupon")) {
+          log("Booking failed due to inactive/invalid coupon. Resetting coupon...");
+          resetCoupon();
+          // Recalculate total without coupon
+          calculateTotalWithDiscount();
+          update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+        }
+      }
+
       Utils.showToast(
           Get.context!, createBookingCategory?.message.toString() ?? "");
     } on AppException catch (exception) {

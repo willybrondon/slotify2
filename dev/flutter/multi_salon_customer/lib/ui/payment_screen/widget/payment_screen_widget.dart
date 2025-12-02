@@ -99,8 +99,10 @@ class PaymentMethodView extends StatelessWidget {
                     ),
                   ),
 
-                  // Coupon Section - Show if not wallet add and this is a booking (not wallet recharge)
-                  if (logic.isWalletAdd != true && logic.isCreateOrder == true)
+                  // Coupon Section - Show if not wallet add, this is a booking (not wallet recharge), and no payment method is pre-selected
+                  if (logic.isWalletAdd != true &&
+                      logic.isCreateOrder == true &&
+                      logic.selectedPayment == null)
                     PaymentCouponSection(),
                 ],
               ).paddingAll(15);

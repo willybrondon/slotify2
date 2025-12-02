@@ -11,12 +11,18 @@ export const apiInstance = axios.create({
 });
 
 const cancelTokenSource = axios.CancelToken.source();
-const token = localStorage.getItem("adminToken");
-apiInstance.defaults.headers.common["Authorization"] = token;
+// Set default headers once
 apiInstance.defaults.headers.common["key"] = secretKey;
 
 apiInstance.interceptors.request.use(
   function (config) {
+    // Dynamically get token from localStorage on each request
+    const token = getTokenData();
+    if (token) {
+      config.headers.Authorization = token;
+    }
+    // Also ensure key is set on each request
+    config.headers.key = secretKey;
     config.cancelToken = cancelTokenSource.token;
     return config;
   },
