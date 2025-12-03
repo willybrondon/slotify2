@@ -31,8 +31,7 @@ class ProviderDetailAppBarView extends StatelessWidget {
               ),
               clipBehavior: Clip.hardEdge,
               child: CachedNetworkImage(
-                imageUrl:
-                    logic.getProductDetailModel?.product?.mainImage ?? "",
+                imageUrl: logic.getProductDetailModel?.product?.mainImage ?? "",
                 fit: BoxFit.cover,
                 width: Get.width,
                 height: Get.height * 0.3,
