@@ -29,54 +29,35 @@ class ProviderDetailAppBarView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.whiteColor,
               ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 40, bottom: 0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.roundBorder,
-                        width: 1.5,
-                      ),
+              clipBehavior: Clip.hardEdge,
+              child: CachedNetworkImage(
+                imageUrl:
+                    logic.getProductDetailModel?.product?.mainImage ?? "",
+                fit: BoxFit.cover,
+                width: Get.width,
+                height: Get.height * 0.3,
+                placeholder: (context, url) {
+                  return Container(
+                    width: Get.width,
+                    height: Get.height * 0.3,
+                    color: AppColors.grey.withOpacity(0.2),
+                    child: Center(
+                      child: Image.asset(AppAsset.icImagePlaceholder)
+                          .paddingAll(25),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            logic.getProductDetailModel?.product?.mainImage ??
-                                "",
-                        fit: BoxFit.cover,
-                        width: Get.width * 0.85,
-                        height: Get.height * 0.25,
-                        placeholder: (context, url) {
-                          return Container(
-                            width: Get.width * 0.85,
-                            height: Get.height * 0.25,
-                            color: AppColors.grey.withOpacity(0.2),
-                            child: Center(
-                              child: Image.asset(AppAsset.icImagePlaceholder)
-                                  .paddingAll(25),
-                            ),
-                          );
-                        },
-                        errorWidget: (context, url, error) {
-                          return Container(
-                            width: Get.width * 0.85,
-                            height: Get.height * 0.25,
-                            color: AppColors.grey.withOpacity(0.2),
-                            child: Center(
-                              child: Image.asset(AppAsset.icImagePlaceholder)
-                                  .paddingAll(30),
-                            ),
-                          );
-                        },
-                      ),
+                  );
+                },
+                errorWidget: (context, url, error) {
+                  return Container(
+                    width: Get.width,
+                    height: Get.height * 0.3,
+                    color: AppColors.grey.withOpacity(0.2),
+                    child: Center(
+                      child: Image.asset(AppAsset.icImagePlaceholder)
+                          .paddingAll(30),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             );
           },

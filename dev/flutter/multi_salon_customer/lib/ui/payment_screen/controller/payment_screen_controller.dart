@@ -352,6 +352,10 @@ class PaymentScreenController extends GetxController {
           bookingScreenController!.isLoading(true);
           bookingScreenController!.update([Constant.idProgressView]);
 
+          // Ensure amount is properly formatted to 2 decimal places to match backend expectation
+          double finalAmount = double.parse(
+              bookingScreenController!.totalPrice.toStringAsFixed(2));
+
           await bookingScreenController!.onCreateBookingApiCall(
             userId: Constant.storage.read<String>('userId') ?? "",
             expertId: bookingData!['expertId'] ?? "",
@@ -359,8 +363,7 @@ class PaymentScreenController extends GetxController {
             salonId: bookingData!['salonId'] ?? "",
             date: bookingData!['date'] ?? "",
             time: bookingData!['time'] ?? "",
-            amount: bookingScreenController!
-                .totalPrice, // Use recalculated totalPrice with coupon discount
+            amount: finalAmount, // Use properly formatted amount with coupon discount
             withoutTax: withoutTaxValue,
             paymentType: "cashAfterService",
             atPlace: bookingData!['atPlace'] ?? 1,
@@ -429,9 +432,12 @@ class PaymentScreenController extends GetxController {
           double withoutTaxValue = double.parse(
               bookingScreenController!.withOutTaxRupee.toStringAsFixed(2));
 
+          // Ensure amount is properly formatted to 2 decimal places to match backend expectation
+          double finalAmount = double.parse(
+              bookingScreenController!.totalPrice.toStringAsFixed(2));
+
           // Check wallet balance
           double walletBalance = double.parse(walletAmount?.toString() ?? "0");
-          double finalAmount = bookingScreenController!.totalPrice;
 
           if (finalAmount > walletBalance) {
             Utils.showToast(Get.context!,
@@ -462,8 +468,7 @@ class PaymentScreenController extends GetxController {
                 bookingScreenController!.formattedDate.toString(),
             time: bookingData?['time'] ??
                 bookingScreenController!.slotsString.toString(),
-            amount:
-                finalAmount, // Use recalculated totalPrice with coupon discount
+            amount: finalAmount, // Use properly formatted amount with coupon discount
             withoutTax: withoutTaxValue,
             paymentType: "",
             atPlace: bookingData?['atPlace'] ??

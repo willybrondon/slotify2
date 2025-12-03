@@ -318,11 +318,12 @@ exports.newBooking = async (req, res, next) => {
 
     console.log("totalAmount after add tax and deduct the discount (if any)", totalAmount);
 
-    if (totalAmount !== bookingAmount) {
+    // Convert totalAmount to string with 2 decimal places for comparison
+    // This ensures both sides are strings and can be compared correctly
+    const totalAmountString = parseFloat(totalAmount).toFixed(2);
+    const bookingAmountString = parseFloat(bookingAmount).toFixed(2);
 
-
-
-
+    if (totalAmountString !== bookingAmountString) {
       return res.status(200).send({ status: false, message: "Invalid amount after add tax and deduct the discount (if any)" });
     }
 

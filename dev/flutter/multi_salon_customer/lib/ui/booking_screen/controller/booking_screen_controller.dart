@@ -840,7 +840,8 @@ class BookingScreenController extends GetxController {
       calculateTotalWithDiscount();
 
       // Use the recalculated totalPrice as the final amount
-      double finalAmount = totalPrice;
+      // Ensure it's properly formatted to 2 decimal places to match backend expectation
+      double finalAmount = double.parse(totalPrice.toStringAsFixed(2));
 
       // Prepare coupon ID - use selectedCouponId if available, otherwise try to find by manual code
       String? couponIdToSend = selectedCouponId;
@@ -1154,50 +1155,60 @@ class BookingScreenController extends GetxController {
   }
 
   calculateTotalWithDiscount() {
-    // Keep original withoutTax for backend (backend calculates discount on this)
-    // Calculate tax on original amount (before discount) - matching backend calculation
-    // Backend uses: taxAmount = (withoutTax * global.settingJSON.tax) / 100
+    // Match backend calculation exactly:
+    // Backend: taxAmount = (req.body.withoutTax * global.settingJSON.tax) / 100
+    // Backend: withTaxAmount = (taxAmount + req.body.withoutTax).toFixed(2) [STRING]
+    // Backend: totalAmount = withTaxAmount [STRING initially, then NUMBER after subtraction]
+    // Backend: if coupon: totalAmount = withTaxAmount - discountAmount [NUMBER]
+    // Backend: bookingAmount = req.body.amount.toFixed(2) [STRING]
+    // Backend: if (totalAmount !== bookingAmount) - compares NUMBER !== STRING
+
+    // Step 1: Calculate tax - matching backend exactly
     if (tax != null && tax! > 0) {
       finalTaxRupee = (withOutTaxRupee * tax!) / 100;
     } else {
       finalTaxRupee = 0.0;
     }
 
-    // Calculate total with tax - matching backend: withTaxAmount = (taxAmount + withoutTax).toFixed(2)
-    // Backend: withTaxAmount is a STRING from .toFixed(2)
-    // But when backend does: totalAmount = withTaxAmount - discountAmount, it converts string to number
-    // So we need to match that exact calculation
-    double withTaxAmountNum = (finalTaxRupee + withOutTaxRupee);
-    // Convert to string with .toFixed(2) then back to number to match backend's precision
+    // Step 2: Calculate withTaxAmount - matching backend: (taxAmount + withoutTax).toFixed(2)
+    // Backend converts this to string, then uses it in arithmetic which converts back to number
+    double withTaxAmountNum = finalTaxRupee + withOutTaxRupee;
+    // Apply .toFixed(2) like backend does, then parse back to match precision
     String withTaxAmountStr = withTaxAmountNum.toStringAsFixed(2);
     double withTaxAmount = double.parse(withTaxAmountStr);
 
-    // Apply discount to get final total - matching backend: totalAmount = withTaxAmount - discountAmount
-    // Backend: when it does "10.50" - 2, JavaScript converts string to number, so result is 8.5 (number)
-    // We need to match that exact calculation
-    totalPriceAfterDiscount = withTaxAmount - couponDiscountAmount;
-    if (totalPriceAfterDiscount < 0) totalPriceAfterDiscount = 0;
+    // Step 3: Apply discount - matching backend: totalAmount = withTaxAmount - discountAmount
+    // When backend does: "10.50" - 2, JavaScript converts string to number: 10.5 - 2 = 8.5
+    // So totalAmount becomes a NUMBER (8.5), not a string
+    double calculatedTotalAmount = withTaxAmount - couponDiscountAmount;
+    if (calculatedTotalAmount < 0) calculatedTotalAmount = 0;
 
-    // Round to 2 decimal places to match backend calculation
-    // Backend compares: totalAmount (NUMBER) !== bookingAmount (STRING from req.body.amount.toFixed(2))
-    // Since backend does: totalAmount = parseFloat("10.50") - 2 = 8.5
-    // And compares: 8.5 !== "8.50" (which is always true in strict comparison)
-    // But the backend might be doing loose comparison or type coercion
-    // We need to ensure our amount, when converted to string with .toFixed(2), matches backend's calculation
-    totalPriceAfterDiscount =
-        double.parse(totalPriceAfterDiscount.toStringAsFixed(2));
+    // Step 4: The backend compares totalAmount (NUMBER) with bookingAmount (STRING)
+    // Since 8.5 !== "8.50" is TRUE in strict comparison, we need to ensure
+    // our amount, when sent and converted to string with .toFixed(2), matches
+    // what the backend calculates. The backend calculates totalAmount as a number,
+    // so we need to send the amount that, when the backend does .toFixed(2) on it,
+    // produces the same string as totalAmount.toFixed(2) would.
 
-    totalPrice = totalPriceAfterDiscount;
+    // However, the backend bug is that it compares NUMBER !== STRING.
+    // To work around this, we need to ensure the numeric value matches exactly.
+    // The backend's totalAmount after subtraction is a number, so we send that number.
+    // When backend does req.body.amount.toFixed(2), it should match totalAmount.toFixed(2).
+
+    // Store the calculated amount (this is what backend will calculate)
+    totalPriceAfterDiscount = calculatedTotalAmount;
+    totalPrice = calculatedTotalAmount;
 
     log("calculateTotalWithDiscount - withOutTaxRupee: $withOutTaxRupee");
     log("calculateTotalWithDiscount - tax percentage: $tax");
     log("calculateTotalWithDiscount - finalTaxRupee: $finalTaxRupee");
-    log("calculateTotalWithDiscount - withTaxAmount (number): $withTaxAmount");
-    log("calculateTotalWithDiscount - withTaxAmount (string): $withTaxAmountStr");
+    log("calculateTotalWithDiscount - withTaxAmount (calculated): $withTaxAmount");
+    log("calculateTotalWithDiscount - withTaxAmount (string format): $withTaxAmountStr");
     log("calculateTotalWithDiscount - couponDiscountAmount: $couponDiscountAmount");
-    log("calculateTotalWithDiscount - totalPriceAfterDiscount: $totalPriceAfterDiscount");
+    log("calculateTotalWithDiscount - calculatedTotalAmount: $calculatedTotalAmount");
     log("calculateTotalWithDiscount - totalPrice: $totalPrice");
-    log("calculateTotalWithDiscount - totalPrice as string (.toFixed(2)): ${totalPrice.toStringAsFixed(2)}");
+    log("calculateTotalWithDiscount - totalPrice.toFixed(2): ${totalPrice.toStringAsFixed(2)}");
+    log("calculateTotalWithDiscount - Backend will calculate: (${withTaxAmountStr} - $couponDiscountAmount) = ${(withTaxAmount - couponDiscountAmount).toStringAsFixed(2)}");
 
     update([
       Constant.idProgressView,
@@ -1232,6 +1243,9 @@ class BookingScreenController extends GetxController {
         double withoutTaxValue =
             double.parse(withOutTaxRupee.toStringAsFixed(2));
 
+        // Ensure amount is properly formatted to 2 decimal places to match backend expectation
+        double finalAmount = double.parse(totalPrice.toStringAsFixed(2));
+
         await onCreateBookingApiCall(
           userId: Constant.storage.read<String>('userId') ?? "",
           expertId: Constant.storage.read<String>('expertDetail') != null
@@ -1242,7 +1256,7 @@ class BookingScreenController extends GetxController {
           date: formattedDate.toString(),
           time: slotsString.toString(),
           amount:
-              totalPrice, // Use recalculated totalPrice with coupon discount
+              finalAmount, // Use properly formatted amount with coupon discount
           withoutTax: withoutTaxValue, // Send as double with 2 decimal places
           paymentType: "",
           atPlace: selectedVenue == "At Salon" ? 1 : 2,
@@ -1365,6 +1379,9 @@ class BookingScreenController extends GetxController {
           double withoutTaxValue =
               double.parse(withOutTaxRupee.toStringAsFixed(2));
 
+          // Ensure amount is properly formatted to 2 decimal places to match backend expectation
+          double finalAmount = double.parse(totalPrice.toStringAsFixed(2));
+
           await onCreateBookingApiCall(
             userId: Constant.storage.read<String>('userId') ?? "",
             expertId: Constant.storage.read<String>('expertDetail') != null
@@ -1374,7 +1391,8 @@ class BookingScreenController extends GetxController {
             salonId: salonId.toString(),
             date: formattedDate.toString(),
             time: slotsString.toString(),
-            amount: totalPrice, // Use recalculated totalPrice
+            amount:
+                finalAmount, // Use properly formatted amount with coupon discount
             withoutTax: withoutTaxValue, // Send as double with 2 decimal places
             paymentType: selectedPayment,
             atPlace: selectedVenue == "At Salon" ? 1 : 2,
