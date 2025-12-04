@@ -43,7 +43,7 @@ class AiConciergeMainView extends StatelessWidget {
                   color: AppColors.primaryAppColor,
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   "Get Personalized Beauty Recommendations",
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -161,7 +161,7 @@ class AiConciergeMainView extends StatelessWidget {
                               logic.selectImageFile != null
                                   ? "Change Image"
                                   : "Select Image",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.whiteColor,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -198,7 +198,7 @@ class AiConciergeMainView extends StatelessWidget {
                                   );
                                 },
                           icon: logic.isLoading.value
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
@@ -208,7 +208,7 @@ class AiConciergeMainView extends StatelessWidget {
                                     ),
                                   ),
                                 )
-                              : const Icon(
+                              : Icon(
                                   Icons.auto_awesome,
                                   color: AppColors.whiteColor,
                                 ),
@@ -216,7 +216,7 @@ class AiConciergeMainView extends StatelessWidget {
                             logic.isLoading.value
                                 ? "Analyzing..."
                                 : "Analyze My Beauty",
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.whiteColor,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -342,8 +342,8 @@ class AiConciergeResultsView extends StatelessWidget {
                         onPressed: () {
                           Get.back();
                         },
-                        icon: const Icon(Icons.home, color: AppColors.whiteColor),
-                        label: const Text(
+                        icon: Icon(Icons.home, color: AppColors.whiteColor),
+                        label: Text(
                           "Back to Home",
                           style: TextStyle(color: AppColors.whiteColor),
                         ),
@@ -386,7 +386,7 @@ class AiConciergeResultsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Beauty Analysis",
             style: TextStyle(
               fontSize: 20,
@@ -496,7 +496,7 @@ class AiConciergeResultsView extends StatelessWidget {
                       width: 100,
                       child: Text(
                         "${entry.key}:",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: AppColors.primaryTextColor,
                         ),
@@ -505,7 +505,7 @@ class AiConciergeResultsView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         entry.value,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.grey,
                         ),
                       ),
@@ -546,7 +546,7 @@ class AiConciergeResultsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Recommended Services",
             style: TextStyle(
               fontSize: 18,
@@ -610,7 +610,7 @@ class AiConciergeResultsView extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         service.name ?? "Service",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primaryTextColor,
@@ -635,7 +635,7 @@ class AiConciergeResultsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Recommended Salons",
             style: TextStyle(
               fontSize: 18,
@@ -705,7 +705,7 @@ class AiConciergeResultsView extends StatelessWidget {
                           children: [
                             Text(
                               salon.name ?? "Salon",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primaryTextColor,
@@ -722,7 +722,7 @@ class AiConciergeResultsView extends StatelessWidget {
                                   const SizedBox(width: 4),
                                   Text(
                                     salon.review!.toStringAsFixed(1),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.grey,
                                     ),
@@ -732,7 +732,7 @@ class AiConciergeResultsView extends StatelessWidget {
                             if (salon.address != null)
                               Text(
                                 salon.address!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   color: AppColors.grey,
                                 ),
@@ -742,7 +742,7 @@ class AiConciergeResultsView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward_ios,
                         size: 16,
                         color: AppColors.grey,
@@ -774,10 +774,10 @@ class AiConciergeResultsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.lightbulb_outline, color: Colors.amber),
-              SizedBox(width: 8),
+              const Icon(Icons.lightbulb_outline, color: Colors.amber),
+              const SizedBox(width: 8),
               Text(
                 "Beauty Tips",
                 style: TextStyle(
@@ -798,7 +798,7 @@ class AiConciergeResultsView extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 6, right: 12),
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.primaryAppColor,
                         shape: BoxShape.circle,
                       ),
@@ -806,7 +806,7 @@ class AiConciergeResultsView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         tip,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           color: AppColors.primaryTextColor,
                           height: 1.5,

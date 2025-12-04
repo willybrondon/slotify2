@@ -307,13 +307,13 @@ class HomeScreenAiConciergeBanner extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.auto_awesome,
                         color: AppColors.whiteColor,
                         size: 24,
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         "AI Beauty Concierge",
                         style: TextStyle(
                           color: AppColors.whiteColor,
@@ -324,7 +324,7 @@ class HomeScreenAiConciergeBanner extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     "Get personalized beauty recommendations based on AI analysis of your selfie",
                     style: TextStyle(
                       color: AppColors.whiteColor,
@@ -345,7 +345,7 @@ class HomeScreenAiConciergeBanner extends StatelessWidget {
                         color: AppColors.whiteColor.withOpacity(0.3),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Try Now →",
                       style: TextStyle(
                         color: AppColors.whiteColor,
@@ -365,7 +365,7 @@ class HomeScreenAiConciergeBanner extends StatelessWidget {
                 color: AppColors.whiteColor.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.face_retouching_natural,
                 color: AppColors.whiteColor,
                 size: 40,
