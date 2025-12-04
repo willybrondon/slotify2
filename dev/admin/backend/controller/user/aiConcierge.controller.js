@@ -173,16 +173,32 @@ exports.checkAIServiceStatus = async (req, res) => {
     // Check Ollama (optional)
     if (process.env.OLLAMA_HOST) {
       try {
-        const { Ollama } = require('ollama');
-        const ollama = new Ollama({ host: process.env.OLLAMA_HOST });
+        const ollamaModule = require('ollama');
+        let ollama;
         
-        // Try to connect to Ollama
-        try {
-          await ollama.list();
+        // Handle different export formats
+        if (ollamaModule.default && typeof ollamaModule.default === 'function') {
+          ollama = new ollamaModule.default({ host: process.env.OLLAMA_HOST });
+        } else if (ollamaModule.Ollama && typeof ollamaModule.Ollama === 'function') {
+          ollama = new ollamaModule.Ollama({ host: process.env.OLLAMA_HOST });
+        } else if (typeof ollamaModule === 'function') {
+          ollama = new ollamaModule({ host: process.env.OLLAMA_HOST });
+        } else {
+          ollama = ollamaModule;
+        }
+        
+        // Try to connect to Ollama (if list method exists)
+        if (ollama.list && typeof ollama.list === 'function') {
+          try {
+            await ollama.list();
+            status.ollama = true;
+            messages.push('✓ Ollama configured and reachable');
+          } catch (connectionError) {
+            messages.push('✗ Ollama configured but not reachable at ' + process.env.OLLAMA_HOST);
+          }
+        } else {
           status.ollama = true;
-          messages.push('✓ Ollama configured and reachable');
-        } catch (connectionError) {
-          messages.push('✗ Ollama configured but not reachable at ' + process.env.OLLAMA_HOST);
+          messages.push('✓ Ollama package loaded (connection test skipped)');
         }
       } catch (error) {
         if (error.message.includes('Cannot find module')) {

@@ -8,9 +8,20 @@ const path = require('path');
 // Initialize Google Gemini
 let genAI = null;
 if (process.env.GEMINI_API_KEY) {
-  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const apiKey = process.env.GEMINI_API_KEY.trim();
+  if (apiKey && apiKey !== '' && !apiKey.includes('your_') && !apiKey.includes('placeholder')) {
+    try {
+      genAI = new GoogleGenerativeAI(apiKey);
+      console.log('[Selfie Analysis] Gemini API initialized successfully');
+    } catch (error) {
+      console.error('[Selfie Analysis] Failed to initialize Gemini:', error.message);
+    }
+  } else {
+    console.warn('[Selfie Analysis] GEMINI_API_KEY appears to be a placeholder. Please set a real API key.');
+  }
 } else {
   console.warn('[Selfie Analysis] GEMINI_API_KEY not found in environment variables');
+  console.warn('[Selfie Analysis] Make sure .env file exists in dev/admin/backend/ and contains GEMINI_API_KEY=your_key');
 }
 
 class SelfieAnalysisService {
@@ -101,10 +112,42 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       let geminiError = null;
       let ollamaError = null;
 
-      // Check if Gemini is configured
+      // Check if Gemini is configured - try to initialize if not already done
       if (!genAI) {
-        geminiError = new Error('GEMINI_API_KEY not found in environment variables');
+        // Try to initialize now (in case .env was updated after server start)
+        const apiKey = process.env.GEMINI_API_KEY?.trim();
+        if (apiKey && apiKey !== '' && !apiKey.includes('your_') && !apiKey.includes('placeholder')) {
+          try {
+            genAI = new GoogleGenerativeAI(apiKey);
+            console.log('[Selfie Analysis] Gemini API initialized successfully (runtime initialization)');
+          } catch (error) {
+            console.error('[Selfie Analysis] Failed to initialize Gemini at runtime:', error.message);
+          }
+        }
+      }
+
+      // Check again after potential runtime initialization
+      if (!genAI) {
+        const hasKey = !!process.env.GEMINI_API_KEY;
+        const apiKeyValue = process.env.GEMINI_API_KEY?.trim() || '';
+        
+        if (hasKey) {
+          if (apiKeyValue.includes('your_') || apiKeyValue.includes('placeholder') || apiKeyValue === '') {
+            geminiError = new Error('GEMINI_API_KEY is set but appears to be a placeholder. Please set a real API key from https://aistudio.google.com/app/apikey');
+          } else if (apiKeyValue.length < 20) {
+            geminiError = new Error('GEMINI_API_KEY is set but appears invalid (too short). Please check your .env file.');
+          } else if (!apiKeyValue.startsWith('AIzaSy')) {
+            geminiError = new Error('GEMINI_API_KEY format appears invalid (should start with AIzaSy). Please check your .env file.');
+          } else {
+            geminiError = new Error('GEMINI_API_KEY is set but initialization failed. Please check server logs and verify the key is correct.');
+          }
+        } else {
+          geminiError = new Error('GEMINI_API_KEY not found in environment variables. Add it to your .env file and restart the server.');
+        }
         console.warn('[Selfie Analysis] Gemini not configured:', geminiError.message);
+        console.warn('[Selfie Analysis] GEMINI_API_KEY exists:', hasKey);
+        console.warn('[Selfie Analysis] GEMINI_API_KEY length:', apiKeyValue.length);
+        console.warn('[Selfie Analysis] GEMINI_API_KEY starts with AIzaSy:', apiKeyValue.startsWith('AIzaSy'));
       } else {
         try {
           const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -206,22 +249,38 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434';
       
       // Try to require ollama
-      let Ollama;
+      let ollama;
       try {
-        Ollama = require('ollama');
+        const ollamaModule = require('ollama');
+        // For ollama v0.5.x, the default export is the Ollama class
+        // Check different possible export formats
+        if (ollamaModule.default && typeof ollamaModule.default === 'function') {
+          ollama = new ollamaModule.default({ host: ollamaHost });
+        } else if (ollamaModule.Ollama && typeof ollamaModule.Ollama === 'function') {
+          ollama = new ollamaModule.Ollama({ host: ollamaHost });
+        } else if (typeof ollamaModule === 'function') {
+          ollama = new ollamaModule({ host: ollamaHost });
+        } else {
+          // For ollama v0.5.x, it might export directly
+          ollama = ollamaModule;
+          if (typeof ollama !== 'object' || !ollama.chat) {
+            throw new Error('Ollama package structure unexpected. Please check package version.');
+          }
+        }
       } catch (requireError) {
-        throw new Error('Ollama package not installed. Run: npm install ollama');
+        if (requireError.message.includes('Cannot find module')) {
+          throw new Error('Ollama package not installed. Run: npm install ollama');
+        }
+        throw requireError;
       }
 
-      const ollama = new Ollama({
-        host: ollamaHost
-      });
-
-      // Check if Ollama server is reachable
-      try {
-        await ollama.list();
-      } catch (connectionError) {
-        throw new Error(`Cannot connect to Ollama at ${ollamaHost}. Make sure Ollama is running.`);
+      // Check if Ollama server is reachable (if list method exists)
+      if (ollama.list && typeof ollama.list === 'function') {
+        try {
+          await ollama.list();
+        } catch (connectionError) {
+          throw new Error(`Cannot connect to Ollama at ${ollamaHost}. Make sure Ollama is running.`);
+        }
       }
 
       const response = await ollama.chat({
