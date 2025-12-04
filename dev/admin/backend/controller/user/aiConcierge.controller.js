@@ -53,10 +53,25 @@ exports.analyzeSelfie = async (req, res) => {
       }
     }
 
+    // Provide helpful error message
+    let errorMessage = error.message || 'Failed to analyze selfie. Please try again.';
+    
+    // Check if it's a configuration error
+    if (errorMessage.includes('Both AI services failed') || 
+        errorMessage.includes('not configured') || 
+        errorMessage.includes('API key')) {
+      errorMessage += '\n\nTo fix this:\n1. Get a free Gemini API key from https://aistudio.google.com/app/apikey\n2. Add GEMINI_API_KEY=your_key_here to your .env file\n3. Restart the server';
+    }
+
     return res.status(200).send({
       status: false,
-      message: error.message || 'Failed to analyze selfie. Please try again.',
-      error: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      message: errorMessage,
+      error: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      configurationHelp: {
+        geminiConfigured: !!process.env.GEMINI_API_KEY,
+        ollamaConfigured: !!process.env.OLLAMA_HOST,
+        setupGuide: 'See AI_CONCIERGE_SETUP.md for detailed setup instructions'
+      }
     });
   }
 };
@@ -137,6 +152,8 @@ exports.checkAIServiceStatus = async (req, res) => {
       message: ''
     };
 
+    const messages = [];
+
     // Check Gemini
     if (process.env.GEMINI_API_KEY) {
       try {
@@ -145,12 +162,12 @@ exports.checkAIServiceStatus = async (req, res) => {
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
         // Quick test (we won't actually call, just check if configured)
         status.gemini = true;
-        status.message = 'Gemini API configured';
+        messages.push('✓ Gemini API configured');
       } catch (error) {
-        status.message = 'Gemini API key invalid';
+        messages.push('✗ Gemini API key invalid: ' + error.message);
       }
     } else {
-      status.message = 'Gemini API key not configured';
+      messages.push('✗ Gemini API key not configured (GEMINI_API_KEY missing)');
     }
 
     // Check Ollama (optional)
@@ -158,20 +175,27 @@ exports.checkAIServiceStatus = async (req, res) => {
       try {
         const { Ollama } = require('ollama');
         const ollama = new Ollama({ host: process.env.OLLAMA_HOST });
-        // Just check if module is available
-        status.ollama = true;
-        if (status.message) {
-          status.message += ' | Ollama configured';
-        } else {
-          status.message = 'Ollama configured';
+        
+        // Try to connect to Ollama
+        try {
+          await ollama.list();
+          status.ollama = true;
+          messages.push('✓ Ollama configured and reachable');
+        } catch (connectionError) {
+          messages.push('✗ Ollama configured but not reachable at ' + process.env.OLLAMA_HOST);
         }
       } catch (error) {
-        // Ollama not installed or not available
-        if (!status.message) {
-          status.message = 'Ollama not available';
+        if (error.message.includes('Cannot find module')) {
+          messages.push('✗ Ollama package not installed (run: npm install ollama)');
+        } else {
+          messages.push('✗ Ollama error: ' + error.message);
         }
       }
+    } else {
+      messages.push('ℹ Ollama not configured (OLLAMA_HOST not set)');
     }
+
+    status.message = messages.join(' | ');
 
     return res.status(200).send({
       status: status.gemini || status.ollama,

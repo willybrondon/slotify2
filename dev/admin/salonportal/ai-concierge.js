@@ -165,18 +165,29 @@ function sendAnalysisRequest(formData) {
         },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        // Check if response is ok
+        if (!response.ok) {
+            // If response is not ok, try to parse error
+            return response.json().then(errData => {
+                throw new Error(errData.message || `Server error: ${response.status} ${response.statusText}`);
+            }).catch(() => {
+                throw new Error(`Server error: ${response.status} ${response.statusText}`);
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.status === true) {
             displayResults(data.data);
         } else {
-            showError(data.message || 'Failed to analyze image. Please try again.');
+            showError(data.message || data.error || 'Failed to analyze image. Please try again.');
             resetAnalyzeButton();
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showError('An error occurred. Please try again.');
+        showError(error.message || 'An error occurred. Please check your connection and try again.');
         resetAnalyzeButton();
     });
 }

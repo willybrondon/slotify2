@@ -60,13 +60,23 @@
             <div class="mobile-menu-content">
                 <!-- Mobile Login Button -->
                 <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu">Login</a>
-                <a href="ai-concierge.html" class="btn-login-mobile-menu" style="margin-top: 10px;">AI Concierge</a>
+                <!-- AI Concierge Button - More Prominent -->
+                <a href="ai-concierge.html" class="btn-ai-concierge-mobile">
+                    <i class="fas fa-robot"></i> AI Concierge
+                </a>
                 <div class="mobile-categories" id="mobileCategories">
                     <!-- Categories will be loaded dynamically -->
                 </div>
             </div>
         </div>
     </nav>
+    
+    <!-- Floating AI Concierge Button for Mobile -->
+    <a href="ai-concierge.html" class="floating-ai-btn mobile-only" id="floatingAiBtn">
+        <i class="fas fa-robot"></i>
+        <span>AI Concierge</span>
+    </a>
+    
     <!-- Download App Button for Mobile -->
     <a href="#" id="download-app-btn" class="download-app-btn" onclick="openPhoneSelection('customer'); return false;">Download the App</a>
     <!-- Mobile Fixed Download Buttons (only visible on mobile) -->

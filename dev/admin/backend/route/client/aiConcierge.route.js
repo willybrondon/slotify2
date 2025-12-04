@@ -21,12 +21,37 @@ const upload = multer({
 const aiConciergeController = require("../../controller/user/aiConcierge.controller");
 const checkAccessWithSecretKey = require("../../middleware/checkAccess");
 
-// Analyze selfie image
+// Analyze selfie image - POST endpoint
 route.post(
   "/analyzeSelfie",
   checkAccessWithSecretKey(),
   upload.single("image"),
   aiConciergeController.analyzeSelfie
+);
+
+// GET handler for analyzeSelfie - returns helpful message
+route.get(
+  "/analyzeSelfie",
+  (req, res) => {
+    return res.status(405).json({
+      status: false,
+      message: "Method not allowed. This endpoint requires POST method.",
+      info: {
+        method: "POST",
+        endpoint: "/user/aiConcierge/analyzeSelfie",
+        requiredHeaders: {
+          key: "Your secret key"
+        },
+        body: {
+          image: "Image file (multipart/form-data)",
+          latitude: "Optional - User latitude",
+          longitude: "Optional - User longitude",
+          city: "Optional - User city",
+          userId: "Optional - User ID"
+        }
+      }
+    });
+  }
 );
 
 // Chat with AI concierge

@@ -330,6 +330,42 @@ html {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* AI Concierge Button in Mobile Menu - More Prominent */
+.btn-ai-concierge-mobile {
+    display: block !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    padding: 16px 20px;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    margin-top: 12px;
+    transition: all 0.3s ease;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-ai-concierge-mobile i {
+    font-size: 1.2rem;
+}
+
+.btn-ai-concierge-mobile:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%) !important;
+    color: #fff !important;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
 .mobile-categories {
     display: flex !important;
     flex-direction: column !important;
@@ -2243,6 +2279,56 @@ html {
 .download-app-btn:focus {
     background: #333;
 }
+/* Floating AI Concierge Button for Mobile */
+.floating-ai-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 3001;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 14px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+.floating-ai-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+    color: white;
+}
+
+.floating-ai-btn i {
+    font-size: 1.2rem;
+}
+
+.floating-ai-btn span {
+    white-space: nowrap;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(102, 126, 234, 0.6);
+    }
+}
+
+@media (min-width: 769px) {
+    .floating-ai-btn {
+        display: none !important;
+    }
+}
+
 @media (max-width: 600px) {
   .mobile-download-btns {
     display: flex;

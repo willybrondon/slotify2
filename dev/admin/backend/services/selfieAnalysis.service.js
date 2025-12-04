@@ -98,36 +98,65 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       let analysisText = null;
       let analysis = {};
       let usedProvider = 'gemini';
+      let geminiError = null;
+      let ollamaError = null;
 
-      try {
-        if (!genAI) {
-          throw new Error('Gemini API key not configured');
-        }
-
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-        const result = await model.generateContent([
-          analysisPrompt,
-          {
-            inlineData: {
-              data: base64Image,
-              mimeType: mimeType
-            }
-          }
-        ]);
-
-        analysisText = result.response.text();
-        usedProvider = 'gemini';
-      } catch (geminiError) {
-        console.error('[Selfie Analysis] Gemini error:', geminiError.message);
-        
-        // Fallback to Ollama if available
+      // Check if Gemini is configured
+      if (!genAI) {
+        geminiError = new Error('GEMINI_API_KEY not found in environment variables');
+        console.warn('[Selfie Analysis] Gemini not configured:', geminiError.message);
+      } else {
         try {
+          const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+          const result = await model.generateContent([
+            analysisPrompt,
+            {
+              inlineData: {
+                data: base64Image,
+                mimeType: mimeType
+              }
+            }
+          ]);
+
+          analysisText = result.response.text();
+          usedProvider = 'gemini';
+        } catch (error) {
+          geminiError = error;
+          console.error('[Selfie Analysis] Gemini API error:', error.message);
+        }
+      }
+
+      // Fallback to Ollama if Gemini failed
+      if (!analysisText) {
+        try {
+          if (!process.env.OLLAMA_HOST) {
+            throw new Error('OLLAMA_HOST not configured');
+          }
           analysisText = await this.analyzeWithOllama(base64Image, analysisPrompt);
           usedProvider = 'ollama';
-        } catch (ollamaError) {
-          console.error('[Selfie Analysis] Ollama fallback error:', ollamaError.message);
-          throw new Error('Both Gemini and Ollama failed. Please check configuration.');
+        } catch (error) {
+          ollamaError = error;
+          console.error('[Selfie Analysis] Ollama fallback error:', error.message);
+          
+          // If both failed, provide helpful error message
+          const errorDetails = [];
+          if (geminiError) {
+            if (geminiError.message.includes('not found')) {
+              errorDetails.push('Gemini: API key not configured. Add GEMINI_API_KEY to your .env file');
+            } else {
+              errorDetails.push(`Gemini: ${geminiError.message}`);
+            }
+          }
+          if (ollamaError) {
+            if (ollamaError.message.includes('not configured')) {
+              errorDetails.push('Ollama: Not configured. Set OLLAMA_HOST in .env or install Ollama');
+            } else {
+              errorDetails.push(`Ollama: ${ollamaError.message}`);
+            }
+          }
+          
+          throw new Error(`Both AI services failed:\n${errorDetails.join('\n')}\n\nPlease configure at least one AI service. See AI_CONCIERGE_SETUP.md for instructions.`);
         }
       }
 
@@ -173,10 +202,27 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
    */
   async analyzeWithOllama(base64Image, prompt) {
     try {
-      const { Ollama } = require('ollama');
+      // Check if Ollama is configured
+      const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434';
+      
+      // Try to require ollama
+      let Ollama;
+      try {
+        Ollama = require('ollama');
+      } catch (requireError) {
+        throw new Error('Ollama package not installed. Run: npm install ollama');
+      }
+
       const ollama = new Ollama({
-        host: process.env.OLLAMA_HOST || 'http://localhost:11434'
+        host: ollamaHost
       });
+
+      // Check if Ollama server is reachable
+      try {
+        await ollama.list();
+      } catch (connectionError) {
+        throw new Error(`Cannot connect to Ollama at ${ollamaHost}. Make sure Ollama is running.`);
+      }
 
       const response = await ollama.chat({
         model: process.env.OLLAMA_MODEL || 'qwen2.5-vl:7b',
@@ -190,6 +236,10 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
           num_predict: 1500
         }
       });
+
+      if (!response || !response.message || !response.message.content) {
+        throw new Error('Ollama returned empty response');
+      }
 
       return response.message.content;
     } catch (error) {
