@@ -52,4 +52,5 @@ class AppRoutes {
   static const String editProfile = '/editProfile';
   static const String setting = '/setting';
   static const String language = '/language';
+  static const String aiConcierge = '/aiConcierge';
 }

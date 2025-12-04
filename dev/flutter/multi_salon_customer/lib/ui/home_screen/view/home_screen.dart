@@ -60,16 +60,24 @@ class HomeScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const HomeScreenCategoryView().paddingOnly(left: 15, right: 15),
-                        const HomeScreenNearSalonView().paddingOnly(left: 15, right: 15),
+                        const HomeScreenAiConciergeBanner()
+                            .paddingOnly(left: 15, right: 15, bottom: 15),
+                        const HomeScreenCategoryView()
+                            .paddingOnly(left: 15, right: 15),
+                        const HomeScreenNearSalonView()
+                            .paddingOnly(left: 15, right: 15),
                         logic.getNewProductModel?.data?.isEmpty == true
                             ? const SizedBox()
-                            : const HomeScreenNewProductView()
-                                .paddingOnly(top: Constant.storage.read<bool>('isLogIn') ?? false ? 15 : 0),
+                            : const HomeScreenNewProductView().paddingOnly(
+                                top: Constant.storage.read<bool>('isLogIn') ??
+                                        false
+                                    ? 15
+                                    : 0),
                         logic.getTrendingProductModel?.data?.isEmpty == true
                             ? const SizedBox()
                             : const HomeScreenTrendingProduct(),
-                        const HomeScreenTopExpertView().paddingOnly(left: 15, right: 15),
+                        const HomeScreenTopExpertView()
+                            .paddingOnly(left: 15, right: 15),
                       ],
                     ),
                   ],

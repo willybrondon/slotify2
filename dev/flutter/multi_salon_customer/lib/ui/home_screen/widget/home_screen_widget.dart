@@ -269,6 +269,115 @@ class HomeScreenCategoryView extends StatelessWidget {
   }
 }
 
+class HomeScreenAiConciergeBanner extends StatelessWidget {
+  const HomeScreenAiConciergeBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(AppRoutes.aiConcierge);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primaryAppColor,
+              AppColors.primaryAppColor.withOpacity(0.8),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryAppColor.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.auto_awesome,
+                        color: AppColors.whiteColor,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        "AI Beauty Concierge",
+                        style: TextStyle(
+                          color: AppColors.whiteColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Get personalized beauty recommendations based on AI analysis of your selfie",
+                    style: TextStyle(
+                      color: AppColors.whiteColor,
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.whiteColor.withOpacity(0.3),
+                      ),
+                    ),
+                    child: const Text(
+                      "Try Now →",
+                      style: TextStyle(
+                        color: AppColors.whiteColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.face_retouching_natural,
+                color: AppColors.whiteColor,
+                size: 40,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class HomeScreenNearSalonView extends StatelessWidget {
   const HomeScreenNearSalonView({super.key});
 

@@ -27,6 +27,7 @@ const withdrawMethod = require("./withdrawMethod.route");
 const expertWithdrawMethod = require("./expertWithdrawMethod.route");
 const expertWithdrawRequest = require("./expertWithdrawRequest.route");
 const couponRoute = require("./coupon.route");
+const aiConciergeRoute = require("./aiConcierge.route");
 
 route.use("/order", order);
 route.use("/cart", cart);
@@ -53,3 +54,4 @@ route.use("/withdrawMethod", withdrawMethod);
 route.use("/expertWithdrawMethod", expertWithdrawMethod);
 route.use("/expertWithdrawRequest", expertWithdrawRequest);
 route.use("/coupon", couponRoute);
+route.use("/aiConcierge", aiConciergeRoute);

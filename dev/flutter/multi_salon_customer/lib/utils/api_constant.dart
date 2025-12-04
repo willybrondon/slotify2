@@ -102,4 +102,9 @@ class ApiConstant {
   /// ---------- Complain ---------- ///
   static const raiseComplain = "user/complain/raiseComplain";
   static const getComplain = "user/complain/get?";
+
+  /// ---------- AI Concierge ---------- ///
+  static const analyzeSelfie = "user/aiConcierge/analyzeSelfie";
+  static const aiConciergeChat = "user/aiConcierge/chat";
+  static const aiConciergeStatus = "user/aiConcierge/status";
 }
