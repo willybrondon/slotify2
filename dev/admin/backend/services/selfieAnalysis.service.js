@@ -5,23 +5,55 @@ const Expert = require('../models/expert.model');
 const fs = require('fs');
 const path = require('path');
 
+// Helper function to get and validate Gemini API key
+function getGeminiApiKey() {
+  let apiKey = process.env.GEMINI_API_KEY;
+  
+  // If not found, try reloading dotenv with explicit path
+  if (!apiKey) {
+    try {
+      const dotenv = require('dotenv');
+      const envPath = path.join(__dirname, '..', '.env');
+      const result = dotenv.config({ path: envPath });
+      
+      if (!result.error) {
+        apiKey = process.env.GEMINI_API_KEY;
+      } else {
+        dotenv.config();
+        apiKey = process.env.GEMINI_API_KEY;
+      }
+    } catch (e) {
+      // dotenv already loaded, continue
+    }
+  }
+  
+  // Clean the key - remove quotes, whitespace
+  if (apiKey) {
+    apiKey = apiKey.trim();
+    // Remove surrounding quotes if present
+    if ((apiKey.startsWith('"') && apiKey.endsWith('"')) || 
+        (apiKey.startsWith("'") && apiKey.endsWith("'"))) {
+      apiKey = apiKey.slice(1, -1);
+    }
+  }
+  
+  return apiKey;
+}
+
 // Initialize Google Gemini
 let genAI = null;
-if (process.env.GEMINI_API_KEY) {
-  const apiKey = process.env.GEMINI_API_KEY.trim();
-  if (apiKey && apiKey !== '' && !apiKey.includes('your_') && !apiKey.includes('placeholder')) {
-    try {
-      genAI = new GoogleGenerativeAI(apiKey);
-      console.log('[Selfie Analysis] Gemini API initialized successfully');
-    } catch (error) {
-      console.error('[Selfie Analysis] Failed to initialize Gemini:', error.message);
-    }
-  } else {
-    console.warn('[Selfie Analysis] GEMINI_API_KEY appears to be a placeholder. Please set a real API key.');
+const apiKey = getGeminiApiKey();
+if (apiKey && apiKey !== '' && !apiKey.includes('your_') && !apiKey.includes('placeholder') && apiKey.length > 20) {
+  try {
+    genAI = new GoogleGenerativeAI(apiKey);
+    console.log('[Selfie Analysis] ✅ Gemini API initialized successfully');
+  } catch (error) {
+    console.error('[Selfie Analysis] ❌ Failed to initialize Gemini:', error.message);
   }
+} else if (apiKey) {
+  console.warn('[Selfie Analysis] ⚠️ GEMINI_API_KEY appears to be invalid or a placeholder. Please set a real API key.');
 } else {
-  console.warn('[Selfie Analysis] GEMINI_API_KEY not found in environment variables');
-  console.warn('[Selfie Analysis] Make sure .env file exists in dev/admin/backend/ and contains GEMINI_API_KEY=your_key');
+  console.warn('[Selfie Analysis] ⚠️ GEMINI_API_KEY not found in environment variables');
 }
 
 class SelfieAnalysisService {
@@ -115,21 +147,21 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       // Check if Gemini is configured - try to initialize if not already done
       if (!genAI) {
         // Try to initialize now (in case .env was updated after server start)
-        const apiKey = process.env.GEMINI_API_KEY?.trim();
-        if (apiKey && apiKey !== '' && !apiKey.includes('your_') && !apiKey.includes('placeholder')) {
+        const apiKey = getGeminiApiKey();
+        if (apiKey && apiKey !== '' && !apiKey.includes('your_') && !apiKey.includes('placeholder') && apiKey.length > 20) {
           try {
             genAI = new GoogleGenerativeAI(apiKey);
-            console.log('[Selfie Analysis] Gemini API initialized successfully (runtime initialization)');
+            console.log('[Selfie Analysis] ✅ Gemini API initialized successfully (runtime initialization)');
           } catch (error) {
-            console.error('[Selfie Analysis] Failed to initialize Gemini at runtime:', error.message);
+            console.error('[Selfie Analysis] ❌ Failed to initialize Gemini at runtime:', error.message);
           }
         }
       }
 
       // Check again after potential runtime initialization
       if (!genAI) {
-        const hasKey = !!process.env.GEMINI_API_KEY;
-        const apiKeyValue = process.env.GEMINI_API_KEY?.trim() || '';
+        const apiKeyValue = getGeminiApiKey() || '';
+        const hasKey = !!apiKeyValue;
         
         if (hasKey) {
           if (apiKeyValue.includes('your_') || apiKeyValue.includes('placeholder') || apiKeyValue === '') {
@@ -144,29 +176,50 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         } else {
           geminiError = new Error('GEMINI_API_KEY not found in environment variables. Add it to your .env file and restart the server.');
         }
-        console.warn('[Selfie Analysis] Gemini not configured:', geminiError.message);
-        console.warn('[Selfie Analysis] GEMINI_API_KEY exists:', hasKey);
-        console.warn('[Selfie Analysis] GEMINI_API_KEY length:', apiKeyValue.length);
-        console.warn('[Selfie Analysis] GEMINI_API_KEY starts with AIzaSy:', apiKeyValue.startsWith('AIzaSy'));
+        console.warn('[Selfie Analysis] ❌ Gemini not configured:', geminiError.message);
       } else {
         try {
-          const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-          const result = await model.generateContent([
-            analysisPrompt,
-            {
-              inlineData: {
-                data: base64Image,
-                mimeType: mimeType
-              }
+          // Try different model names in order of preference
+          const modelNames = [
+            'gemini-1.5-flash-latest',
+            'gemini-1.5-flash',
+            'gemini-pro-vision',
+            'gemini-pro'
+          ];
+          
+          let model = null;
+          let lastError = null;
+          
+          for (const modelName of modelNames) {
+            try {
+              model = genAI.getGenerativeModel({ model: modelName });
+              const result = await model.generateContent([
+                analysisPrompt,
+                {
+                  inlineData: {
+                    data: base64Image,
+                    mimeType: mimeType
+                  }
+                }
+              ]);
+              
+              analysisText = result.response.text();
+              usedProvider = 'gemini';
+              console.log(`[Selfie Analysis] ✅ Successfully used model: ${modelName}`);
+              break; // Success, exit loop
+            } catch (modelError) {
+              lastError = modelError;
+              console.warn(`[Selfie Analysis] ⚠️ Model ${modelName} failed:`, modelError.message);
+              // Continue to next model
             }
-          ]);
-
-          analysisText = result.response.text();
-          usedProvider = 'gemini';
+          }
+          
+          if (!analysisText && lastError) {
+            throw lastError;
+          }
         } catch (error) {
           geminiError = error;
-          console.error('[Selfie Analysis] Gemini API error:', error.message);
+          console.error('[Selfie Analysis] ❌ Gemini API error:', error.message);
         }
       }
 
@@ -185,21 +238,28 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
           // If both failed, provide helpful error message
           const errorDetails = [];
           if (geminiError) {
-            if (geminiError.message.includes('not found')) {
+            // Only show Gemini error if it's a real configuration issue
+            const apiKeyValue = getGeminiApiKey() || '';
+            if (!apiKeyValue || apiKeyValue.trim() === '') {
+              errorDetails.push('Gemini: API key not configured. Add GEMINI_API_KEY to your .env file');
+            } else if (geminiError.message.includes('not found')) {
               errorDetails.push('Gemini: API key not configured. Add GEMINI_API_KEY to your .env file');
             } else {
               errorDetails.push(`Gemini: ${geminiError.message}`);
             }
           }
           if (ollamaError) {
-            if (ollamaError.message.includes('not configured')) {
-              errorDetails.push('Ollama: Not configured. Set OLLAMA_HOST in .env or install Ollama');
-            } else {
+            // Only show Ollama error if it's configured but failed (not if it's just not configured)
+            if (!ollamaError.message.includes('not configured')) {
               errorDetails.push(`Ollama: ${ollamaError.message}`);
             }
           }
           
-          throw new Error(`Both AI services failed:\n${errorDetails.join('\n')}\n\nPlease configure at least one AI service. See AI_CONCIERGE_SETUP.md for instructions.`);
+          if (errorDetails.length > 0) {
+            throw new Error(`Both AI services failed:\n${errorDetails.join('\n')}\n\nPlease configure at least one AI service. See AI_CONCIERGE_SETUP.md for instructions.`);
+          } else {
+            throw new Error('AI services are not configured. Please configure at least one AI service (Gemini or Ollama). See AI_CONCIERGE_SETUP.md for instructions.');
+          }
         }
       }
 

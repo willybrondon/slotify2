@@ -154,20 +154,32 @@ exports.checkAIServiceStatus = async (req, res) => {
 
     const messages = [];
 
-    // Check Gemini
-    if (process.env.GEMINI_API_KEY) {
+    // Check Gemini - use the same helper function as the service
+    function getGeminiApiKey() {
+      let apiKey = process.env.GEMINI_API_KEY;
+      if (apiKey) {
+        apiKey = apiKey.trim();
+        if ((apiKey.startsWith('"') && apiKey.endsWith('"')) || 
+            (apiKey.startsWith("'") && apiKey.endsWith("'"))) {
+          apiKey = apiKey.slice(1, -1);
+        }
+      }
+      return apiKey;
+    }
+    
+    const geminiKey = getGeminiApiKey();
+    if (geminiKey && geminiKey !== '' && geminiKey.length > 20 && geminiKey.startsWith('AIzaSy')) {
       try {
         const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-        // Quick test (we won't actually call, just check if configured)
+        const genAI = new GoogleGenerativeAI(geminiKey);
+        // Quick test - just create instance, don't call API
         status.gemini = true;
         messages.push('✓ Gemini API configured');
       } catch (error) {
         messages.push('✗ Gemini API key invalid: ' + error.message);
       }
     } else {
-      messages.push('✗ Gemini API key not configured (GEMINI_API_KEY missing)');
+      messages.push('✗ Gemini API key not configured (GEMINI_API_KEY missing or invalid)');
     }
 
     // Check Ollama (optional)

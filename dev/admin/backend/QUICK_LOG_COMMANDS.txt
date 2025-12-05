@@ -1,0 +1,61 @@
+# QUICK AI CONCIERGE LOG COMMANDS
+# Copy and paste these commands on your VPS
+
+# ============================================
+# MOST COMMONLY USED (Start here!)
+# ============================================
+
+# 1. Real-time monitoring of AI concierge logs
+pm2 logs backend --lines 0 | grep --line-buffered -i "selfie\|gemini\|ollama\|ai\|concierge"
+
+# 2. View last 100 AI-related log entries
+pm2 logs backend --lines 200 | grep -i "selfie\|gemini\|ollama\|ai\|concierge" | tail -100
+
+# 3. Check if Gemini API key is loaded (on startup)
+pm2 logs backend --lines 100 | grep -E "Gemini API initialized|GEMINI_API_KEY|Environment"
+
+# 4. View only errors related to AI
+pm2 logs backend --err --lines 100 | grep -i "selfie\|gemini\|ollama\|ai\|concierge\|error\|failed"
+
+# ============================================
+# DIAGNOSTIC COMMANDS
+# ============================================
+
+# Check for "Both AI services failed" error
+pm2 logs backend --lines 200 | grep -A 5 "Both AI services failed"
+
+# Search for API key configuration issues
+pm2 logs backend --lines 200 | grep -E "API key not configured|not found in environment|GEMINI_API_KEY"
+
+# Check Gemini initialization status
+pm2 logs backend --lines 100 | grep -E "Gemini API initialized|genAI is initialized|Selfie Analysis.*Gemini"
+
+# ============================================
+# SAVE LOGS TO FILE
+# ============================================
+
+# Save AI logs to a file
+pm2 logs backend --lines 500 | grep -i "selfie\|gemini\|ollama\|ai\|concierge" > ai_logs_$(date +%Y%m%d).txt
+
+# ============================================
+# DIRECT LOG FILE ACCESS
+# ============================================
+
+# View log files directly (if PM2 logs command doesn't work)
+tail -f ~/.pm2/logs/backend-out.log | grep -i "selfie\|gemini\|ollama\|ai\|concierge"
+
+# Search log files for specific errors
+grep -r "API key not configured" ~/.pm2/logs/
+grep -r "Both AI services failed" ~/.pm2/logs/
+
+# ============================================
+# NOTES
+# ============================================
+
+# If your PM2 process name is not "backend", first check:
+pm2 list
+
+# Then replace "backend" in commands above with your process name
+
+# Common process names: backend, slotify-backend, app, server
+
