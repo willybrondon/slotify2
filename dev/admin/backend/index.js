@@ -502,4 +502,13 @@ app.listen(port, () => {
     console.warn("[SMS Service]   - TWILIO_AUTH_TOKEN");
     console.warn("[SMS Service]   - TWILIO_PHONE_NUMBER");
   }
+  
+  // Check Gemini AI configuration on startup (same pattern as Twilio)
+  if (process.env.GEMINI_API_KEY) {
+    console.log("[AI Service] ✓ Gemini API is configured and ready");
+  } else {
+    console.warn("[AI Service] ⚠ WARNING: Gemini API is NOT configured");
+    console.warn("[AI Service] AI concierge features will not work. Please configure:");
+    console.warn("[AI Service]   - GEMINI_API_KEY (get free key from https://aistudio.google.com/app/apikey)");
+  }
 });

@@ -42,7 +42,10 @@ exports.analyzeSelfie = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('[AI Concierge] Analyze selfie error:', error);
+    // Only log error if it's not a configuration issue (those are expected)
+    if (!error.message || (!error.message.includes('not configured') && !error.message.includes('API key not configured'))) {
+      console.error('[AI Concierge] Analyze selfie error:', error.message);
+    }
     
     // Clean up file on error
     if (req.file && req.file.path && fs.existsSync(req.file.path)) {
@@ -56,10 +59,9 @@ exports.analyzeSelfie = async (req, res) => {
     // Provide helpful error message
     let errorMessage = error.message || 'Failed to analyze selfie. Please try again.';
     
-    // Check if it's a configuration error
-    if (errorMessage.includes('Both AI services failed') || 
-        errorMessage.includes('not configured') || 
-        errorMessage.includes('API key')) {
+    // Check if it's a configuration error - only add help if key is truly missing
+    const hasGeminiKey = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim() !== '';
+    if ((errorMessage.includes('Both AI services failed') || errorMessage.includes('not configured')) && !hasGeminiKey) {
       errorMessage += '\n\nTo fix this:\n1. Get a free Gemini API key from https://aistudio.google.com/app/apikey\n2. Add GEMINI_API_KEY=your_key_here to your .env file\n3. Restart the server';
     }
 
@@ -68,8 +70,8 @@ exports.analyzeSelfie = async (req, res) => {
       message: errorMessage,
       error: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       configurationHelp: {
-        geminiConfigured: !!process.env.GEMINI_API_KEY,
-        ollamaConfigured: !!process.env.OLLAMA_HOST,
+        geminiConfigured: hasGeminiKey,
+        ollamaConfigured: !!(process.env.OLLAMA_HOST && process.env.OLLAMA_HOST.trim() !== ''),
         setupGuide: 'See AI_CONCIERGE_SETUP.md for detailed setup instructions'
       }
     });
@@ -154,24 +156,11 @@ exports.checkAIServiceStatus = async (req, res) => {
 
     const messages = [];
 
-    // Check Gemini - use the same helper function as the service
-    function getGeminiApiKey() {
-      let apiKey = process.env.GEMINI_API_KEY;
-      if (apiKey) {
-        apiKey = apiKey.trim();
-        if ((apiKey.startsWith('"') && apiKey.endsWith('"')) || 
-            (apiKey.startsWith("'") && apiKey.endsWith("'"))) {
-          apiKey = apiKey.slice(1, -1);
-        }
-      }
-      return apiKey;
-    }
-    
-    const geminiKey = getGeminiApiKey();
-    if (geminiKey && geminiKey !== '' && geminiKey.length > 20 && geminiKey.startsWith('AIzaSy')) {
+    // Check Gemini (same simple pattern as Twilio/SendGrid)
+    if (process.env.GEMINI_API_KEY) {
       try {
         const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const genAI = new GoogleGenerativeAI(geminiKey);
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         // Quick test - just create instance, don't call API
         status.gemini = true;
         messages.push('✓ Gemini API configured');
@@ -179,7 +168,7 @@ exports.checkAIServiceStatus = async (req, res) => {
         messages.push('✗ Gemini API key invalid: ' + error.message);
       }
     } else {
-      messages.push('✗ Gemini API key not configured (GEMINI_API_KEY missing or invalid)');
+      messages.push('✗ Gemini API key not configured (GEMINI_API_KEY missing)');
     }
 
     // Check Ollama (optional)
