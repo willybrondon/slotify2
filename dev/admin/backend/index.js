@@ -511,4 +511,11 @@ app.listen(port, () => {
     console.warn("[AI Service] AI concierge features will not work. Please configure:");
     console.warn("[AI Service]   - GEMINI_API_KEY (get free key from https://aistudio.google.com/app/apikey)");
   }
+  
+  // Check Ollama (optional - only needed as fallback)
+  if (process.env.OLLAMA_HOST) {
+    console.log("[AI Service] ℹ Ollama is configured (optional fallback)");
+  } else {
+    console.log("[AI Service] ℹ Ollama not configured (optional - only needed if you want local AI fallback)");
+  }
 });

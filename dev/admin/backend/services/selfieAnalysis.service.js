@@ -123,12 +123,10 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         }
       } else {
         try {
-          // Try different model names in order of preference
+          // Try different model names in order of preference (use valid models that support image analysis)
           const modelNames = [
-            'gemini-1.5-flash-latest',
-            'gemini-1.5-flash',
-            'gemini-pro-vision',
-            'gemini-pro'
+            'gemini-1.5-flash',      // Primary: Fast and supports images
+            'gemini-1.5-pro'         // Alternative: More powerful, supports images
           ];
           
           let model = null;

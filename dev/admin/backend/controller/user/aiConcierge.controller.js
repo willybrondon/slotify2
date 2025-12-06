@@ -171,7 +171,7 @@ exports.checkAIServiceStatus = async (req, res) => {
       messages.push('✗ Gemini API key not configured (GEMINI_API_KEY missing)');
     }
 
-    // Check Ollama (optional)
+    // Check Ollama (optional - same pattern as Twilio)
     if (process.env.OLLAMA_HOST) {
       try {
         const ollamaModule = require('ollama');
@@ -195,21 +195,21 @@ exports.checkAIServiceStatus = async (req, res) => {
             status.ollama = true;
             messages.push('✓ Ollama configured and reachable');
           } catch (connectionError) {
-            messages.push('✗ Ollama configured but not reachable at ' + process.env.OLLAMA_HOST);
+            messages.push('ℹ Ollama configured but not reachable (Ollama server may not be running)');
           }
         } else {
           status.ollama = true;
-          messages.push('✓ Ollama package loaded (connection test skipped)');
+          messages.push('✓ Ollama package loaded');
         }
       } catch (error) {
         if (error.message.includes('Cannot find module')) {
-          messages.push('✗ Ollama package not installed (run: npm install ollama)');
+          messages.push('ℹ Ollama package not installed (optional fallback - run: npm install ollama if needed)');
         } else {
-          messages.push('✗ Ollama error: ' + error.message);
+          messages.push('ℹ Ollama: ' + error.message);
         }
       }
     } else {
-      messages.push('ℹ Ollama not configured (OLLAMA_HOST not set)');
+      messages.push('ℹ Ollama not configured (optional - only needed as fallback if Gemini fails)');
     }
 
     status.message = messages.join(' | ');
