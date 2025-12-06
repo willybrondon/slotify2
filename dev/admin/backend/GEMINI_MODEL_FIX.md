@@ -30,20 +30,23 @@ const modelNames = [
 **After:**
 ```javascript
 const modelNames = [
-  'gemini-1.5-flash',      // Primary: Fast and supports images
-  'gemini-1.5-pro'         // Alternative: More powerful, supports images
+  'gemini-1.5-flash',           // Primary: Fast and supports images
+  'gemini-1.5-pro-latest',      // Alternative: Latest pro model, supports images
+  'gemini-1.5-flash-latest'     // Fallback: Latest flash model
 ];
 ```
 
 ## Valid Models for Image Analysis
-- ✅ `gemini-1.5-flash` - Fast, efficient, supports images (recommended)
-- ✅ `gemini-1.5-pro` - More powerful, supports images (fallback)
+- ✅ `gemini-1.5-flash` - Fast, efficient, supports images (primary)
+- ✅ `gemini-1.5-pro-latest` - Latest pro model, supports images (alternative)
+- ✅ `gemini-1.5-flash-latest` - Latest flash model, supports images (fallback)
 
 ## Testing
 The application will now:
 1. Try `gemini-1.5-flash` first (fast and reliable)
-2. Fall back to `gemini-1.5-pro` if the first fails
-3. Both models support image analysis for selfies
+2. Fall back to `gemini-1.5-pro-latest` if the first fails
+3. Fall back to `gemini-1.5-flash-latest` as final option
+4. All models support image analysis for selfies
 
 ## Next Steps
 1. Deploy the updated `services/selfieAnalysis.service.js` to your VPS
