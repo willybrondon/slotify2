@@ -127,8 +127,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
           const modelNames = [
             'gemini-1.5-flash',           // Primary: Fast and supports images
             'gemini-1.5-pro-latest',      // Alternative: Latest pro model, supports images
-            'gemini-1.5-flash-latest',  // Fallback: Latest flash model
-            'gemini-pro-vision'
+            'gemini-1.5-flash-latest'  // Fallback: Latest flash model
           ];
           
           let model = null;
