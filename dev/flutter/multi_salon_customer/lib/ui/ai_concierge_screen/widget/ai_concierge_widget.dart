@@ -14,12 +14,11 @@ class AiConciergeMainView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return SingleChildScrollView(
       child: Column(
         children: [
           const SizedBox(height: 20),
-          
+
           // Header Section
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -189,7 +188,8 @@ class AiConciergeMainView extends StatelessWidget {
                           onPressed: logic.isLoading.value
                               ? null
                               : () async {
-                                  final userId = Constant.storage.read<String>('userId');
+                                  final userId =
+                                      Constant.storage.read<String>('userId');
                                   await logic.onAnalyzeSelfieApiCall(
                                     userId: userId,
                                     latitude: latitude?.toString(),
@@ -251,7 +251,6 @@ class AiConciergeResultsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +303,8 @@ class AiConciergeResultsView extends StatelessWidget {
             builder: (context) {
               final controller = Get.find<AiConciergeController>();
               if (controller.recommendations != null) {
-                return _buildRecommendationsSection(controller.recommendations!);
+                return _buildRecommendationsSection(
+                    controller.recommendations!);
               }
               return const SizedBox.shrink();
             },
@@ -562,10 +562,12 @@ class AiConciergeResultsView extends StatelessWidget {
               itemCount: services.length,
               itemBuilder: (context, index) {
                 final service = services[index];
-                return GestureDetector(
+                return InkWell(
                   onTap: () {
                     // Navigate to service-based salon listing page
-                    if (service.id != null) {
+                    if (service.id != null && service.id!.isNotEmpty) {
+                      print(
+                          "AI Concierge: Clicked service: ${service.name}, ID: ${service.id}");
                       Get.toNamed(
                         AppRoutes.selectBranch,
                         arguments: [
@@ -573,10 +575,15 @@ class AiConciergeResultsView extends StatelessWidget {
                           0.0, // totalPrice
                           0.0, // finalTaxRupee
                           0, // totalMinute
-                          [service.id!], // serviceId - single service for filtering
+                          [
+                            service.id!
+                          ], // serviceId - single service for filtering
                           0.0, // withOutTaxRupee
                         ],
                       );
+                    } else {
+                      print(
+                          "AI Concierge: Service ID is null or empty for service: ${service.name}");
                     }
                   },
                   child: Container(
@@ -662,12 +669,19 @@ class AiConciergeResultsView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          ...salons.map((salon) => GestureDetector(
+          ...salons.map((salon) => InkWell(
                 onTap: () {
-                  Get.toNamed(
-                    AppRoutes.branchDetail,
-                    arguments: [salon.id],
-                  );
+                  if (salon.id != null && salon.id!.isNotEmpty) {
+                    print(
+                        "AI Concierge: Clicked salon: ${salon.name}, ID: ${salon.id}");
+                    Get.toNamed(
+                      AppRoutes.branchDetail,
+                      arguments: [salon.id],
+                    );
+                  } else {
+                    print(
+                        "AI Concierge: Salon ID is null or empty for salon: ${salon.name}");
+                  }
                 },
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12),
@@ -839,4 +853,3 @@ class AiConciergeResultsView extends StatelessWidget {
     );
   }
 }
-

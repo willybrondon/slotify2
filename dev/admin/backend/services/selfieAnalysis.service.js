@@ -468,7 +468,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
 
       return {
         services: servicesWithUrl,
-        salons: salonMatches.salons,
+        salons: salonMatches.salons, // Already formatted in getSalonMatches
         experts: salonMatches.experts,
         beautyTips: beautyTips
       };
@@ -497,7 +497,30 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       })
         .populate('serviceIds.id')
         .sort({ review: -1 })
-        .limit(5);
+        .limit(5)
+        .lean(); // Use lean() for better JSON serialization
+      
+      // Format salons to ensure _id is included and properly formatted
+      const formattedSalons = salons.map(salon => {
+        // With lean(), salon is already a plain object
+        const addressDetails = salon.addressDetails || {};
+        const addressLine1 = addressDetails.addressLine1 || "";
+        const city = addressDetails.city || "";
+        const country = addressDetails.country || "";
+        const fullAddress = [addressLine1, city, country].filter(Boolean).join(", ");
+        
+        return {
+          _id: salon._id,
+          id: salon._id ? salon._id.toString() : null, // Add id field for compatibility
+          name: salon.name || "",
+          mainImage: salon.mainImage || (salon.image && salon.image.length > 0 ? salon.image[0] : ""),
+          review: salon.review || 0,
+          reviewCount: salon.reviewCount || 0,
+          addressDetails: addressDetails,
+          address: fullAddress, // Add formatted address string for easy access
+          locationCoordinates: salon.locationCoordinates || {}
+        };
+      });
 
       // Find experts specialized in these services
       const experts = await Expert.find({
@@ -516,7 +539,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       }
 
       return {
-        salons: salons,
+        salons: formattedSalons, // Use formatted salons
         experts: experts
       };
     } catch (error) {

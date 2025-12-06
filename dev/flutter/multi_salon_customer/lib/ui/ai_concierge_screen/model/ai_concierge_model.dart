@@ -96,13 +96,19 @@ class SkinAnalysis {
   String? texture;
 
   SkinAnalysis(
-      {this.type, this.tone, this.undertone, this.concerns, this.condition, this.texture});
+      {this.type,
+      this.tone,
+      this.undertone,
+      this.concerns,
+      this.condition,
+      this.texture});
 
   SkinAnalysis.fromJson(Map<String, dynamic> json) {
     type = json['type'];
     tone = json['tone'];
     undertone = json['undertone'];
-    concerns = json['concerns'] != null ? List<String>.from(json['concerns']) : null;
+    concerns =
+        json['concerns'] != null ? List<String>.from(json['concerns']) : null;
     condition = json['condition'];
     texture = json['texture'];
   }
@@ -128,7 +134,8 @@ class HairAnalysis {
   String? condition;
   String? length;
 
-  HairAnalysis({this.type, this.texture, this.color, this.condition, this.length});
+  HairAnalysis(
+      {this.type, this.texture, this.color, this.condition, this.length});
 
   HairAnalysis.fromJson(Map<String, dynamic> json) {
     type = json['type'];
@@ -181,7 +188,10 @@ class BeautyProfile {
   List<String>? featuresToEnhance;
 
   BeautyProfile(
-      {this.ageEstimate, this.assessment, this.areasToImprove, this.featuresToEnhance});
+      {this.ageEstimate,
+      this.assessment,
+      this.areasToImprove,
+      this.featuresToEnhance});
 
   BeautyProfile.fromJson(Map<String, dynamic> json) {
     ageEstimate = json['ageEstimate'];
@@ -268,17 +278,53 @@ class ServiceItem {
   String? categoryName;
   String? shareUrl;
 
-  ServiceItem({this.id, this.name, this.image, this.duration, this.status, this.categoryId, this.categoryName, this.shareUrl});
+  ServiceItem(
+      {this.id,
+      this.name,
+      this.image,
+      this.duration,
+      this.status,
+      this.categoryId,
+      this.categoryName,
+      this.shareUrl});
 
   ServiceItem.fromJson(Map<String, dynamic> json) {
-    id = json['_id'] ?? json['id'];
-    name = json['name'];
-    image = json['image'];
-    duration = json['duration'];
-    status = json['status'];
-    categoryId = json['categoryId']?['_id'] ?? json['categoryId'];
-    categoryName = json['categoryId']?['name'] ?? json['categoryName'];
-    shareUrl = json['shareUrl'];
+    // Handle _id which can be ObjectId or string
+    if (json['_id'] != null) {
+      id = json['_id'].toString();
+    } else if (json['id'] != null) {
+      id = json['id'].toString();
+    } else {
+      id = null;
+    }
+
+    name = json['name']?.toString();
+    image = json['image']?.toString();
+    duration = json['duration'] != null
+        ? (json['duration'] is int
+            ? json['duration']
+            : int.tryParse(json['duration'].toString()))
+        : null;
+    status = json['status'] is bool
+        ? json['status']
+        : (json['status']?.toString().toLowerCase() == 'true');
+
+    // Handle categoryId - can be object or string
+    if (json['categoryId'] != null) {
+      if (json['categoryId'] is Map) {
+        categoryId = json['categoryId']['_id']?.toString() ??
+            json['categoryId']['id']?.toString();
+        categoryName = json['categoryId']['name']?.toString();
+      } else {
+        categoryId = json['categoryId'].toString();
+        categoryName = json['categoryName']?.toString();
+      }
+    } else {
+      categoryId = json['categoryId']?.toString();
+      categoryName = json['categoryName']?.toString();
+    }
+
+    shareUrl = json['shareUrl']?.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -305,13 +351,37 @@ class SalonItem {
   SalonItem({this.id, this.name, this.image, this.review, this.address});
 
   SalonItem.fromJson(Map<String, dynamic> json) {
-    id = json['_id'] ?? json['id'];
-    name = json['name'];
-    image = json['mainImage'] ?? json['image'];
-    review = json['review']?.toDouble();
-    address = json['addressDetails'] != null
-        ? json['addressDetails']['addressLine1']
-        : json['address'];
+    // Handle _id which can be ObjectId or string
+    if (json['_id'] != null) {
+      id = json['_id'].toString();
+    } else if (json['id'] != null) {
+      id = json['id'].toString();
+    } else {
+      id = null;
+    }
+
+    name = json['name']?.toString();
+    image = json['mainImage']?.toString() ?? json['image']?.toString();
+    review = json['review'] != null
+        ? (json['review'] is num
+            ? json['review'].toDouble()
+            : double.tryParse(json['review'].toString()) ?? 0.0)
+        : null;
+
+    // Handle address - can be string or object
+    if (json['addressDetails'] != null) {
+      if (json['addressDetails'] is Map) {
+        address = json['addressDetails']['addressLine1']?.toString() ??
+            json['addressDetails']['address']?.toString() ??
+            "";
+      } else {
+        address = json['addressDetails'].toString();
+      }
+    } else if (json['address'] != null) {
+      address = json['address'].toString();
+    } else {
+      address = null;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -332,7 +402,8 @@ class ExpertItem {
   double? review;
   String? specialization;
 
-  ExpertItem({this.id, this.name, this.image, this.review, this.specialization});
+  ExpertItem(
+      {this.id, this.name, this.image, this.review, this.specialization});
 
   ExpertItem.fromJson(Map<String, dynamic> json) {
     id = json['_id'] ?? json['id'];
@@ -352,4 +423,3 @@ class ExpertItem {
     return data;
   }
 }
-

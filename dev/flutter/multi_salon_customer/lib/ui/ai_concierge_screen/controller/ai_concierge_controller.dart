@@ -164,10 +164,24 @@ class AiConciergeController extends GetxController {
         if (aiConciergeModel?.status == true) {
           beautyAnalysis = aiConciergeModel?.data?.analysis;
           recommendations = aiConciergeModel?.data?.recommendations;
-          
+
           log("Analysis completed successfully");
           log("Provider: ${aiConciergeModel?.data?.provider}");
-          
+
+          // Debug: Log recommendations data
+          if (recommendations != null) {
+            log("Recommendations - Services count: ${recommendations.services?.length ?? 0}");
+            log("Recommendations - Salons count: ${recommendations.salons?.length ?? 0}");
+            if (recommendations.services != null &&
+                recommendations.services!.isNotEmpty) {
+              log("First service ID: ${recommendations.services![0].id}");
+            }
+            if (recommendations.salons != null &&
+                recommendations.salons!.isNotEmpty) {
+              log("First salon ID: ${recommendations.salons![0].id}");
+            }
+          }
+
           return aiConciergeModel;
         } else {
           Utils.showToast(
@@ -177,7 +191,8 @@ class AiConciergeController extends GetxController {
         }
       } else {
         log("Analyze Selfie Error Status Code :: ${res.statusCode}");
-        Utils.showToast(Get.context!, "Failed to analyze image. Please try again.");
+        Utils.showToast(
+            Get.context!, "Failed to analyze image. Please try again.");
       }
     } catch (e) {
       log("Analyze Selfie Error :: $e");
@@ -230,10 +245,12 @@ class AiConciergeController extends GetxController {
         if (jsonResponse['status'] == true) {
           return jsonResponse['data']['response'];
         } else {
-          Utils.showToast(Get.context!, jsonResponse['message'] ?? "Failed to get AI response");
+          Utils.showToast(Get.context!,
+              jsonResponse['message'] ?? "Failed to get AI response");
         }
       } else {
-        Utils.showToast(Get.context!, "Failed to get AI response. Please try again.");
+        Utils.showToast(
+            Get.context!, "Failed to get AI response. Please try again.");
       }
     } catch (e) {
       log("AI Chat Error :: $e");
@@ -251,7 +268,8 @@ class AiConciergeController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.aiConciergeStatus);
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.aiConciergeStatus);
       log("AI Status URL :: $url");
 
       final headers = {
@@ -291,4 +309,3 @@ class AiConciergeController extends GetxController {
     update();
   }
 }
-

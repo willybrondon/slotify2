@@ -43,6 +43,10 @@ const salonSchema = new mongoose.Schema(
     },
     isActive: { type: Boolean, default: true },
     isDelete: { type: Boolean, default: false },
+    isClaimed: { type: Boolean, default: false }, // For opt-in onboarding strategy
+    claimToken: { type: String, default: "" }, // Token for salon to claim their profile
+    source: { type: String, default: "" }, // Source of salon data (pagesjaunes, google_places, etc.)
+    source_id: { type: String, default: "" }, // Original ID from source
 
     image: [{ type: String, default: "" }],
     mainImage: { type: String, default: "" },
