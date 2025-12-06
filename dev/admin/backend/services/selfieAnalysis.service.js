@@ -125,7 +125,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         try {
           // Try different model names in order of preference (use valid models that support image analysis)
           const modelNames = [         // Primary: Fast and supports images
-            'gemini-1.5-pro-latest' // Fallback: Latest flash model
+            'gemini-3-pro-preview' // Fallback: Latest flash model
           ];
           
           let model = null;
