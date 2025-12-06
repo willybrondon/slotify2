@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
@@ -6,6 +7,7 @@ import 'package:salon_2/ui/ai_concierge_screen/controller/ai_concierge_controlle
 import 'package:salon_2/ui/ai_concierge_screen/model/ai_concierge_model.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
+import 'package:salon_2/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 /// Main view for image selection and analysis
@@ -564,26 +566,41 @@ class AiConciergeResultsView extends StatelessWidget {
                 final service = services[index];
                 return InkWell(
                   onTap: () {
-                    // Navigate to service-based salon listing page
-                    if (service.id != null && service.id!.isNotEmpty) {
-                      print(
-                          "AI Concierge: Clicked service: ${service.name}, ID: ${service.id}");
-                      Get.toNamed(
-                        AppRoutes.selectBranch,
-                        arguments: [
-                          [], // checkItem
-                          0.0, // totalPrice
-                          0.0, // finalTaxRupee
-                          0, // totalMinute
-                          [
-                            service.id!
-                          ], // serviceId - single service for filtering
-                          0.0, // withOutTaxRupee
-                        ],
-                      );
+                    // In the app: always use app routes to show salons filtered by service
+                    // On web: use web links
+                    if (kIsWeb) {
+                      // Web: open category page
+                      if (service.shareUrl != null &&
+                          service.shareUrl!.isNotEmpty) {
+                        print(
+                            "AI Concierge (Web): Clicked service: ${service.name}, Opening web URL: ${service.shareUrl}");
+                        Utils.launchURL(service.shareUrl!);
+                      } else {
+                        print(
+                            "AI Concierge (Web): Service shareUrl is null or empty for service: ${service.name}");
+                      }
                     } else {
-                      print(
-                          "AI Concierge: Service ID is null or empty for service: ${service.name}");
+                      // App: navigate to salon listing filtered by service
+                      if (service.id != null && service.id!.isNotEmpty) {
+                        print(
+                            "AI Concierge (App): Clicked service: ${service.name}, ID: ${service.id}, Navigating to salon listing");
+                        Get.toNamed(
+                          AppRoutes.selectBranch,
+                          arguments: [
+                            [], // checkItem
+                            0.0, // totalPrice
+                            0.0, // finalTaxRupee
+                            0, // totalMinute
+                            [
+                              service.id!
+                            ], // serviceId - single service for filtering salons
+                            0.0, // withOutTaxRupee
+                          ],
+                        );
+                      } else {
+                        print(
+                            "AI Concierge (App): Service ID is null or empty for service: ${service.name}");
+                      }
                     }
                   },
                   child: Container(
@@ -671,16 +688,31 @@ class AiConciergeResultsView extends StatelessWidget {
           const SizedBox(height: 12),
           ...salons.map((salon) => InkWell(
                 onTap: () {
-                  if (salon.id != null && salon.id!.isNotEmpty) {
-                    print(
-                        "AI Concierge: Clicked salon: ${salon.name}, ID: ${salon.id}");
-                    Get.toNamed(
-                      AppRoutes.branchDetail,
-                      arguments: [salon.id],
-                    );
+                  // In the app: always navigate directly to salon detail for booking
+                  // On web: use web links (which will have "Open in App" button)
+                  if (kIsWeb) {
+                    // Web: open salon page (which has "Open in App" button)
+                    if (salon.shareUrl != null && salon.shareUrl!.isNotEmpty) {
+                      print(
+                          "AI Concierge (Web): Clicked salon: ${salon.name}, Opening web URL: ${salon.shareUrl}");
+                      Utils.launchURL(salon.shareUrl!);
+                    } else {
+                      print(
+                          "AI Concierge (Web): Salon shareUrl is null or empty for salon: ${salon.name}");
+                    }
                   } else {
-                    print(
-                        "AI Concierge: Salon ID is null or empty for salon: ${salon.name}");
+                    // App: navigate directly to salon detail for booking
+                    if (salon.id != null && salon.id!.isNotEmpty) {
+                      print(
+                          "AI Concierge (App): Clicked salon: ${salon.name}, ID: ${salon.id}, Navigating to salon detail for booking");
+                      Get.toNamed(
+                        AppRoutes.branchDetail,
+                        arguments: [salon.id],
+                      );
+                    } else {
+                      print(
+                          "AI Concierge (App): Salon ID is null or empty for salon: ${salon.name}");
+                    }
                   }
                 },
                 child: Container(

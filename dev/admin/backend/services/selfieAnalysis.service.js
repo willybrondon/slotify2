@@ -439,24 +439,44 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         .limit(15);
 
       // Add service URL/slug to each service for web linking
+      // Services should link to their category page, not a service-specific page
+      const generateSlug = (name) => {
+        if (!name) return "";
+        return name
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      };
+      const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
+      
       const servicesWithUrl = services.map(service => {
         const serviceObj = service.toObject();
-        // Generate slug for service URL (similar to category)
-        const generateSlug = (name) => {
-          if (!name) return "";
-          return name
-            .toLowerCase()
-            .trim()
-            .replace(/[^\w\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-")
-            .replace(/^-+|-+$/g, "");
-        };
-        const slug = generateSlug(service.name);
-        const shortId = service._id.toString().substring(0, 6);
-        const slugWithId = `${slug}-${shortId}`;
-        const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
-        serviceObj.shareUrl = `${baseURL}/service/${slugWithId}`;
+        
+        // Link to category page instead of service page
+        // Format: /category/{categorySlug}-{categoryShortId}
+        if (serviceObj.categoryId && serviceObj.categoryId._id) {
+          const categoryName = serviceObj.categoryId.name || "";
+          const categorySlug = generateSlug(categoryName);
+          const categoryShortId = serviceObj.categoryId._id.toString().substring(0, 6);
+          const categorySlugWithId = `${categorySlug}-${categoryShortId}`;
+          serviceObj.shareUrl = `${baseURL}/category/${categorySlugWithId}`;
+          
+          // Save categoryName before overwriting categoryId
+          serviceObj.categoryName = categoryName;
+          serviceObj.categoryId = serviceObj.categoryId._id;
+        } else {
+          // Fallback: if no category, use service page
+          const slug = generateSlug(service.name);
+          const shortId = service._id.toString().substring(0, 6);
+          const slugWithId = `${slug}-${shortId}`;
+          serviceObj.shareUrl = `${baseURL}/service/${slugWithId}`;
+          serviceObj.categoryId = serviceObj.categoryId ? (serviceObj.categoryId._id || serviceObj.categoryId) : null;
+          serviceObj.categoryName = null;
+        }
+        
         return serviceObj;
       });
 
@@ -501,6 +521,18 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         .lean(); // Use lean() for better JSON serialization
       
       // Format salons to ensure _id is included and properly formatted
+      const generateSlug = (name) => {
+        if (!name) return "";
+        return name
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      };
+      const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
+      
       const formattedSalons = salons.map(salon => {
         // With lean(), salon is already a plain object
         const addressDetails = salon.addressDetails || {};
@@ -508,6 +540,12 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         const city = addressDetails.city || "";
         const country = addressDetails.country || "";
         const fullAddress = [addressLine1, city, country].filter(Boolean).join(", ");
+        
+        // Generate salon share URL: /salon/{slug}-{shortId}
+        const salonSlug = generateSlug(salon.name);
+        const salonShortId = salon._id.toString().substring(0, 6);
+        const salonSlugWithId = `${salonSlug}-${salonShortId}`;
+        const shareUrl = `${baseURL}/salon/${salonSlugWithId}`;
         
         return {
           _id: salon._id,
@@ -518,7 +556,8 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
           reviewCount: salon.reviewCount || 0,
           addressDetails: addressDetails,
           address: fullAddress, // Add formatted address string for easy access
-          locationCoordinates: salon.locationCoordinates || {}
+          locationCoordinates: salon.locationCoordinates || {},
+          shareUrl: shareUrl // Add share URL for web linking
         };
       });
 

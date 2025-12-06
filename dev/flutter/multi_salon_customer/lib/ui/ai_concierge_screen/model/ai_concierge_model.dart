@@ -347,8 +347,15 @@ class SalonItem {
   String? image;
   double? review;
   String? address;
+  String? shareUrl;
 
-  SalonItem({this.id, this.name, this.image, this.review, this.address});
+  SalonItem(
+      {this.id,
+      this.name,
+      this.image,
+      this.review,
+      this.address,
+      this.shareUrl});
 
   SalonItem.fromJson(Map<String, dynamic> json) {
     // Handle _id which can be ObjectId or string
@@ -382,6 +389,8 @@ class SalonItem {
     } else {
       address = null;
     }
+
+    shareUrl = json['shareUrl']?.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -391,6 +400,7 @@ class SalonItem {
     data['image'] = image;
     data['review'] = review;
     data['address'] = address;
+    data['shareUrl'] = shareUrl;
     return data;
   }
 }
