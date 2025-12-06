@@ -264,8 +264,11 @@ class ServiceItem {
   String? image;
   int? duration;
   bool? status;
+  String? categoryId;
+  String? categoryName;
+  String? shareUrl;
 
-  ServiceItem({this.id, this.name, this.image, this.duration, this.status});
+  ServiceItem({this.id, this.name, this.image, this.duration, this.status, this.categoryId, this.categoryName, this.shareUrl});
 
   ServiceItem.fromJson(Map<String, dynamic> json) {
     id = json['_id'] ?? json['id'];
@@ -273,6 +276,9 @@ class ServiceItem {
     image = json['image'];
     duration = json['duration'];
     status = json['status'];
+    categoryId = json['categoryId']?['_id'] ?? json['categoryId'];
+    categoryName = json['categoryId']?['name'] ?? json['categoryName'];
+    shareUrl = json['shareUrl'];
   }
 
   Map<String, dynamic> toJson() {
@@ -282,6 +288,9 @@ class ServiceItem {
     data['image'] = image;
     data['duration'] = duration;
     data['status'] = status;
+    data['categoryId'] = categoryId;
+    data['categoryName'] = categoryName;
+    data['shareUrl'] = shareUrl;
     return data;
   }
 }

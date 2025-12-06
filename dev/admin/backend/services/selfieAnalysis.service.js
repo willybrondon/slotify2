@@ -434,7 +434,31 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         })),
         isDelete: false,
         status: true
-      }).limit(15);
+      })
+        .populate('categoryId')
+        .limit(15);
+
+      // Add service URL/slug to each service for web linking
+      const servicesWithUrl = services.map(service => {
+        const serviceObj = service.toObject();
+        // Generate slug for service URL (similar to category)
+        const generateSlug = (name) => {
+          if (!name) return "";
+          return name
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-+|-+$/g, "");
+        };
+        const slug = generateSlug(service.name);
+        const shortId = service._id.toString().substring(0, 6);
+        const slugWithId = `${slug}-${shortId}`;
+        const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
+        serviceObj.shareUrl = `${baseURL}/service/${slugWithId}`;
+        return serviceObj;
+      });
 
       // Get salon matches
       const salonMatches = await this.getSalonMatches(services, context);
@@ -443,7 +467,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       const beautyTips = this.generateBeautyTips(analysis);
 
       return {
-        services: services,
+        services: servicesWithUrl,
         salons: salonMatches.salons,
         experts: salonMatches.experts,
         beautyTips: beautyTips

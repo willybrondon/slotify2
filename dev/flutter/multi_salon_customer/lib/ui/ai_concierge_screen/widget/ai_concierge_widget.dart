@@ -562,63 +562,81 @@ class AiConciergeResultsView extends StatelessWidget {
               itemCount: services.length,
               itemBuilder: (context, index) {
                 final service = services[index];
-                return Container(
-                  width: 150,
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.blackColor.withOpacity(0.05),
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (service.image != null && service.image!.isNotEmpty)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: CachedNetworkImage(
-                            imageUrl: service.image!,
+                return GestureDetector(
+                  onTap: () {
+                    // Navigate to service-based salon listing page
+                    if (service.id != null) {
+                      Get.toNamed(
+                        AppRoutes.selectBranch,
+                        arguments: [
+                          [], // checkItem
+                          0.0, // totalPrice
+                          0.0, // finalTaxRupee
+                          0, // totalMinute
+                          [service.id!], // serviceId - single service for filtering
+                          0.0, // withOutTaxRupee
+                        ],
+                      );
+                    }
+                  },
+                  child: Container(
+                    width: 150,
+                    margin: const EdgeInsets.only(right: 12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.blackColor.withOpacity(0.05),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (service.image != null && service.image!.isNotEmpty)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: CachedNetworkImage(
+                              imageUrl: service.image!,
+                              height: 60,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: AppColors.lineColor,
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: AppColors.lineColor,
+                                child: const Icon(Icons.image),
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
                             height: 60,
                             width: double.infinity,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Container(
+                            decoration: BoxDecoration(
                               color: AppColors.lineColor,
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            errorWidget: (context, url, error) => Container(
-                              color: AppColors.lineColor,
-                              child: const Icon(Icons.image),
-                            ),
+                            child: const Icon(Icons.spa),
                           ),
-                        )
-                      else
-                        Container(
-                          height: 60,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: AppColors.lineColor,
-                            borderRadius: BorderRadius.circular(8),
+                        const SizedBox(height: 8),
+                        Text(
+                          service.name ?? "Service",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTextColor,
                           ),
-                          child: const Icon(Icons.spa),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      const SizedBox(height: 8),
-                      Text(
-                        service.name ?? "Service",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryTextColor,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

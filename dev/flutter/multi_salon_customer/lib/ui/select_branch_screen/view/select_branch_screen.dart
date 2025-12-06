@@ -25,7 +25,9 @@ class SelectBranchScreen extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         flexibleSpace: AppBarCustom(
-          title: "txtSelectSalon".tr,
+          title: selectBranchController.checkItem.isEmpty 
+              ? "Recommended Salons" 
+              : "txtSelectSalon".tr,
           method: InkWell(
             overlayColor: WidgetStatePropertyAll(AppColors.transparent),
             onTap: () {
@@ -80,18 +82,30 @@ class SelectBranchScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
-                              Get.toNamed(
-                                AppRoutes.booking,
-                                arguments: [
-                                  selectBranchController.checkItem,
-                                  selectBranchController.totalPrice,
-                                  selectBranchController.finalTaxRupee,
-                                  selectBranchController.totalMinute,
-                                  selectBranchController.serviceId,
-                                  selectBranchController.withOutTaxRupee,
-                                  logic.getServiceBaseSalonCategory?.data?[index].id,
-                                ],
-                              );
+                              // If coming from AI concierge (no services selected), navigate to salon detail
+                              // Otherwise, navigate to booking flow
+                              if (selectBranchController.checkItem.isEmpty && 
+                                  selectBranchController.serviceId.isNotEmpty) {
+                                // Navigate to salon detail page
+                                Get.toNamed(
+                                  AppRoutes.branchDetail,
+                                  arguments: [logic.getServiceBaseSalonCategory?.data?[index].id],
+                                );
+                              } else {
+                                // Navigate to booking flow
+                                Get.toNamed(
+                                  AppRoutes.booking,
+                                  arguments: [
+                                    selectBranchController.checkItem,
+                                    selectBranchController.totalPrice,
+                                    selectBranchController.finalTaxRupee,
+                                    selectBranchController.totalMinute,
+                                    selectBranchController.serviceId,
+                                    selectBranchController.withOutTaxRupee,
+                                    logic.getServiceBaseSalonCategory?.data?[index].id,
+                                  ],
+                                );
+                              }
                             },
                             child: Container(
                               width: Get.width * 0.93,

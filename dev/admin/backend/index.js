@@ -77,6 +77,11 @@ app.get("/salon/:slugWithId", salonController.serveSalonWebPage);
 const categoryController = require("./controller/user/category.controller");
 app.get("/category/:slugWithId", categoryController.serveCategoryPage);
 
+// Public web route for service pages
+// New format: /service/service-name-shortId (e.g., /service/facial-treatment-6842cd)
+const serviceController = require("./controller/user/service.controller");
+app.get("/service/:slugWithId", serviceController.serveServicePage);
+
 // Public API endpoint for categories (for frontend)
 app.get("/api/public/categories", async (req, res) => {
   try {
