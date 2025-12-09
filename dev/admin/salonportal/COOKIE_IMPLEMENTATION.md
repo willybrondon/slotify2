@@ -1,4 +1,4 @@
-# Cookie Consent Implementation for Skedisy.com
+git addd# Cookie Consent Implementation for Skedisy.com
 
 ## Overview
 A comprehensive, legally compliant cookie consent system has been implemented for skedisy.com that respects GDPR, CCPA, and ePrivacy Directive requirements.

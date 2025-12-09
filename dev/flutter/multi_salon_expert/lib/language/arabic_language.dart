@@ -160,21 +160,4 @@ final Map<String, String> arDZ = {
   "desPleaseEnterAmount": "الرجاء إدخال المبلغ...",
   "desDataNoAdd": "لم تتم إضافة هذه البيانات بعد !!",
   "desNotAvailableWork": "الآن غير متاح للعمل",
-
-  // About App
-  "txtAppName": "Multi Salon Expert",
-  "txtVersion": "إصدار",
-  "txtAboutAppDescription": "Multi Salon Expert عبارة عن منصة شاملة مصممة لمحترفي الصالونات لإدارة حجوزاتهم وإيراداتهم وحضورهم بكفاءة. تواصل مع العملاء، وقم بإدارة جدولك الزمني، وقم بتنمية عملك بسهولة.",
-  "txtDeveloperInfo": "معلومات المطور",
-  "txtContactSupport": "اتصل بالدعم",
-  "txtWebsite": "موقع الويب",
-  "txtCopyright": "© 2025 Skedisy. جميع الحقوق محفوظة.",
-  "txtLegalInformation": "معلومات قانونية",
-  "txtAppFeatures": "ميزات التطبيق",
-  "txtFeature1": "• إدارة الحجوزات والمواعيد",
-  "txtFeature2": "• تتبع الإيرادات والأرباح",
-  "txtFeature3": "• إدارة الحضور",
-  "txtFeature4": "• إشعارات في الوقت الفعلي",
-  "txtFeature5": "• طرق دفع متعددة",
-  "txtFeature6": "• دعم متعدد اللغات",
 };
