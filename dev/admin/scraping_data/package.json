@@ -1,0 +1,14 @@
+{
+    "name": "scraping-data-import",
+    "version": "1.0.0",
+    "description": "Import script for scraped salon data",
+    "main": "import_to_skedisy.js",
+    "scripts": {
+      "import": "node import_to_skedisy.js"
+    },
+    "dependencies": {
+      "mongoose": "^8.14.0",
+      "dotenv": "^16.5.0"
+    }
+  }
+  
