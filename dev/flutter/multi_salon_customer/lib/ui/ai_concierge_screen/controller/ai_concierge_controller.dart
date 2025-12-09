@@ -170,15 +170,15 @@ class AiConciergeController extends GetxController {
 
           // Debug: Log recommendations data
           if (recommendations != null) {
-            log("Recommendations - Services count: ${recommendations.services?.length ?? 0}");
-            log("Recommendations - Salons count: ${recommendations.salons?.length ?? 0}");
-            if (recommendations.services != null &&
-                recommendations.services!.isNotEmpty) {
-              log("First service ID: ${recommendations.services![0].id}");
+            log("Recommendations - Services count: ${recommendations?.services?.length ?? 0}");
+            log("Recommendations - Salons count: ${recommendations?.salons?.length ?? 0}");
+            final services = recommendations?.services;
+            if (services != null && services.isNotEmpty) {
+              log("First service ID: ${services[0].id}");
             }
-            if (recommendations.salons != null &&
-                recommendations.salons!.isNotEmpty) {
-              log("First salon ID: ${recommendations.salons![0].id}");
+            final salons = recommendations?.salons;
+            if (salons != null && salons.isNotEmpty) {
+              log("First salon ID: ${salons[0].id}");
             }
           }
 
