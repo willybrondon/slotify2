@@ -9,7 +9,6 @@ const path = require('path');
 
 // Disable mongoose buffering BEFORE loading models
 mongoose.set('bufferCommands', false);
-mongoose.set('bufferMaxEntries', 0);
 
 // Load .env from backend directory (where the actual .env file is)
 const backendEnvPath = path.join(__dirname, '../backend/.env');
