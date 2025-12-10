@@ -3,12 +3,9 @@
  * Usage: node import_to_skedisy.js salons_ile_de_france_TIMESTAMP.json
  */
 
-const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
-
-// Disable mongoose buffering BEFORE loading models
-mongoose.set('bufferCommands', false);
 
 // Load .env from backend directory (where the actual .env file is)
 const backendEnvPath = path.join(__dirname, '../backend/.env');
@@ -19,49 +16,37 @@ if (fs.existsSync(backendEnvPath)) {
   require('dotenv').config();
 }
 
-// Import salon model (adjust path as needed)
-const Salon = require('../backend/models/salon.model');
-
 // MongoDB connection (matches backend configuration)
-const MONGODB_URI = process.env.MONGODB_CONNECTION_STRING || process.env.MONGODB_URI || 'mongodb://localhost:27017/skedisy';
+// Use the connection string directly - if not in .env, use the provided one
+const MONGODB_URI = process.env.MONGODB_CONNECTION_STRING || process.env.MONGODB_URI || 'mongodb://admin:dbadmin123@46.101.229.176:27017/slotify';
 
 async function importSalons(jsonFile) {
+  let client;
   try {
-    // Connect to MongoDB with proper options
+    // Connect to MongoDB with proper options using native driver
     console.log('🔌 Connecting to MongoDB...');
     console.log('📍 Connection string:', MONGODB_URI.replace(/\/\/.*@/, '//***:***@')); // Hide credentials in log
     
-    await mongoose.connect(MONGODB_URI, {
+    // Use native MongoDB driver with proper connection options
+    client = new MongoClient(MONGODB_URI, {
       serverSelectionTimeoutMS: 30000, // 30 seconds
       socketTimeoutMS: 45000, // 45 seconds
+      connectTimeoutMS: 30000, // 30 seconds
       maxPoolSize: 10, // Maintain up to 10 socket connections
+      retryWrites: true,
+      retryReads: true,
     });
     
-    // Wait for connection to be ready - check readyState
-    if (mongoose.connection.readyState !== 1) {
-      await new Promise((resolve, reject) => {
-        if (mongoose.connection.readyState === 1) {
-          resolve();
-          return;
-        }
-        mongoose.connection.once('connected', resolve);
-        mongoose.connection.once('error', reject);
-        setTimeout(() => reject(new Error('Connection timeout')), 30000);
-      });
-    }
-    
-    // Verify connection with ping
-    await mongoose.connection.db.admin().ping();
+    await client.connect();
     console.log('✅ Connected to MongoDB');
     
-    // Ensure connection is fully ready - wait a bit for indexes to be ready
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Verify connection state one more time
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error('MongoDB connection not ready');
-    }
+    // Verify connection with ping
+    await client.db().admin().ping();
     console.log('✅ Connection verified and ready');
+    
+    // Get the database and collection
+    const db = client.db();
+    const salonsCollection = db.collection('salons');
 
     // Read JSON file
     const filePath = path.join(__dirname, jsonFile);
@@ -99,20 +84,14 @@ async function importSalons(jsonFile) {
           uniqueId = Math.floor(Math.random() * 10000000);
         }
 
-        // Check if salon already exists using native MongoDB driver to avoid buffering
-        if (mongoose.connection.readyState !== 1) {
-          throw new Error('Connection lost during import');
-        }
-        
-        // Use native MongoDB collection directly to bypass mongoose buffering
-        const salonsCollection = mongoose.connection.db.collection('salons');
+        // Check if salon already exists using native MongoDB driver
         const existing = await salonsCollection.findOne({
           $or: [
             { email: salonData.email },
             { 'source_id': salonData.source_id, 'source': salonData.source },
             { uniqueId: uniqueId }
           ]
-        }, { maxTimeMS: 5000 }); // 5 second timeout per query
+        }, { maxTimeMS: 10000 }); // 10 second timeout per query
 
         if (existing) {
           console.log(`⏭️  Skipping duplicate: ${salonData.name} (${existing.email || existing.source_id || existing.uniqueId})`);
@@ -123,13 +102,9 @@ async function importSalons(jsonFile) {
         // If uniqueId is already taken, generate a new one (max 5 attempts to avoid infinite loop)
         let attempts = 0;
         while (attempts < 5) {
-          if (mongoose.connection.readyState !== 1) {
-            throw new Error('Connection lost during uniqueId check');
-          }
-          // Use native MongoDB collection directly
           const existingId = await salonsCollection.findOne(
             { uniqueId: uniqueId },
-            { maxTimeMS: 5000 }
+            { maxTimeMS: 10000 }
           );
           if (!existingId) {
             break; // uniqueId is available
@@ -160,18 +135,17 @@ async function importSalons(jsonFile) {
           isActive: salonData.isActive !== undefined ? salonData.isActive : true,
           isDelete: salonData.isDelete !== undefined ? salonData.isDelete : false,
           isClaimed: salonData.isClaimed !== undefined ? salonData.isClaimed : false,
+          // Add timestamps manually (MongoDB native driver doesn't auto-add them)
+          createdAt: new Date(),
+          updatedAt: new Date(),
         };
 
-        // Create and save salon with timeout
-        // Ensure connection is still ready before save
-        if (mongoose.connection.readyState !== 1) {
-          throw new Error('Connection lost before save');
-        }
+        // Use native MongoDB insertOne (same as manual insert) - this avoids Mongoose buffering issues
+        const result = await salonsCollection.insertOne(salonDataWithId, {
+          maxTimeMS: 30000 // 30 second timeout for insert
+        });
         
-        const salon = new Salon(salonDataWithId);
-        await salon.save({ maxTimeMS: 10000 }); // 10 second timeout for save
-        
-        console.log(`✅ Imported: ${salonData.name} (${salonData.addressDetails?.city || 'Unknown'}) - ID: ${uniqueId}`);
+        console.log(`✅ Imported: ${salonData.name} (${salonData.addressDetails?.city || 'Unknown'}) - ID: ${uniqueId}, MongoDB ID: ${result.insertedId}`);
         imported++;
 
       } catch (error) {
@@ -187,11 +161,19 @@ async function importSalons(jsonFile) {
     console.log(`❌ Errors: ${errors}`);
     console.log('='.repeat(60));
 
-    await mongoose.disconnect();
+    await client.close();
     console.log('✅ Disconnected from MongoDB');
 
   } catch (error) {
     console.error('❌ Fatal error:', error);
+    // Ensure client is closed even on error
+    if (client) {
+      try {
+        await client.close();
+      } catch (closeError) {
+        console.error('Error closing connection:', closeError.message);
+      }
+    }
     process.exit(1);
   }
 }
