@@ -4,11 +4,13 @@
     "description": "Import script for scraped salon data",
     "main": "import_to_skedisy.js",
     "scripts": {
-      "import": "node import_to_skedisy.js"
+        "import": "node import_to_skedisy.js"
     },
     "dependencies": {
-      "mongoose": "^8.14.0",
-      "dotenv": "^16.5.0"
+        "dotenv": "^16.5.0",
+        "mongoose": "^8.14.0"
+    },
+    "optionalDependencies": {
+        "@mongodb-js/saslprep": "^1.4.0"
     }
-  }
-  
+}
