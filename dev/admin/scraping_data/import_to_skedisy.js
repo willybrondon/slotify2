@@ -53,6 +53,15 @@ async function importSalons(jsonFile) {
     // Verify connection with ping
     await mongoose.connection.db.admin().ping();
     console.log('✅ Connected to MongoDB');
+    
+    // Ensure connection is fully ready - wait a bit for indexes to be ready
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Verify connection state one more time
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('MongoDB connection not ready');
+    }
+    console.log('✅ Connection verified and ready');
 
     // Read JSON file
     const filePath = path.join(__dirname, jsonFile);
@@ -90,14 +99,20 @@ async function importSalons(jsonFile) {
           uniqueId = Math.floor(Math.random() * 10000000);
         }
 
-        // Check if salon already exists (single query with all conditions)
-        const existing = await Salon.findOne({
+        // Check if salon already exists using native MongoDB driver to avoid buffering
+        if (mongoose.connection.readyState !== 1) {
+          throw new Error('Connection lost during import');
+        }
+        
+        // Use native MongoDB collection directly to bypass mongoose buffering
+        const salonsCollection = mongoose.connection.db.collection('salons');
+        const existing = await salonsCollection.findOne({
           $or: [
             { email: salonData.email },
             { 'source_id': salonData.source_id, 'source': salonData.source },
             { uniqueId: uniqueId }
           ]
-        }).maxTimeMS(5000); // 5 second timeout per query
+        }, { maxTimeMS: 5000 }); // 5 second timeout per query
 
         if (existing) {
           console.log(`⏭️  Skipping duplicate: ${salonData.name} (${existing.email || existing.source_id || existing.uniqueId})`);
@@ -108,7 +123,14 @@ async function importSalons(jsonFile) {
         // If uniqueId is already taken, generate a new one (max 5 attempts to avoid infinite loop)
         let attempts = 0;
         while (attempts < 5) {
-          const existingId = await Salon.findOne({ uniqueId: uniqueId }).maxTimeMS(5000);
+          if (mongoose.connection.readyState !== 1) {
+            throw new Error('Connection lost during uniqueId check');
+          }
+          // Use native MongoDB collection directly
+          const existingId = await salonsCollection.findOne(
+            { uniqueId: uniqueId },
+            { maxTimeMS: 5000 }
+          );
           if (!existingId) {
             break; // uniqueId is available
           }
@@ -141,6 +163,11 @@ async function importSalons(jsonFile) {
         };
 
         // Create and save salon with timeout
+        // Ensure connection is still ready before save
+        if (mongoose.connection.readyState !== 1) {
+          throw new Error('Connection lost before save');
+        }
+        
         const salon = new Salon(salonDataWithId);
         await salon.save({ maxTimeMS: 10000 }); // 10 second timeout for save
         
