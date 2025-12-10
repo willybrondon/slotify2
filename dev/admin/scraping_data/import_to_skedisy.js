@@ -7,6 +7,10 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 
+// Disable mongoose buffering BEFORE loading models
+mongoose.set('bufferCommands', false);
+mongoose.set('bufferMaxEntries', 0);
+
 // Load .env from backend directory (where the actual .env file is)
 const backendEnvPath = path.join(__dirname, '../backend/.env');
 if (fs.existsSync(backendEnvPath)) {
@@ -24,7 +28,7 @@ const MONGODB_URI = process.env.MONGODB_CONNECTION_STRING || process.env.MONGODB
 
 async function importSalons(jsonFile) {
   try {
-    // Connect to MongoDB with proper options to prevent buffering timeout
+    // Connect to MongoDB with proper options
     console.log('🔌 Connecting to MongoDB...');
     console.log('📍 Connection string:', MONGODB_URI.replace(/\/\/.*@/, '//***:***@')); // Hide credentials in log
     
@@ -34,7 +38,20 @@ async function importSalons(jsonFile) {
       maxPoolSize: 10, // Maintain up to 10 socket connections
     });
     
-    // Wait for connection to be ready
+    // Wait for connection to be ready - check readyState
+    if (mongoose.connection.readyState !== 1) {
+      await new Promise((resolve, reject) => {
+        if (mongoose.connection.readyState === 1) {
+          resolve();
+          return;
+        }
+        mongoose.connection.once('connected', resolve);
+        mongoose.connection.once('error', reject);
+        setTimeout(() => reject(new Error('Connection timeout')), 30000);
+      });
+    }
+    
+    // Verify connection with ping
     await mongoose.connection.db.admin().ping();
     console.log('✅ Connected to MongoDB');
 
@@ -54,52 +71,79 @@ async function importSalons(jsonFile) {
 
     for (const salonData of salonsData) {
       try {
-        // Check if salon already exists (by email or source_id)
-        const existing = await Salon.findOne({
-          $or: [
-            { email: salonData.email },
-            { 'source_id': salonData.source_id, 'source': salonData.source },
-            { uniqueId: salonData.uniqueId }
-          ]
-        });
-
-        if (existing) {
-          console.log(`⏭️  Skipping duplicate: ${salonData.name} (${existing.email || existing.source_id})`);
-          skipped++;
-          continue;
-        }
-
-        // Ensure required fields are present
+        // Validate required fields before any database queries
         if (!salonData.name || !salonData.email || !salonData.password) {
-          console.log(`⚠️  Skipping incomplete salon: ${salonData.name || 'Unknown'} (missing required fields)`);
+          console.log(`⚠️  Skipping incomplete salon: ${salonData.name || 'Unknown'} (missing name, email, or password)`);
           errors++;
           continue;
         }
 
-        // Ensure uniqueId is unique (regenerate if needed)
-        let uniqueId = salonData.uniqueId;
-        let isUniqueId = false;
-        let attempts = 0;
-        while (!isUniqueId && attempts < 10) {
-          const existingId = await Salon.findOne({ uniqueId: uniqueId });
-          if (!existingId) {
-            isUniqueId = true;
-          } else {
-            uniqueId = Math.floor(Math.random() * 10000000);
-            attempts++;
-          }
+        // Ensure addressDetails.addressLine1 is present (required by schema)
+        if (!salonData.addressDetails || !salonData.addressDetails.addressLine1) {
+          console.log(`⚠️  Skipping incomplete salon: ${salonData.name} (missing addressDetails.addressLine1)`);
+          errors++;
+          continue;
         }
 
-        if (!isUniqueId) {
+        // Ensure uniqueId exists, generate if missing
+        let uniqueId = salonData.uniqueId;
+        if (!uniqueId || uniqueId === 0) {
+          uniqueId = Math.floor(Math.random() * 10000000);
+        }
+
+        // Check if salon already exists (single query with all conditions)
+        const existing = await Salon.findOne({
+          $or: [
+            { email: salonData.email },
+            { 'source_id': salonData.source_id, 'source': salonData.source },
+            { uniqueId: uniqueId }
+          ]
+        }).maxTimeMS(5000); // 5 second timeout per query
+
+        if (existing) {
+          console.log(`⏭️  Skipping duplicate: ${salonData.name} (${existing.email || existing.source_id || existing.uniqueId})`);
+          skipped++;
+          continue;
+        }
+
+        // If uniqueId is already taken, generate a new one (max 5 attempts to avoid infinite loop)
+        let attempts = 0;
+        while (attempts < 5) {
+          const existingId = await Salon.findOne({ uniqueId: uniqueId }).maxTimeMS(5000);
+          if (!existingId) {
+            break; // uniqueId is available
+          }
+          uniqueId = Math.floor(Math.random() * 10000000);
+          attempts++;
+        }
+
+        if (attempts >= 5) {
           console.log(`⚠️  Could not generate unique ID for: ${salonData.name}`);
           errors++;
           continue;
         }
 
-        // Create salon with updated uniqueId
-        const salonDataWithId = { ...salonData, uniqueId };
+        // Prepare salon data with proper structure
+        const salonDataWithId = {
+          ...salonData,
+          uniqueId: uniqueId,
+          // Ensure addressDetails structure matches schema
+          addressDetails: {
+            addressLine1: salonData.addressDetails.addressLine1 || '',
+            landMark: salonData.addressDetails.landMark || '',
+            city: salonData.addressDetails.city || '',
+            state: salonData.addressDetails.state || '',
+            country: salonData.addressDetails.country || '',
+          },
+          // Set defaults for required fields
+          isActive: salonData.isActive !== undefined ? salonData.isActive : true,
+          isDelete: salonData.isDelete !== undefined ? salonData.isDelete : false,
+          isClaimed: salonData.isClaimed !== undefined ? salonData.isClaimed : false,
+        };
+
+        // Create and save salon with timeout
         const salon = new Salon(salonDataWithId);
-        await salon.save();
+        await salon.save({ maxTimeMS: 10000 }); // 10 second timeout for save
         
         console.log(`✅ Imported: ${salonData.name} (${salonData.addressDetails?.city || 'Unknown'}) - ID: ${uniqueId}`);
         imported++;
