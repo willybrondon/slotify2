@@ -107,6 +107,22 @@ echo "
 "
 cd /home/admin/backend || exit
 npm install
+
+# Install scraping_data dependencies
+echo "
+################################################
+#          INSTALL SCRAPING_DATA              #
+################################################
+"
+if [ -d "/home/admin/scraping_data" ]; then
+    cd /home/admin/scraping_data || exit
+    npm install
+    echo "✅ Scraping data dependencies installed"
+else
+    echo "⚠️  Scraping data folder not found, skipping..."
+fi
+
+cd /home/admin/backend || exit
 cat > .env << EOF
 #Port
 PORT = 5000

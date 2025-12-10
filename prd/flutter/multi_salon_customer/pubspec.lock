@@ -450,10 +450,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: "5398f14efa795ffb7a33e9b6a08798b26a180edac4ad7db3f231e40f82ce11e1"
+      sha256: "9e8c3858111da373efc5aa341de011d9bd23e2c5c5e0c62bccf32438e192d7b1"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.0"
+    version: "3.0.2"
   flutter_local_notifications:
     dependency: "direct main"
     description:
@@ -748,18 +748,18 @@ packages:
     dependency: "direct main"
     description:
       name: in_app_purchase
-      sha256: "5cddd7f463f3bddb1d37a72b95066e840d5822d66291331d7f8f05ce32c24b6c"
+      sha256: c6a0479a55faed37fad123b4ac71567ff5a8d98e86266ad1469dcfacb9f1c855
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.3"
+    version: "3.0.8"
   in_app_purchase_android:
     dependency: transitive
     description:
       name: in_app_purchase_android
-      sha256: "475b6c6541b54e6878263270d291ca8d5d7ef044263115bdec45e1e59737e3ad"
+      sha256: "8d24e7141d5da4e239045438cb990b98fe8fd3e8de6884fbc76ff4ecec30caf5"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0+1"
+    version: "0.2.5+4"
   in_app_purchase_platform_interface:
     dependency: transitive
     description:
@@ -772,10 +772,10 @@ packages:
     dependency: "direct main"
     description:
       name: in_app_purchase_storekit
-      sha256: "02f08d5688fc2776e3e386ff7d3071b7b375ea8222e8e6bd027b15c0708e4045"
+      sha256: "29526f5ce85bd908b4cacdadb2e8ef299bccbb516b90d2881805343f868502ab"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.3.7"
   in_app_review:
     dependency: "direct main"
     description:
@@ -844,10 +844,10 @@ packages:
     dependency: transitive
     description:
       name: lints
-      sha256: c35bb79562d980e9a453fc715854e1ed39e24e7d0297a880ef54e17f9874a9d7
+      sha256: cbf8d4b858bb0134ef3ef87841abdf8d63bfc255c266b7bf6b39daa1085c4290
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.1"
+    version: "3.0.0"
   matcher:
     dependency: transitive
     description:
