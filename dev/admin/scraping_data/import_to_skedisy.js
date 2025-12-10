@@ -6,7 +6,15 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
+
+// Load .env from backend directory (where the actual .env file is)
+const backendEnvPath = path.join(__dirname, '../backend/.env');
+if (fs.existsSync(backendEnvPath)) {
+  require('dotenv').config({ path: backendEnvPath });
+} else {
+  // Fallback to current directory
+  require('dotenv').config();
+}
 
 // Import salon model (adjust path as needed)
 const Salon = require('../backend/models/salon.model');
@@ -16,8 +24,19 @@ const MONGODB_URI = process.env.MONGODB_CONNECTION_STRING || process.env.MONGODB
 
 async function importSalons(jsonFile) {
   try {
-    // Connect to MongoDB
-    await mongoose.connect(MONGODB_URI);
+    // Connect to MongoDB with proper options to prevent buffering timeout
+    console.log('🔌 Connecting to MongoDB...');
+    console.log('📍 Connection string:', MONGODB_URI.replace(/\/\/.*@/, '//***:***@')); // Hide credentials in log
+    
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 30000, // 30 seconds
+      socketTimeoutMS: 45000, // 45 seconds
+      bufferMaxEntries: 0, // Disable mongoose buffering
+      bufferCommands: false, // Disable mongoose buffering
+    });
+    
+    // Wait for connection to be ready
+    await mongoose.connection.db.admin().ping();
     console.log('✅ Connected to MongoDB');
 
     // Read JSON file
