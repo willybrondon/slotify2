@@ -18,7 +18,7 @@ if (fs.existsSync(backendEnvPath)) {
 
 // MongoDB connection (matches backend configuration)
 // Use the connection string directly - if not in .env, use the provided one
-const MONGODB_URI = process.env.MONGODB_CONNECTION_STRING || process.env.MONGODB_URI || 'mongodb://admin:dbadmin123@46.101.229.176:27017/slotify';
+const MONGODB_URI = process.env.MONGODB_CONNECTION_STRING || process.env.MONGODB_URI || '';
 
 async function importSalons(jsonFile) {
   let client;
@@ -65,10 +65,19 @@ async function importSalons(jsonFile) {
     for (const salonData of salonsData) {
       try {
         // Validate required fields before any database queries
-        if (!salonData.name || !salonData.email || !salonData.password) {
-          console.log(`⚠️  Skipping incomplete salon: ${salonData.name || 'Unknown'} (missing name, email, or password)`);
+        if (!salonData.name || !salonData.password) {
+          console.log(`⚠️  Skipping incomplete salon: ${salonData.name || 'Unknown'} (missing name or password)`);
           errors++;
           continue;
+        }
+        
+        // Generate temporary email if not provided (salon will update when claiming)
+        // Format: temp-{uniqueId}@skedisy-temp.com
+        let email = salonData.email;
+        if (!email || email.trim() === '') {
+          const tempId = salonData.uniqueId || Math.floor(Math.random() * 10000000);
+          email = `temp-${tempId}@skedisy-temp.com`;
+          console.log(`ℹ️  Generated temporary email for ${salonData.name}: ${email} (salon will update when claiming)`);
         }
 
         // Ensure addressDetails.addressLine1 is present (required by schema)
@@ -85,12 +94,22 @@ async function importSalons(jsonFile) {
         }
 
         // Check if salon already exists using native MongoDB driver
+        // Build query conditions - only check source_id if it's not empty
+        const duplicateConditions = [
+          { email: salonData.email },
+          { uniqueId: uniqueId }
+        ];
+        
+        // Only add source_id check if it's not empty (empty source_id would match all records)
+        if (salonData.source_id && salonData.source_id.trim() !== '') {
+          duplicateConditions.push({
+            'source_id': salonData.source_id,
+            'source': salonData.source
+          });
+        }
+        
         const existing = await salonsCollection.findOne({
-          $or: [
-            { email: salonData.email },
-            { 'source_id': salonData.source_id, 'source': salonData.source },
-            { uniqueId: uniqueId }
-          ]
+          $or: duplicateConditions
         }, { maxTimeMS: 10000 }); // 10 second timeout per query
 
         if (existing) {
@@ -122,6 +141,7 @@ async function importSalons(jsonFile) {
         // Prepare salon data with proper structure
         const salonDataWithId = {
           ...salonData,
+          email: email,  // Use the email (real or temporary)
           uniqueId: uniqueId,
           // Ensure addressDetails structure matches schema
           addressDetails: {

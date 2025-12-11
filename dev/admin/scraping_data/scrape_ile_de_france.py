@@ -13,6 +13,9 @@ from typing import List, Dict, Optional
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from urllib.parse import urlparse
+import hashlib
+import re
 
 # Load environment variables
 load_dotenv()
@@ -44,6 +47,27 @@ SALON_CATEGORIES = [
     "epilation",
     "massage",
     "spa",
+]
+
+# Diverse salon keywords to ensure we get salons with lower visibility
+# Including both black (afro) and white (européen) salons
+DIVERSE_SALON_KEYWORDS = [
+    "salon de coiffure",
+    "coiffure afro",
+    "coiffure africaine",
+    "coiffure homme",
+    "coiffure femme",
+    "institut de beauté",
+    "salon de beauté",
+    "coiffeur",
+    "coiffeuse",
+    "spa",
+    "manucure",
+    "onglerie",
+    "barber shop",
+    "barbier",
+    "coiffure mixte",
+    "salon mixte",
 ]
 
 
@@ -203,6 +227,70 @@ class GooglePlacesScraper:
     def __init__(self, api_key: str):
         self.api_key = api_key
         self.session = requests.Session()
+        # Create images directory if it doesn't exist
+        self.images_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
+        os.makedirs(self.images_dir, exist_ok=True)
+    
+    def _extract_email_from_website(self, website_url: str) -> Optional[str]:
+        """Try to extract email address from a website URL"""
+        if not website_url:
+            return None
+        
+        try:
+            # Add protocol if missing
+            if not website_url.startswith(('http://', 'https://')):
+                website_url = 'https://' + website_url
+            
+            # Try to fetch the website
+            response = self.session.get(website_url, timeout=5, allow_redirects=True)
+            if response.status_code == 200:
+                # Look for email patterns in the HTML
+                email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+                emails = re.findall(email_pattern, response.text)
+                
+                # Filter out common non-contact emails
+                filtered_emails = [
+                    email for email in emails 
+                    if not any(skip in email.lower() for skip in ['noreply', 'no-reply', 'donotreply', 'example', 'test'])
+                ]
+                
+                if filtered_emails:
+                    # Return the first valid email found
+                    return filtered_emails[0]
+        except Exception as e:
+            # Silently fail - website might not be accessible
+            pass
+        
+        return None
+    
+    def _download_and_save_image(self, photo_url: str, photo_ref: str = None) -> Optional[str]:
+        """Download image from URL and save locally, return relative path"""
+        try:
+            # Generate unique filename
+            if photo_ref:
+                filename = f"{hashlib.md5(photo_ref.encode()).hexdigest()}.jpg"
+            else:
+                filename = f"{hashlib.md5(photo_url.encode()).hexdigest()}.jpg"
+            
+            filepath = os.path.join(self.images_dir, filename)
+            
+            # Check if image already exists
+            if os.path.exists(filepath):
+                return f"images/{filename}"
+            
+            # Download image
+            response = self.session.get(photo_url, timeout=10)
+            if response.status_code == 200:
+                # Save image
+                with open(filepath, 'wb') as f:
+                    f.write(response.content)
+                return f"images/{filename}"
+            else:
+                print(f"      ⚠️  Could not download image: HTTP {response.status_code}")
+                return None
+        except Exception as e:
+            print(f"      ⚠️  Error downloading image: {e}")
+            return None
     
     def search_nearby(self, lat: float, lng: float, radius: int = 5000, 
                      keyword: str = "salon de coiffure") -> Optional[Dict]:
@@ -316,21 +404,48 @@ class GooglePlacesScraper:
             photos = data.get("photos", [])
             main_image = ""
             images = []
-            if photos:
-                # Get first photo reference
+            if photos and self.api_key:
+                # Download images and save locally
+                for i, photo in enumerate(photos[:5]):  # Limit to 5 images
+                    photo_ref = photo.get("photo_reference", "")
+                    if photo_ref:
+                        try:
+                            # Download image using API key
+                            photo_url = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference={photo_ref}&key={self.api_key}"
+                            saved_path = self._download_and_save_image(photo_url, photo_ref)
+                            if saved_path:
+                                if i == 0:
+                                    main_image = saved_path
+                                images.append(saved_path)
+                                time.sleep(0.1)  # Rate limiting for image downloads
+                        except Exception as e:
+                            print(f"      ⚠️  Could not download image {i+1}: {e}")
+                            continue
+            elif photos:
+                # No API key - store photo references for later use
                 photo_ref = photos[0].get("photo_reference", "")
                 if photo_ref:
-                    main_image = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference={photo_ref}&key={self.api_key}"
+                    # Store reference that can be used later with API key
+                    main_image = f"photo_reference:{photo_ref}"
                     images = [main_image]
             
             # Extract opening hours (legacy API format)
             opening_hours = data.get("opening_hours", {}).get("weekday_text", [])
             
+            # Try to extract email from website, otherwise leave empty
+            website = data.get("website", "")
+            email = ""
+            if website:
+                email = self._extract_email_from_website(website)
+            
+            # If no email found, leave it empty - salon will fill it when claiming
+            # This ensures we don't create fake emails
+            
             return {
                 "source": "google_places",
                 "source_id": data.get("place_id", ""),
                 "name": data.get("name", "").strip(),
-                "email": f"contact@{data.get('name', '').lower().replace(' ', '').replace("'", '')}.fr" if data.get('name') else "",
+                "email": email,  # Empty if not found - salon will provide when claiming
                 "mobile": phone,
                 "addressDetails": {
                     "addressLine1": address_line1,
@@ -379,79 +494,29 @@ class GooglePlacesScraper:
             photos = data.get("photos", [])
             main_image = ""
             images = []
-            if photos:
-                # New API provides photo name, need to construct URL
-                photo = photos[0]
-                photo_name = photo.get("name", "")
+            if photos and self.api_key:
+                # Download images and save locally
+                for i, photo in enumerate(photos[:5]):  # Limit to 5 images
+                    photo_name = photo.get("name", "")
+                    if photo_name:
+                        try:
+                            # Construct photo URL with API key
+                            photo_url = f"https://places.googleapis.com/v1/{photo_name}/media?maxHeightPx=800&maxWidthPx=800&key={self.api_key}"
+                            # Download and save image
+                            saved_path = self._download_and_save_image(photo_url, photo_name)
+                            if saved_path:
+                                if i == 0:
+                                    main_image = saved_path
+                                images.append(saved_path)
+                                time.sleep(0.1)  # Rate limiting
+                        except Exception as e:
+                            print(f"      ⚠️  Could not download image {i+1}: {e}")
+                            continue
+            elif photos:
+                # No API key - store photo name for later use
+                photo_name = photos[0].get("name", "")
                 if photo_name:
-                    # Use Places Photo API
-                    main_image = f"https://places.googleapis.com/v1/{photo_name}/media?maxHeightPx=800&maxWidthPx=800&key={self.api_key}"
-                    images = [main_image]
-            
-            # Extract opening hours (new API format)
-            current_opening_hours = data.get("currentOpeningHours", {})
-            weekday_text = current_opening_hours.get("weekdayDescriptions", [])
-            
-            return {
-                "source": "google_places",
-                "source_id": data.get("place_id", ""),
-                "name": data.get("name", "").strip(),
-                "email": f"contact@{data.get('name', '').lower().replace(' ', '')}.fr",
-                "mobile": phone,
-                "addressDetails": {
-                    "addressLine1": address_line1,
-                    "city": city,
-                    "state": "Île-de-France",
-                    "country": "France"
-                },
-                "locationCoordinates": {
-                    "latitude": str(latitude) if latitude else "",
-                    "longitude": str(longitude) if longitude else ""
-                },
-                "about": f"Salon trouvé via Google Places",
-                "mainImage": main_image,
-                "image": images,
-                "department": department_code,
-                "website": data.get("website", ""),
-                "opening_hours": opening_hours,
-                "raw_data": data
-            }
-        except Exception as e:
-            print(f"Error formatting Google data: {e}")
-            return None
-    
-    def _format_google_data_new_api(self, data: Dict, department_code: str) -> Optional[Dict]:
-        """Format Google Places API (New) data to Skedisy format"""
-        try:
-            # Extract address (new API format)
-            address = data.get("formattedAddress", "")
-            address_parts = address.split(",") if address else []
-            address_line1 = address_parts[0].strip() if address_parts else ""
-            city = address_parts[-2].strip() if len(address_parts) > 1 else ""
-            
-            # Extract coordinates (new API format)
-            location = data.get("location", {})
-            latitude = location.get("latitude", "")
-            longitude = location.get("longitude", "")
-            
-            # Extract phone (new API format)
-            phone = ""
-            national_phone = data.get("nationalPhoneNumber", "")
-            international_phone = data.get("internationalPhoneNumber", "")
-            phone = national_phone or international_phone or ""
-            phone = phone.replace(" ", "").replace(".", "").replace("-", "")
-            
-            # Extract photos (new API format)
-            photos = data.get("photos", [])
-            main_image = ""
-            images = []
-            if photos:
-                # New API provides photo name, need to construct URL
-                photo = photos[0]
-                photo_name = photo.get("name", "")
-                if photo_name:
-                    # Use Places Photo API
-                    main_image = f"https://places.googleapis.com/v1/{photo_name}/media?maxHeightPx=800&maxWidthPx=800&key={self.api_key}"
+                    main_image = f"photo_name:{photo_name}"
                     images = [main_image]
             
             # Extract opening hours (new API format)
@@ -468,11 +533,16 @@ class GooglePlacesScraper:
             if uri:
                 website = uri
             
+            # Try to extract email from website, otherwise leave empty
+            email = ""
+            if website:
+                email = self._extract_email_from_website(website)
+            
             return {
                 "source": "google_places",
                 "source_id": place_id,
                 "name": name,
-                "email": f"contact@{name.lower().replace(' ', '').replace("'", '')}.fr" if name else "",
+                "email": email,  # Empty if not found - salon will provide when claiming
                 "mobile": phone,
                 "addressDetails": {
                     "addressLine1": address_line1,
@@ -600,10 +670,10 @@ def main():
         #         all_salons.extend(salons)
         #         time.sleep(1)  # Rate limiting
         
-        # Scrape from Google Places
+        # Scrape from Google Places with diverse keywords
+        # This ensures we get salons with lower visibility (both black/afro and white/européen salons)
         if gp_scraper:
-            keywords = ["salon de coiffure", "institut de beauté", "spa", "manucure"]
-            salons = gp_scraper.scrape_department_centre(dept_code, keywords)
+            salons = gp_scraper.scrape_department_centre(dept_code, DIVERSE_SALON_KEYWORDS)
             all_salons.extend(salons)
     
     # Remove duplicates (by name + address)
@@ -663,8 +733,11 @@ def main():
     print(f"{'='*60}")
     print(f"\nNext steps:")
     print(f"1. Review {csv_file}")
-    print(f"2. Import {json_file} to Skedisy database")
-    print(f"3. Send claim invitations to salons")
+    print(f"2. Images saved to 'images/' directory (relative paths in JSON)")
+    print(f"3. Import {json_file} to Skedisy database")
+    print(f"4. Send claim invitations to salons")
+    print(f"\nNote: Image paths in JSON are relative (e.g., 'images/abc123.jpg')")
+    print(f"      Make sure to include the 'images/' directory when deploying.")
 
 
 if __name__ == "__main__":
