@@ -190,13 +190,24 @@ exports.getAll = async (req, res) => {
       };
     }
 
+    // Get all salon data, excluding only salonTime array
+    // When using $project with exclusions (field: 0), all other fields are included by default
+    // We then ensure isClaimed defaults to false if not set in database
     const data = await Salon.aggregate([
       {
         $match: searchFilter,
       },
       {
         $project: {
-          salonTime: 0,
+          salonTime: 0, // Exclude salonTime array - all other fields included automatically
+        },
+      },
+      {
+        $addFields: {
+          // Ensure isClaimed defaults to false if not set (for old salons without this field)
+          isClaimed: { $ifNull: ["$isClaimed", false] },
+          // Ensure claimToken exists (empty string if not set)
+          claimToken: { $ifNull: ["$claimToken", ""] },
         },
       },
     ]);

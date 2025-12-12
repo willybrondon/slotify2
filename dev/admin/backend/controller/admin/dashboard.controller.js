@@ -41,6 +41,12 @@ exports.allStats = async (req, res) => {
     const totalSalons = salons.length;
     const totalExperts = experts.length;
 
+    // Calculate claim rate metrics
+    const totalSalonsAll = await Salon.countDocuments({ isDelete: false });
+    const claimedSalons = await Salon.countDocuments({ isClaimed: true, isDelete: false });
+    const unclaimedSalons = totalSalonsAll - claimedSalons;
+    const claimRate = totalSalonsAll > 0 ? ((claimedSalons / totalSalonsAll) * 100).toFixed(2) : 0;
+
     const data = {
       commission: totalAmount,
       bookings: totalBookings,
@@ -48,6 +54,13 @@ exports.allStats = async (req, res) => {
       users: totalUsers,
       experts: totalExperts,
       salons: totalSalons,
+      // Claim rate metrics
+      claimMetrics: {
+        totalSalons: totalSalonsAll,
+        claimedSalons: claimedSalons,
+        unclaimedSalons: unclaimedSalons,
+        claimRate: parseFloat(claimRate) // Percentage of salons that have claimed
+      }
     };
 
     return res.status(200).json({ status: true, data });

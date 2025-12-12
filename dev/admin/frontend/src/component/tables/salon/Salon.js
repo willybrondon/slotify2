@@ -15,6 +15,7 @@ import {
   getAllSalons,
   handleBestSeller,
   salonDelete,
+  sendClaimInvitation,
 } from "../../../redux/slice/salonSlice";
 import { ReactComponent as Delete } from "../../../assets/icon/delete.svg";
 import { ReactComponent as Booking } from "../../../assets/icon/booking.svg";
@@ -65,6 +66,21 @@ export const Salon = () => {
 
   useEffect(() => {
     setData(salon);
+    // Debug: Check if salons have isClaimed field
+    if (salon && salon.length > 0) {
+      console.log("=== SALON DATA DEBUG ===");
+      console.log("Total salons:", salon.length);
+      console.log("Salon data sample:", salon[0]);
+      console.log("isClaimed values:", salon.map(s => ({ 
+        name: s.name, 
+        isClaimed: s.isClaimed,
+        isClaimedType: typeof s.isClaimed,
+        hasIsClaimed: 'isClaimed' in s
+      })));
+      const unclaimedCount = salon.filter(s => s.isClaimed !== true).length;
+      console.log(`Unclaimed salons: ${unclaimedCount} out of ${salon.length}`);
+      console.log("========================");
+    }
   }, [salon]);
 
   function openImage(imageUrl) {
@@ -169,6 +185,19 @@ export const Salon = () => {
         />
       ),
     },
+    {
+      Header: "Claim Status",
+      Cell: ({ row }) => {
+        // Use row directly like all other columns
+        const isClaimed = row?.isClaimed === true;
+        
+        return (
+          <span className={`badge ${isClaimed ? 'bg-success' : 'bg-warning'}`} style={{ padding: "6px 12px", fontSize: "12px" }}>
+            {isClaimed ? 'Claimed' : 'Unclaimed'}
+          </span>
+        );
+      },
+    },
 
     {
       Header: "Schedule",
@@ -250,19 +279,59 @@ export const Salon = () => {
     },
     {
       Header: "Action",
-      Cell: ({ row }) => (
-        <span className="d-flex justify-content-center">
-          <button
-            className="py-1 me-2"
-            style={{ backgroundColor: "#CFF3FF", borderRadius: "8px" }}
-            onClick={() => {
-              handleAddSalon(row);
-            }}
-          >
-            <Edit />
-          </button>
-        </span>
-      ),
+      Cell: ({ row }) => {
+        // Check if salon is unclaimed - use row directly like other columns
+        const isClaimedValue = row?.isClaimed;
+        const isUnclaimed = isClaimedValue !== true;
+        
+        return (
+          <span className="d-flex justify-content-center align-items-center gap-2" style={{ flexWrap: "nowrap" }}>
+            <button
+              className="py-1 me-2"
+              style={{ backgroundColor: "#CFF3FF", borderRadius: "8px", minWidth: "40px", height: "32px" }}
+              onClick={() => {
+                handleAddSalon(row);
+              }}
+            >
+              <Edit />
+            </button>
+            {/* TEMPORARY: Always show button for testing - will fix condition after confirming it works */}
+            <button
+              className="py-1 px-2"
+              style={{ 
+                backgroundColor: "#FF6B00", 
+                borderRadius: "8px",
+                border: "none",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "90px",
+                height: "32px",
+                flexShrink: 0,
+                marginLeft: "8px"
+              }}
+              onClick={() => handleSendInvitation(row)}
+              title="Send Claim Invitation (Email & SMS)"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ marginRight: "6px", flexShrink: 0 }}
+              >
+                <path
+                  d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z"
+                  fill="#FFFFFF"
+                />
+              </svg>
+              <span style={{ color: "#FFFFFF", fontSize: "12px", fontWeight: "600", whiteSpace: "nowrap" }}>Invite</span>
+            </button>
+          </span>
+        );
+      },
     },
   ];
 
@@ -304,17 +373,143 @@ export const Salon = () => {
     navigate("/admin/salon/orders", { state: { data: row } });
   };
 
+  const handleSendInvitation = async (row) => {
+    try {
+      const result = await dispatch(
+        sendClaimInvitation({ salonId: row._id, method: "both" })
+      ).unwrap();
+
+      if (result?.status) {
+        // Check which methods succeeded
+        const results = result?.data?.results || {};
+        let message = "Invitation sent successfully!";
+        
+        if (results.email?.success && results.sms?.success) {
+          message = "Invitation sent via email and SMS!";
+        } else if (results.email?.success) {
+          message = "Invitation sent via email. SMS failed (no phone number or Twilio not configured).";
+        } else if (results.sms?.success) {
+          message = "Invitation sent via SMS. Email failed.";
+        }
+        
+        toast.success(message);
+        
+        // Refresh salon list to update claim status
+        const payload = {
+          start: page,
+          limit: rowsPerPage,
+          search,
+        };
+        dispatch(getAllSalons(payload));
+      } else {
+        // Show detailed error message
+        const results = result?.data?.results || {};
+        let errorMsg = result?.message || "Failed to send invitation";
+        
+        if (results.email && !results.email.success) {
+          errorMsg += ` Email: ${results.email.error || "Failed"}`;
+        }
+        if (results.sms && !results.sms.success) {
+          errorMsg += ` SMS: ${results.sms.error || "Failed"}`;
+        }
+        
+        toast.error(errorMsg);
+      }
+    } catch (error) {
+      console.error("Error sending invitation:", error);
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to send invitation"
+      );
+    }
+  };
+
+  const handleBulkSendInvitations = async () => {
+    const unclaimedSalons = data.filter((salon) => !salon.isClaimed);
+    
+    if (unclaimedSalons.length === 0) {
+      toast.info("No unclaimed salons to send invitations to.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Send claim invitations to ${unclaimedSalons.length} unclaimed salon(s)?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      toast.info(`Sending invitations to ${unclaimedSalons.length} salons...`);
+      
+      // Send invitations in batches to avoid overwhelming the server
+      const batchSize = 10;
+      let sent = 0;
+      let failed = 0;
+
+      for (let i = 0; i < unclaimedSalons.length; i += batchSize) {
+        const batch = unclaimedSalons.slice(i, i + batchSize);
+        
+        await Promise.all(
+          batch.map(async (salon) => {
+            try {
+              const result = await dispatch(
+                sendClaimInvitation({ salonId: salon._id, method: "both" })
+              ).unwrap();
+              
+              if (result?.status) {
+                sent++;
+              } else {
+                failed++;
+              }
+            } catch (error) {
+              failed++;
+            }
+          })
+        );
+
+        // Small delay between batches
+        if (i + batchSize < unclaimedSalons.length) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      }
+
+      toast.success(
+        `Bulk send completed! Sent: ${sent}, Failed: ${failed}`
+      );
+
+      // Refresh salon list
+      const payload = {
+        start: page,
+        limit: rowsPerPage,
+        search,
+      };
+      dispatch(getAllSalons(payload));
+    } catch (error) {
+      console.error("Error in bulk send:", error);
+      toast.error("Error sending bulk invitations");
+    }
+  };
+
   return (
     <div className="userTable">
       <Title name="Salons" />
 
       <div className="betBox">
-        <Button
-          className={`bg-button p-10 text-black m10-bottom`}
-          text={`Add salon`}
-          bIcon={`fa-solid fa-user-plus`}
-          onClick={() => handleAddSalon()}
-        />
+        <div className="d-flex gap-2">
+          <Button
+            className={`bg-button p-10 text-black m10-bottom`}
+            text={`Add salon`}
+            bIcon={`fa-solid fa-user-plus`}
+            onClick={() => handleAddSalon()}
+          />
+          <Button
+            className={`bg-warning p-10 text-white m10-bottom`}
+            text={`Send Invitations (Bulk)`}
+            bIcon={`fa-solid fa-envelope`}
+            onClick={handleBulkSendInvitations}
+          />
+        </div>
 
         <div className="col-md-8 col-lg-5  ms-auto">
           <Searching

@@ -8,9 +8,13 @@ const upload = multer({ storage });
 const checkAccessWithSecretKey = require("../../middleware/checkAccess");
 
 const salonController = require("../../controller/salon/salon.controller");
+const claimController = require("../../controller/salon/claim.controller");
 const salon = require("../../middleware/salon");
 
 route.post("/login", checkAccessWithSecretKey(), salonController.login);
+
+// Salon claim endpoint (public - no auth required)
+route.post("/claim", checkAccessWithSecretKey(), claimController.claimSalon);
 
 route.get("/profile", salon, checkAccessWithSecretKey(), salonController.profile);
 

@@ -2,6 +2,7 @@ const express = require("express");
 const route = express.Router();
 const multer = require("multer");
 const salonController = require("../../controller/admin/salon.controller");
+const claimController = require("../../controller/salon/claim.controller");
 const checkAccessWithSecretKey = require("../../middleware/checkAccess");
 const storage = require("./../../middleware/multer");
 const admin = require("../../middleware/admin");
@@ -34,5 +35,9 @@ route.get("/fetchSalonWalletHistoryByAdmin", checkAccessWithSecretKey(), admin, 
 route.get("/getShareLink", checkAccessWithSecretKey(), admin, salonController.getSalonShareLink);
 
 route.patch("/delete", checkAccessWithSecretKey(), admin, salonController.delete);
+
+// Claim invitation routes
+route.post("/send-claim-invitation", checkAccessWithSecretKey(), admin, claimController.sendClaimInvitation);
+route.post("/bulk-send-invitations", checkAccessWithSecretKey(), admin, claimController.bulkSendInvitations);
 
 module.exports = route;

@@ -139,6 +139,13 @@ export const getSalonHistory = createAsyncThunk(
   }
 );
 
+export const sendClaimInvitation = createAsyncThunk(
+  "admin/salon/sendClaimInvitation",
+  async (payload) => {
+    return apiInstance.post(`admin/salon/send-claim-invitation`, payload);
+  }
+);
+
 const salonSlice = createSlice({
   name: "salonSlice",
   initialState,
