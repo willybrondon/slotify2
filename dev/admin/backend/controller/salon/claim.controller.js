@@ -108,8 +108,47 @@ exports.sendClaimInvitation = async (req, res) => {
       });
     }
 
-    // Generate claim link
-    const claimLink = `${process.env.baseURL}salon/claim?token=${salon.claimToken}&email=${encodeURIComponent(salon.email)}`;
+    // Generate claimToken if it doesn't exist or is empty
+    if (!salon.claimToken || salon.claimToken.trim() === '') {
+      const crypto = require('crypto');
+      salon.claimToken = crypto.randomBytes(32).toString('hex');
+      await salon.save();
+      console.log(`[Claim Invitation] ✅ Generated new claimToken for salon ${salon.name} (ID: ${salon._id})`);
+      console.log(`[Claim Invitation] Token length: ${salon.claimToken.length} characters`);
+    } else {
+      console.log(`[Claim Invitation] Using existing claimToken for salon ${salon.name}`);
+    }
+
+    // Verify token is not empty before generating link
+    if (!salon.claimToken || salon.claimToken.trim() === '') {
+      console.error(`[Claim Invitation] ❌ ERROR: claimToken is still empty after generation!`);
+      return res.status(200).json({
+        status: false,
+        message: "Failed to generate claim token. Please try again."
+      });
+    }
+
+    // Generate claim link - ensure baseURL doesn't have trailing slash (we add it)
+    let baseURL = process.env.baseURL || '';
+    if (baseURL && !baseURL.endsWith('/')) {
+      baseURL = baseURL + '/';
+    }
+    const claimLink = `${baseURL}salon/claim?token=${salon.claimToken}&email=${encodeURIComponent(salon.email)}`;
+    
+    console.log(`[Claim Invitation] Generated claim link for ${salon.name}:`);
+    console.log(`   Token: ${salon.claimToken.substring(0, 10)}... (length: ${salon.claimToken.length})`);
+    console.log(`   Email: ${salon.email}`);
+    console.log(`   Link: ${claimLink}`);
+    
+    // Verify link is correct
+    if (claimLink.includes('token=&') || claimLink.includes('token=') && !salon.claimToken) {
+      console.error(`[Claim Invitation] ❌ ERROR: Generated link has empty token!`);
+      console.error(`[Claim Invitation] Link: ${claimLink}`);
+      return res.status(200).json({
+        status: false,
+        message: "Failed to generate valid claim link. Please try again."
+      });
+    }
 
     const results = {
       email: null,

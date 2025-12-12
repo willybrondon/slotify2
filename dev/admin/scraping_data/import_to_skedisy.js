@@ -254,6 +254,8 @@ async function importSalons(jsonFile) {
               platformFee: salonData.platformFee !== undefined ? salonData.platformFee : existing.platformFee,
               source: salonData.source || existing.source,
               source_id: salonData.source_id || existing.source_id,
+              // Generate claimToken if it doesn't exist or is empty
+              claimToken: existing.claimToken && existing.claimToken.trim() !== '' ? existing.claimToken : generateClaimToken(),
               updatedAt: new Date(),
             }
           };
@@ -315,6 +317,7 @@ async function importSalons(jsonFile) {
           isActive: salonData.isActive !== undefined ? salonData.isActive : true,
           isDelete: salonData.isDelete !== undefined ? salonData.isDelete : false,
           isClaimed: salonData.isClaimed !== undefined ? salonData.isClaimed : false,
+          claimToken: salonData.claimToken || generateClaimToken(), // Generate claim token if not provided
           // Add timestamps manually (MongoDB native driver doesn't auto-add them)
           createdAt: new Date(),
           updatedAt: new Date(),

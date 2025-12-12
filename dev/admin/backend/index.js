@@ -67,6 +67,11 @@ global.updateSettingFile = (settingData) => {
 const indexRoute = require("./route/index");
 app.use(indexRoute);
 
+// Public web route for salon claim page
+app.get("/salon/claim", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "salon-claim.html"));
+});
+
 // Public web route for salon pages (for sharing and deep linking)
 // New format: /salon/slug-shortId (e.g., /salon/coiffure-beaute-brasil-6885e2)
 const salonController = require("./controller/user/salon.controller");

@@ -45,11 +45,14 @@ async function sendSMS(to, message) {
       return { success: false, error: "Phone number is required" };
     }
 
-    // Format phone number to E.164 format if needed
-    let formattedPhone = to.trim();
+    // Format phone number - use same format as customer signup (user.controller.js verifyMobileForSignup)
+    // Just add + prefix if missing, don't modify the number format
+    let formattedPhone = to.trim().replace(/\s+/g, ''); // Remove spaces
+    
     if (!formattedPhone.startsWith("+")) {
-      // If no country code, assume it needs one (you may need to adjust this based on your requirements)
-      console.warn(`Phone number ${formattedPhone} may need country code prefix (e.g., +1 for US)`);
+      // If no + prefix, add it (same as customer signup)
+      formattedPhone = `+${formattedPhone}`;
+      console.log(`[SMS Service] Added + prefix: ${to} -> ${formattedPhone}`);
     }
 
     // Send SMS
