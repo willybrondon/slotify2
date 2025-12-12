@@ -1,6 +1,15 @@
 const Salon = require("../../models/salon.model");
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// Initialize SendGrid only if API key is configured
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  console.log('[Claim Controller] SendGrid initialized with API key');
+} else {
+  console.error('[Claim Controller] ⚠️  WARNING: SENDGRID_API_KEY not found in environment variables');
+  console.error('[Claim Controller] Email sending will fail. Please add SENDGRID_API_KEY to .env file');
+}
+
 const { sendSMS } = require("../../services/sms.service");
 
 /**
@@ -109,77 +118,126 @@ exports.sendClaimInvitation = async (req, res) => {
 
     // Send email if method is 'email' or 'both'
     if (method === 'email' || method === 'both') {
-      // Create email template
-      const emailHtml = `
-      <!DOCTYPE html>
-      <html lang="fr">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-          .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-          h2 { color: #333; }
-          p { color: #666; line-height: 1.6; }
-          .button { display: inline-block; padding: 12px 30px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-          .button:hover { background-color: #0056b3; }
-          .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9em; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h2>Votre salon a été ajouté sur Skedisy</h2>
-          <p>Bonjour,</p>
-          <p>Votre salon <strong>${salon.name}</strong> a été ajouté sur Skedisy, la plateforme de réservation de services de beauté.</p>
-          
-          <p><strong>Réclamez votre profil pour:</strong></p>
-          <ul>
-            <li>Gérer vos réservations en ligne</li>
-            <li>Augmenter votre visibilité</li>
-            <li>Recevoir de nouveaux clients</li>
-            <li>Suivre vos revenus et commissions</li>
-          </ul>
-          
-          <p style="text-align: center;">
-            <a href="${claimLink}" class="button">Réclamer mon profil</a>
-          </p>
-          
-          <p>Ou copiez ce lien dans votre navigateur:</p>
-          <p style="word-break: break-all; color: #007bff;">${claimLink}</p>
-          
-          <div class="footer">
-            <p>Cordialement,<br>L'équipe Skedisy</p>
-            <p style="font-size: 0.8em; color: #999;">Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email.</p>
+      // Validate email configuration first
+      if (!process.env.SENDGRID_API_KEY) {
+        console.error("[Claim Invitation] ❌ ERROR: SENDGRID_API_KEY not configured in .env");
+        results.email = { success: false, error: "SendGrid API key not configured" };
+      } else if (!process.env.EMAIL) {
+        console.error("[Claim Invitation] ❌ ERROR: EMAIL (from address) not configured in .env");
+        results.email = { success: false, error: "Email from address not configured" };
+      } else if (!salon.email || salon.email.trim() === '') {
+        console.error(`[Claim Invitation] ❌ ERROR: Salon ${salon.name} (ID: ${salon._id}) does not have an email address`);
+        results.email = { success: false, error: "Salon email address not found" };
+      } else {
+        // Create email template
+        const emailHtml = `
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+            .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+            h2 { color: #333; }
+            p { color: #666; line-height: 1.6; }
+            .button { display: inline-block; padding: 12px 30px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .button:hover { background-color: #0056b3; }
+            .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9em; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h2>Votre salon a été ajouté sur Skedisy</h2>
+            <p>Bonjour,</p>
+            <p>Votre salon <strong>${salon.name}</strong> a été ajouté sur Skedisy, la plateforme de réservation de services de beauté.</p>
+            
+            <p><strong>Réclamez votre profil pour:</strong></p>
+            <ul>
+              <li>Gérer vos réservations en ligne</li>
+              <li>Augmenter votre visibilité</li>
+              <li>Recevoir de nouveaux clients</li>
+              <li>Suivre vos revenus et commissions</li>
+            </ul>
+            
+            <p style="text-align: center;">
+              <a href="${claimLink}" class="button">Réclamer mon profil</a>
+            </p>
+            
+            <p>Ou copiez ce lien dans votre navigateur:</p>
+            <p style="word-break: break-all; color: #007bff;">${claimLink}</p>
+            
+            <div class="footer">
+              <p>Cordialement,<br>L'équipe Skedisy</p>
+              <p style="font-size: 0.8em; color: #999;">Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email.</p>
+            </div>
           </div>
-        </div>
-      </body>
-      </html>
-    `;
+        </body>
+        </html>
+      `;
 
-    const msg = {
-      to: salon.email,
-      from: process.env.EMAIL,
-      subject: "Votre salon a été ajouté sur Skedisy - Réclamez votre profil",
-      html: emailHtml,
-    };
+        const msg = {
+          to: salon.email.trim(),
+          from: process.env.EMAIL.trim(),
+          subject: "Votre salon a été ajouté sur Skedisy - Réclamez votre profil",
+          html: emailHtml,
+        };
 
-      try {
-        await sgMail.send(msg);
-        results.email = { success: true, message: "Email sent successfully" };
-      } catch (error) {
-        console.error("Email send error:", error);
-        results.email = { success: false, error: error.message || "Failed to send email" };
+        try {
+          console.log(`[Claim Invitation] 📧 Attempting to send email:`);
+          console.log(`   To: ${salon.email}`);
+          console.log(`   From: ${process.env.EMAIL}`);
+          console.log(`   Salon: ${salon.name} (ID: ${salon._id})`);
+          console.log(`   SendGrid API Key: ${process.env.SENDGRID_API_KEY ? 'Configured ✓' : 'Missing ✗'}`);
+          
+          const emailResponse = await sgMail.send(msg);
+          
+          console.log(`[Claim Invitation] ✅ Email sent successfully!`);
+          console.log(`   Status Code: ${emailResponse[0]?.statusCode}`);
+          console.log(`   Response Headers:`, emailResponse[0]?.headers);
+          
+          results.email = { success: true, message: "Email sent successfully" };
+        } catch (error) {
+          console.error(`[Claim Invitation] ❌ Email send FAILED:`);
+          console.error(`   To: ${salon.email}`);
+          console.error(`   Error Message: ${error.message}`);
+          console.error(`   Error Code: ${error.code}`);
+          if (error.response?.body) {
+            console.error(`   SendGrid Response:`, JSON.stringify(error.response.body, null, 2));
+            if (error.response.body.errors) {
+              error.response.body.errors.forEach((err, idx) => {
+                console.error(`   Error ${idx + 1}: ${err.message} (field: ${err.field})`);
+              });
+            }
+          }
+          
+          // Extract detailed error message
+          let errorMessage = error.message || "Failed to send email";
+          if (error.response?.body?.errors && error.response.body.errors.length > 0) {
+            errorMessage = error.response.body.errors.map(e => e.message).join('; ');
+          }
+          
+          results.email = { success: false, error: errorMessage };
+        }
       }
     }
 
     // Send SMS if method is 'sms' or 'both'
     if (method === 'sms' || method === 'both') {
       if (!salon.mobile || salon.mobile.trim() === '') {
+        console.log(`[Claim Invitation] ⚠️  Salon ${salon.name} (ID: ${salon._id}) does not have a mobile number`);
         results.sms = { success: false, error: "Salon mobile number not found" };
       } else {
+        console.log(`[Claim Invitation] Attempting to send SMS to: ${salon.mobile} for salon: ${salon.name}`);
         const smsMessage = `Bonjour! Votre salon ${salon.name} a été ajouté sur Skedisy. Réclamez votre profil: ${claimLink}`;
         const smsResult = await sendSMS(salon.mobile, smsMessage);
         results.sms = smsResult;
+        
+        if (smsResult.success) {
+          console.log(`[Claim Invitation] ✅ SMS sent successfully to ${salon.mobile}`);
+        } else {
+          console.error(`[Claim Invitation] ❌ SMS failed for ${salon.mobile}:`, smsResult.error);
+        }
       }
     }
 
