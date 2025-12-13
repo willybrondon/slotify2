@@ -300,10 +300,16 @@ exports.login = async (req, res) => {
         message: "Oops\x20!\x20Invalid\x20details.",
       });
   } catch (error) {
-    console.log(error);
+    console.error('[Admin Login] ERROR:', error);
+    console.error('[Admin Login] Error details:', {
+      message: error.message,
+      stack: error.stack,
+      email: req.body?.email
+    });
     return res.status(500).json({
       status: false,
-      message: error.message || "Internal Sever Error",
+      message: error.message || "Internal Server Error",
+      error: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };

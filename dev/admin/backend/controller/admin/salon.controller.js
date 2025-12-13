@@ -191,11 +191,15 @@ exports.getAll = async (req, res) => {
     }
 
     // Get all salon data, excluding only salonTime array
+    // IMPORTANT: Only show non-deleted salons (isDelete: false)
     // When using $project with exclusions (field: 0), all other fields are included by default
     // We then ensure isClaimed defaults to false if not set in database
     const data = await Salon.aggregate([
       {
-        $match: searchFilter,
+        $match: {
+          isDelete: false, // Only show non-deleted salons
+          ...searchFilter,
+        },
       },
       {
         $project: {

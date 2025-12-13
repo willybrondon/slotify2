@@ -18,11 +18,12 @@ exports.allStats = async (req, res) => {
         },
       };
     }
+    // FIXED: Include isDelete: false filter for all entities to show all active data
     const [bookings, users, salons, experts] = await Promise.all([
       Booking.find({ status: "completed", ...dateFilter }),
       User.find({ isDelete: false }),
-      Salon.find({ isActive: true }),
-      Expert.find({ isBlock: false }),
+      Salon.find({ isDelete: false }), // Changed from isActive: true to isDelete: false to show all non-deleted salons
+      Expert.find({ isDelete: false, isBlock: false }), // Added isDelete: false filter
     ]);
 
     let totalAmount = 0;
@@ -41,11 +42,15 @@ exports.allStats = async (req, res) => {
     const totalSalons = salons.length;
     const totalExperts = experts.length;
 
-    // Calculate claim rate metrics
+    // Calculate claim rate metrics - use same filter as salons query above
     const totalSalonsAll = await Salon.countDocuments({ isDelete: false });
     const claimedSalons = await Salon.countDocuments({ isClaimed: true, isDelete: false });
     const unclaimedSalons = totalSalonsAll - claimedSalons;
     const claimRate = totalSalonsAll > 0 ? ((claimedSalons / totalSalonsAll) * 100).toFixed(2) : 0;
+    
+    // Log for debugging
+    console.log(`[Dashboard] Stats: Users: ${totalUsers}, Salons: ${totalSalons}, Experts: ${totalExperts}`);
+    console.log(`[Dashboard] Total Salons (non-deleted): ${totalSalonsAll}, Claimed: ${claimedSalons}`);
 
     const data = {
       commission: totalAmount,
