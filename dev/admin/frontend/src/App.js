@@ -50,7 +50,7 @@ function App() {
 
     useEffect(() => {
         axios
-            .get("/api/admin/login/login")
+            .get("admin/login/login")
             .then((res) => {
                 setLogin(res.data.login);
             })

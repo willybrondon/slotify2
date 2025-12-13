@@ -65,7 +65,7 @@ global.updateSettingFile = (settingData) => {
 };
 
 const indexRoute = require("./route/index");
-app.use("/api", indexRoute); // Mount all routes under /api prefix
+app.use(indexRoute);
 
 // Public web route for salon claim page
 app.get("/salon/claim", (req, res) => {
