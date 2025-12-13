@@ -301,9 +301,19 @@ function displayRecommendations(recommendations) {
                 <div class="salon-list">
         `;
         
-        recommendations.salons.forEach(salon => {
+        recommendations.salons.forEach((salon, index) => {
+            const salonId = salon._id || salon.id;
+            // Use shareUrl if available, otherwise construct it
+            let webUrl = salon.shareUrl;
+            if (!webUrl && salonId) {
+                const salonSlug = salon.slug || (salon.name ? salon.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : 'salon');
+                const shortId = salon.shortId || (salonId.toString().substring(0, 6));
+                const slugWithId = `${salonSlug}-${shortId}`;
+                webUrl = `${API_BASE_URL}salon/${slugWithId}`;
+            }
+            
             html += `
-                <div class="salon-item">
+                <div class="salon-item" style="cursor: pointer;" onclick="handleSalonClick('${salonId}', '${webUrl || ''}')">
                     ${salon.image || salon.mainImage 
                         ? `<img src="${salon.image || salon.mainImage}" alt="${salon.name || 'Salon'}" onerror="this.style.display='none'">` 
                         : '<div style="width: 80px; height: 80px; background: #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-store" style="font-size: 30px; color: #999;"></i></div>'}
@@ -371,5 +381,64 @@ function showError(message) {
 
 function hideError() {
     errorMessage.style.display = 'none';
+}
+
+// Handle salon click - try app deep link first, fallback to web
+function handleSalonClick(salonId, webUrl) {
+    if (!salonId) {
+        console.error('Salon ID is missing');
+        return;
+    }
+    
+    // Ensure webUrl is valid
+    if (!webUrl) {
+        // Fallback: construct web URL if not provided
+        webUrl = `${API_BASE_URL}salon/${salonId}`;
+    }
+    
+    // Try to open app using deep link
+    const deepLink = `slotify://salon/${salonId}`;
+    
+    // Method 1: Try custom scheme deep link (slotify://)
+    // Create a hidden iframe to attempt deep linking
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = deepLink;
+    document.body.appendChild(iframe);
+    
+    // Set a timeout to check if app opened
+    let appOpened = false;
+    const timeout = setTimeout(() => {
+        if (!appOpened) {
+            // App didn't open, redirect to web page
+            window.location.href = webUrl;
+        }
+        if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+        }
+    }, 1500);
+    
+    // Try to detect if app opened (blur event indicates app focus)
+    const blurHandler = function() {
+        appOpened = true;
+        clearTimeout(timeout);
+        window.removeEventListener('blur', blurHandler);
+        if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+        }
+    };
+    window.addEventListener('blur', blurHandler);
+    
+    // Method 2: Also try universal link (https://skedisy.com/salon/...)
+    // Universal links work automatically if app is installed (iOS/Android)
+    // If app is not installed, browser will open the web page
+    // This is the preferred method for modern apps
+    setTimeout(() => {
+        if (!appOpened) {
+            // Try universal link - if app is installed, it will open
+            // If not, browser will navigate to web page
+            window.location.href = webUrl;
+        }
+    }, 300);
 }
 
