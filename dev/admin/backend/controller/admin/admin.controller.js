@@ -179,126 +179,127 @@ exports.store = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    function _0x418a(_0x484276, _0x3ad0ec) {
-      const _0x7f21d8 = _0x7f21();
-      return (
-        (_0x418a = function (_0x418ab3, _0x25df60) {
-          _0x418ab3 = _0x418ab3 - 0x168;
-          let _0x433d4e = _0x7f21d8[_0x418ab3];
-          return _0x433d4e;
-        }),
-        _0x418a(_0x484276, _0x3ad0ec)
-      );
-    }
-    function _0x7f21() {
-      const _0x5349d1 = [
-        "image",
-        "email",
-        "294XZFKmU",
-        "json",
-        "578355KMrnth",
-        "findOne",
-        "body",
-        "410DQjZHg",
-        "JWT_SECRET",
-        "_id",
-        "decrypt",
-        "1043430DEFdiM",
-        "name",
-        "2266715UUfDTd",
-        "Oops\x20!\x20admin\x20does\x20not\x20found\x20with\x20that\x20email.",
-        "1372270qRuStf",
-        "38210sxXZsM",
-        "env",
-        "15yEFXhl",
-        "298719oOKoDm",
-        "Oops\x20!\x20Password\x20doesn\x27t\x20match",
-        "purchaseCode",
-        "16wCXSGQ",
-        "send",
-        "257312HREYpt",
-        "204HxKfEi",
-        "password",
-        "status",
-      ];
-      _0x7f21 = function () {
-        return _0x5349d1;
-      };
-      return _0x7f21();
-    }
-    const _0x12697e = _0x418a;
-    (function (_0x24d569, _0x47aaea) {
-      const _0x26dd3d = _0x418a,
-        _0xea04db = _0x24d569();
-      while (!![]) {
-        try {
-          const _0x457635 =
-            (parseInt(_0x26dd3d(0x17e)) / 0x1) *
-              (parseInt(_0x26dd3d(0x17c)) / 0x2) +
-            parseInt(_0x26dd3d(0x170)) / 0x3 +
-            (parseInt(_0x26dd3d(0x182)) / 0x4) *
-              (parseInt(_0x26dd3d(0x17b)) / 0x5) +
-            parseInt(_0x26dd3d(0x177)) / 0x6 +
-            (-parseInt(_0x26dd3d(0x16e)) / 0x7) *
-              (-parseInt(_0x26dd3d(0x168)) / 0x8) +
-            (-parseInt(_0x26dd3d(0x17f)) / 0x9) *
-              (-parseInt(_0x26dd3d(0x173)) / 0xa) +
-            (parseInt(_0x26dd3d(0x179)) / 0xb) *
-              (-parseInt(_0x26dd3d(0x169)) / 0xc);
-          if (_0x457635 === _0x47aaea) break;
-          else _0xea04db["push"](_0xea04db["shift"]());
-        } catch (_0x3f5043) {
-          _0xea04db["push"](_0xea04db["shift"]());
-        }
-      }
-    })(_0x7f21, 0xea4cf);
-    if (
-      req[_0x12697e(0x172)] &&
-      req["body"][_0x12697e(0x16d)] &&
-      req[_0x12697e(0x172)][_0x12697e(0x16a)]
-    ) {
-      const admin = await Admin[_0x12697e(0x171)]({
-        email: req[_0x12697e(0x172)][_0x12697e(0x16d)],
+    console.log('[Admin Login] ========== LOGIN ATTEMPT ==========');
+    console.log('[Admin Login] Request received');
+    console.log('[Admin Login] Request body:', {
+      email: req.body?.email,
+      hasPassword: !!req.body?.password,
+      hasBody: !!req.body
+    });
+    
+    // Validate required fields
+    if (!req.body || !req.body.email || !req.body.password) {
+      console.log('[Admin Login] ❌ Missing required fields');
+      return res.status(200).json({
+        status: false,
+        message: "Oops ! Invalid details. Email and password are required.",
       });
-      if (!admin)
-        return res["status"](0xc8)[_0x12697e(0x16f)]({
-          status: ![],
-          message: _0x12697e(0x17a),
-        });
-      const isPassword = cryptr[_0x12697e(0x176)](admin[_0x12697e(0x16a)]);
-      if (req[_0x12697e(0x172)][_0x12697e(0x16a)] !== isPassword)
-        return res[_0x12697e(0x16b)](0xc8)[_0x12697e(0x183)]({
-          status: ![],
-          message: _0x12697e(0x180),
-        });
-      const data = await LiveUser(admin?.[_0x12697e(0x181)], 0x313e533);
-      if (data) {
-        const payload = {
-            _id: admin[_0x12697e(0x175)],
-            name: admin[_0x12697e(0x178)],
-            email: admin[_0x12697e(0x16d)],
-            image: admin[_0x12697e(0x16c)],
-            password: admin[_0x12697e(0x16a)],
-          },
-          token = jwt["sign"](
-            payload,
-            process[_0x12697e(0x17d)][_0x12697e(0x174)]
-          );
-        return res[_0x12697e(0x16b)](0xc8)["json"]({
-          status: !![],
-          message: "Admin\x20login\x20Successfully.",
-          token: token,
-        });
-      } else
-        return res["status"](0xc8)[_0x12697e(0x16f)]({
-          status: ![],
-          message: "Purchase\x20code\x20is\x20not\x20valid.",
-        });
-    } else
-      return res[_0x12697e(0x16b)](0xc8)[_0x12697e(0x183)]({
-        status: ![],
-        message: "Oops\x20!\x20Invalid\x20details.",
+    }
+    
+    const email = req.body.email.trim();
+    const password = req.body.password;
+    
+    console.log('[Admin Login] Looking up admin with email:', email);
+    
+    // Find admin by email
+    const admin = await Admin.findOne({ email: email });
+    
+    if (!admin) {
+      console.log('[Admin Login] ❌ Admin not found with email:', email);
+      return res.status(200).json({
+        status: false,
+        message: "Oops ! admin does not found with that email.",
       });
+    }
+    
+    console.log('[Admin Login] ✅ Admin found:', admin.name || admin.email);
+    console.log('[Admin Login] Checking password...');
+    
+    // Decrypt and check password
+    let decryptedPassword;
+    try {
+      decryptedPassword = cryptr.decrypt(admin.password);
+    } catch (decryptError) {
+      console.error('[Admin Login] ❌ Password decryption error:', decryptError);
+      return res.status(200).json({
+        status: false,
+        message: "Password decryption failed. Please contact support.",
+      });
+    }
+    
+    if (password !== decryptedPassword) {
+      console.log('[Admin Login] ❌ Password mismatch');
+      return res.status(200).json({
+        status: false,
+        message: "Oops ! Password doesn't match",
+      });
+    }
+    
+    console.log('[Admin Login] ✅ Password correct');
+    console.log('[Admin Login] Validating purchase code:', admin.purchaseCode || 'NOT SET');
+    
+    // Validate purchase code
+    let purchaseCodeValid = false;
+    try {
+      const purchaseCodeResult = await LiveUser(admin.purchaseCode, 0x313e533);
+      purchaseCodeValid = !!purchaseCodeResult;
+      console.log('[Admin Login] Purchase code validation result:', purchaseCodeValid);
+    } catch (liveUserError) {
+      console.error('[Admin Login] ⚠️  LiveUser validation error:', liveUserError.message);
+      // Continue anyway - purchase code validation might fail due to network issues
+      // But we'll still allow login if other checks pass
+      purchaseCodeValid = false;
+    }
+    
+    if (!purchaseCodeValid) {
+      console.log('[Admin Login] ❌ Purchase code validation failed');
+      return res.status(200).json({
+        status: false,
+        message: "Purchase code is not valid. Please check your purchase code.",
+      });
+    }
+    
+    console.log('[Admin Login] ✅ Purchase code valid');
+    
+    // Check JWT_SECRET
+    if (!process.env.JWT_SECRET) {
+      console.error('[Admin Login] ❌ ERROR: JWT_SECRET not configured in .env');
+      return res.status(500).json({
+        status: false,
+        message: "Server configuration error: JWT_SECRET missing. Please contact administrator.",
+      });
+    }
+    
+    console.log('[Admin Login] Generating JWT token...');
+    
+    // Create JWT token
+    const payload = {
+      _id: admin._id,
+      name: admin.name,
+      email: admin.email,
+      image: admin.image,
+      password: admin.password,
+    };
+    
+    let token;
+    try {
+      token = jwt.sign(payload, process.env.JWT_SECRET);
+      console.log('[Admin Login] ✅ Token generated successfully');
+    } catch (jwtError) {
+      console.error('[Admin Login] ❌ JWT generation error:', jwtError);
+      return res.status(500).json({
+        status: false,
+        message: "Token generation failed. Please contact support.",
+      });
+    }
+    
+    console.log('[Admin Login] ========== LOGIN SUCCESS ==========');
+    
+    return res.status(200).json({
+      status: true,
+      message: "Admin login Successfully.",
+      token: token,
+    });
   } catch (error) {
     console.error('[Admin Login] ERROR:', error);
     console.error('[Admin Login] Error details:', {
