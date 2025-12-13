@@ -3,6 +3,15 @@ const Expert = require("../../models/expert.model");
 const SalonSettlement = require("../../models/salonSettlement.model");
 const ExpertSettlement = require("../../models/expertSettlement.model");
 const moment = require("moment");
+const fs = require("fs");
+const path = require("path");
+const { generateInvoicePDF } = require("../../services/invoice.service");
+const sgMail = require('@sendgrid/mail');
+
+// Initialize SendGrid if API key is configured
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 exports.allSalonSettlement = async (req, res) => {
   try {
@@ -574,6 +583,231 @@ exports.expertSettlementInfo = async (req, res) => {
     return res.status(500).json({
       status: false,
       error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+/**
+ * Generate and download PDF invoice for salon settlement
+ * GET /api/admin/settlement/salon-invoice?settlementId=xxx
+ */
+exports.generateSalonInvoice = async (req, res) => {
+  try {
+    if (!req.query.settlementId) {
+      return res.status(200).json({
+        status: false,
+        message: "Settlement ID is required"
+      });
+    }
+
+    // Get settlement with populated salon
+    const settlement = await SalonSettlement.findById(req.query.settlementId)
+      .populate({
+        path: "salonId",
+        select: "name email mobile addressDetails"
+      })
+      .populate({
+        path: "bookingId",
+        select: "bookingId date amount salonEarning salonCommission"
+      });
+
+    if (!settlement) {
+      return res.status(200).json({
+        status: false,
+        message: "Settlement not found"
+      });
+    }
+
+    console.log(`[Invoice] Generating PDF invoice for settlement ${settlement._id}`);
+
+    // Generate PDF
+    const pdfPath = await generateInvoicePDF(settlement, settlement.bookingId || []);
+
+    // Send PDF as download
+    const filename = path.basename(pdfPath);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    const fileStream = fs.createReadStream(pdfPath);
+    fileStream.pipe(res);
+
+    fileStream.on('end', () => {
+      // Optionally delete the file after sending (or keep for records)
+      // fs.unlinkSync(pdfPath);
+      console.log(`[Invoice] PDF sent successfully: ${filename}`);
+    });
+
+    fileStream.on('error', (error) => {
+      console.error('[Invoice] Error streaming PDF:', error);
+      res.status(500).json({
+        status: false,
+        error: "Error generating invoice"
+      });
+    });
+
+  } catch (error) {
+    console.error('[Invoice] Error generating invoice:', error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error"
+    });
+  }
+};
+
+/**
+ * Send invoice via email to salon
+ * POST /api/admin/settlement/send-salon-invoice
+ * Body: { settlementId }
+ */
+exports.sendSalonInvoice = async (req, res) => {
+  try {
+    const { settlementId } = req.body;
+
+    if (!settlementId) {
+      return res.status(200).json({
+        status: false,
+        message: "Settlement ID is required"
+      });
+    }
+
+    // Check SendGrid configuration
+    if (!process.env.SENDGRID_API_KEY || !process.env.EMAIL) {
+      console.error('[Invoice] SendGrid not configured');
+      return res.status(200).json({
+        status: false,
+        message: "Email service not configured. Please set SENDGRID_API_KEY and EMAIL in .env"
+      });
+    }
+
+    // Get settlement with populated salon
+    const settlement = await SalonSettlement.findById(settlementId)
+      .populate({
+        path: "salonId",
+        select: "name email mobile addressDetails"
+      })
+      .populate({
+        path: "bookingId",
+        select: "bookingId date amount salonEarning salonCommission"
+      });
+
+    if (!settlement) {
+      return res.status(200).json({
+        status: false,
+        message: "Settlement not found"
+      });
+    }
+
+    // Get salon data (handle both populate and aggregation formats)
+    let salon = null;
+    if (settlement.salon) {
+      salon = Array.isArray(settlement.salon) && settlement.salon.length > 0 
+        ? settlement.salon[0] 
+        : settlement.salon;
+    } else if (settlement.salonId && typeof settlement.salonId === 'object') {
+      salon = settlement.salonId;
+    }
+    
+    if (!salon || !salon.email) {
+      return res.status(200).json({
+        status: false,
+        message: "Salon email not found"
+      });
+    }
+
+    console.log(`[Invoice] Generating and sending invoice to ${salon.email}`);
+
+    // Generate PDF
+    const pdfPath = await generateInvoicePDF(settlement, settlement.bookingId || []);
+
+    // Read PDF file
+    const pdfBuffer = fs.readFileSync(pdfPath);
+    const pdfBase64 = pdfBuffer.toString('base64');
+    const filename = path.basename(pdfPath);
+
+    // Prepare email
+    const invoiceNumber = `INV-${settlement._id.toString().substring(0, 8).toUpperCase()}`;
+    const settlementDate = moment(settlement.date || settlement.createdAt).format('MM/YYYY');
+
+    const msg = {
+      to: salon.email,
+      from: process.env.EMAIL,
+      subject: `Facture Skedisy - ${settlementDate} - ${invoiceNumber}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .invoice-details { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Facture Skedisy</h1>
+            </div>
+            <div class="content">
+              <p>Bonjour <strong>${salon.name}</strong>,</p>
+              
+              <p>Veuillez trouver ci-joint votre facture pour la période de <strong>${settlementDate}</strong>.</p>
+              
+              <div class="invoice-details">
+                <p><strong>Numéro de facture:</strong> ${invoiceNumber}</p>
+                <p><strong>Période:</strong> ${settlementDate}</p>
+                <p><strong>Montant total:</strong> ${new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(settlement.finalAmount || 0)}</p>
+                <p><strong>Statut:</strong> ${settlement.statusOfTransaction === 1 ? 'Payé' : 'En attente'}</p>
+              </div>
+              
+              <p>Pour toute question concernant cette facture, n'hésitez pas à nous contacter.</p>
+              
+              <p>Cordialement,<br>L'équipe Skedisy</p>
+            </div>
+            <div class="footer">
+              <p>Cet email a été envoyé automatiquement. Merci de ne pas y répondre.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      attachments: [
+        {
+          content: pdfBase64,
+          filename: filename,
+          type: 'application/pdf',
+          disposition: 'attachment'
+        }
+      ]
+    };
+
+    // Send email
+    await sgMail.send(msg);
+
+    console.log(`[Invoice] Invoice sent successfully to ${salon.email}`);
+
+    return res.status(200).json({
+      status: true,
+      message: "Invoice sent successfully via email",
+      email: salon.email,
+      invoiceNumber: invoiceNumber
+    });
+
+  } catch (error) {
+    console.error('[Invoice] Error sending invoice:', error);
+    
+    // More detailed error message
+    if (error.response) {
+      console.error('[Invoice] SendGrid error details:', error.response.body);
+    }
+
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+      details: error.response?.body || null
     });
   }
 };

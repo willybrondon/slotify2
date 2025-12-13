@@ -13,4 +13,8 @@ route.put("/salonBonusPenalty", checkAccessWithSecretKey(), admin, settlementCon
 route.get("/salonSettlementInfo", checkAccessWithSecretKey(), admin, settlementController.salonSettlementInfo);
 route.get("/expertSettlementInfo", checkAccessWithSecretKey(), admin, settlementController.expertSettlementInfo);
 
+// Invoice endpoints
+route.get("/salon-invoice", checkAccessWithSecretKey(), admin, settlementController.generateSalonInvoice);
+route.post("/send-salon-invoice", checkAccessWithSecretKey(), admin, settlementController.sendSalonInvoice);
+
 module.exports = route;
