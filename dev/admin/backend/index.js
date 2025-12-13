@@ -69,7 +69,179 @@ app.use(indexRoute);
 
 // Public web route for salon claim page
 app.get("/salon/claim", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "salon-claim.html"));
+  const filePath = path.join(__dirname, "public", "salon-claim.html");
+  
+  // Check if file exists, if not serve inline HTML
+  if (!fs.existsSync(filePath)) {
+    console.warn(`[Salon Claim] File not found at ${filePath}, serving inline HTML`);
+    // Serve the HTML inline as fallback
+    return res.send(`
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réclamer votre salon - Skedisy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { color: #667eea; font-size: 32px; margin-bottom: 10px; }
+        .logo p { color: #666; font-size: 14px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 14px; }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus { outline: none; border-color: #667eea; }
+        .error { background: #fee; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
+        .success { background: #efe; color: #3c3; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .loading { display: none; text-align: center; margin-top: 20px; }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .info { background: #f0f7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: #555; }
+        .info strong { color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🎉 Bienvenue sur Skedisy</h1>
+            <p>Réclamez votre profil salon</p>
+        </div>
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+        <div class="info">
+            <strong>Votre salon a été ajouté sur Skedisy!</strong><br>
+            Créez un mot de passe pour réclamer votre profil et commencer à gérer vos réservations en ligne.
+        </div>
+        <form id="claimForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required readonly>
+            </div>
+            <div class="form-group">
+                <label for="password">Nouveau mot de passe</label>
+                <input type="password" id="password" name="password" required minlength="6" placeholder="Minimum 6 caractères">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirmer le mot de passe</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Répétez le mot de passe">
+            </div>
+            <button type="submit" class="btn" id="submitBtn">Réclamer mon profil</button>
+        </form>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #666;">Traitement en cours...</p>
+        </div>
+    </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const email = urlParams.get('email');
+        if (!token || !email) {
+            document.getElementById('error').textContent = 'Lien invalide. Veuillez utiliser le lien fourni dans votre email.';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('claimForm').style.display = 'none';
+        } else {
+            document.getElementById('email').value = decodeURIComponent(email);
+        }
+        document.getElementById('claimForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirmPassword) {
+                document.getElementById('error').textContent = 'Les mots de passe ne correspondent pas.';
+                document.getElementById('error').style.display = 'block';
+                return;
+            }
+            if (password.length < 6) {
+                document.getElementById('error').textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
+                document.getElementById('error').style.display = 'block';
+                return;
+            }
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('claimForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            try {
+                const baseURL = window.location.origin;
+                const apiURL = \`\${baseURL}/api/salon/claim\`;
+                const response = await fetch(apiURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token, email: decodeURIComponent(email), password: password })
+                });
+                const data = await response.json();
+                if (data.status === true) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('success').textContent = '✅ Profil réclamé avec succès! Vous pouvez maintenant vous connecter.';
+                    document.getElementById('success').style.display = 'block';
+                    setTimeout(() => { window.location.href = '/salonpanel/login'; }, 3000);
+                } else {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').textContent = data.message || 'Une erreur est survenue. Veuillez réessayer.';
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('claimForm').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').textContent = 'Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('claimForm').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+    `);
+  }
+  
+  res.sendFile(filePath);
 });
 
 // Public web route for salon pages (for sharing and deep linking)
