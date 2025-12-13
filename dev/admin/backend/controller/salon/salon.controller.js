@@ -38,12 +38,19 @@ exports.login = async (req, res) => {
     }
 
     // Check if salon is claimed (for newly claimed salons)
-    if (!salon.isClaimed) {
+    // Allow admin bypass using secret key for support purposes
+    const adminBypass = req.headers.key === process.env.secretKey || req.body.key === process.env.secretKey || req.query.key === process.env.secretKey;
+    
+    if (!salon.isClaimed && !adminBypass) {
       console.log(`[Salon Login] Salon not yet claimed: ${salon.email}`);
       return res.status(200).send({
         status: false,
         message: "Please claim your salon profile first using the invitation link.",
       });
+    }
+    
+    if (!salon.isClaimed && adminBypass) {
+      console.log(`[Salon Login] Admin bypass used for unclaimed salon: ${salon.email}`);
     }
 
     const payload = {
