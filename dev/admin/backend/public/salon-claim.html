@@ -243,6 +243,11 @@
                 const baseURL = window.location.origin;
                 const apiURL = `${baseURL}/api/salon/claim`;
                 
+                console.log('[Claim Form] Attempting to claim salon...');
+                console.log('[Claim Form] API URL:', apiURL);
+                console.log('[Claim Form] Token:', token ? token.substring(0, 10) + '...' : 'missing');
+                console.log('[Claim Form] Email:', decodeURIComponent(email));
+                
                 const response = await fetch(apiURL, {
                     method: 'POST',
                     headers: {
@@ -255,7 +260,17 @@
                     })
                 });
                 
+                console.log('[Claim Form] Response status:', response.status);
+                console.log('[Claim Form] Response ok:', response.ok);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('[Claim Form] Response error:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('[Claim Form] Response data:', data);
                 
                 if (data.status === true) {
                     document.getElementById('loading').style.display = 'none';
@@ -273,8 +288,18 @@
                     document.getElementById('claimForm').style.display = 'block';
                 }
             } catch (error) {
+                console.error('[Claim Form] Error details:', error);
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').textContent = 'Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.';
+                
+                // More detailed error message
+                let errorMessage = 'Erreur de connexion. ';
+                if (error.message) {
+                    errorMessage += error.message;
+                } else {
+                    errorMessage += 'Veuillez vérifier votre connexion internet et réessayer.';
+                }
+                
+                document.getElementById('error').textContent = errorMessage;
                 document.getElementById('error').style.display = 'block';
                 document.getElementById('claimForm').style.display = 'block';
             }

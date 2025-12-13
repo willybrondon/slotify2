@@ -13,8 +13,8 @@ const salon = require("../../middleware/salon");
 
 route.post("/login", checkAccessWithSecretKey(), salonController.login);
 
-// Salon claim endpoint (public - no auth required)
-route.post("/claim", checkAccessWithSecretKey(), claimController.claimSalon);
+// Salon claim endpoint (public - no auth required for claiming)
+route.post("/claim", claimController.claimSalon);
 
 route.get("/profile", salon, checkAccessWithSecretKey(), salonController.profile);
 

@@ -9,4 +9,5 @@ route.use("/user", user);
 route.use("/admin", admin);
 route.use("/salon", salon);
 
+// All routes are mounted at /api prefix in index.js
 module.exports = route;

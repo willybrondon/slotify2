@@ -65,7 +65,7 @@ global.updateSettingFile = (settingData) => {
 };
 
 const indexRoute = require("./route/index");
-app.use(indexRoute);
+app.use("/api", indexRoute); // Mount all routes under /api prefix
 
 // Public web route for salon claim page
 app.get("/salon/claim", (req, res) => {
@@ -210,7 +210,7 @@ app.get("/salon/claim", (req, res) => {
             document.getElementById('loading').style.display = 'block';
             try {
                 const baseURL = window.location.origin;
-                const apiURL = \`\${baseURL}/api/salon/claim\`;
+                const apiURL = \`\${baseURL}/api/salon/claim\`; // Now correctly mounted at /api
                 const response = await fetch(apiURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
