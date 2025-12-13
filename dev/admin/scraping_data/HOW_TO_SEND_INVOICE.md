@@ -7,8 +7,9 @@ The admin panel now includes invoice functionality for salon settlements. You ca
 
 ### Navigation Path:
 1. Log in to the admin dashboard
-2. Navigate to **Salon Payment** section (usually in the sidebar menu)
-3. You'll see a table listing all salon settlements
+2. In the **sidebar menu**, look for the **"Finance"** section
+3. Click on **"Salon Payment"** (it has a money/payment icon)
+4. You'll see a table listing all salon settlements
 
 ## Invoice Actions Available
 
