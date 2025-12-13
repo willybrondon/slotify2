@@ -463,20 +463,46 @@ exports.getProductsOfParticularSalon = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
+    // SAFEGUARD: Require salonId parameter
     if (!req.query.salonId) {
-      return res.status(200).json({ status: false, message: "Invalid Details" });
+      console.error("[Salon Delete] ERROR: Attempted to delete salon without salonId");
+      return res.status(200).json({ status: false, message: "Invalid Details: salonId is required" });
     }
-    const salon = await Salon.findById(req.query.salonId);
+
+    // SAFEGUARD: Validate salonId format to prevent injection
+    let salonId;
+    try {
+      salonId = new mongoose.Types.ObjectId(req.query.salonId);
+    } catch (error) {
+      console.error("[Salon Delete] ERROR: Invalid salonId format:", req.query.salonId);
+      return res.status(200).json({ status: false, message: "Invalid salonId format" });
+    }
+
+    const salon = await Salon.findById(salonId);
 
     if (!salon) {
+      console.error("[Salon Delete] ERROR: Salon not found:", salonId);
       return res.status(200).json({ status: false, message: "Salon does not Exist" });
     }
 
+    // SAFEGUARD: Log deletion for audit
+    console.log(`[Salon Delete] Soft deleting salon: ${salon.name} (${salon.email}) - ID: ${salonId}`);
+
+    // Soft delete: Set isDelete flag instead of actually deleting
     salon.isDelete = true;
-    await Expert.updateMany({ salonId: salon._id, isDelete: false }, { $set: { isDelete: true } });
-    return res.status(200).json({ status: true, message: "success", salon });
+    await salon.save();
+
+    // Also soft delete associated experts
+    const expertUpdateResult = await Expert.updateMany(
+      { salonId: salon._id, isDelete: false }, 
+      { $set: { isDelete: true } }
+    );
+    
+    console.log(`[Salon Delete] Soft deleted ${expertUpdateResult.modifiedCount} associated experts`);
+
+    return res.status(200).json({ status: true, message: "Salon deleted successfully", salon });
   } catch (error) {
-    console.log(error);
+    console.error("[Salon Delete] ERROR:", error);
     return res.status(500).json({ status: false, error: error.message || "Server Error" });
   }
 };

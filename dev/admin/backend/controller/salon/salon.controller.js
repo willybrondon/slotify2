@@ -17,19 +17,33 @@ exports.login = async (req, res) => {
 
     const salon = await Salon.findOne({ email: req.body.email.trim(), isDelete: false });
 
-    if (salon) {
-      if (req.body.password != salon.password) {
-        return res.status(200).send({ status: false, message: "Oops ! Invalid Password!" });
-      }
-
-      if (!salon.isActive) {
-        return res.status(200).send({
-          status: false,
-          message: "Salon is blocked by admin ! Contact Admin from more details",
-        });
-      }
-    } else {
+    if (!salon) {
+      console.log(`[Salon Login] Salon not found or deleted: ${req.body.email.trim()}`);
       return res.status(200).send({ status: false, message: "Salon Not Found! Contact Admin!" });
+    }
+
+    // Check password
+    if (req.body.password != salon.password) {
+      console.log(`[Salon Login] Invalid password for salon: ${salon.email}`);
+      return res.status(200).send({ status: false, message: "Oops ! Invalid Password!" });
+    }
+
+    // Check if salon is active
+    if (!salon.isActive) {
+      console.log(`[Salon Login] Salon is inactive: ${salon.email}`);
+      return res.status(200).send({
+        status: false,
+        message: "Salon is blocked by admin ! Contact Admin from more details",
+      });
+    }
+
+    // Check if salon is claimed (for newly claimed salons)
+    if (!salon.isClaimed) {
+      console.log(`[Salon Login] Salon not yet claimed: ${salon.email}`);
+      return res.status(200).send({
+        status: false,
+        message: "Please claim your salon profile first using the invitation link.",
+      });
     }
 
     const payload = {

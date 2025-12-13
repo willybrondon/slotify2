@@ -28,10 +28,11 @@ exports.claimSalon = async (req, res) => {
     }
 
     // Find salon by email and claim token
+    // IMPORTANT: Allow claiming even if isDelete is true (soft delete recovery)
     const salon = await Salon.findOne({
       email: email.trim(),
-      claimToken: token.trim(),
-      isDelete: false
+      claimToken: token.trim()
+      // Removed isDelete: false to allow recovery of soft-deleted salons
     });
 
     if (!salon) {
@@ -52,9 +53,12 @@ exports.claimSalon = async (req, res) => {
     // Update salon: claim profile, set password, activate
     salon.isClaimed = true;
     salon.isActive = true;
+    salon.isDelete = false; // Ensure salon is not marked as deleted
     salon.password = password;
     salon.claimToken = ""; // Clear token after claiming
     await salon.save();
+    
+    console.log(`[Claim] Salon ${salon.name} (${salon.email}) claimed successfully. isDelete set to false.`);
 
     return res.status(200).json({
       status: true,
