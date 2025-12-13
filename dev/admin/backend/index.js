@@ -210,7 +210,11 @@ app.get("/salon/claim", (req, res) => {
             document.getElementById('loading').style.display = 'block';
             try {
                 const baseURL = window.location.origin;
-                const apiURL = \`\${baseURL}/api/salon/claim\`; // Now correctly mounted at /api
+                const apiURL = \`\${baseURL}/salon/claim\`;
+                console.log('[Claim Form] Attempting to claim salon...');
+                console.log('[Claim Form] API URL:', apiURL);
+                console.log('[Claim Form] Token:', token ? token.substring(0, 10) + '...' : 'missing');
+                console.log('[Claim Form] Email:', decodeURIComponent(email));
                 const response = await fetch(apiURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -229,6 +233,7 @@ app.get("/salon/claim", (req, res) => {
                     document.getElementById('claimForm').style.display = 'block';
                 }
             } catch (error) {
+                console.error('[Claim Form] Fetch error:', error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').textContent = 'Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.';
                 document.getElementById('error').style.display = 'block';
