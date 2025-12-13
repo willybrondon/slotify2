@@ -1,3 +1,3 @@
-export const baseURL = "";
+export const baseURL = "/api";
 export const secretKey = "";
 export const projectName = "";
