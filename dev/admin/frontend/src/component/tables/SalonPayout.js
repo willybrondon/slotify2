@@ -13,7 +13,7 @@ import Button from "../extras/Button";
 import Table from "../extras/Table";
 import Pagination from "../extras/Pagination";
 
-import { getSalary, payment } from "../../redux/slice/salarySlice";
+import { getSalary, payment, downloadSalonInvoice, sendSalonInvoice } from "../../redux/slice/salarySlice";
 import BonusPenaltyDialog from "./BonusPenaltyDialog";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
@@ -224,6 +224,51 @@ const SalonPayout = () => {
     },
 
     {
+      Header: "Invoice",
+      Cell: ({ row }) => (
+        <span className="d-flex justify-content-center gap-2">
+          <button
+            className="py-1"
+            style={{ backgroundColor: "#FFE5E5", borderRadius: "8px" }}
+            onClick={() => handleDownloadInvoice(row?._id)}
+            title="Download Invoice"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 15.5777L8.5 12.0777L9.5775 11.0002L11.25 12.6727V6.50024H12.75V12.6727L14.4225 11.0002L15.5 12.0777L12 15.5777ZM18.75 18.5002H5.25V17.0002H18.75V18.5002Z"
+                fill="#DC3545"
+              />
+            </svg>
+          </button>
+          <button
+            className="py-1"
+            style={{ backgroundColor: "#E0F7FA", borderRadius: "8px" }}
+            onClick={() => handleSendInvoice(row?._id)}
+            title="Send Invoice via Email"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z"
+                fill="#17A2B8"
+              />
+            </svg>
+          </button>
+        </span>
+      ),
+    },
+    {
       Header: "Pay",
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
@@ -322,6 +367,14 @@ const SalonPayout = () => {
         row,
       },
     });
+  };
+
+  const handleDownloadInvoice = (settlementId) => {
+    dispatch(downloadSalonInvoice(settlementId));
+  };
+
+  const handleSendInvoice = (settlementId) => {
+    dispatch(sendSalonInvoice(settlementId));
   };
 
   const types = [

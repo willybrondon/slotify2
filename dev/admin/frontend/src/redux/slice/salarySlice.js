@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
+import { baseURL, secretKey } from "../../util/config";
 
 const initialState = {
   salary: [],
@@ -94,6 +95,50 @@ export const monthlyState = createAsyncThunk(
   "admin/booking/monthlyState",
   async (payload) => {
     return apiInstanceFetch.get(`admin/booking/monthlyState?year=${payload}`);
+  }
+);
+
+// Download invoice PDF
+export const downloadSalonInvoice = createAsyncThunk(
+  "admin/settlement/downloadSalonInvoice",
+  async (settlementId) => {
+    const getTokenData = () => localStorage.getItem("adminToken");
+    
+    const response = await fetch(`${baseURL}admin/settlement/salon-invoice?settlementId=${settlementId}`, {
+      method: "GET",
+      headers: {
+        key: secretKey,
+        Authorization: getTokenData(),
+      },
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to download invoice");
+    }
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `invoice-${settlementId}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    
+    return { status: true, message: "Invoice downloaded successfully" };
+  }
+);
+
+// Send invoice via email
+export const sendSalonInvoice = createAsyncThunk(
+  "admin/settlement/sendSalonInvoice",
+  async (settlementId) => {
+    return apiInstance.post(
+      `admin/settlement/send-salon-invoice`,
+      { settlementId }
+    );
   }
 );
 
@@ -254,6 +299,34 @@ const salarySlice = createSlice({
 
     builder.addCase(monthlyState.rejected, (state, action) => {
       state.isSkeleton = false;
+    });
+
+    builder.addCase(downloadSalonInvoice.pending, (state, action) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(downloadSalonInvoice.fulfilled, (state, action) => {
+      state.isLoading = false;
+      Success("Invoice downloaded successfully");
+    });
+
+    builder.addCase(downloadSalonInvoice.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+
+    builder.addCase(sendSalonInvoice.pending, (state, action) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(sendSalonInvoice.fulfilled, (state, action) => {
+      state.isLoading = false;
+      if (action?.payload?.status) {
+        Success(action?.payload?.message || "Invoice sent successfully");
+      }
+    });
+
+    builder.addCase(sendSalonInvoice.rejected, (state, action) => {
+      state.isLoading = false;
     });
   },
 });
