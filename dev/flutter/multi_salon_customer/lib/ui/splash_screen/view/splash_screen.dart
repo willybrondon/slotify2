@@ -16,6 +16,7 @@ import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
+import 'package:salon_2/main.dart' as main_app;
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -45,6 +46,20 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(
       const Duration(seconds: 3),
       () async {
+        // Check if deep link navigation already occurred or if we're already on a different route
+        // If so, don't navigate from splash screen to avoid overriding deep link
+        if (main_app.deepLinkNavigated) {
+          log("Deep link navigation detected, skipping splash screen navigation");
+          return;
+        }
+
+        // Also check if current route is not splash (meaning navigation already occurred)
+        final currentRoute = Get.currentRoute;
+        if (currentRoute != AppRoutes.initial && currentRoute != '/') {
+          log("Already navigated to: $currentRoute, skipping splash screen navigation");
+          return;
+        }
+
         await splashController.onSettingApiCall();
 
         initFirebase();

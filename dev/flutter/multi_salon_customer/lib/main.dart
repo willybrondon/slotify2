@@ -338,6 +338,9 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
+// Global flag to track if deep link navigation occurred
+bool _deepLinkNavigated = false;
+
 // Handle incoming deep links
 void _initializeDeepLinks() {
   try {
@@ -365,6 +368,9 @@ void _initializeDeepLinks() {
   }
 }
 
+// Getter to check if deep link navigation occurred
+bool get deepLinkNavigated => _deepLinkNavigated;
+
 void _handleIncomingLink(Uri uri) {
   try {
     log("Handling incoming link: $uri");
@@ -374,8 +380,9 @@ void _handleIncomingLink(Uri uri) {
       final salonId = uri.pathSegments.isNotEmpty ? uri.pathSegments[0] : null;
       if (salonId != null && salonId.isNotEmpty) {
         log("Navigating to salon detail: $salonId");
-        // Navigate to salon detail page
-        Future.delayed(const Duration(milliseconds: 500), () {
+        _deepLinkNavigated = true; // Mark that deep link navigation occurred
+        // Wait for app to be ready, then navigate
+        Future.delayed(const Duration(milliseconds: 1000), () {
           Get.toNamed(AppRoutes.branchDetail, arguments: [salonId]);
         });
         return;
@@ -398,9 +405,11 @@ void _handleIncomingLink(Uri uri) {
             if (shortId.length == 6 &&
                 RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(shortId)) {
               log("Navigating to salon detail from App Link: $slugWithId (shortId: $shortId)");
+              _deepLinkNavigated =
+                  true; // Mark that deep link navigation occurred
               // Pass the slug to the backend, which will resolve it to full salon ID
               // The backend will handle the lookup by short ID
-              Future.delayed(const Duration(milliseconds: 500), () {
+              Future.delayed(const Duration(milliseconds: 1000), () {
                 Get.toNamed(AppRoutes.branchDetail, arguments: [slugWithId]);
               });
               return;
