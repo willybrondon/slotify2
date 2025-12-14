@@ -140,6 +140,11 @@ class BookingScreenController extends GetxController {
   @override
   void onInit() async {
     log("Enter booking screen controller");
+
+    // Reset loading state to prevent infinite loading on second booking
+    isLoading1(false);
+    isLoading(false);
+
     await getDataFromArgs();
     await onGetExpertServiceBasedSalonApiCall(
         serviceId: serviceId.join(","), salonId: salonId.toString());
@@ -349,6 +354,9 @@ class BookingScreenController extends GetxController {
 
       log("----------Completed--------------");
     } else {
+      // Clear any previous loading state before moving to next step
+      isLoading1(false);
+
       stepCount++;
       currentStep += 1;
 
@@ -365,7 +373,11 @@ class BookingScreenController extends GetxController {
       } else {
         // For regular salon bookings:
         // Step 0: Select Venue, Step 1: Select Expert, Step 2: Select Date/Time, Step 3: Payment
-        if (currentStep == 2) {
+        if (currentStep == 1) {
+          // Moving from venue selection to expert selection - ensure loading is cleared
+          log("Regular Salon Booking: Moving to expert selection (step 1)");
+          isLoading1(false);
+        } else if (currentStep == 2) {
           // Validate that an expert is selected before proceeding to date/time step
           if (selectExpert < 0 ||
               getExpertServiceBaseSalonCategory?.data == null ||
@@ -375,7 +387,12 @@ class BookingScreenController extends GetxController {
             // Go back to previous step
             stepCount--;
             currentStep -= 1;
-            update([Constant.idCurrentStep, Constant.idStep1]);
+            isLoading1(false);
+            update([
+              Constant.idCurrentStep,
+              Constant.idStep1,
+              Constant.idProgressView
+            ]);
             return;
           }
           // Moving to date/time selection - trigger booking API call
@@ -388,40 +405,55 @@ class BookingScreenController extends GetxController {
       Constant.idConfirm,
       Constant.idCurrentStep,
       Constant.idStep1,
-      Constant.idStep3
+      Constant.idStep3,
+      Constant.idProgressView
     ]);
   }
 
   // Helper method to trigger booking API call
   _triggerBookingApiCall() async {
     try {
+      // Ensure loading state is set before API call
+      isLoading1(true);
+      update([Constant.idProgressView]);
+
       // Get expert ID - for regular salon bookings, use selected expert from step 1
       String expertIdToUse = "";
       if (expertDetail != null) {
         // Expert pre-selected (Top Experts flow)
         expertIdToUse = expertDetail!;
+        log("Using pre-selected expert ID (Top Experts): $expertIdToUse");
       } else if (selectExpert >= 0 &&
           getExpertServiceBaseSalonCategory?.data != null &&
           selectExpert < (getExpertServiceBaseSalonCategory!.data!.length)) {
         // Regular salon booking - use selected expert from step 1
         expertIdToUse =
             getExpertServiceBaseSalonCategory!.data![selectExpert].id ?? "";
-        log("Using selected expert ID: $expertIdToUse");
+        log("Using selected expert ID from step 1: $expertIdToUse (index: $selectExpert)");
       } else {
         // Fallback to stored expert ID
         expertIdToUse = Constant.storage.read<String>('expertDetail') != null
             ? Constant.storage.read<String>('expertDetail').toString()
             : Constant.storage.read<String>('expertId')?.toString() ?? "";
+        log("Using fallback expert ID: $expertIdToUse");
       }
 
       if (expertIdToUse.isEmpty) {
+        log("Error: No expert ID found. selectExpert: $selectExpert, expertDetail: $expertDetail");
         Utils.showToast(Get.context!, "Please select an expert first");
         // Go back to previous step
         stepCount--;
         currentStep -= 1;
-        update([Constant.idCurrentStep, Constant.idStep1]);
+        isLoading1(false);
+        update([
+          Constant.idCurrentStep,
+          Constant.idStep1,
+          Constant.idProgressView
+        ]);
         return;
       }
+
+      log("Calling onGetBookingApiCall with expertId: $expertIdToUse, salonId: $salonId, date: $date");
 
       await onGetBookingApiCall(
         selectedDate: date,
@@ -436,6 +468,8 @@ class BookingScreenController extends GetxController {
       log("Get Booking Status :: ${getBookingModel?.status}");
       if (getBookingModel?.status == false) {
         Utils.showToast(Get.context!, getBookingModel?.message ?? "");
+        // Ensure loading is cleared even if booking API returns false
+        isLoading1(false);
       }
 
       rupee = (totalPrice.toDouble() + finalTaxRupee.toDouble());
@@ -449,11 +483,18 @@ class BookingScreenController extends GetxController {
       ]);
     } catch (e) {
       log("Error triggering booking API call: $e");
+      log("Error stack trace: ${StackTrace.current}");
       Utils.showToast(
           Get.context!, "Error loading available slots: ${e.toString()}");
       // Ensure loading is cleared on error
       isLoading1(false);
-      update([Constant.idProgressView]);
+      // Go back to previous step on error
+      if (currentStep > 0) {
+        stepCount--;
+        currentStep -= 1;
+      }
+      update(
+          [Constant.idProgressView, Constant.idCurrentStep, Constant.idStep1]);
     }
   }
 
@@ -1370,133 +1411,7 @@ class BookingScreenController extends GetxController {
         // For non-wallet payments (Stripe, Cash After Service)
         log("it's ${selectedPayment} payment");
 
-        if (selectedPayment == "cashAfterService") {
-          // For Cash After Service, create booking directly
-          // Recalculate amount right before sending (same as Stripe does)
-          calculateTotalWithDiscount();
-
-          // Ensure withoutTax is sent as double with 2 decimal places to match backend expectation
-          double withoutTaxValue =
-              double.parse(withOutTaxRupee.toStringAsFixed(2));
-
-          // Ensure amount is properly formatted to 2 decimal places to match backend expectation
-          double finalAmount = double.parse(totalPrice.toStringAsFixed(2));
-
-          await onCreateBookingApiCall(
-            userId: Constant.storage.read<String>('userId') ?? "",
-            expertId: Constant.storage.read<String>('expertDetail') != null
-                ? Constant.storage.read<String>('expertDetail').toString()
-                : Constant.storage.read<String>('expertId').toString(),
-            serviceId: serviceId.join(","),
-            salonId: salonId.toString(),
-            date: formattedDate.toString(),
-            time: slotsString.toString(),
-            amount:
-                finalAmount, // Use properly formatted amount with coupon discount
-            withoutTax: withoutTaxValue, // Send as double with 2 decimal places
-            paymentType: selectedPayment,
-            atPlace: selectedVenue == "At Salon" ? 1 : 2,
-            address: searchEditingController.text,
-          );
-
-          if (createBookingCategory?.status == true) {
-            // Clear all data and show success
-            finalTaxRupee = 0.0;
-            withOutTaxRupee = 0.0;
-            totalPrice = 0.0;
-            resetCoupon();
-
-            for (var i = 0;
-                i <
-                    (categoryDetailController
-                            .getServiceCategory?.services?.length ??
-                        0);
-                i++) {
-              categoryDetailController.onCheckBoxClick(false, i);
-            }
-
-            for (var i = 0;
-                i <
-                    (homeScreenController
-                            .getAllServiceCategory?.services?.length ??
-                        0);
-                i++) {
-              homeScreenController.onServiceCheckBoxClick(false, i);
-            }
-
-            for (var i = 0;
-                i <
-                    (homeScreenController
-                            .getExpertCategory?.data?.services?.length ??
-                        0);
-                i++) {
-              homeScreenController.onCheckBoxClick(false, i);
-            }
-
-            for (var i = 0;
-                i <
-                    (branchDetailController.getSalonDetailCategory?.salon
-                            ?.serviceIds?.length ??
-                        0);
-                i++) {
-              branchDetailController.onCheckBoxClick(false, i);
-            }
-
-            homeScreenController.withOutTaxRupee = 0.0;
-            homeScreenController.totalPrice = 0.0;
-            homeScreenController.finalTaxRupee = 0.0;
-            homeScreenController.totalMinute = 0;
-            homeScreenController.checkItem.clear();
-            homeScreenController.serviceId.clear();
-            homeScreenController.serviceName.clear();
-
-            homeScreenController.withOutTaxRupeeExpert = 0.0;
-            homeScreenController.totalPriceExpert = 0.0;
-            homeScreenController.finalTaxRupeeExpert = 0.0;
-            homeScreenController.totalMinuteExpert = 0;
-            homeScreenController.checkItemExpert.clear();
-            homeScreenController.serviceIdExpert.clear();
-            homeScreenController.serviceNameExpert.clear();
-
-            searchScreenController.totalMinute = 0;
-            searchScreenController.checkItem.clear();
-            searchScreenController.serviceId.clear();
-            searchScreenController.serviceName.clear();
-
-            categoryDetailController.totalMinute = 0;
-            categoryDetailController.checkItem.clear();
-            categoryDetailController.serviceId.clear();
-            categoryDetailController.serviceName.clear();
-
-            branchDetailController.withOutTaxRupee = 0.0;
-            branchDetailController.totalPrice = 0.0;
-            branchDetailController.finalTaxRupee = 0.0;
-            branchDetailController.totalMinute = 0;
-            branchDetailController.checkItem.clear();
-            branchDetailController.serviceId.clear();
-
-            selectBranchController.selectBranch = -1;
-            Constant.storage.remove("expertDetail");
-            selectedExpertDataList.clear();
-
-            Get.delete<CategoryDetailController>();
-            Get.delete<BranchDetailController>();
-            Get.delete<SelectBranchController>();
-            Get.delete<ViewAllCategoryController>();
-            Get.delete<ExpertDetailController>();
-
-            Get.offAndToNamed(AppRoutes.bottom);
-            Get.dialog(
-              barrierColor: AppColors.blackColor.withOpacity(0.8),
-              Dialog(
-                backgroundColor: AppColors.transparent,
-                child: SuccessDialog(),
-              ),
-            );
-          } else {
-            Utils.showToast(Get.context!, createBookingCategory?.message ?? "");
-          }
-        } else if (selectedPayment == "Stripe") {
+        if (selectedPayment == "Stripe") {
           // For Stripe, collect booking data and navigate to payment screen
           Map<String, dynamic> bookingData = {
             'isWalletAdd': false, // This is a direct service payment

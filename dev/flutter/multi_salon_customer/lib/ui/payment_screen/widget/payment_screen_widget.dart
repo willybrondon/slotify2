@@ -99,6 +99,12 @@ class PaymentMethodView extends StatelessWidget {
                     ),
                   ),
 
+                  // Show discount summary for cash after service when coupon is applied
+                  if (logic.selectedPayment == "cashAfterService" &&
+                      logic.isWalletAdd != true &&
+                      logic.isCreateOrder == true)
+                    PaymentDiscountSummaryView(),
+
                   // Coupon Section - Show if not wallet add, this is a booking (not wallet recharge), and no payment method is pre-selected
                   if (logic.isWalletAdd != true &&
                       logic.isCreateOrder == true &&
@@ -368,6 +374,142 @@ class PaymentCouponSection extends StatelessWidget {
                 ),
               ).paddingOnly(bottom: 15),
           ],
+        );
+      },
+    );
+  }
+}
+
+class PaymentDiscountSummaryView extends StatelessWidget {
+  const PaymentDiscountSummaryView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<BookingScreenController>(
+      id: Constant.idApplyCoupon,
+      builder: (bookingLogic) {
+        // Only show if coupon is applied
+        if (bookingLogic.couponDiscountAmount <= 0) {
+          return const SizedBox.shrink();
+        }
+
+        // Calculate subtotal (amount before discount)
+        double subtotal =
+            bookingLogic.withOutTaxRupee + bookingLogic.finalTaxRupee;
+        double discount = bookingLogic.couponDiscountAmount;
+        double total = bookingLogic.totalPrice;
+
+        return Container(
+          width: Get.width,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(top: 16),
+          decoration: BoxDecoration(
+            color: AppColors.whiteColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.grey.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Order Summary",
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                  fontSize: 16,
+                  color: AppColors.primaryTextColor,
+                ),
+              ),
+              SizedBox(height: 12),
+              // Subtotal
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Subtotal",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplay,
+                      fontSize: 14,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                  Text(
+                    "$currency ${subtotal.toStringAsFixed(2)}",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplay,
+                      fontSize: 14,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              // Discount
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.local_offer,
+                        size: 16,
+                        color: AppColors.primaryAppColor,
+                      ),
+                      SizedBox(width: 6),
+                      Text(
+                        bookingLogic.manualCouponCode != null
+                            ? "Coupon '${bookingLogic.manualCouponCode}'"
+                            : "Discount",
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplay,
+                          fontSize: 14,
+                          color: AppColors.primaryAppColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "-$currency ${discount.toStringAsFixed(2)}",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 14,
+                      color: AppColors.primaryAppColor,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              Divider(
+                color: AppColors.grey.withOpacity(0.2),
+                height: 1,
+              ),
+              SizedBox(height: 12),
+              // Total
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Total Amount",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 16,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                  Text(
+                    "$currency ${total.toStringAsFixed(2)}",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 16,
+                      color: AppColors.primaryAppColor,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );

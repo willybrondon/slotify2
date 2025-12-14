@@ -522,19 +522,27 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                                         .getDataFromArgs();
                                                   }
                                                 },
-                                                child: logic.isSalonSaved[
-                                                            index] ==
-                                                        true
-                                                    ? Image.asset(
-                                                        AppAsset.icLikeFilled,
-                                                        height: 32,
-                                                      ).paddingOnly(
-                                                        right: 7, top: 7)
-                                                    : Image.asset(
-                                                        AppAsset.icLikeOutline,
-                                                        height: 32,
-                                                      ).paddingOnly(
-                                                        right: 7, top: 7),
+                                                child: Container(
+                                                  height: 32,
+                                                  width: 32,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.whiteColor,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Center(
+                                                    child: Image.asset(
+                                                      logic.isSalonSaved[
+                                                                  index] ==
+                                                              true
+                                                          ? AppAsset
+                                                              .icLikeFilled
+                                                          : AppAsset
+                                                              .icLikeOutline,
+                                                      height: 18,
+                                                      width: 18,
+                                                    ),
+                                                  ),
+                                                ).paddingOnly(right: 7, top: 7),
                                               ),
                                               // Share Button
                                               GestureDetector(
@@ -554,9 +562,20 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                                     salonName: salonName,
                                                   );
                                                 },
-                                                child: Image.asset(
-                                                  AppAsset.icShare,
+                                                child: Container(
                                                   height: 32,
+                                                  width: 32,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.whiteColor,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Center(
+                                                    child: Image.asset(
+                                                      AppAsset.icShare,
+                                                      height: 18,
+                                                      width: 18,
+                                                    ),
+                                                  ),
                                                 ).paddingOnly(right: 7, top: 7),
                                               ),
                                             ],
