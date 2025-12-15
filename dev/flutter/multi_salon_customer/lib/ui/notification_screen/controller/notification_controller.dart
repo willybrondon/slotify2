@@ -81,6 +81,16 @@ class NotificationController extends GetxController {
       required String userId,
       required int index}) async {
     try {
+      // Validate inputs
+      if (notificationId.isEmpty || userId.isEmpty) {
+        Utils.showToast(Get.context!, "Invalid notification data");
+        return;
+      }
+
+      // Show loading state
+      isLoading(true);
+      update([Constant.idProgressView]);
+
       final queryParameters = {
         "notificationId": notificationId,
         "userId": userId,
@@ -110,22 +120,67 @@ class NotificationController extends GetxController {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['status'] == true) {
           // Remove notification from local list
-          if (notificationCategory?.notification != null &&
-              index < notificationCategory!.notification!.length) {
-            notificationCategory!.notification!.removeAt(index);
-            update([Constant.idProgressView]);
-            Utils.showToast(Get.context!, "Notification deleted successfully");
+          if (notificationCategory?.notification != null) {
+            // Find the notification by ID instead of index (more reliable)
+            final notificationIndex = notificationCategory!.notification!
+                .indexWhere((notif) => notif.id == notificationId);
+
+            if (notificationIndex != -1) {
+              notificationCategory!.notification!.removeAt(notificationIndex);
+              update([Constant.idProgressView]);
+              Utils.showToast(
+                  Get.context!,
+                  jsonResponse['message'] ??
+                      "Notification deleted successfully");
+            } else {
+              // If not found by ID, try using the provided index
+              if (index < notificationCategory!.notification!.length) {
+                notificationCategory!.notification!.removeAt(index);
+                update([Constant.idProgressView]);
+                Utils.showToast(
+                    Get.context!,
+                    jsonResponse['message'] ??
+                        "Notification deleted successfully");
+              } else {
+                // Refresh the list if index is out of bounds
+                log("Index out of bounds, refreshing notification list");
+                await onGetNotificationApiCall(userId: userId);
+                Utils.showToast(
+                    Get.context!,
+                    jsonResponse['message'] ??
+                        "Notification deleted successfully");
+              }
+            }
+          } else {
+            // Refresh the list if notification list is null
+            await onGetNotificationApiCall(userId: userId);
+            Utils.showToast(Get.context!,
+                jsonResponse['message'] ?? "Notification deleted successfully");
           }
         } else {
           Utils.showToast(Get.context!,
               jsonResponse['message'] ?? "Failed to delete notification");
+        }
+      } else {
+        // Handle non-200 status codes
+        try {
+          final jsonResponse = jsonDecode(response.body);
+          Utils.showToast(Get.context!,
+              jsonResponse['message'] ?? "Failed to delete notification");
+        } catch (e) {
+          Utils.showToast(
+              Get.context!, "Failed to delete notification. Please try again.");
         }
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Delete Notification Api :: $e");
-      Utils.showToast(Get.context!, "Error deleting notification");
+      Utils.showToast(
+          Get.context!, "Error deleting notification: ${e.toString()}");
+    } finally {
+      isLoading(false);
+      update([Constant.idProgressView]);
     }
   }
 }

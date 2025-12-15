@@ -25,8 +25,27 @@ class PaymentAppBarView extends StatelessWidget {
         overlayColor: WidgetStatePropertyAll(AppColors.transparent),
         onTap: () {
           // Stop any ongoing loading states and go back immediately
-          final paymentController = Get.find<PaymentScreenController>();
-          paymentController.isLoading.value = false;
+          try {
+            final paymentController = Get.find<PaymentScreenController>();
+
+            // Mark as closed first to prevent any async operations from updating UI
+            paymentController.isScreenClosed = true;
+
+            // Clear loading states
+            paymentController.isLoading.value = false;
+            paymentController.update([Constant.idProgressView]);
+
+            // Also clear booking controller loading state if it exists
+            if (paymentController.bookingScreenController != null) {
+              paymentController.bookingScreenController!.isLoading(false);
+              paymentController.bookingScreenController!
+                  .update([Constant.idProgressView]);
+              log("Payment Screen - Cleared booking controller loading state on back");
+            }
+          } catch (e) {
+            log("Payment Screen - Error clearing loading states: $e");
+          }
+
           Get.back();
         },
         child: Icon(

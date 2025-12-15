@@ -164,121 +164,198 @@ class ProductDetailNameView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Enhanced product name with better typography
             Text(
               Constant.capitalizeFirstLetter(
                   logic.getProductDetailModel?.product?.productName ?? ""),
               style: TextStyle(
                 fontFamily: AppFontFamily.heeBo700,
-                fontSize: 19,
+                fontSize: 22,
                 color: AppColors.appText,
+                letterSpacing: 0.3,
+                height: 1.3,
               ),
-            ),
+            ).paddingOnly(bottom: 8),
+            // Enhanced brand badge
             Container(
               decoration: BoxDecoration(
                 color: AppColors.orangeBg,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                    color: AppColors.orange.withOpacity(0.04), width: 1),
+                    color: AppColors.orange.withOpacity(0.15), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.orange.withOpacity(0.1),
+                    offset: const Offset(0, 2),
+                    blurRadius: 4,
+                    spreadRadius: 0,
+                  ),
+                ],
               ),
-              padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 9),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               child: Text(
                 logic.getProductDetailModel?.product?.brand?.toUpperCase() ??
                     "",
                 style: TextStyle(
                   fontFamily: AppFontFamily.heeBo600,
-                  fontSize: 14,
+                  fontSize: 13,
                   color: AppColors.orange,
+                  letterSpacing: 0.5,
                 ),
               ),
-            ).paddingOnly(top: 7, bottom: 10),
-            Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryAppColor,
-                    borderRadius: BorderRadius.circular(36),
+            ).paddingOnly(bottom: 12),
+            // Enhanced price section with better visual design
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.grey.withOpacity(0.1),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.blackColor.withOpacity(0.04),
+                    offset: const Offset(0, 2),
+                    blurRadius: 6,
+                    spreadRadius: 0,
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
-                  child: Text(
-                    "$currency ${logic.getProductDetailModel?.product?.price ?? ""}",
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryAppColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryAppColor.withOpacity(0.3),
+                          offset: const Offset(0, 2),
+                          blurRadius: 4,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+                    child: Text(
+                      "$currency ${logic.getProductDetailModel?.product?.price ?? ""}",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.heeBo800,
+                        fontSize: 16,
+                        color: AppColors.whiteColor,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    "$currency ${logic.getProductDetailModel?.product?.mrp ?? ""}",
                     style: TextStyle(
-                      fontFamily: AppFontFamily.heeBo800,
+                      fontFamily: AppFontFamily.heeBo700,
+                      fontSize: 15,
+                      decoration: TextDecoration.lineThrough,
+                      decorationColor: AppColors.currencyGrey,
+                      decorationThickness: 2,
+                      color: AppColors.currencyGrey,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      "( ${"txtIncludeAllTax".tr} )",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.heeBo500,
+                        fontSize: 11,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ).paddingOnly(bottom: 12),
+            // Enhanced rating section
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.grey.withOpacity(0.1),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.blackColor.withOpacity(0.04),
+                    offset: const Offset(0, 2),
+                    blurRadius: 6,
+                    spreadRadius: 0,
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    height: 36,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.yellow2,
+                      border: Border.all(
+                        color: AppColors.ratingYellow.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(5, (index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Image.asset(
+                            index < logic.filledStars!
+                                ? AppAsset.icStarFilled
+                                : AppAsset.icStarOutline,
+                            height: 16,
+                            width: 16,
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    "(${logic.getProductDetailModel?.product?.rating?.toStringAsFixed(1) ?? " "} Ratings)",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.heeBo600,
                       fontSize: 14,
-                      color: AppColors.whiteColor,
+                      color: AppColors.appText,
                     ),
                   ),
+                ],
+              ),
+            ).paddingOnly(top: 8, bottom: 8),
+            // Enhanced divider
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.grey.withOpacity(0.0),
+                    AppColors.grey.withOpacity(0.2),
+                    AppColors.grey.withOpacity(0.0),
+                  ],
                 ),
-                Text(
-                  "$currency ${logic.getProductDetailModel?.product?.mrp ?? ""}",
-                  style: TextStyle(
-                    fontFamily: AppFontFamily.heeBo700,
-                    fontSize: 14,
-                    decoration: TextDecoration.lineThrough,
-                    decorationColor: AppColors.currencyGrey,
-                    decorationThickness: 1.5,
-                    color: AppColors.currencyGrey,
-                  ),
-                ).paddingOnly(right: 8, left: 13),
-                Text(
-                  "( ${"txtIncludeAllTax".tr} )",
-                  style: TextStyle(
-                    fontFamily: AppFontFamily.heeBo500,
-                    fontSize: 12.5,
-                    color: AppColors.primaryTextColor,
-                  ),
-                ),
-              ],
+              ),
             ),
-            Row(
-              children: [
-                Container(
-                  height: 32,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: AppColors.yellow2,
-                  ),
-                  child: SizedBox(
-                    height: 15,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: 5,
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 13),
-                      itemBuilder: (context, index) {
-                        if (index < logic.filledStars!) {
-                          return Image.asset(
-                            AppAsset.icStarFilled,
-                            height: 15,
-                            width: 15,
-                          );
-                        } else {
-                          return Image.asset(
-                            AppAsset.icStarOutline,
-                            height: 15,
-                            width: 15,
-                          );
-                        }
-                      },
-                      separatorBuilder: (context, index) {
-                        return SizedBox(width: Get.width * 0.017);
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  "(${logic.getProductDetailModel?.product?.rating?.toStringAsFixed(1) ?? " "} Ratings)",
-                  style: TextStyle(
-                    fontFamily: AppFontFamily.heeBo600,
-                    fontSize: 14,
-                    color: AppColors.appText,
-                  ),
-                ),
-              ],
-            ).paddingOnly(top: 10),
-            Divider(color: AppColors.grey.withOpacity(0.2))
-                .paddingOnly(top: 10, bottom: 10),
           ],
         ).paddingOnly(left: 15, right: 15, top: 0);
       },
@@ -827,11 +904,23 @@ class ProductDetailBottomView extends StatelessWidget {
                         : logic.onAddCartClick();
                   },
                   child: Container(
+                    height: 56,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(44),
+                      borderRadius: BorderRadius.circular(16),
                       color: logic.isAnyAttributeSelected()
                           ? AppColors.primaryAppColor
                           : AppColors.grey.withOpacity(0.4),
+                      boxShadow: logic.isAnyAttributeSelected()
+                          ? [
+                              BoxShadow(
+                                color:
+                                    AppColors.primaryAppColor.withOpacity(0.4),
+                                offset: const Offset(0, 4),
+                                blurRadius: 12,
+                                spreadRadius: 0,
+                              ),
+                            ]
+                          : [],
                     ),
                     child: Center(
                       child: Text(
@@ -843,7 +932,8 @@ class ProductDetailBottomView extends StatelessWidget {
                               ? AppColors.whiteColor
                               : AppColors.grey,
                           fontFamily: AppFontFamily.heeBo700,
-                          fontSize: 16,
+                          fontSize: 17,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),

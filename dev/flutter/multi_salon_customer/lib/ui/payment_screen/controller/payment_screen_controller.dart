@@ -32,6 +32,9 @@ class PaymentScreenController extends GetxController {
   // Loading state management
   RxBool isLoading = false.obs;
 
+  // Flag to track if screen is closed (to prevent updates after navigation)
+  bool isScreenClosed = false;
+
   // Booking controller reference for creating bookings
   BookingScreenController? bookingScreenController;
 
@@ -97,6 +100,33 @@ class PaymentScreenController extends GetxController {
     }
     super.onInit();
   }
+
+  @override
+  void onClose() {
+    // Mark screen as closed to prevent any further updates
+    isScreenClosed = true;
+
+    // Clear all loading states when screen is closed
+    log("Payment Screen - onClose called, clearing loading states");
+    isLoading.value = false;
+    update([Constant.idProgressView]);
+
+    // Clear booking controller loading state if it exists
+    if (bookingScreenController != null) {
+      try {
+        bookingScreenController!.isLoading(false);
+        bookingScreenController!.update([Constant.idProgressView]);
+        log("Payment Screen - Cleared booking controller loading state on close");
+      } catch (e) {
+        log("Payment Screen - Error clearing booking controller loading state: $e");
+      }
+    }
+
+    super.onClose();
+  }
+
+  // Helper method to check if screen is still active before updating UI
+  bool get isScreenActive => !isScreenClosed;
 
   getDataFromArgs() {
     log("Payment Screen - Args received: $args");
@@ -220,20 +250,29 @@ class PaymentScreenController extends GetxController {
         log("Called stripe Init");
 
         await StripeService().stripePay().then((value) {
-          isLoading(false);
-          update([Constant.idProgressView]);
+          // Only update if screen is still active
+          if (isScreenActive) {
+            isLoading(false);
+            update([Constant.idProgressView]);
+          }
         }).catchError((e) {
-          isLoading(false);
-          update([Constant.idProgressView]);
           log("Stripe payment error: $e");
-          Utils.showToast(Get.context!, "Payment failed: ${e.toString()}");
+          // Only update if screen is still active
+          if (isScreenActive) {
+            isLoading(false);
+            update([Constant.idProgressView]);
+            Utils.showToast(Get.context!, "Payment failed: ${e.toString()}");
+          }
         });
       } catch (e) {
-        isLoading(false);
-        update([Constant.idProgressView]);
+        // Only update if screen is still active
+        if (isScreenActive) {
+          isLoading(false);
+          update([Constant.idProgressView]);
+          Utils.showToast(
+              Get.context!, "Payment initialization failed: ${e.toString()}");
+        }
         log("Stripe initialization error: $e");
-        Utils.showToast(
-            Get.context!, "Payment initialization failed: ${e.toString()}");
       }
     } else if (selectedPayment == "cashAfterService") {
       log("it's Cash After Service");
@@ -259,12 +298,14 @@ class PaymentScreenController extends GetxController {
             if (bookingData!['selectedCouponId'] != null) {
               bookingScreenController!.selectedCouponId =
                   bookingData!['selectedCouponId'];
+              log("Cash Payment - Synced selectedCouponId: ${bookingScreenController!.selectedCouponId}");
             }
             if (bookingData!['manualCouponCode'] != null) {
               bookingScreenController!.manualCouponCode =
                   bookingData!['manualCouponCode'];
               bookingScreenController!.couponCodeController.text =
                   bookingData!['manualCouponCode'];
+              log("Cash Payment - Synced manualCouponCode: ${bookingScreenController!.manualCouponCode}");
             }
             // Always sync couponDiscountAmount from bookingData to ensure discount is applied
             if (bookingData!['couponDiscountAmount'] != null) {
@@ -277,9 +318,17 @@ class PaymentScreenController extends GetxController {
             if (bookingData!['withOutTaxRupee'] != null) {
               bookingScreenController!.withOutTaxRupee =
                   (bookingData!['withOutTaxRupee'] as num).toDouble();
+              log("Cash Payment - Synced withOutTaxRupee: ${bookingScreenController!.withOutTaxRupee}");
             }
             if (bookingData!['tax'] != null) {
               bookingScreenController!.tax = bookingData!['tax'] as int?;
+              log("Cash Payment - Synced tax: ${bookingScreenController!.tax}");
+            }
+            // Sync finalTaxRupee if available (will be recalculated anyway, but good to have)
+            if (bookingData!['finalTaxRupee'] != null) {
+              bookingScreenController!.finalTaxRupee =
+                  (bookingData!['finalTaxRupee'] as num).toDouble();
+              log("Cash Payment - Synced finalTaxRupee: ${bookingScreenController!.finalTaxRupee}");
             }
           }
 
@@ -304,13 +353,28 @@ class PaymentScreenController extends GetxController {
           // First, try finding it in the current list
           if (bookingScreenController!.selectedCouponId == null &&
               bookingScreenController!.manualCouponCode != null) {
+            log("Cash Payment - Looking for coupon ID for manual code: ${bookingScreenController!.manualCouponCode}");
+
+            // Ensure coupon list is fetched if not available
+            if (bookingScreenController!.getCouponModel == null &&
+                bookingScreenController!.withOutTaxRupee > 0) {
+              log("Cash Payment - Coupon list not available, fetching...");
+              String userId = Constant.storage.read<String>('userId') ?? "";
+              await bookingScreenController!.getCouponApiCall(
+                userId: userId,
+                type: "2", // Type 2 for booking
+                amount:
+                    bookingScreenController!.withOutTaxRupee.toInt().toString(),
+              );
+            }
+
             if (bookingScreenController!.getCouponModel?.data != null) {
               for (var coupon
                   in bookingScreenController!.getCouponModel!.data!) {
                 if (coupon.code?.toUpperCase() ==
                     bookingScreenController!.manualCouponCode!.toUpperCase()) {
                   bookingScreenController!.selectedCouponId = coupon.id;
-                  log("Found coupon ID for manual code in current list: ${coupon.id}");
+                  log("Cash Payment - ✅ Found coupon ID for manual code in list: ${coupon.id}");
                   break;
                 }
               }
@@ -319,7 +383,7 @@ class PaymentScreenController extends GetxController {
             // If still not found, try refetching coupons to see if it's available
             if (bookingScreenController!.selectedCouponId == null &&
                 bookingScreenController!.withOutTaxRupee > 0) {
-              log("Coupon ID not found in current list, refetching coupons...");
+              log("Cash Payment - Coupon ID not found in current list, refetching coupons...");
               String userId = Constant.storage.read<String>('userId') ?? "";
               await bookingScreenController!.getCouponApiCall(
                 userId: userId,
@@ -336,17 +400,59 @@ class PaymentScreenController extends GetxController {
                       bookingScreenController!.manualCouponCode!
                           .toUpperCase()) {
                     bookingScreenController!.selectedCouponId = coupon.id;
-                    log("Found coupon ID for manual code after refetch: ${coupon.id}");
+                    log("Cash Payment - ✅ Found coupon ID for manual code after refetch: ${coupon.id}");
                     break;
                   }
                 }
               }
             }
+
+            // If still not found, log warning but proceed (backend will validate)
+            if (bookingScreenController!.selectedCouponId == null) {
+              log("Cash Payment - ⚠️  WARNING: Coupon ID not found for code: ${bookingScreenController!.manualCouponCode}");
+              log("Cash Payment - ⚠️  Booking will proceed without couponId - backend may reject if coupon is required");
+            }
           }
 
-          log("Cash Payment - selectedCouponId: ${bookingScreenController!.selectedCouponId}");
-          log("Cash Payment - manualCouponCode: ${bookingScreenController!.manualCouponCode}");
-          log("Cash Payment - totalPrice: ${bookingScreenController!.totalPrice}");
+          // Sync all booking data to booking controller to ensure onCreateBookingApiCall has correct state
+          // This is important because onCreateBookingApiCall recalculates the total internally
+          if (bookingData != null) {
+            // Sync service and salon IDs (needed for booking controller state)
+            if (bookingData!['serviceId'] != null) {
+              String serviceIdStr = bookingData!['serviceId'].toString();
+              bookingScreenController!.serviceId = serviceIdStr.split(",");
+              log("Cash Payment - Synced serviceId: ${bookingScreenController!.serviceId}");
+            }
+            if (bookingData!['salonId'] != null) {
+              bookingScreenController!.salonId =
+                  bookingData!['salonId'].toString();
+              log("Cash Payment - Synced salonId: ${bookingScreenController!.salonId}");
+            }
+            if (bookingData!['date'] != null) {
+              bookingScreenController!.formattedDate =
+                  bookingData!['date'].toString();
+              log("Cash Payment - Synced formattedDate: ${bookingScreenController!.formattedDate}");
+            }
+            if (bookingData!['time'] != null) {
+              bookingScreenController!.slotsString =
+                  bookingData!['time'].toString();
+              log("Cash Payment - Synced slotsString: ${bookingScreenController!.slotsString}");
+            }
+            if (bookingData!['totalMinute'] != null) {
+              bookingScreenController!.totalMinute =
+                  (bookingData!['totalMinute'] as num).toInt();
+              log("Cash Payment - Synced totalMinute: ${bookingScreenController!.totalMinute}");
+            }
+          }
+
+          log("Cash Payment - Final state before API call:");
+          log("  - selectedCouponId: ${bookingScreenController!.selectedCouponId}");
+          log("  - manualCouponCode: ${bookingScreenController!.manualCouponCode}");
+          log("  - couponDiscountAmount: ${bookingScreenController!.couponDiscountAmount}");
+          log("  - withOutTaxRupee: ${bookingScreenController!.withOutTaxRupee}");
+          log("  - tax: ${bookingScreenController!.tax}");
+          log("  - finalTaxRupee: ${bookingScreenController!.finalTaxRupee}");
+          log("  - totalPrice: ${bookingScreenController!.totalPrice}");
 
           // Set loading state
           bookingScreenController!.isLoading(true);
@@ -363,12 +469,19 @@ class PaymentScreenController extends GetxController {
             salonId: bookingData!['salonId'] ?? "",
             date: bookingData!['date'] ?? "",
             time: bookingData!['time'] ?? "",
-            amount: finalAmount, // Use properly formatted amount with coupon discount
+            amount:
+                finalAmount, // Use properly formatted amount with coupon discount
             withoutTax: withoutTaxValue,
             paymentType: "cashAfterService",
             atPlace: bookingData!['atPlace'] ?? 1,
             address: bookingData!['address'] ?? "",
           );
+
+          // Check if screen is still active before updating UI
+          if (!isScreenActive) {
+            log("Payment Screen - Screen closed, skipping UI updates");
+            return;
+          }
 
           // Clear loading state
           bookingScreenController!.isLoading(false);
@@ -400,16 +513,23 @@ class PaymentScreenController extends GetxController {
           }
         } catch (e) {
           log("Error creating booking for cash after service: $e");
-          Utils.showToast(
-              Get.context!, "Error creating booking: ${e.toString()}");
-          // Ensure loading is cleared on error
-          if (bookingScreenController != null) {
-            bookingScreenController!.isLoading(false);
-            bookingScreenController!.update([Constant.idProgressView]);
+
+          // Check if screen is still active before showing error
+          if (isScreenActive) {
+            Utils.showToast(
+                Get.context!, "Error creating booking: ${e.toString()}");
+            // Ensure loading is cleared on error
+            if (bookingScreenController != null) {
+              bookingScreenController!.isLoading(false);
+              bookingScreenController!.update([Constant.idProgressView]);
+            }
           }
         } finally {
-          isLoading(false);
-          update([Constant.idProgressView]);
+          // Only update if screen is still active
+          if (isScreenActive) {
+            isLoading(false);
+            update([Constant.idProgressView]);
+          }
         }
       }
     } else if (selectedPayment == "wallet") {
@@ -468,7 +588,8 @@ class PaymentScreenController extends GetxController {
                 bookingScreenController!.formattedDate.toString(),
             time: bookingData?['time'] ??
                 bookingScreenController!.slotsString.toString(),
-            amount: finalAmount, // Use properly formatted amount with coupon discount
+            amount:
+                finalAmount, // Use properly formatted amount with coupon discount
             withoutTax: withoutTaxValue,
             paymentType: "",
             atPlace: bookingData?['atPlace'] ??
@@ -476,6 +597,12 @@ class PaymentScreenController extends GetxController {
             address: bookingData?['address'] ??
                 bookingScreenController!.searchEditingController.text,
           );
+
+          // Check if screen is still active before updating UI
+          if (!isScreenActive) {
+            log("Payment Screen - Screen closed, skipping UI updates (wallet)");
+            return;
+          }
 
           // Clear loading state
           bookingScreenController!.isLoading(false);
@@ -507,16 +634,23 @@ class PaymentScreenController extends GetxController {
           }
         } catch (e) {
           log("Error creating booking for wallet payment: $e");
-          Utils.showToast(
-              Get.context!, "Error creating booking: ${e.toString()}");
-          // Ensure loading is cleared on error
-          if (bookingScreenController != null) {
-            bookingScreenController!.isLoading(false);
-            bookingScreenController!.update([Constant.idProgressView]);
+
+          // Check if screen is still active before showing error
+          if (isScreenActive) {
+            Utils.showToast(
+                Get.context!, "Error creating booking: ${e.toString()}");
+            // Ensure loading is cleared on error
+            if (bookingScreenController != null) {
+              bookingScreenController!.isLoading(false);
+              bookingScreenController!.update([Constant.idProgressView]);
+            }
           }
         } finally {
-          isLoading(false);
-          update([Constant.idProgressView]);
+          // Only update if screen is still active
+          if (isScreenActive) {
+            isLoading(false);
+            update([Constant.idProgressView]);
+          }
         }
       }
     }
@@ -573,12 +707,17 @@ class PaymentScreenController extends GetxController {
         depositToWalletModel = DepositToWalletModel.fromJson(jsonResponse);
       }
     } on AppException catch (exception) {
-      Utils.showToast(Get.context!, exception.message);
+      if (isScreenActive) {
+        Utils.showToast(Get.context!, exception.message);
+      }
     } catch (e) {
       log("Error call Deposit To Wallet Api :: $e");
     } finally {
-      isLoading(false);
-      update([Constant.idProgressView]);
+      // Only update if screen is still active
+      if (isScreenActive) {
+        isLoading(false);
+        update([Constant.idProgressView]);
+      }
     }
   }
 }

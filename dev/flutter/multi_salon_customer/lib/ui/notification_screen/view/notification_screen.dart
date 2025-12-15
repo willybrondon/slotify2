@@ -315,7 +315,7 @@ class NotificationScreen extends StatelessWidget {
                                                                                 4),
                                                                         SizedBox(
                                                                           width:
-                                                                              Get.width * 0.85,
+                                                                              Get.width * 0.6,
                                                                           child:
                                                                               Text(
                                                                             logic.notificationCategory?.notification?[index].message ??
@@ -334,23 +334,111 @@ class NotificationScreen extends StatelessWidget {
                                                                       ],
                                                                     ),
                                                                   ),
-                                                                  Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .bottomRight,
-                                                                    child: Text(
-                                                                      "${logic.date}  ${logic.formattedTime}",
-                                                                      style: TextStyle(
-                                                                          color: AppColors
-                                                                              .roundBorder,
-                                                                          fontSize:
-                                                                              10,
-                                                                          fontFamily:
-                                                                              AppFontFamily.sfProDisplay),
-                                                                    ).paddingOnly(
-                                                                        bottom:
-                                                                            3),
-                                                                  ),
+                                                                  Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .end,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      // Delete button
+                                                                      GestureDetector(
+                                                                        onTap:
+                                                                            () {
+                                                                          // Show confirmation dialog
+                                                                          Get.dialog(
+                                                                            AlertDialog(
+                                                                              title: Text(
+                                                                                "Delete Notification",
+                                                                                style: TextStyle(
+                                                                                  fontFamily: AppFontFamily.sfProDisplayBold,
+                                                                                  fontSize: 18,
+                                                                                  color: AppColors.primaryTextColor,
+                                                                                ),
+                                                                              ),
+                                                                              content: Text(
+                                                                                "Are you sure you want to delete this notification?",
+                                                                                style: TextStyle(
+                                                                                  fontFamily: AppFontFamily.sfProDisplay,
+                                                                                  fontSize: 14,
+                                                                                  color: AppColors.primaryTextColor,
+                                                                                ),
+                                                                              ),
+                                                                              actions: [
+                                                                                TextButton(
+                                                                                  onPressed: () => Get.back(),
+                                                                                  child: Text(
+                                                                                    "Cancel",
+                                                                                    style: TextStyle(
+                                                                                      fontFamily: AppFontFamily.sfProDisplay,
+                                                                                      fontSize: 14,
+                                                                                      color: AppColors.primaryTextColor,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                TextButton(
+                                                                                  onPressed: () {
+                                                                                    Get.back();
+                                                                                    logic.onDeleteNotificationApiCall(
+                                                                                      notificationId: notificationId,
+                                                                                      userId: userId,
+                                                                                      index: index,
+                                                                                    );
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    "Delete",
+                                                                                    style: TextStyle(
+                                                                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                                                                      fontSize: 14,
+                                                                                      color: Colors.red,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                        child:
+                                                                            Container(
+                                                                          padding: const EdgeInsets
+                                                                              .all(
+                                                                              8),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Colors.red.withOpacity(0.1),
+                                                                            shape:
+                                                                                BoxShape.circle,
+                                                                          ),
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.delete_outline,
+                                                                            color:
+                                                                                Colors.red,
+                                                                            size:
+                                                                                20,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      // Date and time
+                                                                      Text(
+                                                                        "${logic.date}  ${logic.formattedTime}",
+                                                                        style: TextStyle(
+                                                                            color: AppColors
+                                                                                .roundBorder,
+                                                                            fontSize:
+                                                                                10,
+                                                                            fontFamily:
+                                                                                AppFontFamily.sfProDisplay),
+                                                                      ).paddingOnly(
+                                                                          top:
+                                                                              4,
+                                                                          bottom:
+                                                                              3),
+                                                                    ],
+                                                                  ).paddingOnly(
+                                                                      right: 5),
                                                                 ],
                                                               ),
                                                             ),

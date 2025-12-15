@@ -296,172 +296,285 @@ class BranchDetailDataView extends StatelessWidget {
           color: AppColors.backGround,
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    logic.getSalonDetailCategory?.salon?.name ?? "",
-                    style: TextStyle(
-                      color: AppColors.appText,
-                      fontFamily: AppFontFamily.heeBo800,
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ).paddingOnly(top: 10, left: 15, right: 15, bottom: 10),
-              Row(
-                children: [
-                  Image.asset(
-                    AppAsset.icLocation,
-                    height: 22,
-                    width: 22,
-                  ).paddingOnly(right: 8),
-                  SizedBox(
-                    width: Get.width * 0.8,
-                    child: Text(
-                      "${logic.getSalonDetailCategory?.salon?.addressDetails?.addressLine1}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.landMark}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.city}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.state}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.country}",
-                      style: TextStyle(
-                        color: AppColors.termsDialog,
-                        fontFamily: AppFontFamily.heeBo600,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
-              ).paddingOnly(left: 15, right: 15, bottom: 10),
-              Row(
-                children: [
-                  Image.asset(
-                    AppAsset.icDirection,
-                    height: 22,
-                    width: 22,
-                  ).paddingOnly(right: 8),
-                  RichText(
-                    text: TextSpan(
-                      text: logic.getSalonDetailCategory?.salon?.distance ==
-                              null
-                          ? ""
-                          : "${logic.getSalonDetailCategory?.salon?.distance?.toStringAsFixed(2)} ${"txtKMs".tr}  ",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.appText,
-                        fontFamily: AppFontFamily.heeBo600,
-                      ),
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: 'txtFromLocation'.tr,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: AppFontFamily.heeBo600,
-                            color: AppColors.termsDialog,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ).paddingOnly(left: 15, right: 15, bottom: 10),
-              Row(
-                children: [
-                  Image.asset(
-                    AppAsset.icStarFilled,
-                    height: 19,
-                    width: 19,
-                  ).paddingOnly(right: 8),
-                  RichText(
-                    text: TextSpan(
-                      text: "4.8",
-                      style: TextStyle(
-                        color: AppColors.ratingYellow,
-                        fontSize: 16.5,
-                        fontFamily: AppFontFamily.heeBo700,
-                      ),
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: "  (1280)",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: AppFontFamily.heeBo600,
-                            color: AppColors.termsDialog,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ).paddingOnly(top: 3),
-                ],
-              ).paddingOnly(left: 15, right: 15, bottom: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        logic.launchMaps();
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
+              // Enhanced salon name with better visual hierarchy
+              Container(
+                margin: const EdgeInsets.only(
+                    top: 15, left: 15, right: 15, bottom: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        logic.getSalonDetailCategory?.salon?.name ?? "",
+                        style: TextStyle(
                           color: AppColors.appText,
-                          boxShadow: Constant.boxShadow,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              AppAsset.icDirectionFilled,
-                              height: 24,
-                              width: 24,
-                            ).paddingOnly(right: 12),
-                            Text(
-                              "txtDirection".tr,
-                              style: TextStyle(
-                                color: AppColors.whiteColor,
-                                fontFamily: AppFontFamily.heeBo600,
-                                fontSize: 17,
-                              ),
-                            ),
-                          ],
+                          fontFamily: AppFontFamily.heeBo800,
+                          fontSize: 22,
+                          letterSpacing: 0.5,
+                          height: 1.2,
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+              // Enhanced address section with better card design
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.blackColor.withOpacity(0.05),
+                      offset: const Offset(0, 2),
+                      blurRadius: 8,
+                      spreadRadius: 0,
+                    ),
+                  ],
+                  border: Border.all(
+                    color: AppColors.grey.withOpacity(0.1),
+                    width: 1,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        logic.makingPhoneCall();
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: AppColors.callBox,
-                          boxShadow: Constant.boxShadow,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              AppAsset.icCallFilled,
-                              height: 24,
-                              width: 24,
-                            ).paddingOnly(right: 12),
-                            Text(
-                              "txtCallSalon".tr,
-                              style: TextStyle(
-                                color: AppColors.whiteColor,
-                                fontFamily: AppFontFamily.heeBo600,
-                                fontSize: 17,
-                              ),
-                            ),
-                          ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset(
+                        AppAsset.icLocation,
+                        height: 18,
+                        width: 18,
+                      ),
+                    ).paddingOnly(right: 12),
+                    Expanded(
+                      child: Text(
+                        "${logic.getSalonDetailCategory?.salon?.addressDetails?.addressLine1}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.landMark}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.city}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.state}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.country}",
+                        style: TextStyle(
+                          color: AppColors.termsDialog,
+                          fontFamily: AppFontFamily.heeBo600,
+                          fontSize: 14,
+                          height: 1.4,
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+              // Enhanced distance section
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.blackColor.withOpacity(0.05),
+                      offset: const Offset(0, 2),
+                      blurRadius: 8,
+                      spreadRadius: 0,
+                    ),
+                  ],
+                  border: Border.all(
+                    color: AppColors.grey.withOpacity(0.1),
+                    width: 1,
                   ),
-                ],
-              ).paddingOnly(left: 15, right: 15, bottom: 20, top: 3),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset(
+                        AppAsset.icDirection,
+                        height: 18,
+                        width: 18,
+                      ),
+                    ).paddingOnly(right: 12),
+                    RichText(
+                      text: TextSpan(
+                        text: logic.getSalonDetailCategory?.salon?.distance ==
+                                null
+                            ? ""
+                            : "${logic.getSalonDetailCategory?.salon?.distance?.toStringAsFixed(2)} ${"txtKMs".tr}  ",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.appText,
+                          fontFamily: AppFontFamily.heeBo600,
+                        ),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: 'txtFromLocation'.tr,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: AppFontFamily.heeBo600,
+                              color: AppColors.termsDialog,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Enhanced rating section
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.blackColor.withOpacity(0.05),
+                      offset: const Offset(0, 2),
+                      blurRadius: 8,
+                      spreadRadius: 0,
+                    ),
+                  ],
+                  border: Border.all(
+                    color: AppColors.grey.withOpacity(0.1),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.ratingYellow.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset(
+                        AppAsset.icStarFilled,
+                        height: 18,
+                        width: 18,
+                      ),
+                    ).paddingOnly(right: 12),
+                    RichText(
+                      text: TextSpan(
+                        text: "4.8",
+                        style: TextStyle(
+                          color: AppColors.ratingYellow,
+                          fontSize: 17,
+                          fontFamily: AppFontFamily.heeBo700,
+                        ),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: "  (1280)",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: AppFontFamily.heeBo600,
+                              color: AppColors.termsDialog,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Enhanced action buttons with better design
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          logic.launchMaps();
+                        },
+                        child: Container(
+                          height: 52,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.appText,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.blackColor.withOpacity(0.15),
+                                offset: const Offset(0, 4),
+                                blurRadius: 12,
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                AppAsset.icDirectionFilled,
+                                height: 24,
+                                width: 24,
+                              ).paddingOnly(right: 12),
+                              Text(
+                                "txtDirection".tr,
+                                style: TextStyle(
+                                  color: AppColors.whiteColor,
+                                  fontFamily: AppFontFamily.heeBo600,
+                                  fontSize: 17,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          logic.makingPhoneCall();
+                        },
+                        child: Container(
+                          height: 52,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.callBox,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.callBox.withOpacity(0.3),
+                                offset: const Offset(0, 4),
+                                blurRadius: 12,
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                AppAsset.icCallFilled,
+                                height: 24,
+                                width: 24,
+                              ).paddingOnly(right: 12),
+                              Text(
+                                "txtCallSalon".tr,
+                                style: TextStyle(
+                                  color: AppColors.whiteColor,
+                                  fontFamily: AppFontFamily.heeBo600,
+                                  fontSize: 17,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         );
