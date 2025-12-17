@@ -876,13 +876,34 @@ class BookingScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      // Recalculate amount right before sending to ensure accuracy
+      // CRITICAL: Recalculate amount right before sending to ensure accuracy
       // This matches the backend calculation exactly
+      // Backend calculation flow:
+      // 1. taxAmount = (withoutTax * tax) / 100
+      // 2. withTaxAmount = (taxAmount + withoutTax).toFixed(2) [STRING]
+      // 3. If coupon: discountAmount = calculated from Math.floor(withoutTax)
+      // 4. totalAmount = parseFloat(withTaxAmount) - discountAmount [NUMBER]
+      // 5. totalAmountString = parseFloat(totalAmount).toFixed(2) [STRING]
+      // 6. bookingAmountString = parseFloat(bookingAmount).toFixed(2) [STRING]
+      // 7. Compare: totalAmountString !== bookingAmountString
       calculateTotalWithDiscount();
 
       // Use the recalculated totalPrice as the final amount
       // Ensure it's properly formatted to 2 decimal places to match backend expectation
+      // Backend does: parseFloat(bookingAmount).toFixed(2) for comparison
+      // So we need to ensure our amount, when converted to string with .toFixed(2), matches
       double finalAmount = double.parse(totalPrice.toStringAsFixed(2));
+
+      // Log for debugging - this should match backend calculation
+      log("Create Booking - Final calculation check:");
+      log("  - withOutTaxRupee: $withOutTaxRupee");
+      log("  - tax: $tax");
+      log("  - finalTaxRupee: $finalTaxRupee");
+      log("  - withTaxAmount: ${(finalTaxRupee + withOutTaxRupee).toStringAsFixed(2)}");
+      log("  - couponDiscountAmount: $couponDiscountAmount");
+      log("  - totalPrice: $totalPrice");
+      log("  - finalAmount: $finalAmount");
+      log("  - finalAmount.toFixed(2): ${finalAmount.toStringAsFixed(2)}");
 
       // Prepare coupon ID - use selectedCouponId if available, otherwise try to find by manual code
       String? couponIdToSend = selectedCouponId;
@@ -1199,12 +1220,14 @@ class BookingScreenController extends GetxController {
     // Match backend calculation exactly:
     // Backend: taxAmount = (req.body.withoutTax * global.settingJSON.tax) / 100
     // Backend: withTaxAmount = (taxAmount + req.body.withoutTax).toFixed(2) [STRING]
-    // Backend: totalAmount = withTaxAmount [STRING initially, then NUMBER after subtraction]
-    // Backend: if coupon: totalAmount = withTaxAmount - discountAmount [NUMBER]
-    // Backend: bookingAmount = req.body.amount.toFixed(2) [STRING]
-    // Backend: if (totalAmount !== bookingAmount) - compares NUMBER !== STRING
+    // Backend: if coupon: discountAmount calculated from Math.floor(parseFloat(withoutTax))
+    // Backend: totalAmount = withTaxAmount - discountAmount [NUMBER]
+    // Backend: totalAmountString = parseFloat(totalAmount).toFixed(2) [STRING]
+    // Backend: bookingAmountString = parseFloat(bookingAmount).toFixed(2) [STRING]
+    // Backend: compares totalAmountString !== bookingAmountString
 
     // Step 1: Calculate tax - matching backend exactly
+    // Backend uses full withoutTax (with decimals) for tax calculation
     if (tax != null && tax! > 0) {
       finalTaxRupee = (withOutTaxRupee * tax!) / 100;
     } else {
@@ -1218,9 +1241,14 @@ class BookingScreenController extends GetxController {
     String withTaxAmountStr = withTaxAmountNum.toStringAsFixed(2);
     double withTaxAmount = double.parse(withTaxAmountStr);
 
-    // Step 3: Apply discount - matching backend: totalAmount = withTaxAmount - discountAmount
-    // When backend does: "10.50" - 2, JavaScript converts string to number: 10.5 - 2 = 8.5
-    // So totalAmount becomes a NUMBER (8.5), not a string
+    // Step 3: Apply discount - CRITICAL FIX
+    // Backend calculates discount using Math.floor(parseFloat(withoutTax)) to match validateCoupon
+    // validateCoupon receives integer from frontend (toInt().toString())
+    // So discount is calculated with integer part of withoutTax
+    // We need to ensure couponDiscountAmount matches what backend will calculate
+    // The couponDiscountAmount comes from validateCoupon API which uses integer
+    // So it should already be correct, but we apply it to the full withTaxAmount
+
     double calculatedTotalAmount = withTaxAmount - couponDiscountAmount;
     if (calculatedTotalAmount < 0) calculatedTotalAmount = 0;
 

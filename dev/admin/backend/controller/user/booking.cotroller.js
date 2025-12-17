@@ -300,7 +300,12 @@ exports.newBooking = async (req, res, next) => {
       if (coupon.discountType == 1) {
         discountAmount = coupon.maxDiscount;
       } else if (coupon.discountType == 2) {
-        const discount = (parseInt(req.body.withoutTax) * coupon.discountPercent) / 100;
+        // FIX: Use parseFloat instead of parseInt to preserve decimals
+        // This matches the validateCoupon API calculation which uses parseInt(amount) from query string
+        // Since frontend sends integer to validateCoupon, we should use integer here too
+        // But to be safe and match frontend calculation, use parseFloat and round to integer
+        const withoutTaxInt = Math.floor(parseFloat(req.body.withoutTax));
+        const discount = (withoutTaxInt * coupon.discountPercent) / 100;
         const formatedDiscount = parseFloat(discount.toFixed(2));
 
         discountAmount = formatedDiscount > coupon.maxDiscount ? coupon.maxDiscount : formatedDiscount;
@@ -313,15 +318,24 @@ exports.newBooking = async (req, res, next) => {
         });
       }
 
-      totalAmount = withTaxAmount - discountAmount;
+      // FIX: Convert withTaxAmount (STRING) to NUMBER before subtraction to avoid precision issues
+      // withTaxAmount is a string from .toFixed(2), need to convert to number for accurate calculation
+      totalAmount = parseFloat(withTaxAmount) - discountAmount;
     }
 
     console.log("totalAmount after add tax and deduct the discount (if any)", totalAmount);
+    console.log("totalAmount type:", typeof totalAmount);
+    console.log("withTaxAmount:", withTaxAmount, "type:", typeof withTaxAmount);
+    console.log("discountAmount:", discountAmount, "type:", typeof discountAmount);
 
     // Convert totalAmount to string with 2 decimal places for comparison
     // This ensures both sides are strings and can be compared correctly
     const totalAmountString = parseFloat(totalAmount).toFixed(2);
     const bookingAmountString = parseFloat(bookingAmount).toFixed(2);
+    
+    console.log("totalAmountString:", totalAmountString);
+    console.log("bookingAmountString:", bookingAmountString);
+    console.log("Comparison:", totalAmountString, "!== ", bookingAmountString, "=", totalAmountString !== bookingAmountString);
 
     if (totalAmountString !== bookingAmountString) {
       return res.status(200).send({ status: false, message: "Invalid amount after add tax and deduct the discount (if any)" });
