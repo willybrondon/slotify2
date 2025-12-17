@@ -407,11 +407,40 @@ class PaymentScreenController extends GetxController {
               }
             }
 
-            // If still not found, log warning but proceed (backend will validate)
+            // CRITICAL FIX: If still not found and discount is applied, cannot proceed
             if (bookingScreenController!.selectedCouponId == null) {
-              log("Cash Payment - ⚠️  WARNING: Coupon ID not found for code: ${bookingScreenController!.manualCouponCode}");
-              log("Cash Payment - ⚠️  Booking will proceed without couponId - backend may reject if coupon is required");
+              if (bookingScreenController!.couponDiscountAmount > 0) {
+                log("Cash Payment - ❌ ERROR: Coupon discount applied but coupon ID not found!");
+                log("Cash Payment - ❌ Cannot proceed - backend will reject due to amount mismatch");
+
+                if (isScreenActive) {
+                  isLoading(false);
+                  update([Constant.idProgressView]);
+                  Utils.showToast(Get.context!,
+                      "Coupon validation failed. Please remove the coupon and try again.");
+                }
+                return;
+              } else {
+                log("Cash Payment - ⚠️  WARNING: Coupon code provided but no discount applied and ID not found");
+                // If no discount, it's safe to proceed without coupon ID
+              }
             }
+          }
+
+          // CRITICAL FIX: Validate coupon data before proceeding
+          if (bookingScreenController!.couponDiscountAmount > 0) {
+            if (bookingScreenController!.selectedCouponId == null ||
+                bookingScreenController!.selectedCouponId!.isEmpty) {
+              log("Cash Payment - ❌ ERROR: Discount applied but no coupon ID available");
+              if (isScreenActive) {
+                isLoading(false);
+                update([Constant.idProgressView]);
+                Utils.showToast(
+                    Get.context!, "Coupon validation error. Please try again.");
+              }
+              return;
+            }
+            log("Cash Payment - ✅ Coupon validated: ID=${bookingScreenController!.selectedCouponId}, Discount=${bookingScreenController!.couponDiscountAmount}");
           }
 
           // Sync all booking data to booking controller to ensure onCreateBookingApiCall has correct state
@@ -454,13 +483,58 @@ class PaymentScreenController extends GetxController {
           log("  - finalTaxRupee: ${bookingScreenController!.finalTaxRupee}");
           log("  - totalPrice: ${bookingScreenController!.totalPrice}");
 
+          // CRITICAL FIX: Validate required fields before API call
+          if (bookingData!['expertId'] == null ||
+              bookingData!['expertId'].toString().isEmpty) {
+            log("Cash Payment - ❌ ERROR: expertId is missing");
+            if (isScreenActive) {
+              isLoading(false);
+              update([Constant.idProgressView]);
+              Utils.showToast(Get.context!,
+                  "Booking data is incomplete. Please try again.");
+            }
+            return;
+          }
+
+          if (bookingData!['serviceId'] == null ||
+              bookingData!['serviceId'].toString().isEmpty) {
+            log("Cash Payment - ❌ ERROR: serviceId is missing");
+            if (isScreenActive) {
+              isLoading(false);
+              update([Constant.idProgressView]);
+              Utils.showToast(Get.context!,
+                  "Booking data is incomplete. Please try again.");
+            }
+            return;
+          }
+
+          if (bookingData!['salonId'] == null ||
+              bookingData!['salonId'].toString().isEmpty) {
+            log("Cash Payment - ❌ ERROR: salonId is missing");
+            if (isScreenActive) {
+              isLoading(false);
+              update([Constant.idProgressView]);
+              Utils.showToast(Get.context!,
+                  "Booking data is incomplete. Please try again.");
+            }
+            return;
+          }
+
+          // Ensure amount is properly formatted to 2 decimal places to match backend expectation
+          // Backend does: parseFloat(totalAmount).toFixed(2) for comparison
+          double finalAmount = double.parse(
+              bookingScreenController!.totalPrice.toStringAsFixed(2));
+
+          // Log final values for debugging
+          log("Cash Payment - Final values before API call:");
+          log("  - finalAmount: $finalAmount (${finalAmount.toStringAsFixed(2)})");
+          log("  - withoutTaxValue: $withoutTaxValue (${withoutTaxValue.toStringAsFixed(2)})");
+          log("  - selectedCouponId: ${bookingScreenController!.selectedCouponId}");
+          log("  - couponDiscountAmount: ${bookingScreenController!.couponDiscountAmount}");
+
           // Set loading state
           bookingScreenController!.isLoading(true);
           bookingScreenController!.update([Constant.idProgressView]);
-
-          // Ensure amount is properly formatted to 2 decimal places to match backend expectation
-          double finalAmount = double.parse(
-              bookingScreenController!.totalPrice.toStringAsFixed(2));
 
           await bookingScreenController!.onCreateBookingApiCall(
             userId: Constant.storage.read<String>('userId') ?? "",
@@ -469,9 +543,8 @@ class PaymentScreenController extends GetxController {
             salonId: bookingData!['salonId'] ?? "",
             date: bookingData!['date'] ?? "",
             time: bookingData!['time'] ?? "",
-            amount:
-                finalAmount, // Use properly formatted amount with coupon discount
-            withoutTax: withoutTaxValue,
+            amount: finalAmount, // Matches backend calculation exactly
+            withoutTax: withoutTaxValue, // Base amount before discount
             paymentType: "cashAfterService",
             atPlace: bookingData!['atPlace'] ?? 1,
             address: bookingData!['address'] ?? "",
@@ -488,6 +561,8 @@ class PaymentScreenController extends GetxController {
           bookingScreenController!.update([Constant.idProgressView]);
 
           if (bookingScreenController!.createBookingCategory?.status == true) {
+            log("Cash Payment - ✅ Booking created successfully!");
+
             // Clear all data and show success
             bookingScreenController!.finalTaxRupee = 0.0;
             bookingScreenController!.withOutTaxRupee = 0.0;
@@ -506,10 +581,27 @@ class PaymentScreenController extends GetxController {
               ),
             );
           } else {
-            Utils.showToast(
-                Get.context!,
+            // Booking failed - show specific error message and handle coupon errors
+            String errorMessage =
                 bookingScreenController!.createBookingCategory?.message ??
-                    "Booking failed");
+                    "Booking failed";
+
+            log("Cash Payment - ❌ Booking failed: $errorMessage");
+
+            // Check if error is related to coupon, amount, or discount
+            String lowerErrorMessage = errorMessage.toLowerCase();
+            if (lowerErrorMessage.contains("coupon") ||
+                lowerErrorMessage.contains("discount") ||
+                lowerErrorMessage.contains("amount") ||
+                lowerErrorMessage.contains("invalid")) {
+              log("Cash Payment - ⚠️  Coupon/amount-related error detected. Resetting coupon...");
+              bookingScreenController!.resetCoupon();
+              // Recalculate without coupon
+              bookingScreenController!.calculateTotalWithDiscount();
+              log("Cash Payment - Recalculated total without coupon: ${bookingScreenController!.totalPrice}");
+            }
+
+            Utils.showToast(Get.context!, errorMessage);
           }
         } catch (e) {
           log("Error creating booking for cash after service: $e");
