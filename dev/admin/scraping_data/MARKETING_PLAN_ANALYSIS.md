@@ -509,15 +509,671 @@
    - Use existing QR code functionality
 
 3. **Create Salon Integration Guides**
-   - How to add link to Instagram bio
-   - How to add link to Facebook
-   - How to add link to Google Business Profile
+
+   #### **A. How to Add Link to Instagram Bio**
+   
+   **Step-by-Step Instructions:**
+   
+   1. **Get Your Salon Share URL**
+      - Log into your Skedisy salon panel
+      - Navigate to Salon Settings → Share & Links
+      - Copy your unique share URL (format: `https://skedisy.com/salon/{your-salon-name}-{id}`)
+      - Or use the deep link: `slotify://salon/{salonId}`
+   
+   2. **Add Link to Instagram Bio**
+      - Open Instagram app on your phone
+      - Go to your profile (tap your profile picture)
+      - Tap "Edit Profile"
+      - Tap on "Website" or "Link in Bio" field
+      - Paste your Skedisy salon share URL
+      - Tap "Done" to save
+   
+   3. **Alternative: Use Linktree or Similar**
+      - If you want multiple links, use Linktree, Linkin.bio, or similar services
+      - Add "Book Appointment" or "View Services" as the link text
+      - Use your Skedisy salon share URL as the destination
+   
+   4. **Best Practices:**
+      - Use a call-to-action in your bio: "Book now → Link in bio"
+      - Update bio text: "✨ Book your appointment online! Tap link in bio 👆"
+      - Use emojis to make it stand out: "📱 Book Now | 💇‍♀️ View Services"
+   
+   **Example Bio:**
+   ```
+   💇‍♀️ Professional Hair Salon
+   ✨ Book your appointment online!
+   📱 Tap link in bio to book now
+   📍 [Your Location]
+   ⏰ Mon-Sat: 9AM-7PM
+   ```
+   
+   ---
+   
+   #### **B. How to Add Link to Facebook**
+   
+   **Step-by-Step Instructions:**
+   
+   1. **Get Your Salon Share URL**
+      - Same as Instagram: Get from Salon Settings → Share & Links
+      - Copy your share URL: `https://skedisy.com/salon/{your-salon-name}-{id}`
+   
+   2. **Add Link to Facebook Page**
+      - Go to your Facebook Business Page
+      - Click "Edit Page" or "Edit Page Info"
+      - Scroll to "Website" or "Contact Information"
+      - Paste your Skedisy salon share URL in the "Website" field
+      - Click "Save Changes"
+   
+   3. **Add as Call-to-Action Button**
+      - Go to your Facebook Page
+      - Click "Add a Button" (or edit existing button)
+      - Select "Book Now" or "Learn More"
+      - Choose "Website URL"
+      - Paste your Skedisy salon share URL
+      - Click "Save"
+   
+   4. **Add to Facebook Posts**
+      - When posting about services or promotions
+      - Include your Skedisy link in the post
+      - Use text like: "Book your appointment: [paste link]"
+      - Pin important posts with booking links to the top of your page
+   
+   5. **Add to Facebook Stories**
+      - Create a story with "Book Now" text
+      - Add a link sticker
+      - Paste your Skedisy salon share URL
+      - The link will be clickable for 24 hours
+   
+   **Example Facebook Post:**
+   ```
+   🎉 New Services Available!
+   
+   We're excited to offer:
+   ✂️ Haircuts & Styling
+   💆‍♀️ Hair Treatments
+   💅 Nail Services
+   
+   Book your appointment online:
+   [Your Skedisy Link]
+   
+   #HairSalon #BookNow #OnlineBooking
+   ```
+   
+   ---
+   
+   #### **C. How to Add Link to Google Business Profile**
+   
+   **Step-by-Step Instructions:**
+   
+   1. **Get Your Salon Share URL**
+      - Same as above: Get from Salon Settings → Share & Links
+      - Copy your share URL: `https://skedisy.com/salon/{your-salon-name}-{id}`
+   
+   2. **Add Website Link to Google Business Profile**
+      - Open Google Business Profile (business.google.com or Google Maps app)
+      - Sign in to your business account
+      - Click on your business profile
+      - Click "Edit Profile" or "Info"
+      - Find "Website" field
+      - Paste your Skedisy salon share URL
+      - Click "Save"
+   
+   3. **Add as Booking Link (If Available)**
+      - In Google Business Profile, look for "Booking" or "Reserve" section
+      - Click "Add booking link" or "Edit booking options"
+      - Select "Website" or "Custom URL"
+      - Paste your Skedisy salon share URL
+      - Add label: "Book Appointment" or "Online Booking"
+      - Click "Save"
+   
+   4. **Add to Google Posts**
+      - In Google Business Profile, click "Posts"
+      - Create a new post
+      - Add your Skedisy link in the post
+      - Use text like: "Book your appointment online: [link]"
+      - Add relevant images
+      - Click "Publish"
+   
+   5. **Add to Google Business Description**
+      - Edit your business description
+      - Include: "Book appointments online at [your Skedisy link]"
+      - This makes the link visible to all visitors
+   
+   **Example Google Business Description:**
+   ```
+   Professional hair salon offering haircuts, styling, 
+   treatments, and nail services. 
+   
+   Book your appointment online: [Your Skedisy Link]
+   
+   Walk-ins welcome, but appointments recommended.
+   ```
+   
+   ---
+   
+   #### **D. Additional Integration Tips**
+   
+   **Website Integration:**
+   - Add "Book Now" button to your salon website
+   - Link directly to your Skedisy salon share URL
+   - Place button in header, footer, or prominent location
+   
+   **Email Signature:**
+   - Add booking link to your email signature
+   - Format: "Book your appointment: [link]"
+   
+   **WhatsApp Business:**
+   - Add booking link to your WhatsApp Business profile
+   - Include in automated messages
+   - Share in WhatsApp status updates
+   
+   **Physical Materials:**
+   - Add QR code to business cards
+   - Include link on receipts/invoices
+   - Display QR code at reception desk
+   
+   **Social Media Posts:**
+   - Include booking link in all service posts
+   - Use link in Stories (Instagram, Facebook)
+   - Pin booking posts to top of profiles
 
 ### **Short-Term Development** (Next 2-4 Weeks)
 
 1. **Implement Referral System** (2-3 weeks)
    - Highest ROI feature
    - Enables viral growth
+   
+   #### **A. System Overview**
+   
+   **Referral Program Structure:**
+   - **User-to-User Referrals**: Give 10€, Get 10€
+     - Referrer gets 10€ when referee completes first booking
+     - Referee gets 10€ discount on first booking
+   - **Salon Referrals**: 5€ per customer conversion
+     - Salon gets 5€ when referred customer completes first booking
+     - Encourages salons to promote the platform
+   
+   **Key Features:**
+   - Unique referral codes for each user
+   - Referral code sharing (via link, QR code, social media)
+   - Automatic reward distribution
+   - Referral tracking and analytics
+   - Referral dashboard for users and salons
+   
+   ---
+   
+   #### **B. Database Schema Changes**
+   
+   **1. User Model Updates** (`dev/admin/backend/models/user.model.js`)
+   ```javascript
+   // Add to userSchema:
+   referralCode: { 
+     type: String, 
+     default: "", 
+     unique: true,
+     sparse: true  // Allows multiple null values
+   },
+   referredBy: { 
+     type: mongoose.Schema.Types.ObjectId, 
+     ref: "User", 
+     default: null 
+   },
+   referralCodeUsed: { 
+     type: String, 
+     default: null  // Code used during signup
+   },
+   referralCount: { 
+     type: Number, 
+     default: 0  // Number of successful referrals
+   },
+   referralEarnings: { 
+     type: Number, 
+     default: 0  // Total earnings from referrals (in wallet currency)
+   },
+   referralRewardsReceived: { 
+     type: Number, 
+     default: 0  // Total rewards received as referee
+   },
+   firstBookingCompleted: { 
+     type: Boolean, 
+     default: false  // Track if first booking is done (for reward eligibility)
+   },
+   referralRewardEligible: { 
+     type: Boolean, 
+     default: true  // Whether user is eligible for referral rewards
+   }
+   ```
+   
+   **2. Salon Model Updates** (`dev/admin/backend/models/salon.model.js`)
+   ```javascript
+   // Add to salonSchema:
+   referralCode: { 
+     type: String, 
+     default: "", 
+     unique: true,
+     sparse: true
+   },
+   referralCount: { 
+     type: Number, 
+     default: 0 
+   },
+   referralEarnings: { 
+     type: Number, 
+     default: 0  // Total earnings from salon referrals
+   }
+   ```
+   
+   **3. Create Referral Model** (`dev/admin/backend/models/referral.model.js`)
+   ```javascript
+   const referralSchema = new mongoose.Schema({
+     referrerId: { 
+       type: mongoose.Schema.Types.ObjectId, 
+       ref: "User", 
+       required: true 
+     },
+     referrerType: { 
+       type: String, 
+       enum: ["user", "salon"], 
+       required: true 
+     },
+     refereeId: { 
+       type: mongoose.Schema.Types.ObjectId, 
+       ref: "User", 
+       required: true 
+     },
+     referralCode: { 
+       type: String, 
+       required: true 
+     },
+     status: { 
+       type: String, 
+       enum: ["pending", "completed", "rewarded"], 
+       default: "pending" 
+     },
+     firstBookingId: { 
+       type: mongoose.Schema.Types.ObjectId, 
+       ref: "Booking", 
+       default: null 
+     },
+     referrerReward: { 
+       type: Number, 
+       default: 0  // Amount rewarded to referrer
+     },
+     refereeReward: { 
+       type: Number, 
+       default: 0  // Amount rewarded to referee
+     },
+     rewardDate: { 
+       type: Date, 
+       default: null 
+     },
+     createdAt: { 
+       type: Date, 
+       default: Date.now 
+     }
+   });
+   ```
+   
+   ---
+   
+   #### **C. Backend API Endpoints**
+   
+   **1. Generate Referral Code** 
+   - **Endpoint**: `POST /user/referral/generate`
+   - **Location**: `dev/admin/backend/controller/user/referral.controller.js`
+   - **Functionality**:
+     - Generate unique referral code for user
+     - Format: `SKED-{userId}-{random4chars}` or `SKED-{random8chars}`
+     - Store in user.referralCode
+     - Return referral code and share URL
+   
+   **2. Apply Referral Code (During Signup)**
+   - **Endpoint**: `POST /user/referral/apply`
+   - **Functionality**:
+     - Validate referral code exists and is active
+     - Check if code belongs to user or salon
+     - Store referral relationship
+     - Create referral record with status "pending"
+     - Apply 10€ discount coupon to new user (for first booking)
+   
+   **3. Get Referral Statistics**
+   - **Endpoint**: `GET /user/referral/stats?userId={userId}`
+   - **Functionality**:
+     - Return referral count
+     - Return referral earnings
+     - Return pending referrals
+     - Return completed referrals
+     - Return share URL and QR code
+   
+   **4. Process Referral Reward (Triggered on First Booking)**
+   - **Endpoint**: `POST /user/referral/processReward` (Internal/Admin)
+   - **Functionality**:
+     - Called automatically when referee completes first booking
+     - Validate referral exists and is pending
+     - Reward referrer: Add 10€ to wallet (user) or 5€ (salon)
+     - Mark referral as "completed" and "rewarded"
+     - Create wallet history entries
+     - Send notifications to both parties
+   
+   **5. Get Referral Dashboard (Admin)**
+   - **Endpoint**: `GET /admin/referral/dashboard`
+   - **Functionality**:
+     - Total referrals
+     - Total rewards distributed
+     - Top referrers
+     - Referral conversion rate
+     - Revenue from referrals
+   
+   ---
+   
+   #### **D. Frontend Implementation**
+   
+   **1. Customer App - Referral Screen**
+   - **Location**: `dev/flutter/multi_salon_customer/lib/ui/referral_screen/`
+   - **Components**:
+     - Referral code display (large, copyable)
+     - QR code for referral code
+     - Share buttons (WhatsApp, SMS, Email, Social Media)
+     - Referral statistics (count, earnings)
+     - Referral history list
+     - "How it works" section
+   
+   **2. Customer App - Signup Flow Integration**
+   - **Location**: `dev/flutter/multi_salon_customer/lib/ui/signup_screen/`
+   - **Add**:
+     - Optional referral code input field
+     - Validate and apply referral code
+     - Show discount message if code applied
+   
+   **3. Customer App - Home Screen Banner**
+   - **Location**: `dev/flutter/multi_salon_customer/lib/ui/home_screen/`
+   - **Add**:
+     - Referral banner (if user hasn't referred anyone)
+     - "Earn 10€ for each friend you refer!" message
+     - Quick access to referral screen
+   
+   **4. Salon App - Referral Dashboard**
+   - **Location**: `dev/flutter/multi_salon_expert/lib/ui/referral_screen/`
+   - **Components**:
+     - Salon referral code
+     - Referral statistics
+     - Earnings from referrals
+     - Share options
+   
+   **5. Admin Panel - Referral Management**
+   - **Location**: `dev/admin/frontend/src/` or `dev/admin/salon/src/`
+   - **Components**:
+     - Referral dashboard
+     - Referral list with filters
+     - Reward management
+     - Analytics and reports
+   
+   ---
+   
+   #### **E. Implementation Steps (2-3 Weeks)**
+   
+   **Week 1: Backend Foundation**
+   - [ ] Day 1-2: Update User and Salon models with referral fields
+   - [ ] Day 2-3: Create Referral model
+   - [ ] Day 3-4: Implement referral code generation API
+   - [ ] Day 4-5: Implement apply referral code API
+   - [ ] Day 5: Implement referral statistics API
+   - [ ] Day 5: Testing backend APIs
+   
+   **Week 2: Reward System & Integration**
+   - [ ] Day 1-2: Implement reward processing logic
+   - [ ] Day 2-3: Integrate with booking system (trigger on first booking)
+   - [ ] Day 3-4: Integrate with wallet system (add rewards)
+   - [ ] Day 4-5: Create wallet history entries for referrals
+   - [ ] Day 5: Implement notification system for rewards
+   - [ ] Day 5: Testing reward flow end-to-end
+   
+   **Week 3: Frontend Implementation**
+   - [ ] Day 1-2: Create referral screen in customer app
+   - [ ] Day 2-3: Add referral code input to signup flow
+   - [ ] Day 3-4: Add referral banner to home screen
+   - [ ] Day 4-5: Create salon referral dashboard
+   - [ ] Day 5: Create admin referral management panel
+   - [ ] Day 5: Testing all UI components
+   
+   **Week 3 (Optional Extension):**
+   - [ ] Day 1-2: Add referral analytics
+   - [ ] Day 2-3: Add referral sharing features (deep links)
+   - [ ] Day 3-4: Add referral leaderboard
+   - [ ] Day 4-5: Final testing and bug fixes
+   - [ ] Day 5: Documentation and launch preparation
+   
+   ---
+   
+   #### **F. Technical Implementation Details**
+   
+   **1. Referral Code Generation Algorithm**
+   ```javascript
+   // Generate unique referral code
+   function generateReferralCode(userId) {
+     const prefix = "SKED";
+     const userIdStr = userId.toString().slice(-4); // Last 4 chars of ID
+     const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+     return `${prefix}-${userIdStr}-${random}`;
+   }
+   
+   // Ensure uniqueness
+   async function ensureUniqueCode(code) {
+     const exists = await User.findOne({ referralCode: code });
+     if (exists) {
+       return generateReferralCode(userId); // Regenerate
+     }
+     return code;
+   }
+   ```
+   
+   **2. Referral Reward Processing Flow**
+   ```javascript
+   // Triggered when referee completes first booking
+   async function processReferralReward(refereeId, bookingId) {
+     // 1. Find referral record
+     const referral = await Referral.findOne({ 
+       refereeId, 
+       status: "pending" 
+     });
+     
+     if (!referral) return; // No referral found
+     
+     // 2. Validate first booking
+     const booking = await Booking.findById(bookingId);
+     if (!booking || booking.userId.toString() !== refereeId) return;
+     
+     // 3. Check if this is truly first booking
+     const previousBookings = await Booking.countDocuments({ 
+       userId: refereeId,
+       _id: { $ne: bookingId }
+     });
+     if (previousBookings > 0) return; // Not first booking
+     
+     // 4. Reward referrer
+     if (referral.referrerType === "user") {
+       // User referral: Give 10€
+       await User.findByIdAndUpdate(referral.referrerId, {
+         $inc: { 
+           referralCount: 1,
+           referralEarnings: 10,
+           amount: 10  // Add to wallet
+         }
+       });
+       
+       // Create wallet history
+       await UserWalletHistory.create({
+         user: referral.referrerId,
+         amount: 10,
+         type: 1, // Deposit
+         uniqueId: generateUniqueIdentifier(),
+         // Add referral metadata
+       });
+     } else if (referral.referrerType === "salon") {
+       // Salon referral: Give 5€
+       await Salon.findByIdAndUpdate(referral.referrerId, {
+         $inc: { 
+           referralCount: 1,
+           referralEarnings: 5
+         }
+       });
+       // Salon earnings handled separately
+     }
+     
+     // 5. Update referral record
+     referral.status = "completed";
+     referral.rewarded = true;
+     referral.firstBookingId = bookingId;
+     referral.rewardDate = new Date();
+     await referral.save();
+     
+     // 6. Send notifications
+     // Notify referrer: "You earned 10€! Your friend completed their first booking"
+     // Notify referee: "Thank you for using a referral code! You saved 10€"
+   }
+   ```
+   
+   **3. Referral Code Application During Signup**
+   ```javascript
+   // In user signup/registration
+   async function applyReferralCode(newUserId, referralCode) {
+     if (!referralCode) return; // No code provided
+     
+     // Find referrer (user or salon)
+     const referrerUser = await User.findOne({ referralCode });
+     const referrerSalon = await Salon.findOne({ referralCode });
+     
+     if (!referrerUser && !referrerSalon) {
+       throw new Error("Invalid referral code");
+     }
+     
+     // Create referral record
+     const referral = await Referral.create({
+       referrerId: referrerUser?._id || referrerSalon._id,
+       referrerType: referrerUser ? "user" : "salon",
+       refereeId: newUserId,
+       referralCode: referralCode,
+       status: "pending"
+     });
+     
+     // Update new user
+     await User.findByIdAndUpdate(newUserId, {
+       referredBy: referrerUser?._id || referrerSalon._id,
+       referralCodeUsed: referralCode
+     });
+     
+     // Apply 10€ discount coupon for first booking
+     // Create or assign a special "FIRST_BOOKING_REFERRAL" coupon
+     // This coupon gives 10€ discount on first booking
+   }
+   ```
+   
+   ---
+   
+   #### **G. User Experience Flow**
+   
+   **Scenario 1: User Refers Friend**
+   1. User opens app → Sees referral banner or goes to Referral screen
+   2. User sees their unique referral code: `SKED-1234-ABCD`
+   3. User taps "Share" → Options: WhatsApp, SMS, Email, Copy Link
+   4. Friend receives link: `https://skedisy.com/signup?ref=SKED-1234-ABCD`
+   5. Friend signs up with referral code (auto-filled from URL)
+   6. Friend sees: "You'll get 10€ off your first booking!"
+   7. Friend completes first booking → Gets 10€ discount applied
+   8. Original user receives notification: "You earned 10€! Your friend booked."
+   9. 10€ automatically added to referrer's wallet
+   
+   **Scenario 2: Salon Refers Customer**
+   1. Salon owner gets referral code in salon panel
+   2. Salon shares code with customers (in-store, social media, etc.)
+   3. Customer signs up with salon's referral code
+   4. Customer completes first booking
+   5. Salon earns 5€ (tracked in salon earnings)
+   6. Salon can see referral stats in dashboard
+   
+   ---
+   
+   #### **H. Reward Configuration**
+   
+   **Configurable Settings (Store in Settings/Config):**
+   - User referral reward: 10€ (default)
+   - Salon referral reward: 5€ (default)
+   - Minimum booking amount for reward eligibility
+   - Reward expiration (if applicable)
+   - Maximum referrals per user (if applicable)
+   
+   **Reward Eligibility Rules:**
+   - Referee must complete first booking (not just sign up)
+   - Booking must be paid (not cancelled)
+   - Referrer must be active user (not blocked/deleted)
+   - One reward per referral (prevent duplicate rewards)
+   
+   ---
+   
+   #### **I. Analytics & Tracking**
+   
+   **Metrics to Track:**
+   - Total referrals created
+   - Referral conversion rate (signups → first booking)
+   - Average time from referral to first booking
+   - Top referrers (users and salons)
+   - Total rewards distributed
+   - Revenue generated from referrals
+   - Cost per acquisition via referrals
+   
+   **Dashboard Views:**
+   - User: Personal referral stats, earnings, history
+   - Salon: Salon referral stats, earnings, top customers
+   - Admin: Platform-wide stats, top referrers, ROI analysis
+   
+   ---
+   
+   #### **J. Testing Checklist**
+   
+   **Backend Testing:**
+   - [ ] Referral code generation (uniqueness, format)
+   - [ ] Referral code application (valid/invalid codes)
+   - [ ] Reward processing (first booking trigger)
+   - [ ] Wallet credit (correct amounts)
+   - [ ] Duplicate prevention (no double rewards)
+   - [ ] Edge cases (deleted users, blocked users, etc.)
+   
+   **Frontend Testing:**
+   - [ ] Referral screen displays correctly
+   - [ ] Share functionality works
+   - [ ] Signup flow with referral code
+   - [ ] Referral statistics update
+   - [ ] Notifications received
+   - [ ] QR code generation and scanning
+   
+   **Integration Testing:**
+   - [ ] End-to-end referral flow
+   - [ ] Reward distribution accuracy
+   - [ ] Wallet balance updates
+   - [ ] Notification delivery
+   - [ ] Analytics tracking
+   
+   ---
+   
+   #### **K. Launch Strategy**
+   
+   **Pre-Launch:**
+   - Create referral program documentation
+   - Prepare marketing materials (banners, emails)
+   - Set up reward budgets
+   - Test with beta users
+   
+   **Launch:**
+   - Announce to existing users via push notification
+   - Send email campaign about referral program
+   - Update app store descriptions
+   - Social media announcement
+   
+   **Post-Launch:**
+   - Monitor referral metrics daily
+   - Adjust rewards if needed
+   - Feature top referrers
+   - Collect user feedback
 
 2. **Implement Loyalty Points** (2-3 weeks)
    - Increases retention

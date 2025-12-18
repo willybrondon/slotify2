@@ -330,16 +330,52 @@ exports.newBooking = async (req, res, next) => {
 
     // Convert totalAmount to string with 2 decimal places for comparison
     // This ensures both sides are strings and can be compared correctly
-    const totalAmountString = parseFloat(totalAmount).toFixed(2);
-    const bookingAmountString = parseFloat(bookingAmount).toFixed(2);
+    // CRITICAL: Ensure both are numbers first, then convert to string
+    const totalAmountNum = typeof totalAmount === 'string' ? parseFloat(totalAmount) : totalAmount;
+    const bookingAmountNum = typeof bookingAmount === 'string' ? parseFloat(bookingAmount) : parseFloat(bookingAmount);
     
+    const totalAmountString = totalAmountNum.toFixed(2);
+    const bookingAmountString = bookingAmountNum.toFixed(2);
+    
+    // Enhanced logging for debugging
+    console.log("=== AMOUNT COMPARISON DEBUG ===");
+    console.log("req.body.withoutTax:", req.body.withoutTax, "type:", typeof req.body.withoutTax);
+    console.log("req.body.amount:", req.body.amount, "type:", typeof req.body.amount);
+    console.log("req.body.couponId:", req.body.couponId);
+    console.log("taxAmount:", taxAmount);
+    console.log("withTaxAmount (string):", withTaxAmount, "type:", typeof withTaxAmount);
+    console.log("discountAmount:", discountAmount, "type:", typeof discountAmount);
+    console.log("totalAmount (raw):", totalAmount, "type:", typeof totalAmount);
+    console.log("totalAmountNum:", totalAmountNum);
+    console.log("bookingAmount (raw):", bookingAmount, "type:", typeof bookingAmount);
+    console.log("bookingAmountNum:", bookingAmountNum);
     console.log("totalAmountString:", totalAmountString);
     console.log("bookingAmountString:", bookingAmountString);
     console.log("Comparison:", totalAmountString, "!== ", bookingAmountString, "=", totalAmountString !== bookingAmountString);
+    console.log("Difference:", Math.abs(totalAmountNum - bookingAmountNum));
+    console.log("=== END AMOUNT COMPARISON DEBUG ===");
 
-    if (totalAmountString !== bookingAmountString) {
-      return res.status(200).send({ status: false, message: "Invalid amount after add tax and deduct the discount (if any)" });
+    // CRITICAL FIX: Use numeric comparison with tolerance for floating point errors
+    // Instead of strict string comparison, compare the numeric values
+    // Allow for very small differences due to floating point precision (0.01 cent tolerance)
+    const amountDifference = Math.abs(totalAmountNum - bookingAmountNum);
+    const tolerance = 0.01; // Allow 1 cent difference due to floating point precision
+    
+    if (amountDifference > tolerance) {
+      console.log("❌ AMOUNT MISMATCH DETECTED:");
+      console.log("  Expected (backend):", totalAmountString);
+      console.log("  Received (frontend):", bookingAmountString);
+      console.log("  Difference:", amountDifference);
+      console.log("  Tolerance:", tolerance);
+      
+      return res.status(200).json({
+        status: false,
+        message: `book failed - Amount mismatch. Expected: ${totalAmountString}, Received: ${bookingAmountString}`,
+      });
     }
+    
+    // Log successful match
+    console.log("✅ AMOUNT MATCH - Booking can proceed");
 
     booking.amount = req.body.amount;
     booking.tax = taxAmount.toFixed(2);
