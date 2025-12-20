@@ -520,6 +520,87 @@ class PaymentScreenController extends GetxController {
             return;
           }
 
+          // CRITICAL FIX: Ensure coupon ID is found BEFORE calling onCreateBookingApiCall
+          // This matches the wallet payment flow which works correctly
+          // If discount is applied, we MUST have a coupon ID, otherwise backend will reject
+          if (bookingScreenController!.couponDiscountAmount > 0) {
+            // Final attempt to find coupon ID if still missing
+            if (bookingScreenController!.selectedCouponId == null || 
+                bookingScreenController!.selectedCouponId!.isEmpty) {
+              log("Cash Payment - ⚠️ CRITICAL: Discount applied (${bookingScreenController!.couponDiscountAmount}) but coupon ID still missing!");
+              log("Cash Payment - Making final attempt to find coupon ID...");
+              
+              // Try one more time to find in list
+              if (bookingScreenController!.manualCouponCode != null) {
+                // First check existing list
+                if (bookingScreenController!.getCouponModel?.data != null) {
+                  for (var coupon in bookingScreenController!.getCouponModel!.data!) {
+                    if (coupon.code?.toUpperCase() == 
+                        bookingScreenController!.manualCouponCode!.toUpperCase()) {
+                      bookingScreenController!.selectedCouponId = coupon.id;
+                      log("Cash Payment - ✅ Found coupon ID in existing list: ${coupon.id}");
+                      break;
+                    }
+                  }
+                }
+                
+                // If still not found and list is null, try fetching
+                if ((bookingScreenController!.selectedCouponId == null || 
+                     bookingScreenController!.selectedCouponId!.isEmpty) &&
+                    bookingScreenController!.getCouponModel == null &&
+                    bookingScreenController!.withOutTaxRupee > 0) {
+                  log("Cash Payment - Coupon list not available, fetching...");
+                  String userId = Constant.storage.read<String>('userId') ?? "";
+                  if (userId.isNotEmpty) {
+                    await bookingScreenController!.getCouponApiCall(
+                      userId: userId,
+                      type: "2",
+                      amount: bookingScreenController!.withOutTaxRupee.toInt().toString(),
+                    );
+                    
+                    // Try finding again after fetch
+                    if (bookingScreenController!.getCouponModel?.data != null) {
+                      for (var coupon in bookingScreenController!.getCouponModel!.data!) {
+                        if (coupon.code?.toUpperCase() == 
+                            bookingScreenController!.manualCouponCode!.toUpperCase()) {
+                          bookingScreenController!.selectedCouponId = coupon.id;
+                          log("Cash Payment - ✅ Found coupon ID after fetch: ${coupon.id}");
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              
+              // If still not found, this will cause "book failed" - prevent it
+              if (bookingScreenController!.selectedCouponId == null || 
+                  bookingScreenController!.selectedCouponId!.isEmpty) {
+                log("Cash Payment - ❌ ERROR: Cannot proceed - discount applied but coupon ID not found!");
+                log("Cash Payment - ❌ Backend will reject with 'book failed - Amount mismatch'");
+                log("Cash Payment - ❌ Frontend sends: ${bookingScreenController!.totalPrice} (with discount)");
+                log("Cash Payment - ❌ Backend expects: ${bookingScreenController!.totalPrice + bookingScreenController!.couponDiscountAmount} (without discount, no couponId)");
+                
+                if (isScreenActive) {
+                  isLoading(false);
+                  update([Constant.idProgressView]);
+                  
+                  // Reset coupon to prevent booking failure
+                  bookingScreenController!.resetCoupon();
+                  bookingScreenController!.calculateTotalWithDiscount();
+                  
+                  Utils.showToast(Get.context!, 
+                      "Coupon validation failed. The coupon may have expired or is no longer valid. Please remove it and try again.");
+                }
+                return; // Don't proceed with booking - it will fail anyway
+              }
+            }
+            
+            log("Cash Payment - ✅ Coupon ID validated before API call: ${bookingScreenController!.selectedCouponId}");
+            log("Cash Payment - ✅ Discount amount: ${bookingScreenController!.couponDiscountAmount}");
+            log("Cash Payment - ✅ Total price (with discount): ${bookingScreenController!.totalPrice}");
+          }
+
           // Ensure amount is properly formatted to 2 decimal places to match backend expectation
           // Backend does: parseFloat(totalAmount).toFixed(2) for comparison
           double finalAmount = double.parse(
@@ -531,6 +612,7 @@ class PaymentScreenController extends GetxController {
           log("  - withoutTaxValue: $withoutTaxValue (${withoutTaxValue.toStringAsFixed(2)})");
           log("  - selectedCouponId: ${bookingScreenController!.selectedCouponId}");
           log("  - couponDiscountAmount: ${bookingScreenController!.couponDiscountAmount}");
+          log("  - totalPrice: ${bookingScreenController!.totalPrice}");
 
           // Set loading state
           bookingScreenController!.isLoading(true);
