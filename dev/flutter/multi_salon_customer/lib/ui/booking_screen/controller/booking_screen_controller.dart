@@ -995,8 +995,34 @@ class BookingScreenController extends GetxController {
       
       log("Create Booking - Final couponIdToSend: $couponIdToSend");
       log("Create Booking - couponDiscountAmount: $couponDiscountAmount");
+      log("Create Booking - manualCouponCode: $manualCouponCode");
+      
+      // CRITICAL VALIDATION: If discount is applied, coupon ID MUST be present
+      if (couponDiscountAmount > 0 && (couponIdToSend == null || couponIdToSend.isEmpty)) {
+        log("Create Booking - ❌❌❌ CRITICAL ERROR: Discount applied but coupon ID is missing!");
+        log("Create Booking - ❌ This WILL cause 'book failed - Amount mismatch'");
+        log("Create Booking - ❌ Frontend sends: $finalAmount (with discount)");
+        log("Create Booking - ❌ Backend expects: ${(finalAmount + couponDiscountAmount).toStringAsFixed(2)} (without discount, no couponId)");
+        log("Create Booking - ❌ Resetting coupon to prevent booking failure...");
+        
+        // Reset coupon and recalculate without discount
+        resetCoupon();
+        calculateTotalWithDiscount();
+        
+        // Clear loading state
+        isLoading(false);
+        update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
+        
+        // Show error to user
+        Utils.showToast(Get.context!, 
+            "Coupon validation failed. The coupon may have expired or is no longer valid. Please remove it and try again.");
+        
+        // Don't proceed with booking - it will fail anyway
+        return;
+      }
 
-      final body = json.encode({
+      // Build request body - CRITICAL: Include couponId if discount is applied
+      Map<String, dynamic> requestBody = {
         "userId": userId,
         "expertId": expertId,
         "serviceId": serviceId,
@@ -1008,11 +1034,46 @@ class BookingScreenController extends GetxController {
         "paymentType": paymentType,
         "atPlace": atPlace,
         "address": address,
-        if (couponIdToSend != null && couponIdToSend.isNotEmpty)
-          "couponId": couponIdToSend,
-      });
+      };
+      
+      // CRITICAL: If discount is applied, coupon ID MUST be included
+      // If it's missing, we've already returned early above, but double-check here as final safeguard
+      if (couponDiscountAmount > 0) {
+        if (couponIdToSend != null && couponIdToSend.isNotEmpty) {
+          requestBody["couponId"] = couponIdToSend;
+          log("Create Booking - ✅ Including couponId in request: $couponIdToSend");
+        } else {
+          // This should never happen due to validation above, but if it does, prevent booking
+          log("Create Booking - ❌❌❌ FATAL: Discount applied but couponId is missing in request body!");
+          log("Create Booking - ❌ This will cause 'book failed' error");
+          log("Create Booking - ❌ Resetting coupon and preventing booking...");
+          
+          // Reset coupon and recalculate
+          resetCoupon();
+          calculateTotalWithDiscount();
+          
+          // Clear loading state
+          isLoading(false);
+          update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
+          
+          // Show error
+          Utils.showToast(Get.context!, 
+              "Coupon validation error. Please remove the coupon and try again.");
+          
+          // Don't proceed with booking
+          return;
+        }
+      } else if (couponIdToSend != null && couponIdToSend.isNotEmpty) {
+        // No discount but coupon ID exists (shouldn't happen, but include it anyway)
+        requestBody["couponId"] = couponIdToSend;
+        log("Create Booking - Including couponId (no discount): $couponIdToSend");
+      }
 
+      final body = json.encode(requestBody);
+
+      log("Create Booking - ========== FINAL REQUEST ==========");
       log("Create Booking - selectedCouponId: $selectedCouponId");
+      log("Create Booking - couponIdToSend: $couponIdToSend");
       log("Create Booking - couponDiscountAmount: $couponDiscountAmount");
       log("Create Booking - finalAmount: $finalAmount");
       log("Create Booking - amount (original param): $amount");
@@ -1020,7 +1081,9 @@ class BookingScreenController extends GetxController {
       log("Create Booking - withOutTaxRupee: $withOutTaxRupee");
       log("Create Booking - finalTaxRupee: $finalTaxRupee");
       log("Create Booking - totalPrice: $totalPrice");
+      log("Create Booking - Has couponId in body: ${couponIdToSend != null && couponIdToSend.isNotEmpty}");
       log("Create Booking Body :: $body");
+      log("Create Booking - ===================================");
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.createBooking);
       log("Create Booking Url :: $url");
@@ -1254,26 +1317,57 @@ class BookingScreenController extends GetxController {
     } else {
       log("onApplyManualCouponCode - Coupon validated successfully");
       log("  - Discount Amount: $couponDiscountAmount");
-      Utils.showToast(Get.context!, "Coupon applied successfully!");
-
-      // Find the coupon in the list to get its ID
+      
+      // CRITICAL FIX: Must find coupon ID after validation
+      // First, try to find in existing list
       if (getCouponModel?.data != null) {
         for (int i = 0; i < getCouponModel!.data!.length; i++) {
           if (getCouponModel!.data![i].code?.toUpperCase() == couponCode) {
             selectedCouponId = getCouponModel!.data![i].id;
             applyCoupon = i;
-            log("onApplyManualCouponCode - Found coupon in list, ID: $selectedCouponId");
+            log("onApplyManualCouponCode - ✅ Found coupon in list, ID: $selectedCouponId");
             break;
           }
         }
       }
 
-      // If coupon not found in list, we need to fetch it or use the code
-      // For now, we'll try to fetch available coupons again to see if it appears
-      if (selectedCouponId == null) {
-        log("onApplyManualCouponCode - Coupon not found in current list, will use code for booking");
-        // The booking API will need to find the coupon by code
-        // We'll handle this in the booking API call
+      // If coupon not found in list, fetch coupon list and try again
+      // This is CRITICAL - without coupon ID, booking will fail with "book failed"
+      if (selectedCouponId == null || selectedCouponId!.isEmpty) {
+        log("onApplyManualCouponCode - ⚠️ Coupon not found in current list, fetching coupons...");
+        
+        // Fetch coupon list to find the ID
+        await getCouponApiCall(
+          userId: userId,
+          type: "2", // Type 2 for booking
+          amount: withOutTaxRupee.toInt().toString(),
+        );
+        
+        // Try finding again after fetch
+        if (getCouponModel?.data != null) {
+          for (int i = 0; i < getCouponModel!.data!.length; i++) {
+            if (getCouponModel!.data![i].code?.toUpperCase() == couponCode) {
+              selectedCouponId = getCouponModel!.data![i].id;
+              applyCoupon = i;
+              log("onApplyManualCouponCode - ✅ Found coupon after fetch, ID: $selectedCouponId");
+              break;
+            }
+          }
+        }
+        
+        // If still not found, this is a problem - coupon is valid but not in available list
+        // This might happen if coupon was just created or has special conditions
+        if (selectedCouponId == null || selectedCouponId!.isEmpty) {
+          log("onApplyManualCouponCode - ⚠️ WARNING: Coupon validated but ID not found in list!");
+          log("onApplyManualCouponCode - ⚠️ This may cause 'book failed' error if coupon ID is not found during booking");
+          // We'll try to find it again during booking creation
+        }
+      }
+      
+      if (selectedCouponId != null && selectedCouponId!.isNotEmpty) {
+        Utils.showToast(Get.context!, "Coupon applied successfully!");
+      } else {
+        log("onApplyManualCouponCode - ⚠️ Coupon applied but ID not found - booking may fail");
       }
     }
 
@@ -1558,51 +1652,69 @@ class BookingScreenController extends GetxController {
           // This ensures the correct amount (with coupon discount) is passed to payment screen
           calculateTotalWithDiscount();
           
-          // FIX Issue 1 & 3: Ensure coupon ID is found before navigating
-          // If discount is applied, we MUST have a coupon ID to prevent backend validation failure
+          // CRITICAL FIX: Ensure coupon ID is found BEFORE navigating to payment screen
+          // If discount is applied, we MUST have a coupon ID, otherwise booking will fail
           if (couponDiscountAmount > 0) {
             // Try to find coupon ID if missing
             if (selectedCouponId == null || selectedCouponId!.isEmpty) {
+              log("Cash Service - ⚠️ CRITICAL: Discount applied (${couponDiscountAmount}) but coupon ID missing!");
+              log("Cash Service - Attempting to find coupon ID before navigation...");
+              
+              // First, try to find in existing coupon list
               if (manualCouponCode != null && getCouponModel?.data != null) {
-                // Search in existing coupon list
                 for (var coupon in getCouponModel!.data!) {
                   if (coupon.code?.toUpperCase() == manualCouponCode!.toUpperCase()) {
                     selectedCouponId = coupon.id;
-                    log("Cash Service - Found coupon ID before navigation: $selectedCouponId");
+                    log("Cash Service - ✅ Found coupon ID in existing list: $selectedCouponId");
                     break;
                   }
                 }
               }
               
-              // If still not found and discount is applied, this will cause booking to fail
-              if (selectedCouponId == null || selectedCouponId!.isEmpty) {
-                log("Cash Service - ⚠️ WARNING: Discount applied (${couponDiscountAmount}) but coupon ID not found!");
-                log("Cash Service - This may cause 'book failed' error. Attempting to fetch coupons...");
-                
-                // Try fetching coupons if not already fetched
-                if (getCouponModel == null && withOutTaxRupee > 0) {
-                  String userId = Constant.storage.read<String>('userId') ?? "";
-                  if (userId.isNotEmpty) {
-                    await getCouponApiCall(
-                      userId: userId,
-                      type: "2",
-                      amount: withOutTaxRupee.toInt().toString(),
-                    );
-                    
-                    // Try finding again after fetch
-                    if (manualCouponCode != null && getCouponModel?.data != null) {
-                      for (var coupon in getCouponModel!.data!) {
-                        if (coupon.code?.toUpperCase() == manualCouponCode!.toUpperCase()) {
-                          selectedCouponId = coupon.id;
-                          log("Cash Service - ✅ Found coupon ID after fetch: $selectedCouponId");
-                          break;
-                        }
+              // If still not found, fetch coupon list
+              if ((selectedCouponId == null || selectedCouponId!.isEmpty) && withOutTaxRupee > 0) {
+                log("Cash Service - Coupon ID not found in list, fetching coupons...");
+                String userId = Constant.storage.read<String>('userId') ?? "";
+                if (userId.isNotEmpty) {
+                  await getCouponApiCall(
+                    userId: userId,
+                    type: "2",
+                    amount: withOutTaxRupee.toInt().toString(),
+                  );
+                  
+                  // Try finding again after fetch
+                  if (manualCouponCode != null && getCouponModel?.data != null) {
+                    for (var coupon in getCouponModel!.data!) {
+                      if (coupon.code?.toUpperCase() == manualCouponCode!.toUpperCase()) {
+                        selectedCouponId = coupon.id;
+                        log("Cash Service - ✅ Found coupon ID after fetch: $selectedCouponId");
+                        break;
                       }
                     }
                   }
                 }
               }
+              
+              // CRITICAL: If still not found, prevent navigation to avoid "book failed"
+              if (selectedCouponId == null || selectedCouponId!.isEmpty) {
+                log("Cash Service - ❌ ERROR: Cannot proceed - discount applied but coupon ID not found!");
+                log("Cash Service - ❌ Navigating to payment screen will cause 'book failed' error");
+                log("Cash Service - ❌ Resetting coupon to prevent booking failure...");
+                
+                // Reset coupon and recalculate
+                resetCoupon();
+                calculateTotalWithDiscount();
+                
+                // Show error to user
+                Utils.showToast(Get.context!, 
+                    "Coupon validation failed. The coupon may have expired or is no longer valid. Please remove it and try again.");
+                
+                // Don't navigate - prevent booking failure
+                return;
+              }
             }
+            
+            log("Cash Service - ✅ Coupon ID validated before navigation: $selectedCouponId");
           }
           
           // For Cash After Service, navigate to payment screen to show confirmation
