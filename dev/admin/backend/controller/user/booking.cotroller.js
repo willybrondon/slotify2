@@ -313,7 +313,7 @@ exports.newBooking = async (req, res, next) => {
 
       if (!alreadyUsed) {
         coupon.usedBy.push({
-          customerId: customerObjId,
+          userId: user._id,
           usageType: coupon.type,
         });
       }
