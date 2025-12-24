@@ -162,7 +162,7 @@ class BranchDetailTopView extends StatelessWidget {
                       Get.back();
                     },
                     child: Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: AppColors.whiteColor,
                         shape: BoxShape.circle,
@@ -190,7 +190,7 @@ class BranchDetailTopView extends StatelessWidget {
                 child: SafeArea(
                   child: PopupMenuButton<String>(
                     icon: Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: AppColors.whiteColor,
                         shape: BoxShape.circle,
@@ -306,7 +306,7 @@ class BranchDetailDataView extends StatelessWidget {
               // Enhanced salon name with better visual hierarchy
               Container(
                 margin: const EdgeInsets.only(
-                    top: 15, left: 15, right: 15, bottom: 5),
+                    top: 15, left: 15, right: 15, bottom: 2),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -327,7 +327,7 @@ class BranchDetailDataView extends StatelessWidget {
               ),
               // Enhanced address section with better card design
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.whiteColor,
@@ -376,7 +376,7 @@ class BranchDetailDataView extends StatelessWidget {
               ),
               // Enhanced distance section
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.whiteColor,
@@ -436,7 +436,7 @@ class BranchDetailDataView extends StatelessWidget {
               ),
               // Enhanced rating section
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.whiteColor,
