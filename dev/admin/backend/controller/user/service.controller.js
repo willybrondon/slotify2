@@ -40,6 +40,34 @@ const normalizeCityName = (cityName) => {
     .toLowerCase();
 };
 
+// Helper function to get translated name for service
+const getTranslatedServiceName = (service, language = 'en') => {
+  if (!service) return '';
+  
+  // Map language codes to field names
+  const translationMap = {
+    'en': service.nameEn || service.name,
+    'fr': service.nameFr || service.nameEn || service.name,
+    'pt': service.namePt || service.nameEn || service.name,
+  };
+  
+  // Default to English if language not found
+  return translationMap[language] || service.name || '';
+};
+
+// Helper function to get translated category name
+const getTranslatedCategoryName = (category, language = 'en') => {
+  if (!category) return '';
+  
+  const translationMap = {
+    'en': category.nameEn || category.name,
+    'fr': category.nameFr || category.nameEn || category.name,
+    'pt': category.namePt || category.nameEn || category.name,
+  };
+  
+  return translationMap[language] || category.name || '';
+};
+
 exports.getAll = async (req, res) => {
   try {
     console.log("req.query ====================== ", req.query);
@@ -173,16 +201,19 @@ exports.getAll = async (req, res) => {
 
     console.log("Service API - Final services after search filtering:", finalServices.length);
 
-    // Transform the results to match the expected format
+    // Get language from query parameter, default to 'en'
+    const language = req.query.language || 'en';
+
+    // Transform the results to match the expected format with translations
     const result = finalServices.map(service => ({
       _id: service._id,
-      name: service.name,
+      name: getTranslatedServiceName(service, language),
       status: service.status,
       image: service.image,
       duration: service.duration,
       price: service.price,
       categoryId: service.categoryId?._id,
-      categoryname: service.categoryId?.name,
+      categoryname: getTranslatedCategoryName(service.categoryId, language),
       createdAt: service.createdAt,
     }));
 
@@ -208,6 +239,9 @@ exports.serviceBasedCategory = async (req, res) => {
       return res.status(200).send({ status: false, message: "Oops Invalid Details" });
     }
 
+    // Get language from query parameter, default to 'en'
+    const language = req.query.language || 'en';
+
     const [service, tax] = await Promise.all([
       Service.find({
         categoryId: req.query.categoryId,
@@ -217,10 +251,22 @@ exports.serviceBasedCategory = async (req, res) => {
       global.settingJSON,
     ]);
 
+    // Map services with translated names
+    const translatedServices = service.map(s => ({
+      _id: s._id,
+      name: getTranslatedServiceName(s, language),
+      status: s.status,
+      image: s.image,
+      duration: s.duration,
+      price: s.price,
+      categoryId: s.categoryId,
+      createdAt: s.createdAt,
+    }));
+
     return res.status(200).json({
       status: true,
       message: "Services found",
-      services: service,
+      services: translatedServices,
       tax: tax.tax,
     });
   } catch (error) {

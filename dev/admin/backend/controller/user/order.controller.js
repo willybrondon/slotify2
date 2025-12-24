@@ -105,7 +105,7 @@ exports.createOrder = async (req, res) => {
 
         if (!alreadyUsed) {
           coupon.usedBy.push({
-            customerId: customerObjId,
+            userId: userId,
             usageType: coupon.type,
           });
         }
@@ -340,7 +340,7 @@ exports.createOrder = async (req, res) => {
 
         if (!alreadyUsed) {
           coupon.usedBy.push({
-            customerId: customerObjId,
+            userId: userId,
             usageType: coupon.type,
           });
         }

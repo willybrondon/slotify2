@@ -47,7 +47,7 @@ final Map<String, String> frCH = {
   "txtSearchServices": "Rechercher des services",
   "txtQuickBookAppointment": "Rendez-vous de livre rapide",
   "txtSpecialist": "Spécialiste",
-  "txtBookNow": "Reserve maintenant",
+  "txtBookNow": "",
   "txtCategory": "Catégorie",
   "txtViewAll": "Voir tout",
   "txtPrivacyPolicy": "politique de confidentialité",

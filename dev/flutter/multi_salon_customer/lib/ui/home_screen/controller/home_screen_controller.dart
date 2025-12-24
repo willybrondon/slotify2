@@ -608,7 +608,12 @@ class HomeScreenController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getAllCategory);
+      // Get current language code (default to 'en')
+      final languageCode = Get.locale?.languageCode ?? 'en';
+      
+      final queryParameters = {"language": languageCode};
+      String queryString = Uri(queryParameters: queryParameters).query;
+      final url = Uri.parse("${ApiConstant.BASE_URL}${ApiConstant.getAllCategory}?$queryString");
 
       log("Get All Category Url :: $url");
 
@@ -702,7 +707,14 @@ class HomeScreenController extends GetxController {
         Constant.idServiceList
       ]);
 
-      final queryParameters = {"search": search ?? "", "city": city};
+      // Get current language code (default to 'en')
+      final languageCode = Get.locale?.languageCode ?? 'en';
+
+      final queryParameters = {
+        "search": search ?? "",
+        "city": city,
+        "language": languageCode,
+      };
 
       log("Get All Service Params :: $queryParameters");
 

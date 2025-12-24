@@ -17,7 +17,6 @@ import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 // QR Code Dialog
 void _showQRCodeDialog(BuildContext context, BranchDetailController logic) {
@@ -153,15 +152,17 @@ class BranchDetailTopView extends StatelessWidget {
                   },
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
+              // Back arrow and share button positioned like profile screen
+              Positioned(
+                top: 0,
+                left: 0,
+                child: SafeArea(
+                  child: GestureDetector(
                     onTap: () {
                       Get.back();
                     },
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: AppColors.whiteColor,
                         shape: BoxShape.circle,
@@ -173,17 +174,23 @@ class BranchDetailTopView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: Image.asset(
-                        AppAsset.icBackArrow,
-                        height: 20,
-                        width: 20,
+                      child: Icon(
+                        Icons.arrow_back,
                         color: AppColors.blackColor,
+                        size: 24,
                       ),
                     ),
-                  ).paddingOnly(left: 15, right: 12),
-                  PopupMenuButton<String>(
+                  ),
+                ),
+              ),
+              // Share button positioned on the right side
+              Positioned(
+                top: 0,
+                right: 0,
+                child: SafeArea(
+                  child: PopupMenuButton<String>(
                     icon: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: AppColors.whiteColor,
                         shape: BoxShape.circle,
@@ -198,7 +205,7 @@ class BranchDetailTopView extends StatelessWidget {
                       child: Icon(
                         Icons.share,
                         color: AppColors.blackColor,
-                        size: 22,
+                        size: 24,
                       ),
                     ),
                     color: AppColors.whiteColor,
@@ -245,8 +252,8 @@ class BranchDetailTopView extends StatelessWidget {
                       ),
                     ],
                   ),
-                ],
-              ).paddingOnly(left: 20, right: 20, top: 25),
+                ),
+              ),
             ],
           ),
         );

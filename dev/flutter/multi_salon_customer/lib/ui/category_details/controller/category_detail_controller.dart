@@ -88,8 +88,12 @@ class CategoryDetailController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView, Constant.idServiceList]);
 
+      // Get current language code (default to 'en')
+      final languageCode = Get.locale?.languageCode ?? 'en';
+
       final queryParameters = {
         "categoryId": categoryId,
+        "language": languageCode,
       };
 
       log("Category Id :: $queryParameters");

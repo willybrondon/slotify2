@@ -34,17 +34,42 @@ const findCategoryByShortId = async (shortId) => {
   }
 };
 
+// Helper function to get translated name
+const getTranslatedName = (category, language = 'en') => {
+  if (!category) return '';
+  
+  // Map language codes to field names
+  const translationMap = {
+    'en': category.nameEn || category.name,
+    'fr': category.nameFr || category.nameEn || category.name,
+    'pt': category.namePt || category.nameEn || category.name,
+  };
+  
+  // Default to English if language not found
+  return translationMap[language] || category.name || '';
+};
+
 //get all category
 exports.getAll = async (req, res) => {
   try {
+    const language = req.query.language || 'en'; // Get language from query parameter, default to 'en'
+    
     const categories = await Category.find({ isDelete: false, status: true }).select("-isDelete -updatedAt -createdAt").sort({
       createdAt: -1,
     });
 
+    // Map categories with translated names
+    const translatedCategories = categories.map(category => ({
+      _id: category._id,
+      name: getTranslatedName(category, language),
+      image: category.image,
+      status: category.status,
+    }));
+
     return res.status(200).send({
       status: true,
       message: "Categories Found",
-      data: categories,
+      data: translatedCategories,
     });
   } catch (error) {
     console.log(error);

@@ -47,7 +47,7 @@ final Map<String, String> frCH = {
   "txtSearchServices": "Rechercher des services",
   "txtQuickBookAppointment": "Rendez-vous de livre rapide",
   "txtSpecialist": "Spécialiste",
-  "txtBookNow": "Reserve maintenant",
+  "txtBookNow": "Reservez",
   "txtCategory": "Catégorie",
   "txtViewAll": "Voir tout",
   "txtPrivacyPolicy": "politique de confidentialité",
@@ -195,18 +195,21 @@ final Map<String, String> frCH = {
   "desCancelBooking": "Voulez-vous annuler ce rendez-vous de réservation?",
   "desDeletedPermanently":
       "Votre compte sera supprimé en permanence. Vos données ne seront plus restaurées.",
-  "desDeleteAccountWarning": "Cette action est permanente et ne peut pas être annulée!",
+  "desDeleteAccountWarning":
+      "Cette action est permanente et ne peut pas être annulée!",
   "txtWhatWillBeDeleted": "Ce qui sera supprimé:",
   "desPersonalInfo": "Informations personnelles (nom, e-mail, téléphone)",
   "desBookingHistory": "Historique des réservations et rendez-vous",
   "desWalletBalance": "Solde et transactions du portefeuille",
   "desFavoritesWishlist": "Favoris et articles de liste de souhaits",
   "desOrderHistory": "Historique des commandes et reçus",
-  "desCannotBeUndone": "Cette action ne peut pas être annulée. Toutes vos données seront définitivement supprimées.",
+  "desCannotBeUndone":
+      "Cette action ne peut pas être annulée. Toutes vos données seront définitivement supprimées.",
   "txtDeletePermanently": "Supprimer définitivement",
   "txtDeletingAccount": "Suppression du compte...",
   "desAccountDeletedSuccess": "Compte supprimé avec succès",
-  "desDeleteAccountFailed": "Échec de la suppression du compte. Veuillez réessayer.",
+  "desDeleteAccountFailed":
+      "Échec de la suppression du compte. Veuillez réessayer.",
   "desPleaseAcceptConditions": "Veuillez d'abord accepter les termes et l'état",
   "desLogOut": "Êtes-vous sûr de vouloir vous déconnecter ?",
   "desSlotBooked": "Cette fente est déjà réservée",
@@ -235,7 +238,7 @@ final Map<String, String> frCH = {
   "txtSetPrimary": "Définir comme principal",
   "txtSaveAddress": "Enregistrer l'adresse",
   "txtCancelledBy": "AnnuléPar",
-  "txtCallSalon": "Appeler le salon",
+  "txtCallSalon": "Appel salon",
   "txtBestSeller": "Meilleur vendeur",
   "txtMyCart": "Mon panier",
   "txtProductPriceDetails": "Détails du prix du produit",
@@ -286,7 +289,7 @@ final Map<String, String> frCH = {
   "txtOurMostPopularProduct": "Notre produit le plus populaire",
   "txtGoToCart": "Aller au panier",
   "txtAddToCart": "Ajouter au panier",
-  "txtPayNow": "Payez maintenant",
+  "txtPayNow": "Payez",
   "txtSearchForProducts": "Rechercher des produits...",
   "txtMyAccount": "Mon compte",
   "txtAccountDetails":
@@ -347,9 +350,11 @@ final Map<String, String> frCH = {
   "txtAboutAppDescription":
       "Skedisy est votre solution tout-en-un pour réserver des services de salon et de beauté. Découvrez les salons à proximité, parcourez les services, réservez des rendez-vous et gérez votre routine beauté sans effort avec notre plateforme facile à utiliser.",
   "txtAppFeatures": "Fonctionnalités de l'application",
-  "txtFeature1": "• Parcourir et réserver des services de salon près de chez vous",
+  "txtFeature1":
+      "• Parcourir et réserver des services de salon près de chez vous",
   "txtFeature2": "• Afficher les prix et la durée des services en détail",
-  "txtFeature3": "• Plusieurs méthodes de paiement (carte, portefeuille, espèces)",
+  "txtFeature3":
+      "• Plusieurs méthodes de paiement (carte, portefeuille, espèces)",
   "txtFeature4": "• Confirmations de réservation en temps réel",
   "txtFeature5":
       "• Suivre l'historique des rendez-vous et les réservations à venir",

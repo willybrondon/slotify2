@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const serviceSchema = new mongoose.Schema(
   {
     name: String,
+    nameEn: { type: String, trim: true }, // English translation
+    nameFr: { type: String, trim: true }, // French translation
+    namePt: { type: String, trim: true }, // Portuguese translation
     // price: Number,
     image: String,
     duration: Number,
