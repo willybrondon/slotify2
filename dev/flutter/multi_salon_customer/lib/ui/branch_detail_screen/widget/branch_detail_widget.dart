@@ -157,27 +157,30 @@ class BranchDetailTopView extends StatelessWidget {
                 top: 0,
                 left: 0,
                 child: SafeArea(
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.whiteColor,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.blackColor.withOpacity(0.1),
-                            offset: const Offset(0, 2),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: AppColors.blackColor,
-                        size: 24,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppColors.whiteColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.blackColor.withOpacity(0.1),
+                              offset: const Offset(0, 2),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: AppColors.blackColor,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -188,26 +191,28 @@ class BranchDetailTopView extends StatelessWidget {
                 top: 0,
                 right: 0,
                 child: SafeArea(
-                  child: PopupMenuButton<String>(
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.whiteColor,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.blackColor.withOpacity(0.1),
-                            offset: const Offset(0, 2),
-                            blurRadius: 4,
-                          ),
-                        ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: PopupMenuButton<String>(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppColors.whiteColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.blackColor.withOpacity(0.1),
+                              offset: const Offset(0, 2),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.share,
+                          color: AppColors.blackColor,
+                          size: 20,
+                        ),
                       ),
-                      child: Icon(
-                        Icons.share,
-                        color: AppColors.blackColor,
-                        size: 24,
-                      ),
-                    ),
                     color: AppColors.whiteColor,
                     onSelected: (value) async {
                       if (value == 'share') {
@@ -251,6 +256,7 @@ class BranchDetailTopView extends StatelessWidget {
                         ),
                       ),
                     ],
+                    ),
                   ),
                 ),
               ),
@@ -325,40 +331,17 @@ class BranchDetailDataView extends StatelessWidget {
                   ],
                 ),
               ),
-              // Enhanced address section with better card design
+              // Address section - simple row
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.blackColor.withOpacity(0.05),
-                      offset: const Offset(0, 2),
-                      blurRadius: 8,
-                      spreadRadius: 0,
-                    ),
-                  ],
-                  border: Border.all(
-                    color: AppColors.grey.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Image.asset(
-                        AppAsset.icLocation,
-                        height: 18,
-                        width: 18,
-                      ),
+                    Image.asset(
+                      AppAsset.icLocation,
+                      height: 18,
+                      width: 18,
+                      color: AppColors.grey,
                     ).paddingOnly(right: 12),
                     Expanded(
                       child: Text(
@@ -374,39 +357,16 @@ class BranchDetailDataView extends StatelessWidget {
                   ],
                 ),
               ),
-              // Enhanced distance section
+              // Distance section - simple row
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.blackColor.withOpacity(0.05),
-                      offset: const Offset(0, 2),
-                      blurRadius: 8,
-                      spreadRadius: 0,
-                    ),
-                  ],
-                  border: Border.all(
-                    color: AppColors.grey.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Image.asset(
-                        AppAsset.icDirection,
-                        height: 18,
-                        width: 18,
-                      ),
+                    Image.asset(
+                      AppAsset.icDirection,
+                      height: 18,
+                      width: 18,
+                      color: AppColors.grey,
                     ).paddingOnly(right: 12),
                     RichText(
                       text: TextSpan(
@@ -417,7 +377,7 @@ class BranchDetailDataView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.appText,
-                          fontFamily: AppFontFamily.heeBo600,
+                          fontFamily: AppFontFamily.heeBo700,
                         ),
                         children: <TextSpan>[
                           TextSpan(
@@ -434,39 +394,16 @@ class BranchDetailDataView extends StatelessWidget {
                   ],
                 ),
               ),
-              // Enhanced rating section
+              // Rating section - simple row
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.blackColor.withOpacity(0.05),
-                      offset: const Offset(0, 2),
-                      blurRadius: 8,
-                      spreadRadius: 0,
-                    ),
-                  ],
-                  border: Border.all(
-                    color: AppColors.grey.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.ratingYellow.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Image.asset(
-                        AppAsset.icStarFilled,
-                        height: 18,
-                        width: 18,
-                      ),
+                    Image.asset(
+                      AppAsset.icStarFilled,
+                      height: 18,
+                      width: 18,
+                      color: AppColors.ratingYellow,
                     ).paddingOnly(right: 12),
                     RichText(
                       text: TextSpan(
@@ -520,9 +457,10 @@ class BranchDetailDataView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image.asset(
-                                AppAsset.icDirectionFilled,
+                                AppAsset.icDirection,
                                 height: 24,
                                 width: 24,
+                                color: AppColors.grey,
                               ).paddingOnly(right: 12),
                               Text(
                                 "txtDirection".tr,
@@ -547,10 +485,10 @@ class BranchDetailDataView extends StatelessWidget {
                           height: 52,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
-                            color: AppColors.callBox,
+                            color: AppColors.appText,
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.callBox.withOpacity(0.3),
+                                color: AppColors.blackColor.withOpacity(0.15),
                                 offset: const Offset(0, 4),
                                 blurRadius: 12,
                                 spreadRadius: 0,
@@ -561,9 +499,10 @@ class BranchDetailDataView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image.asset(
-                                AppAsset.icCallFilled,
+                                AppAsset.icCall,
                                 height: 24,
                                 width: 24,
+                                color: AppColors.grey,
                               ).paddingOnly(right: 12),
                               Text(
                                 "txtCallSalon".tr,
