@@ -213,49 +213,51 @@ class BranchDetailTopView extends StatelessWidget {
                           size: 20,
                         ),
                       ),
-                    color: AppColors.whiteColor,
-                    onSelected: (value) async {
-                      if (value == 'share') {
-                        await logic.shareSalonLink();
-                      } else if (value == 'copy') {
-                        await logic.copySalonLink();
-                      } else if (value == 'qr') {
-                        _showQRCodeDialog(context, logic);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) => [
-                      PopupMenuItem<String>(
-                        value: 'share',
-                        child: Row(
-                          children: [
-                            Icon(Icons.share, color: AppColors.primaryAppColor),
-                            const SizedBox(width: 10),
-                            Text('Share Link'),
-                          ],
+                      color: AppColors.whiteColor,
+                      onSelected: (value) async {
+                        if (value == 'share') {
+                          await logic.shareSalonLink();
+                        } else if (value == 'copy') {
+                          await logic.copySalonLink();
+                        } else if (value == 'qr') {
+                          _showQRCodeDialog(context, logic);
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        PopupMenuItem<String>(
+                          value: 'share',
+                          child: Row(
+                            children: [
+                              Icon(Icons.share,
+                                  color: AppColors.primaryAppColor),
+                              const SizedBox(width: 10),
+                              Text('Share Link'),
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'copy',
-                        child: Row(
-                          children: [
-                            Icon(Icons.copy, color: AppColors.primaryAppColor),
-                            const SizedBox(width: 10),
-                            Text('Copy Link'),
-                          ],
+                        PopupMenuItem<String>(
+                          value: 'copy',
+                          child: Row(
+                            children: [
+                              Icon(Icons.copy,
+                                  color: AppColors.primaryAppColor),
+                              const SizedBox(width: 10),
+                              Text('Copy Link'),
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'qr',
-                        child: Row(
-                          children: [
-                            Icon(Icons.qr_code,
-                                color: AppColors.primaryAppColor),
-                            const SizedBox(width: 10),
-                            Text('Show QR Code'),
-                          ],
+                        PopupMenuItem<String>(
+                          value: 'qr',
+                          child: Row(
+                            children: [
+                              Icon(Icons.qr_code,
+                                  color: AppColors.primaryAppColor),
+                              const SizedBox(width: 10),
+                              Text('Show QR Code'),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
                     ),
                   ),
                 ),

@@ -160,7 +160,7 @@ class HomeScreenCategoryView extends StatelessWidget {
                           : logic.getAllCategory?.data?.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
+                        crossAxisCount: 5,
                         childAspectRatio: 0.75,
                         crossAxisSpacing: 6,
                       ),
@@ -190,8 +190,8 @@ class HomeScreenCategoryView extends StatelessWidget {
                                   child: Stack(
                                     children: [
                                       Container(
-                                        height: 100,
-                                        width: 80,
+                                        height: 80,
+                                        width: 65,
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(14),
@@ -206,20 +206,20 @@ class HomeScreenCategoryView extends StatelessWidget {
                                           placeholder: (context, url) {
                                             return Image.asset(AppAsset
                                                     .icCategoryPlaceholder)
-                                                .paddingAll(15);
+                                                .paddingAll(12);
                                           },
                                           errorWidget: (context, url, error) {
                                             return Image.asset(AppAsset
                                                     .icCategoryPlaceholder)
-                                                .paddingAll(15);
+                                                .paddingAll(12);
                                           },
                                         ),
                                       ),
                                       Positioned(
-                                        top: 74,
+                                        top: 58,
                                         child: Container(
-                                          height: 27,
-                                          width: 80,
+                                          height: 22,
+                                          width: 65,
                                           decoration: BoxDecoration(
                                             borderRadius:
                                                 const BorderRadius.only(
@@ -244,7 +244,7 @@ class HomeScreenCategoryView extends StatelessWidget {
                                               style: TextStyle(
                                                 fontFamily:
                                                     AppFontFamily.sfProDisplay,
-                                                fontSize: 12.5,
+                                                fontSize: 11,
                                                 color: AppColors.appText,
                                               ),
                                             ).paddingOnly(

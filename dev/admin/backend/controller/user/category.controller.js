@@ -49,6 +49,21 @@ const getTranslatedName = (category, language = 'en') => {
   return translationMap[language] || category.name || '';
 };
 
+// Helper function to get translated service name
+const getTranslatedServiceName = (service, language = 'en') => {
+  if (!service) return '';
+  
+  // Map language codes to field names
+  const translationMap = {
+    'en': service.nameEn || service.name,
+    'fr': service.nameFr || service.nameEn || service.name,
+    'pt': service.namePt || service.nameEn || service.name,
+  };
+  
+  // Default to English if language not found
+  return translationMap[language] || service.name || '';
+};
+
 //get all category
 exports.getAll = async (req, res) => {
   try {
@@ -89,6 +104,7 @@ exports.getSalonsByCategory = async (req, res) => {
     const longitude = req.query.longitude;
     const start = parseInt(req.query.start) || 0;
     const limit = parseInt(req.query.limit) || 20;
+    const language = req.query.language || 'en'; // Get language from query parameter, default to 'en'
 
     if (!categoryId) {
       return res.status(200).json({
@@ -116,14 +132,15 @@ exports.getSalonsByCategory = async (req, res) => {
     const serviceIds = services.map(s => s._id);
 
     if (serviceIds.length === 0) {
+      const translatedCategoryName = getTranslatedName(category, language);
       return res.status(200).json({
         status: true,
         message: "No salons found for this category",
         category: {
           _id: category._id,
-          name: category.name,
+          name: translatedCategoryName,
           image: category.image,
-          description: category.description || `${category.name} services available at top-rated salons`,
+          description: category.description || `${translatedCategoryName} services available at top-rated salons`,
         },
         salons: [],
         total: 0,
@@ -154,7 +171,7 @@ exports.getSalonsByCategory = async (req, res) => {
       .populate({
         path: "serviceIds.id",
         match: { categoryId: categoryId, isDelete: false, status: true },
-        select: "name duration categoryId",
+        select: "name nameEn nameFr namePt duration categoryId price",
       })
       .select("name mainImage review reviewCount addressDetails locationCoordinates about")
       .skip(start * limit)
@@ -200,6 +217,22 @@ exports.getSalonsByCategory = async (req, res) => {
 
     // Format salon data for response
     const formattedSalons = salons.map(salon => {
+      // Translate service names in salon.serviceIds
+      if (salon.serviceIds && Array.isArray(salon.serviceIds)) {
+        salon.serviceIds = salon.serviceIds.map(serviceItem => {
+          if (serviceItem.id) {
+            return {
+              ...serviceItem,
+              id: {
+                ...serviceItem.id,
+                name: getTranslatedServiceName(serviceItem.id, language),
+              }
+            };
+          }
+          return serviceItem;
+        });
+      }
+      
       // Get minimum price from services in this category
       const categoryServices = salon.serviceIds
         .filter(s => s.id && s.price !== null && s.price !== undefined)
@@ -238,14 +271,17 @@ exports.getSalonsByCategory = async (req, res) => {
       };
     });
 
+    // Get translated category name
+    const translatedCategoryName = getTranslatedName(category, language);
+    
     return res.status(200).json({
       status: true,
       message: "Salons retrieved successfully",
       category: {
         _id: category._id,
-        name: category.name,
+        name: translatedCategoryName,
         image: category.image,
-        description: category.description || `${category.name} services available at top-rated salons`,
+        description: category.description || `${translatedCategoryName} services available at top-rated salons`,
       },
       salons: formattedSalons,
       total: total,
