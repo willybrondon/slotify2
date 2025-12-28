@@ -45,12 +45,21 @@ async function sendSMS(to, message) {
       return { success: false, error: "Phone number is required" };
     }
 
-    // Format phone number - use same format as customer signup (user.controller.js verifyMobileForSignup)
-    // Just add + prefix if missing, don't modify the number format
+    // Format phone number - handle French numbers in different formats
     let formattedPhone = to.trim().replace(/\s+/g, ''); // Remove spaces
     
-    if (!formattedPhone.startsWith("+")) {
-      // If no + prefix, add it (same as customer signup)
+    // Handle French phone numbers (+33, 33, or 0 prefix)
+    // Formats: +33145834832, 33145834832, 0145834832
+    if (formattedPhone.startsWith("0")) {
+      // French national format (0145834832) -> convert to international (+33145834832)
+      formattedPhone = `+33${formattedPhone.substring(1)}`;
+      console.log(`[SMS Service] Converted French national format: ${to} -> ${formattedPhone}`);
+    } else if (formattedPhone.startsWith("33") && !formattedPhone.startsWith("+33")) {
+      // French international format without + (33145834832) -> add + (+33145834832)
+      formattedPhone = `+${formattedPhone}`;
+      console.log(`[SMS Service] Added + to French international format: ${to} -> ${formattedPhone}`);
+    } else if (!formattedPhone.startsWith("+")) {
+      // Other numbers - just add + prefix
       formattedPhone = `+${formattedPhone}`;
       console.log(`[SMS Service] Added + prefix: ${to} -> ${formattedPhone}`);
     }
