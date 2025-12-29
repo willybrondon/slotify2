@@ -213,6 +213,12 @@ exports.sendClaimInvitation = async (req, res) => {
             <div class="footer">
               <p>Cordialement,<br>L'équipe Skedisy</p>
               <p style="font-size: 0.8em; color: #999;">Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email.</p>
+              <p style="font-size: 0.8em; color: #999; margin-top: 15px;">
+                <strong>Besoin d'aide?</strong><br>
+                Site web: <a href="https://skedisy.com" style="color: #007bff;">https://skedisy.com</a><br>
+                Email support: <a href="mailto:support@skedisy.com" style="color: #007bff;">support@skedisy.com</a><br>
+                Téléphone: <a href="tel:+33766160394" style="color: #007bff;">+33 7 66 16 03 94</a>
+              </p>
             </div>
           </div>
         </body>
@@ -272,7 +278,7 @@ exports.sendClaimInvitation = async (req, res) => {
         results.sms = { success: false, error: "Salon mobile number not found" };
       } else {
         console.log(`[Claim Invitation] Attempting to send SMS to: ${salon.mobile} for salon: ${salon.name}`);
-        const smsMessage = `Bonjour! Votre salon ${salon.name} a été ajouté sur Skedisy. Réclamez votre profil: ${claimLink}`;
+        const smsMessage = `Bonjour! Votre salon ${salon.name} a été ajouté sur Skedisy. Pour réclamer mon profil: ${claimLink} - Site: https://skedisy.com - Support: support@skedisy.com - Tel: +33766160394`;
         const smsResult = await sendSMS(salon.mobile, smsMessage);
         results.sms = smsResult;
         
@@ -405,6 +411,12 @@ exports.bulkSendInvitations = async (req, res) => {
               <div class="footer">
                 <p>Cordialement,<br>L'équipe Skedisy</p>
                 <p style="font-size: 0.8em; color: #999;">Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email.</p>
+                <p style="font-size: 0.8em; color: #999; margin-top: 15px;">
+                  <strong>Besoin d'aide?</strong><br>
+                  Site web: <a href="https://skedisy.com" style="color: #007bff;">https://skedisy.com</a><br>
+                  Email support: <a href="mailto:support@skedisy.com" style="color: #007bff;">support@skedisy.com</a><br>
+                  Téléphone: <a href="tel:+33766160394" style="color: #007bff;">+33 7 66 16 03 94</a>
+                </p>
               </div>
             </div>
           </body>
