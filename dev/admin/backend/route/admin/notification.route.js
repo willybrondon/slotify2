@@ -11,6 +11,7 @@ const admin = require('../../middleware/admin');
 
 route.post('/toOneUser', checkAccessWithSecretKey(),upload.single('image'), notificationController.particularUserNotification)
 route.post('/toExpert', checkAccessWithSecretKey(), upload.single('image'),notificationController.particularExpertNotification)
+route.post('/toSalon', checkAccessWithSecretKey(), upload.single('image'), notificationController.particularSalonNotification)
 route.post('/notifyAllUsers', checkAccessWithSecretKey(),  upload.single('image'), notificationController.allUserNotification)
 
 
