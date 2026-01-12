@@ -191,34 +191,42 @@ exports.sendClaimInvitation = async (req, res) => {
         </head>
         <body>
           <div class="container">
-            <h2>Votre salon a été ajouté sur Skedisy</h2>
+            <h2 style="color: #007bff; text-align: center;">🎉 Félicitations ! Votre salon est sur Skedisy</h2>
             <p>Bonjour,</p>
-            <p>Votre salon <strong>${salon.name}</strong> a été ajouté sur Skedisy, la plateforme de réservation de services de beauté.</p>
+            <p>Excellente nouvelle ! Votre salon <strong>${salon.name}</strong> a été ajouté sur <strong>Skedisy</strong>, la plateforme de réservation de services de beauté qui connecte des milliers de clients aux meilleurs salons.</p>
             
-            <p><strong>Réclamez votre profil pour:</strong></p>
-            <ul>
-              <li>Gérer vos réservations en ligne</li>
-              <li>Augmenter votre visibilité</li>
-              <li>Recevoir de nouveaux clients</li>
-              <li>Suivre vos revenus et commissions</li>
-            </ul>
-            
-            <p style="text-align: center;">
-              <a href="${claimLink}" class="button">Réclamer mon profil</a>
+            <p style="background-color: #f0f8ff; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0;">
+              <strong>✨ Pourquoi réclamer votre profil maintenant ?</strong><br>
+              C'est <strong>gratuit</strong>, cela prend moins de 2 minutes, et vous pourrez commencer à recevoir des réservations dès aujourd'hui !
             </p>
             
-            <p>Ou copiez ce lien dans votre navigateur:</p>
-            <p style="word-break: break-all; color: #007bff;">${claimLink}</p>
+            <p><strong>En réclamant votre profil, vous pourrez :</strong></p>
+            <ul style="line-height: 2;">
+              <li>✅ <strong>Gérer toutes vos réservations</strong> en ligne, 24/7</li>
+              <li>✅ <strong>Augmenter votre visibilité</strong> et être découvert par de nouveaux clients</li>
+              <li>✅ <strong>Recevoir des réservations</strong> même en dehors des heures d'ouverture</li>
+              <li>✅ <strong>Suivre vos revenus en temps réel</strong> avec un tableau de bord complet</li>
+              <li>✅ <strong>Gagner du temps</strong> en automatisant la gestion des rendez-vous</li>
+            </ul>
+            
+            <p style="text-align: center; margin: 30px 0;">
+              <a href="${claimLink}" class="button" style="font-size: 16px; font-weight: bold; padding: 15px 40px;">🚀 Réclamer mon profil maintenant</a>
+            </p>
+            
+            <p style="text-align: center; color: #666; font-size: 0.9em;">Ou copiez ce lien dans votre navigateur :</p>
+            <p style="word-break: break-all; color: #007bff; text-align: center; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">${claimLink}</p>
+            
+            <p style="margin-top: 30px; padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px;">
+              <strong>💡 Astuce :</strong> Plus vous réclamez tôt votre profil, plus vite vous commencerez à recevoir des réservations !
+            </p>
             
             <div class="footer">
-              <p>Cordialement,<br>L'équipe Skedisy</p>
-              <p style="font-size: 0.8em; color: #999;">Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email.</p>
-              <p style="font-size: 0.8em; color: #999; margin-top: 15px;">
-                <strong>Besoin d'aide?</strong><br>
-                Site web: <a href="https://skedisy.com" style="color: #007bff;">https://skedisy.com</a><br>
-                Email support: <a href="mailto:support@skedisy.com" style="color: #007bff;">support@skedisy.com</a><br>
-                Téléphone: <a href="tel:+33766160394" style="color: #007bff;">+33 7 66 16 03 94</a>
-              </p>
+              <p style="margin-top: 30px;"><strong>Des questions ? Nous sommes là pour vous aider :</strong></p>
+              <p>📧 Email : <a href="mailto:support@skedisy.com" style="color: #007bff; text-decoration: none;">support@skedisy.com</a></p>
+              <p>📞 Téléphone : <a href="tel:+33766160394" style="color: #007bff; text-decoration: none;">+33 7 66 16 03 94</a></p>
+              <p>🌐 Site web : <a href="https://skedisy.com" style="color: #007bff; text-decoration: none;">https://skedisy.com</a></p>
+              <p style="margin-top: 25px;">Cordialement,<br><strong>L'équipe Skedisy</strong></p>
+              <p style="font-size: 0.8em; color: #999; margin-top: 15px; font-style: italic;">Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email en toute sécurité.</p>
             </div>
           </div>
         </body>
@@ -228,7 +236,7 @@ exports.sendClaimInvitation = async (req, res) => {
         const msg = {
           to: salon.email.trim(),
           from: process.env.EMAIL.trim(),
-          subject: "Votre salon a été ajouté sur Skedisy - Réclamez votre profil",
+          subject: "🎉 Félicitations ! Réclamez votre profil Skedisy gratuitement (2 min)",
           html: emailHtml,
         };
 
@@ -278,7 +286,21 @@ exports.sendClaimInvitation = async (req, res) => {
         results.sms = { success: false, error: "Salon mobile number not found" };
       } else {
         console.log(`[Claim Invitation] Attempting to send SMS to: ${salon.mobile} for salon: ${salon.name}`);
-        const smsMessage = `Bonjour! Votre salon ${salon.name} a été ajouté sur Skedisy. Pour réclamer mon profil: ${claimLink} - Site: https://skedisy.com - Support: support@skedisy.com - Tel: +33766160394`;
+        const smsMessage = `🎉 Félicitations! Votre salon ${salon.name} est maintenant sur Skedisy!
+
+Skesdisy, la plateforme de réservation de services de beauté à pour but de vous ramener des clients.
+Réclamez votre profil GRATUITEMENT (2 min) pour:
+✅ Gérer vos réservations 24/7
+✅ Recevoir de nouveaux clients
+✅ Augmenter vos revenus
+✅ Suivre vos statistiques en temps réel
+
+🚀 Réclamez maintenant: ${claimLink}
+
+Questions? support@skedisy.com ou +33 7 66 16 03 94
+Site: https://skedisy.com
+
+L'équipe Skedisy`;
         const smsResult = await sendSMS(salon.mobile, smsMessage);
         results.sms = smsResult;
         
@@ -389,34 +411,42 @@ exports.bulkSendInvitations = async (req, res) => {
           </head>
           <body>
             <div class="container">
-              <h2>Votre salon a été ajouté sur Skedisy</h2>
+              <h2 style="color: #007bff; text-align: center;">🎉 Félicitations ! Votre salon est sur Skedisy</h2>
               <p>Bonjour,</p>
-              <p>Votre salon <strong>${salon.name}</strong> a été ajouté sur Skedisy, la plateforme de réservation de services de beauté.</p>
+              <p>Excellente nouvelle ! Votre salon <strong>${salon.name}</strong> a été ajouté sur <strong>Skedisy</strong>, la plateforme de réservation de services de beauté qui connecte des milliers de clients aux meilleurs salons.</p>
               
-              <p><strong>Réclamez votre profil pour:</strong></p>
-              <ul>
-                <li>Gérer vos réservations en ligne</li>
-                <li>Augmenter votre visibilité</li>
-                <li>Recevoir de nouveaux clients</li>
-                <li>Suivre vos revenus et commissions</li>
-              </ul>
-              
-              <p style="text-align: center;">
-                <a href="${claimLink}" class="button">Réclamer mon profil</a>
+              <p style="background-color: #f0f8ff; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0;">
+                <strong>✨ Pourquoi réclamer votre profil maintenant ?</strong><br>
+                C'est <strong>gratuit</strong>, cela prend moins de 2 minutes, et vous pourrez commencer à recevoir des réservations dès aujourd'hui !
               </p>
               
-              <p>Ou copiez ce lien dans votre navigateur:</p>
-              <p style="word-break: break-all; color: #007bff;">${claimLink}</p>
+              <p><strong>En réclamant votre profil, vous pourrez :</strong></p>
+              <ul style="line-height: 2;">
+                <li>✅ <strong>Gérer toutes vos réservations</strong> en ligne, 24/7</li>
+                <li>✅ <strong>Augmenter votre visibilité</strong> et être découvert par de nouveaux clients</li>
+                <li>✅ <strong>Recevoir des réservations</strong> même en dehors des heures d'ouverture</li>
+                <li>✅ <strong>Suivre vos revenus en temps réel</strong> avec un tableau de bord complet</li>
+                <li>✅ <strong>Gagner du temps</strong> en automatisant la gestion des rendez-vous</li>
+              </ul>
+              
+              <p style="text-align: center; margin: 30px 0;">
+                <a href="${claimLink}" class="button" style="font-size: 16px; font-weight: bold; padding: 15px 40px;">🚀 Réclamer mon profil maintenant</a>
+              </p>
+              
+              <p style="text-align: center; color: #666; font-size: 0.9em;">Ou copiez ce lien dans votre navigateur :</p>
+              <p style="word-break: break-all; color: #007bff; text-align: center; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">${claimLink}</p>
+              
+              <p style="margin-top: 30px; padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px;">
+                <strong>💡 Astuce :</strong> Plus vous réclamez tôt votre profil, plus vite vous commencerez à recevoir des réservations !
+              </p>
               
               <div class="footer">
-                <p>Cordialement,<br>L'équipe Skedisy</p>
-                <p style="font-size: 0.8em; color: #999;">Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email.</p>
-                <p style="font-size: 0.8em; color: #999; margin-top: 15px;">
-                  <strong>Besoin d'aide?</strong><br>
-                  Site web: <a href="https://skedisy.com" style="color: #007bff;">https://skedisy.com</a><br>
-                  Email support: <a href="mailto:support@skedisy.com" style="color: #007bff;">support@skedisy.com</a><br>
-                  Téléphone: <a href="tel:+33766160394" style="color: #007bff;">+33 7 66 16 03 94</a>
-                </p>
+                <p style="margin-top: 30px;"><strong>Des questions ? Nous sommes là pour vous aider :</strong></p>
+                <p>📧 Email : <a href="mailto:support@skedisy.com" style="color: #007bff; text-decoration: none;">support@skedisy.com</a></p>
+                <p>📞 Téléphone : <a href="tel:+33766160394" style="color: #007bff; text-decoration: none;">+33 7 66 16 03 94</a></p>
+                <p>🌐 Site web : <a href="https://skedisy.com" style="color: #007bff; text-decoration: none;">https://skedisy.com</a></p>
+                <p style="margin-top: 25px;">Cordialement,<br><strong>L'équipe Skedisy</strong></p>
+                <p style="font-size: 0.8em; color: #999; margin-top: 15px; font-style: italic;">Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email en toute sécurité.</p>
               </div>
             </div>
           </body>
@@ -426,7 +456,7 @@ exports.bulkSendInvitations = async (req, res) => {
         const msg = {
           to: salon.email,
           from: process.env.EMAIL,
-          subject: "Votre salon a été ajouté sur Skedisy - Réclamez votre profil",
+          subject: "🎉 Félicitations ! Réclamez votre profil Skedisy gratuitement (2 min)",
           html: emailHtml,
         };
 
