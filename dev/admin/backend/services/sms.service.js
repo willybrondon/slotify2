@@ -45,12 +45,28 @@ async function sendSMS(to, message) {
       return { success: false, error: "Phone number is required" };
     }
 
-    // Format phone number - handle French numbers in different formats
+    // Format phone number - handle French and Cameroon numbers in different formats
     let formattedPhone = to.trim().replace(/\s+/g, ''); // Remove spaces
     
+    // Handle Cameroon phone numbers first (check before French to avoid conflicts)
+    // Formats: +237690343431, 237690343431, 690343431
+    if (formattedPhone.startsWith("+237")) {
+      // Already in correct format: +237690343431
+      console.log(`[SMS Service] Cameroon number already formatted: ${formattedPhone}`);
+    } else if (formattedPhone.startsWith("237") && formattedPhone.length === 12) {
+      // Cameroon international format without + (237690343431) -> add + (+237690343431)
+      formattedPhone = `+${formattedPhone}`;
+      console.log(`[SMS Service] Added + to Cameroon international format: ${to} -> ${formattedPhone}`);
+    } else if (!formattedPhone.startsWith("+") && !formattedPhone.startsWith("237") && 
+               formattedPhone.length === 9 && 
+               (formattedPhone.startsWith("6") || formattedPhone.startsWith("7") || formattedPhone.startsWith("8"))) {
+      // Cameroon local format (690343431) -> convert to international (+237690343431)
+      formattedPhone = `+237${formattedPhone}`;
+      console.log(`[SMS Service] Converted Cameroon local format: ${to} -> ${formattedPhone}`);
+    }
     // Handle French phone numbers (+33, 33, or 0 prefix)
     // Formats: +33145834832, 33145834832, 0145834832
-    if (formattedPhone.startsWith("0")) {
+    else if (formattedPhone.startsWith("0")) {
       // French national format (0145834832) -> convert to international (+33145834832)
       formattedPhone = `+33${formattedPhone.substring(1)}`;
       console.log(`[SMS Service] Converted French national format: ${to} -> ${formattedPhone}`);

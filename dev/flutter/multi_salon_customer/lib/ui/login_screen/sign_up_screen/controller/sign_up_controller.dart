@@ -125,23 +125,71 @@ class SignUpController extends GetxController {
         return false;
       }
 
-      // For international format: 10-15 digits (not counting the +)
-      if (cleanedMobile.length < 10 || cleanedMobile.length > 15) {
-        return false;
+      // Check for French number (+33)
+      if (cleanedMobile.startsWith('33')) {
+        // French number: +33XXXXXXXXX (should be 11 digits after +33, total 13 with +)
+        // Format: +33XXXXXXXXX (e.g., +33690343431 = 11 digits)
+        if (cleanedMobile.length == 11) {
+          return true;
+        }
       }
+      
+      // Check for Cameroon number (+237)
+      if (cleanedMobile.startsWith('237')) {
+        // Cameroon number: +237XXXXXXXXX (should be 9 digits after +237, total 12 with +)
+        // Format: +237XXXXXXXXX (e.g., +237690343431 = 9 digits)
+        if (cleanedMobile.length == 12) {
+          return true;
+        }
+      }
+
+      // For other international format: 10-15 digits (not counting the +)
+      if (cleanedMobile.length >= 10 && cleanedMobile.length <= 15) {
+        return true;
+      }
+      
+      return false;
     } else {
       // For local format: should contain only digits
       if (!RegExp(r'^\d+$').hasMatch(cleanedMobile)) {
         return false;
       }
 
-      // For local format: 10-15 digits
-      if (cleanedMobile.length < 10 || cleanedMobile.length > 15) {
-        return false;
+      // Check for French number without + (33XXXXXXXXX or 0XXXXXXXXX)
+      if (cleanedMobile.startsWith('33')) {
+        // French international format without +: 33XXXXXXXXX (11 digits)
+        if (cleanedMobile.length == 11) {
+          return true;
+        }
+      } else if (cleanedMobile.startsWith('0')) {
+        // French national format: 0XXXXXXXXX (10 digits)
+        if (cleanedMobile.length == 10) {
+          return true;
+        }
       }
-    }
+      
+      // Check for Cameroon number without + (237XXXXXXXXX)
+      if (cleanedMobile.startsWith('237')) {
+        // Cameroon international format without +: 237XXXXXXXXX (12 digits)
+        if (cleanedMobile.length == 12) {
+          return true;
+        }
+      }
+      
+      // Check for Cameroon local format (9 digits, typically starting with 6, 7, or 8)
+      // Cameroon mobile numbers are 9 digits: 6XXXXXXXX, 7XXXXXXXX, or 8XXXXXXXX
+      if (cleanedMobile.length == 9 && 
+          (cleanedMobile.startsWith('6') || cleanedMobile.startsWith('7') || cleanedMobile.startsWith('8'))) {
+        return true;
+      }
 
-    return true;
+      // For other local format: 10-15 digits
+      if (cleanedMobile.length >= 10 && cleanedMobile.length <= 15) {
+        return true;
+      }
+      
+      return false;
+    }
   }
 
   onClickSignup() async {

@@ -60,8 +60,8 @@ class AppColors {
   static Color selectSize = const Color(0xffF9F9F9);
   static Color cancelButton = const Color(0xffF70934);
   static Color lightRedColor = const Color(0xffFFF6F6);
-  static Color redButton = const Color(0xffFEF4F4);
-  static Color greenButton = const Color(0xffF4FFF5);
+  static Color redButton = const Color(0xffFFCDD2); // More visible red for unavailable slots
+  static Color greenButton = const Color(0xffC8E6C9); // More visible green for available slots
   static Color textSlot = const Color(0xff484E60);
   static Color greyText = const Color(0xffB0B0B0);
   static Color descriptionText = const Color(0xff9B9B9B);
