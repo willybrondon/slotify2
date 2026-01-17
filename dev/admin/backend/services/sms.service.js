@@ -94,10 +94,36 @@ async function sendSMS(to, message) {
       status: messageResponse.status,
     };
   } catch (error) {
-    console.error(`Error sending SMS to ${to}:`, error.message);
+    // Check for Twilio permission errors (e.g., for certain countries like Cameroon)
+    const isPermissionError = error.message && error.message.includes("Permission to send an SMS has not been enabled for the region");
+    
+    if (isPermissionError) {
+      // Extract country code from phone number for better error message
+      const countryCode = formattedPhone.startsWith("+237") ? "Cameroon (+237)" : 
+                         formattedPhone.startsWith("+33") ? "France (+33)" : 
+                         "this country";
+      
+      console.error(`[SMS Service] ❌ SMS permission error for ${formattedPhone}:`);
+      console.error(`[SMS Service] ⚠️  Twilio does not have permission to send SMS to ${countryCode}.`);
+      console.error(`[SMS Service] 📋 To enable SMS to ${countryCode}:`);
+      console.error(`[SMS Service]    1. Log in to Twilio Console: https://console.twilio.com`);
+      console.error(`[SMS Service]    2. Go to Settings > Geo Permissions`);
+      console.error(`[SMS Service]    3. Enable SMS permissions for the required country`);
+      console.error(`[SMS Service]    4. Note: Some countries require account verification`);
+      
+      return {
+        success: false,
+        error: `SMS permission not enabled for ${countryCode}. Please enable SMS geo permissions in Twilio Console for this country code.`,
+        errorCode: "PERMISSION_ERROR",
+        countryCode: formattedPhone.substring(0, 4), // +237 or +33
+      };
+    }
+    
+    console.error(`[SMS Service] Error sending SMS to ${to}:`, error.message);
     return {
       success: false,
       error: error.message,
+      errorCode: "GENERAL_ERROR",
     };
   }
 }

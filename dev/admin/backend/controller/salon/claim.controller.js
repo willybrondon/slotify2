@@ -307,7 +307,15 @@ L'équipe Skedisy`;
         if (smsResult.success) {
           console.log(`[Claim Invitation] ✅ SMS sent successfully to ${salon.mobile}`);
         } else {
-          console.error(`[Claim Invitation] ❌ SMS failed for ${salon.mobile}:`, smsResult.error);
+          // Check if it's a permission error (e.g., Cameroon not enabled in Twilio)
+          if (smsResult.errorCode === "PERMISSION_ERROR") {
+            console.error(`[Claim Invitation] ❌ SMS failed for ${salon.mobile}: ${smsResult.error}`);
+            console.error(`[Claim Invitation] ⚠️  Twilio geo permission not enabled for ${smsResult.countryCode || "this country"}`);
+            console.error(`[Claim Invitation] 📧 Email invitation will still be sent if enabled.`);
+            console.error(`[Claim Invitation] 💡 Recommendation: Enable ${smsResult.countryCode || "country"} SMS permissions in Twilio Console`);
+          } else {
+            console.error(`[Claim Invitation] ❌ SMS failed for ${salon.mobile}:`, smsResult.error);
+          }
         }
       }
     }

@@ -648,7 +648,7 @@ class PaymentScreenController extends GetxController {
           if (bookingScreenController!.createBookingCategory?.status == true) {
             log("Cash Payment - ✅ Booking created successfully!");
 
-            // Clear all data and show success
+            // Clear all data
             bookingScreenController!.finalTaxRupee = 0.0;
             bookingScreenController!.withOutTaxRupee = 0.0;
             bookingScreenController!.totalPrice = 0.0;
@@ -657,93 +657,7 @@ class PaymentScreenController extends GetxController {
             // Navigate back to home screen
             Get.offAllNamed(AppRoutes.bottom);
 
-            // CRITICAL FIX: Reload home screen data after successful booking
-            // This ensures categories, salons, and experts are displayed when user returns to home
-            try {
-              HomeScreenController? homeScreenController = Get.isRegistered<HomeScreenController>()
-                  ? Get.find<HomeScreenController>()
-                  : null;
-
-              if (homeScreenController != null) {
-                log("Cash Payment - Reloading home screen data...");
-                
-                // Reload categories, salons, and experts
-                homeScreenController.getAllCategory = null;
-                homeScreenController.getAllSalonCategory = null;
-                homeScreenController.getAllExpertCategory = null;
-                homeScreenController.startExpert = 0; // Reset expert pagination
-                
-                // Reload data
-                await homeScreenController.onGetAllCategoryApiCall();
-                await homeScreenController.onGetAllSalonApiCall(
-                  latitude: latitude ?? 0.0,
-                  longitude: longitude ?? 0.0,
-                  userId: Constant.storage.read<String>('userId') ?? "",
-                );
-                await homeScreenController.onGetAllExpertApiCall(
-                  start: homeScreenController.startExpert.toString(),
-                  limit: homeScreenController.limitExpert.toString(),
-                );
-                
-                log("Cash Payment - ✅ Home screen data reloaded successfully");
-              } else {
-                log("Cash Payment - ⚠️ HomeScreenController not found, data will load on next screen init");
-              }
-
-              // CRITICAL FIX: Reload notification data after successful booking
-              // This ensures new notifications (including booking confirmation) appear in the app
-              try {
-                NotificationController? notificationController = Get.isRegistered<NotificationController>()
-                    ? Get.find<NotificationController>()
-                    : null;
-
-                if (notificationController != null) {
-                  log("Cash Payment - Reloading notification data...");
-                  await notificationController.onGetNotificationApiCall(
-                    userId: Constant.storage.read<String>('userId') ?? "",
-                  );
-                  log("Cash Payment - ✅ Notification data reloaded successfully");
-                } else {
-                  log("Cash Payment - ⚠️ NotificationController not found, data will load on next screen init");
-                }
-              } catch (e) {
-                log("Cash Payment - ⚠️ Error reloading notification data: $e");
-                // Don't block success dialog if reload fails
-              }
-
-              // CRITICAL FIX: Reload booking detail data after successful booking
-              // This ensures the new booking appears in the booking list
-              try {
-                BookingDetailScreenController? bookingDetailController = Get.isRegistered<BookingDetailScreenController>()
-                    ? Get.find<BookingDetailScreenController>()
-                    : null;
-
-                if (bookingDetailController != null) {
-                  log("Cash Payment - Reloading booking detail data...");
-                  // Reset pagination and reload pending bookings (where new booking will appear)
-                  bookingDetailController.startPending = 0;
-                  bookingDetailController.getPending = [];
-                  await bookingDetailController.onGetAllBookingApiCall(
-                    userId: Constant.storage.read<String>('userId') ?? "",
-                    status: "pending",
-                    start: bookingDetailController.startPending.toString(),
-                    limit: bookingDetailController.limitPending.toString(),
-                    search: bookingDetailController.bookingDetailScreenEditingController.text.trim(),
-                  );
-                  log("Cash Payment - ✅ Booking detail data reloaded successfully");
-                } else {
-                  log("Cash Payment - ⚠️ BookingDetailScreenController not found, data will load on next screen init");
-                }
-              } catch (e) {
-                log("Cash Payment - ⚠️ Error reloading booking detail data: $e");
-                // Don't block success dialog if reload fails
-              }
-            } catch (e) {
-              log("Cash Payment - ⚠️ Error reloading data: $e");
-              // Don't block success dialog if reload fails
-            }
-
-            // Show success dialog
+            // Show success dialog IMMEDIATELY (don't wait for data reload)
             Get.dialog(
               barrierColor: AppColors.blackColor.withOpacity(0.8),
               Material(
@@ -751,6 +665,95 @@ class PaymentScreenController extends GetxController {
                 child: SuccessDialog(),
               ),
             );
+
+            // CRITICAL FIX: Reload data in background AFTER showing dialog (non-blocking)
+            // This ensures categories, salons, and experts are displayed when user returns to home
+            // Using Future without await so it doesn't block the dialog
+            Future.microtask(() async {
+              try {
+                HomeScreenController? homeScreenController = Get.isRegistered<HomeScreenController>()
+                    ? Get.find<HomeScreenController>()
+                    : null;
+
+                if (homeScreenController != null) {
+                  log("Cash Payment - Reloading home screen data...");
+                  
+                  // Reload categories, salons, and experts
+                  homeScreenController.getAllCategory = null;
+                  homeScreenController.getAllSalonCategory = null;
+                  homeScreenController.getAllExpertCategory = null;
+                  homeScreenController.startExpert = 0; // Reset expert pagination
+                  
+                  // Reload data
+                  await homeScreenController.onGetAllCategoryApiCall();
+                  await homeScreenController.onGetAllSalonApiCall(
+                    latitude: latitude ?? 0.0,
+                    longitude: longitude ?? 0.0,
+                    userId: Constant.storage.read<String>('userId') ?? "",
+                  );
+                  await homeScreenController.onGetAllExpertApiCall(
+                    start: homeScreenController.startExpert.toString(),
+                    limit: homeScreenController.limitExpert.toString(),
+                  );
+                  
+                  log("Cash Payment - ✅ Home screen data reloaded successfully");
+                } else {
+                  log("Cash Payment - ⚠️ HomeScreenController not found, data will load on next screen init");
+                }
+
+                // CRITICAL FIX: Reload notification data after successful booking
+                // This ensures new notifications (including booking confirmation) appear in the app
+                try {
+                  NotificationController? notificationController = Get.isRegistered<NotificationController>()
+                      ? Get.find<NotificationController>()
+                      : null;
+
+                  if (notificationController != null) {
+                    log("Cash Payment - Reloading notification data...");
+                    await notificationController.onGetNotificationApiCall(
+                      userId: Constant.storage.read<String>('userId') ?? "",
+                    );
+                    log("Cash Payment - ✅ Notification data reloaded successfully");
+                  } else {
+                    log("Cash Payment - ⚠️ NotificationController not found, data will load on next screen init");
+                  }
+                } catch (e) {
+                  log("Cash Payment - ⚠️ Error reloading notification data: $e");
+                  // Don't block success dialog if reload fails
+                }
+
+                // CRITICAL FIX: Reload booking detail data after successful booking
+                // This ensures the new booking appears in the booking list
+                try {
+                  BookingDetailScreenController? bookingDetailController = Get.isRegistered<BookingDetailScreenController>()
+                      ? Get.find<BookingDetailScreenController>()
+                      : null;
+
+                  if (bookingDetailController != null) {
+                    log("Cash Payment - Reloading booking detail data...");
+                    // Reset pagination and reload pending bookings (where new booking will appear)
+                    bookingDetailController.startPending = 0;
+                    bookingDetailController.getPending = [];
+                    await bookingDetailController.onGetAllBookingApiCall(
+                      userId: Constant.storage.read<String>('userId') ?? "",
+                      status: "pending",
+                      start: bookingDetailController.startPending.toString(),
+                      limit: bookingDetailController.limitPending.toString(),
+                      search: bookingDetailController.bookingDetailScreenEditingController.text.trim(),
+                    );
+                    log("Cash Payment - ✅ Booking detail data reloaded successfully");
+                  } else {
+                    log("Cash Payment - ⚠️ BookingDetailScreenController not found, data will load on next screen init");
+                  }
+                } catch (e) {
+                  log("Cash Payment - ⚠️ Error reloading booking detail data: $e");
+                  // Don't block success dialog if reload fails
+                }
+              } catch (e) {
+                log("Cash Payment - ⚠️ Error reloading data: $e");
+                // Don't block success dialog if reload fails
+              }
+            });
           } else {
             // Booking failed - show specific error message and handle coupon errors
             String errorMessage =
@@ -881,93 +884,7 @@ class PaymentScreenController extends GetxController {
             // Navigate back to home screen
             Get.offAllNamed(AppRoutes.bottom);
 
-            // CRITICAL FIX: Reload home screen data after successful booking
-            // This ensures categories, salons, and experts are displayed when user returns to home
-            try {
-              HomeScreenController? homeScreenController = Get.isRegistered<HomeScreenController>()
-                  ? Get.find<HomeScreenController>()
-                  : null;
-
-              if (homeScreenController != null) {
-                log("Wallet Payment - Reloading home screen data...");
-                
-                // Reload categories, salons, and experts
-                homeScreenController.getAllCategory = null;
-                homeScreenController.getAllSalonCategory = null;
-                homeScreenController.getAllExpertCategory = null;
-                homeScreenController.startExpert = 0; // Reset expert pagination
-                
-                // Reload data
-                await homeScreenController.onGetAllCategoryApiCall();
-                await homeScreenController.onGetAllSalonApiCall(
-                  latitude: latitude ?? 0.0,
-                  longitude: longitude ?? 0.0,
-                  userId: Constant.storage.read<String>('userId') ?? "",
-                );
-                await homeScreenController.onGetAllExpertApiCall(
-                  start: homeScreenController.startExpert.toString(),
-                  limit: homeScreenController.limitExpert.toString(),
-                );
-                
-                log("Wallet Payment - ✅ Home screen data reloaded successfully");
-              } else {
-                log("Wallet Payment - ⚠️ HomeScreenController not found, data will load on next screen init");
-              }
-
-              // CRITICAL FIX: Reload notification data after successful booking
-              // This ensures new notifications (including booking confirmation) appear in the app
-              try {
-                NotificationController? notificationController = Get.isRegistered<NotificationController>()
-                    ? Get.find<NotificationController>()
-                    : null;
-
-                if (notificationController != null) {
-                  log("Wallet Payment - Reloading notification data...");
-                  await notificationController.onGetNotificationApiCall(
-                    userId: Constant.storage.read<String>('userId') ?? "",
-                  );
-                  log("Wallet Payment - ✅ Notification data reloaded successfully");
-                } else {
-                  log("Wallet Payment - ⚠️ NotificationController not found, data will load on next screen init");
-                }
-              } catch (e) {
-                log("Wallet Payment - ⚠️ Error reloading notification data: $e");
-                // Don't block success dialog if reload fails
-              }
-
-              // CRITICAL FIX: Reload booking detail data after successful booking
-              // This ensures the new booking appears in the booking list
-              try {
-                BookingDetailScreenController? bookingDetailController = Get.isRegistered<BookingDetailScreenController>()
-                    ? Get.find<BookingDetailScreenController>()
-                    : null;
-
-                if (bookingDetailController != null) {
-                  log("Wallet Payment - Reloading booking detail data...");
-                  // Reset pagination and reload pending bookings (where new booking will appear)
-                  bookingDetailController.startPending = 0;
-                  bookingDetailController.getPending = [];
-                  await bookingDetailController.onGetAllBookingApiCall(
-                    userId: Constant.storage.read<String>('userId') ?? "",
-                    status: "pending",
-                    start: bookingDetailController.startPending.toString(),
-                    limit: bookingDetailController.limitPending.toString(),
-                    search: bookingDetailController.bookingDetailScreenEditingController.text.trim(),
-                  );
-                  log("Wallet Payment - ✅ Booking detail data reloaded successfully");
-                } else {
-                  log("Wallet Payment - ⚠️ BookingDetailScreenController not found, data will load on next screen init");
-                }
-              } catch (e) {
-                log("Wallet Payment - ⚠️ Error reloading booking detail data: $e");
-                // Don't block success dialog if reload fails
-              }
-            } catch (e) {
-              log("Wallet Payment - ⚠️ Error reloading data: $e");
-              // Don't block success dialog if reload fails
-            }
-
-            // Show success dialog
+            // Show success dialog IMMEDIATELY (don't wait for data reload)
             Get.dialog(
               barrierColor: AppColors.blackColor.withOpacity(0.8),
               Material(
@@ -975,6 +892,95 @@ class PaymentScreenController extends GetxController {
                 child: SuccessDialog(),
               ),
             );
+
+            // CRITICAL FIX: Reload data in background AFTER showing dialog (non-blocking)
+            // This ensures categories, salons, and experts are displayed when user returns to home
+            // Using Future without await so it doesn't block the dialog
+            Future.microtask(() async {
+              try {
+                HomeScreenController? homeScreenController = Get.isRegistered<HomeScreenController>()
+                    ? Get.find<HomeScreenController>()
+                    : null;
+
+                if (homeScreenController != null) {
+                  log("Wallet Payment - Reloading home screen data...");
+                  
+                  // Reload categories, salons, and experts
+                  homeScreenController.getAllCategory = null;
+                  homeScreenController.getAllSalonCategory = null;
+                  homeScreenController.getAllExpertCategory = null;
+                  homeScreenController.startExpert = 0; // Reset expert pagination
+                  
+                  // Reload data
+                  await homeScreenController.onGetAllCategoryApiCall();
+                  await homeScreenController.onGetAllSalonApiCall(
+                    latitude: latitude ?? 0.0,
+                    longitude: longitude ?? 0.0,
+                    userId: Constant.storage.read<String>('userId') ?? "",
+                  );
+                  await homeScreenController.onGetAllExpertApiCall(
+                    start: homeScreenController.startExpert.toString(),
+                    limit: homeScreenController.limitExpert.toString(),
+                  );
+                  
+                  log("Wallet Payment - ✅ Home screen data reloaded successfully");
+                } else {
+                  log("Wallet Payment - ⚠️ HomeScreenController not found, data will load on next screen init");
+                }
+
+                // CRITICAL FIX: Reload notification data after successful booking
+                // This ensures new notifications (including booking confirmation) appear in the app
+                try {
+                  NotificationController? notificationController = Get.isRegistered<NotificationController>()
+                      ? Get.find<NotificationController>()
+                      : null;
+
+                  if (notificationController != null) {
+                    log("Wallet Payment - Reloading notification data...");
+                    await notificationController.onGetNotificationApiCall(
+                      userId: Constant.storage.read<String>('userId') ?? "",
+                    );
+                    log("Wallet Payment - ✅ Notification data reloaded successfully");
+                  } else {
+                    log("Wallet Payment - ⚠️ NotificationController not found, data will load on next screen init");
+                  }
+                } catch (e) {
+                  log("Wallet Payment - ⚠️ Error reloading notification data: $e");
+                  // Don't block success dialog if reload fails
+                }
+
+                // CRITICAL FIX: Reload booking detail data after successful booking
+                // This ensures the new booking appears in the booking list
+                try {
+                  BookingDetailScreenController? bookingDetailController = Get.isRegistered<BookingDetailScreenController>()
+                      ? Get.find<BookingDetailScreenController>()
+                      : null;
+
+                  if (bookingDetailController != null) {
+                    log("Wallet Payment - Reloading booking detail data...");
+                    // Reset pagination and reload pending bookings (where new booking will appear)
+                    bookingDetailController.startPending = 0;
+                    bookingDetailController.getPending = [];
+                    await bookingDetailController.onGetAllBookingApiCall(
+                      userId: Constant.storage.read<String>('userId') ?? "",
+                      status: "pending",
+                      start: bookingDetailController.startPending.toString(),
+                      limit: bookingDetailController.limitPending.toString(),
+                      search: bookingDetailController.bookingDetailScreenEditingController.text.trim(),
+                    );
+                    log("Wallet Payment - ✅ Booking detail data reloaded successfully");
+                  } else {
+                    log("Wallet Payment - ⚠️ BookingDetailScreenController not found, data will load on next screen init");
+                  }
+                } catch (e) {
+                  log("Wallet Payment - ⚠️ Error reloading booking detail data: $e");
+                  // Don't block success dialog if reload fails
+                }
+              } catch (e) {
+                log("Wallet Payment - ⚠️ Error reloading data: $e");
+                // Don't block success dialog if reload fails
+              }
+            });
           } else {
             Utils.showToast(
                 Get.context!,
