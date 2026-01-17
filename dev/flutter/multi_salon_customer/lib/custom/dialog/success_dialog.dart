@@ -20,8 +20,7 @@ class SuccessDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 320,
-      width: 280,
+      height: 335,
       padding: const EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
       decoration: BoxDecoration(
         color: AppColors.dialogBg,
@@ -72,23 +71,27 @@ class SuccessDialog extends StatelessWidget {
                   Get.back(); // Close dialog first
                   // Force reload booking data before navigating
                   try {
-                    BookingDetailScreenController? bookingController = Get.isRegistered<BookingDetailScreenController>()
-                        ? Get.find<BookingDetailScreenController>()
-                        : null;
-                    
+                    BookingDetailScreenController? bookingController =
+                        Get.isRegistered<BookingDetailScreenController>()
+                            ? Get.find<BookingDetailScreenController>()
+                            : null;
+
                     if (bookingController != null) {
                       log("SuccessDialog - Forcing reload of pending bookings...");
                       bookingController.startPending = 0;
                       bookingController.getPending = [];
-                      bookingController.tabController?.index = 0; // Set to pending tab
-                      
+                      bookingController.tabController?.index =
+                          0; // Set to pending tab
+
                       // Load pending bookings
                       await bookingController.onGetAllBookingApiCall(
                         userId: Constant.storage.read<String>('userId') ?? "",
                         status: "pending",
                         start: bookingController.startPending.toString(),
                         limit: bookingController.limitPending.toString(),
-                        search: bookingController.bookingDetailScreenEditingController.text.trim(),
+                        search: bookingController
+                            .bookingDetailScreenEditingController.text
+                            .trim(),
                       );
                       log("SuccessDialog - ✅ Pending bookings reloaded");
                     }

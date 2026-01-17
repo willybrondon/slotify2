@@ -678,13 +678,11 @@ class PaymentScreenController extends GetxController {
                 if (homeScreenController != null) {
                   log("Cash Payment - Reloading home screen data...");
                   
-                  // Reload categories, salons, and experts
-                  homeScreenController.getAllCategory = null;
-                  homeScreenController.getAllSalonCategory = null;
-                  homeScreenController.getAllExpertCategory = null;
-                  homeScreenController.startExpert = 0; // Reset expert pagination
+                  // Reload data (don't set to null to avoid showing empty screens)
+                  // Reset expert pagination before reload
+                  homeScreenController.startExpert = 0;
                   
-                  // Reload data
+                  // Reload data - this will update existing data rather than clearing it
                   await homeScreenController.onGetAllCategoryApiCall();
                   await homeScreenController.onGetAllSalonApiCall(
                     latitude: latitude ?? 0.0,
@@ -905,13 +903,11 @@ class PaymentScreenController extends GetxController {
                 if (homeScreenController != null) {
                   log("Wallet Payment - Reloading home screen data...");
                   
-                  // Reload categories, salons, and experts
-                  homeScreenController.getAllCategory = null;
-                  homeScreenController.getAllSalonCategory = null;
-                  homeScreenController.getAllExpertCategory = null;
-                  homeScreenController.startExpert = 0; // Reset expert pagination
+                  // Reload data (don't set to null to avoid showing empty screens)
+                  // Reset expert pagination before reload
+                  homeScreenController.startExpert = 0;
                   
-                  // Reload data
+                  // Reload data - this will update existing data rather than clearing it
                   await homeScreenController.onGetAllCategoryApiCall();
                   await homeScreenController.onGetAllSalonApiCall(
                     latitude: latitude ?? 0.0,
