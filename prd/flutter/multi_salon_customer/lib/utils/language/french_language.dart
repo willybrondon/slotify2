@@ -195,7 +195,7 @@ final Map<String, String> frCH = {
       "Votre compte sera supprimé en permanence. Vos données ne seront plus restaurées.",
   "desPleaseAcceptConditions": "Veuillez d'abord accepter les termes et l'état",
   "desLogOut": "Êtes-vous sûr de vouloir vous déconnecter ?",
-  "desSlotBooked": "Cette fente est déjà réservée",
+  "desSlotBooked": "Ce créneau est déjà réservé",
   "desPreviousSlot": "Vous ne pouvez pas réserver des crénaux précédents",
   "desExit": "Êtes-vous sûr de vouloir quitter ?",
   "desEnterEmail": "Veuillez entrer votre email",

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -123,6 +125,22 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
           ),
         );
       }
+    });
+
+    // CRITICAL FIX: Load pending bookings on initial screen load
+    // This ensures bookings are displayed when user navigates to this screen
+    Future.microtask(() async {
+      log("BookingDetailScreen - Loading initial pending bookings...");
+      startPending = 0;
+      getPending = [];
+      await onGetAllBookingApiCall(
+        userId: Constant.storage.read<String>('userId') ?? "",
+        status: "pending",
+        start: startPending.toString(),
+        limit: limitPending.toString(),
+        search: bookingDetailScreenEditingController.text.trim(),
+      );
+      log("BookingDetailScreen - ✅ Initial pending bookings loaded");
     });
 
     super.onInit();
@@ -321,7 +339,13 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
       log("Get All Booking Headers :: $headers");
 
-      final response = await http.get(url, headers: headers);
+      final response = await http.get(url, headers: headers).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          log("Get All Booking - Request timeout");
+          throw TimeoutException("Request timeout after 30 seconds");
+        },
+      );
 
       log("Get All Booking StatusCode :: ${response.statusCode}");
       log("Get All Booking Body :: ${response.body}");
@@ -352,11 +376,27 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
             }
           }
         }
+      } else {
+        log("Get All Booking - Failed with status code: ${response.statusCode}");
+        Utils.showToast(Get.context!, "Failed to load bookings. Please try again.");
       }
     } on AppException catch (exception) {
+      log("App Exception in Get All Booking: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
+    } on SocketException catch (e) {
+      log("Network error in Get All Booking: $e");
+      Utils.showToast(Get.context!,
+          "Network connection error. Please check your internet connection.");
+    } on HandshakeException catch (e) {
+      log("SSL Handshake error in Get All Booking: $e");
+      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+    } on TimeoutException catch (e) {
+      log("Timeout error in Get All Booking: $e");
+      Utils.showToast(Get.context!,
+          "Request timeout. Please check your connection and try again.");
     } catch (e) {
       log("Error call Get All Booking Api :: $e");
+      Utils.showToast(Get.context!, "Connection error. Please try again.");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
@@ -378,7 +418,13 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
 
       final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
 
-      final response = await http.put(url, headers: headers, body: body);
+      final response = await http.put(url, headers: headers, body: body).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          log("Cancel Booking - Request timeout");
+          throw TimeoutException("Request timeout after 30 seconds");
+        },
+      );
 
       log("Cancel Booking Status Status Code :: ${response.statusCode}");
       log("Cancel Booking Status Response :: ${response.body}");
@@ -386,12 +432,27 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         cancelBookingCategory = CancelBookingModel.fromJson(jsonResponse);
+      } else {
+        log("Cancel Booking - Failed with status code: ${response.statusCode}");
+        Utils.showToast(Get.context!, "Failed to cancel booking. Please try again.");
       }
     } on AppException catch (exception) {
+      log("App Exception in Cancel Booking: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
+    } on SocketException catch (e) {
+      log("Network error in Cancel Booking: $e");
+      Utils.showToast(Get.context!,
+          "Network connection error. Please check your internet connection.");
+    } on HandshakeException catch (e) {
+      log("SSL Handshake error in Cancel Booking: $e");
+      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+    } on TimeoutException catch (e) {
+      log("Timeout error in Cancel Booking: $e");
+      Utils.showToast(Get.context!,
+          "Request timeout. Please check your connection and try again.");
     } catch (e) {
       log("Error call Cancel Booking Status Api :: $e");
-      Utils.showToast(Get.context!, '$e');
+      Utils.showToast(Get.context!, "Connection error. Please try again.");
     } finally {
       isLoading(false);
       isLoading1(false);
@@ -413,7 +474,13 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
 
       final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
 
-      final response = await http.post(url, headers: headers, body: body);
+      final response = await http.post(url, headers: headers, body: body).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          log("User Submit Review - Request timeout");
+          throw TimeoutException("Request timeout after 30 seconds");
+        },
+      );
 
       log("User Submit Review Status Code :: ${response.statusCode}");
       log("User Submit Review Response :: ${response.body}");
@@ -421,11 +488,27 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         userSubmitReviewCategory = UserSubmitReviewModel.fromJson(jsonResponse);
+      } else {
+        log("User Submit Review - Failed with status code: ${response.statusCode}");
+        Utils.showToast(Get.context!, "Failed to submit review. Please try again.");
       }
     } on AppException catch (exception) {
+      log("App Exception in User Submit Review: ${exception.message}");
       Utils.showToast(Get.context!, exception.message);
+    } on SocketException catch (e) {
+      log("Network error in User Submit Review: $e");
+      Utils.showToast(Get.context!,
+          "Network connection error. Please check your internet connection.");
+    } on HandshakeException catch (e) {
+      log("SSL Handshake error in User Submit Review: $e");
+      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+    } on TimeoutException catch (e) {
+      log("Timeout error in User Submit Review: $e");
+      Utils.showToast(Get.context!,
+          "Request timeout. Please check your connection and try again.");
     } catch (e) {
       log("Error call User Submit Review Api :: $e");
+      Utils.showToast(Get.context!, "Connection error. Please try again.");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);

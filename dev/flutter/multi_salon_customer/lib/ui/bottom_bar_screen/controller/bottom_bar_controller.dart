@@ -33,22 +33,26 @@ class BottomBarController extends GetxController {
 
   onClick(value) {
     if (value == 1) {
+      // Reset booking detail controller state
       bookingDetailScreenController.startPending = 0;
       bookingDetailScreenController.getPending = [];
       bookingDetailScreenController.bookingDetailScreenEditingController.clear();
-
-      if (bookingDetailScreenController.tabController?.index == 0) {
-        log("Enter in bottom condition if");
-        bookingDetailScreenController.onGetAllBookingApiCall(
+      
+      // Always set tab to pending (index 0) and reload data
+      log("BottomBar - Navigating to bookings tab, forcing pending bookings reload...");
+      bookingDetailScreenController.tabController?.index = 0;
+      
+      // Force reload pending bookings regardless of previous tab index
+      Future.microtask(() async {
+        await bookingDetailScreenController.onGetAllBookingApiCall(
           userId: Constant.storage.read<String>('userId') ?? "",
           status: "pending",
           start: bookingDetailScreenController.startPending.toString(),
           limit: bookingDetailScreenController.limitPending.toString(),
+          search: bookingDetailScreenController.bookingDetailScreenEditingController.text.trim(),
         );
-      } else {
-        log("Enter in bottom condition else");
-        Get.find<BookingDetailScreenController>().tabController?.index = 0;
-      }
+        log("BottomBar - ✅ Pending bookings reloaded");
+      });
     }
 
     value == 2 ? notificationController.onGetNotificationApiCall(userId: Constant.storage.read<String>('userId') ?? "") : null;

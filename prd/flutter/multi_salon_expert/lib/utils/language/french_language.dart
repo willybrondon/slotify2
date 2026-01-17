@@ -82,7 +82,7 @@ final Map<String, String> frCH = {
   "txtMorning": "Matin",
   "txtAfternoon": "Après-midi",
   "txtEvening": "Soirée",
-  "txtUploadSlot": "Télécharger la fente",
+  "txtUploadSlot": "Télécharger le créneau",
   "txtOrderDetails": "détails de la commande",
   "txtNoData": "Aucune donnée disponible..!",
   "txtViewDetails": "Voir les détails",

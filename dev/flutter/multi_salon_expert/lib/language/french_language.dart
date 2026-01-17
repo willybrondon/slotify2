@@ -82,7 +82,7 @@ final Map<String, String> frCH = {
   "txtMorning": "Matin",
   "txtAfternoon": "Après-midi",
   "txtEvening": "Soirée",
-  "txtUploadSlot": "Télécharger la fente",
+  "txtUploadSlot": "Télécharger le créneau",
   "txtOrderDetails": "détails de la commande",
   "txtNoData": "Aucune donnée disponible..!",
   "txtViewDetails": "Voir les détails",
@@ -155,8 +155,7 @@ final Map<String, String> frCH = {
   "txtComplain": "Se plaindre",
   "txtComplainSection": "Section de plainte",
   "desSlotBooked": "Ce créneau est réservé",
-  "desPreviousSlot":
-      "Vous ne pouvez pas réserver des machines à sous précédents",
+  "desPreviousSlot": "Vous ne pouvez pas réserver des créneaux précédents",
   "desExit": "Êtes-vous sûr de vouloir quitter ?",
   "txtCancelledBy": "AnnuléPar",
   "txtHistory": "Histoire",
