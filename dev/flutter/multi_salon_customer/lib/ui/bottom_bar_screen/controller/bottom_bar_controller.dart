@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:get/get.dart';
+import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
 import 'package:salon_2/ui/booking_detail_screen/view/booking.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
@@ -49,8 +50,8 @@ class BottomBarController extends GetxController {
           if (homeScreenController.getAllSalonCategory == null) {
             log("BottomBar - Reloading home screen salon data...");
             homeScreenController.onGetAllSalonApiCall(
-              latitude: homeScreenController.latitude ?? 0.0,
-              longitude: homeScreenController.longitude ?? 0.0,
+              latitude: latitude ?? 0.0,
+              longitude: longitude ?? 0.0,
               userId: Constant.storage.read<String>('userId') ?? "",
             );
           }
