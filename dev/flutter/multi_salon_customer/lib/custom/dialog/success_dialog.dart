@@ -19,7 +19,6 @@ class SuccessDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 335,
-      padding: const EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
       decoration: BoxDecoration(
         color: AppColors.dialogBg,
         borderRadius: BorderRadius.circular(45),

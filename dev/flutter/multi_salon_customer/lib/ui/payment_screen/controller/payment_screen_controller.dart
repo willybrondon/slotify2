@@ -528,28 +528,30 @@ class PaymentScreenController extends GetxController {
           // If discount is applied, we MUST have a coupon ID, otherwise backend will reject
           if (bookingScreenController!.couponDiscountAmount > 0) {
             // Final attempt to find coupon ID if still missing
-            if (bookingScreenController!.selectedCouponId == null || 
+            if (bookingScreenController!.selectedCouponId == null ||
                 bookingScreenController!.selectedCouponId!.isEmpty) {
               log("Cash Payment - ⚠️ CRITICAL: Discount applied (${bookingScreenController!.couponDiscountAmount}) but coupon ID still missing!");
               log("Cash Payment - Making final attempt to find coupon ID...");
-              
+
               // Try one more time to find in list
               if (bookingScreenController!.manualCouponCode != null) {
                 // First check existing list
                 if (bookingScreenController!.getCouponModel?.data != null) {
-                  for (var coupon in bookingScreenController!.getCouponModel!.data!) {
-                    if (coupon.code?.toUpperCase() == 
-                        bookingScreenController!.manualCouponCode!.toUpperCase()) {
+                  for (var coupon
+                      in bookingScreenController!.getCouponModel!.data!) {
+                    if (coupon.code?.toUpperCase() ==
+                        bookingScreenController!.manualCouponCode!
+                            .toUpperCase()) {
                       bookingScreenController!.selectedCouponId = coupon.id;
                       log("Cash Payment - ✅ Found coupon ID in existing list: ${coupon.id}");
                       break;
                     }
                   }
                 }
-                
+
                 // If still not found and list is null, try fetching
-                if ((bookingScreenController!.selectedCouponId == null || 
-                     bookingScreenController!.selectedCouponId!.isEmpty) &&
+                if ((bookingScreenController!.selectedCouponId == null ||
+                        bookingScreenController!.selectedCouponId!.isEmpty) &&
                     bookingScreenController!.getCouponModel == null &&
                     bookingScreenController!.withOutTaxRupee > 0) {
                   log("Cash Payment - Coupon list not available, fetching...");
@@ -558,14 +560,18 @@ class PaymentScreenController extends GetxController {
                     await bookingScreenController!.getCouponApiCall(
                       userId: userId,
                       type: "2",
-                      amount: bookingScreenController!.withOutTaxRupee.toInt().toString(),
+                      amount: bookingScreenController!.withOutTaxRupee
+                          .toInt()
+                          .toString(),
                     );
-                    
+
                     // Try finding again after fetch
                     if (bookingScreenController!.getCouponModel?.data != null) {
-                      for (var coupon in bookingScreenController!.getCouponModel!.data!) {
-                        if (coupon.code?.toUpperCase() == 
-                            bookingScreenController!.manualCouponCode!.toUpperCase()) {
+                      for (var coupon
+                          in bookingScreenController!.getCouponModel!.data!) {
+                        if (coupon.code?.toUpperCase() ==
+                            bookingScreenController!.manualCouponCode!
+                                .toUpperCase()) {
                           bookingScreenController!.selectedCouponId = coupon.id;
                           log("Cash Payment - ✅ Found coupon ID after fetch: ${coupon.id}");
                           break;
@@ -575,30 +581,30 @@ class PaymentScreenController extends GetxController {
                   }
                 }
               }
-              
+
               // If still not found, this will cause "book failed" - prevent it
-              if (bookingScreenController!.selectedCouponId == null || 
+              if (bookingScreenController!.selectedCouponId == null ||
                   bookingScreenController!.selectedCouponId!.isEmpty) {
                 log("Cash Payment - ❌ ERROR: Cannot proceed - discount applied but coupon ID not found!");
                 log("Cash Payment - ❌ Backend will reject with 'book failed - Amount mismatch'");
                 log("Cash Payment - ❌ Frontend sends: ${bookingScreenController!.totalPrice} (with discount)");
                 log("Cash Payment - ❌ Backend expects: ${bookingScreenController!.totalPrice + bookingScreenController!.couponDiscountAmount} (without discount, no couponId)");
-                
+
                 if (isScreenActive) {
                   isLoading(false);
                   update([Constant.idProgressView]);
-                  
+
                   // Reset coupon to prevent booking failure
                   bookingScreenController!.resetCoupon();
                   bookingScreenController!.calculateTotalWithDiscount();
-                  
-                  Utils.showToast(Get.context!, 
+
+                  Utils.showToast(Get.context!,
                       "Coupon validation failed. The coupon may have expired or is no longer valid. Please remove it and try again.");
                 }
                 return; // Don't proceed with booking - it will fail anyway
               }
             }
-            
+
             log("Cash Payment - ✅ Coupon ID validated before API call: ${bookingScreenController!.selectedCouponId}");
             log("Cash Payment - ✅ Discount amount: ${bookingScreenController!.couponDiscountAmount}");
             log("Cash Payment - ✅ Total price (with discount): ${bookingScreenController!.totalPrice}");
@@ -654,8 +660,8 @@ class PaymentScreenController extends GetxController {
             bookingScreenController!.totalPrice = 0.0;
             bookingScreenController!.resetCoupon();
 
-            // Navigate back to home screen
-            Get.offAllNamed(AppRoutes.bottom);
+            // Navigate back to home screen - use offAndToNamed to preserve controllers (like PRD)
+            Get.offAndToNamed(AppRoutes.bottom);
 
             // Show success dialog IMMEDIATELY (don't wait for data reload)
             Get.dialog(
@@ -671,17 +677,18 @@ class PaymentScreenController extends GetxController {
             // Using Future without await so it doesn't block the dialog
             Future.microtask(() async {
               try {
-                HomeScreenController? homeScreenController = Get.isRegistered<HomeScreenController>()
-                    ? Get.find<HomeScreenController>()
-                    : null;
+                HomeScreenController? homeScreenController =
+                    Get.isRegistered<HomeScreenController>()
+                        ? Get.find<HomeScreenController>()
+                        : null;
 
                 if (homeScreenController != null) {
                   log("Cash Payment - Reloading home screen data...");
-                  
+
                   // Reload data (don't set to null to avoid showing empty screens)
                   // Reset expert pagination before reload
                   homeScreenController.startExpert = 0;
-                  
+
                   // Reload data - this will update existing data rather than clearing it
                   await homeScreenController.onGetAllCategoryApiCall();
                   await homeScreenController.onGetAllSalonApiCall(
@@ -693,7 +700,7 @@ class PaymentScreenController extends GetxController {
                     start: homeScreenController.startExpert.toString(),
                     limit: homeScreenController.limitExpert.toString(),
                   );
-                  
+
                   log("Cash Payment - ✅ Home screen data reloaded successfully");
                 } else {
                   log("Cash Payment - ⚠️ HomeScreenController not found, data will load on next screen init");
@@ -702,9 +709,10 @@ class PaymentScreenController extends GetxController {
                 // CRITICAL FIX: Reload notification data after successful booking
                 // This ensures new notifications (including booking confirmation) appear in the app
                 try {
-                  NotificationController? notificationController = Get.isRegistered<NotificationController>()
-                      ? Get.find<NotificationController>()
-                      : null;
+                  NotificationController? notificationController =
+                      Get.isRegistered<NotificationController>()
+                          ? Get.find<NotificationController>()
+                          : null;
 
                   if (notificationController != null) {
                     log("Cash Payment - Reloading notification data...");
@@ -723,9 +731,10 @@ class PaymentScreenController extends GetxController {
                 // CRITICAL FIX: Reload booking detail data after successful booking
                 // This ensures the new booking appears in the booking list
                 try {
-                  BookingDetailScreenController? bookingDetailController = Get.isRegistered<BookingDetailScreenController>()
-                      ? Get.find<BookingDetailScreenController>()
-                      : null;
+                  BookingDetailScreenController? bookingDetailController =
+                      Get.isRegistered<BookingDetailScreenController>()
+                          ? Get.find<BookingDetailScreenController>()
+                          : null;
 
                   if (bookingDetailController != null) {
                     log("Cash Payment - Reloading booking detail data...");
@@ -737,7 +746,9 @@ class PaymentScreenController extends GetxController {
                       status: "pending",
                       start: bookingDetailController.startPending.toString(),
                       limit: bookingDetailController.limitPending.toString(),
-                      search: bookingDetailController.bookingDetailScreenEditingController.text.trim(),
+                      search: bookingDetailController
+                          .bookingDetailScreenEditingController.text
+                          .trim(),
                     );
                     log("Cash Payment - ✅ Booking detail data reloaded successfully");
                   } else {
@@ -879,8 +890,8 @@ class PaymentScreenController extends GetxController {
             bookingScreenController!.totalPrice = 0.0;
             bookingScreenController!.resetCoupon();
 
-            // Navigate back to home screen
-            Get.offAllNamed(AppRoutes.bottom);
+            // Navigate back to home screen - use offAndToNamed to preserve controllers (like PRD)
+            Get.offAndToNamed(AppRoutes.bottom);
 
             // Show success dialog IMMEDIATELY (don't wait for data reload)
             Get.dialog(
@@ -896,17 +907,18 @@ class PaymentScreenController extends GetxController {
             // Using Future without await so it doesn't block the dialog
             Future.microtask(() async {
               try {
-                HomeScreenController? homeScreenController = Get.isRegistered<HomeScreenController>()
-                    ? Get.find<HomeScreenController>()
-                    : null;
+                HomeScreenController? homeScreenController =
+                    Get.isRegistered<HomeScreenController>()
+                        ? Get.find<HomeScreenController>()
+                        : null;
 
                 if (homeScreenController != null) {
                   log("Wallet Payment - Reloading home screen data...");
-                  
+
                   // Reload data (don't set to null to avoid showing empty screens)
                   // Reset expert pagination before reload
                   homeScreenController.startExpert = 0;
-                  
+
                   // Reload data - this will update existing data rather than clearing it
                   await homeScreenController.onGetAllCategoryApiCall();
                   await homeScreenController.onGetAllSalonApiCall(
@@ -918,7 +930,7 @@ class PaymentScreenController extends GetxController {
                     start: homeScreenController.startExpert.toString(),
                     limit: homeScreenController.limitExpert.toString(),
                   );
-                  
+
                   log("Wallet Payment - ✅ Home screen data reloaded successfully");
                 } else {
                   log("Wallet Payment - ⚠️ HomeScreenController not found, data will load on next screen init");
@@ -927,9 +939,10 @@ class PaymentScreenController extends GetxController {
                 // CRITICAL FIX: Reload notification data after successful booking
                 // This ensures new notifications (including booking confirmation) appear in the app
                 try {
-                  NotificationController? notificationController = Get.isRegistered<NotificationController>()
-                      ? Get.find<NotificationController>()
-                      : null;
+                  NotificationController? notificationController =
+                      Get.isRegistered<NotificationController>()
+                          ? Get.find<NotificationController>()
+                          : null;
 
                   if (notificationController != null) {
                     log("Wallet Payment - Reloading notification data...");
@@ -948,9 +961,10 @@ class PaymentScreenController extends GetxController {
                 // CRITICAL FIX: Reload booking detail data after successful booking
                 // This ensures the new booking appears in the booking list
                 try {
-                  BookingDetailScreenController? bookingDetailController = Get.isRegistered<BookingDetailScreenController>()
-                      ? Get.find<BookingDetailScreenController>()
-                      : null;
+                  BookingDetailScreenController? bookingDetailController =
+                      Get.isRegistered<BookingDetailScreenController>()
+                          ? Get.find<BookingDetailScreenController>()
+                          : null;
 
                   if (bookingDetailController != null) {
                     log("Wallet Payment - Reloading booking detail data...");
@@ -962,7 +976,9 @@ class PaymentScreenController extends GetxController {
                       status: "pending",
                       start: bookingDetailController.startPending.toString(),
                       limit: bookingDetailController.limitPending.toString(),
-                      search: bookingDetailController.bookingDetailScreenEditingController.text.trim(),
+                      search: bookingDetailController
+                          .bookingDetailScreenEditingController.text
+                          .trim(),
                     );
                     log("Wallet Payment - ✅ Booking detail data reloaded successfully");
                   } else {
