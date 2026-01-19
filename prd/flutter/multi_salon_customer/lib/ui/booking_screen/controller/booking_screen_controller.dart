@@ -278,6 +278,10 @@ class BookingScreenController extends GetxController {
   onGetSlotsList() {
     morningSlots.clear();
     afternoonSlots.clear();
+    
+    // Reset flags to default values
+    hasMorningSlots = true;
+    hasAfternoonSlots = true;
 
     totalDuration = getBookingModel?.salonTime?.time?.toInt();
     breakStartTimes = breakStartTime ?? "";
@@ -295,7 +299,10 @@ class BookingScreenController extends GetxController {
       afternoonSlots.add(getBookingModel?.allSlots?.evening?[i] ?? "");
     }
 
-    afternoonSlots = afternoonSlots.sublist(1);
+    // Only call sublist if list has more than 1 element to avoid range error
+    if (afternoonSlots.length > 1) {
+      afternoonSlots = afternoonSlots.sublist(1);
+    }
 
     log("Morning Slot :: $morningSlots");
     log("Afternoon Slot :: $afternoonSlots");

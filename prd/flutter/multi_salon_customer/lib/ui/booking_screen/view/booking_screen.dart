@@ -997,17 +997,24 @@ class BookingScreen extends StatelessWidget {
 
   Widget buildSlotCategory(
       String category, List<String> slots, String selectedDate) {
-    bookingScreenController.hasMorningSlots = slots.any((slot) {
+    // Check if there are any available slots (slots in the future)
+    bool hasAvailableSlots = slots.any((slot) {
       DateTime currentTime = DateTime.now();
       DateTime currentDate = DateTime.now();
       DateTime slotDateTime = DateFormat('yyyy-MM-dd').parse(selectedDate);
 
-      DateTime currentTimeWithDate = DateTime(
+      // Normalize current date to start of day for comparison
+      DateTime currentDateNormalized = DateTime(
         currentDate.year,
         currentDate.month,
         currentDate.day,
-        currentTime.hour,
-        currentTime.minute,
+      );
+
+      // Normalize slot date to start of day for comparison
+      DateTime slotDateNormalized = DateTime(
+        slotDateTime.year,
+        slotDateTime.month,
+        slotDateTime.day,
       );
 
       DateTime slotTime = DateFormat('hh:mm a').parse(slot);
@@ -1019,12 +1026,31 @@ class BookingScreen extends StatelessWidget {
         slotTime.minute,
       );
 
-      return !currentDate.isAfter(slotDateTime) ||
-          !currentTimeWithDate.isAfter(slotTimeWithDate);
+      // If slot date is in the future, show all slots
+      if (slotDateNormalized.isAfter(currentDateNormalized)) {
+        return true;
+      }
+
+      // If slot date is today, only show slots that are after current time
+      if (slotDateNormalized.isAtSameMomentAs(currentDateNormalized)) {
+        return slotTimeWithDate.isAfter(currentTime);
+      }
+
+      // If slot date is in the past, don't show
+      return false;
     });
 
-    if (!(bookingScreenController.hasMorningSlots) && category == "Morning") {
-      return const SizedBox();
+    // Set the appropriate flag based on category
+    if (category == "txtMorning".tr || category == "Morning") {
+      bookingScreenController.hasMorningSlots = hasAvailableSlots;
+      if (!hasAvailableSlots) {
+        return const SizedBox();
+      }
+    } else if (category == "txtAfternoon".tr || category == "Afternoon") {
+      bookingScreenController.hasAfternoonSlots = hasAvailableSlots;
+      if (!hasAvailableSlots) {
+        return const SizedBox();
+      }
     }
 
     return SafeArea(

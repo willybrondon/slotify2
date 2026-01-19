@@ -605,6 +605,10 @@ class BookingScreenController extends GetxController {
   onGetSlotsList() {
     morningSlots.clear();
     afternoonSlots.clear();
+    
+    // Reset flags to default values
+    hasMorningSlots = true;
+    hasAfternoonSlots = true;
 
     totalDuration = getBookingModel?.salonTime?.time?.toInt();
     breakStartTimes = breakStartTime ?? "";
