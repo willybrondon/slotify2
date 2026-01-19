@@ -114,6 +114,7 @@ exports.getBookingBasedDate = async (req, res) => {
 };
 
 exports.newBooking = async (req, res, next) => {
+  let booking = null; // Declare booking at function scope so it's accessible in catch block
   try {
     console.log("req.body++++++++", req.body);
 
@@ -215,7 +216,7 @@ exports.newBooking = async (req, res, next) => {
       });
     }
 
-    const booking = new Booking();
+    booking = new Booking();
 
     booking.userId = user._id;
     booking.expertId = expert._id;
@@ -440,7 +441,9 @@ exports.newBooking = async (req, res, next) => {
               
               if (existingBooking && existingBooking.status === 'pending') {
                 // Time slot is already booked, delete this booking and throw error
-                await Booking.deleteOne({ _id: booking._id });
+                if (booking && booking._id) {
+                  await Booking.deleteOne({ _id: booking._id });
+                }
                 throw new Error(`Time slot ${time} is already booked for this date and expert`);
               } else {
                 // Old booking doesn't exist or is not pending, delete the unique string and retry
@@ -543,6 +546,14 @@ exports.newBooking = async (req, res, next) => {
       } catch (cleanupError) {
         console.log("Error during cleanup:", cleanupError);
       }
+    }
+    
+    // Handle "time slot already booked" error specifically
+    if (error.message && error.message.includes("is already booked")) {
+      return res.status(200).send({ 
+        status: false, 
+        message: error.message 
+      });
     }
     
     // Handle duplicate key error specifically
