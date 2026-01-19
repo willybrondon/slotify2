@@ -18,7 +18,9 @@ class SuccessDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 335,
+      height: 365,
+      width: 300,
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
       decoration: BoxDecoration(
         color: AppColors.dialogBg,
         borderRadius: BorderRadius.circular(45),
@@ -27,15 +29,15 @@ class SuccessDialog extends StatelessWidget {
         children: [
           Image.asset(
             AppAsset.inSuccessfully,
-            height: 70,
-            width: 70,
-          ).paddingOnly(top: 5, bottom: 15),
+            height: 90,
+            width: 90,
+          ).paddingOnly(top: 10, bottom: 20),
           Text(
             "txtBookingSuccessful".tr,
             style: TextStyle(
               fontFamily: AppFontFamily.sfProDisplayBold,
               color: AppColors.categoryService,
-              fontSize: 20,
+              fontSize: 23,
             ),
           ),
           SizedBox(
@@ -46,24 +48,24 @@ class SuccessDialog extends StatelessWidget {
               style: TextStyle(
                 fontFamily: AppFontFamily.sfProDisplayRegular,
                 color: AppColors.captionDialog,
-                fontSize: 14,
+                fontSize: 16,
               ),
             ),
-          ).paddingOnly(top: 8, bottom: 5),
+          ),
           const Spacer(),
           GetBuilder<BottomBarController>(
             id: Constant.idBottomBar,
             builder: (logic) {
               return AppButton(
                 buttonColor: AppColors.primaryAppColor,
-                width: Get.width * 0.6,
-                height: 42,
+                width: Get.width * 0.65,
+                height: 46,
                 buttonText: "txtGotoBookings".tr,
                 color: AppColors.whiteColor,
                 fontFamily: AppFontFamily.sfProDisplay,
                 borderColor: AppColors.grey.withOpacity(0.1),
                 borderWidth: 1,
-                fontSize: 14,
+                fontSize: 15,
                 onTap: () {
                   logic.onClick(1);
                   Get.back();
@@ -71,16 +73,16 @@ class SuccessDialog extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           AppButton(
             buttonColor: AppColors.whiteColor,
-            width: Get.width * 0.6,
-            height: 42,
+            width: Get.width * 0.65,
+            height: 46,
             buttonText: "txtCancel".tr,
             borderColor: AppColors.greyColor.withOpacity(0.1),
             borderWidth: 1,
             fontFamily: AppFontFamily.sfProDisplay,
-            fontSize: 14,
+            fontSize: 15,
             color: AppColors.primaryTextColor,
             onTap: () {
               Get.back();

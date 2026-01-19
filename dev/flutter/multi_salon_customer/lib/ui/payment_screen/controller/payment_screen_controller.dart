@@ -21,6 +21,7 @@ import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/utils/utils.dart';
+import 'package:intl/intl.dart';
 
 class PaymentScreenController extends GetxController {
   dynamic args = Get.arguments;
@@ -660,14 +661,44 @@ class PaymentScreenController extends GetxController {
             bookingScreenController!.totalPrice = 0.0;
             bookingScreenController!.resetCoupon();
 
+            // CRITICAL FIX: Reset booking screen controller state completely for next booking
+            // This ensures the booking process starts fresh like the first booking
+            bookingScreenController!.currentStep = 0;
+            bookingScreenController!.stepCount = 0;
+            bookingScreenController!.selectExpert = -1;
+            bookingScreenController!.expertDetail = null;
+            bookingScreenController!.selectedExpertDataList.clear();
+            bookingScreenController!.salonId = null;
+            bookingScreenController!.serviceId.clear();
+            bookingScreenController!.checkItem.clear();
+            bookingScreenController!.selectedVenue = "";
+            bookingScreenController!.slotsString = null;
+            bookingScreenController!.selectedSlot = '';
+            bookingScreenController!.selectedSlotsList.clear();
+            bookingScreenController!.morningSlots.clear();
+            bookingScreenController!.afternoonSlots.clear();
+            bookingScreenController!.eveningSlots.clear();
+            bookingScreenController!.disabledSlotsMap.clear();
+            bookingScreenController!.searchEditingController.clear();
+            bookingScreenController!.getBookingModel = null;
+            bookingScreenController!.getExpertServiceBaseSalonCategory = null;
+            bookingScreenController!.checkValue = false;
+            bookingScreenController!.hasMorningSlots = true;
+            bookingScreenController!.hasAfternoonSlots = true;
+            bookingScreenController!.totalMinute = null;
+            bookingScreenController!.date =
+                DateFormat('yyyy-MM-dd').format(DateTime.now());
+            bookingScreenController!.formattedDate =
+                DateFormat('yyyy-MM-dd').format(DateTime.now());
+
             // Navigate back to home screen - use offAndToNamed to preserve controllers (like PRD)
             Get.offAndToNamed(AppRoutes.bottom);
 
             // Show success dialog IMMEDIATELY (don't wait for data reload)
             Get.dialog(
               barrierColor: AppColors.blackColor.withOpacity(0.8),
-              Material(
-                color: AppColors.transparent,
+              Dialog(
+                backgroundColor: AppColors.transparent,
                 child: SuccessDialog(),
               ),
             );
@@ -884,11 +915,43 @@ class PaymentScreenController extends GetxController {
           bookingScreenController!.update([Constant.idProgressView]);
 
           if (bookingScreenController!.createBookingCategory?.status == true) {
-            // Clear all data and show success
+            log("Wallet Payment - ✅ Booking created successfully!");
+
+            // Clear all data
             bookingScreenController!.finalTaxRupee = 0.0;
             bookingScreenController!.withOutTaxRupee = 0.0;
             bookingScreenController!.totalPrice = 0.0;
             bookingScreenController!.resetCoupon();
+
+            // CRITICAL FIX: Reset booking screen controller state completely for next booking
+            // This ensures the booking process starts fresh like the first booking
+            bookingScreenController!.currentStep = 0;
+            bookingScreenController!.stepCount = 0;
+            bookingScreenController!.selectExpert = -1;
+            bookingScreenController!.expertDetail = null;
+            bookingScreenController!.selectedExpertDataList.clear();
+            bookingScreenController!.salonId = null;
+            bookingScreenController!.serviceId.clear();
+            bookingScreenController!.checkItem.clear();
+            bookingScreenController!.selectedVenue = "";
+            bookingScreenController!.slotsString = null;
+            bookingScreenController!.selectedSlot = '';
+            bookingScreenController!.selectedSlotsList.clear();
+            bookingScreenController!.morningSlots.clear();
+            bookingScreenController!.afternoonSlots.clear();
+            bookingScreenController!.eveningSlots.clear();
+            bookingScreenController!.disabledSlotsMap.clear();
+            bookingScreenController!.searchEditingController.clear();
+            bookingScreenController!.getBookingModel = null;
+            bookingScreenController!.getExpertServiceBaseSalonCategory = null;
+            bookingScreenController!.checkValue = false;
+            bookingScreenController!.hasMorningSlots = true;
+            bookingScreenController!.hasAfternoonSlots = true;
+            bookingScreenController!.totalMinute = null;
+            bookingScreenController!.date =
+                DateFormat('yyyy-MM-dd').format(DateTime.now());
+            bookingScreenController!.formattedDate =
+                DateFormat('yyyy-MM-dd').format(DateTime.now());
 
             // Navigate back to home screen - use offAndToNamed to preserve controllers (like PRD)
             Get.offAndToNamed(AppRoutes.bottom);
@@ -896,8 +959,8 @@ class PaymentScreenController extends GetxController {
             // Show success dialog IMMEDIATELY (don't wait for data reload)
             Get.dialog(
               barrierColor: AppColors.blackColor.withOpacity(0.8),
-              Material(
-                color: AppColors.transparent,
+              Dialog(
+                backgroundColor: AppColors.transparent,
                 child: SuccessDialog(),
               ),
             );
