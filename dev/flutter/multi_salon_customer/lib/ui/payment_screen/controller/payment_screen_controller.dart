@@ -13,6 +13,12 @@ import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.d
 import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_screen_controller.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/notification_screen/controller/notification_controller.dart';
+import 'package:salon_2/ui/branch_detail_screen/controller/branch_detail_controller.dart';
+import 'package:salon_2/ui/category_details/controller/category_detail_controller.dart';
+import 'package:salon_2/ui/search_screen/controller/search_screen_controller.dart';
+import 'package:salon_2/ui/select_branch_screen/controller/select_branch_controller.dart';
+import 'package:salon_2/ui/view_all_category/controller/view_all_category_controller.dart';
+import 'package:salon_2/ui/expert/expert_detail/controller/expert_detail_controller.dart';
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
 import 'package:salon_2/ui/payment_screen/model/deposit_to_wallet_model.dart';
 import 'package:salon_2/utils/app_colors.dart';
@@ -690,22 +696,114 @@ class PaymentScreenController extends GetxController {
             bookingScreenController!.salonAddress = null;
             bookingScreenController!.getSalonDetailCategory = null;
 
+            // CRITICAL FIX: Clear all controller data like PRD does (to fix salon detail null, expert button state, etc.)
+            // Get controllers (use Get.isRegistered to check if they exist)
+            HomeScreenController? homeScreenControllerCash =
+                Get.isRegistered<HomeScreenController>()
+                    ? Get.find<HomeScreenController>()
+                    : null;
+
+            BranchDetailController? branchDetailControllerCash =
+                Get.isRegistered<BranchDetailController>()
+                    ? Get.find<BranchDetailController>()
+                    : null;
+
+            CategoryDetailController? categoryDetailControllerCash =
+                Get.isRegistered<CategoryDetailController>()
+                    ? Get.find<CategoryDetailController>()
+                    : null;
+
+            SearchScreenController? searchScreenControllerCash =
+                Get.isRegistered<SearchScreenController>()
+                    ? Get.find<SearchScreenController>()
+                    : null;
+
+            SelectBranchController? selectBranchControllerCash =
+                Get.isRegistered<SelectBranchController>()
+                    ? Get.find<SelectBranchController>()
+                    : null;
+
+            // Clear HomeScreenController data (like PRD)
+            if (homeScreenControllerCash != null) {
+              homeScreenControllerCash.withOutTaxRupee = 0.0;
+              homeScreenControllerCash.totalPrice = 0.0;
+              homeScreenControllerCash.finalTaxRupee = 0.0;
+              homeScreenControllerCash.totalMinute = 0;
+              homeScreenControllerCash.checkItem.clear();
+              homeScreenControllerCash.serviceId.clear();
+              homeScreenControllerCash.serviceName.clear();
+
+              // CRITICAL: Clear expert-related data (this fixes the button showing as selected)
+              homeScreenControllerCash.withOutTaxRupeeExpert = 0.0;
+              homeScreenControllerCash.totalPriceExpert = 0.0;
+              homeScreenControllerCash.finalTaxRupeeExpert = 0.0;
+              homeScreenControllerCash.totalMinuteExpert = 0;
+              homeScreenControllerCash.checkItemExpert.clear();
+              homeScreenControllerCash.serviceIdExpert.clear();
+              homeScreenControllerCash.serviceNameExpert.clear();
+            }
+
+            // Clear SearchScreenController data
+            if (searchScreenControllerCash != null) {
+              searchScreenControllerCash.totalMinute = 0;
+              searchScreenControllerCash.checkItem.clear();
+              searchScreenControllerCash.serviceId.clear();
+              searchScreenControllerCash.serviceName.clear();
+            }
+
+            // Clear CategoryDetailController data
+            if (categoryDetailControllerCash != null) {
+              categoryDetailControllerCash.totalMinute = 0;
+              categoryDetailControllerCash.checkItem.clear();
+              categoryDetailControllerCash.serviceId.clear();
+              categoryDetailControllerCash.serviceName.clear();
+            }
+
+            // Clear BranchDetailController data
+            if (branchDetailControllerCash != null) {
+              branchDetailControllerCash.withOutTaxRupee = 0.0;
+              branchDetailControllerCash.totalPrice = 0.0;
+              branchDetailControllerCash.finalTaxRupee = 0.0;
+              branchDetailControllerCash.totalMinute = 0;
+              branchDetailControllerCash.checkItem.clear();
+              branchDetailControllerCash.serviceId.clear();
+            }
+
+            // Clear SelectBranchController
+            if (selectBranchControllerCash != null) {
+              selectBranchControllerCash.selectBranch = -1;
+            }
+
             // Remove expertDetail from storage (like PRD) - this ensures fresh expert selection on next booking
             Constant.storage.remove("expertDetail");
 
             // Navigate back to home screen - use offAndToNamed to preserve controllers (like PRD)
             Get.offAndToNamed(AppRoutes.bottom);
 
-            // Delete BookingScreenController after navigation so it gets recreated fresh with new arguments on next booking
-            // This ensures onInit() and getDataFromArgs() are called with fresh navigation arguments
+            // Delete controllers after clearing (like PRD) - this ensures fresh data on next visit
             Future.delayed(Duration(seconds: 1), () {
               try {
+                if (Get.isRegistered<CategoryDetailController>()) {
+                  Get.delete<CategoryDetailController>();
+                }
+                if (Get.isRegistered<BranchDetailController>()) {
+                  Get.delete<BranchDetailController>();
+                }
+                if (Get.isRegistered<SelectBranchController>()) {
+                  Get.delete<SelectBranchController>();
+                }
+                if (Get.isRegistered<ViewAllCategoryController>()) {
+                  Get.delete<ViewAllCategoryController>();
+                }
+                if (Get.isRegistered<ExpertDetailController>()) {
+                  Get.delete<ExpertDetailController>();
+                }
                 if (Get.isRegistered<BookingScreenController>()) {
                   Get.delete<BookingScreenController>();
-                  log("Cash Payment - ✅ BookingScreenController deleted for fresh recreation");
                 }
+                log("Cash Payment - ✅ Controllers deleted for fresh recreation");
               } catch (e) {
-                log("Cash Payment - ⚠️ Error deleting BookingScreenController: $e");
+                log("Cash Payment - ⚠️ Error deleting controllers: $e");
               }
             });
 
@@ -967,22 +1065,114 @@ class PaymentScreenController extends GetxController {
             bookingScreenController!.salonAddress = null;
             bookingScreenController!.getSalonDetailCategory = null;
 
+            // CRITICAL FIX: Clear all controller data like PRD does (to fix salon detail null, expert button state, etc.)
+            // Get controllers (use Get.isRegistered to check if they exist)
+            HomeScreenController? homeScreenControllerWallet =
+                Get.isRegistered<HomeScreenController>()
+                    ? Get.find<HomeScreenController>()
+                    : null;
+
+            BranchDetailController? branchDetailControllerWallet =
+                Get.isRegistered<BranchDetailController>()
+                    ? Get.find<BranchDetailController>()
+                    : null;
+
+            CategoryDetailController? categoryDetailControllerWallet =
+                Get.isRegistered<CategoryDetailController>()
+                    ? Get.find<CategoryDetailController>()
+                    : null;
+
+            SearchScreenController? searchScreenControllerWallet =
+                Get.isRegistered<SearchScreenController>()
+                    ? Get.find<SearchScreenController>()
+                    : null;
+
+            SelectBranchController? selectBranchControllerWallet =
+                Get.isRegistered<SelectBranchController>()
+                    ? Get.find<SelectBranchController>()
+                    : null;
+
+            // Clear HomeScreenController data (like PRD)
+            if (homeScreenControllerWallet != null) {
+              homeScreenControllerWallet.withOutTaxRupee = 0.0;
+              homeScreenControllerWallet.totalPrice = 0.0;
+              homeScreenControllerWallet.finalTaxRupee = 0.0;
+              homeScreenControllerWallet.totalMinute = 0;
+              homeScreenControllerWallet.checkItem.clear();
+              homeScreenControllerWallet.serviceId.clear();
+              homeScreenControllerWallet.serviceName.clear();
+
+              // CRITICAL: Clear expert-related data (this fixes the button showing as selected)
+              homeScreenControllerWallet.withOutTaxRupeeExpert = 0.0;
+              homeScreenControllerWallet.totalPriceExpert = 0.0;
+              homeScreenControllerWallet.finalTaxRupeeExpert = 0.0;
+              homeScreenControllerWallet.totalMinuteExpert = 0;
+              homeScreenControllerWallet.checkItemExpert.clear();
+              homeScreenControllerWallet.serviceIdExpert.clear();
+              homeScreenControllerWallet.serviceNameExpert.clear();
+            }
+
+            // Clear SearchScreenController data
+            if (searchScreenControllerWallet != null) {
+              searchScreenControllerWallet.totalMinute = 0;
+              searchScreenControllerWallet.checkItem.clear();
+              searchScreenControllerWallet.serviceId.clear();
+              searchScreenControllerWallet.serviceName.clear();
+            }
+
+            // Clear CategoryDetailController data
+            if (categoryDetailControllerWallet != null) {
+              categoryDetailControllerWallet.totalMinute = 0;
+              categoryDetailControllerWallet.checkItem.clear();
+              categoryDetailControllerWallet.serviceId.clear();
+              categoryDetailControllerWallet.serviceName.clear();
+            }
+
+            // Clear BranchDetailController data
+            if (branchDetailControllerWallet != null) {
+              branchDetailControllerWallet.withOutTaxRupee = 0.0;
+              branchDetailControllerWallet.totalPrice = 0.0;
+              branchDetailControllerWallet.finalTaxRupee = 0.0;
+              branchDetailControllerWallet.totalMinute = 0;
+              branchDetailControllerWallet.checkItem.clear();
+              branchDetailControllerWallet.serviceId.clear();
+            }
+
+            // Clear SelectBranchController
+            if (selectBranchControllerWallet != null) {
+              selectBranchControllerWallet.selectBranch = -1;
+            }
+
             // Remove expertDetail from storage (like PRD) - this ensures fresh expert selection on next booking
             Constant.storage.remove("expertDetail");
 
             // Navigate back to home screen - use offAndToNamed to preserve controllers (like PRD)
             Get.offAndToNamed(AppRoutes.bottom);
 
-            // Delete BookingScreenController after navigation so it gets recreated fresh with new arguments on next booking
-            // This ensures onInit() and getDataFromArgs() are called with fresh navigation arguments
+            // Delete controllers after clearing (like PRD) - this ensures fresh data on next visit
             Future.delayed(Duration(seconds: 1), () {
               try {
+                if (Get.isRegistered<CategoryDetailController>()) {
+                  Get.delete<CategoryDetailController>();
+                }
+                if (Get.isRegistered<BranchDetailController>()) {
+                  Get.delete<BranchDetailController>();
+                }
+                if (Get.isRegistered<SelectBranchController>()) {
+                  Get.delete<SelectBranchController>();
+                }
+                if (Get.isRegistered<ViewAllCategoryController>()) {
+                  Get.delete<ViewAllCategoryController>();
+                }
+                if (Get.isRegistered<ExpertDetailController>()) {
+                  Get.delete<ExpertDetailController>();
+                }
                 if (Get.isRegistered<BookingScreenController>()) {
                   Get.delete<BookingScreenController>();
-                  log("Wallet Payment - ✅ BookingScreenController deleted for fresh recreation");
                 }
+                log("Wallet Payment - ✅ Controllers deleted for fresh recreation");
               } catch (e) {
-                log("Wallet Payment - ⚠️ Error deleting BookingScreenController: $e");
+                log("Wallet Payment - ⚠️ Error deleting controllers: $e");
               }
             });
 
