@@ -655,22 +655,19 @@ class PaymentScreenController extends GetxController {
           if (bookingScreenController!.createBookingCategory?.status == true) {
             log("Cash Payment - ✅ Booking created successfully!");
 
-            // Clear all data
+            // Clear prices only (data from navigation arguments will be set when user navigates to booking screen again)
             bookingScreenController!.finalTaxRupee = 0.0;
             bookingScreenController!.withOutTaxRupee = 0.0;
             bookingScreenController!.totalPrice = 0.0;
             bookingScreenController!.resetCoupon();
 
-            // CRITICAL FIX: Reset booking screen controller state completely for next booking
-            // This ensures the booking process starts fresh like the first booking
+            // CRITICAL FIX: Reset booking flow state only (not data from navigation arguments)
+            // Navigation arguments (salonId, serviceId, checkItem, totalPrice, etc.) will be set via getDataFromArgs() when user navigates to booking screen again
             bookingScreenController!.currentStep = 0;
             bookingScreenController!.stepCount = 0;
             bookingScreenController!.selectExpert = -1;
             bookingScreenController!.expertDetail = null;
             bookingScreenController!.selectedExpertDataList.clear();
-            bookingScreenController!.salonId = null;
-            bookingScreenController!.serviceId.clear();
-            bookingScreenController!.checkItem.clear();
             bookingScreenController!.selectedVenue = "";
             bookingScreenController!.slotsString = null;
             bookingScreenController!.selectedSlot = '';
@@ -685,14 +682,32 @@ class PaymentScreenController extends GetxController {
             bookingScreenController!.checkValue = false;
             bookingScreenController!.hasMorningSlots = true;
             bookingScreenController!.hasAfternoonSlots = true;
-            bookingScreenController!.totalMinute = null;
             bookingScreenController!.date =
                 DateFormat('yyyy-MM-dd').format(DateTime.now());
             bookingScreenController!.formattedDate =
                 DateFormat('yyyy-MM-dd').format(DateTime.now());
+            bookingScreenController!.salonName = null;
+            bookingScreenController!.salonAddress = null;
+            bookingScreenController!.getSalonDetailCategory = null;
+
+            // Remove expertDetail from storage (like PRD) - this ensures fresh expert selection on next booking
+            Constant.storage.remove("expertDetail");
 
             // Navigate back to home screen - use offAndToNamed to preserve controllers (like PRD)
             Get.offAndToNamed(AppRoutes.bottom);
+
+            // Delete BookingScreenController after navigation so it gets recreated fresh with new arguments on next booking
+            // This ensures onInit() and getDataFromArgs() are called with fresh navigation arguments
+            Future.delayed(Duration(seconds: 1), () {
+              try {
+                if (Get.isRegistered<BookingScreenController>()) {
+                  Get.delete<BookingScreenController>();
+                  log("Cash Payment - ✅ BookingScreenController deleted for fresh recreation");
+                }
+              } catch (e) {
+                log("Cash Payment - ⚠️ Error deleting BookingScreenController: $e");
+              }
+            });
 
             // Show success dialog IMMEDIATELY (don't wait for data reload)
             Get.dialog(
@@ -917,22 +932,19 @@ class PaymentScreenController extends GetxController {
           if (bookingScreenController!.createBookingCategory?.status == true) {
             log("Wallet Payment - ✅ Booking created successfully!");
 
-            // Clear all data
+            // Clear prices only (data from navigation arguments will be set when user navigates to booking screen again)
             bookingScreenController!.finalTaxRupee = 0.0;
             bookingScreenController!.withOutTaxRupee = 0.0;
             bookingScreenController!.totalPrice = 0.0;
             bookingScreenController!.resetCoupon();
 
-            // CRITICAL FIX: Reset booking screen controller state completely for next booking
-            // This ensures the booking process starts fresh like the first booking
+            // CRITICAL FIX: Reset booking flow state only (not data from navigation arguments)
+            // Navigation arguments (salonId, serviceId, checkItem, totalPrice, etc.) will be set via getDataFromArgs() when user navigates to booking screen again
             bookingScreenController!.currentStep = 0;
             bookingScreenController!.stepCount = 0;
             bookingScreenController!.selectExpert = -1;
             bookingScreenController!.expertDetail = null;
             bookingScreenController!.selectedExpertDataList.clear();
-            bookingScreenController!.salonId = null;
-            bookingScreenController!.serviceId.clear();
-            bookingScreenController!.checkItem.clear();
             bookingScreenController!.selectedVenue = "";
             bookingScreenController!.slotsString = null;
             bookingScreenController!.selectedSlot = '';
@@ -947,14 +959,32 @@ class PaymentScreenController extends GetxController {
             bookingScreenController!.checkValue = false;
             bookingScreenController!.hasMorningSlots = true;
             bookingScreenController!.hasAfternoonSlots = true;
-            bookingScreenController!.totalMinute = null;
             bookingScreenController!.date =
                 DateFormat('yyyy-MM-dd').format(DateTime.now());
             bookingScreenController!.formattedDate =
                 DateFormat('yyyy-MM-dd').format(DateTime.now());
+            bookingScreenController!.salonName = null;
+            bookingScreenController!.salonAddress = null;
+            bookingScreenController!.getSalonDetailCategory = null;
+
+            // Remove expertDetail from storage (like PRD) - this ensures fresh expert selection on next booking
+            Constant.storage.remove("expertDetail");
 
             // Navigate back to home screen - use offAndToNamed to preserve controllers (like PRD)
             Get.offAndToNamed(AppRoutes.bottom);
+
+            // Delete BookingScreenController after navigation so it gets recreated fresh with new arguments on next booking
+            // This ensures onInit() and getDataFromArgs() are called with fresh navigation arguments
+            Future.delayed(Duration(seconds: 1), () {
+              try {
+                if (Get.isRegistered<BookingScreenController>()) {
+                  Get.delete<BookingScreenController>();
+                  log("Wallet Payment - ✅ BookingScreenController deleted for fresh recreation");
+                }
+              } catch (e) {
+                log("Wallet Payment - ⚠️ Error deleting BookingScreenController: $e");
+              }
+            });
 
             // Show success dialog IMMEDIATELY (don't wait for data reload)
             Get.dialog(

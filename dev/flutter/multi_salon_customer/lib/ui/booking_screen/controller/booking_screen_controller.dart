@@ -622,7 +622,10 @@ class BookingScreenController extends GetxController {
       afternoonSlots.add(getBookingModel?.allSlots?.evening?[i] ?? "");
     }
 
-    afternoonSlots = afternoonSlots.sublist(1);
+    // Only call sublist if list has more than 1 element to avoid range error
+    if (afternoonSlots.length > 1) {
+      afternoonSlots = afternoonSlots.sublist(1);
+    }
 
     log("Morning Slot :: $morningSlots");
     log("Afternoon Slot :: $afternoonSlots");
