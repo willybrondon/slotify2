@@ -407,17 +407,57 @@ exports.newBooking = async (req, res, next) => {
     const uniqueBookingId = await generateUniqueBookingId();
     booking.bookingId = uniqueBookingId;
 
-    const bookingDateFormat = moment().format("YYYY-MM-DD");
-    const uniqueStrings = await Promise.all(
-      timeArray.map((time) =>
-        UString.create({
-          string: `${bookingDateFormat}-${expert._id}-${time}`,
-          bookingId: booking._id,
-        })
-      )
-    );
-
+    // Save booking first to get a valid _id
     await booking.save();
+
+    const bookingDateFormat = moment().format("YYYY-MM-DD");
+    
+    // Create unique strings with duplicate handling
+    const uniqueStrings = await Promise.all(
+      timeArray.map(async (time) => {
+        const uniqueStringValue = `${bookingDateFormat}-${expert._id}-${time}`;
+        
+        try {
+          // Try to create the unique string
+          return await UString.create({
+            string: uniqueStringValue,
+            bookingId: booking._id,
+          });
+        } catch (error) {
+          // Handle duplicate key error
+          if (error.code === 11000) {
+            // Check if the existing unique string is associated with this booking
+            const existingUniqueString = await UString.findOne({ string: uniqueStringValue });
+            
+            if (existingUniqueString && existingUniqueString.bookingId.toString() === booking._id.toString()) {
+              // Same booking, return the existing unique string
+              return existingUniqueString;
+            }
+            
+            // Check if it's associated with a valid pending booking
+            if (existingUniqueString) {
+              const existingBooking = await Booking.findById(existingUniqueString.bookingId);
+              
+              if (existingBooking && existingBooking.status === 'pending') {
+                // Time slot is already booked, delete this booking and throw error
+                await Booking.deleteOne({ _id: booking._id });
+                throw new Error(`Time slot ${time} is already booked for this date and expert`);
+              } else {
+                // Old booking doesn't exist or is not pending, delete the unique string and retry
+                await UString.deleteOne({ _id: existingUniqueString._id });
+                return await UString.create({
+                  string: uniqueStringValue,
+                  bookingId: booking._id,
+                });
+              }
+            }
+          }
+          
+          // Re-throw if it's not a duplicate key error
+          throw error;
+        }
+      })
+    );
 
     res.status(200).send({
       status: true,
@@ -492,6 +532,27 @@ exports.newBooking = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    
+    // Clean up: If booking was created but process failed, delete it and associated unique strings
+    if (booking && booking._id) {
+      try {
+        await Promise.all([
+          Booking.deleteOne({ _id: booking._id }),
+          UString.deleteMany({ bookingId: booking._id })
+        ]);
+      } catch (cleanupError) {
+        console.log("Error during cleanup:", cleanupError);
+      }
+    }
+    
+    // Handle duplicate key error specifically
+    if (error.code === 11000) {
+      return res.status(200).send({ 
+        status: false, 
+        message: "This time slot is already booked. Please try a different time." 
+      });
+    }
+    
     return res.status(500).send({ status: false, message: error.message || "Internal Server Error" });
   }
 };
