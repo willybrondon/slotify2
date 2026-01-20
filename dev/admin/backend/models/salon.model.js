@@ -50,6 +50,12 @@ const salonSchema = new mongoose.Schema(
 
     image: [{ type: String, default: "" }],
     mainImage: { type: String, default: "" },
+    heroImage: { type: String, default: "" }, // Hero image for public web page
+    valueProposition: {
+      title: { type: String, default: "" }, // Main value proposition title
+      description: { type: String, default: "" }, // Value proposition description
+      features: [{ type: String, default: "" }], // Array of feature highlights
+    },
     isBestSeller: { type: Boolean, default: false },
 
     serviceIds: [

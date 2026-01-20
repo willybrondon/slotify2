@@ -18,7 +18,7 @@ route.post("/claim", claimController.claimSalon);
 
 route.get("/profile", salon, checkAccessWithSecretKey(), salonController.profile);
 
-route.patch("/update", salon, upload.fields([{ name: "image", maxCount: 10 }, { name: "mainImage" }]), checkAccessWithSecretKey(), salonController.update);
+route.patch("/update", salon, upload.fields([{ name: "image", maxCount: 10 }, { name: "mainImage" }, { name: "heroImage" }]), checkAccessWithSecretKey(), salonController.update);
 
 route.post("/updateSalonPassword", checkAccessWithSecretKey(), salon, salonController.updateSalonPassword);
 

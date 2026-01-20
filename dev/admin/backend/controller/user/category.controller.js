@@ -478,8 +478,13 @@ exports.serveCategoryPage = async (req, res) => {
                 <h3 class="salon-card-name">${salon.name}</h3>
                 ${ratingHtml}
                 ${priceHtml}
-                ${salon.address ? `<div class="salon-address">📍 ${salon.address}</div>` : ''}
+                ${salon.address ? `<div class="salon-address"><i class="fas fa-map-marker-alt"></i> ${salon.address}</div>` : ''}
                 ${distanceHtml}
+                <div class="salon-card-cta">
+                  <span class="salon-card-cta-btn">
+                    <i class="fas fa-calendar-check"></i> View & Book
+                  </span>
+                </div>
               </div>
             </a>
           `;
@@ -553,19 +558,85 @@ exports.serveCategoryPage = async (req, res) => {
             line-height: 1.6;
             padding-top: 80px; /* Account for fixed navbar */
         }
+        /* Category Hero Section */
+        .category-hero-section {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        .category-hero-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .category-hero-placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .category-hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+        }
+        .category-hero-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: white;
+            padding: 40px 0;
+        }
+        .category-hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .category-hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 24px;
+            max-width: 700px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            line-height: 1.6;
+        }
+        .category-hero-stats {
+            display: flex;
+            gap: 32px;
+            font-size: 1.1rem;
+        }
+        .category-hero-stats span {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 8px;
+        }
+        .category-hero-stats strong {
+            font-size: 1.3rem;
+            display: block;
+        }
+        
         .category-header {
             background: #fff;
             padding: 40px 0;
             border-bottom: 1px solid #eee;
-            margin-top: 0;
         }
         .category-header-content {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
-        .category-title {
-            font-size: 2.5rem;
+        .category-subtitle {
+            font-size: 2rem;
             font-weight: 700;
             color: #111;
             margin-bottom: 12px;
@@ -619,66 +690,105 @@ exports.serveCategoryPage = async (req, res) => {
         .salon-card {
             background: #fff;
             border: 1px solid #e0e0e0;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
             text-decoration: none;
             color: inherit;
-            transition: all 0.2s;
+            transition: all 0.3s;
             display: block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .salon-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
             border-color: #111;
         }
         .salon-card-image {
             width: 100%;
-            height: 200px;
+            height: 220px;
             object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .salon-card:hover .salon-card-image {
+            transform: scale(1.05);
         }
         .salon-card-image-placeholder {
             width: 100%;
-            height: 200px;
-            background: #f8f8f8;
+            height: 220px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #999;
+            color: white;
+            font-weight: 600;
         }
         .salon-card-content {
-            padding: 20px;
+            padding: 24px;
         }
         .salon-card-name {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #111;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            line-height: 1.3;
         }
         .salon-rating {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
         .rating-stars {
             color: #ffa500;
+            font-size: 1.1rem;
         }
         .salon-price {
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: #111;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
         }
         .salon-address {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #666;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
         }
         .salon-distance {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #999;
+            font-weight: 500;
+        }
+        .salon-card-cta {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+            text-align: center;
+        }
+        .salon-card-cta-btn {
+            background: #111;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .salon-card:hover .salon-card-cta-btn {
+            background: #333;
+            transform: translateY(-1px);
         }
         .no-results {
             text-align: center;
@@ -690,14 +800,27 @@ exports.serveCategoryPage = async (req, res) => {
         }
         @media (max-width: 768px) {
             body {
-                padding-top: 70px; /* Slightly less padding on mobile */
+                padding-top: 70px;
             }
-            .category-title {
+            .category-hero-section {
+                height: 300px;
+            }
+            .category-hero-title {
                 font-size: 2rem;
+            }
+            .category-hero-description {
+                font-size: 1rem;
+            }
+            .category-hero-stats {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .category-subtitle {
+                font-size: 1.75rem;
             }
             .salons-grid {
                 grid-template-columns: 1fr;
-                gap: 16px;
+                gap: 20px;
             }
         }
     </style>
@@ -760,10 +883,26 @@ exports.serveCategoryPage = async (req, res) => {
         </div>
     </nav>
     
+    <!-- Hero Section -->
+    <div class="category-hero-section">
+        ${categoryImage ? `<div class="category-hero-image" style="background-image: url('${categoryImage}');"></div>` : '<div class="category-hero-image category-hero-placeholder"></div>'}
+        <div class="category-hero-overlay"></div>
+        <div class="category-hero-content">
+            <div class="category-header-content">
+                <h1 class="category-hero-title">${category.name}</h1>
+                <p class="category-hero-description">${categoryDescription}</p>
+                <div class="category-hero-stats">
+                    <span><strong>${formattedSalons.length}</strong> Salons</span>
+                    <span><strong>${formattedSalons.filter(s => s.review > 0).length}</strong> Rated</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="category-header">
         <div class="category-header-content">
-            <h1 class="category-title">${category.name}</h1>
-            <p class="category-description">${category.description || `Find the best ${category.name} services at top-rated salons near you. Book your appointment today!`}</p>
+            <h2 class="category-subtitle">Discover Top ${category.name} Salons</h2>
+            <p class="category-description">${categoryDescription}</p>
         </div>
     </div>
     

@@ -33,11 +33,16 @@ export const AdminProfile = () => {
   const [mainImage, setMainImage] = useState([]);
   const [image, setImage] = useState([]);
   const [imagePath, setImagePath] = useState();
+  const [heroImage, setHeroImage] = useState([]);
+  const [heroImagePath, setHeroImagePath] = useState();
   const [mobile, setMobile] = useState();
   const [platformFee, setPlatformFee] = useState();
   const [latitude, setLatitude] = useState();
   const [longitude, setLongitude] = useState();
   const [about, setAbout] = useState();
+  const [valuePropositionTitle, setValuePropositionTitle] = useState();
+  const [valuePropositionDescription, setValuePropositionDescription] = useState();
+  const [valuePropositionFeatures, setValuePropositionFeatures] = useState();
 
   const [error, setError] = useState({
     name: "",
@@ -56,6 +61,10 @@ export const AdminProfile = () => {
     confirmPassword: "",
     oldPassword: "",
     about: "",
+    heroImage: "",
+    valuePropositionTitle: "",
+    valuePropositionDescription: "",
+    valuePropositionFeatures: "",
   });
 
   const [newPassword, setNewPassword] = useState("");
@@ -92,6 +101,10 @@ export const AdminProfile = () => {
       setPlatformFee(data?.platformFee);
       setImagePath(data?.mainImage);
       setAbout(data?.about);
+      setHeroImagePath(data?.heroImage);
+      setValuePropositionTitle(data?.valueProposition?.title || "");
+      setValuePropositionDescription(data?.valueProposition?.description || "");
+      setValuePropositionFeatures(data?.valueProposition?.features?.join(", ") || "");
     }
     setError({ name: "", email: "" });
   }, [data]);
@@ -102,6 +115,15 @@ export const AdminProfile = () => {
     setError((prevErrors) => ({
       ...prevErrors,
       image: "",
+    }));
+  };
+
+  const handleUploadHeroImage = (e) => {
+    setHeroImage(e.target.files[0]);
+    setHeroImagePath(URL.createObjectURL(e.target.files[0]));
+    setError((prevErrors) => ({
+      ...prevErrors,
+      heroImage: "",
     }));
   };
 
@@ -141,6 +163,9 @@ export const AdminProfile = () => {
     } else {
       const formData = new FormData();
       formData.append("mainImage", image);
+      if (heroImage) {
+        formData.append("heroImage", heroImage);
+      }
       formData.append("name", name);
       formData.append("email", email);
       formData.append("address", address);
@@ -152,6 +177,15 @@ export const AdminProfile = () => {
       formData.append("longitude", longitude);
       formData.append("mobile", mobile);
       formData.append("about", about);
+      if (valuePropositionTitle) {
+        formData.append("valuePropositionTitle", valuePropositionTitle);
+      }
+      if (valuePropositionDescription) {
+        formData.append("valuePropositionDescription", valuePropositionDescription);
+      }
+      if (valuePropositionFeatures) {
+        formData.append("valuePropositionFeatures", JSON.stringify(valuePropositionFeatures.split(",").map(f => f.trim()).filter(f => f)));
+      }
 
       let payload = {
         salonId: admin?._id,
@@ -405,6 +439,121 @@ export const AdminProfile = () => {
                         }
                       }}
                     />
+                  </div>
+                </div>
+                <div className="row mt-3">
+                  <div className="col-12">
+                    <h5 style={{ marginBottom: "20px", color: "#1c2b20" }}>Web Page Settings</h5>
+                    <p style={{ fontSize: "14px", color: "#666", marginBottom: "20px" }}>
+                      Customize how your salon appears on the public web page
+                    </p>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-lg-6 col-md-6 col-12 mb-3">
+                    <label style={{ marginBottom: "10px", display: "block", fontWeight: "500" }}>
+                      Hero Image (for public web page)
+                    </label>
+                    <div style={{ position: "relative", cursor: "pointer" }}>
+                      <input
+                        id="hero-image-input"
+                        type="file"
+                        accept="image/*"
+                        className="d-none"
+                        onChange={(e) => handleUploadHeroImage(e)}
+                      />
+                      <div style={{ position: "relative" }}>
+                        <img
+                          style={{
+                            height: "200px",
+                            width: "100%",
+                            objectFit: "cover",
+                            borderRadius: "10px",
+                            border: "2px dashed #ddd",
+                          }}
+                          src={heroImagePath || admin?.heroImage || admin?.mainImage}
+                          onClick={() => heroImagePath && handlePrevious(heroImagePath)}
+                          alt="hero"
+                          onError={(e) => {
+                            e.currentTarget.src = admin?.mainImage || Male;
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "0",
+                            left: "0",
+                            right: "0",
+                            background: "linear-gradient(rgb(28 43 32 / 60%), #1c2b20)",
+                            borderRadius: "0px 0px 10px 10px",
+                            height: "40px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <label htmlFor="hero-image-input" className="text-white" style={{ cursor: "pointer" }}>
+                            {heroImagePath || admin?.heroImage ? "Change Hero Image" : "Upload Hero Image"}
+                          </label>
+                        </div>
+                      </div>
+                      <p style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                        Recommended: 1200x400px. This image appears at the top of your public salon page.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="col-lg-6 col-md-6 col-12">
+                    <ExInput
+                      type={`text`}
+                      id={`valuePropositionTitle`}
+                      name={`valuePropositionTitle`}
+                      value={valuePropositionTitle}
+                      label={`Value Proposition Title`}
+                      placeholder={`e.g., Premier Hair & Beauty Experience`}
+                      errorMessage={error.valuePropositionTitle && error.valuePropositionTitle}
+                      onChange={(e) => {
+                        setValuePropositionTitle(e.target.value);
+                        setError({
+                          ...error,
+                          valuePropositionTitle: "",
+                        });
+                      }}
+                    />
+                    <Textarea
+                      row={3}
+                      value={valuePropositionDescription}
+                      id={`valuePropositionDescription`}
+                      name={`valuePropositionDescription`}
+                      label={`Value Proposition Description`}
+                      placeholder={`Brief description of what makes your salon special`}
+                      errorMessage={error.valuePropositionDescription && error.valuePropositionDescription}
+                      onChange={(e) => {
+                        setValuePropositionDescription(e.target.value);
+                        setError({
+                          ...error,
+                          valuePropositionDescription: "",
+                        });
+                      }}
+                    />
+                    <ExInput
+                      type={`text`}
+                      id={`valuePropositionFeatures`}
+                      name={`valuePropositionFeatures`}
+                      value={valuePropositionFeatures}
+                      label={`Key Features (comma-separated)`}
+                      placeholder={`e.g., Expert stylists, Elegant atmosphere, Personalized service`}
+                      errorMessage={error.valuePropositionFeatures && error.valuePropositionFeatures}
+                      onChange={(e) => {
+                        setValuePropositionFeatures(e.target.value);
+                        setError({
+                          ...error,
+                          valuePropositionFeatures: "",
+                        });
+                      }}
+                    />
+                    <p style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                      Separate multiple features with commas. These will appear as highlights on your public page.
+                    </p>
                   </div>
                 </div>
               </div>

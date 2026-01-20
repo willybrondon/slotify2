@@ -458,13 +458,19 @@ exports.serveSalonWebPage = async (req, res) => {
       _id: fullSalonId,
       isActive: true,
       isDelete: false,
-    }).populate("serviceIds.id");
+    }).populate({
+      path: "serviceIds.id",
+      populate: {
+        path: "categoryId",
+        select: "name image"
+      }
+    });
 
     if (!salon) {
       return res.status(404).send("Salon not found");
     }
 
-    // Fetch additional data: products, experts, reviews
+    // Fetch additional data: products, experts, reviews with expert info
     const [products, experts, reviews] = await Promise.all([
       Product.find({
         salon: salon._id,
@@ -474,14 +480,18 @@ exports.serveSalonWebPage = async (req, res) => {
         salonId: salon._id,
         isBlock: false,
         isDelete: false,
-      }).select("fname lname image review reviewCount").limit(10),
+      }).select("fname lname image review reviewCount").limit(20),
       Review.find({ salonId: salon._id })
         .populate({
           path: "userId",
           select: "fname lname image",
         })
+        .populate({
+          path: "expertId",
+          select: "fname lname image",
+        })
         .sort({ createdAt: -1 })
-        .limit(10),
+        .limit(20),
     ]);
 
     // Generate the new slug format for share URL
@@ -492,9 +502,15 @@ exports.serveSalonWebPage = async (req, res) => {
     // Ensure baseURL doesn't have trailing slash to avoid double slashes
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
     const shareUrl = `${baseURL}/salon/${salonSlugWithId}`;
-    const salonImage = salon.mainImage || (salon.image && salon.image.length > 0 ? salon.image[0] : "");
+    // Use heroImage if available, otherwise fallback to mainImage or first image
+    const salonImage = salon.heroImage || salon.mainImage || (salon.image && salon.image.length > 0 ? salon.image[0] : "");
     const salonName = salon.name || "Salon";
     const salonDescription = salon.about || `Book your appointment at ${salonName}`;
+    // Get value proposition data
+    const valueProposition = salon.valueProposition || {};
+    const valuePropTitle = valueProposition.title || `${salonName} — Premier Hair & Beauty Experience`;
+    const valuePropDescription = valueProposition.description || "";
+    const valuePropFeatures = valueProposition.features || [];
     const salonAddress = salon.addressDetails 
       ? `${salon.addressDetails.addressLine1}, ${salon.addressDetails.city || ""}, ${salon.addressDetails.country || ""}`.replace(/,\s*,/g, ',').replace(/^,|,$/g, '')
       : "";
@@ -522,16 +538,66 @@ exports.serveSalonWebPage = async (req, res) => {
       openingHoursHtml = `<div class="section"><h3 class="section-title">⏰ Opening Hours</h3><div class="hours-grid">${openingHoursHtml}</div></div>`;
     }
 
-    // Services Section
+    // Services Section - Group by Category
     let servicesHtml = '';
     if (salon.serviceIds && salon.serviceIds.length > 0) {
-      servicesHtml = salon.serviceIds.slice(0, 12).map(service => {
-        const serviceName = (service.id?.name || 'Service').replace(/"/g, '&quot;');
-        const servicePrice = service.price || 0;
-        return `<div class="service-item"><div class="service-name">${serviceName}</div><div class="service-price">${currency}${servicePrice}</div></div>`;
+      // Group services by category
+      const servicesByCategory = {};
+      salon.serviceIds.forEach(service => {
+        if (service.id && service.id.categoryId) {
+          const categoryId = service.id.categoryId._id?.toString() || service.id.categoryId?.toString() || 'other';
+          const categoryName = service.id.categoryId?.name || 'Other Services';
+          if (!servicesByCategory[categoryId]) {
+            servicesByCategory[categoryId] = {
+              name: categoryName,
+              services: []
+            };
+          }
+          servicesByCategory[categoryId].services.push(service);
+        } else {
+          if (!servicesByCategory['other']) {
+            servicesByCategory['other'] = {
+              name: 'Other Services',
+              services: []
+            };
+          }
+          servicesByCategory['other'].services.push(service);
+        }
+      });
+
+      // Build HTML for each category
+      const categorySections = Object.values(servicesByCategory).map(category => {
+        const serviceItems = category.services.slice(0, 8).map(service => {
+          const serviceName = (service.id?.name || 'Service').replace(/"/g, '&quot;');
+          const servicePrice = service.price || 0;
+          const serviceDuration = service.id?.duration || 0;
+          const durationText = serviceDuration > 0 ? `<div class="service-duration">⏱️ ${serviceDuration} min</div>` : '';
+          return `
+            <div class="service-item">
+              <div class="service-header">
+                <div class="service-name">${serviceName}</div>
+                <div class="service-price">${currency}${servicePrice}</div>
+              </div>
+              ${durationText}
+              <button onclick="openApp()" class="service-book-btn">
+                <i class="fas fa-calendar-plus"></i> Book Now
+              </button>
+            </div>`;
+        }).join('');
+        const moreInCategory = category.services.length > 8 ? `<p class="service-more">+ ${category.services.length - 8} more in this category</p>` : '';
+        return `
+          <div class="service-category-group">
+            <h4 class="service-category-title">${category.name}</h4>
+            <div class="services-grid">${serviceItems}</div>
+            ${moreInCategory}
+          </div>`;
       }).join('');
-      const moreServices = salon.serviceIds.length > 12 ? `<p style="text-align: center; color: #666; margin-top: 16px; font-size: 0.95rem;">+ ${salon.serviceIds.length - 12} more services available in the app</p>` : '';
-      servicesHtml = `<div class="section"><h3 class="section-title">💇 Services</h3><div class="services-grid">${servicesHtml}</div>${moreServices}</div>`;
+
+      const totalServices = salon.serviceIds.length;
+      const displayedServices = Object.values(servicesByCategory).reduce((sum, cat) => sum + Math.min(cat.services.length, 8), 0);
+      const moreServices = totalServices > displayedServices ? `<p class="services-total-more">+ ${totalServices - displayedServices} more services available in the app</p>` : '';
+      
+      servicesHtml = `<div class="section"><h3 class="section-title">💇 Services</h3>${categorySections}${moreServices}</div>`;
     } else {
       servicesHtml = '<div class="section"><h3 class="section-title">💇 Services</h3><p class="empty-state">No services available</p></div>';
     }
@@ -570,7 +636,7 @@ exports.serveSalonWebPage = async (req, res) => {
       staffHtml = '<div class="section"><h3 class="section-title">👤 Staff</h3><p class="empty-state">No staff information available</p></div>';
     }
 
-    // Reviews Section
+    // Reviews Section - Show expert/staff info
     let reviewsHtml = '';
     if (reviews && reviews.length > 0) {
       reviewsHtml = reviews.map(review => {
@@ -579,13 +645,20 @@ exports.serveSalonWebPage = async (req, res) => {
         const userName = `${userFname} ${userLname}`.trim() || 'Anonymous';
         const userImage = review.userId?.image || '';
         const reviewRating = review.rating || 0;
-        const reviewComment = ((review.comment || review.message || '').replace(/"/g, '&quot;').replace(/\n/g, '<br>'));
+        const reviewComment = ((review.review || review.comment || review.message || '').replace(/"/g, '&quot;').replace(/\n/g, '<br>'));
+        
+        // Expert/Staff information
+        const expertFname = (review.expertId?.fname || '').replace(/"/g, '&quot;');
+        const expertLname = (review.expertId?.lname || '').replace(/"/g, '&quot;');
+        const expertName = `${expertFname} ${expertLname}`.trim();
+        const expertInfo = expertName ? `<div class="review-expert">👤 With ${expertName}</div>` : '';
+        
         const imageHtml = userImage ? `<img src="${userImage}" alt="${userName}" class="review-avatar" onerror="this.style.display='none'">` : `<div class="review-avatar">${userName.charAt(0).toUpperCase()}</div>`;
         const ratingHtml = reviewRating > 0 ? `<div class="review-rating">${'⭐'.repeat(Math.round(reviewRating))} ${reviewRating.toFixed(1)}</div>` : '';
         const commentHtml = reviewComment ? `<div class="review-text">${reviewComment}</div>` : '';
-        return `<div class="review-item"><div class="review-header">${imageHtml}<div class="review-info"><div class="review-name">${userName}</div>${ratingHtml}</div></div>${commentHtml}</div>`;
+        return `<div class="review-item"><div class="review-header">${imageHtml}<div class="review-info"><div class="review-name">${userName}</div>${ratingHtml}${expertInfo}</div></div>${commentHtml}</div>`;
       }).join('');
-      reviewsHtml = `<div class="section"><h3 class="section-title">💬 Reviews</h3>${reviewsHtml}</div>`;
+      reviewsHtml = `<div class="section"><h3 class="section-title">💬 Reviews</h3><div class="reviews-container">${reviewsHtml}</div></div>`;
     } else {
       reviewsHtml = '<div class="section"><h3 class="section-title">💬 Reviews</h3><p class="empty-state">No reviews yet</p></div>';
     }
@@ -774,6 +847,141 @@ exports.serveSalonWebPage = async (req, res) => {
             padding: 0 20px;
             width: 100%;
         }
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        .hero-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .hero-placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: white;
+            padding: 40px 0;
+        }
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            line-height: 1.2;
+        }
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 24px;
+            max-width: 700px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            line-height: 1.6;
+        }
+        .hero-rating {
+            margin-bottom: 32px;
+        }
+        .hero-rating .rating-badge {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+        .hero-cta-btn {
+            background: #fff;
+            color: #111;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .hero-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0,0,0,0.3);
+            background: #f8f8f8;
+        }
+        .hero-cta-btn i {
+            font-size: 1.1rem;
+        }
+        
+        /* Value Proposition Section */
+        .value-proposition-section {
+            background: #f8f8f8;
+            padding: 60px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .value-prop-description {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .value-prop-description p {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        .value-props-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+        }
+        .value-prop-item {
+            text-align: center;
+            padding: 24px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .value-prop-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .value-prop-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        .value-prop-item h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 12px;
+        }
+        .value-prop-item p {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
         .salon-header {
             background: #fff;
             padding: 40px 0;
@@ -781,28 +989,17 @@ exports.serveSalonWebPage = async (req, res) => {
         }
         .salon-header-content {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 40px;
+            grid-template-columns: 1fr;
+            gap: 24px;
             align-items: start;
-        }
-        .salon-image-wrapper {
-            position: relative;
-        }
-        .salon-image {
-            width: 100%;
-            max-width: 400px;
-            height: 300px;
-            object-fit: cover;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .salon-info-header {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
         }
-        .salon-info-header h1 {
-            font-size: 2.5rem;
+        .salon-info-header h2 {
+            font-size: 2rem;
             font-weight: 700;
             color: #111;
             margin: 0;
@@ -870,20 +1067,29 @@ exports.serveSalonWebPage = async (req, res) => {
             margin-bottom: 20px;
         }
         .open-app-btn {
-            background: #111;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 16px 32px;
+            padding: 18px 32px;
             border-radius: 12px;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             width: 100%;
             margin-bottom: 16px;
-            transition: background 0.2s;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         .open-app-btn:hover {
-            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        .open-app-btn i {
+            font-size: 1rem;
         }
         #download-section {
             margin-top: 24px;
@@ -932,26 +1138,83 @@ exports.serveSalonWebPage = async (req, res) => {
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 16px;
         }
+        /* Service Category Grouping */
+        .service-category-group {
+            margin-bottom: 40px;
+        }
+        .service-category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #eee;
+        }
         .service-item, .product-item, .staff-item {
-            background: #f8f8f8;
-            padding: 20px;
+            background: #fff;
+            padding: 24px;
             border-radius: 12px;
-            transition: transform 0.2s;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s;
         }
         .service-item:hover, .product-item:hover, .staff-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #111;
+        }
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
         }
         .service-name, .product-name, .staff-name {
             font-weight: 600;
             color: #111;
-            margin-bottom: 8px;
             font-size: 1.1rem;
+            flex: 1;
         }
         .service-price, .product-price {
             color: #111;
             font-weight: 700;
             font-size: 1.2rem;
+            margin-left: 16px;
+        }
+        .service-duration {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+        .service-book-btn {
+            margin-top: 16px;
+            width: 100%;
+            background: #111;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .service-book-btn:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+        .service-book-btn i {
+            font-size: 0.9rem;
+        }
+        .service-more, .services-total-more {
+            text-align: center;
+            color: #666;
+            margin-top: 16px;
+            font-size: 0.95rem;
+            font-style: italic;
         }
         .product-item {
             display: flex;
@@ -975,47 +1238,66 @@ exports.serveSalonWebPage = async (req, res) => {
         }
         .staff-item {
             display: flex;
-            gap: 16px;
+            gap: 20px;
             align-items: center;
+            padding: 20px;
         }
         .staff-item img {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
             flex-shrink: 0;
+            border: 3px solid #f0f0f0;
         }
         .staff-info {
             flex: 1;
         }
+        .staff-name {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
         .staff-rating {
             color: #ffa500;
-            font-size: 0.9rem;
+            font-size: 1rem;
             margin-top: 4px;
+            font-weight: 600;
+        }
+        .reviews-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
         .review-item {
-            background: #f8f8f8;
+            background: #fff;
             padding: 24px;
             border-radius: 12px;
-            margin-bottom: 16px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+        .review-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #111;
         }
         .review-header {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
         }
         .review-avatar {
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             object-fit: cover;
-            background: #ddd;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #999;
-            font-weight: 600;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
         }
         .review-info {
             flex: 1;
@@ -1023,17 +1305,25 @@ exports.serveSalonWebPage = async (req, res) => {
         .review-name {
             font-weight: 600;
             color: #111;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
         }
         .review-rating {
             color: #ffa500;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        .review-expert {
+            color: #666;
             font-size: 0.9rem;
             margin-top: 4px;
+            font-style: italic;
         }
         .review-text {
             color: #444;
             line-height: 1.7;
             font-size: 1rem;
+            margin-top: 12px;
         }
         .hours-grid {
             display: grid;
@@ -1132,15 +1422,49 @@ exports.serveSalonWebPage = async (req, res) => {
             text-align: center;
             color: #bdc3c7;
         }
+        /* Sticky Booking Button on Mobile */
+        .sticky-booking-btn {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #111;
+            color: white;
+            padding: 16px;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-booking-btn button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
         /* Responsive Design */
         @media (max-width: 968px) {
+            .hero-section {
+                height: 400px;
+            }
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            .value-props-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
             .salon-header-content {
                 grid-template-columns: 1fr;
                 gap: 24px;
-            }
-            .salon-image {
-                max-width: 100%;
-                height: 250px;
             }
             .content-grid {
                 grid-template-columns: 1fr;
@@ -1155,10 +1479,27 @@ exports.serveSalonWebPage = async (req, res) => {
         }
         @media (max-width: 768px) {
             body {
-                padding-top: 70px; /* Slightly less padding on mobile */
+                padding-top: 70px;
+                padding-bottom: 80px; /* Space for sticky button */
             }
-            .salon-info-header h1 {
+            .hero-section {
+                height: 350px;
+            }
+            .hero-title {
                 font-size: 2rem;
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            .hero-cta-btn {
+                padding: 14px 28px;
+                font-size: 1rem;
+            }
+            .value-props-grid {
+                grid-template-columns: 1fr;
+            }
+            .salon-info-header h2 {
+                font-size: 1.75rem;
             }
             .section-title {
                 font-size: 1.5rem;
@@ -1166,6 +1507,9 @@ exports.serveSalonWebPage = async (req, res) => {
             .footer-content {
                 grid-template-columns: 1fr;
                 gap: 32px;
+            }
+            .sticky-booking-btn {
+                display: block;
             }
         }
     </style>
@@ -1229,17 +1573,116 @@ exports.serveSalonWebPage = async (req, res) => {
     </nav>
     
     <div class="main-wrapper">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            ${salonImage ? `<div class="hero-image" style="background-image: url('${salonImage}');"></div>` : '<div class="hero-image hero-placeholder"></div>'}
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="container">
+                    <h1 class="hero-title">${valuePropTitle}</h1>
+                    ${valuePropDescription ? `<p class="hero-subtitle">${valuePropDescription.length > 150 ? valuePropDescription.substring(0, 150) + '...' : valuePropDescription}</p>` : `<p class="hero-subtitle">${salonDescription.length > 150 ? salonDescription.substring(0, 150) + '...' : salonDescription}</p>`}
+                    ${ratingBadgeHtml ? `<div class="hero-rating">${ratingBadgeHtml}</div>` : ''}
+                    <button onclick="openApp()" class="hero-cta-btn">
+                        <i class="fas fa-calendar-check"></i> Book Your Appointment Now
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Value Proposition Section -->
+        ${valuePropFeatures.length > 0 || valuePropDescription ? `
+        <div class="value-proposition-section">
+            <div class="container">
+                ${valuePropDescription ? `<div class="value-prop-description"><p>${valuePropDescription}</p></div>` : ''}
+                ${valuePropFeatures.length > 0 ? `
+                <div class="value-props-grid">
+                    ${valuePropFeatures.map((feature, index) => {
+                        const icons = ['✨', '👨‍🎨', '💆', '⭐', '🌟', '💅', '🎨', '💇'];
+                        const icon = icons[index % icons.length];
+                        return `
+                        <div class="value-prop-item">
+                            <div class="value-prop-icon">${icon}</div>
+                            <h4>${feature}</h4>
+                        </div>
+                        `;
+                    }).join('')}
+                    ${salonReviewCount > 0 ? `
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">⭐</div>
+                        <h4>Top Rated</h4>
+                        <p>Rated ${salonRating.toFixed(1)} by ${salonReviewCount} clients</p>
+                    </div>
+                    ` : ''}
+                </div>
+                ` : `
+                <div class="value-props-grid">
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">✨</div>
+                        <h4>Elegant Atmosphere</h4>
+                        <p>Experience luxury in a sophisticated and welcoming environment</p>
+                    </div>
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">👨‍🎨</div>
+                        <h4>Expert Stylists</h4>
+                        <p>Our team of experienced professionals is dedicated to your satisfaction</p>
+                    </div>
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">💆</div>
+                        <h4>Personalized Service</h4>
+                        <p>Every appointment includes a personalized consultation</p>
+                    </div>
+                    ${salonReviewCount > 0 ? `
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">⭐</div>
+                        <h4>Top Rated</h4>
+                        <p>Rated ${salonRating.toFixed(1)} by ${salonReviewCount} clients</p>
+                    </div>
+                    ` : ''}
+                </div>
+                `}
+            </div>
+        </div>
+        ` : `
+        <div class="value-proposition-section">
+            <div class="container">
+                <div class="value-props-grid">
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">✨</div>
+                        <h4>Elegant Atmosphere</h4>
+                        <p>Experience luxury in a sophisticated and welcoming environment</p>
+                    </div>
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">👨‍🎨</div>
+                        <h4>Expert Stylists</h4>
+                        <p>Our team of experienced professionals is dedicated to your satisfaction</p>
+                    </div>
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">💆</div>
+                        <h4>Personalized Service</h4>
+                        <p>Every appointment includes a personalized consultation</p>
+                    </div>
+                    ${salonReviewCount > 0 ? `
+                    <div class="value-prop-item">
+                        <div class="value-prop-icon">⭐</div>
+                        <h4>Top Rated</h4>
+                        <p>Rated ${salonRating.toFixed(1)} by ${salonReviewCount} clients</p>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+        `}
+        
+        <!-- Salon Info Section -->
         <div class="salon-header">
             <div class="container">
                 <div class="salon-header-content">
-                    ${salonImage ? `<div class="salon-image-wrapper"><img src="${salonImage}" alt="${salonName}" class="salon-image" onerror="this.style.display='none'"></div>` : ''}
                     <div class="salon-info-header">
-                        <h1>${salonName}</h1>
-                        ${ratingBadgeHtml}
+                        <h2>About ${salonName}</h2>
                         <p class="salon-description">${salonDescription}</p>
                         <div class="salon-contact">
-                            ${salonAddress ? `<p>📍 ${salonAddress}</p>` : ''}
-                            ${salonMobile ? `<p>📞 ${salonMobile}</p>` : ''}
+                            ${salonAddress ? `<p><i class="fas fa-map-marker-alt"></i> ${salonAddress}</p>` : ''}
+                            ${salonMobile ? `<p><i class="fas fa-phone"></i> ${salonMobile}</p>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1261,7 +1704,7 @@ exports.serveSalonWebPage = async (req, res) => {
                         <div class="booking-card">
                             <h3>Book Your Appointment</h3>
                             <button onclick="openApp()" class="open-app-btn">
-                                Open in Skedisy App
+                                <i class="fas fa-calendar-check"></i> Book Now
                             </button>
                             <div id="download-section">
                                 <p style="text-align: center; margin-bottom: 16px; color: #666; font-size: 0.95rem;">
@@ -1284,6 +1727,14 @@ exports.serveSalonWebPage = async (req, res) => {
         
         ${footerHtml}
     </div>
+    
+    <!-- Sticky Booking Button (Mobile Only) -->
+    <div class="sticky-booking-btn">
+        <button onclick="openApp()">
+            <i class="fas fa-calendar-check"></i> Book Your Appointment
+        </button>
+    </div>
+    
     <script src="${baseURL}/script.js"></script>
 </body>
 </html>`;

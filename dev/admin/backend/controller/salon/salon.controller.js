@@ -121,6 +121,34 @@ exports.update = async (req, res) => {
       longitude: req.body.longitude ? req.body.longitude : salon.locationCoordinates.longitude,
     };
 
+    // Handle value proposition fields
+    if (req.body.valuePropositionTitle) {
+      if (!salon.valueProposition) {
+        salon.valueProposition = {};
+      }
+      salon.valueProposition.title = req.body.valuePropositionTitle;
+    }
+    if (req.body.valuePropositionDescription) {
+      if (!salon.valueProposition) {
+        salon.valueProposition = {};
+      }
+      salon.valueProposition.description = req.body.valuePropositionDescription;
+    }
+    if (req.body.valuePropositionFeatures) {
+      if (!salon.valueProposition) {
+        salon.valueProposition = {};
+      }
+      // Parse features from comma-separated string or JSON array
+      try {
+        salon.valueProposition.features = typeof req.body.valuePropositionFeatures === 'string' 
+          ? JSON.parse(req.body.valuePropositionFeatures) 
+          : req.body.valuePropositionFeatures;
+      } catch (e) {
+        // If not JSON, treat as comma-separated string
+        salon.valueProposition.features = req.body.valuePropositionFeatures.split(',').map(f => f.trim()).filter(f => f);
+      }
+    }
+
     if (req.files.mainImage) {
       const image = salon?.mainImage.split("storage");
       if (image) {
@@ -150,6 +178,17 @@ exports.update = async (req, res) => {
       });
 
       salon.image = imagesData;
+    }
+
+    // Handle hero image upload
+    if (req.files.heroImage) {
+      if (salon.heroImage) {
+        const heroImage = salon.heroImage.split("storage");
+        if (heroImage && heroImage[1] && fs.existsSync("storage" + heroImage[1])) {
+          fs.unlinkSync("storage" + heroImage[1]);
+        }
+      }
+      salon.heroImage = process.env.baseURL + req.files.heroImage[0].path;
     }
 
     await salon.save();
