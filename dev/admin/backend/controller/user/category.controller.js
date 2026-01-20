@@ -566,7 +566,7 @@ exports.serveCategoryPage = async (req, res) => {
             overflow: hidden;
             margin-top: 0;
         }
-        .category-hero-image {
+        .category-hero-background {
             position: absolute;
             top: 0;
             left: 0;
@@ -575,9 +575,33 @@ exports.serveCategoryPage = async (req, res) => {
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-        }
-        .category-hero-placeholder {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: url('${baseURL}/logo.png');
+            background-color: #667eea; /* Fallback color */
+        }
+        .category-hero-image-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 180px;
+            height: 180px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 3;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .category-hero-image-overlay img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
         }
         .category-hero-overlay {
             position: absolute;
@@ -585,7 +609,8 @@ exports.serveCategoryPage = async (req, res) => {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
+            z-index: 1;
         }
         .category-hero-content {
             position: relative;
@@ -595,6 +620,7 @@ exports.serveCategoryPage = async (req, res) => {
             align-items: center;
             color: white;
             padding: 40px 0;
+            padding-left: 240px; /* Make room for category image on left */
         }
         .category-hero-title {
             font-size: 3rem;
@@ -805,6 +831,17 @@ exports.serveCategoryPage = async (req, res) => {
             .category-hero-section {
                 height: 300px;
             }
+            .category-hero-image-overlay {
+                width: 120px;
+                height: 120px;
+                top: 15px;
+                left: 15px;
+                padding: 8px;
+            }
+            .category-hero-content {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
             .category-hero-title {
                 font-size: 2rem;
             }
@@ -885,7 +922,8 @@ exports.serveCategoryPage = async (req, res) => {
     
     <!-- Hero Section -->
     <div class="category-hero-section">
-        ${categoryImage ? `<div class="category-hero-image" style="background-image: url('${categoryImage}');"></div>` : '<div class="category-hero-image category-hero-placeholder"></div>'}
+        <div class="category-hero-background"></div>
+        ${categoryImage ? `<div class="category-hero-image-overlay"><img src="${categoryImage}" alt="${category.name}" onerror="this.style.display='none'"></div>` : ''}
         <div class="category-hero-overlay"></div>
         <div class="category-hero-content">
             <div class="category-header-content">

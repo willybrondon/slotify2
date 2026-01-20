@@ -627,7 +627,7 @@ exports.serveSalonWebPage = async (req, res) => {
         const expertName = `${expertFname} ${expertLname}`.trim() || 'Staff Member';
         const expertImage = expert.image || '';
         const expertRating = expert.review || 0;
-        const imageHtml = expertImage ? `<img src="${expertImage}" alt="${expertName}" onerror="this.style.display='none'">` : `<div class="review-avatar" style="width: 60px; height: 60px;">${expertName.charAt(0).toUpperCase()}</div>`;
+        const imageHtml = expertImage ? `<img src="${expertImage}" alt="${expertName}" class="staff-item-img" onerror="this.style.display='none'">` : `<div class="review-avatar" style="width: 60px; height: 60px;">${expertName.charAt(0).toUpperCase()}</div>`;
         const ratingHtml = expertRating > 0 ? `<div class="staff-rating">⭐ ${expertRating.toFixed(1)}</div>` : '';
         return `<div class="staff-item">${imageHtml}<div class="staff-info"><div class="staff-name">${expertName}</div>${ratingHtml}</div></div>`;
       }).join('');
@@ -798,23 +798,55 @@ exports.serveSalonWebPage = async (req, res) => {
     <script>
         // Try to open app, fallback to app store or show page
         function openApp() {
-            // Try Android
-            window.location = "${deepLink}";
+            const deepLink = "${deepLink}";
+            const androidPackage = "${androidPackage}";
+            const iosAppStoreId = "${iosAppStoreId}";
+            const androidStoreUrl = "https://play.google.com/store/apps/details?id=" + androidPackage;
+            const iosStoreUrl = iosAppStoreId ? "https://apps.apple.com/app/id" + iosAppStoreId : "https://apps.apple.com/search?term=skedisy";
             
-            // Fallback after delay
-            setTimeout(function() {
-                // If still on page, show download options
-                document.getElementById('download-section').style.display = 'block';
-            }, 2000);
-        }
-        
-        // Auto-try on page load
-        window.onload = function() {
-            // Only auto-open if coming from external link (not direct navigation)
-            if (document.referrer === '' || document.referrer.indexOf('${baseURL}') === -1) {
-                openApp();
+            // Detect device
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isAndroid = /Android/.test(navigator.userAgent);
+            const isMobile = isIOS || isAndroid;
+            
+            // Try to open app
+            let appOpened = false;
+            const startTime = Date.now();
+            
+            // Try deep link
+            window.location.href = deepLink;
+            
+            // For mobile devices, check if we're still on the page after a short delay
+            if (isMobile) {
+                setTimeout(function() {
+                    const timeElapsed = Date.now() - startTime;
+                    // If less than 2 seconds passed, app likely didn't open
+                    if (timeElapsed < 2000) {
+                        // Redirect to app store
+                        if (isIOS) {
+                            window.location.href = iosStoreUrl;
+                        } else if (isAndroid) {
+                            window.location.href = androidStoreUrl;
+                        } else {
+                            // Show download section for other devices
+                            document.getElementById('download-section').style.display = 'block';
+                        }
+                    } else {
+                        // App might have opened, show download section as fallback
+                        setTimeout(function() {
+                            if (document.hasFocus()) {
+                                document.getElementById('download-section').style.display = 'block';
+                            }
+                        }, 1000);
+                    }
+                }, 500);
+            } else {
+                // For desktop, show download section immediately
+                setTimeout(function() {
+                    document.getElementById('download-section').style.display = 'block';
+                }, 1000);
             }
-        };
+        }
     </script>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -862,8 +894,9 @@ exports.serveSalonWebPage = async (req, res) => {
             width: 100%;
             height: 100%;
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
+            object-fit: cover;
         }
         .hero-placeholder {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1003,6 +1036,11 @@ exports.serveSalonWebPage = async (req, res) => {
             font-weight: 700;
             color: #111;
             margin: 0;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .salon-info-header .rating-badge {
             display: inline-flex;
@@ -1013,6 +1051,9 @@ exports.serveSalonWebPage = async (req, res) => {
             border-radius: 20px;
             width: fit-content;
             font-size: 1rem;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            scroll-margin-bottom: 100px; /* Prevent hiding behind sticky button on mobile */
         }
         .rating-stars {
             color: #ffa500;
@@ -1095,6 +1136,7 @@ exports.serveSalonWebPage = async (req, res) => {
             margin-top: 24px;
             padding-top: 24px;
             border-top: 1px solid #e0e0e0;
+            display: none; /* Hidden by default, shown when app not installed */
         }
         .download-buttons {
             display: flex;
@@ -1132,6 +1174,8 @@ exports.serveSalonWebPage = async (req, res) => {
             font-weight: 700;
             color: #111;
             margin-bottom: 24px;
+            padding-top: 20px; /* Add top padding for mobile */
+            scroll-margin-top: 100px; /* Prevent hiding behind navbar on mobile */
         }
         .services-grid {
             display: grid;
@@ -1148,7 +1192,9 @@ exports.serveSalonWebPage = async (req, res) => {
             color: #111;
             margin-bottom: 20px;
             padding-bottom: 12px;
+            padding-top: 20px; /* Add top padding for mobile */
             border-bottom: 2px solid #eee;
+            scroll-margin-top: 100px; /* Prevent hiding behind navbar on mobile */
         }
         .service-item, .product-item, .staff-item {
             background: #fff;
@@ -1242,13 +1288,16 @@ exports.serveSalonWebPage = async (req, res) => {
             align-items: center;
             padding: 20px;
         }
-        .staff-item img {
+        .staff-item img,
+        .staff-item-img {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             object-fit: cover;
+            object-position: center center;
             flex-shrink: 0;
             border: 3px solid #f0f0f0;
+            display: block;
         }
         .staff-info {
             flex: 1;
@@ -1480,7 +1529,7 @@ exports.serveSalonWebPage = async (req, res) => {
         @media (max-width: 768px) {
             body {
                 padding-top: 70px;
-                padding-bottom: 80px; /* Space for sticky button */
+                padding-bottom: 100px; /* Space for sticky button */
             }
             .hero-section {
                 height: 350px;
@@ -1500,9 +1549,14 @@ exports.serveSalonWebPage = async (req, res) => {
             }
             .salon-info-header h2 {
                 font-size: 1.75rem;
+                padding: 10px 16px;
             }
             .section-title {
                 font-size: 1.5rem;
+                padding-top: 30px; /* Extra padding on mobile */
+            }
+            .service-category-title {
+                padding-top: 30px; /* Extra padding on mobile */
             }
             .footer-content {
                 grid-template-columns: 1fr;
@@ -1510,6 +1564,12 @@ exports.serveSalonWebPage = async (req, res) => {
             }
             .sticky-booking-btn {
                 display: block;
+            }
+            .salon-info-header .rating-badge {
+                margin-bottom: 20px; /* Extra margin on mobile */
+            }
+            .content-wrapper {
+                padding-bottom: 120px; /* Extra padding to prevent content hiding behind sticky button */
             }
         }
     </style>
