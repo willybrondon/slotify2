@@ -1,0 +1,105 @@
+PROJECT INFORMATION FOR SKEDISY PAYMENT AGGREGATION APPLICATION
+================================================================
+
+PROJECT NAME: Skedisy
+NATURE OF ACTIVITY: Online Marketplace for Beauty and Wellness Services
+
+DETAILED BUSINESS DESCRIPTION:
+-----------------------------
+Skedisy is a two-sided marketplace platform that connects customers with salons and beauty service providers. We facilitate online bookings for beauty and wellness services including hair styling, beauty treatments, spa services, nail care, and related personal care services.
+
+Our platform operates as a commission-based marketplace (B2B2C model) where:
+- Customers browse and book beauty services from licensed salons
+- Salons receive bookings through our platform
+- We collect a commission (5-15%) on each completed booking
+- Monthly settlements are processed to salon partners
+
+SPECIFIC NEEDS:
+--------------
+1. Payment Processing:
+   - Process online payments for service bookings (€10-€500 per transaction)
+   - Support multiple payment methods: Credit/Debit cards, Digital wallets, Cash-after-service tracking
+   - Handle refunds for cancelled bookings
+   - Process monthly settlements to salon partners with commission deduction
+
+2. Transaction Volume:
+   - Initial: 500-2,000 bookings/month (Île-de-France region)
+   - Growth target: 10,000+ bookings/month within 12 months
+   - Average transaction: €30-€150
+   - Monthly transaction value: €300,000+ within first year
+
+3. Technical Requirements:
+   - RESTful API integration with Node.js/Express backend
+   - Mobile SDK support (iOS & Android Flutter apps)
+   - Webhook support for payment status updates
+   - PCI DSS compliance
+   - Multi-currency support (EUR primary, future: XAF, USD)
+
+4. Business Model:
+   - Commission-based revenue: 5-15% per booking
+   - Split payment processing (customer → platform → salon)
+   - Monthly automated settlements
+   - Real-time payment processing for bookings
+
+5. Compliance:
+   - GDPR compliance (EU operations)
+   - PCI DSS Level 1 compliance
+   - French payment regulations
+   - AML/KYC for salon partners
+
+WHAT WE WILL USE THE SOLUTION FOR:
+----------------------------------
+1. Customer Payment Processing:
+   - Accept payments from customers booking beauty services
+   - Process immediate payments (card/wallet) or track deferred payments (cash after service)
+   - Issue payment confirmations and receipts
+   - Handle booking cancellations and refunds
+
+2. Commission & Fee Management:
+   - Automatically calculate and deduct platform commission (5-15%)
+   - Calculate salon and expert commission splits
+   - Track earnings and settlements
+
+3. Salon Partner Settlements:
+   - Monthly automated payout distribution to salon partners
+   - Commission and fee reconciliation
+   - Settlement reporting and financial statements
+
+4. Platform Operations:
+   - Real-time transaction monitoring
+   - Financial reporting and analytics
+   - Fraud detection and prevention
+   - Revenue tracking and management
+
+TIMELINE:
+---------
+- Phase 1 (Weeks 1-4): Integration & Testing
+- Phase 2 (Weeks 5-8): Soft Launch with select salons
+- Phase 3 (Week 9+): Full platform launch
+
+CURRENT STATUS:
+--------------
+- Platform: Fully developed and operational
+- Technology: Node.js backend, Flutter mobile apps, MongoDB database
+- Current Payment: Stripe integration (needs expansion)
+- Market: Launching in Île-de-France, France (expanding to Cameroon and other regions)
+- Business Model: Commission-based marketplace with monthly settlements
+
+REGULATORY COMPLIANCE:
+---------------------
+We operate as a legitimate marketplace platform in the beauty and wellness services sector. All transactions are for real services provided by licensed salons and service providers. We are committed to full compliance with:
+- EU GDPR regulations
+- French payment and commerce regulations
+- PCI DSS standards
+- Anti-money laundering requirements
+- Tax and VAT compliance
+
+ADDITIONAL INFORMATION:
+----------------------
+Our platform serves three user types:
+1. Customers: Book and pay for beauty services
+2. Salons: Receive bookings and payments through the platform
+3. Experts/Staff: Individual service providers within salons
+
+We require a payment aggregation solution that can handle the complexity of a marketplace model with split payments, commission calculations, and automated settlements while providing a seamless experience for all parties.
+

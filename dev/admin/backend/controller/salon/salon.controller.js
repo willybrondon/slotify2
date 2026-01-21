@@ -2,6 +2,9 @@ const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const Setting = require("../../models/setting.model");
 const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
+const SalonWalletHistory = require("../../models/salonWalletHistory.model");
+const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
+const { PAYMENT_GATEWAY } = require("../../types/constant");
 
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -573,6 +576,110 @@ exports.fetchSalonWalletHistory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};
+
+// Deposit amount to salon wallet (by salon owner via Stripe/Zitopay)
+exports.depositeToWallet = async (req, res) => {
+  try {
+    const { amount, paymentGateway } = req.query;
+
+    if (!amount || !paymentGateway) {
+      return res.status(200).json({ status: false, message: "Invalid request: Missing required fields." });
+    }
+
+    const requestedAmount = parseFloat(amount);
+    const salonId = req.salon._id;
+
+    if (requestedAmount <= 0) {
+      return res.status(200).json({ status: false, message: "Amount must be greater than 0." });
+    }
+
+    // Validate payment gateway
+    const paymentGatewayNum = parseInt(paymentGateway);
+    if (!Object.values(PAYMENT_GATEWAY).includes(paymentGatewayNum)) {
+      return res.status(200).json({ status: false, message: "Invalid payment gateway." });
+    }
+
+    const salon = await Salon.findById(salonId);
+
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon not found." });
+    }
+
+    if (!salon.isActive) {
+      return res.status(200).json({ status: false, message: "Salon account is inactive." });
+    }
+
+    // Add amount to salon wallet
+    salon.wallet = (salon.wallet || 0) + requestedAmount;
+    await salon.save();
+
+    // Create wallet history entry
+    const uniqueId = await generateUniqueIdentifier();
+    const walletHistory = new SalonWalletHistory({
+      salon: salon._id,
+      amount: requestedAmount,
+      paymentGateway: paymentGatewayNum,
+      type: 1, // Deposit
+      description: `Wallet recharge via ${paymentGateway === PAYMENT_GATEWAY.STRIPE.toString() ? 'Stripe' : paymentGateway === PAYMENT_GATEWAY.ZITOPAY.toString() ? 'Zitopay' : 'Payment Gateway'}`,
+      date: moment().format("YYYY-MM-DD"),
+      time: moment().format("HH:mm a"),
+      uniqueId: uniqueId,
+      addedBy: "salon",
+    });
+
+    await walletHistory.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Wallet successfully credited.",
+      walletBalance: salon.wallet,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};
+
+// Get salon wallet history
+exports.walletHistory = async (req, res) => {
+  try {
+    const salonId = req.salon._id;
+    const month = req.query.month || moment().format("YYYY-MM");
+
+    if (!month) {
+      return res.status(200).json({ status: false, message: "Invalid request: Missing month." });
+    }
+
+    const salon = await Salon.findById(salonId);
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon not found." });
+    }
+
+    // Get wallet history for the specified month
+    const startDate = moment(month, "YYYY-MM").startOf("month").toDate();
+    const endDate = moment(month, "YYYY-MM").endOf("month").toDate();
+
+    const walletHistory = await SalonWalletHistory.find({
+      salon: salonId,
+      createdAt: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    })
+      .sort({ createdAt: -1 })
+      .populate("booking", "bookingId date time");
+
+    return res.status(200).json({
+      status: true,
+      message: "Wallet history retrieved successfully.",
+      walletBalance: salon.wallet || 0,
+      data: walletHistory,
+    });
+  } catch (error) {
+    console.error(error);
     return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
   }
 };

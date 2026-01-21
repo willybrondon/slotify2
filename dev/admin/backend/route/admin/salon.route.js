@@ -32,6 +32,8 @@ route.get("/getProductsOfParticularSalon", checkAccessWithSecretKey(), admin, sa
 
 route.get("/fetchSalonWalletHistoryByAdmin", checkAccessWithSecretKey(), admin, salonController.fetchSalonWalletHistoryByAdmin);
 
+route.post("/addMoneyToWallet", checkAccessWithSecretKey(), admin, salonController.addMoneyToSalonWallet);
+
 route.get("/getShareLink", checkAccessWithSecretKey(), admin, salonController.getSalonShareLink);
 
 route.patch("/delete", checkAccessWithSecretKey(), admin, salonController.delete);

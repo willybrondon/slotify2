@@ -33,6 +33,7 @@ const salonSchema = new mongoose.Schema(
 
     platformFee: { type: Number, default: 0 },
     earning: { type: Number, default: 0 },
+    wallet: { type: Number, default: 0 }, // Salon wallet balance for prepayment
 
     review: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },

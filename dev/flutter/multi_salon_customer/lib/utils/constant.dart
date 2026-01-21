@@ -24,6 +24,9 @@ class Constant {
   static const stripeMerchantCountryCode =
       'US'; // Fixed to use proper country code
 
+  /// ===================>> ZITOPAY
+  static const zitopayBaseUrl = "https://api.zitopay.africa/v1";
+
   // ----- RATE APP ----- //
   static String appStoreId = ' ';
 

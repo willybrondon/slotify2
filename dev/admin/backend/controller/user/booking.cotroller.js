@@ -8,7 +8,9 @@ const Holiday = require("../../models/salonClose.model");
 const Notification = require("../../models/notification.model");
 const UString = require("../../models/uniqueString.model");
 const UserWalletHistory = require("../../models/userWalletHistory.model");
+const SalonWalletHistory = require("../../models/salonWalletHistory.model");
 const Coupon = require("../../models/coupon.model");
+const Setting = require("../../models/setting.model");
 
 const mongoose = require("mongoose");
 
@@ -148,6 +150,34 @@ exports.newBooking = async (req, res, next) => {
 
     if (!salon || !salon.isActive) {
       return res.status(200).send({ status: false, message: "Salon not found" });
+    }
+
+    // Check salon wallet balance before allowing booking
+    const setting = await Setting.findOne().sort({ createdAt: -1 });
+    const minSalonWalletBalance = setting?.minSalonWalletBalance || 0;
+    const salonWalletBalance = salon.wallet || 0;
+
+    // Calculate expected commission for this booking (will be calculated again later, but need early check)
+    const services = req.body.serviceId.split(",");
+    const servicesDataForCheck = await Service.find({ _id: { $in: services } });
+    const matchedServicesForCheck = salon.serviceIds.filter((service) => {
+      return services.toString().includes(service.id?._id);
+    });
+    let totalServicePriceForCheck = 0;
+    matchedServicesForCheck.forEach((service) => {
+      totalServicePriceForCheck += parseInt(service.price);
+    });
+    
+    // Calculate platform fee (commission that will be deducted)
+    const expectedPlatformFee = (salon.platformFee * totalServicePriceForCheck) / 100;
+    const requiredBalance = minSalonWalletBalance + expectedPlatformFee;
+
+    // Check if salon has sufficient wallet balance
+    if (salonWalletBalance < requiredBalance) {
+      return res.status(200).send({
+        status: false,
+        message: `Salon wallet balance is insufficient. Required: ${requiredBalance.toFixed(2)}, Current: ${salonWalletBalance.toFixed(2)}. Please recharge your wallet to accept bookings.`,
+      });
     }
 
     const isTimeAlreadyBooked = await Booking.exists({
@@ -410,6 +440,30 @@ exports.newBooking = async (req, res, next) => {
 
     // Save booking first to get a valid _id
     await booking.save();
+
+    // Deduct platform commission from salon wallet
+    const platformFee = (salon.platformFee * req.body.withoutTax) / 100;
+    const commissionAmount = parseFloat(platformFee.toFixed(2));
+    
+    if (commissionAmount > 0) {
+      // Deduct commission from salon wallet
+      salon.wallet = (salon.wallet || 0) - commissionAmount;
+      await salon.save();
+
+      // Create wallet history entry
+      const uniqueIdForSalonWallet = await generateUniqueIdentifier();
+      await new SalonWalletHistory({
+        salon: salon._id,
+        booking: booking._id,
+        amount: commissionAmount,
+        type: 2, // Commission deduction
+        description: `Commission deducted for booking ${booking.bookingId}`,
+        date: moment().format("YYYY-MM-DD"),
+        time: moment().format("HH:mm a"),
+        uniqueId: uniqueIdForSalonWallet,
+        addedBy: "system",
+      }).save();
+    }
 
     const bookingDateFormat = moment().format("YYYY-MM-DD");
     

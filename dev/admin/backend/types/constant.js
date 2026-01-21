@@ -64,6 +64,7 @@ exports.PAYMENT_GATEWAY = {
   STRIPE: 1,
   RAZORPAY: 2,
   FLUTTERWAVE: 3,
+  ZITOPAY: 4,
 };
 
 exports.REVIEW_TYPE = {

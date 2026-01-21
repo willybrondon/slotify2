@@ -2,6 +2,9 @@ const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const Product = require("../../models/product.model");
 const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
+const SalonWalletHistory = require("../../models/salonWalletHistory.model");
+const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
+const { PAYMENT_GATEWAY } = require("../../types/constant");
 
 const { deleteFile, deleteFiles } = require("../../middleware/deleteFile");
 const fs = require("fs");
@@ -645,5 +648,70 @@ exports.getSalonShareLink = async (req, res) => {
       status: false,
       error: error.message || "Internal Server Error",
     });
+  }
+};
+
+// Admin adds money to salon wallet
+exports.addMoneyToSalonWallet = async (req, res) => {
+  try {
+    const { salonId, amount, paymentGateway, description } = req.body;
+
+    if (!salonId || !amount || !paymentGateway) {
+      return res.status(200).json({ status: false, message: "Invalid request: Missing required fields." });
+    }
+
+    const requestedAmount = parseFloat(amount);
+    const salonObjId = new mongoose.Types.ObjectId(salonId);
+
+    if (requestedAmount <= 0) {
+      return res.status(200).json({ status: false, message: "Amount must be greater than 0." });
+    }
+
+    // Validate payment gateway
+    const paymentGatewayNum = parseInt(paymentGateway);
+    if (!Object.values(PAYMENT_GATEWAY).includes(paymentGatewayNum)) {
+      return res.status(200).json({ status: false, message: "Invalid payment gateway." });
+    }
+
+    const salon = await Salon.findById(salonObjId);
+
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon not found." });
+    }
+
+    // Add amount to salon wallet
+    salon.wallet = (salon.wallet || 0) + requestedAmount;
+    await salon.save();
+
+    // Create wallet history entry
+    const uniqueId = await generateUniqueIdentifier();
+    const walletHistory = new SalonWalletHistory({
+      salon: salon._id,
+      amount: requestedAmount,
+      paymentGateway: paymentGatewayNum,
+      type: 4, // Admin manual addition
+      description: description || `Admin added funds via ${paymentGatewayNum === PAYMENT_GATEWAY.STRIPE ? 'Stripe' : paymentGatewayNum === PAYMENT_GATEWAY.ZITOPAY ? 'Zitopay' : 'Payment Gateway'}`,
+      date: moment().format("YYYY-MM-DD"),
+      time: moment().format("HH:mm a"),
+      uniqueId: uniqueId,
+      addedBy: "admin",
+    });
+
+    await walletHistory.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Amount successfully added to salon wallet.",
+      walletBalance: salon.wallet,
+      salon: {
+        _id: salon._id,
+        name: salon.name,
+        email: salon.email,
+        wallet: salon.wallet,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
   }
 };

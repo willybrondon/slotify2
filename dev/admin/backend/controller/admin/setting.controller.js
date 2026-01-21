@@ -29,6 +29,7 @@ exports.update = async (req, res) => {
     }
 
     setting.minWithdrawalRequestedAmount = req.body.minWithdrawalRequestedAmount ? parseInt(req.body.minWithdrawalRequestedAmount) : setting.minWithdrawalRequestedAmount;
+    setting.minSalonWalletBalance = req.body.minSalonWalletBalance ? parseFloat(req.body.minSalonWalletBalance) : setting.minSalonWalletBalance;
     setting.tax = req.body.tax ? parseInt(req.body.tax) : setting.tax;
     setting.adminCommissionCharges = req.body.adminCommissionCharges ? parseInt(req.body.adminCommissionCharges) : setting.adminCommissionCharges;
     setting.cancelOrderCharges = req.body.cancelOrderCharges ? parseInt(req.body.cancelOrderCharges) : setting.cancelOrderCharges;
@@ -39,6 +40,10 @@ exports.update = async (req, res) => {
     setting.razorSecretKey = req.body.razorSecretKey ? req.body.razorSecretKey : setting.razorSecretKey;
     setting.stripePublishableKey = req.body.stripePublishableKey ? req.body.stripePublishableKey : setting.stripePublishableKey;
     setting.stripeSecretKey = req.body.stripeSecretKey ? req.body.stripeSecretKey : setting.stripeSecretKey;
+
+    setting.zitopayApiKey = req.body.zitopayApiKey ? req.body.zitopayApiKey : setting.zitopayApiKey;
+    setting.zitopaySecretKey = req.body.zitopaySecretKey ? req.body.zitopaySecretKey : setting.zitopaySecretKey;
+    setting.zitopayMerchantId = req.body.zitopayMerchantId ? req.body.zitopayMerchantId : setting.zitopayMerchantId;
 
     setting.flutterWaveKey = req.body.flutterWaveKey ? req.body.flutterWaveKey : setting.flutterWaveKey;
     setting.currencySymbol = req.body.currencySymbol ? req.body.currencySymbol : setting.currencySymbol;
@@ -78,6 +83,9 @@ exports.handleSwitch = async (req, res) => {
     }
     if (type == 4) {
       setting.isFlutterWave = !setting.isFlutterWave;
+    }
+    if (type == 5) {
+      setting.isZitopay = !setting.isZitopay;
     }
     if (type == 6) {
       setting.isAddProductRequest = !setting.isAddProductRequest;

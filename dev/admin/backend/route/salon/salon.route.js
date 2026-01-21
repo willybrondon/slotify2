@@ -39,5 +39,7 @@ route.patch("/updateSalonTime", checkAccessWithSecretKey(), salon, salonControll
 route.patch("/manageBreak", checkAccessWithSecretKey(), salon, salonController.manageBreak);
 
 route.get("/fetchSalonWalletHistory", checkAccessWithSecretKey(), salon, salonController.fetchSalonWalletHistory);
+route.post("/depositeToWallet", checkAccessWithSecretKey(), salon, salonController.depositeToWallet);
+route.get("/walletHistory", checkAccessWithSecretKey(), salon, salonController.walletHistory);
 
 module.exports = route;

@@ -71,6 +71,7 @@ class PaymentMethodView extends StatelessWidget {
                   PaymentTitleView(),
                   // PaymentRazorPayView(), // Commented out for wallet recharge
                   PaymentStripeView(),
+                  PaymentZitopayView(),
                   // PaymentFlutterWaveView(), // Commented out for wallet recharge
                 ],
               ).paddingAll(15)
@@ -80,9 +81,18 @@ class PaymentMethodView extends StatelessWidget {
                   // Show the payment method that was already selected in booking screen
                   if (logic.selectedPayment == "wallet") PaymentMyWalletView(),
                   if (logic.selectedPayment == "Stripe") PaymentStripeView(),
+                  if (logic.selectedPayment == "Zitopay") PaymentZitopayView(),
                   if (logic.selectedPayment == "cashAfterService")
                     PaymentCashOnHandView(),
                   // Add other payment methods as needed
+                  // Show all available payment methods if none selected
+                  if (logic.selectedPayment == null || logic.selectedPayment == "")
+                    ...[
+                      PaymentMyWalletView(),
+                      PaymentStripeView(),
+                      PaymentZitopayView(),
+                      PaymentCashOnHandView(),
+                    ],
 
                   // Show a message that payment method is already selected
                   Container(
@@ -892,6 +902,99 @@ class PaymentStripeView extends StatelessWidget {
                     ),
                   ),
                   child: logic.selectedPayment == "Stripe"
+                      ? Image.asset(
+                          AppAsset.icCheck,
+                          color: AppColors.primaryAppColor,
+                          height: 15,
+                          width: 15,
+                        )
+                      : const SizedBox(),
+                ).paddingOnly(right: 10),
+              ],
+            ),
+          ),
+        );
+      },
+    ).paddingOnly(bottom: 15);
+  }
+}
+
+class PaymentZitopayView extends StatelessWidget {
+  const PaymentZitopayView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<PaymentScreenController>(
+      id: Constant.idSelectPaymentMethod,
+      builder: (logic) {
+        return InkWell(
+          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+          onTap: () {
+            logic.onSelectPaymentMethod("Zitopay");
+          },
+          child: Container(
+            height: 60,
+            width: Get.width,
+            padding: const EdgeInsets.only(left: 10, right: 5),
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 1,
+                color: AppColors.grey.withOpacity(0.1),
+              ),
+              borderRadius: BorderRadius.circular(10),
+              color: AppColors.whiteColor,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.roundBg,
+                      ),
+                      child: Image.asset(
+                        AppAsset.icZitopay,
+                        height: 30,
+                        width: 30,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Fallback icon if Zitopay icon not found
+                          return Icon(
+                            Icons.payment,
+                            size: 30,
+                            color: AppColors.primaryAppColor,
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(width: Get.width * 0.04),
+                    Text(
+                      "Zitopay",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplay,
+                        fontSize: 16.5,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  height: 25,
+                  width: 25,
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: logic.selectedPayment == "Zitopay"
+                          ? AppColors.primaryAppColor
+                          : AppColors.greyColor.withOpacity(0.3),
+                    ),
+                  ),
+                  child: logic.selectedPayment == "Zitopay"
                       ? Image.asset(
                           AppAsset.icCheck,
                           color: AppColors.primaryAppColor,
