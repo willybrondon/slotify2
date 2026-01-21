@@ -886,6 +886,8 @@ exports.serveSalonWebPage = async (req, res) => {
             height: 500px;
             overflow: hidden;
             margin-top: 0;
+            margin-left: 0;
+            margin-right: 0;
         }
         .hero-image {
             position: absolute;
@@ -919,6 +921,13 @@ exports.serveSalonWebPage = async (req, res) => {
             color: #ffffff !important;
             padding: 40px 0;
         }
+        .hero-content * {
+            color: #ffffff !important;
+        }
+        .hero-content h1,
+        .hero-content p {
+            color: #ffffff !important;
+        }
         .hero-title {
             font-size: 3.5rem;
             font-weight: 700;
@@ -932,11 +941,15 @@ exports.serveSalonWebPage = async (req, res) => {
                 1px 1px 0 rgba(0,0,0,0.5);
             line-height: 1.2;
         }
+        .hero-title * {
+            color: #ffffff !important;
+        }
         .hero-subtitle {
             font-size: 1.3rem;
             margin-bottom: 24px;
             max-width: 700px;
             color: #ffffff !important;
+            font-weight: 400;
             text-shadow: 
                 0 2px 4px rgba(0,0,0,0.8),
                 0 4px 8px rgba(0,0,0,0.6),
@@ -944,6 +957,9 @@ exports.serveSalonWebPage = async (req, res) => {
                 -1px -1px 0 rgba(0,0,0,0.5),
                 1px 1px 0 rgba(0,0,0,0.5);
             line-height: 1.6;
+        }
+        .hero-subtitle * {
+            color: #ffffff !important;
         }
         .hero-rating {
             margin-bottom: 32px;
@@ -1551,17 +1567,43 @@ exports.serveSalonWebPage = async (req, res) => {
         }
         @media (max-width: 768px) {
             body {
-                padding-top: 70px;
+                padding-top: 0;
                 padding-bottom: 100px; /* Space for sticky button */
+                overflow-x: hidden;
+            }
+            .main-wrapper {
+                margin-top: 0;
+                padding-top: 0;
             }
             .hero-section {
-                height: 350px;
-                min-height: 350px;
+                position: relative;
+                height: 100vh;
+                min-height: 100vh;
+                width: 100%;
+                max-width: 100vw;
+                margin: 0;
+                padding: 0;
+                left: 0;
+                right: 0;
             }
             .hero-image {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                min-height: 100vh;
                 background-size: cover;
                 background-position: center center;
-                min-height: 100%;
+                background-repeat: no-repeat;
+            }
+            .hero-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                min-height: 100vh;
             }
             .hero-overlay {
                 background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
@@ -1606,6 +1648,62 @@ exports.serveSalonWebPage = async (req, res) => {
             }
             .content-wrapper {
                 padding-bottom: 120px; /* Extra padding to prevent content hiding behind sticky button */
+            }
+            .hero-content {
+                position: relative;
+                height: 100%;
+                min-height: 100vh;
+                padding: 20px;
+                z-index: 2;
+            }
+            .hero-content .container {
+                padding: 0 20px;
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            .hero-section {
+                position: relative;
+                height: 100vh;
+                min-height: 100vh;
+                width: 100%;
+                max-width: 100vw;
+                margin: 0;
+                padding: 0;
+                left: 0;
+                right: 0;
+            }
+            .hero-image {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                min-height: 100vh;
+                background-size: cover;
+                background-position: center center;
+                background-repeat: no-repeat;
+            }
+            .hero-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                min-height: 100vh;
+            }
+            .hero-content {
+                position: relative;
+                height: 100%;
+                min-height: 100vh;
+                padding: 15px;
+                z-index: 2;
+            }
+            .hero-content .container {
+                padding: 0 15px;
+                width: 100%;
+                max-width: 100%;
             }
         }
     </style>
