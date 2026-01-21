@@ -48,12 +48,19 @@ async function initializeSettings() {
     } else {
       global.settingJSON = settingJson;
     }
+    console.log("Settings initialized successfully");
   } catch (error) {
     console.error("Failed to initialize settings:", error);
+    // Use default settings if database query fails
+    global.settingJSON = settingJson;
   }
 }
 
-module.exports = initializeSettings();
+// Initialize settings (don't block server startup)
+initializeSettings().catch((error) => {
+  console.error("Critical error initializing settings:", error);
+  global.settingJSON = settingJson; // Fallback to default
+});
 
 //Declare the function as a global variable to update the setting.js file
 global.updateSettingFile = (settingData) => {

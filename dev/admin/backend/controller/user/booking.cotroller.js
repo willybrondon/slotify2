@@ -200,8 +200,7 @@ exports.newBooking = async (req, res, next) => {
       });
     }
 
-    const services = req.body.serviceId.split(",");
-
+    // services is already declared above (line 161) for wallet check, reuse it
     const expertServices = services.every((service) => expert.serviceId.includes(service.trim()));
 
     if (!expertServices) {
