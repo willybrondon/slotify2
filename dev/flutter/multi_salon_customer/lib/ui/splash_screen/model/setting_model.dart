@@ -70,6 +70,10 @@ class Setting {
     String? currencySymbol,
     String? flutterWaveKey,
     bool? isFlutterWave,
+    bool? isZitopay,
+    String? zitopayApiKey,
+    String? zitopaySecretKey,
+    String? zitopayMerchantId,
     FirebaseKey? firebaseKey,
     bool? isAddProductRequest,
     bool? isUpdateProductRequest,
@@ -95,6 +99,10 @@ class Setting {
     _currencySymbol = currencySymbol;
     _flutterWaveKey = flutterWaveKey;
     _isFlutterWave = isFlutterWave;
+    _isZitopay = isZitopay;
+    _zitopayApiKey = zitopayApiKey;
+    _zitopaySecretKey = zitopaySecretKey;
+    _zitopayMerchantId = zitopayMerchantId;
     _firebaseKey = firebaseKey;
     _isAddProductRequest = isAddProductRequest;
     _isUpdateProductRequest = isUpdateProductRequest;
@@ -122,6 +130,10 @@ class Setting {
     _currencySymbol = json['currencySymbol'];
     _flutterWaveKey = json['flutterWaveKey'];
     _isFlutterWave = json['isFlutterWave'];
+    _isZitopay = json['isZitopay'];
+    _zitopayApiKey = json['zitopayApiKey'];
+    _zitopaySecretKey = json['zitopaySecretKey'];
+    _zitopayMerchantId = json['zitopayMerchantId'];
     _firebaseKey = json['firebaseKey'] != null ? FirebaseKey.fromJson(json['firebaseKey']) : null;
     _isAddProductRequest = json['isAddProductRequest'];
     _isUpdateProductRequest = json['isUpdateProductRequest'];
@@ -147,6 +159,10 @@ class Setting {
   String? _currencySymbol;
   String? _flutterWaveKey;
   bool? _isFlutterWave;
+  bool? _isZitopay;
+  String? _zitopayApiKey;
+  String? _zitopaySecretKey;
+  String? _zitopayMerchantId;
   FirebaseKey? _firebaseKey;
   bool? _isAddProductRequest;
   bool? _isUpdateProductRequest;
@@ -172,6 +188,10 @@ class Setting {
     String? currencySymbol,
     String? flutterWaveKey,
     bool? isFlutterWave,
+    bool? isZitopay,
+    String? zitopayApiKey,
+    String? zitopaySecretKey,
+    String? zitopayMerchantId,
     FirebaseKey? firebaseKey,
     bool? isAddProductRequest,
     bool? isUpdateProductRequest,
@@ -198,6 +218,10 @@ class Setting {
         currencySymbol: currencySymbol ?? _currencySymbol,
         flutterWaveKey: flutterWaveKey ?? _flutterWaveKey,
         isFlutterWave: isFlutterWave ?? _isFlutterWave,
+        isZitopay: isZitopay ?? _isZitopay,
+        zitopayApiKey: zitopayApiKey ?? _zitopayApiKey,
+        zitopaySecretKey: zitopaySecretKey ?? _zitopaySecretKey,
+        zitopayMerchantId: zitopayMerchantId ?? _zitopayMerchantId,
         firebaseKey: firebaseKey ?? _firebaseKey,
         isAddProductRequest: isAddProductRequest ?? _isAddProductRequest,
         isUpdateProductRequest: isUpdateProductRequest ?? _isUpdateProductRequest,
@@ -223,6 +247,10 @@ class Setting {
   String? get currencySymbol => _currencySymbol;
   String? get flutterWaveKey => _flutterWaveKey;
   bool? get isFlutterWave => _isFlutterWave;
+  bool? get isZitopay => _isZitopay;
+  String? get zitopayApiKey => _zitopayApiKey;
+  String? get zitopaySecretKey => _zitopaySecretKey;
+  String? get zitopayMerchantId => _zitopayMerchantId;
   FirebaseKey? get firebaseKey => _firebaseKey;
   bool? get isAddProductRequest => _isAddProductRequest;
   bool? get isUpdateProductRequest => _isUpdateProductRequest;
@@ -250,6 +278,10 @@ class Setting {
     map['currencySymbol'] = _currencySymbol;
     map['flutterWaveKey'] = _flutterWaveKey;
     map['isFlutterWave'] = _isFlutterWave;
+    map['isZitopay'] = _isZitopay;
+    map['zitopayApiKey'] = _zitopayApiKey;
+    map['zitopaySecretKey'] = _zitopaySecretKey;
+    map['zitopayMerchantId'] = _zitopayMerchantId;
     if (_firebaseKey != null) {
       map['firebaseKey'] = _firebaseKey?.toJson();
     }

@@ -22,6 +22,7 @@ import 'package:salon_2/ui/expert/expert_detail/controller/expert_detail_control
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
 import 'package:salon_2/ui/payment_screen/method/zitopay/zitopay_service.dart';
 import 'package:salon_2/ui/payment_screen/model/deposit_to_wallet_model.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/app_colors.dart';
 
 import 'package:salon_2/utils/api_constant.dart';
