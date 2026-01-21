@@ -1,0 +1,524 @@
+{
+  "description": "Comprehensive list of salon services commonly offered in Cameroon salons, spas, and beauty centers",
+  "country": "Cameroon",
+  "last_updated": "2025-01-20",
+  "categories": [
+    {
+      "category": {
+        "name": "Coiffure / Hair Services",
+        "nameEn": "Hair Services",
+        "nameFr": "Coiffure",
+        "namePt": "Serviços de Cabelo",
+        "status": true
+      },
+      "services": [
+        {
+          "name": "Coupe de cheveux",
+          "nameEn": "Haircut",
+          "nameFr": "Coupe de cheveux",
+          "namePt": "Corte de cabelo",
+          "duration": 30,
+          "description": "Coupe de cheveux standard pour homme et femme"
+        },
+        {
+          "name": "Tissage",
+          "nameEn": "Hair Braiding",
+          "nameFr": "Tissage",
+          "namePt": "Trança",
+          "duration": 180,
+          "description": "Tissage de cheveux avec extensions naturelles ou synthétiques"
+        },
+        {
+          "name": "Tissage crochet",
+          "nameEn": "Crochet Braids",
+          "nameFr": "Tissage crochet",
+          "namePt": "Tranças de crochê",
+          "duration": 240,
+          "description": "Pose de tissage par méthode crochet"
+        },
+        {
+          "name": "Pose de perruque",
+          "nameEn": "Wig Installation",
+          "nameFr": "Pose de perruque",
+          "namePt": "Instalação de peruca",
+          "duration": 120,
+          "description": "Installation professionnelle de perruque lace front"
+        },
+        {
+          "name": "Couture de perruque",
+          "nameEn": "Wig Customization",
+          "nameFr": "Couture de perruque",
+          "namePt": "Customização de peruca",
+          "duration": 90,
+          "description": "Customisation et couture de perruque sur mesure"
+        },
+        {
+          "name": "Coloration de cheveux",
+          "nameEn": "Hair Coloring",
+          "nameFr": "Coloration de cheveux",
+          "namePt": "Coloração de cabelo",
+          "duration": 150,
+          "description": "Coloration complète ou mèches colorées"
+        },
+        {
+          "name": "Défrisage",
+          "nameEn": "Hair Relaxing",
+          "nameFr": "Défrisage",
+          "namePt": "Alisamento",
+          "duration": 180,
+          "description": "Défrisage chimique des cheveux"
+        },
+        {
+          "name": "Pose d'extensions",
+          "nameEn": "Hair Extensions",
+          "nameFr": "Pose d'extensions",
+          "namePt": "Extensões de cabelo",
+          "duration": 240,
+          "description": "Pose d'extensions capillaires (Peruvian, Indian, Malaysian)"
+        },
+        {
+          "name": "Coiffure afro",
+          "nameEn": "Afro Hair Styling",
+          "nameFr": "Coiffure afro",
+          "namePt": "Penteados afro",
+          "duration": 120,
+          "description": "Coiffure spécialisée pour cheveux afro naturels"
+        },
+        {
+          "name": "Dreadlocks",
+          "nameEn": "Dreadlocks",
+          "nameFr": "Dreadlocks",
+          "namePt": "Dreadlocks",
+          "duration": 300,
+          "description": "Création et entretien de dreadlocks"
+        },
+        {
+          "name": "Traitement capillaire",
+          "nameEn": "Hair Treatment",
+          "nameFr": "Traitement capillaire",
+          "namePt": "Tratamento capilar",
+          "duration": 90,
+          "description": "Traitement profond pour cheveux abîmés"
+        },
+        {
+          "name": "Shampooing mentholé",
+          "nameEn": "Mentholated Shampoo",
+          "nameFr": "Shampooing mentholé",
+          "namePt": "Shampoo mentolado",
+          "duration": 45,
+          "description": "Shampooing au menthol pour rafraîchissement"
+        },
+        {
+          "name": "Soins du cuir chevelu",
+          "nameEn": "Scalp Treatment",
+          "nameFr": "Soins du cuir chevelu",
+          "namePt": "Tratamento do couro cabeludo",
+          "duration": 60,
+          "description": "Soins spécialisés pour le cuir chevelu"
+        },
+        {
+          "name": "Lissage brésilien",
+          "nameEn": "Brazilian Blowout",
+          "nameFr": "Lissage brésilien",
+          "namePt": "Alisamento brasileiro",
+          "duration": 180,
+          "description": "Lissage permanent brésilien"
+        },
+        {
+          "name": "Coiffure mariée",
+          "nameEn": "Bridal Hair",
+          "nameFr": "Coiffure mariée",
+          "namePt": "Penteado de noiva",
+          "duration": 180,
+          "description": "Coiffure spéciale pour mariage"
+        }
+      ]
+    },
+    {
+      "category": {
+        "name": "Barbier / Barber Services",
+        "nameEn": "Barber Services",
+        "nameFr": "Barbier",
+        "namePt": "Serviços de Barbeiro",
+        "status": true
+      },
+      "services": [
+        {
+          "name": "Coupe homme",
+          "nameEn": "Men's Haircut",
+          "nameFr": "Coupe homme",
+          "namePt": "Corte masculino",
+          "duration": 30,
+          "description": "Coupe de cheveux pour hommes"
+        },
+        {
+          "name": "Rasage barbe",
+          "nameEn": "Beard Shave",
+          "nameFr": "Rasage barbe",
+          "namePt": "Barba",
+          "duration": 20,
+          "description": "Rasage de la barbe au rasoir"
+        },
+        {
+          "name": "Taille de barbe",
+          "nameEn": "Beard Trim",
+          "nameFr": "Taille de barbe",
+          "namePt": "Aparar barba",
+          "duration": 15,
+          "description": "Taille et modelage de la barbe"
+        },
+        {
+          "name": "Coupe fade",
+          "nameEn": "Fade Cut",
+          "nameFr": "Coupe fade",
+          "namePt": "Corte fade",
+          "duration": 45,
+          "description": "Coupe fade moderne"
+        },
+        {
+          "name": "Soins du visage homme",
+          "nameEn": "Men's Facial",
+          "nameFr": "Soins du visage homme",
+          "namePt": "Tratamento facial masculino",
+          "duration": 30,
+          "description": "Soins du visage spécialisés pour hommes"
+        }
+      ]
+    },
+    {
+      "category": {
+        "name": "Onglerie / Nail Services",
+        "nameEn": "Nail Services",
+        "nameFr": "Onglerie",
+        "namePt": "Serviços de Unhas",
+        "status": true
+      },
+      "services": [
+        {
+          "name": "Manucure",
+          "nameEn": "Manicure",
+          "nameFr": "Manucure",
+          "namePt": "Manicure",
+          "duration": 45,
+          "description": "Soin complet des ongles des mains"
+        },
+        {
+          "name": "Pédicure",
+          "nameEn": "Pedicure",
+          "nameFr": "Pédicure",
+          "namePt": "Pedicure",
+          "duration": 60,
+          "description": "Soin complet des ongles des pieds"
+        },
+        {
+          "name": "Pose de vernis classique",
+          "nameEn": "Classic Nail Polish",
+          "nameFr": "Pose de vernis classique",
+          "namePt": "Esmalte clássico",
+          "duration": 30,
+          "description": "Pose de vernis traditionnel"
+        },
+        {
+          "name": "Pose de gel",
+          "nameEn": "Gel Polish",
+          "nameFr": "Pose de gel",
+          "namePt": "Esmalte gel",
+          "duration": 60,
+          "description": "Pose de vernis gel semi-permanent"
+        },
+        {
+          "name": "Pose d'ongles en gel",
+          "nameEn": "Gel Nail Extensions",
+          "nameFr": "Pose d'ongles en gel",
+          "namePt": "Extensões de unhas em gel",
+          "duration": 120,
+          "description": "Pose d'ongles artificiels en gel"
+        },
+        {
+          "name": "Pose d'ongles en acrylique",
+          "nameEn": "Acrylic Nails",
+          "nameFr": "Pose d'ongles en acrylique",
+          "namePt": "Unhas de acrílico",
+          "duration": 120,
+          "description": "Pose d'ongles artificiels en acrylique"
+        },
+        {
+          "name": "Nail art",
+          "nameEn": "Nail Art",
+          "nameFr": "Nail art",
+          "namePt": "Arte em unhas",
+          "duration": 90,
+          "description": "Dessins et décoration sur ongles"
+        },
+        {
+          "name": "Pose de french",
+          "nameEn": "French Manicure",
+          "nameFr": "Pose de french",
+          "namePt": "Francesinha",
+          "duration": 60,
+          "description": "Pose de french manicure classique"
+        },
+        {
+          "name": "Dépose d'ongles",
+          "nameEn": "Nail Removal",
+          "nameFr": "Dépose d'ongles",
+          "namePt": "Remoção de unhas",
+          "duration": 45,
+          "description": "Dépose professionnelle d'ongles artificiels"
+        },
+        {
+          "name": "Soin des cuticules",
+          "nameEn": "Cuticle Care",
+          "nameFr": "Soin des cuticules",
+          "namePt": "Cuidado com cutículas",
+          "duration": 20,
+          "description": "Traitement des cuticules"
+        }
+      ]
+    },
+    {
+      "category": {
+        "name": "Épilation / Hair Removal",
+        "nameEn": "Hair Removal",
+        "nameFr": "Épilation",
+        "namePt": "Depilação",
+        "status": true
+      },
+      "services": [
+        {
+          "name": "Épilation à la cire",
+          "nameEn": "Waxing",
+          "nameFr": "Épilation à la cire",
+          "namePt": "Depilação com cera",
+          "duration": 30,
+          "description": "Épilation à la cire chaude ou froide"
+        },
+        {
+          "name": "Épilation visage",
+          "nameEn": "Facial Hair Removal",
+          "nameFr": "Épilation visage",
+          "namePt": "Depilação facial",
+          "duration": 20,
+          "description": "Épilation des sourcils et duvet facial"
+        },
+        {
+          "name": "Épilation jambes",
+          "nameEn": "Leg Waxing",
+          "nameFr": "Épilation jambes",
+          "namePt": "Depilação das pernas",
+          "duration": 45,
+          "description": "Épilation complète des jambes"
+        },
+        {
+          "name": "Épilation aisselles",
+          "nameEn": "Underarm Waxing",
+          "nameFr": "Épilation aisselles",
+          "namePt": "Depilação das axilas",
+          "duration": 15,
+          "description": "Épilation des aisselles"
+        },
+        {
+          "name": "Épilation maillot",
+          "nameEn": "Bikini Waxing",
+          "nameFr": "Épilation maillot",
+          "namePt": "Depilação do biquíni",
+          "duration": 30,
+          "description": "Épilation du maillot classique ou brésilien"
+        }
+      ]
+    },
+    {
+      "category": {
+        "name": "Soins du visage / Facial Care",
+        "nameEn": "Facial Care",
+        "nameFr": "Soins du visage",
+        "namePt": "Cuidados Faciais",
+        "status": true
+      },
+      "services": [
+        {
+          "name": "Soin du visage",
+          "nameEn": "Facial Treatment",
+          "nameFr": "Soin du visage",
+          "namePt": "Tratamento facial",
+          "duration": 60,
+          "description": "Soin complet du visage avec nettoyage"
+        },
+        {
+          "name": "Nettoyage de peau",
+          "nameEn": "Deep Cleansing",
+          "nameFr": "Nettoyage de peau",
+          "namePt": "Limpeza profunda",
+          "duration": 75,
+          "description": "Nettoyage profond de la peau"
+        },
+        {
+          "name": "Soin hydratant",
+          "nameEn": "Hydrating Facial",
+          "nameFr": "Soin hydratant",
+          "namePt": "Hidratação facial",
+          "duration": 60,
+          "description": "Soin hydratant intensif"
+        },
+        {
+          "name": "Soin anti-âge",
+          "nameEn": "Anti-aging Treatment",
+          "nameFr": "Soin anti-âge",
+          "namePt": "Tratamento antienvelhecimento",
+          "duration": 90,
+          "description": "Soin anti-âge avec produits actifs"
+        },
+        {
+          "name": "Traitement de l'acné",
+          "nameEn": "Acne Treatment",
+          "nameFr": "Traitement de l'acné",
+          "namePt": "Tratamento de acne",
+          "duration": 75,
+          "description": "Traitement spécialisé contre l'acné"
+        },
+        {
+          "name": "Microdermabrasion",
+          "nameEn": "Microdermabrasion",
+          "nameFr": "Microdermabrasion",
+          "namePt": "Microdermabrasão",
+          "duration": 60,
+          "description": "Exfoliation mécanique de la peau"
+        }
+      ]
+    },
+    {
+      "category": {
+        "name": "Maquillage / Makeup",
+        "nameEn": "Makeup",
+        "nameFr": "Maquillage",
+        "namePt": "Maquiagem",
+        "status": true
+      },
+      "services": [
+        {
+          "name": "Maquillage jour",
+          "nameEn": "Day Makeup",
+          "nameFr": "Maquillage jour",
+          "namePt": "Maquiagem do dia",
+          "duration": 45,
+          "description": "Maquillage naturel pour le quotidien"
+        },
+        {
+          "name": "Maquillage soir",
+          "nameEn": "Evening Makeup",
+          "nameFr": "Maquillage soir",
+          "namePt": "Maquiagem noturna",
+          "duration": 60,
+          "description": "Maquillage pour soirée"
+        },
+        {
+          "name": "Maquillage mariée",
+          "nameEn": "Bridal Makeup",
+          "nameFr": "Maquillage mariée",
+          "namePt": "Maquiagem de noiva",
+          "duration": 120,
+          "description": "Maquillage spécial pour mariage"
+        },
+        {
+          "name": "Maquillage artistique",
+          "nameEn": "Artistic Makeup",
+          "nameFr": "Maquillage artistique",
+          "namePt": "Maquiagem artística",
+          "duration": 90,
+          "description": "Maquillage créatif et artistique"
+        },
+        {
+          "name": "Pose de cils",
+          "nameEn": "Eyelash Extensions",
+          "nameFr": "Pose de cils",
+          "namePt": "Extensão de cílios",
+          "duration": 120,
+          "description": "Pose d'extensions de cils"
+        },
+        {
+          "name": "Microblading sourcils",
+          "nameEn": "Microblading Eyebrows",
+          "nameFr": "Microblading sourcils",
+          "namePt": "Microblading sobrancelhas",
+          "duration": 120,
+          "description": "Tatouage semi-permanent des sourcils"
+        }
+      ]
+    },
+    {
+      "category": {
+        "name": "Massage et Spa / Massage & Spa",
+        "nameEn": "Massage & Spa",
+        "nameFr": "Massage et Spa",
+        "namePt": "Massagem e Spa",
+        "status": true
+      },
+      "services": [
+        {
+          "name": "Massage relaxant",
+          "nameEn": "Relaxing Massage",
+          "nameFr": "Massage relaxant",
+          "namePt": "Massagem relaxante",
+          "duration": 60,
+          "description": "Massage de relaxation complet du corps"
+        },
+        {
+          "name": "Massage thérapeutique",
+          "nameEn": "Therapeutic Massage",
+          "nameFr": "Massage thérapeutique",
+          "namePt": "Massagem terapêutica",
+          "duration": 60,
+          "description": "Massage pour soulager les tensions"
+        },
+        {
+          "name": "Massage sportif",
+          "nameEn": "Sports Massage",
+          "nameFr": "Massage sportif",
+          "namePt": "Massagem esportiva",
+          "duration": 60,
+          "description": "Massage pour sportifs"
+        },
+        {
+          "name": "Soin du corps",
+          "nameEn": "Body Treatment",
+          "nameFr": "Soin du corps",
+          "namePt": "Tratamento corporal",
+          "duration": 90,
+          "description": "Enveloppement et soin complet du corps"
+        },
+        {
+          "name": "Gommage corps",
+          "nameEn": "Body Scrub",
+          "nameFr": "Gommage corps",
+          "namePt": "Esfoliação corporal",
+          "duration": 45,
+          "description": "Exfoliation du corps"
+        },
+        {
+          "name": "Sauna",
+          "nameEn": "Sauna",
+          "nameFr": "Sauna",
+          "namePt": "Sauna",
+          "duration": 30,
+          "description": "Accès au sauna"
+        },
+        {
+          "name": "Hammam",
+          "nameEn": "Hammam",
+          "nameFr": "Hammam",
+          "namePt": "Hammam",
+          "duration": 45,
+          "description": "Bain de vapeur traditionnel"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Les durées sont en minutes et peuvent varier selon le salon",
+    "Certains services peuvent nécessiter une consultation préalable",
+    "Les prix varient généralement selon le salon et la localisation",
+    "La plupart des salons acceptent les paiements en espèces",
+    "Il est recommandé de prendre rendez-vous à l'avance"
+  ]
+}
+

@@ -896,7 +896,7 @@ exports.serveSalonWebPage = async (req, res) => {
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            object-fit: cover;
+            background-attachment: scroll;
         }
         .hero-placeholder {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -907,7 +907,8 @@ exports.serveSalonWebPage = async (req, res) => {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7));
+            z-index: 1;
         }
         .hero-content {
             position: relative;
@@ -915,30 +916,47 @@ exports.serveSalonWebPage = async (req, res) => {
             height: 100%;
             display: flex;
             align-items: center;
-            color: white;
+            color: #ffffff !important;
             padding: 40px 0;
         }
         .hero-title {
             font-size: 3.5rem;
             font-weight: 700;
             margin-bottom: 16px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #ffffff !important;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.8),
+                0 4px 8px rgba(0,0,0,0.6),
+                2px 2px 8px rgba(0,0,0,0.9),
+                -1px -1px 0 rgba(0,0,0,0.5),
+                1px 1px 0 rgba(0,0,0,0.5);
             line-height: 1.2;
         }
         .hero-subtitle {
             font-size: 1.3rem;
             margin-bottom: 24px;
             max-width: 700px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            color: #ffffff !important;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.8),
+                0 4px 8px rgba(0,0,0,0.6),
+                2px 2px 6px rgba(0,0,0,0.9),
+                -1px -1px 0 rgba(0,0,0,0.5),
+                1px 1px 0 rgba(0,0,0,0.5);
             line-height: 1.6;
         }
         .hero-rating {
             margin-bottom: 32px;
         }
         .hero-rating .rating-badge {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.25);
             backdrop-filter: blur(10px);
-            color: white;
+            color: #ffffff !important;
+            text-shadow: 
+                0 1px 3px rgba(0,0,0,0.8),
+                0 2px 6px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
         .hero-cta-btn {
             background: #fff;
@@ -1503,9 +1521,14 @@ exports.serveSalonWebPage = async (req, res) => {
             }
             .hero-title {
                 font-size: 2.5rem;
+                color: #ffffff !important;
             }
             .hero-subtitle {
                 font-size: 1.1rem;
+                color: #ffffff !important;
+            }
+            .hero-overlay {
+                background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.75));
             }
             .value-props-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -1533,6 +1556,19 @@ exports.serveSalonWebPage = async (req, res) => {
             }
             .hero-section {
                 height: 350px;
+                min-height: 350px;
+            }
+            .hero-image {
+                background-size: cover;
+                background-position: center center;
+                min-height: 100%;
+            }
+            .hero-overlay {
+                background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
+            }
+            .hero-title,
+            .hero-subtitle {
+                color: #ffffff !important;
             }
             .hero-title {
                 font-size: 2rem;

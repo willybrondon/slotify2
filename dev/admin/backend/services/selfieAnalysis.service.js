@@ -2,6 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Service = require('../models/service.model');
 const Salon = require('../models/salon.model');
 const Expert = require('../models/expert.model');
+const geolib = require('geolib');
 const fs = require('fs');
 const path = require('path');
 
@@ -480,8 +481,8 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         return serviceObj;
       });
 
-      // Get salon matches
-      const salonMatches = await this.getSalonMatches(services, context);
+      // Get salon matches (pass analysis for hair-based filtering)
+      const salonMatches = await this.getSalonMatches(services, context, analysis);
 
       // Generate beauty tips
       const beautyTips = this.generateBeautyTips(analysis);
@@ -499,9 +500,10 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
   }
 
   /**
-   * Match salons and experts based on recommended services
+   * Match salons and experts based on recommended services, location, and hair analysis
+   * Prioritize salons based on their service types matching user's needs
    */
-  async getSalonMatches(services, context) {
+  async getSalonMatches(services, context, analysis = null) {
     try {
       if (!services || services.length === 0) {
         return { salons: [], experts: [] };
@@ -510,15 +512,79 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       const serviceIds = services.map(s => s._id);
 
       // Find salons that offer these services
-      const salons = await Salon.find({
+      let salons = await Salon.find({
         'serviceIds.id': { $in: serviceIds },
         isActive: true,
         isDelete: false
       })
-        .populate('serviceIds.id')
-        .sort({ review: -1 })
-        .limit(5)
+        .populate({
+          path: 'serviceIds.id',
+          populate: {
+            path: 'categoryId',
+            select: 'name'
+          }
+        })
         .lean(); // Use lean() for better JSON serialization
+      
+      // Score and rank salons based on service type matching
+      salons = this.scoreSalonsByServiceTypes(salons, services, analysis);
+      
+      // Filter salons based on hair type/color if analysis is provided
+      if (analysis && analysis.hair) {
+        salons = this.filterSalonsByHairType(salons, analysis.hair);
+      }
+      
+      // Calculate distance and filter by location if provided
+      if (context.latitude && context.longitude) {
+        const userLocation = {
+          latitude: parseFloat(context.latitude),
+          longitude: parseFloat(context.longitude)
+        };
+        
+        salons = salons.map(salon => {
+          if (salon.locationCoordinates && salon.locationCoordinates.latitude && salon.locationCoordinates.longitude) {
+            const salonLocation = {
+              latitude: parseFloat(salon.locationCoordinates.latitude),
+              longitude: parseFloat(salon.locationCoordinates.longitude)
+            };
+            const distanceInMeters = geolib.getDistance(userLocation, salonLocation);
+            salon.distance = distanceInMeters / 1000; // Convert to kilometers
+          } else {
+            salon.distance = null;
+          }
+          return salon;
+        });
+        
+        // Filter to only nearby salons (within 50km) and sort by service match score, then distance, then rating
+        salons = salons
+          .filter(salon => salon.distance !== null && salon.distance <= 50)
+          .sort((a, b) => {
+            // Sort by service match score first (if available), then distance, then rating
+            if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
+              if (b.serviceMatchScore !== a.serviceMatchScore) {
+                return b.serviceMatchScore - a.serviceMatchScore;
+              }
+            }
+            if (a.distance !== b.distance) {
+              return a.distance - b.distance;
+            }
+            return (b.review || 0) - (a.review || 0);
+          });
+      } else {
+        // If no location, sort by service match score first, then rating
+        salons.sort((a, b) => {
+          if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
+            if (b.serviceMatchScore !== a.serviceMatchScore) {
+              return b.serviceMatchScore - a.serviceMatchScore;
+            }
+          }
+          return (b.review || 0) - (a.review || 0);
+        });
+      }
+      
+      // Limit to top 3-5 most relevant salons (closest and best rated)
+      const maxSalons = context.latitude && context.longitude ? 5 : 3;
+      salons = salons.slice(0, maxSalons);
       
       // Format salons to ensure _id is included and properly formatted
       const generateSlug = (name) => {
@@ -557,11 +623,14 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
           addressDetails: addressDetails,
           address: fullAddress, // Add formatted address string for easy access
           locationCoordinates: salon.locationCoordinates || {},
-          shareUrl: shareUrl // Add share URL for web linking
+          distance: salon.distance || null, // Include distance if calculated
+          shareUrl: shareUrl, // Add share URL for web linking
+          matchingServiceCount: salon.matchingServiceCount || 0, // Number of matching services
+          matchingServiceTypes: salon.matchingServiceTypes || [] // Types of matching services
         };
       });
 
-      // Find experts specialized in these services
+      // Find experts specialized in these services (limit to 3)
       const experts = await Expert.find({
         serviceId: { $in: serviceIds },
         isActive: true,
@@ -569,13 +638,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       })
         .populate('serviceId')
         .sort({ review: -1 })
-        .limit(5);
-
-      // If location context provided, filter by location
-      if (context.latitude && context.longitude) {
-        // You can add location-based filtering here
-        // For now, we'll return all matches sorted by rating
-      }
+        .limit(3);
 
       return {
         salons: formattedSalons, // Use formatted salons
@@ -585,6 +648,202 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       console.error('[Selfie Analysis] Salon matching error:', error);
       return { salons: [], experts: [] };
     }
+  }
+  
+  /**
+   * Score salons based on how well their service types match the recommended services
+   * and user's analysis needs
+   */
+  scoreSalonsByServiceTypes(salons, recommendedServices, analysis = null) {
+    if (!salons || salons.length === 0) return salons;
+    
+    // Create a map of recommended service IDs for quick lookup
+    const recommendedServiceIds = new Set(recommendedServices.map(s => s._id.toString()));
+    
+    // Create service type categories based on analysis
+    const serviceTypeCategories = {
+      skin: [],
+      hair: [],
+      facial: [],
+      beauty: []
+    };
+    
+    if (analysis) {
+      // Categorize services based on analysis
+      recommendedServices.forEach(service => {
+        const serviceName = (service.name || '').toLowerCase();
+        const categoryName = service.categoryId?.name?.toLowerCase() || '';
+        
+        if (analysis.skin && (serviceName.includes('facial') || serviceName.includes('skin') || 
+            serviceName.includes('acne') || serviceName.includes('treatment') ||
+            categoryName.includes('skin') || categoryName.includes('facial'))) {
+          serviceTypeCategories.skin.push(service._id.toString());
+        }
+        
+        if (analysis.hair && (serviceName.includes('hair') || serviceName.includes('cut') || 
+            serviceName.includes('color') || serviceName.includes('styling') ||
+            categoryName.includes('hair'))) {
+          serviceTypeCategories.hair.push(service._id.toString());
+        }
+        
+        if (analysis.face && (serviceName.includes('makeup') || serviceName.includes('eyebrow') ||
+            serviceName.includes('threading') || categoryName.includes('makeup'))) {
+          serviceTypeCategories.facial.push(service._id.toString());
+        }
+        
+        // General beauty services
+        if (serviceName.includes('beauty') || serviceName.includes('spa') ||
+            categoryName.includes('beauty') || categoryName.includes('spa')) {
+          serviceTypeCategories.beauty.push(service._id.toString());
+        }
+      });
+    }
+    
+    // Score each salon based on service type matching
+    const scoredSalons = salons.map(salon => {
+      let serviceMatchScore = 0;
+      let matchingServiceCount = 0;
+      let matchingServiceTypes = new Set();
+      
+      if (salon.serviceIds && salon.serviceIds.length > 0) {
+        salon.serviceIds.forEach(serviceItem => {
+          if (serviceItem.id && serviceItem.id._id) {
+            const serviceId = serviceItem.id._id.toString();
+            
+            // Check if this service is in recommended services
+            if (recommendedServiceIds.has(serviceId)) {
+              matchingServiceCount++;
+              serviceMatchScore += 10; // Base score for matching service
+              
+              // Check service category/type
+              const serviceName = (serviceItem.id.name || '').toLowerCase();
+              const categoryName = (serviceItem.id.categoryId?.name || '').toLowerCase();
+              
+              // Add bonus points for service type matching
+              if (analysis) {
+                // Skin services
+                if (analysis.skin && (serviceName.includes('facial') || serviceName.includes('skin') ||
+                    serviceName.includes('acne') || serviceName.includes('treatment') ||
+                    categoryName.includes('skin') || categoryName.includes('facial'))) {
+                  serviceMatchScore += 5;
+                  matchingServiceTypes.add('skin');
+                }
+                
+                // Hair services
+                if (analysis.hair && (serviceName.includes('hair') || serviceName.includes('cut') ||
+                    serviceName.includes('color') || serviceName.includes('styling') ||
+                    categoryName.includes('hair'))) {
+                  serviceMatchScore += 5;
+                  matchingServiceTypes.add('hair');
+                }
+                
+                // Facial/beauty services
+                if (analysis.face && (serviceName.includes('makeup') || serviceName.includes('eyebrow') ||
+                    categoryName.includes('makeup'))) {
+                  serviceMatchScore += 5;
+                  matchingServiceTypes.add('facial');
+                }
+              }
+              
+              // Bonus for salon having multiple matching services
+              if (matchingServiceCount > 1) {
+                serviceMatchScore += (matchingServiceCount - 1) * 2;
+              }
+            }
+          }
+        });
+      }
+      
+      // Store the score and matching info
+      salon.serviceMatchScore = serviceMatchScore;
+      salon.matchingServiceCount = matchingServiceCount;
+      salon.matchingServiceTypes = Array.from(matchingServiceTypes);
+      
+      return salon;
+    });
+    
+    // Sort by service match score (highest first)
+    scoredSalons.sort((a, b) => {
+      if (b.serviceMatchScore !== a.serviceMatchScore) {
+        return b.serviceMatchScore - a.serviceMatchScore;
+      }
+      // If scores are equal, prefer salons with more matching services
+      if (b.matchingServiceCount !== a.matchingServiceCount) {
+        return b.matchingServiceCount - a.matchingServiceCount;
+      }
+      // Then by rating
+      return (b.review || 0) - (a.review || 0);
+    });
+    
+    return scoredSalons;
+  }
+  
+  /**
+   * Filter salons based on hair type/color from analysis
+   * Prioritize salons that specialize in the user's hair type
+   */
+  filterSalonsByHairType(salons, hairAnalysis) {
+    if (!hairAnalysis) return salons;
+    
+    const hairType = hairAnalysis.type?.toLowerCase() || '';
+    const hairColor = hairAnalysis.color?.toLowerCase() || '';
+    const hairCondition = hairAnalysis.condition?.toLowerCase() || '';
+    
+    // Score salons based on how well they match the hair type
+    const scoredSalons = salons.map(salon => {
+      let score = 0;
+      
+      // Check if salon services match hair type
+      if (salon.serviceIds && salon.serviceIds.length > 0) {
+        salon.serviceIds.forEach(serviceItem => {
+          if (serviceItem.id && serviceItem.id.name) {
+            const serviceName = serviceItem.id.name.toLowerCase();
+            
+            // Match hair type
+            if (hairType) {
+              if (hairType === 'curly' || hairType === 'coily') {
+                if (serviceName.includes('curly') || serviceName.includes('afro') || serviceName.includes('textured')) {
+                  score += 10;
+                }
+              } else if (hairType === 'straight') {
+                if (serviceName.includes('straight') || serviceName.includes('smoothing') || serviceName.includes('keratin')) {
+                  score += 10;
+                }
+              } else if (hairType === 'wavy') {
+                if (serviceName.includes('wave') || serviceName.includes('texture')) {
+                  score += 10;
+                }
+              }
+            }
+            
+            // Match hair color services
+            if (hairColor && (serviceName.includes('color') || serviceName.includes('highlight') || serviceName.includes('dye'))) {
+              score += 5;
+            }
+            
+            // Match hair condition services
+            if (hairCondition === 'damaged' || hairCondition === 'dry') {
+              if (serviceName.includes('treatment') || serviceName.includes('repair') || serviceName.includes('spa')) {
+                score += 8;
+              }
+            }
+          }
+        });
+      }
+      
+      return { salon, score };
+    });
+    
+    // Sort by score (highest first), then by rating
+    scoredSalons.sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      return (b.salon.review || 0) - (a.salon.review || 0);
+    });
+    
+    // Return salons (remove score)
+    return scoredSalons.map(item => item.salon);
   }
 
   /**

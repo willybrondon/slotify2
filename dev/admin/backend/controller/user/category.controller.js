@@ -826,31 +826,69 @@ exports.serveCategoryPage = async (req, res) => {
         }
         @media (max-width: 768px) {
             body {
-                padding-top: 70px;
+                padding-top: 80px;
             }
             .category-hero-section {
-                height: 300px;
+                height: auto;
+                min-height: auto;
+                padding-top: 30px;
+                padding-bottom: 20px;
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 15px;
+                position: relative;
             }
             .category-hero-image-overlay {
-                width: 120px;
-                height: 120px;
-                top: 15px;
-                left: 15px;
+                position: relative;
+                width: 100px;
+                height: 100px;
+                top: auto;
+                left: auto;
                 padding: 8px;
+                margin: 0;
+                flex-shrink: 0;
+                z-index: 3;
             }
             .category-hero-content {
-                padding-left: 20px;
+                padding-left: 0;
                 padding-right: 20px;
+                padding-top: 0;
+                padding-bottom: 0;
+                align-items: flex-start;
+                flex: 1;
+                min-width: 0;
+                height: auto;
+            }
+            .category-hero-content .category-header-content {
+                padding: 0;
+                max-width: none;
             }
             .category-hero-title {
-                font-size: 2rem;
+                font-size: 1.4rem;
+                margin-bottom: 8px;
+                margin-top: 0;
+                line-height: 1.3;
             }
             .category-hero-description {
-                font-size: 1rem;
+                font-size: 0.85rem;
+                margin-bottom: 10px;
+                line-height: 1.4;
+                max-width: 100%;
             }
             .category-hero-stats {
-                flex-direction: column;
-                gap: 12px;
+                flex-direction: row;
+                gap: 6px;
+                font-size: 0.75rem;
+                flex-wrap: wrap;
+            }
+            .category-hero-stats span {
+                padding: 4px 10px;
+                font-size: 0.75rem;
+            }
+            .category-hero-stats strong {
+                font-size: 0.9rem;
+                display: inline;
             }
             .category-subtitle {
                 font-size: 1.75rem;
