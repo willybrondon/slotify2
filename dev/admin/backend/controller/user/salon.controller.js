@@ -976,7 +976,7 @@ exports.serveSalonWebPage = async (req, res) => {
         }
         .hero-cta-btn {
             background: #fff;
-            color: #111;
+            color: #000000 !important;
             border: none;
             padding: 18px 40px;
             border-radius: 50px;
@@ -988,6 +988,9 @@ exports.serveSalonWebPage = async (req, res) => {
             display: inline-flex;
             align-items: center;
             gap: 12px;
+        }
+        .hero-cta-btn * {
+            color: #000000 !important;
         }
         .hero-cta-btn:hover {
             transform: translateY(-2px);
@@ -1138,7 +1141,7 @@ exports.serveSalonWebPage = async (req, res) => {
         .booking-card h3 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #111;
+            color: #000000 !important;
             margin-bottom: 20px;
         }
         .open-app-btn {
@@ -1577,25 +1580,25 @@ exports.serveSalonWebPage = async (req, res) => {
             }
             .hero-section {
                 position: relative;
-                height: 100vh;
-                min-height: 100vh;
+                height: 400px;
                 width: 100%;
                 max-width: 100vw;
                 margin: 0;
                 padding: 0;
                 left: 0;
                 right: 0;
+                overflow: hidden;
             }
             .hero-image {
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 100%;
+                width: 100vw;
                 height: 100%;
-                min-height: 100vh;
                 background-size: cover;
                 background-position: center center;
                 background-repeat: no-repeat;
+                object-fit: cover;
             }
             .hero-overlay {
                 position: absolute;
@@ -1603,9 +1606,6 @@ exports.serveSalonWebPage = async (req, res) => {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                min-height: 100vh;
-            }
-            .hero-overlay {
                 background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
             }
             .hero-title,
@@ -1652,7 +1652,6 @@ exports.serveSalonWebPage = async (req, res) => {
             .hero-content {
                 position: relative;
                 height: 100%;
-                min-height: 100vh;
                 padding: 20px;
                 z-index: 2;
             }
@@ -1665,25 +1664,25 @@ exports.serveSalonWebPage = async (req, res) => {
         @media (max-width: 480px) {
             .hero-section {
                 position: relative;
-                height: 100vh;
-                min-height: 100vh;
+                height: 400px;
                 width: 100%;
                 max-width: 100vw;
                 margin: 0;
                 padding: 0;
                 left: 0;
                 right: 0;
+                overflow: hidden;
             }
             .hero-image {
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 100%;
+                width: 100vw;
                 height: 100%;
-                min-height: 100vh;
                 background-size: cover;
                 background-position: center center;
                 background-repeat: no-repeat;
+                object-fit: cover;
             }
             .hero-overlay {
                 position: absolute;
@@ -1691,12 +1690,10 @@ exports.serveSalonWebPage = async (req, res) => {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                min-height: 100vh;
             }
             .hero-content {
                 position: relative;
                 height: 100%;
-                min-height: 100vh;
                 padding: 15px;
                 z-index: 2;
             }

@@ -5,6 +5,7 @@ import { Success } from "../../component/api/toastServices";
 const initialState = {
     withDraw: [],
     walletHistory:[],
+    walletBalance: 0,
     isLoading: false,
     isSkeleton: false,
     total: null,
@@ -16,8 +17,14 @@ export const getWithDrawMethod = createAsyncThunk("user/getWithDrawMethod", asyn
     return apiInstanceFetch.get(`salon/withdrawMethod/getWithdrawMethodsBySalon`)
 })
 export const getWalletHistory = createAsyncThunk("user/getWalletHistory", async (payload) => {
-
-    return apiInstanceFetch.get(`salon/fetchSalonWalletHistory?type=${payload?.type}&startDate=${payload?.startDate}&endDate=${payload?.endDate}`)
+    const params = new URLSearchParams({
+        type: payload?.type || "All",
+        startDate: payload?.startDate || "All",
+        endDate: payload?.endDate || "All",
+        start: payload?.start || 0,
+        limit: payload?.limit || 10,
+    });
+    return apiInstanceFetch.get(`salon/fetchSalonWalletHistory?${params.toString()}`)
 })
 
 export const addWithDrawMethod = createAsyncThunk(
@@ -28,6 +35,17 @@ export const addWithDrawMethod = createAsyncThunk(
             `salon/withdrawRequest/withdrawRequestBySalon`,
             payload
         );
+    }
+);
+
+export const depositToWallet = createAsyncThunk(
+    "salon/depositToWallet/post",
+    async (payload) => {
+        const params = new URLSearchParams({
+            amount: payload.amount,
+            paymentGateway: payload.paymentGateway,
+        });
+        return apiInstanceFetch.post(`salon/depositeToWallet?${params.toString()}`);
     }
 );
 
@@ -60,12 +78,26 @@ const withDrawSlice = createSlice({
         builder.addCase(getWalletHistory.fulfilled, (state, action) => {
 
             state.walletHistory = action.payload.data;
-            state.total = action?.payload?.total
+            state.total = action?.payload?.total;
+            state.walletBalance = action?.payload?.walletBalance || 0;
             state.isSkeleton = false;
         })
 
         builder.addCase(getWalletHistory.rejected, (state, action) => {
             state.isSkeleton = false;
+        })
+        
+        builder.addCase(depositToWallet.pending, (state, action) => {
+            state.isLoading = true;
+        })
+
+        builder.addCase(depositToWallet.fulfilled, (state, action) => {
+            state.walletBalance = action?.payload?.walletBalance || state.walletBalance;
+            state.isLoading = false;
+        })
+
+        builder.addCase(depositToWallet.rejected, (state, action) => {
+            state.isLoading = false;
         })
     }
 

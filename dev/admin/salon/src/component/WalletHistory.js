@@ -19,7 +19,7 @@ const WalletHistory = () => {
     ]
     const { setting } = useSelector((state) => state.setting)
 
-    const { walletHistory, total } = useSelector((state) => state.withDraw);
+    const { walletHistory, total, walletBalance } = useSelector((state) => state.withDraw);
 
     const [transactionType, setTransactionType] = useState("All");
     const handleChangePage = (event, newPage) => {
@@ -57,10 +57,10 @@ const WalletHistory = () => {
             endDate: endDate === "ALL" ? "All" : endDate,
             start: page,
             limit: rowsPerPage,
-            type: transactionType
+            type: transactionType === "All" ? "All" : transactionType
         }
         dispatch(getWalletHistory(payload))
-    }, [page, rowsPerPage, startDate, transactionType])
+    }, [page, rowsPerPage, startDate, endDate, transactionType])
 
     const walletTable = [
         {
@@ -115,66 +115,79 @@ const WalletHistory = () => {
         {
             Header: "Transaction Type",
             Cell: ({ row }) =>
-                row?.type === 3 ? (
+                row?.type === 1 || row?.type === 2 || row?.type === 5 ? (
                     <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#1ebc1e" }}>
                         Credit
                     </button>
-                ) : row?.type === 4 ? (
-                    <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#1ebc1e" }}>
-                        Credit
-                    </button>
-                ) : row?.type === 2 && row?.payoutStatus === 2 ? (
+                ) : row?.type === 3 || row?.type === 4 ? (
                     <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#F23434" }}>
                         Debit
                     </button>
                 ) : (
                     <button className="m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#FFC7C6", color: "#FF1B1B", fontWeight: "700" }}>
-                        Pending
+                        Unknown
                     </button>
                 ),
         },
         {
-            Header: "Transaction Completed",
-            Cell: ({ row }) =>
-                row?.type === 2 ? ( 
-                    <>
-                        {row?.payoutStatus === 1 ? (
-                            <button className="d-flex align-items-center justify-content-center"
-                                style={{ background: "#D8F0F9", color: "#17A7DB", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
-                                <Refund />
-                                <span style={{ whiteSpace: "nowrap" }} className="ms-2">{
-                                    row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
-                                }</span>
-                            </button>
-                        ) : (
-                            <button className="d-flex align-items-center justify-content-center"
-                                style={{ background: "#F5DDC3", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
-                                <WithDraw />
-                                <span style={{ whiteSpace: "nowrap" }} className="ms-2">{
-                                    row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
-                                }</span>
-                            </button>
-                        )
-                        }
-                    </>
-
-                ) : row?.type === 3 ? (
-                    <button className="d-flex align-items-center justify-content-center"
-                        style={{ background: "#D9F2D9", color: "#14AF14", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
-                        <Order />
-                        <span style={{ whiteSpace: "nowrap" }} className="ms-2">Order Confirmed</span>
-                    </button>
-
-                ) : row?.type === 4 ? (
-                    <button className="d-flex align-items-center justify-content-center"
-                        style={{ background: "#D9F2E7", color: "#0EC070", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
-                        <Complete />
-                        <span style={{ whiteSpace: "nowrap" }} className="ms-2">Booking Completed</span>
-                    </button>
-
-                ) : (
-                    ""
-                ),
+            Header: "Transaction Details",
+            Cell: ({ row }) => {
+                // Type 1: Credit from Admin
+                if (row?.type === 1) {
+                    return (
+                        <button className="d-flex align-items-center justify-content-center"
+                            style={{ background: "#D9F2D9", color: "#14AF14", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+                            <Order />
+                            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Credit from Admin</span>
+                        </button>
+                    );
+                }
+                // Type 2: Credit from Self (Salon Owner Recharge)
+                if (row?.type === 2) {
+                    return (
+                        <button className="d-flex align-items-center justify-content-center"
+                            style={{ background: "#D9F2D9", color: "#14AF14", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+                            <Order />
+                            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Wallet Recharge</span>
+                        </button>
+                    );
+                }
+                // Type 3: Debit Commission
+                if (row?.type === 3) {
+                    return (
+                        <button className="d-flex align-items-center justify-content-center"
+                            style={{ background: "#FFC7C6", color: "#FF1B1B", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+                            <WithDraw />
+                            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Platform Commission</span>
+                        </button>
+                    );
+                }
+                // Type 4: Debit Withdrawal
+                if (row?.type === 4) {
+                    return (
+                        <button className="d-flex align-items-center justify-content-center"
+                            style={{ background: row?.payoutStatus === 1 ? "#D8F0F9" : row?.payoutStatus === 2 ? "#D9F2D9" : "#FFC7C6", 
+                                    color: row?.payoutStatus === 1 ? "#17A7DB" : row?.payoutStatus === 2 ? "#14AF14" : "#FF1B1B", 
+                                    border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+                            {row?.payoutStatus === 1 ? <Refund /> : <WithDraw />}
+                            <span style={{ whiteSpace: "nowrap" }} className="ms-2">
+                                {row?.payoutStatus === 1 ? "Withdraw Pending" : row?.payoutStatus === 2 ? "Withdraw Approved" : "Withdraw Declined"}
+                            </span>
+                        </button>
+                    );
+                }
+                // Type 5: Credit Refund
+                if (row?.type === 5) {
+                    return (
+                        <button className="d-flex align-items-center justify-content-center"
+                            style={{ background: "#D9F2E7", color: "#0EC070", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
+                            <Complete />
+                            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Booking Refund</span>
+                        </button>
+                    );
+                }
+                return "";
+            },
         },
     ];
 
@@ -182,6 +195,18 @@ const WalletHistory = () => {
         <div className="orderDetails mt-2">
             <div className="row">
                 <Title name="Wallet History" className="mt-4" />
+                {walletBalance !== undefined && (
+                    <div className="col-12 mb-3">
+                        <div className="betBox p-3" style={{ background: "#f8f9fa", borderRadius: "8px" }}>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <span className="fw-bold" style={{ fontSize: "1.1rem" }}>Current Wallet Balance:</span>
+                                <span className="fw-bold" style={{ fontSize: "1.3rem", color: "#14AF14" }}>
+                                    {setting?.currencySymbol || ""} {walletBalance?.toFixed(2) || "0.00"}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
             <div className="betBox">
                 <div className="inputData pb-2">

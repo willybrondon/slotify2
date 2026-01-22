@@ -18,11 +18,12 @@ const salonExpertWalletHistorySchema = new mongoose.Schema(
     commissionPerProductQuantity: { type: Number, default: 0 },
     amount: { type: Number, default: 0 },
 
-    type: { type: Number, enum: [1, 2, 3, 4] },
-    //1.amount deposite to expert at the time of booking complete
-    //2.amount deduct from (salon OR Expert) when at the time of withdraw request approve
-    //3.amount deposite to salon at the time of order confirmed
-    //4.amount deposite to salon at the time of booking complete
+    type: { type: Number, enum: [1, 2, 3, 4, 5] },
+    //1.amount credited from admin
+    //2.amount credited from salon owner (self-recharge)
+    //3.amount debited for platform commission (on booking)
+    //4.amount debited for withdrawal request
+    //5.amount credited for booking cancellation refund (if applicable)
 
     payoutStatus: { type: Number, default: 0, enum: WITHDRAW_REQUEST_STATUS },
 

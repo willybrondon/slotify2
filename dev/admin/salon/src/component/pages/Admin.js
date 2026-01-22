@@ -39,6 +39,7 @@ import ProductDetails from "../tables/products/ProductDetails";
 import Order from "../tables/order/Order";
 import WithDrawMoney from "../tables/WithDrawMoney";
 import WalletHistory from "../WalletHistory";
+import Wallet from "../Wallet";
 import OrderDetails from "../tables/order/OrderDetails";
 import Attribute from "../tables/attributes/Attribute";
 
@@ -91,6 +92,7 @@ const Admin = () => {
             <Route path="/staffEarning" element={<StaffEarning />} />
             <Route path="/salonEarning" element={<SalonEarnings />} />
             <Route path="/withdrawMoney" element={<WithDrawMoney />} />
+            <Route path="/wallet" element={<Wallet />} />
             <Route path="/walletHistory" element={<WalletHistory />} />
             <Route path="/holiday" element={<Holiday />} />
             <Route path="/futureBooking" element={<UpcomingBooking />} />

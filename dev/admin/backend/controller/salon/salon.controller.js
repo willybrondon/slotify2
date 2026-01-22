@@ -2,7 +2,6 @@ const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const Setting = require("../../models/setting.model");
 const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
-const SalonWalletHistory = require("../../models/salonWalletHistory.model");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
 const { PAYMENT_GATEWAY } = require("../../types/constant");
 
@@ -506,11 +505,6 @@ exports.manageBreak = async (req, res) => {
 exports.fetchSalonWalletHistory = async (req, res) => {
   try {
     const { type } = req.query;
-
-    if (!type) {
-      return res.status(200).json({ status: false, message: "Invalid request: Missing required fields." });
-    }
-
     const salonId = req.salon._id;
 
     const startDate = req.query.startDate || "All";
@@ -535,30 +529,34 @@ exports.fetchSalonWalletHistory = async (req, res) => {
       };
     }
 
-    let typeQuery = {}; //2.deduct Or 3.deposite Or 4.deposite
+    let typeQuery = {};
     if (type !== "All") {
-      if (parseInt(type) === 3) {
-        typeQuery.type = { $in: [3, 4] };
+      const typeNum = parseInt(type);
+      // Map frontend types to backend types:
+      // Frontend "3" = Credit (types 1, 2, 5)
+      // Frontend "2" = Debit (types 3, 4)
+      if (typeNum === 3) {
+        typeQuery.type = { $in: [1, 2, 5] }; // All credit types
+      } else if (typeNum === 2) {
+        typeQuery.type = { $in: [3, 4] }; // All debit types
       } else {
-        typeQuery.type = parseInt(type);
+        typeQuery.type = typeNum;
       }
     }
 
     const [salon, total, data] = await Promise.all([
       Salon.findById(salonObjId),
       SalonExpertWalletHistory.countDocuments({
-        type: { $ne: 1 },
         salon: salonObjId,
         ...dateFilterQuery,
         ...typeQuery,
       }),
       SalonExpertWalletHistory.find({
-        type: { $ne: 1 },
         salon: salonObjId,
         ...dateFilterQuery,
         ...typeQuery,
       })
-        .select("type payoutStatus amount uniqueId date time createdAt")
+        .select("type paymentGateway payoutStatus amount uniqueId date time createdAt")
         .sort({ date: -1, time: -1 })
         .skip(start * limit)
         .limit(limit),
@@ -573,6 +571,7 @@ exports.fetchSalonWalletHistory = async (req, res) => {
       message: "Success",
       total: total,
       data: data,
+      walletBalance: salon.wallet || 0,
     });
   } catch (error) {
     console.log(error);
@@ -618,16 +617,14 @@ exports.depositeToWallet = async (req, res) => {
 
     // Create wallet history entry
     const uniqueId = await generateUniqueIdentifier();
-    const walletHistory = new SalonWalletHistory({
+    const walletHistory = new SalonExpertWalletHistory({
       salon: salon._id,
       amount: requestedAmount,
       paymentGateway: paymentGatewayNum,
-      type: 1, // Deposit
-      description: `Wallet recharge via ${paymentGateway === PAYMENT_GATEWAY.STRIPE.toString() ? 'Stripe' : paymentGateway === PAYMENT_GATEWAY.ZITOPAY.toString() ? 'Zitopay' : 'Payment Gateway'}`,
+      type: 2, // CREDIT_FROM_SELF (salon owner self-recharge)
       date: moment().format("YYYY-MM-DD"),
       time: moment().format("HH:mm a"),
       uniqueId: uniqueId,
-      addedBy: "salon",
     });
 
     await walletHistory.save();
