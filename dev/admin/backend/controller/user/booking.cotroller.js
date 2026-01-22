@@ -182,13 +182,15 @@ exports.newBooking = async (req, res, next) => {
     // Check if salon has sufficient wallet balance
     if (salonWalletBalance < requiredBalance) {
       // Send SMS and Email notification to salon owner about insufficient wallet balance
-      try {
-        const currencySymbol = global.settingJSON?.currencySymbol || "";
-        const currencyName = global.settingJSON?.currencyName || "";
-        
-        // SMS Notification
-        if (salon.mobile && salon.mobile.trim() !== "") {
-          const smsMessage = `⚠️ ALERTE: Votre solde de portefeuille est insuffisant!
+      // Use setImmediate to send notifications asynchronously without blocking the response
+      setImmediate(async () => {
+        try {
+          const currencySymbol = global.settingJSON?.currencySymbol || "";
+          
+          // SMS Notification
+          if (salon.mobile && salon.mobile.trim() !== "") {
+            try {
+              const smsMessage = `⚠️ ALERTE: Votre solde de portefeuille est insuffisant!
 
 Votre salon "${salon.name}" ne peut pas accepter de nouvelles réservations.
 
@@ -200,91 +202,95 @@ Veuillez recharger votre portefeuille depuis votre tableau de bord salon pour co
 Merci,
 L'équipe Skedisy`;
 
-          const smsResult = await sendSMS(salon.mobile, smsMessage);
-          if (smsResult.success) {
-            console.log(`[Wallet Alert] SMS sent successfully to salon ${salon.name} (${salon.mobile})`);
-          } else {
-            console.error(`[Wallet Alert] Failed to send SMS to salon ${salon.name}:`, smsResult.error);
+              const smsResult = await sendSMS(salon.mobile, smsMessage);
+              if (smsResult.success) {
+                console.log(`[Wallet Alert] SMS sent successfully to salon ${salon.name} (${salon.mobile})`);
+              } else {
+                console.error(`[Wallet Alert] Failed to send SMS to salon ${salon.name}:`, smsResult.error);
+              }
+            } catch (smsError) {
+              console.error(`[Wallet Alert] Error sending SMS to salon ${salon.name}:`, smsError.message);
+            }
           }
-        }
 
-        // Email Notification
-        if (salon.email && salon.email.trim() !== "") {
-          try {
-            const websiteLink = process.env.WEBSITE_URL || "https://skedisy.com";
-            const supportEmail = process.env.SUPPORT_EMAIL || "support@skedisy.com";
-            const contactNumber = process.env.CONTACT_NUMBER || "+33 7 66 16 03 94";
+          // Email Notification
+          if (salon.email && salon.email.trim() !== "" && process.env.SENDGRID_API_KEY) {
+            try {
+              const websiteLink = process.env.WEBSITE_URL || "https://skedisy.com";
+              const supportEmail = process.env.SUPPORT_EMAIL || "support@skedisy.com";
+              const contactNumber = process.env.CONTACT_NUMBER || "+33 7 66 16 03 94";
 
-            const emailHtml = `
-            <!DOCTYPE html>
-            <html lang="fr">
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-                .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-                h2 { color: #d32f2f; }
-                .alert-box { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0; }
-                .info-box { background-color: #f0f8ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
-                .info-box p { margin: 8px 0; }
-                .button { display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                .button:hover { background-color: #0056b3; }
-                .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9em; }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <h2>⚠️ Alerte: Solde de Portefeuille Insuffisant</h2>
-                
-                <div class="alert-box">
-                  <p><strong>Cher propriétaire de salon,</strong></p>
-                  <p>Votre salon <strong>"${salon.name}"</strong> ne peut actuellement pas accepter de nouvelles réservations car votre solde de portefeuille est insuffisant.</p>
+              const emailHtml = `
+              <!DOCTYPE html>
+              <html lang="fr">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+                  .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+                  h2 { color: #d32f2f; }
+                  .alert-box { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                  .info-box { background-color: #f0f8ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                  .info-box p { margin: 8px 0; }
+                  .button { display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+                  .button:hover { background-color: #0056b3; }
+                  .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9em; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <h2>⚠️ Alerte: Solde de Portefeuille Insuffisant</h2>
+                  
+                  <div class="alert-box">
+                    <p><strong>Cher propriétaire de salon,</strong></p>
+                    <p>Votre salon <strong>"${salon.name}"</strong> ne peut actuellement pas accepter de nouvelles réservations car votre solde de portefeuille est insuffisant.</p>
+                  </div>
+
+                  <div class="info-box">
+                    <p><strong>Détails du solde:</strong></p>
+                    <p>Solde actuel: <strong>${currencySymbol}${salonWalletBalance.toFixed(2)}</strong></p>
+                    <p>Solde requis: <strong>${currencySymbol}${requiredBalance.toFixed(2)}</strong></p>
+                    <p>Déficit: <strong>${currencySymbol}${(requiredBalance - salonWalletBalance).toFixed(2)}</strong></p>
+                  </div>
+
+                  <p>Pour continuer à accepter des réservations, veuillez recharger votre portefeuille depuis votre tableau de bord salon.</p>
+                  
+                  <a href="${websiteLink}/salonpanel/wallet" class="button">Recharger mon portefeuille</a>
+
+                  <div class="info-box">
+                    <p><strong>Besoin d'aide?</strong></p>
+                    <p>Site web: <a href="${websiteLink}" style="color: #007bff; text-decoration: none;">${websiteLink}</a></p>
+                    <p>Email: <a href="mailto:${supportEmail}" style="color: #007bff; text-decoration: none;">${supportEmail}</a></p>
+                    <p>Téléphone: <a href="tel:${contactNumber}" style="color: #007bff; text-decoration: none;">${contactNumber}</a></p>
+                  </div>
+                  
+                  <div class="footer">
+                    <p>Cordialement,<br>L'équipe Skedisy</p>
+                  </div>
                 </div>
+              </body>
+              </html>
+            `;
 
-                <div class="info-box">
-                  <p><strong>Détails du solde:</strong></p>
-                  <p>Solde actuel: <strong>${currencySymbol}${salonWalletBalance.toFixed(2)}</strong></p>
-                  <p>Solde requis: <strong>${currencySymbol}${requiredBalance.toFixed(2)}</strong></p>
-                  <p>Déficit: <strong>${currencySymbol}${(requiredBalance - salonWalletBalance).toFixed(2)}</strong></p>
-                </div>
+              const msg = {
+                to: salon.email.trim(),
+                from: process.env.EMAIL || "noreply@skedisy.com",
+                subject: `⚠️ Alerte: Solde de Portefeuille Insuffisant - ${salon.name}`,
+                html: emailHtml,
+              };
 
-                <p>Pour continuer à accepter des réservations, veuillez recharger votre portefeuille depuis votre tableau de bord salon.</p>
-                
-                <a href="${websiteLink}/salonpanel/wallet" class="button">Recharger mon portefeuille</a>
-
-                <div class="info-box">
-                  <p><strong>Besoin d'aide?</strong></p>
-                  <p>Site web: <a href="${websiteLink}" style="color: #007bff; text-decoration: none;">${websiteLink}</a></p>
-                  <p>Email: <a href="mailto:${supportEmail}" style="color: #007bff; text-decoration: none;">${supportEmail}</a></p>
-                  <p>Téléphone: <a href="tel:${contactNumber}" style="color: #007bff; text-decoration: none;">${contactNumber}</a></p>
-                </div>
-                
-                <div class="footer">
-                  <p>Cordialement,<br>L'équipe Skedisy</p>
-                </div>
-              </div>
-            </body>
-            </html>
-          `;
-
-            const msg = {
-              to: salon.email.trim(),
-              from: process.env.EMAIL || "noreply@skedisy.com",
-              subject: `⚠️ Alerte: Solde de Portefeuille Insuffisant - ${salon.name}`,
-              html: emailHtml,
-            };
-
-            await sgMail.send(msg);
-            console.log(`[Wallet Alert] Email sent successfully to salon ${salon.name} (${salon.email})`);
-          } catch (emailError) {
-            console.error(`[Wallet Alert] Error sending email to salon ${salon.name}:`, emailError.message);
+              await sgMail.send(msg);
+              console.log(`[Wallet Alert] Email sent successfully to salon ${salon.name} (${salon.email})`);
+            } catch (emailError) {
+              console.error(`[Wallet Alert] Error sending email to salon ${salon.name}:`, emailError.message);
+            }
           }
+        } catch (notificationError) {
+          console.error("[Wallet Alert] Error in notification process:", notificationError.message);
+          // Don't fail the booking request if notification fails
         }
-      } catch (notificationError) {
-        console.error("[Wallet Alert] Error sending notifications:", notificationError.message);
-        // Don't fail the booking request if notification fails
-      }
+      });
 
       return res.status(200).send({
         status: false,

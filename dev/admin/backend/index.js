@@ -302,13 +302,25 @@ app.get("/robots.txt", sitemapController.generateRobots);
 
 // Serve .well-known files for App Links verification (must be before other static routes)
 app.get("/.well-known/assetlinks.json", (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.sendFile(path.join(__dirname, "public", ".well-known", "assetlinks.json"));
+  const filePath = path.join(__dirname, "public", ".well-known", "assetlinks.json");
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'application/json');
+    res.sendFile(filePath);
+  } else {
+    console.warn(`[App Links] File not found: ${filePath} - This is not critical, app links will still work`);
+    res.status(404).json({ error: "File not found" });
+  }
 });
 
 app.get("/.well-known/apple-app-site-association", (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.sendFile(path.join(__dirname, "public", ".well-known", "apple-app-site-association"));
+  const filePath = path.join(__dirname, "public", ".well-known", "apple-app-site-association");
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'application/json');
+    res.sendFile(filePath);
+  } else {
+    console.warn(`[App Links] File not found: ${filePath} - This is not critical, app links will still work`);
+    res.status(404).json({ error: "File not found" });
+  }
 });
 
 async function updateAttendance(expertId, action) {
