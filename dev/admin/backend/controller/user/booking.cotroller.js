@@ -441,7 +441,7 @@ exports.newBooking = async (req, res, next) => {
     await booking.save();
 
     // Deduct platform commission from salon wallet
-    const platformFee = (salon.platformFee * req.body.withoutTax) / 100;
+    // platformFee is already calculated above (line 413), reuse it
     const commissionAmount = parseFloat(platformFee.toFixed(2));
     
     if (commissionAmount > 0) {
