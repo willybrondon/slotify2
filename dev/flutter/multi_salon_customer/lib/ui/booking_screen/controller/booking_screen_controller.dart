@@ -1696,8 +1696,8 @@ class BookingScreenController extends GetxController {
         // For non-wallet payments (Stripe, Cash After Service)
         log("it's ${selectedPayment} payment");
 
-        if (selectedPayment == "Stripe") {
-          // For Stripe, collect booking data and navigate to payment screen
+        if (selectedPayment == "Stripe" || selectedPayment == "Zitopay" || selectedPayment == "MTN MoMo") {
+          // For Stripe, Zitopay, or MTN MoMo, collect booking data and navigate to payment screen
           Map<String, dynamic> bookingData = {
             'isWalletAdd': false, // This is a direct service payment
             'totalAmount': totalPrice.toString(),

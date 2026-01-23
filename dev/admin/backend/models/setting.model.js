@@ -19,6 +19,12 @@ const settingSchema = new mongoose.Schema(
     zitopaySecretKey: { type: String, default: "" },
     zitopayMerchantId: { type: String, default: "" },
 
+    isMtnMomo: { type: Boolean, default: false },
+    mtnMomoPrimaryKey: { type: String, default: "" }, // Primary Key (API User ID)
+    mtnMomoSecondaryKey: { type: String, default: "" }, // Secondary Key (API User Secret)
+    mtnMomoSubscriptionKey: { type: String, default: "" }, // Subscription Key (Ocp-Apim-Subscription-Key)
+    mtnMomoEnvironment: { type: String, default: "sandbox" }, // sandbox or production
+
     maintenanceMode: { type: Boolean, default: false },
 
     currencySymbol: { type: String, default: "" },

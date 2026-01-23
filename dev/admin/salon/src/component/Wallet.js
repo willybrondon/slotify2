@@ -38,6 +38,9 @@ const Wallet = () => {
     if (settingsData?.isZitopay) {
         availablePaymentMethods.push({ value: "Zitopay", label: "Zitopay" });
     }
+    if (settingsData?.isMtnMomo) {
+        availablePaymentMethods.push({ value: "MTN MoMo", label: "MTN Mobile Money" });
+    }
 
     const handleStripePaymentSuccess = async (sessionId) => {
         try {
@@ -158,6 +161,10 @@ const Wallet = () => {
                 // TODO: Implement Zitopay payment flow for web
                 toast.info("Zitopay payment integration for web is coming soon. Please use Stripe for now.");
                 setIsProcessing(false);
+            } else if (paymentMethod === "MTN MoMo") {
+                // TODO: Implement MTN MoMo payment flow for web
+                toast.info("MTN MoMo payment integration for web is coming soon. Please use Stripe for now.");
+                setIsProcessing(false);
             } else {
                 toast.error("Selected payment method is not supported");
                 setIsProcessing(false);
@@ -256,7 +263,7 @@ const Wallet = () => {
                                 </label>
                                 <div style={{ fontSize: "14px", lineHeight: "25px", color: "#A5A5A5" }}>
                                     <div>
-                                        To recharge your wallet, select or enter the desired amount and choose your preferred payment method (Stripe or Zitopay). 
+                                        To recharge your wallet, select or enter the desired amount and choose your preferred payment method (Stripe, Zitopay, or MTN MoMo). 
                                         Once the payment is processed successfully, the amount will be automatically credited to your wallet. 
                                         Your wallet balance must meet the minimum required amount plus commission fees to accept new bookings.
                                     </div>
@@ -350,7 +357,7 @@ const Wallet = () => {
                             <div className="alert alert-warning mt-4" role="alert">
                                 <strong>No Payment Methods Available</strong>
                                 <br />
-                                <small>Please contact admin to enable payment methods (Stripe or Zitopay).</small>
+                                <small>Please contact admin to enable payment methods (Stripe, Zitopay, or MTN MoMo).</small>
                             </div>
                         )}
 

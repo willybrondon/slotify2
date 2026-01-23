@@ -27,6 +27,9 @@ class Constant {
   /// ===================>> ZITOPAY
   static const zitopayBaseUrl = "https://api.zitopay.africa/v1";
 
+  /// ===================>> MTN MOMO
+  static const mtnMomoBaseUrl = "https://sandbox.momodeveloper.mtn.com"; // Use production URL in production
+
   // ----- RATE APP ----- //
   static String appStoreId = ' ';
 

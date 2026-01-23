@@ -65,6 +65,7 @@ exports.PAYMENT_GATEWAY = {
   RAZORPAY: 2,
   FLUTTERWAVE: 3,
   ZITOPAY: 4,
+  MTN_MOMO: 5,
 };
 
 exports.REVIEW_TYPE = {

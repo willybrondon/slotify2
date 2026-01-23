@@ -70,6 +70,7 @@ class PaymentMethodView extends StatelessWidget {
         final SplashController splashController = Get.find<SplashController>();
         final isStripeEnabled = splashController.settingCategory?.setting?.isStripePay ?? false;
         final isZitopayEnabled = splashController.settingCategory?.setting?.isZitopay ?? false;
+        final isMtnMomoEnabled = splashController.settingCategory?.setting?.isMtnMomo ?? false;
         final isRazorPayEnabled = splashController.settingCategory?.setting?.isRazorPay ?? false;
         final isFlutterWaveEnabled = splashController.settingCategory?.setting?.isFlutterWave ?? false;
 
@@ -80,6 +81,7 @@ class PaymentMethodView extends StatelessWidget {
                   // Only show enabled payment methods for wallet recharge
                   if (isStripeEnabled) const PaymentStripeView(),
                   if (isZitopayEnabled) const PaymentZitopayView(),
+                  if (isMtnMomoEnabled) const PaymentMtnMomoView(),
                   if (isRazorPayEnabled) const PaymentRazorPayView(),
                   if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
                 ],
@@ -91,6 +93,7 @@ class PaymentMethodView extends StatelessWidget {
                   if (logic.selectedPayment == "wallet") const PaymentMyWalletView(),
                   if (logic.selectedPayment == "Stripe" && isStripeEnabled) const PaymentStripeView(),
                   if (logic.selectedPayment == "Zitopay" && isZitopayEnabled) const PaymentZitopayView(),
+                  if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) const PaymentMtnMomoView(),
                   if (logic.selectedPayment == "Razorpay" && isRazorPayEnabled) const PaymentRazorPayView(),
                   if (logic.selectedPayment == "flutterWave" && isFlutterWaveEnabled) const PaymentFlutterWaveView(),
                   if (logic.selectedPayment == "cashAfterService")
@@ -102,6 +105,7 @@ class PaymentMethodView extends StatelessWidget {
                       const PaymentMyWalletView(),
                       if (isStripeEnabled) const PaymentStripeView(),
                       if (isZitopayEnabled) const PaymentZitopayView(),
+                      if (isMtnMomoEnabled) const PaymentMtnMomoView(),
                       if (isRazorPayEnabled) const PaymentRazorPayView(),
                       if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
                       const PaymentCashOnHandView(),
@@ -1008,6 +1012,99 @@ class PaymentZitopayView extends StatelessWidget {
                     ),
                   ),
                   child: logic.selectedPayment == "Zitopay"
+                      ? Image.asset(
+                          AppAsset.icCheck,
+                          color: AppColors.primaryAppColor,
+                          height: 15,
+                          width: 15,
+                        )
+                      : const SizedBox(),
+                ).paddingOnly(right: 10),
+              ],
+            ),
+          ),
+        );
+      },
+    ).paddingOnly(bottom: 15);
+  }
+}
+
+class PaymentMtnMomoView extends StatelessWidget {
+  const PaymentMtnMomoView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<PaymentScreenController>(
+      id: Constant.idSelectPaymentMethod,
+      builder: (logic) {
+        return InkWell(
+          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+          onTap: () {
+            logic.onSelectPaymentMethod("MTN MoMo");
+          },
+          child: Container(
+            height: 60,
+            width: Get.width,
+            padding: const EdgeInsets.only(left: 10, right: 5),
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 1,
+                color: AppColors.grey.withOpacity(0.1),
+              ),
+              borderRadius: BorderRadius.circular(10),
+              color: AppColors.whiteColor,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.roundBg,
+                      ),
+                      child: Image.asset(
+                        AppAsset.icMtnMomo,
+                        height: 30,
+                        width: 30,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Fallback icon if MTN MoMo icon not found
+                          return Icon(
+                            Icons.payment,
+                            size: 30,
+                            color: AppColors.primaryAppColor,
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(width: Get.width * 0.04),
+                    Text(
+                      "MTN Mobile Money",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplay,
+                        fontSize: 16.5,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  height: 25,
+                  width: 25,
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: logic.selectedPayment == "MTN MoMo"
+                          ? AppColors.primaryAppColor
+                          : AppColors.greyColor.withOpacity(0.3),
+                    ),
+                  ),
+                  child: logic.selectedPayment == "MTN MoMo"
                       ? Image.asset(
                           AppAsset.icCheck,
                           color: AppColors.primaryAppColor,

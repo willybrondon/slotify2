@@ -48,6 +48,12 @@ exports.update = async (req, res) => {
     setting.zitopaySecretKey = req.body.zitopaySecretKey ? req.body.zitopaySecretKey : setting.zitopaySecretKey;
     setting.zitopayMerchantId = req.body.zitopayMerchantId ? req.body.zitopayMerchantId : setting.zitopayMerchantId;
 
+    // MTN MoMo fields
+    setting.mtnMomoPrimaryKey = req.body.mtnMomoPrimaryKey ? req.body.mtnMomoPrimaryKey : setting.mtnMomoPrimaryKey;
+    setting.mtnMomoSecondaryKey = req.body.mtnMomoSecondaryKey ? req.body.mtnMomoSecondaryKey : setting.mtnMomoSecondaryKey;
+    setting.mtnMomoSubscriptionKey = req.body.mtnMomoSubscriptionKey ? req.body.mtnMomoSubscriptionKey : setting.mtnMomoSubscriptionKey;
+    setting.mtnMomoEnvironment = req.body.mtnMomoEnvironment ? req.body.mtnMomoEnvironment : setting.mtnMomoEnvironment;
+
     setting.flutterWaveKey = req.body.flutterWaveKey ? req.body.flutterWaveKey : setting.flutterWaveKey;
     setting.currencySymbol = req.body.currencySymbol ? req.body.currencySymbol : setting.currencySymbol;
     setting.currencyName = req.body.currencyName ? req.body.currencyName : setting.currencyName;
@@ -95,6 +101,9 @@ exports.handleSwitch = async (req, res) => {
     }
     if (type == 7) {
       setting.isUpdateProductRequest = !setting.isUpdateProductRequest;
+    }
+    if (type == 8) {
+      setting.isMtnMomo = !setting.isMtnMomo;
     }
 
     await setting.save();

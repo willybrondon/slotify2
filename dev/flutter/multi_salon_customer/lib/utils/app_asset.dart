@@ -110,6 +110,7 @@ class AppAsset {
   static const icStart = "${getIconsPath}start.png";
   static const icStripe = "${getIconsPath}stripe.png";
   static const icZitopay = "${getIconsPath}zitopay.png";
+  static const icMtnMomo = "${getIconsPath}mtn_momo.png";
   static const icTechnical = "${getIconsPath}technical.png";
   static const icTerms = "${getIconsPath}terms.png";
   static const icTheme = "${getIconsPath}theme.png";

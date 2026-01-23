@@ -1884,6 +1884,202 @@ class BookingScreen extends StatelessWidget {
                   ).paddingOnly(bottom: 15)
                 : const SizedBox(),
 
+            /// Zitopay Payment
+            splashController.settingCategory?.setting?.isZitopay == true
+                ? GetBuilder<BookingScreenController>(
+                    id: Constant.idStep3,
+                    builder: (logic) {
+                      return InkWell(
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
+                        onTap: () {
+                          logic.onStep3("Zitopay");
+                        },
+                        child: Container(
+                          height: 60,
+                          width: Get.width,
+                          padding: const EdgeInsets.only(left: 10, right: 5),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: AppColors.grey.withOpacity(0.1),
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            color: AppColors.whiteColor,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 40,
+                                    width: 40,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.roundBg,
+                                    ),
+                                    child: Image.asset(
+                                      AppAsset.icZitopay,
+                                      height: 30,
+                                      width: 30,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Icon(
+                                          Icons.payment,
+                                          size: 30,
+                                          color: AppColors.primaryAppColor,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: Get.width * 0.04),
+                                  Text(
+                                    "Zitopay",
+                                    style: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                      fontSize: 16.5,
+                                      color: AppColors.primaryTextColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  logic.onStep3("Zitopay");
+                                },
+                                child: Container(
+                                        height: 25,
+                                        width: 25,
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: logic.selectedPayment ==
+                                                    "Zitopay"
+                                                ? AppColors.primaryAppColor
+                                                : AppColors.greyColor
+                                                    .withOpacity(0.3),
+                                          ),
+                                        ),
+                                        child: logic.selectedPayment == "Zitopay"
+                                            ? Image.asset(
+                                                AppAsset.icCheck,
+                                                color:
+                                                    AppColors.primaryAppColor,
+                                                height: 15,
+                                                width: 15,
+                                              )
+                                            : const SizedBox())
+                                    .paddingOnly(right: 10),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ).paddingOnly(bottom: 15)
+                : const SizedBox(),
+
+            /// MTN MoMo Payment
+            splashController.settingCategory?.setting?.isMtnMomo == true
+                ? GetBuilder<BookingScreenController>(
+                    id: Constant.idStep3,
+                    builder: (logic) {
+                      return InkWell(
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
+                        onTap: () {
+                          logic.onStep3("MTN MoMo");
+                        },
+                        child: Container(
+                          height: 60,
+                          width: Get.width,
+                          padding: const EdgeInsets.only(left: 10, right: 5),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: AppColors.grey.withOpacity(0.1),
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            color: AppColors.whiteColor,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 40,
+                                    width: 40,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.roundBg,
+                                    ),
+                                    child: Image.asset(
+                                      AppAsset.icMtnMomo,
+                                      height: 30,
+                                      width: 30,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Icon(
+                                          Icons.payment,
+                                          size: 30,
+                                          color: AppColors.primaryAppColor,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: Get.width * 0.04),
+                                  Text(
+                                    "MTN Mobile Money",
+                                    style: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplay,
+                                      fontSize: 16.5,
+                                      color: AppColors.primaryTextColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  logic.onStep3("MTN MoMo");
+                                },
+                                child: Container(
+                                        height: 25,
+                                        width: 25,
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: logic.selectedPayment ==
+                                                    "MTN MoMo"
+                                                ? AppColors.primaryAppColor
+                                                : AppColors.greyColor
+                                                    .withOpacity(0.3),
+                                          ),
+                                        ),
+                                        child: logic.selectedPayment == "MTN MoMo"
+                                            ? Image.asset(
+                                                AppAsset.icCheck,
+                                                color:
+                                                    AppColors.primaryAppColor,
+                                                height: 15,
+                                                width: 15,
+                                              )
+                                            : const SizedBox())
+                                    .paddingOnly(right: 10),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ).paddingOnly(bottom: 15)
+                : const SizedBox(),
+
             // Flutter Wave Payment Method - COMMENTED OUT as requested
             // splashController.settingCategory?.setting?.isFlutterWave == true
             //     ? GetBuilder<BookingScreenController>(

@@ -74,6 +74,11 @@ class Setting {
     String? zitopayApiKey,
     String? zitopaySecretKey,
     String? zitopayMerchantId,
+    bool? isMtnMomo,
+    String? mtnMomoPrimaryKey,
+    String? mtnMomoSecondaryKey,
+    String? mtnMomoSubscriptionKey,
+    String? mtnMomoEnvironment,
     FirebaseKey? firebaseKey,
     bool? isAddProductRequest,
     bool? isUpdateProductRequest,
@@ -104,6 +109,11 @@ class Setting {
     _zitopayApiKey = zitopayApiKey;
     _zitopaySecretKey = zitopaySecretKey;
     _zitopayMerchantId = zitopayMerchantId;
+    _isMtnMomo = isMtnMomo;
+    _mtnMomoPrimaryKey = mtnMomoPrimaryKey;
+    _mtnMomoSecondaryKey = mtnMomoSecondaryKey;
+    _mtnMomoSubscriptionKey = mtnMomoSubscriptionKey;
+    _mtnMomoEnvironment = mtnMomoEnvironment;
     _firebaseKey = firebaseKey;
     _isAddProductRequest = isAddProductRequest;
     _isUpdateProductRequest = isUpdateProductRequest;
@@ -136,6 +146,11 @@ class Setting {
     _zitopayApiKey = json['zitopayApiKey'];
     _zitopaySecretKey = json['zitopaySecretKey'];
     _zitopayMerchantId = json['zitopayMerchantId'];
+    _isMtnMomo = json['isMtnMomo'];
+    _mtnMomoPrimaryKey = json['mtnMomoPrimaryKey'];
+    _mtnMomoSecondaryKey = json['mtnMomoSecondaryKey'];
+    _mtnMomoSubscriptionKey = json['mtnMomoSubscriptionKey'];
+    _mtnMomoEnvironment = json['mtnMomoEnvironment'];
     _firebaseKey = json['firebaseKey'] != null ? FirebaseKey.fromJson(json['firebaseKey']) : null;
     _isAddProductRequest = json['isAddProductRequest'];
     _isUpdateProductRequest = json['isUpdateProductRequest'];
@@ -166,6 +181,11 @@ class Setting {
   String? _zitopayApiKey;
   String? _zitopaySecretKey;
   String? _zitopayMerchantId;
+  bool? _isMtnMomo;
+  String? _mtnMomoPrimaryKey;
+  String? _mtnMomoSecondaryKey;
+  String? _mtnMomoSubscriptionKey;
+  String? _mtnMomoEnvironment;
   FirebaseKey? _firebaseKey;
   bool? _isAddProductRequest;
   bool? _isUpdateProductRequest;
@@ -227,6 +247,11 @@ class Setting {
         zitopayApiKey: zitopayApiKey ?? _zitopayApiKey,
         zitopaySecretKey: zitopaySecretKey ?? _zitopaySecretKey,
         zitopayMerchantId: zitopayMerchantId ?? _zitopayMerchantId,
+        isMtnMomo: isMtnMomo ?? _isMtnMomo,
+        mtnMomoPrimaryKey: mtnMomoPrimaryKey ?? _mtnMomoPrimaryKey,
+        mtnMomoSecondaryKey: mtnMomoSecondaryKey ?? _mtnMomoSecondaryKey,
+        mtnMomoSubscriptionKey: mtnMomoSubscriptionKey ?? _mtnMomoSubscriptionKey,
+        mtnMomoEnvironment: mtnMomoEnvironment ?? _mtnMomoEnvironment,
         firebaseKey: firebaseKey ?? _firebaseKey,
         isAddProductRequest: isAddProductRequest ?? _isAddProductRequest,
         isUpdateProductRequest: isUpdateProductRequest ?? _isUpdateProductRequest,
@@ -257,6 +282,11 @@ class Setting {
   String? get zitopayApiKey => _zitopayApiKey;
   String? get zitopaySecretKey => _zitopaySecretKey;
   String? get zitopayMerchantId => _zitopayMerchantId;
+  bool? get isMtnMomo => _isMtnMomo;
+  String? get mtnMomoPrimaryKey => _mtnMomoPrimaryKey;
+  String? get mtnMomoSecondaryKey => _mtnMomoSecondaryKey;
+  String? get mtnMomoSubscriptionKey => _mtnMomoSubscriptionKey;
+  String? get mtnMomoEnvironment => _mtnMomoEnvironment;
   FirebaseKey? get firebaseKey => _firebaseKey;
   bool? get isAddProductRequest => _isAddProductRequest;
   bool? get isUpdateProductRequest => _isUpdateProductRequest;
@@ -289,6 +319,11 @@ class Setting {
     map['zitopayApiKey'] = _zitopayApiKey;
     map['zitopaySecretKey'] = _zitopaySecretKey;
     map['zitopayMerchantId'] = _zitopayMerchantId;
+    map['isMtnMomo'] = _isMtnMomo;
+    map['mtnMomoPrimaryKey'] = _mtnMomoPrimaryKey;
+    map['mtnMomoSecondaryKey'] = _mtnMomoSecondaryKey;
+    map['mtnMomoSubscriptionKey'] = _mtnMomoSubscriptionKey;
+    map['mtnMomoEnvironment'] = _mtnMomoEnvironment;
     if (_firebaseKey != null) {
       map['firebaseKey'] = _firebaseKey?.toJson();
     }
