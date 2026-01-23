@@ -20,7 +20,7 @@ const Wallet = () => {
     
     const [amount, setAmount] = useState("");
     const [selectedAmount, setSelectedAmount] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState("Stripe");
+    const [paymentMethod, setPaymentMethod] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
     const [amountError, setAmountError] = useState(false);
     
@@ -100,10 +100,16 @@ const Wallet = () => {
 
     // Set default payment method if available
     useEffect(() => {
-        if (availablePaymentMethods.length > 0 && !paymentMethod) {
-            setPaymentMethod(availablePaymentMethods[0].value);
+        if (availablePaymentMethods.length > 0) {
+            // If no payment method is set, or if current payment method is not in available methods, set to first available
+            if (!paymentMethod || !availablePaymentMethods.find(m => m.value === paymentMethod)) {
+                setPaymentMethod(availablePaymentMethods[0].value);
+            }
+        } else {
+            // If no payment methods are available, clear the selection
+            setPaymentMethod("");
         }
-    }, [availablePaymentMethods.length]);
+    }, [availablePaymentMethods.length, currency, setting]);
 
     const handleAmountSelect = (amt) => {
         setSelectedAmount(amt);
@@ -148,13 +154,28 @@ const Wallet = () => {
                     }
                 );
 
+                // Check if response is ok
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    let errorMessage = "Failed to create payment session";
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = errorText || `Server error: ${response.status}`;
+                    }
+                    toast.error(errorMessage);
+                    setIsProcessing(false);
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (data.status && data.checkoutUrl) {
                     // Redirect to Stripe Checkout
                     window.location.href = data.checkoutUrl;
                 } else {
-                    toast.error(data.message || "Failed to create payment session");
+                    toast.error(data.message || data.error || "Failed to create payment session");
                     setIsProcessing(false);
                 }
             } else if (paymentMethod === "Zitopay") {
@@ -163,7 +184,7 @@ const Wallet = () => {
                 setIsProcessing(false);
             } else if (paymentMethod === "MTN MoMo") {
                 // TODO: Implement MTN MoMo payment flow for web
-                toast.info("MTN MoMo payment integration for web is coming soon. Please use Stripe for now.");
+                toast.info("MTN Mobile Money payment integration for web is coming soon. Please use Stripe for now.");
                 setIsProcessing(false);
             } else {
                 toast.error("Selected payment method is not supported");
@@ -171,7 +192,8 @@ const Wallet = () => {
             }
         } catch (error) {
             console.error("Wallet recharge error:", error);
-            toast.error("An error occurred during wallet recharge");
+            const errorMessage = error.message || "An error occurred during wallet recharge";
+            toast.error(errorMessage);
             setIsProcessing(false);
         }
     };
