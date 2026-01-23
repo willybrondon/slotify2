@@ -233,13 +233,28 @@ nvm use 18.20.2
 
 # Build the frontend
 echo "Building frontend..."
+echo "Running: npm run build"
 npm run build
+
+# Check if build command succeeded
+BUILD_EXIT_CODE=$?
+if [ $BUILD_EXIT_CODE -ne 0 ]; then
+    echo "ERROR: Frontend build command failed with exit code $BUILD_EXIT_CODE"
+    echo "Please check the build output above for errors."
+    exit 1
+fi
 
 # Verify build was successful
 if [ ! -f "/home/admin/frontend/build/index.html" ]; then
     echo "ERROR: Frontend build failed - index.html not found!"
+    echo "Build exit code was: $BUILD_EXIT_CODE"
     echo "Build directory contents:"
     ls -la /home/admin/frontend/build/ 2>/dev/null || echo "Build directory does not exist!"
+    echo ""
+    echo "Checking if build directory exists:"
+    [ -d "/home/admin/frontend/build" ] && echo "Build directory exists" || echo "Build directory does NOT exist"
+    echo ""
+    echo "Please check the build output above for compilation errors."
     exit 1
 fi
 
@@ -287,13 +302,28 @@ nvm use 18.20.2
 
 # Build the salon frontend
 echo "Building salon frontend..."
+echo "Running: PUBLIC_URL=/salonpanel npm run build"
 PUBLIC_URL=/salonpanel npm run build
+
+# Check if build command succeeded
+BUILD_EXIT_CODE=$?
+if [ $BUILD_EXIT_CODE -ne 0 ]; then
+    echo "ERROR: Salon build command failed with exit code $BUILD_EXIT_CODE"
+    echo "Please check the build output above for errors."
+    exit 1
+fi
 
 # Verify build was successful
 if [ ! -f "/home/admin/salon/build/index.html" ]; then
     echo "ERROR: Salon build failed - index.html not found!"
+    echo "Build exit code was: $BUILD_EXIT_CODE"
     echo "Build directory contents:"
     ls -la /home/admin/salon/build/ 2>/dev/null || echo "Build directory does not exist!"
+    echo ""
+    echo "Checking if build directory exists:"
+    [ -d "/home/admin/salon/build" ] && echo "Build directory exists" || echo "Build directory does NOT exist"
+    echo ""
+    echo "Please check the build output above for compilation errors."
     exit 1
 fi
 

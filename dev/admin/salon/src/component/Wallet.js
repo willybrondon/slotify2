@@ -176,42 +176,6 @@ const Wallet = () => {
         }
     };
 
-    const handleStripePaymentSuccess = async (sessionId) => {
-        try {
-            setIsProcessing(true);
-            const response = await fetch(
-                `${baseURL}/salon/handleStripePaymentSuccess?session_id=${sessionId}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "key": secretKey,
-                        "Authorization": sessionStorage.getItem("token") || "",
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            const data = await response.json();
-
-            if (data.status) {
-                toast.success(data.message || "Payment successful! Wallet credited.");
-                setAmount("");
-                setSelectedAmount("");
-                // Refresh wallet history and balance
-                dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
-                // Remove query params from URL
-                navigate("/salonpanel/wallet", { replace: true });
-            } else {
-                toast.error(data.message || "Payment verification failed");
-            }
-        } catch (error) {
-            console.error("Payment success handler error:", error);
-            toast.error("An error occurred while processing payment");
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
     const minSalonWalletBalance = settingsData?.minSalonWalletBalance || 0;
     const isBalanceInsufficient = walletBalance < minSalonWalletBalance;
     const deficit = minSalonWalletBalance - walletBalance;

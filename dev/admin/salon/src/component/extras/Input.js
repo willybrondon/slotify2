@@ -48,7 +48,7 @@ const Input = (props) => {
       handleImage(e);
     }
 
-    if (e.target.value.trim() == "") {
+    if (e.target.value.trim() === "") {
       setError("d-block");
     } else {
       
@@ -229,7 +229,6 @@ export const FormInput = (props) => {
     name,
     type,
     newClass,
-    errorMessage,
     placeholder,
     onKeyPress,
     accept,
@@ -441,14 +440,14 @@ const ImageScript = ({ value, setMultiImagePath }) => {
     return () => {
       $(`[data-remove]`).off("click", removeImage);
     };
-  }, [value]);
+  }, [value, setMultiImagePath]);
 
   return null;
 };
 
 export const Textarea = (props) => {
   const { id, label, row, placeholder, name, errorMessage,onChange,readOnly ,value} = props;
-  const [error, setError] = useState("d-none");
+  const [error] = useState("d-none");
  
   return (
     <div className="inputData text-start">

@@ -2,7 +2,6 @@ import axios from "axios";
 
 import { DangerRight } from "./toastServices";
 import { baseURL, secretKey } from "../../util/config";
-import { useEffect } from "react";
 
 const getTokenData = () => sessionStorage.getItem("token");
 export const apiInstance = axios.create({
