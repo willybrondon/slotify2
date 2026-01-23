@@ -23,6 +23,9 @@ const Wallet = () => {
     const [paymentMethod, setPaymentMethod] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
     const [amountError, setAmountError] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [phoneError, setPhoneError] = useState(false);
+    const [paymentReference, setPaymentReference] = useState(null);
     
     const quickAmounts = ["50", "100", "150", "200", "250", "300", "500"];
     
@@ -45,8 +48,12 @@ const Wallet = () => {
     const handleStripePaymentSuccess = async (sessionId) => {
         try {
             setIsProcessing(true);
+            // Fix URL construction to avoid double slashes
+            const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+            const successUrl = `${baseUrlClean}/salon/handleStripePaymentSuccess?session_id=${sessionId}`;
+            
             const response = await fetch(
-                `${baseURL}/salon/handleStripePaymentSuccess?session_id=${sessionId}`,
+                successUrl,
                 {
                     method: "GET",
                     headers: {
@@ -117,6 +124,75 @@ const Wallet = () => {
         setAmountError(false);
     };
 
+    const pollPaymentStatus = async (reference) => {
+        const maxAttempts = 30; // Poll for up to 30 attempts (about 1.5 minutes)
+        let attempts = 0;
+
+        const checkStatus = async () => {
+            if (attempts >= maxAttempts) {
+                toast.error("Payment timeout. Please check your phone or try again.");
+                setIsProcessing(false);
+                setPaymentReference(null);
+                return;
+            }
+
+            attempts++;
+
+            try {
+                const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+                const statusUrl = `${baseUrlClean}/salon/checkMTNMomoPaymentStatus?reference=${reference}`;
+                
+                const response = await fetch(
+                    statusUrl,
+                    {
+                        method: "GET",
+                        headers: {
+                            "key": secretKey,
+                            "Authorization": sessionStorage.getItem("token") || "",
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                if (!response.ok) {
+                    // If error, wait a bit and try again
+                    setTimeout(checkStatus, 3000);
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.status && data.paymentStatus === "SUCCESSFUL") {
+                    // Payment successful
+                    toast.success(data.message || "Payment successful! Wallet credited.");
+                    setAmount("");
+                    setSelectedAmount("");
+                    setPhoneNumber("");
+                    setPaymentReference(null);
+                    setIsProcessing(false);
+                    
+                    // Refresh wallet history and balance
+                    dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
+                } else if (data.paymentStatus === "FAILED" || data.paymentStatus === "CANCELLED") {
+                    // Payment failed or cancelled
+                    toast.error(data.message || `Payment ${data.paymentStatus}`);
+                    setIsProcessing(false);
+                    setPaymentReference(null);
+                } else {
+                    // Still pending - check again in 3 seconds
+                    setTimeout(checkStatus, 3000);
+                }
+            } catch (error) {
+                console.error("Payment status check error:", error);
+                // Continue polling on error
+                setTimeout(checkStatus, 3000);
+            }
+        };
+
+        // Start polling
+        checkStatus();
+    };
+
     const handleRecharge = async () => {
         const rechargeAmount = amount.trim();
         
@@ -142,8 +218,12 @@ const Wallet = () => {
         try {
             if (paymentMethod === "Stripe") {
                 // Create Stripe Checkout Session
+                // Fix URL construction to avoid double slashes
+                const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+                const stripeUrl = `${baseUrlClean}/salon/createStripeCheckoutSession?amount=${rechargeAmount}`;
+                
                 const response = await fetch(
-                    `${baseURL}/salon/createStripeCheckoutSession?amount=${rechargeAmount}`,
+                    stripeUrl,
                     {
                         method: "GET",
                         headers: {
@@ -183,9 +263,67 @@ const Wallet = () => {
                 toast.info("Zitopay payment integration for web is coming soon. Please use Stripe for now.");
                 setIsProcessing(false);
             } else if (paymentMethod === "MTN MoMo") {
-                // TODO: Implement MTN MoMo payment flow for web
-                toast.info("MTN Mobile Money payment integration for web is coming soon. Please use Stripe for now.");
-                setIsProcessing(false);
+                // Validate phone number
+                if (!phoneNumber || phoneNumber.trim() === "") {
+                    toast.error("Please enter your MTN MoMo phone number");
+                    setPhoneError(true);
+                    setIsProcessing(false);
+                    return;
+                }
+
+                // Clean phone number (remove spaces, dashes, etc.)
+                const cleanPhone = phoneNumber.replace(/\D/g, "");
+                if (cleanPhone.length < 9) {
+                    toast.error("Please enter a valid phone number");
+                    setPhoneError(true);
+                    setIsProcessing(false);
+                    return;
+                }
+
+                setPhoneError(false);
+
+                // Create MTN MoMo payment request
+                const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+                const momoUrl = `${baseUrlClean}/salon/createMTNMomoPaymentRequest?amount=${rechargeAmount}&phoneNumber=${encodeURIComponent(cleanPhone)}`;
+                
+                const response = await fetch(
+                    momoUrl,
+                    {
+                        method: "GET",
+                        headers: {
+                            "key": secretKey,
+                            "Authorization": sessionStorage.getItem("token") || "",
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    let errorMessage = "Failed to create payment request";
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = errorText || `Server error: ${response.status}`;
+                    }
+                    toast.error(errorMessage);
+                    setIsProcessing(false);
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.status && data.reference) {
+                    toast.success(data.message || "Payment request sent. Please approve on your phone.");
+                    setPaymentReference(data.reference);
+                    
+                    // Start polling for payment status
+                    pollPaymentStatus(data.reference);
+                } else {
+                    toast.error(data.message || data.error || "Failed to create payment request");
+                    setIsProcessing(false);
+                }
             } else {
                 toast.error("Selected payment method is not supported");
                 setIsProcessing(false);
@@ -321,24 +459,60 @@ const Wallet = () => {
 
                         {/* Payment Method Selection */}
                         {availablePaymentMethods.length > 0 ? (
-                            <div className="inputData mt-4">
-                                <label className="styleForTitle" htmlFor="paymentMethod">
-                                    Select Payment Method
-                                </label>
-                                <select
-                                    name="paymentMethod"
-                                    className="rounded-2 fw-bold"
-                                    id="paymentMethod"
-                                    value={paymentMethod}
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
-                                >
-                                    {availablePaymentMethods.map((method) => (
-                                        <option key={method.value} value={method.value}>
-                                            {method.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                            <>
+                                <div className="inputData mt-4">
+                                    <label className="styleForTitle" htmlFor="paymentMethod">
+                                        Select Payment Method
+                                    </label>
+                                    <select
+                                        name="paymentMethod"
+                                        className="rounded-2 fw-bold"
+                                        id="paymentMethod"
+                                        value={paymentMethod}
+                                        onChange={(e) => {
+                                            setPaymentMethod(e.target.value);
+                                            setPhoneNumber("");
+                                            setPhoneError(false);
+                                        }}
+                                    >
+                                        {availablePaymentMethods.map((method) => (
+                                            <option key={method.value} value={method.value}>
+                                                {method.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* MTN MoMo Phone Number Input */}
+                                {paymentMethod === "MTN MoMo" && (
+                                    <div className="inputData mt-4">
+                                        <label className="styleForTitle" htmlFor="phoneNumber">
+                                            MTN MoMo Phone Number
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            name="phoneNumber"
+                                            className={`form-control fw-bold p-3 ${phoneError ? "border-danger" : ""}`}
+                                            id="phoneNumber"
+                                            placeholder="Enter your MTN MoMo phone number (e.g., 237612345678)"
+                                            value={phoneNumber}
+                                            onChange={(e) => {
+                                                setPhoneNumber(e.target.value);
+                                                setPhoneError(false);
+                                            }}
+                                            disabled={isProcessing}
+                                        />
+                                        {phoneError && (
+                                            <label className="d-flex justify-content-end mt-1" style={{ color: "red", fontSize: "15px" }}>
+                                                *Please enter a valid phone number
+                                            </label>
+                                        )}
+                                        <small className="text-muted mt-1 d-block">
+                                            Enter your MTN Mobile Money registered phone number
+                                        </small>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <div className="alert alert-warning mt-4" role="alert">
                                 <strong>No Payment Methods Available</strong>
@@ -356,7 +530,7 @@ const Wallet = () => {
                                     style={{ backgroundColor: "#1ebc1e" }}
                                     text={isProcessing ? "Processing..." : "Recharge Wallet"}
                                     onClick={handleRecharge}
-                                    disabled={isProcessing || !amount || parseFloat(amount) <= 0 || availablePaymentMethods.length === 0}
+                                    disabled={isProcessing || !amount || parseFloat(amount) <= 0 || availablePaymentMethods.length === 0 || (paymentMethod === "MTN MoMo" && (!phoneNumber || phoneNumber.trim() === ""))}
                                 />
                             </div>
                         </div>

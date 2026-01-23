@@ -43,5 +43,8 @@ route.post("/depositeToWallet", checkAccessWithSecretKey(), salon, salonControll
 route.get("/walletHistory", checkAccessWithSecretKey(), salon, salonController.walletHistory);
 route.get("/createStripeCheckoutSession", checkAccessWithSecretKey(), salon, salonController.createStripeCheckoutSession);
 route.get("/handleStripePaymentSuccess", checkAccessWithSecretKey(), salon, salonController.handleStripePaymentSuccess);
+route.get("/createMTNMomoPaymentRequest", checkAccessWithSecretKey(), salon, salonController.createMTNMomoPaymentRequest);
+route.get("/checkMTNMomoPaymentStatus", checkAccessWithSecretKey(), salon, salonController.checkMTNMomoPaymentStatus);
+route.post("/handleMTNMomoPaymentCallback", salonController.handleMTNMomoPaymentCallback);
 
 module.exports = route;

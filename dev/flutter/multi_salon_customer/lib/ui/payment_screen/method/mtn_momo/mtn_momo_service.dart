@@ -22,10 +22,8 @@ import 'package:salon_2/utils/utils.dart';
 class MtnMomoService {
   static late String mtnMomoPrimaryKey;
   static late String mtnMomoSecondaryKey;
-  static late String mtnMomoSubscriptionKey;
+  static String? mtnMomoSubscriptionKey; // Optional - may be required for some MTN MoMo setups
   static late String mtnMomoEnvironment;
-  static late String mtnMomoApiKey; // Generated from Primary/Secondary Key
-  static late String mtnMomoApiSecret; // Generated from Primary/Secondary Key
   static late String dates;
   static late String times;
   static late double rupees;
@@ -113,9 +111,10 @@ class MtnMomoService {
       throw Exception("MTN MoMo Secondary Key is not configured");
     }
 
-    // Subscription Key is optional - can be empty if not required by your MTN MoMo setup
-    if (subscriptionKey.isEmpty) {
-      log("MTN MoMo Subscription Key is not provided - proceeding without it");
+    // Subscription Key is REQUIRED for MTN MoMo API authentication
+    // Without it, the API will return 401 Unauthorized
+    if (subscriptionKey == null || subscriptionKey.isEmpty) {
+      throw Exception("MTN MoMo Subscription Key is required for authentication. Please configure it in Admin Settings.");
     }
 
     log("Using MTN MoMo Primary Key: ${primaryKey.substring(0, 7)}...");
@@ -177,53 +176,37 @@ class MtnMomoService {
           ? "https://api.momodeveloper.mtn.com"
           : Constant.mtnMomoBaseUrl;
 
-      // Step 1: Create API User (if not exists) using Primary Key and Secondary Key
-      // Step 2: Create API Key for the user
-      // Step 3: Get access token using API Key and API Secret
+      // MTN MoMo Authentication Flow:
+      // According to MTN MoMo API documentation:
+      // 1. Primary Key = API User ID (X-Reference-Id when creating user)
+      // 2. Secondary Key = API User Secret
+      // 3. To get token, use Basic Auth with Primary Key:Secondary Key
+      // 4. Subscription Key (Ocp-Apim-Subscription-Key) may be required for some endpoints
       
-      // First, create/get API Key using Primary Key and Secondary Key
-      String primarySecondaryCredentials = base64Encode(utf8.encode('$mtnMomoPrimaryKey:$mtnMomoSecondaryKey'));
-      
-      // Create API Key (this will return API Key and API Secret)
-      Map<String, String> apiKeyHeaders = {
-        'Authorization': 'Basic $primarySecondaryCredentials',
-        'X-Target-Environment': mtnMomoEnvironment,
-      };
-      
-      // Only add Subscription Key if provided
-      if (mtnMomoSubscriptionKey.isNotEmpty) {
-        apiKeyHeaders['Ocp-Apim-Subscription-Key'] = mtnMomoSubscriptionKey;
+      // Get access token using Primary Key and Secondary Key
+      // MTN MoMo API requires Subscription Key (Ocp-Apim-Subscription-Key) for authentication
+      if (mtnMomoSubscriptionKey == null || mtnMomoSubscriptionKey!.isEmpty) {
+        throw Exception("MTN MoMo Subscription Key is required. Please configure it in Admin Settings.");
       }
       
-      var apiKeyResponse = await http.post(
-        Uri.parse('$baseUrl/v1_0/apiuser/$mtnMomoPrimaryKey/apikey'),
-        headers: apiKeyHeaders,
-      );
-
-      log("MTN MoMo API Key Response StatusCode :: ${apiKeyResponse.statusCode}");
-      log("MTN MoMo API Key Response Body :: ${apiKeyResponse.body}");
-
-      if (apiKeyResponse.statusCode != 201 && apiKeyResponse.statusCode != 200) {
-        // If API Key creation fails, try to get existing one
-        log("API Key creation failed, trying to get existing API Key");
-      } else {
-        final apiKeyData = jsonDecode(apiKeyResponse.body);
-        mtnMomoApiKey = apiKeyData['apiKey'] ?? mtnMomoPrimaryKey; // Fallback to Primary Key if not returned
-        // Note: API Secret is not returned, we need to use Primary/Secondary for token
-      }
-
-      // Step 2: Get access token using Primary Key and Secondary Key
-      // MTN MoMo uses Primary Key and Secondary Key directly for token generation
       String tokenCredentials = base64Encode(utf8.encode('$mtnMomoPrimaryKey:$mtnMomoSecondaryKey'));
+      
+      // Set environment value - MTN MoMo expects "sandbox" or "production" (lowercase)
+      String targetEnvironment = mtnMomoEnvironment.toLowerCase();
+      if (targetEnvironment != "sandbox" && targetEnvironment != "production") {
+        log("WARNING: Invalid environment '$mtnMomoEnvironment'. Defaulting to 'sandbox'");
+        targetEnvironment = "sandbox";
+      }
       
       Map<String, String> tokenHeaders = {
         'Authorization': 'Basic $tokenCredentials',
+        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey!, // REQUIRED - always include
+        'X-Target-Environment': targetEnvironment,
+        'Content-Type': 'application/json',
       };
       
-      // Only add Subscription Key if provided
-      if (mtnMomoSubscriptionKey.isNotEmpty) {
-        tokenHeaders['Ocp-Apim-Subscription-Key'] = mtnMomoSubscriptionKey;
-      }
+      log("MTN MoMo Token Request - Environment: $targetEnvironment");
+      log("MTN MoMo Token Request - Using Subscription Key: ${mtnMomoSubscriptionKey!.substring(0, 7)}...");
       
       var tokenResponse = await http.post(
         Uri.parse('$baseUrl/collection/token/'),
@@ -234,7 +217,30 @@ class MtnMomoService {
       log("MTN MoMo Token Response Body :: ${tokenResponse.body}");
 
       if (tokenResponse.statusCode != 200) {
-        throw Exception("Failed to get MTN MoMo access token. Status: ${tokenResponse.statusCode}");
+        String errorDetails = "";
+        try {
+          final errorData = jsonDecode(tokenResponse.body);
+          errorDetails = errorData['message'] ?? errorData['error'] ?? errorData.toString();
+        } catch (e) {
+          errorDetails = tokenResponse.body.isNotEmpty ? tokenResponse.body : "No error details provided";
+        }
+        
+        String errorMessage = "Failed to get MTN MoMo access token. Status: ${tokenResponse.statusCode}";
+        if (errorDetails.isNotEmpty) {
+          errorMessage += "\nError: $errorDetails";
+        }
+        
+        // Provide helpful guidance based on status code
+        if (tokenResponse.statusCode == 401) {
+          errorMessage += "\n\nPossible causes:";
+          errorMessage += "\n1. Invalid Primary Key or Secondary Key";
+          errorMessage += "\n2. Missing or incorrect Subscription Key (Ocp-Apim-Subscription-Key)";
+          errorMessage += "\n3. API User not created in MTN MoMo Developer Portal";
+          errorMessage += "\n4. Wrong environment (sandbox vs production)";
+          errorMessage += "\n\nPlease verify your MTN MoMo credentials in Admin Settings.";
+        }
+        
+        throw Exception(errorMessage);
       }
 
       final tokenData = jsonDecode(tokenResponse.body);
@@ -264,18 +270,20 @@ class MtnMomoService {
 
       log("MTN MoMo request body :: $body");
 
+      // Set environment value - MTN MoMo expects "sandbox" or "production" (lowercase)
+      String targetEnvironment = mtnMomoEnvironment.toLowerCase();
+      if (targetEnvironment != "sandbox" && targetEnvironment != "production") {
+        targetEnvironment = "sandbox";
+      }
+      
       Map<String, String> paymentHeaders = {
         'Authorization': 'Bearer $accessToken',
-        'X-Target-Environment': mtnMomoEnvironment,
+        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey!, // REQUIRED - always include
+        'X-Target-Environment': targetEnvironment,
         'X-Reference-Id': reference,
         'X-Callback-Url': 'https://skedisy.com/payment/mtn-momo/callback', // Your webhook URL
         'Content-Type': 'application/json',
       };
-      
-      // Only add Subscription Key if provided
-      if (mtnMomoSubscriptionKey.isNotEmpty) {
-        paymentHeaders['Ocp-Apim-Subscription-Key'] = mtnMomoSubscriptionKey;
-      }
       
       var response = await http.post(
         Uri.parse('$baseUrl/collection/v1_0/requesttopay'),
@@ -332,17 +340,26 @@ class MtnMomoService {
           ? "https://api.momodeveloper.mtn.com"
           : Constant.mtnMomoBaseUrl;
 
-      // Get access token first
-      String tokenCredentials = base64Encode(utf8.encode('$mtnMomoApiKey:$mtnMomoApiSecret'));
+      // Get access token first using Primary Key and Secondary Key
+      // Subscription Key is REQUIRED
+      if (mtnMomoSubscriptionKey == null || mtnMomoSubscriptionKey!.isEmpty) {
+        log("Failed to get access token for status check - Subscription Key missing");
+        return;
+      }
+      
+      String tokenCredentials = base64Encode(utf8.encode('$mtnMomoPrimaryKey:$mtnMomoSecondaryKey'));
+      
+      // Set environment value - MTN MoMo expects "sandbox" or "production" (lowercase)
+      String targetEnvironment = mtnMomoEnvironment.toLowerCase();
+      if (targetEnvironment != "sandbox" && targetEnvironment != "production") {
+        targetEnvironment = "sandbox";
+      }
       
       Map<String, String> tokenHeaders = {
         'Authorization': 'Basic $tokenCredentials',
+        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey!, // REQUIRED - always include
+        'X-Target-Environment': targetEnvironment,
       };
-      
-      // Only add Subscription Key if provided
-      if (mtnMomoSubscriptionKey.isNotEmpty) {
-        tokenHeaders['Ocp-Apim-Subscription-Key'] = mtnMomoSubscriptionKey;
-      }
       
       var tokenResponse = await http.post(
         Uri.parse('$baseUrl/collection/token/'),
@@ -362,15 +379,17 @@ class MtnMomoService {
         return;
       }
 
+      // Set environment value - MTN MoMo expects "sandbox" or "production" (lowercase)
+      String targetEnvironment = mtnMomoEnvironment.toLowerCase();
+      if (targetEnvironment != "sandbox" && targetEnvironment != "production") {
+        targetEnvironment = "sandbox";
+      }
+      
       Map<String, String> statusHeaders = {
         'Authorization': 'Bearer $accessToken',
-        'X-Target-Environment': mtnMomoEnvironment,
+        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey!, // REQUIRED - always include
+        'X-Target-Environment': targetEnvironment,
       };
-      
-      // Only add Subscription Key if provided
-      if (mtnMomoSubscriptionKey.isNotEmpty) {
-        statusHeaders['Ocp-Apim-Subscription-Key'] = mtnMomoSubscriptionKey;
-      }
       
       var response = await http.get(
         Uri.parse('$baseUrl/collection/v1_0/requesttopay/$reference'),

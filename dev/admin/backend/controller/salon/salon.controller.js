@@ -2,9 +2,11 @@ const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const Setting = require("../../models/setting.model");
 const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
+const SalonWalletHistory = require("../../models/salonWalletHistory.model");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
 const { PAYMENT_GATEWAY } = require("../../types/constant");
 const stripe = require("stripe");
+const axios = require("axios");
 
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -835,5 +837,394 @@ exports.walletHistory = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};
+
+// Create MTN MoMo Payment Request for salon wallet recharge
+exports.createMTNMomoPaymentRequest = async (req, res) => {
+  try {
+    const { amount, phoneNumber } = req.query;
+    const salonId = req.salon._id;
+
+    if (!amount || parseFloat(amount) <= 0) {
+      return res.status(200).json({ status: false, message: "Invalid amount." });
+    }
+
+    if (!phoneNumber || phoneNumber.trim() === "") {
+      return res.status(200).json({ status: false, message: "Phone number is required for MTN MoMo payment." });
+    }
+
+    const salon = await Salon.findById(salonId);
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon not found." });
+    }
+
+    if (!salon.isActive) {
+      return res.status(200).json({ status: false, message: "Salon account is inactive." });
+    }
+
+    // Get MTN MoMo settings
+    const setting = await Setting.findOne().sort({ createdAt: -1 });
+    if (!setting || !setting.isMtnMomo || !setting.mtnMomoPrimaryKey || !setting.mtnMomoSecondaryKey || !setting.mtnMomoSubscriptionKey) {
+      return res.status(200).json({ status: false, message: "MTN MoMo is not configured or enabled." });
+    }
+
+    // Determine base URL based on environment
+    const environment = (setting.mtnMomoEnvironment || "sandbox").toLowerCase();
+    const baseUrl = environment === "production"
+      ? "https://api.momodeveloper.mtn.com"
+      : "https://sandbox.momodeveloper.mtn.com";
+
+    // Get currency from settings
+    const currency = (setting.currencyName || "XAF").toUpperCase();
+
+    // Step 1: Get access token
+    const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
+    
+    const targetEnvironment = environment === "production" ? "production" : "sandbox";
+    
+    const tokenHeaders = {
+      "Authorization": `Basic ${tokenCredentials}`,
+      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
+      "X-Target-Environment": targetEnvironment,
+      "Content-Type": "application/json",
+    };
+
+    let tokenResponse;
+    try {
+      tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
+    } catch (error) {
+      console.error("MTN MoMo Token Error:", error.response?.data || error.message);
+      return res.status(200).json({
+        status: false,
+        message: `Failed to get MTN MoMo access token: ${error.response?.data?.message || error.message}`,
+      });
+    }
+
+    if (tokenResponse.status !== 200 || !tokenResponse.data.access_token) {
+      return res.status(200).json({
+        status: false,
+        message: "Failed to get MTN MoMo access token.",
+      });
+    }
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Step 2: Create payment request
+    const reference = `SALON_${Date.now()}_${salonId}`;
+    const cleanPhone = phoneNumber.replace(/\D/g, ""); // Remove non-digits
+
+    const paymentBody = {
+      amount: parseFloat(amount).toFixed(2),
+      currency: currency,
+      externalId: reference,
+      payer: {
+        partyIdType: "MSISDN",
+        partyId: cleanPhone,
+      },
+      payerMessage: `Wallet recharge for ${salon.name}`,
+      payeeNote: "Salon Wallet Recharge",
+    };
+
+    const baseURL = process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com";
+    const callbackUrl = `${baseURL}/salon/handleMTNMomoPaymentCallback`;
+
+    const paymentHeaders = {
+      "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
+      "X-Target-Environment": targetEnvironment,
+      "X-Reference-Id": reference,
+      "X-Callback-Url": callbackUrl,
+      "Content-Type": "application/json",
+    };
+
+    let paymentResponse;
+    try {
+      paymentResponse = await axios.post(
+        `${baseUrl}/collection/v1_0/requesttopay`,
+        paymentBody,
+        { headers: paymentHeaders }
+      );
+    } catch (error) {
+      console.error("MTN MoMo Payment Request Error:", error.response?.data || error.message);
+      return res.status(200).json({
+        status: false,
+        message: `Payment request failed: ${error.response?.data?.message || error.message}`,
+      });
+    }
+
+    if (paymentResponse.status === 202) {
+      // 202 Accepted means payment request was created successfully
+      return res.status(200).json({
+        status: true,
+        message: "Payment request sent. Please approve on your phone.",
+        reference: reference,
+        phoneNumber: cleanPhone,
+      });
+    } else {
+      return res.status(200).json({
+        status: false,
+        message: paymentResponse.data?.message || "Failed to create payment request",
+      });
+    }
+  } catch (error) {
+    console.error("MTN MoMo Payment Request creation error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+// Check MTN MoMo Payment Status
+exports.checkMTNMomoPaymentStatus = async (req, res) => {
+  try {
+    const { reference } = req.query;
+    const salonId = req.salon._id;
+
+    if (!reference) {
+      return res.status(200).json({ status: false, message: "Reference ID is required." });
+    }
+
+    const salon = await Salon.findById(salonId);
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon not found." });
+    }
+
+    // Get MTN MoMo settings
+    const setting = await Setting.findOne().sort({ createdAt: -1 });
+    if (!setting || !setting.mtnMomoPrimaryKey || !setting.mtnMomoSecondaryKey || !setting.mtnMomoSubscriptionKey) {
+      return res.status(200).json({ status: false, message: "MTN MoMo is not configured." });
+    }
+
+    // Determine base URL based on environment
+    const environment = (setting.mtnMomoEnvironment || "sandbox").toLowerCase();
+    const baseUrl = environment === "production"
+      ? "https://api.momodeveloper.mtn.com"
+      : "https://sandbox.momodeveloper.mtn.com";
+
+    // Get access token
+    const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
+    const targetEnvironment = environment === "production" ? "production" : "sandbox";
+
+    const tokenHeaders = {
+      "Authorization": `Basic ${tokenCredentials}`,
+      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
+      "X-Target-Environment": targetEnvironment,
+    };
+
+    let tokenResponse;
+    try {
+      tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
+    } catch (error) {
+      return res.status(200).json({
+        status: false,
+        message: "Failed to get access token for status check",
+      });
+    }
+
+    if (tokenResponse.status !== 200 || !tokenResponse.data.access_token) {
+      return res.status(200).json({
+        status: false,
+        message: "Failed to get access token",
+      });
+    }
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Check payment status
+    const statusHeaders = {
+      "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
+      "X-Target-Environment": targetEnvironment,
+    };
+
+    let statusResponse;
+    try {
+      statusResponse = await axios.get(
+        `${baseUrl}/collection/v1_0/requesttopay/${reference}`,
+        { headers: statusHeaders }
+      );
+    } catch (error) {
+      return res.status(200).json({
+        status: false,
+        message: "Failed to check payment status",
+      });
+    }
+
+    if (statusResponse.status === 200) {
+      const paymentStatus = statusResponse.data.status;
+      
+      if (paymentStatus === "SUCCESSFUL") {
+        // Payment successful - credit wallet
+        const amount = parseFloat(statusResponse.data.amount || 0);
+        
+        // Check if already processed (avoid duplicate credits)
+        const existingHistory = await SalonExpertWalletHistory.findOne({
+          uniqueId: reference,
+        });
+
+        if (!existingHistory) {
+          // Add amount to salon wallet
+          salon.wallet = (salon.wallet || 0) + amount;
+          await salon.save();
+
+          // Create wallet history entry
+          const uniqueId = await generateUniqueIdentifier();
+          const walletHistory = new SalonExpertWalletHistory({
+            salon: salon._id,
+            amount: amount,
+            paymentGateway: PAYMENT_GATEWAY.MTN_MOMO,
+            type: 2, // CREDIT_FROM_SELF (salon owner self-recharge)
+            date: moment().format("YYYY-MM-DD"),
+            time: moment().format("HH:mm a"),
+            uniqueId: reference, // Use reference as uniqueId to prevent duplicates
+          });
+
+          await walletHistory.save();
+        }
+
+        return res.status(200).json({
+          status: true,
+          message: "Payment successful! Wallet credited.",
+          walletBalance: salon.wallet,
+          paymentStatus: paymentStatus,
+        });
+      } else if (paymentStatus === "FAILED" || paymentStatus === "CANCELLED") {
+        return res.status(200).json({
+          status: false,
+          message: `Payment ${paymentStatus}`,
+          paymentStatus: paymentStatus,
+        });
+      } else {
+        // PENDING - still processing
+        return res.status(200).json({
+          status: true,
+          message: "Payment is still being processed. Please wait...",
+          paymentStatus: paymentStatus,
+        });
+      }
+    } else {
+      return res.status(200).json({
+        status: false,
+        message: "Failed to check payment status",
+      });
+    }
+  } catch (error) {
+    console.error("MTN MoMo Payment Status check error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+// Handle MTN MoMo Payment Callback (webhook)
+exports.handleMTNMomoPaymentCallback = async (req, res) => {
+  try {
+    // MTN MoMo sends webhook callbacks here
+    const { reference } = req.body || req.query;
+    
+    if (!reference) {
+      return res.status(200).json({ status: false, message: "Reference ID is required." });
+    }
+
+    // Get MTN MoMo settings
+    const setting = await Setting.findOne().sort({ createdAt: -1 });
+    if (!setting || !setting.mtnMomoPrimaryKey || !setting.mtnMomoSecondaryKey || !setting.mtnMomoSubscriptionKey) {
+      return res.status(200).json({ status: false, message: "MTN MoMo is not configured." });
+    }
+
+    // Determine base URL based on environment
+    const environment = (setting.mtnMomoEnvironment || "sandbox").toLowerCase();
+    const baseUrl = environment === "production"
+      ? "https://api.momodeveloper.mtn.com"
+      : "https://sandbox.momodeveloper.mtn.com";
+
+    // Get access token
+    const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
+    const targetEnvironment = environment === "production" ? "production" : "sandbox";
+
+    const tokenHeaders = {
+      "Authorization": `Basic ${tokenCredentials}`,
+      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
+      "X-Target-Environment": targetEnvironment,
+    };
+
+    let tokenResponse;
+    try {
+      tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
+    } catch (error) {
+      return res.status(200).json({ status: false, message: "Failed to get access token" });
+    }
+
+    if (tokenResponse.status !== 200 || !tokenResponse.data.access_token) {
+      return res.status(200).json({ status: false, message: "Failed to get access token" });
+    }
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Check payment status
+    const statusHeaders = {
+      "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
+      "X-Target-Environment": targetEnvironment,
+    };
+
+    let statusResponse;
+    try {
+      statusResponse = await axios.get(
+        `${baseUrl}/collection/v1_0/requesttopay/${reference}`,
+        { headers: statusHeaders }
+      );
+    } catch (error) {
+      return res.status(200).json({ status: false, message: "Failed to check payment status" });
+    }
+
+    if (statusResponse.status === 200 && statusResponse.data.status === "SUCCESSFUL") {
+      // Extract salon ID from reference (format: SALON_timestamp_salonId)
+      const parts = reference.split("_");
+      if (parts.length >= 3) {
+        const salonId = parts[2];
+        const salon = await Salon.findById(salonId);
+        
+        if (salon) {
+          const amount = parseFloat(statusResponse.data.amount || 0);
+          
+          // Check if already processed (avoid duplicate credits)
+          const existingHistory = await SalonExpertWalletHistory.findOne({
+            uniqueId: reference,
+          });
+
+          if (!existingHistory) {
+            // Add amount to salon wallet
+            salon.wallet = (salon.wallet || 0) + amount;
+            await salon.save();
+
+            // Create wallet history entry
+            const uniqueId = await generateUniqueIdentifier();
+            const walletHistory = new SalonExpertWalletHistory({
+              salon: salon._id,
+              amount: amount,
+              paymentGateway: PAYMENT_GATEWAY.MTN_MOMO,
+              type: 2, // CREDIT_FROM_SELF
+              date: moment().format("YYYY-MM-DD"),
+              time: moment().format("HH:mm a"),
+              uniqueId: reference, // Use reference as uniqueId to prevent duplicates
+            });
+
+            await walletHistory.save();
+          }
+        }
+      }
+    }
+
+    return res.status(200).json({ status: true, message: "Callback processed" });
+  } catch (error) {
+    console.error("MTN MoMo Payment Callback error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
   }
 };
