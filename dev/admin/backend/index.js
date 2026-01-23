@@ -683,6 +683,54 @@ app.get("/salonportal/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "index.html"));
 });
 
+// Serve static files for salon panel at /salonpanel/ path
+const salonPath = path.join(__dirname, "salon");
+const salonIndexPath = path.join(salonPath, "index.html");
+
+if (fs.existsSync(salonIndexPath)) {
+  // Salon panel is built and deployed
+  app.use("/salonpanel", express.static(salonPath));
+  // Direct route for salon panel (all /salonpanel/* paths)
+  app.get("/salonpanel/*", function (req, res) {
+    res.status(200).sendFile(salonIndexPath);
+  });
+} else {
+  // Salon panel not built - show helpful error message
+  console.warn(`[Salon Panel] Salon panel not found at ${salonIndexPath}. Please build and deploy the salon frontend.`);
+  app.get("/salonpanel/*", function (req, res) {
+    res.status(404).send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Salon Panel Not Found</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 50px; text-align: center; background: #f5f5f5; }
+            .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            h1 { color: #e74c3c; }
+            code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+            pre { background: #f4f4f4; padding: 15px; border-radius: 5px; text-align: left; overflow-x: auto; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Salon Panel Not Configured</h1>
+            <p>The salon panel frontend has not been built and deployed.</p>
+            <p><strong>Expected location:</strong> <code>${salonIndexPath}</code></p>
+            <p>To fix this, run the following commands on your server:</p>
+            <pre>cd /home/admin/salon
+npm install
+npm run build
+mkdir -p ${salonPath}
+cp -r build/* ${salonPath}/</pre>
+            <p>Or use the installation script which should handle this automatically.</p>
+          </div>
+        </body>
+      </html>
+    `);
+  });
+}
+
+// Backward compatibility: /SalonPanel/* (capital letters)
 app.get("/SalonPanel/*", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
 });

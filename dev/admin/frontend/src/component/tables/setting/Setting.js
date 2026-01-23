@@ -47,6 +47,10 @@ const Setting = (props) => {
   const [zitopayApiKey, setZitopayApiKey] = useState("");
   const [zitopaySecretKey, setZitopaySecretKey] = useState("");
   const [zitopayMerchantId, setZitopayMerchantId] = useState("");
+  const [mtnMomoPrimaryKey, setMtnMomoPrimaryKey] = useState("");
+  const [mtnMomoSecondaryKey, setMtnMomoSecondaryKey] = useState("");
+  const [mtnMomoSubscriptionKey, setMtnMomoSubscriptionKey] = useState("");
+  const [mtnMomoEnvironment, setMtnMomoEnvironment] = useState("sandbox");
   const [minWithdrawalRequestedAmount, setMinWithdrawalRequestedAmount] = useState("");
   const [minSalonWalletBalance, setMinSalonWalletBalance] = useState("");
   const [currencyName, setCurrencyName] = useState();
@@ -71,6 +75,10 @@ const Setting = (props) => {
     zitopayApiKey: "",
     zitopaySecretKey: "",
     zitopayMerchantId: "",
+    mtnMomoPrimaryKey: "",
+    mtnMomoSecondaryKey: "",
+    mtnMomoSubscriptionKey: "",
+    mtnMomoEnvironment: "",
   });
 
   useEffect(() => {
@@ -106,6 +114,10 @@ const Setting = (props) => {
       setZitopayApiKey(setting.zitopayApiKey || "");
       setZitopaySecretKey(setting.zitopaySecretKey || "");
       setZitopayMerchantId(setting.zitopayMerchantId || "");
+      setMtnMomoPrimaryKey(setting.mtnMomoPrimaryKey || "");
+      setMtnMomoSecondaryKey(setting.mtnMomoSecondaryKey || "");
+      setMtnMomoSubscriptionKey(setting.mtnMomoSubscriptionKey || "");
+      setMtnMomoEnvironment(setting.mtnMomoEnvironment || "sandbox");
       setRazorPayId(setting.razorPayId);
       setRazorSecretKey(setting.razorSecretKey);
       setTax(setting.tax);
@@ -171,6 +183,10 @@ const Setting = (props) => {
         zitopayApiKey,
         zitopaySecretKey,
         zitopayMerchantId,
+        mtnMomoPrimaryKey,
+        mtnMomoSecondaryKey,
+        mtnMomoSubscriptionKey,
+        mtnMomoEnvironment,
         razorPayId,
         razorSecretKey,
         tax,
@@ -567,6 +583,136 @@ const Setting = (props) => {
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 5)}
                         value={setting?.isZitopay}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6 mt-3 ">
+                  <div className="settingBoxOuter">
+                    <div className="settingBoxHeader">
+                      <h4>MTN MOMO SETTING</h4>
+                    </div>
+                    <div className="col-12 ">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label
+                          htmlFor="mtnMomoPrimaryKey"
+                          className="ms-2 order-1"
+                        >
+                          MTN MoMo Primary Key
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="mtnMomoPrimaryKey"
+                          value={mtnMomoPrimaryKey}
+                          placeholder="Enter MTN MoMo Primary Key"
+                          onChange={(e) => {
+                            setMtnMomoPrimaryKey(e.target.value);
+                            if (!e.target.value) {
+                              return setError({
+                                ...error,
+                                mtnMomoPrimaryKey: ` MTN MoMo Primary Key Is Required`,
+                              });
+                            } else {
+                              return setError({
+                                ...error,
+                                mtnMomoPrimaryKey: "",
+                              });
+                            }
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMomoPrimaryKey}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="mtnMomoSecondaryKey" className="ms-2 order-1">
+                          MTN MoMo Secondary Key
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="mtnMomoSecondaryKey"
+                          value={mtnMomoSecondaryKey}
+                          placeholder="Enter MTN MoMo Secondary Key"
+                          onChange={(e) => {
+                            setMtnMomoSecondaryKey(e.target.value);
+                            if (!e.target.value) {
+                              return setError({
+                                ...error,
+                                mtnMomoSecondaryKey: ` MTN MoMo Secondary Key Is Required`,
+                              });
+                            } else {
+                              return setError({
+                                ...error,
+                                mtnMomoSecondaryKey: "",
+                              });
+                            }
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMomoSecondaryKey}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="mtnMomoSubscriptionKey" className="ms-2 order-1">
+                          MTN MoMo Subscription Key (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="mtnMomoSubscriptionKey"
+                          value={mtnMomoSubscriptionKey}
+                          placeholder="Enter MTN MoMo Subscription Key (Optional)"
+                          onChange={(e) => {
+                            setMtnMomoSubscriptionKey(e.target.value);
+                            return setError({
+                              ...error,
+                              mtnMomoSubscriptionKey: "",
+                            });
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMomoSubscriptionKey}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="mtnMomoEnvironment" className="ms-2 order-1">
+                          MTN MoMo Environment
+                        </label>
+                        <select
+                          className="rounded-2"
+                          id="mtnMomoEnvironment"
+                          value={mtnMomoEnvironment}
+                          onChange={(e) => {
+                            setMtnMomoEnvironment(e.target.value);
+                          }}
+                        >
+                          <option value="sandbox">Sandbox</option>
+                          <option value="production">Production</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="inputData">
+                      <div>
+                        <label className="my-3">MTN MoMo active (enable/disable MTN MoMo)</label>
+                      </div>
+                      <ToggleSwitch
+                        onClick={() => handleSettingSwitch(setting?._id, 8)}
+                        value={setting?.isMtnMomo}
                       />
                     </div>
                   </div>

@@ -437,8 +437,8 @@ class PaymentScreenController extends GetxController {
         // For wallet recharge
         if (isWalletAdd == true) {
           await MtnMomoService().init(
-            mtnMomoApiKeyParam: mtnMomoApiKey ?? "",
-            mtnMomoApiSecretParam: mtnMomoApiSecret ?? "",
+            mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
+            mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
             mtnMomoSubscriptionKeyParam: mtnMomoSubscriptionKey ?? "",
             mtnMomoEnvironmentParam: mtnMomoEnvironment ?? "sandbox",
             totalAmountWithOutTax: parsedAmount,
@@ -454,8 +454,8 @@ class PaymentScreenController extends GetxController {
           }
 
           await MtnMomoService().init(
-            mtnMomoApiKeyParam: mtnMomoApiKey ?? "",
-            mtnMomoApiSecretParam: mtnMomoApiSecret ?? "",
+            mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
+            mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
             mtnMomoSubscriptionKeyParam: mtnMomoSubscriptionKey ?? "",
             mtnMomoEnvironmentParam: mtnMomoEnvironment ?? "sandbox",
             totalAmountWithOutTax: parsedAmount,
