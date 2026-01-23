@@ -690,14 +690,25 @@ const salonIndexPath = path.join(salonPath, "index.html");
 if (fs.existsSync(salonIndexPath)) {
   // Salon panel is built and deployed
   app.use("/salonpanel", express.static(salonPath));
-  // Direct route for salon panel (all /salonpanel/* paths)
+  app.use("/salonPanel", express.static(salonPath)); // Handle /salonPanel/ (capital P)
+  app.use("/SalonPanel", express.static(salonPath)); // Handle /SalonPanel/ (both capital)
+  
+  // Direct route for salon panel (all case variations)
   app.get("/salonpanel/*", function (req, res) {
+    res.status(200).sendFile(salonIndexPath);
+  });
+  app.get("/salonPanel/*", function (req, res) {
+    res.status(200).sendFile(salonIndexPath);
+  });
+  app.get("/SalonPanel/*", function (req, res) {
     res.status(200).sendFile(salonIndexPath);
   });
 } else {
   // Salon panel not built - show helpful error message
   console.warn(`[Salon Panel] Salon panel not found at ${salonIndexPath}. Please build and deploy the salon frontend.`);
-  app.get("/salonpanel/*", function (req, res) {
+  
+  // Handle all case variations with error message
+  const handleSalonPanelError = function (req, res) {
     res.status(404).send(`
       <!DOCTYPE html>
       <html>
@@ -727,13 +738,13 @@ cp -r build/* ${salonPath}/</pre>
         </body>
       </html>
     `);
-  });
+  };
+  
+  app.get("/salonpanel/*", handleSalonPanelError);
+  app.get("/salonPanel/*", handleSalonPanelError);
+  app.get("/SalonPanel/*", handleSalonPanelError);
 }
 
-// Backward compatibility: /SalonPanel/* (capital letters)
-app.get("/SalonPanel/*", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "salon", "index.html"));
-});
 
 // Serve static files for salonportal at root path (main page) - MUST BE LAST
 app.use("/", express.static(path.join(__dirname, "..", "salonportal")));
