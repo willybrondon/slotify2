@@ -681,8 +681,10 @@ exports.createStripeCheckoutSession = async (req, res) => {
 
     // Get base URL for callbacks
     const baseURL = process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com";
-    const successURL = `${baseURL}/salonpanel/wallet?payment=success&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelURL = `${baseURL}/salonpanel/wallet?payment=cancelled`;
+    // Fix double slash issue - remove trailing slash if present
+    const baseURLClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+    const successURL = `${baseURLClean}/salonpanel/wallet?payment=success&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelURL = `${baseURLClean}/salonpanel/wallet?payment=cancelled`;
 
     // Create Stripe Checkout Session
     const session = await stripeInstance.checkout.sessions.create({
@@ -865,9 +867,35 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     // Get MTN MoMo settings
     const setting = await Setting.findOne().sort({ createdAt: -1 });
-    if (!setting || !setting.isMtnMomo || !setting.mtnMomoPrimaryKey || !setting.mtnMomoSecondaryKey || !setting.mtnMomoSubscriptionKey) {
-      return res.status(200).json({ status: false, message: "MTN MoMo is not configured or enabled." });
+    
+    // Check each requirement and provide specific error messages
+    if (!setting) {
+      return res.status(200).json({ status: false, message: "Settings not found." });
     }
+    
+    if (!setting.isMtnMomo) {
+      return res.status(200).json({ 
+        status: false, 
+        message: "MTN MoMo is not enabled. Please enable it in Admin Settings > Payment Settings > MTN MoMo." 
+      });
+    }
+    
+    if (!setting.mtnMomoPrimaryKey || setting.mtnMomoPrimaryKey.trim() === "") {
+      return res.status(200).json({ 
+        status: false, 
+        message: "MTN MoMo Primary Key is not configured. Please add it in Admin Settings." 
+      });
+    }
+    
+    if (!setting.mtnMomoSecondaryKey || setting.mtnMomoSecondaryKey.trim() === "") {
+      return res.status(200).json({ 
+        status: false, 
+        message: "MTN MoMo Secondary Key is not configured. Please add it in Admin Settings." 
+      });
+    }
+    
+    // Subscription Key is optional - some MTN MoMo API configurations don't require it
+    // We'll try to use it if provided, but won't fail if it's missing
 
     // Determine base URL based on environment
     const environment = (setting.mtnMomoEnvironment || "sandbox").toLowerCase();
@@ -885,10 +913,14 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     
     const tokenHeaders = {
       "Authorization": `Basic ${tokenCredentials}`,
-      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
       "X-Target-Environment": targetEnvironment,
       "Content-Type": "application/json",
     };
+    
+    // Add Subscription Key only if provided (some MTN MoMo API configurations require it, others don't)
+    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
+      tokenHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
+    }
 
     let tokenResponse;
     try {
@@ -931,12 +963,16 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     const paymentHeaders = {
       "Authorization": `Bearer ${accessToken}`,
-      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
       "X-Target-Environment": targetEnvironment,
       "X-Reference-Id": reference,
       "X-Callback-Url": callbackUrl,
       "Content-Type": "application/json",
     };
+    
+    // Add Subscription Key only if provided
+    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
+      paymentHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
+    }
 
     let paymentResponse;
     try {
@@ -993,8 +1029,16 @@ exports.checkMTNMomoPaymentStatus = async (req, res) => {
 
     // Get MTN MoMo settings
     const setting = await Setting.findOne().sort({ createdAt: -1 });
-    if (!setting || !setting.mtnMomoPrimaryKey || !setting.mtnMomoSecondaryKey || !setting.mtnMomoSubscriptionKey) {
-      return res.status(200).json({ status: false, message: "MTN MoMo is not configured." });
+    if (!setting) {
+      return res.status(200).json({ status: false, message: "Settings not found." });
+    }
+    
+    if (!setting.mtnMomoPrimaryKey || setting.mtnMomoPrimaryKey.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo Primary Key is not configured." });
+    }
+    
+    if (!setting.mtnMomoSecondaryKey || setting.mtnMomoSecondaryKey.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo Secondary Key is not configured." });
     }
 
     // Determine base URL based on environment
@@ -1009,9 +1053,13 @@ exports.checkMTNMomoPaymentStatus = async (req, res) => {
 
     const tokenHeaders = {
       "Authorization": `Basic ${tokenCredentials}`,
-      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
       "X-Target-Environment": targetEnvironment,
     };
+    
+    // Add Subscription Key only if provided (optional - some MTN MoMo API configurations don't require it)
+    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
+      tokenHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
+    }
 
     let tokenResponse;
     try {
@@ -1035,9 +1083,13 @@ exports.checkMTNMomoPaymentStatus = async (req, res) => {
     // Check payment status
     const statusHeaders = {
       "Authorization": `Bearer ${accessToken}`,
-      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
       "X-Target-Environment": targetEnvironment,
     };
+    
+    // Add Subscription Key only if provided
+    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
+      statusHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
+    }
 
     let statusResponse;
     try {
@@ -1131,8 +1183,16 @@ exports.handleMTNMomoPaymentCallback = async (req, res) => {
 
     // Get MTN MoMo settings
     const setting = await Setting.findOne().sort({ createdAt: -1 });
-    if (!setting || !setting.mtnMomoPrimaryKey || !setting.mtnMomoSecondaryKey || !setting.mtnMomoSubscriptionKey) {
-      return res.status(200).json({ status: false, message: "MTN MoMo is not configured." });
+    if (!setting) {
+      return res.status(200).json({ status: false, message: "Settings not found." });
+    }
+    
+    if (!setting.mtnMomoPrimaryKey || setting.mtnMomoPrimaryKey.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo Primary Key is not configured." });
+    }
+    
+    if (!setting.mtnMomoSecondaryKey || setting.mtnMomoSecondaryKey.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo Secondary Key is not configured." });
     }
 
     // Determine base URL based on environment
@@ -1147,9 +1207,13 @@ exports.handleMTNMomoPaymentCallback = async (req, res) => {
 
     const tokenHeaders = {
       "Authorization": `Basic ${tokenCredentials}`,
-      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
       "X-Target-Environment": targetEnvironment,
     };
+    
+    // Add Subscription Key only if provided (optional)
+    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
+      tokenHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
+    }
 
     let tokenResponse;
     try {
@@ -1167,9 +1231,13 @@ exports.handleMTNMomoPaymentCallback = async (req, res) => {
     // Check payment status
     const statusHeaders = {
       "Authorization": `Bearer ${accessToken}`,
-      "Ocp-Apim-Subscription-Key": setting.mtnMomoSubscriptionKey,
       "X-Target-Environment": targetEnvironment,
     };
+    
+    // Add Subscription Key only if provided
+    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
+      statusHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
+    }
 
     let statusResponse;
     try {

@@ -98,9 +98,18 @@ const Wallet = () => {
             // Call backend to verify and process payment
             handleStripePaymentSuccess(sessionId);
         } else if (paymentStatus === "cancelled") {
+            // Payment was cancelled - show message and clean up
             toast.info("Payment was cancelled. You can try again when ready.");
-            // Remove query params from URL
-            navigate("/salonpanel/wallet", { replace: true });
+            setIsProcessing(false);
+            setAmount("");
+            setSelectedAmount("");
+            setPhoneNumber("");
+            setPaymentReference(null);
+            
+            // Remove query params from URL and navigate to clean wallet page
+            // Use replace to avoid adding to history
+            const cleanPath = window.location.pathname.split('?')[0];
+            navigate(cleanPath, { replace: true });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, searchParams, navigate]);

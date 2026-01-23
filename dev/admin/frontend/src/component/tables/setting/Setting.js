@@ -40,6 +40,8 @@ const Setting = (props) => {
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
   const [cancelOrderCharges,setCancelOrderCharges] = useState("");
   const [adminCommissionCharges, setAdminCommissionCharges] = useState("");
+  const [customerCommissionCharges, setCustomerCommissionCharges] = useState("");
+  const [salonCommissionCharges, setSalonCommissionCharges] = useState("");
   const [data, setData] = useState([]);
   // box 5
   const [stripePublishableKey, setStripePublishableKey] = useState("");
@@ -79,6 +81,9 @@ const Setting = (props) => {
     mtnMomoSecondaryKey: "",
     mtnMomoSubscriptionKey: "",
     mtnMomoEnvironment: "",
+    adminCommissionCharges: "",
+    customerCommissionCharges: "",
+    salonCommissionCharges: "",
   });
 
   useEffect(() => {
@@ -130,6 +135,8 @@ const Setting = (props) => {
       setMinWithdrawalRequestedAmount(setting?.minWithdrawalRequestedAmount);
       setMinSalonWalletBalance(setting?.minSalonWalletBalance || "");
       setAdminCommissionCharges(setting?.adminCommissionCharges);
+      setCustomerCommissionCharges(setting?.customerCommissionCharges || "");
+      setSalonCommissionCharges(setting?.salonCommissionCharges || "");
       setCancelOrderCharges(setting?.cancelOrderCharges);
     }
   }, [setting]);
@@ -151,6 +158,8 @@ const Setting = (props) => {
       !flutterWaveKey ||
       !firebaseKey || 
       !adminCommissionCharges || 
+      !customerCommissionCharges ||
+      !salonCommissionCharges ||
       !cancelOrderCharges
     ) {
       let error = {};
@@ -170,7 +179,9 @@ const Setting = (props) => {
       if (!flutterWaveKey)
         error.flutterWaveKey = "Flutter Wave Key is required";
       if (!firebaseKey) error.firebaseKey = "Firebase Key is required";
-      if (!adminCommissionCharges) error.commissionPerProductQuantity = "commissionPerProductQuantity Key is required";
+      if (!adminCommissionCharges) error.commissionPerProductQuantity = "Admin Commission (for products) is required";
+      if (!customerCommissionCharges) error.customerCommissionCharges = "Customer Commission Charge is required";
+      if (!salonCommissionCharges) error.salonCommissionCharges = "Salon Commission Charge is required";
       if (!cancelOrderCharges) error.cancelOrderCharges = "cancelOrderCharges Key is required";
       if (!minWithdrawalRequestedAmount) error.minWithdrawalRequestedAmount = "withDrawReq is required";
       return setError({ ...error });
@@ -197,7 +208,9 @@ const Setting = (props) => {
         minWithdrawalRequestedAmount,
         minSalonWalletBalance,
         cancelOrderCharges,
-        adminCommissionCharges 
+        adminCommissionCharges,
+        customerCommissionCharges,
+        salonCommissionCharges
       };
       const payload = { data: data, id: setting?._id };
       await dispatch(updateSetting(payload)).unwrap();
@@ -672,7 +685,7 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="mtnMomoSubscriptionKey"
                           value={mtnMomoSubscriptionKey}
-                          placeholder="Enter MTN MoMo Subscription Key (Optional)"
+                          placeholder="Enter MTN MoMo Subscription Key (if required by your API)"
                           onChange={(e) => {
                             setMtnMomoSubscriptionKey(e.target.value);
                             return setError({
@@ -681,6 +694,15 @@ const Setting = (props) => {
                             });
                           }}
                         />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMomoSubscriptionKey}
+                          </p>
+                        )}
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          Optional: Some MTN MoMo API configurations require this key (Ocp-Apim-Subscription-Key), 
+                          while others only need Primary and Secondary keys. Leave empty if your API doesn't require it.
+                        </label>
                         {error && (
                           <p className="errorMessage text-start">
                             {error && error?.mtnMomoSubscriptionKey}
@@ -709,11 +731,20 @@ const Setting = (props) => {
                     <div className="inputData">
                       <div>
                         <label className="my-3">MTN MoMo active (enable/disable MTN MoMo)</label>
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px", display: "block" }}>
+                          ⚠️ <strong>Important:</strong> Make sure to enable this toggle switch after adding all MTN MoMo keys above. 
+                          The payment will not work if this is disabled, even if all keys are configured.
+                        </label>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 8)}
                         value={setting?.isMtnMomo}
                       />
+                      {setting?.isMtnMomo ? (
+                        <span style={{ color: "#1ebc1e", fontSize: "12px", marginLeft: "10px" }}>✓ Enabled</span>
+                      ) : (
+                        <span style={{ color: "#dc3545", fontSize: "12px", marginLeft: "10px" }}>✗ Disabled</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1090,14 +1121,14 @@ const Setting = (props) => {
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label htmlFor="Admin Commission Charges (%)" className="ms-2 order-1">
-                          Admin Commission Charges (%)
+                          Admin Commission Charges (%) - For Products
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="adminCommissionCharges"
                           value={adminCommissionCharges}
-                          placeholder="Enter Admin Commission"
+                          placeholder="Enter Admin Commission for Products"
                           onChange={(e) => {
                             setAdminCommissionCharges(e.target.value);
                             if (!e.target.value) {
@@ -1118,6 +1149,81 @@ const Setting = (props) => {
                             {error && error?.adminCommissionCharges}
                           </p>
                         )}
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          Commission percentage charged on product orders
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="Customer Commission Charges (%)" className="ms-2 order-1">
+                          Admin Commission Charge Customer (%) - For Bookings
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="customerCommissionCharges"
+                          value={customerCommissionCharges}
+                          placeholder="Enter Customer Commission Charge"
+                          onChange={(e) => {
+                            setCustomerCommissionCharges(e.target.value);
+                            if (!e.target.value) {
+                              return setError({
+                                ...error,
+                                customerCommissionCharges: ` Customer Commission Charge Is Required`,
+                              });
+                            } else {
+                              return setError({
+                                ...error,
+                                customerCommissionCharges: "",
+                              });
+                            }
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.customerCommissionCharges}
+                          </p>
+                        )}
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          Commission percentage charged from customers on bookings
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="Salon Commission Charges (%)" className="ms-2 order-1">
+                          Admin Commission Charge Salon (%) - For Bookings
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="salonCommissionCharges"
+                          value={salonCommissionCharges}
+                          placeholder="Enter Salon Commission Charge"
+                          onChange={(e) => {
+                            setSalonCommissionCharges(e.target.value);
+                            if (!e.target.value) {
+                              return setError({
+                                ...error,
+                                salonCommissionCharges: ` Salon Commission Charge Is Required`,
+                              });
+                            } else {
+                              return setError({
+                                ...error,
+                                salonCommissionCharges: "",
+                              });
+                            }
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.salonCommissionCharges}
+                          </p>
+                        )}
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          Commission percentage charged from salon owners on bookings
+                        </label>
                       </div>
                     </div>
                     <div className="col-12">
