@@ -270,11 +270,8 @@ class MtnMomoService {
 
       log("MTN MoMo request body :: $body");
 
-      // Set environment value - MTN MoMo expects "sandbox" or "production" (lowercase)
-      String targetEnvironment = mtnMomoEnvironment.toLowerCase();
-      if (targetEnvironment != "sandbox" && targetEnvironment != "production") {
-        targetEnvironment = "sandbox";
-      }
+      // Reuse targetEnvironment from above (already set at line 195)
+      // No need to redeclare it
       
       Map<String, String> paymentHeaders = {
         'Authorization': 'Bearer $accessToken',
@@ -379,11 +376,8 @@ class MtnMomoService {
         return;
       }
 
-      // Set environment value - MTN MoMo expects "sandbox" or "production" (lowercase)
-      String targetEnvironment = mtnMomoEnvironment.toLowerCase();
-      if (targetEnvironment != "sandbox" && targetEnvironment != "production") {
-        targetEnvironment = "sandbox";
-      }
+      // Reuse targetEnvironment from above (already set at line 353)
+      // No need to redeclare it
       
       Map<String, String> statusHeaders = {
         'Authorization': 'Bearer $accessToken',
