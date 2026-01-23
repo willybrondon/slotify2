@@ -461,26 +461,137 @@ const Wallet = () => {
                         {availablePaymentMethods.length > 0 ? (
                             <>
                                 <div className="inputData mt-4">
-                                    <label className="styleForTitle" htmlFor="paymentMethod">
+                                    <label className="styleForTitle">
                                         Select Payment Method
                                     </label>
-                                    <select
-                                        name="paymentMethod"
-                                        className="rounded-2 fw-bold"
-                                        id="paymentMethod"
-                                        value={paymentMethod}
-                                        onChange={(e) => {
-                                            setPaymentMethod(e.target.value);
-                                            setPhoneNumber("");
-                                            setPhoneError(false);
-                                        }}
-                                    >
+                                    <div className="mt-2">
                                         {availablePaymentMethods.map((method) => (
-                                            <option key={method.value} value={method.value}>
-                                                {method.label}
-                                            </option>
+                                            <div
+                                                key={method.value}
+                                                onClick={() => {
+                                                    if (!isProcessing) {
+                                                        setPaymentMethod(method.value);
+                                                        setPhoneNumber("");
+                                                        setPhoneError(false);
+                                                    }
+                                                }}
+                                                style={{
+                                                    cursor: isProcessing ? "not-allowed" : "pointer",
+                                                    padding: "12px 15px",
+                                                    marginBottom: "10px",
+                                                    border: `2px solid ${paymentMethod === method.value ? "#1ebc1e" : "#e0e0e0"}`,
+                                                    borderRadius: "10px",
+                                                    backgroundColor: paymentMethod === method.value ? "#f0fdf4" : "#ffffff",
+                                                    transition: "all 0.3s ease",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "space-between",
+                                                    opacity: isProcessing ? 0.6 : 1,
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (!isProcessing && paymentMethod !== method.value) {
+                                                        e.currentTarget.style.borderColor = "#1ebc1e";
+                                                        e.currentTarget.style.backgroundColor = "#f9fafb";
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (paymentMethod !== method.value) {
+                                                        e.currentTarget.style.borderColor = "#e0e0e0";
+                                                        e.currentTarget.style.backgroundColor = "#ffffff";
+                                                    }
+                                                }}
+                                            >
+                                                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                                    {/* Payment Method Logo */}
+                                                    <div
+                                                        style={{
+                                                            width: "40px",
+                                                            height: "40px",
+                                                            borderRadius: "50%",
+                                                            backgroundColor: "#f3f4f6",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            padding: "8px",
+                                                        }}
+                                                    >
+                                                        {method.value === "Stripe" ? (
+                                                            <img
+                                                                src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/stripe.svg"
+                                                                alt="Stripe"
+                                                                style={{ width: "30px", height: "30px" }}
+                                                                onError={(e) => {
+                                                                    e.target.outerHTML = '<span style="font-weight: bold; color: #635BFF; font-size: 14px;">S</span>';
+                                                                }}
+                                                            />
+                                                        ) : method.value === "MTN MoMo" ? (
+                                                            <div style={{ position: "relative", width: "30px", height: "30px" }}>
+                                                                <img
+                                                                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/MTN_Logo.svg/512px-MTN_Logo.svg.png"
+                                                                    alt="MTN MoMo"
+                                                                    style={{ 
+                                                                        width: "30px", 
+                                                                        height: "30px", 
+                                                                        objectFit: "contain",
+                                                                        filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.1))"
+                                                                    }}
+                                                                    onError={(e) => {
+                                                                        // Fallback to styled text with MTN colors
+                                                                        e.target.style.display = "none";
+                                                                        const fallback = document.createElement("div");
+                                                                        fallback.innerHTML = '<span style="font-weight: bold; color: #FFCC00; font-size: 11px; background: linear-gradient(135deg, #FFCC00 0%, #FFD700 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">MTN</span>';
+                                                                        fallback.style.cssText = "display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;";
+                                                                        e.target.parentElement.appendChild(fallback);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        ) : method.value === "Zitopay" ? (
+                                                            <span style={{ fontWeight: "bold", color: "#1ebc1e", fontSize: "14px" }}>ZP</span>
+                                                        ) : (
+                                                            <span style={{ fontWeight: "bold", color: "#6b7280", fontSize: "14px" }}>{method.label.charAt(0)}</span>
+                                                        )}
+                                                    </div>
+                                                    <span
+                                                        style={{
+                                                            fontSize: "16px",
+                                                            fontWeight: "600",
+                                                            color: "#1f2937",
+                                                        }}
+                                                    >
+                                                        {method.label}
+                                                    </span>
+                                                </div>
+                                                {/* Selection Indicator */}
+                                                <div
+                                                    style={{
+                                                        width: "24px",
+                                                        height: "24px",
+                                                        borderRadius: "6px",
+                                                        border: `2px solid ${paymentMethod === method.value ? "#1ebc1e" : "#d1d5db"}`,
+                                                        backgroundColor: paymentMethod === method.value ? "#1ebc1e" : "transparent",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                    }}
+                                                >
+                                                    {paymentMethod === method.value && (
+                                                        <svg
+                                                            width="14"
+                                                            height="14"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+                                                                fill="white"
+                                                            />
+                                                        </svg>
+                                                    )}
+                                                </div>
+                                            </div>
                                         ))}
-                                    </select>
+                                    </div>
                                 </div>
 
                                 {/* MTN MoMo Phone Number Input */}
