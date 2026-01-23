@@ -292,6 +292,30 @@ class PaymentScreenController extends GetxController {
       update([Constant.idProgressView]);
 
       try {
+        // Get Zitopay settings from splash controller
+        SplashController splashController = Get.find<SplashController>();
+        bool isZitopayEnabled = splashController.settingCategory?.setting?.isZitopay ?? false;
+        String? zitopayApiKey = splashController.settingCategory?.setting?.zitopayApiKey;
+        String? zitopaySecretKey = splashController.settingCategory?.setting?.zitopaySecretKey;
+        String? zitopayMerchantId = splashController.settingCategory?.setting?.zitopayMerchantId;
+
+        // Check if Zitopay is enabled and configured
+        if (!isZitopayEnabled) {
+          isLoading(false);
+          update([Constant.idProgressView]);
+          Utils.showToast(Get.context!, "Zitopay payment is not enabled. Please select another payment method.");
+          return;
+        }
+
+        if (zitopayApiKey == null || zitopayApiKey.isEmpty ||
+            zitopaySecretKey == null || zitopaySecretKey.isEmpty ||
+            zitopayMerchantId == null || zitopayMerchantId.isEmpty) {
+          isLoading(false);
+          update([Constant.idProgressView]);
+          Utils.showToast(Get.context!, "Zitopay is not properly configured. Please contact support.");
+          return;
+        }
+
         // Parse amount properly
         int parsedAmount = 0;
         if (totalAmount != null && totalAmount!.isNotEmpty) {
@@ -302,12 +326,6 @@ class PaymentScreenController extends GetxController {
         }
 
         log("Parsed amount for Zitopay: $parsedAmount");
-
-        // Get Zitopay keys from settings
-        SplashController splashController = Get.find<SplashController>();
-        String? zitopayApiKey = splashController.settingCategory?.setting?.zitopayApiKey;
-        String? zitopaySecretKey = splashController.settingCategory?.setting?.zitopaySecretKey;
-        String? zitopayMerchantId = splashController.settingCategory?.setting?.zitopayMerchantId;
 
         // For wallet recharge
         if (isWalletAdd == true) {

@@ -1,36 +1,54 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Title from "./extras/Title";
+import Button from "./extras/Button";
 import { depositToWallet, getWalletHistory } from "../redux/slice/withDrawSlice";
 import { toast } from "react-toastify";
+import { getCurrency } from "../redux/slice/settingSlice";
 import { useNavigate } from "react-router-dom";
+import withDrawBanner from "../assets/images/withDraw.png";
 
 const Wallet = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { setting } = useSelector((state) => state.setting);
     const { admin } = useSelector((state) => state.auth);
-    const { walletBalance } = useSelector((state) => state.withDraw);
+    const { walletBalance, isSkeleton } = useSelector((state) => state.withDraw);
+    const { currency } = useSelector((state) => state.setting);
     
     const [amount, setAmount] = useState("");
     const [selectedAmount, setSelectedAmount] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("Stripe");
     const [isProcessing, setIsProcessing] = useState(false);
+    const [amountError, setAmountError] = useState(false);
     
     const quickAmounts = ["50", "100", "150", "200", "250", "300", "500"];
-    const paymentMethods = [
-        { value: "Stripe", label: "Stripe" },
-        { value: "Zitopay", label: "Zitopay" }
-    ];
+    
+    // Get available payment methods from settings
+    const availablePaymentMethods = [];
+    if (setting?.isStripePay) {
+        availablePaymentMethods.push({ value: "Stripe", label: "Stripe" });
+    }
+    if (setting?.isZitopay) {
+        availablePaymentMethods.push({ value: "Zitopay", label: "Zitopay" });
+    }
 
     useEffect(() => {
-        // Fetch current wallet balance
         dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
+        dispatch(getCurrency());
     }, [dispatch]);
+
+    // Set default payment method if available
+    useEffect(() => {
+        if (availablePaymentMethods.length > 0 && !paymentMethod) {
+            setPaymentMethod(availablePaymentMethods[0].value);
+        }
+    }, [availablePaymentMethods.length]);
 
     const handleAmountSelect = (amt) => {
         setSelectedAmount(amt);
         setAmount(amt);
+        setAmountError(false);
     };
 
     const handleRecharge = async () => {
@@ -38,6 +56,7 @@ const Wallet = () => {
         
         if (!rechargeAmount || rechargeAmount === "0" || parseFloat(rechargeAmount) <= 0) {
             toast.error("Please enter a valid amount to recharge");
+            setAmountError(true);
             return;
         }
 
@@ -46,16 +65,22 @@ const Wallet = () => {
             return;
         }
 
+        if (availablePaymentMethods.length === 0) {
+            toast.error("No payment methods are enabled. Please contact admin.");
+            return;
+        }
+
         setIsProcessing(true);
+        setAmountError(false);
 
         try {
             // Map payment method to gateway number
             const paymentGatewayMap = {
-                "Stripe": 1,
-                "Zitopay": 4
+                "Stripe": "STRIPE",
+                "Zitopay": "ZITOPAY"
             };
 
-            const paymentGateway = paymentGatewayMap[paymentMethod] || 1;
+            const paymentGateway = paymentGatewayMap[paymentMethod] || "STRIPE";
 
             // For now, we'll use a simple approach - redirect to payment gateway
             // In a real implementation, you'd integrate Stripe/Zitopay payment flow here
@@ -80,7 +105,9 @@ const Wallet = () => {
             
             // if (result.payload?.status) {
             //     toast.success("Wallet recharged successfully!");
-            //     navigate("/salonpanel/walletHistory");
+            //     setAmount("");
+            //     setSelectedAmount("");
+            //     dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
             // } else {
             //     toast.error(result.payload?.message || "Failed to recharge wallet");
             // }
@@ -93,123 +120,181 @@ const Wallet = () => {
         }
     };
 
+    const minSalonWalletBalance = setting?.minSalonWalletBalance || 0;
+    const isBalanceInsufficient = walletBalance < minSalonWalletBalance;
+    const deficit = minSalonWalletBalance - walletBalance;
+
     return (
-        <div className="orderDetails mt-2">
-            <div className="row">
-                <Title name="Wallet" className="mt-4" />
-            </div>
-            
-            <div className="betBox mt-4">
-                {/* Current Wallet Balance */}
-                <div className="col-12 mb-4">
-                    <div className="betBox p-4" style={{ background: "#f8f9fa", borderRadius: "8px", border: "2px solid #14AF14" }}>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 className="mb-2" style={{ color: "#666" }}>Current Wallet Balance</h5>
-                                <h2 className="mb-0" style={{ color: "#14AF14", fontWeight: "bold" }}>
-                                    {setting?.currencySymbol || ""} {walletBalance?.toFixed(2) || "0.00"}
-                                </h2>
+        <>
+            <div className="mainExpert">
+                <Title name="Wallet" />
+
+                <div className="row">
+                    {/* Left Column - Balance Banner */}
+                    <div className="col-md-6" style={{ position: "relative" }}>
+                        {/* Text positioned on top of the image */}
+                        <div style={{ position: "absolute", top: "14%", left: "29%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>
+                            My Wallet Balance
+                        </div>
+                        <div style={{ position: "absolute", top: "20%", left: "16%", transform: "translateX(-50%)", color: "white", fontSize: "40px", zIndex: 2, fontWeight: "bold" }}>
+                            {currency?.currencySymbol || setting?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
+                        </div>
+
+                        {/* Image */}
+                        <img src={withDrawBanner} alt="Wallet Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
+
+                        {/* Minimum Balance Info */}
+                        {minSalonWalletBalance > 0 && (
+                            <div className="mt-4">
+                                <div className={`alert ${isBalanceInsufficient ? "alert-warning" : "alert-info"}`} role="alert">
+                                    <strong>Minimum Required Balance:</strong> {currency?.currencySymbol || setting?.currencySymbol || ""} {minSalonWalletBalance.toFixed(2)}
+                                    <br />
+                                    <small>
+                                        {isBalanceInsufficient ? (
+                                            <>
+                                                Your wallet balance is below the minimum required amount. 
+                                                You need to add at least <strong>{currency?.currencySymbol || setting?.currencySymbol || ""} {deficit.toFixed(2)}</strong> to accept bookings.
+                                            </>
+                                        ) : (
+                                            "Your wallet must have at least this amount plus the commission fee to accept new bookings."
+                                        )}
+                                    </small>
+                                </div>
                             </div>
-                            <div style={{ fontSize: "3rem" }}>💰</div>
+                        )}
+
+                        {/* Wallet Recharge Instructions */}
+                        <div className="row mt-4">
+                            <div className="inputData mt-4 col-md-11">
+                                <label className="styleForTitle fw-bold" style={{ color: "#1C2B20", fontSize: "24px" }}>
+                                    Wallet Recharge Instructions :
+                                </label>
+                                <div style={{ fontSize: "14px", lineHeight: "25px", color: "#A5A5A5" }}>
+                                    <div>
+                                        To recharge your wallet, select or enter the desired amount and choose your preferred payment method (Stripe or Zitopay). 
+                                        Once the payment is processed successfully, the amount will be automatically credited to your wallet. 
+                                        Your wallet balance must meet the minimum required amount plus commission fees to accept new bookings.
+                                    </div>
+                                    <div style={{ wordWrap: "break-word", marginTop: "10px" }}>
+                                        You can view your wallet transaction history in the "Wallet History" section. 
+                                        All transactions including recharges, commission deductions, and refunds will be recorded there.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Minimum Balance Info */}
-                {setting?.minSalonWalletBalance > 0 && (
-                    <div className="col-12 mb-4">
-                        <div className="alert alert-info" role="alert">
-                            <strong>Minimum Required Balance:</strong> {setting?.currencySymbol || ""} {setting.minSalonWalletBalance.toFixed(2)}
-                            <br />
-                            <small>Your wallet must have at least this amount plus the commission fee to accept new bookings.</small>
+                    {/* Right Column - Recharge Form */}
+                    <div className="col-md-6">
+                        <div className="inputData mt-2">
+                            <label className="styleForTitle" htmlFor="rechargeAmount">
+                                Enter Recharge Amount
+                            </label>
+                            <div className="input-group mt-2" style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                                <span className="input-group-text fw-bold" style={{ position: "relative", display: "flex", alignItems: "center", background: "#1C2B20", color: "white" }}>
+                                    {currency?.currencySymbol || setting?.currencySymbol || ""}
+                                </span>
+                                <input
+                                    type="number"
+                                    name="rechargeAmount"
+                                    className="form-control fw-bold p-3"
+                                    id="rechargeAmount"
+                                    style={{
+                                        paddingLeft: "2.5rem",
+                                        borderTopLeftRadius: "0",
+                                        borderBottomLeftRadius: "0",
+                                    }}
+                                    placeholder="Enter amount"
+                                    value={amount}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        setAmount(value);
+                                        setSelectedAmount("");
+                                        setAmountError(false);
+                                    }}
+                                    min="1"
+                                    step="0.01"
+                                />
+                            </div>
+                            {amountError && (
+                                <label className="d-flex justify-content-end mt-1" style={{ color: "red", fontSize: "15px" }}>
+                                    *Please enter a valid amount
+                                </label>
+                            )}
                         </div>
-                    </div>
-                )}
 
-                {/* Recharge Section */}
-                <div className="col-12">
-                    <h4 className="mb-3">Recharge Your Wallet</h4>
-                    
-                    {/* Quick Amount Selection */}
-                    <div className="mb-4">
-                        <label className="form-label fw-bold">Select Amount</label>
-                        <div className="d-flex flex-wrap gap-2">
-                            {quickAmounts.map((amt) => (
-                                <button
-                                    key={amt}
-                                    type="button"
-                                    className={`btn ${selectedAmount === amt ? "btn-primary" : "btn-outline-primary"}`}
-                                    onClick={() => handleAmountSelect(amt)}
-                                    style={{ minWidth: "80px" }}
+                        {/* Quick Amount Selection */}
+                        <div className="inputData mt-4">
+                            <label className="styleForTitle">Or Select Quick Amount</label>
+                            <div className="d-flex flex-wrap gap-2 mt-2">
+                                {quickAmounts.map((amt) => (
+                                    <button
+                                        key={amt}
+                                        type="button"
+                                        className={`btn ${selectedAmount === amt ? "btn-primary" : "btn-outline-primary"}`}
+                                        onClick={() => handleAmountSelect(amt)}
+                                        style={{ minWidth: "80px", padding: "8px 16px" }}
+                                    >
+                                        {currency?.currencySymbol || setting?.currencySymbol || ""} {amt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Payment Method Selection */}
+                        {availablePaymentMethods.length > 0 ? (
+                            <div className="inputData mt-4">
+                                <label className="styleForTitle" htmlFor="paymentMethod">
+                                    Select Payment Method
+                                </label>
+                                <select
+                                    name="paymentMethod"
+                                    className="rounded-2 fw-bold"
+                                    id="paymentMethod"
+                                    value={paymentMethod}
+                                    onChange={(e) => setPaymentMethod(e.target.value)}
                                 >
-                                    {setting?.currencySymbol || ""} {amt}
-                                </button>
-                            ))}
+                                    {availablePaymentMethods.map((method) => (
+                                        <option key={method.value} value={method.value}>
+                                            {method.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ) : (
+                            <div className="alert alert-warning mt-4" role="alert">
+                                <strong>No Payment Methods Available</strong>
+                                <br />
+                                <small>Please contact admin to enable payment methods (Stripe or Zitopay).</small>
+                            </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <div className="row formFooter">
+                            <div className="col-12 text-end mt-4">
+                                <Button
+                                    type="submit"
+                                    className="text-white m10-left"
+                                    style={{ backgroundColor: "#1ebc1e" }}
+                                    text={isProcessing ? "Processing..." : "Recharge Wallet"}
+                                    onClick={handleRecharge}
+                                    disabled={isProcessing || !amount || parseFloat(amount) <= 0 || availablePaymentMethods.length === 0}
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Custom Amount Input */}
-                    <div className="mb-4">
-                        <label htmlFor="customAmount" className="form-label fw-bold">
-                            Or Enter Custom Amount
-                        </label>
-                        <input
-                            type="number"
-                            className="form-control"
-                            id="customAmount"
-                            placeholder="Enter amount"
-                            value={amount}
-                            onChange={(e) => {
-                                setAmount(e.target.value);
-                                setSelectedAmount("");
-                            }}
-                            min="1"
-                            step="0.01"
-                        />
-                    </div>
-
-                    {/* Payment Method Selection */}
-                    <div className="mb-4">
-                        <label htmlFor="paymentMethod" className="form-label fw-bold">
-                            Payment Method
-                        </label>
-                        <select
-                            className="form-select"
-                            id="paymentMethod"
-                            value={paymentMethod}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                        >
-                            {paymentMethods.map((method) => (
-                                <option key={method.value} value={method.value}>
-                                    {method.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Recharge Button */}
-                    <div className="mb-3">
-                        <button
-                            type="button"
-                            className="btn btn-primary btn-lg w-100"
-                            onClick={handleRecharge}
-                            disabled={isProcessing || !amount || parseFloat(amount) <= 0}
-                            style={{ padding: "12px", fontSize: "1.1rem" }}
-                        >
-                            {isProcessing ? "Processing..." : `Recharge ${setting?.currencySymbol || ""} ${amount || "0.00"}`}
-                        </button>
-                    </div>
-
-                    {/* Info Message */}
-                    <div className="alert alert-warning" role="alert">
-                        <small>
-                            <strong>Note:</strong> Payment gateway integration is required. 
-                            After successful payment, the amount will be credited to your wallet automatically.
-                        </small>
+                        {/* Info Message */}
+                        <div className="alert alert-info mt-4" role="alert">
+                            <small>
+                                <strong>Note:</strong> Payment gateway integration is required. 
+                                After successful payment, the amount will be credited to your wallet automatically. 
+                                You can view your transaction history in the "Wallet History" section.
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

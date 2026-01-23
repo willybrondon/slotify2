@@ -78,6 +78,7 @@ class Setting {
     bool? isAddProductRequest,
     bool? isUpdateProductRequest,
     num? minWithdrawalRequestedAmount,
+    num? minSalonWalletBalance,
     num? adminCommissionCharges,
     num? cancelOrderCharges,
   }) {
@@ -107,6 +108,7 @@ class Setting {
     _isAddProductRequest = isAddProductRequest;
     _isUpdateProductRequest = isUpdateProductRequest;
     _minWithdrawalRequestedAmount = minWithdrawalRequestedAmount;
+    _minSalonWalletBalance = minSalonWalletBalance;
     _adminCommissionCharges = adminCommissionCharges;
     _cancelOrderCharges = cancelOrderCharges;
   }
@@ -138,6 +140,7 @@ class Setting {
     _isAddProductRequest = json['isAddProductRequest'];
     _isUpdateProductRequest = json['isUpdateProductRequest'];
     _minWithdrawalRequestedAmount = json['minWithdrawalRequestedAmount'];
+    _minSalonWalletBalance = json['minSalonWalletBalance'];
     _adminCommissionCharges = json['adminCommissionCharges'];
     _cancelOrderCharges = json['cancelOrderCharges'];
   }
@@ -167,6 +170,7 @@ class Setting {
   bool? _isAddProductRequest;
   bool? _isUpdateProductRequest;
   num? _minWithdrawalRequestedAmount;
+  num? _minSalonWalletBalance;
   num? _adminCommissionCharges;
   num? _cancelOrderCharges;
   Setting copyWith({
@@ -196,6 +200,7 @@ class Setting {
     bool? isAddProductRequest,
     bool? isUpdateProductRequest,
     num? minWithdrawalRequestedAmount,
+    num? minSalonWalletBalance,
     num? adminCommissionCharges,
     num? cancelOrderCharges,
   }) =>
@@ -226,6 +231,7 @@ class Setting {
         isAddProductRequest: isAddProductRequest ?? _isAddProductRequest,
         isUpdateProductRequest: isUpdateProductRequest ?? _isUpdateProductRequest,
         minWithdrawalRequestedAmount: minWithdrawalRequestedAmount ?? _minWithdrawalRequestedAmount,
+        minSalonWalletBalance: minSalonWalletBalance ?? _minSalonWalletBalance,
         adminCommissionCharges: adminCommissionCharges ?? _adminCommissionCharges,
         cancelOrderCharges: cancelOrderCharges ?? _cancelOrderCharges,
       );
@@ -255,6 +261,7 @@ class Setting {
   bool? get isAddProductRequest => _isAddProductRequest;
   bool? get isUpdateProductRequest => _isUpdateProductRequest;
   num? get minWithdrawalRequestedAmount => _minWithdrawalRequestedAmount;
+  num? get minSalonWalletBalance => _minSalonWalletBalance;
   num? get adminCommissionCharges => _adminCommissionCharges;
   num? get cancelOrderCharges => _cancelOrderCharges;
 
@@ -288,6 +295,7 @@ class Setting {
     map['isAddProductRequest'] = _isAddProductRequest;
     map['isUpdateProductRequest'] = _isUpdateProductRequest;
     map['minWithdrawalRequestedAmount'] = _minWithdrawalRequestedAmount;
+    map['minSalonWalletBalance'] = _minSalonWalletBalance;
     map['adminCommissionCharges'] = _adminCommissionCharges;
     map['cancelOrderCharges'] = _cancelOrderCharges;
     return map;

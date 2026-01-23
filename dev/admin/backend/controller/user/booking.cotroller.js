@@ -27,8 +27,20 @@ if (process.env.SENDGRID_API_KEY) {
 
 exports.getBookingBasedDate = async (req, res) => {
   try {
-    if (!req.query.date || !req.query.expertId || !req.query.salonId) {
+    // Validate required parameters
+    if (!req.query.date || !req.query.salonId) {
       return res.status(200).send({ status: false, message: "Oops Invalid Details!!" });
+    }
+
+    // Validate expertId - check if it's null, "null", empty, or undefined
+    const expertId = req.query.expertId;
+    if (!expertId || expertId === "null" || expertId === "undefined" || expertId.trim() === "") {
+      return res.status(200).send({ status: false, message: "Expert ID is required!!" });
+    }
+
+    // Validate if expertId is a valid ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(expertId)) {
+      return res.status(200).send({ status: false, message: "Invalid Expert ID format!!" });
     }
 
     const dayOfWeek = moment(req.query.date).format("dddd");
@@ -40,7 +52,7 @@ exports.getBookingBasedDate = async (req, res) => {
     const [holiday, salonTime, expert] = await Promise.all([
       Holiday.findOne({ date: req.query.date, salonId: salon._id }),
       salon.salonTime.find((time) => time.day == dayOfWeek),
-      Expert.findById(req.query.expertId),
+      Expert.findById(expertId),
     ]);
 
     if (holiday) {
@@ -99,7 +111,7 @@ exports.getBookingBasedDate = async (req, res) => {
     const timeSlots = [].concat(...bookings.map((booking) => booking.time));
 
     const busyExpert = await BusyExpert.findOne({
-      expertId: req.query.expertId,
+      expertId: expertId,
       date: req.query.date,
     });
 

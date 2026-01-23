@@ -8,6 +8,7 @@ import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/ui/home_screen/widget/view_all_screen_widget.dart';
 import 'package:salon_2/ui/payment_screen/controller/payment_screen_controller.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/ui/wallet_screen/controller/wallet_screen_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
@@ -65,33 +66,45 @@ class PaymentMethodView extends StatelessWidget {
     return GetBuilder<PaymentScreenController>(
       id: Constant.idSelectPaymentMethod,
       builder: (logic) {
+        // Get settings from splash controller to check which payment methods are enabled
+        final SplashController splashController = Get.find<SplashController>();
+        final isStripeEnabled = splashController.settingCategory?.setting?.isStripePay ?? false;
+        final isZitopayEnabled = splashController.settingCategory?.setting?.isZitopay ?? false;
+        final isRazorPayEnabled = splashController.settingCategory?.setting?.isRazorPay ?? false;
+        final isFlutterWaveEnabled = splashController.settingCategory?.setting?.isFlutterWave ?? false;
+
         return logic.isWalletAdd == true
-            ? const Column(
+            ? Column(
                 children: [
-                  PaymentTitleView(),
-                  // PaymentRazorPayView(), // Commented out for wallet recharge
-                  PaymentStripeView(),
-                  PaymentZitopayView(),
-                  // PaymentFlutterWaveView(), // Commented out for wallet recharge
+                  const PaymentTitleView(),
+                  // Only show enabled payment methods for wallet recharge
+                  if (isStripeEnabled) const PaymentStripeView(),
+                  if (isZitopayEnabled) const PaymentZitopayView(),
+                  if (isRazorPayEnabled) const PaymentRazorPayView(),
+                  if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
                 ],
               ).paddingAll(15)
             : Column(
                 children: [
-                  PaymentTitleView(),
+                  const PaymentTitleView(),
                   // Show the payment method that was already selected in booking screen
-                  if (logic.selectedPayment == "wallet") PaymentMyWalletView(),
-                  if (logic.selectedPayment == "Stripe") PaymentStripeView(),
-                  if (logic.selectedPayment == "Zitopay") PaymentZitopayView(),
+                  if (logic.selectedPayment == "wallet") const PaymentMyWalletView(),
+                  if (logic.selectedPayment == "Stripe" && isStripeEnabled) const PaymentStripeView(),
+                  if (logic.selectedPayment == "Zitopay" && isZitopayEnabled) const PaymentZitopayView(),
+                  if (logic.selectedPayment == "Razorpay" && isRazorPayEnabled) const PaymentRazorPayView(),
+                  if (logic.selectedPayment == "flutterWave" && isFlutterWaveEnabled) const PaymentFlutterWaveView(),
                   if (logic.selectedPayment == "cashAfterService")
-                    PaymentCashOnHandView(),
+                    const PaymentCashOnHandView(),
                   // Add other payment methods as needed
                   // Show all available payment methods if none selected
                   if (logic.selectedPayment == null || logic.selectedPayment == "")
                     ...[
-                      PaymentMyWalletView(),
-                      PaymentStripeView(),
-                      PaymentZitopayView(),
-                      PaymentCashOnHandView(),
+                      const PaymentMyWalletView(),
+                      if (isStripeEnabled) const PaymentStripeView(),
+                      if (isZitopayEnabled) const PaymentZitopayView(),
+                      if (isRazorPayEnabled) const PaymentRazorPayView(),
+                      if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
+                      const PaymentCashOnHandView(),
                     ],
 
                   // Show a message that payment method is already selected

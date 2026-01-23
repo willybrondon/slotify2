@@ -40,10 +40,23 @@ class ZitopayService {
       Get.put(CategoryDetailController());
   SearchScreenController searchScreenController =
       Get.put(SearchScreenController());
-  BookingScreenController bookingScreenController =
-      Get.put(BookingScreenController());
+  BookingScreenController? bookingScreenController;
   PaymentScreenController paymentScreenController =
-      Get.put(PaymentScreenController());
+      Get.find<PaymentScreenController>();
+
+  ZitopayService() {
+    // Try to get booking controller if available (may not be available for wallet recharge)
+    try {
+      if (Get.isRegistered<BookingScreenController>()) {
+        bookingScreenController = Get.find<BookingScreenController>();
+      } else {
+        // If not registered, try to put it (for direct payments)
+        bookingScreenController = Get.put(BookingScreenController());
+      }
+    } catch (e) {
+      log("BookingScreenController initialization: $e");
+    }
+  }
   BranchDetailController branchDetailController =
       Get.put(BranchDetailController());
   SelectBranchController selectBranchController =
@@ -223,7 +236,9 @@ class ZitopayService {
         }
       } else {
         log("Error during Zitopay payment - Status: ${response.statusCode}");
-        bookingScreenController.isLoading(false);
+        if (bookingScreenController != null) {
+          bookingScreenController!.isLoading(false);
+        }
 
         try {
           final errorResponse = jsonDecode(response.body);
@@ -237,7 +252,9 @@ class ZitopayService {
         }
       }
     } catch (e) {
-      bookingScreenController.isLoading(false);
+      if (bookingScreenController != null) {
+        bookingScreenController!.isLoading(false);
+      }
       log('Zitopay Payment Error: $e');
       Utils.showToast(Get.context!, "Payment failed: $e");
       rethrow;
@@ -246,9 +263,18 @@ class ZitopayService {
 
   Future<void> _processPaymentSuccess() async {
     try {
+      // Check if booking controller is available
+      if (bookingScreenController == null && paymentScreenController.isWalletAdd != true) {
+        log("Error: BookingScreenController not available for direct payment");
+        Utils.showToast(Get.context!, "Error: Booking controller not available");
+        return;
+      }
+
       // Set loading state
-      bookingScreenController.isLoading(true);
-      bookingScreenController.update([Constant.idProgressView]);
+      if (bookingScreenController != null) {
+        bookingScreenController!.isLoading(true);
+        bookingScreenController!.update([Constant.idProgressView]);
+      }
       
       if (paymentScreenController.isWalletAdd == true) {
         // Wallet recharge
@@ -259,15 +285,19 @@ class ZitopayService {
         );
 
         if (paymentScreenController.depositToWalletModel?.status == true) {
-          bookingScreenController.isLoading(false);
-          bookingScreenController.update([Constant.idProgressView]);
+          if (bookingScreenController != null) {
+            bookingScreenController!.isLoading(false);
+            bookingScreenController!.update([Constant.idProgressView]);
+          }
           Utils.showToast(
               Get.context!,
               paymentScreenController.depositToWalletModel?.message ?? "");
           Get.back();
         } else {
-          bookingScreenController.isLoading(false);
-          bookingScreenController.update([Constant.idProgressView]);
+          if (bookingScreenController != null) {
+            bookingScreenController!.isLoading(false);
+            bookingScreenController!.update([Constant.idProgressView]);
+          }
           Utils.showToast(
               Get.context!,
               paymentScreenController.depositToWalletModel?.message ?? "");
@@ -275,42 +305,51 @@ class ZitopayService {
       } else {
         // Direct payment - use passed data from payment controller
         // Recalculate total with discount before creating booking
-        bookingScreenController.calculateTotalWithDiscount();
+        if (bookingScreenController != null) {
+          bookingScreenController!.calculateTotalWithDiscount();
+        }
 
         // Use the recalculated totalPrice (includes coupon discount)
-        double finalAmount = bookingScreenController.totalPrice;
+        double finalAmount = bookingScreenController?.totalPrice ?? 0.0;
 
         // Ensure withoutTax is sent as double with 2 decimal places
-        double withoutTaxValue = double.parse(
-            bookingScreenController.withOutTaxRupee.toStringAsFixed(2));
+        double withoutTaxValue = bookingScreenController != null
+            ? double.parse(
+                bookingScreenController!.withOutTaxRupee.toStringAsFixed(2))
+            : 0.0;
 
-        await bookingScreenController.onCreateBookingApiCall(
+        if (bookingScreenController == null) {
+          Utils.showToast(Get.context!, "Error: Booking controller not available");
+          return;
+        }
+
+        await bookingScreenController!.onCreateBookingApiCall(
           userId: Constant.storage.read<String>('userId') ?? "",
           expertId: expertIds.isNotEmpty
               ? expertIds
               : (Constant.storage.read<String>('expertDetail') != null
                   ? Constant.storage.read<String>('expertDetail').toString()
-                  : Constant.storage.read<String>('expertId').toString()),
+                  : Constant.storage.read<String>('expertId') ?? ""),
           serviceId: serviceIds.isNotEmpty
               ? serviceIds
-              : bookingScreenController.serviceId.join(","),
-          salonId: bookingScreenController.salonId.toString(),
+              : bookingScreenController!.serviceId.join(","),
+          salonId: bookingScreenController!.salonId.toString(),
           date: dates.isNotEmpty
               ? dates
-              : bookingScreenController.formattedDate.toString(),
+              : bookingScreenController!.formattedDate.toString(),
           time: times.isNotEmpty
               ? times
-              : bookingScreenController.slotsString.toString(),
+              : bookingScreenController!.slotsString.toString(),
           amount: finalAmount, // Use recalculated totalPrice with coupon discount
           withoutTax: withoutTaxValue, // Send as double with 2 decimal places
           paymentType: "Zitopay", // Use Zitopay as payment type
-          atPlace: bookingScreenController.selectedVenue == "At Salon" ? 1 : 2,
-          address: bookingScreenController.searchEditingController.text,
+          atPlace: bookingScreenController!.selectedVenue == "At Salon" ? 1 : 2,
+          address: bookingScreenController!.searchEditingController.text,
         );
 
-        if (bookingScreenController.createBookingCategory?.status == true) {
-          bookingScreenController.isLoading(false);
-          bookingScreenController.update([Constant.idProgressView]);
+        if (bookingScreenController!.createBookingCategory?.status == true) {
+          bookingScreenController!.isLoading(false);
+          bookingScreenController!.update([Constant.idProgressView]);
           
           Utils.showToast(
               Get.context!, "Payment successful! Booking created.");
@@ -327,18 +366,20 @@ class ZitopayService {
             ),
           );
         } else {
-          bookingScreenController.isLoading(false);
-          bookingScreenController.update([Constant.idProgressView]);
+          bookingScreenController!.isLoading(false);
+          bookingScreenController!.update([Constant.idProgressView]);
           
           Utils.showToast(
               Get.context!,
-              bookingScreenController.createBookingCategory?.message ??
+              bookingScreenController!.createBookingCategory?.message ??
                   "Booking failed");
         }
       }
     } catch (e) {
-      bookingScreenController.isLoading(false);
-      bookingScreenController.update([Constant.idProgressView]);
+      if (bookingScreenController != null) {
+        bookingScreenController!.isLoading(false);
+        bookingScreenController!.update([Constant.idProgressView]);
+      }
       log("Error processing Zitopay payment success: $e");
       Utils.showToast(Get.context!, "Error processing payment: $e");
     }
