@@ -30,8 +30,11 @@ exports.update = async (req, res) => {
 
     setting.minWithdrawalRequestedAmount = req.body.minWithdrawalRequestedAmount ? parseInt(req.body.minWithdrawalRequestedAmount) : setting.minWithdrawalRequestedAmount;
     setting.minSalonWalletBalance = req.body.minSalonWalletBalance ? parseFloat(req.body.minSalonWalletBalance) : setting.minSalonWalletBalance;
+    setting.minUserWalletBalance = req.body.minUserWalletBalance ? parseFloat(req.body.minUserWalletBalance) : setting.minUserWalletBalance;
     setting.tax = req.body.tax ? parseInt(req.body.tax) : setting.tax;
     setting.adminCommissionCharges = req.body.adminCommissionCharges ? parseInt(req.body.adminCommissionCharges) : setting.adminCommissionCharges;
+    setting.customerCommissionCharges = req.body.customerCommissionCharges ? parseFloat(req.body.customerCommissionCharges) : setting.customerCommissionCharges;
+    setting.salonCommissionCharges = req.body.salonCommissionCharges ? parseFloat(req.body.salonCommissionCharges) : setting.salonCommissionCharges;
     setting.cancelOrderCharges = req.body.cancelOrderCharges ? parseInt(req.body.cancelOrderCharges) : setting.cancelOrderCharges;
 
     setting.tnc = req.body.tnc ? req.body.tnc : setting.tnc;

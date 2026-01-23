@@ -8,6 +8,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_2/custom/bottom_sheet/payment_bottom_sheet.dart';
 import 'package:salon_2/custom/dialog/confirm_dialog.dart';
+import 'package:salon_2/custom/dialog/insufficient_wallet_dialog.dart';
 import 'package:salon_2/custom/dialog/success_dialog.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
@@ -1108,11 +1109,91 @@ class BookingScreenController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         createBookingCategory = CreateBookingModel.fromJson(jsonResponse);
+        
+        // Check if booking failed due to insufficient wallet balance
+        // Check both the status and the insufficientWallet flag
+        if (jsonResponse['status'] == false && jsonResponse['insufficientWallet'] == true) {
+          log("Booking failed due to insufficient wallet balance");
+          
+          try {
+            final currentBalance = (jsonResponse['currentBalance'] ?? 0.0).toDouble();
+            final requiredBalance = (jsonResponse['requiredBalance'] ?? 0.0).toDouble();
+            final deficit = (jsonResponse['deficit'] ?? (requiredBalance - currentBalance)).toDouble();
+            
+            // Get currency symbol from settings
+            final SplashController splashController = Get.find<SplashController>();
+            final currencySymbol = splashController.settingCategory?.setting?.currencySymbol ?? "";
+            
+            // Show insufficient wallet dialog
+            Get.dialog(
+              barrierColor: AppColors.blackColor.withOpacity(0.8),
+              Dialog(
+                backgroundColor: AppColors.transparent,
+                shadowColor: AppColors.transparent,
+                elevation: 0,
+                child: InsufficientWalletDialog(
+                  currentBalance: currentBalance,
+                  requiredBalance: requiredBalance,
+                  deficit: deficit,
+                  currencySymbol: currencySymbol,
+                ),
+              ),
+            );
+            
+            // Don't show toast for this error as we're showing a dialog
+            return;
+          } catch (e) {
+            log("Error parsing insufficient wallet response: $e");
+            // Fall through to show toast if parsing fails
+          }
+        }
       }
 
       // Check if booking failed due to inactive/invalid coupon
       if (createBookingCategory?.status == false) {
         String errorMessage = createBookingCategory?.message.toString() ?? "";
+        
+        // Also check error message for insufficient wallet (fallback)
+        if (errorMessage.toLowerCase().contains("insufficient wallet") ||
+            errorMessage.toLowerCase().contains("solde insuffisant") ||
+            errorMessage.toLowerCase().contains("minimum balance")) {
+          log("Booking failed due to insufficient wallet balance (detected from message)");
+          
+          // Try to parse balance details from error message or use defaults
+          try {
+            final jsonResponse = jsonDecode(response.body);
+            final currentBalance = (jsonResponse['currentBalance'] ?? 0.0).toDouble();
+            final requiredBalance = (jsonResponse['requiredBalance'] ?? 0.0).toDouble();
+            final deficit = (jsonResponse['deficit'] ?? (requiredBalance - currentBalance)).toDouble();
+            
+            // Get currency symbol from settings
+            final SplashController splashController = Get.find<SplashController>();
+            final currencySymbol = splashController.settingCategory?.setting?.currencySymbol ?? "";
+            
+            // Show insufficient wallet dialog
+            Get.dialog(
+              barrierColor: AppColors.blackColor.withOpacity(0.8),
+              Dialog(
+                backgroundColor: AppColors.transparent,
+                shadowColor: AppColors.transparent,
+                elevation: 0,
+                child: InsufficientWalletDialog(
+                  currentBalance: currentBalance,
+                  requiredBalance: requiredBalance,
+                  deficit: deficit,
+                  currencySymbol: currencySymbol,
+                ),
+              ),
+            );
+            
+            // Don't show toast for this error as we're showing a dialog
+            return;
+          } catch (e) {
+            log("Error parsing insufficient wallet response: $e");
+            // Fall through to show toast if parsing fails
+          }
+        }
+        
         // If error is about inactive/invalid coupon, reset the coupon
         if (errorMessage.toLowerCase().contains("inactive coupon") ||
             errorMessage.toLowerCase().contains("invalid coupon")) {

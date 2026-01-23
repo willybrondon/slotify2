@@ -28,12 +28,13 @@ const userWalletHistorySchema = new mongoose.Schema(
     couponAmount: { type: Number, default: 0 }, //discount OR bonus
 
     paymentGateway: { type: Number, default: 1, enum: PAYMENT_GATEWAY },
-    type: { type: Number, enum: [1, 2, 3, 4, 5] },
+    type: { type: Number, enum: [1, 2, 3, 4, 5, 6] },
     //1.amount deposite at the time of add wallet
     //2.amount deduct at the time of booking (salon's fee + tax)
     //3.amount deduct at the time of product purchase
     //4.order cancel charges
     //5.amount refund at the time of order cancel
+    //6.amount deduct for platform commission (on booking)
 
     date: { type: String, default: moment().format("YYYY-MM-DD") },
     time: { type: String, default: moment().format("HH:mm a") },

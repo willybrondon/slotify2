@@ -5,8 +5,9 @@ import Button from "./extras/Button";
 import { depositToWallet, getWalletHistory } from "../redux/slice/withDrawSlice";
 import { toast } from "react-toastify";
 import { getCurrency, getSetting } from "../redux/slice/settingSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import withDrawBanner from "../assets/images/withDraw.png";
+import { baseURL, secretKey } from "../util/config";
 
 const Wallet = () => {
     const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const Wallet = () => {
     const { admin } = useSelector((state) => state.auth);
     const { walletBalance, isSkeleton } = useSelector((state) => state.withDraw);
     const { currency } = useSelector((state) => state.setting);
+    const [searchParams] = useSearchParams();
     
     const [amount, setAmount] = useState("");
     const [selectedAmount, setSelectedAmount] = useState("");
@@ -37,11 +39,61 @@ const Wallet = () => {
         availablePaymentMethods.push({ value: "Zitopay", label: "Zitopay" });
     }
 
+    const handleStripePaymentSuccess = async (sessionId) => {
+        try {
+            setIsProcessing(true);
+            const response = await fetch(
+                `${baseURL}/salon/handleStripePaymentSuccess?session_id=${sessionId}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "key": secretKey,
+                        "Authorization": sessionStorage.getItem("token") || "",
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (data.status) {
+                toast.success(data.message || "Payment successful! Wallet credited.");
+                setAmount("");
+                setSelectedAmount("");
+                // Refresh wallet history and balance
+                dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
+                // Remove query params from URL
+                navigate("/salonpanel/wallet", { replace: true });
+            } else {
+                toast.error(data.message || "Payment verification failed");
+            }
+        } catch (error) {
+            console.error("Payment success handler error:", error);
+            toast.error("An error occurred while processing payment");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     useEffect(() => {
         dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
         dispatch(getCurrency());
         dispatch(getSetting()); // Also fetch from salon/getCurrency to ensure we have all data
-    }, [dispatch]);
+
+        // Handle Stripe payment callback
+        const paymentStatus = searchParams.get("payment");
+        const sessionId = searchParams.get("session_id");
+
+        if (paymentStatus === "success" && sessionId) {
+            // Call backend to verify and process payment
+            handleStripePaymentSuccess(sessionId);
+        } else if (paymentStatus === "cancelled") {
+            toast.info("Payment was cancelled. You can try again when ready.");
+            // Remove query params from URL
+            navigate("/salonpanel/wallet", { replace: true });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, searchParams, navigate]);
 
     // Set default payment method if available
     useEffect(() => {
@@ -79,47 +131,75 @@ const Wallet = () => {
         setAmountError(false);
 
         try {
-            // Map payment method to gateway number
-            const paymentGatewayMap = {
-                "Stripe": "STRIPE",
-                "Zitopay": "ZITOPAY"
-            };
+            if (paymentMethod === "Stripe") {
+                // Create Stripe Checkout Session
+                const response = await fetch(
+                    `${baseURL}/salon/createStripeCheckoutSession?amount=${rechargeAmount}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "key": secretKey,
+                            "Authorization": sessionStorage.getItem("token") || "",
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
 
-            const paymentGateway = paymentGatewayMap[paymentMethod] || "STRIPE";
+                const data = await response.json();
 
-            // For now, we'll use a simple approach - redirect to payment gateway
-            // In a real implementation, you'd integrate Stripe/Zitopay payment flow here
-            // For Stripe/Zitopay, you'd typically:
-            // 1. Create a payment intent/session
-            // 2. Redirect user to payment page
-            // 3. Handle callback/webhook
-            // 4. Call depositToWallet API on success
-
-            // For now, we'll show a message that payment integration is needed
-            toast.info(`Redirecting to ${paymentMethod} payment...`);
-            
-            // TODO: Implement actual payment gateway integration
-            // This is a placeholder - you'll need to integrate with Stripe/Zitopay
-            // Similar to how it's done in the Flutter customer app
-            
-            // After successful payment, call:
-            // const result = await dispatch(depositToWallet({
-            //     amount: parseFloat(rechargeAmount),
-            //     paymentGateway: paymentGateway
-            // }));
-            
-            // if (result.payload?.status) {
-            //     toast.success("Wallet recharged successfully!");
-            //     setAmount("");
-            //     setSelectedAmount("");
-            //     dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
-            // } else {
-            //     toast.error(result.payload?.message || "Failed to recharge wallet");
-            // }
-
+                if (data.status && data.checkoutUrl) {
+                    // Redirect to Stripe Checkout
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    toast.error(data.message || "Failed to create payment session");
+                    setIsProcessing(false);
+                }
+            } else if (paymentMethod === "Zitopay") {
+                // TODO: Implement Zitopay payment flow for web
+                toast.info("Zitopay payment integration for web is coming soon. Please use Stripe for now.");
+                setIsProcessing(false);
+            } else {
+                toast.error("Selected payment method is not supported");
+                setIsProcessing(false);
+            }
         } catch (error) {
             console.error("Wallet recharge error:", error);
             toast.error("An error occurred during wallet recharge");
+            setIsProcessing(false);
+        }
+    };
+
+    const handleStripePaymentSuccess = async (sessionId) => {
+        try {
+            setIsProcessing(true);
+            const response = await fetch(
+                `${baseURL}/salon/handleStripePaymentSuccess?session_id=${sessionId}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "key": secretKey,
+                        "Authorization": sessionStorage.getItem("token") || "",
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (data.status) {
+                toast.success(data.message || "Payment successful! Wallet credited.");
+                setAmount("");
+                setSelectedAmount("");
+                // Refresh wallet history and balance
+                dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
+                // Remove query params from URL
+                navigate("/salonpanel/wallet", { replace: true });
+            } else {
+                toast.error(data.message || "Payment verification failed");
+            }
+        } catch (error) {
+            console.error("Payment success handler error:", error);
+            toast.error("An error occurred while processing payment");
         } finally {
             setIsProcessing(false);
         }

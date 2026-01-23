@@ -44,8 +44,10 @@ const bookingSchema = new mongoose.Schema(
       minAmountToApply: { type: Number, default: 0 },
     },
 
-    platformFee: { type: Number, default: 0 }, //admin income (withoutTax * platformFeePercent / 100)
-    platformFeePercent: { type: Number, default: 0 },
+    platformFee: { type: Number, default: 0 }, //admin income from salon (withoutTax * platformFeePercent / 100)
+    platformFeePercent: { type: Number, default: 0 }, //salon commission percentage
+    customerCommission: { type: Number, default: 0 }, //admin income from customer (withoutTax * customerCommissionPercent / 100)
+    customerCommissionPercent: { type: Number, default: 0 }, //customer commission percentage
 
     salonEarning: { type: Number, default: 0 }, //salon income(withoutTax - platformFee)
     salonCommission: { type: Number, default: 0 },

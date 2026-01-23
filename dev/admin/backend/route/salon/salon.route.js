@@ -41,5 +41,7 @@ route.patch("/manageBreak", checkAccessWithSecretKey(), salon, salonController.m
 route.get("/fetchSalonWalletHistory", checkAccessWithSecretKey(), salon, salonController.fetchSalonWalletHistory);
 route.post("/depositeToWallet", checkAccessWithSecretKey(), salon, salonController.depositeToWallet);
 route.get("/walletHistory", checkAccessWithSecretKey(), salon, salonController.walletHistory);
+route.get("/createStripeCheckoutSession", checkAccessWithSecretKey(), salon, salonController.createStripeCheckoutSession);
+route.get("/handleStripePaymentSuccess", checkAccessWithSecretKey(), salon, salonController.handleStripePaymentSuccess);
 
 module.exports = route;

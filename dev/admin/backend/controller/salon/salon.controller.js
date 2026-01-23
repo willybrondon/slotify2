@@ -4,6 +4,7 @@ const Setting = require("../../models/setting.model");
 const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
 const { PAYMENT_GATEWAY } = require("../../types/constant");
+const stripe = require("stripe");
 
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -637,6 +638,162 @@ exports.depositeToWallet = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};
+
+// Create Stripe Checkout Session for salon wallet recharge
+exports.createStripeCheckoutSession = async (req, res) => {
+  try {
+    const { amount } = req.query;
+    const salonId = req.salon._id;
+
+    if (!amount || parseFloat(amount) <= 0) {
+      return res.status(200).json({ status: false, message: "Invalid amount." });
+    }
+
+    const salon = await Salon.findById(salonId);
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon not found." });
+    }
+
+    if (!salon.isActive) {
+      return res.status(200).json({ status: false, message: "Salon account is inactive." });
+    }
+
+    // Get Stripe settings
+    const setting = await Setting.findOne().sort({ createdAt: -1 });
+    if (!setting || !setting.isStripePay || !setting.stripeSecretKey) {
+      return res.status(200).json({ status: false, message: "Stripe is not configured or enabled." });
+    }
+
+    // Initialize Stripe with secret key
+    const stripeInstance = stripe(setting.stripeSecretKey);
+
+    // Get currency from settings
+    const currency = (setting.currencyName || "usd").toLowerCase();
+    const currencySymbol = setting.currencySymbol || "";
+
+    // Convert amount to cents (Stripe uses smallest currency unit)
+    // For XAF and other currencies that don't use cents, use the amount as-is
+    const amountInSmallestUnit = currency === "xaf" || currency === "eur" ? Math.round(parseFloat(amount) * 100) : Math.round(parseFloat(amount) * 100);
+
+    // Get base URL for callbacks
+    const baseURL = process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com";
+    const successURL = `${baseURL}/salonpanel/wallet?payment=success&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelURL = `${baseURL}/salonpanel/wallet?payment=cancelled`;
+
+    // Create Stripe Checkout Session
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: currency,
+            product_data: {
+              name: "Salon Wallet Recharge",
+              description: `Recharge wallet for ${salon.name}`,
+            },
+            unit_amount: amountInSmallestUnit,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: successURL,
+      cancel_url: cancelURL,
+      metadata: {
+        salonId: salonId.toString(),
+        amount: amount,
+        type: "wallet_recharge",
+      },
+      customer_email: salon.email || undefined,
+    });
+
+    return res.status(200).json({
+      status: true,
+      message: "Stripe Checkout Session created successfully.",
+      checkoutUrl: session.url,
+      sessionId: session.id,
+    });
+  } catch (error) {
+    console.error("Stripe Checkout Session creation error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+// Handle Stripe payment success callback (called after payment is confirmed)
+exports.handleStripePaymentSuccess = async (req, res) => {
+  try {
+    const { session_id } = req.query;
+
+    if (!session_id) {
+      return res.status(200).json({ status: false, message: "Session ID is required." });
+    }
+
+    // Get Stripe settings
+    const setting = await Setting.findOne().sort({ createdAt: -1 });
+    if (!setting || !setting.stripeSecretKey) {
+      return res.status(200).json({ status: false, message: "Stripe is not configured." });
+    }
+
+    // Initialize Stripe
+    const stripeInstance = stripe(setting.stripeSecretKey);
+
+    // Retrieve the checkout session
+    const session = await stripeInstance.checkout.sessions.retrieve(session_id);
+
+    if (session.payment_status !== "paid") {
+      return res.status(200).json({
+        status: false,
+        message: "Payment not completed.",
+      });
+    }
+
+    // Get salon ID from metadata
+    const salonId = session.metadata?.salonId;
+    const amount = parseFloat(session.metadata?.amount || session.amount_total / 100);
+
+    if (!salonId) {
+      return res.status(200).json({ status: false, message: "Salon ID not found in session." });
+    }
+
+    const salon = await Salon.findById(salonId);
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon not found." });
+    }
+
+    // Add amount to salon wallet
+    salon.wallet = (salon.wallet || 0) + amount;
+    await salon.save();
+
+    // Create wallet history entry
+    const uniqueId = await generateUniqueIdentifier();
+    const walletHistory = new SalonExpertWalletHistory({
+      salon: salon._id,
+      amount: amount,
+      paymentGateway: PAYMENT_GATEWAY.STRIPE,
+      type: 2, // CREDIT_FROM_SELF (salon owner self-recharge)
+      date: moment().format("YYYY-MM-DD"),
+      time: moment().format("HH:mm a"),
+      uniqueId: uniqueId,
+    });
+
+    await walletHistory.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Payment successful! Wallet credited.",
+      walletBalance: salon.wallet,
+    });
+  } catch (error) {
+    console.error("Stripe payment success handler error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
   }
 };
 

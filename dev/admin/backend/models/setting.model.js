@@ -27,13 +27,16 @@ const settingSchema = new mongoose.Schema(
     flutterWaveKey: { type: String, default: "" },
     isFlutterWave: { type: Boolean, default: false },
 
-    adminCommissionCharges: { type: Number, default: 0 },
+    adminCommissionCharges: { type: Number, default: 0 }, // Commission for product orders
+    customerCommissionCharges: { type: Number, default: 0 }, // Commission percentage charged from customers on bookings
+    salonCommissionCharges: { type: Number, default: 0 }, // Commission percentage charged from salon owners on bookings (replaces platformFee from salon model)
     cancelOrderCharges: { type: Number, default: 0 },
 
     firebaseKey: { type: Object, default: {} },
 
     minWithdrawalRequestedAmount: { type: Number, default: 0 }, //min amount required for withdrawal by salon OR expert
     minSalonWalletBalance: { type: Number, default: 0 }, //minimum wallet balance required for salon to accept bookings
+    minUserWalletBalance: { type: Number, default: 0 }, //minimum wallet balance required for customer to make bookings
 
     isAddProductRequest: { type: Boolean, default: false }, //false then directly product add by seller, true then product add through request
     isUpdateProductRequest: { type: Boolean, default: false }, //false then directly product update by seller, true then product update through request

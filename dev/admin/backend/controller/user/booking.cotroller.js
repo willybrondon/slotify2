@@ -9,8 +9,10 @@ const Notification = require("../../models/notification.model");
 const UString = require("../../models/uniqueString.model");
 const UserWalletHistory = require("../../models/userWalletHistory.model");
 const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
+const SalonWalletHistory = require("../../models/salonWalletHistory.model");
 const Coupon = require("../../models/coupon.model");
 const Setting = require("../../models/setting.model");
+const { SALON_EXPERT_WALLET_TYPE, USER_WALLET_TYPE } = require("../../types/constant");
 const { sendSMS } = require("../../services/sms.service");
 const sgMail = require("@sendgrid/mail");
 
@@ -176,6 +178,10 @@ exports.newBooking = async (req, res, next) => {
     const minSalonWalletBalance = setting?.minSalonWalletBalance || 0;
     const salonWalletBalance = salon.wallet || 0;
 
+    // Get commission percentages from settings (or fall back to salon.platformFee for backward compatibility)
+    const salonCommissionPercent = setting?.salonCommissionCharges || salon.platformFee || 0;
+    const customerCommissionPercent = setting?.customerCommissionCharges || 0;
+
     // Calculate expected commission for this booking (will be calculated again later, but need early check)
     const services = req.body.serviceId.split(",");
     const servicesDataForCheck = await Service.find({ _id: { $in: services } });
@@ -187,8 +193,8 @@ exports.newBooking = async (req, res, next) => {
       totalServicePriceForCheck += parseInt(service.price);
     });
     
-    // Calculate platform fee (commission that will be deducted)
-    const expectedPlatformFee = (salon.platformFee * totalServicePriceForCheck) / 100;
+    // Calculate platform fee (commission that will be deducted from salon)
+    const expectedPlatformFee = (salonCommissionPercent * totalServicePriceForCheck) / 100;
     const requiredBalance = minSalonWalletBalance + expectedPlatformFee;
 
     // Check if salon has sufficient wallet balance
@@ -307,6 +313,135 @@ L'équipe Skedisy`;
       return res.status(200).send({
         status: false,
         message: `Salon wallet balance is insufficient. Required: ${requiredBalance.toFixed(2)}, Current: ${salonWalletBalance.toFixed(2)}. Please recharge your wallet to accept bookings.`,
+      });
+    }
+
+    // Calculate commission that will be deducted from customer wallet
+    // Use customerCommissionPercent from settings (or 0 if not set)
+    const expectedCustomerCommission = customerCommissionPercent > 0 ? (customerCommissionPercent * totalServicePriceForCheck) / 100 : 0;
+    // Customer needs: minimum balance + booking amount + commission
+    // Note: req.body.amount is the final amount (with tax, minus discount), which is what will be deducted
+    const requiredCustomerBalance = minUserWalletBalance + parseFloat(req.body.amount) + expectedCustomerCommission;
+    
+    // Check if customer has minimum wallet balance + booking amount + commission
+    if (userWalletBalance < requiredCustomerBalance) {
+      const currencySymbol = global.settingJSON?.currencySymbol || "";
+      const deficit = requiredCustomerBalance - userWalletBalance;
+      
+      // Send SMS and Email notification to customer about insufficient wallet balance
+      setImmediate(async () => {
+        try {
+          // SMS Notification
+          if (user.mobile && user.mobile.trim() !== "") {
+            try {
+              const smsMessage = `⚠️ ALERTE: Votre solde de portefeuille est insuffisant!
+
+Vous ne pouvez pas finaliser votre réservation car votre solde de portefeuille est insuffisant.
+
+Solde actuel: ${currencySymbol}${userWalletBalance.toFixed(2)}
+Solde requis: ${currencySymbol}${requiredCustomerBalance.toFixed(2)}
+Détails: Réservation (${currencySymbol}${parseFloat(req.body.amount || 0).toFixed(2)}) + Commission (${currencySymbol}${expectedCustomerCommission.toFixed(2)}) + Minimum (${currencySymbol}${minUserWalletBalance.toFixed(2)})
+
+Veuillez recharger votre portefeuille depuis l'application pour continuer à effectuer des réservations.
+
+Merci,
+L'équipe Skedisy`;
+
+              const smsResult = await sendSMS(user.mobile, smsMessage);
+              if (smsResult.success) {
+                console.log(`[Customer Wallet Alert] SMS sent successfully to user ${user.fname} ${user.lname} (${user.mobile})`);
+              } else {
+                console.error(`[Customer Wallet Alert] Failed to send SMS to user ${user.fname} ${user.lname}:`, smsResult.error);
+              }
+            } catch (smsError) {
+              console.error(`[Customer Wallet Alert] Error sending SMS to user ${user.fname} ${user.lname}:`, smsError.message);
+            }
+          }
+
+          // Email Notification
+          if (user.email && user.email.trim() !== "" && process.env.SENDGRID_API_KEY) {
+            try {
+              const websiteLink = process.env.WEBSITE_URL || "https://skedisy.com";
+              const supportEmail = process.env.SUPPORT_EMAIL || "support@skedisy.com";
+              const contactNumber = process.env.CONTACT_NUMBER || "+33 7 66 16 03 94";
+
+              const emailHtml = `
+              <!DOCTYPE html>
+              <html lang="fr">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+                  .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+                  h2 { color: #d32f2f; }
+                  .alert-box { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                  .info-box { background-color: #f0f8ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                  .info-box p { margin: 8px 0; }
+                  .button { display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+                  .button:hover { background-color: #0056b3; }
+                  .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9em; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <h2>⚠️ Alerte: Solde de Portefeuille Insuffisant</h2>
+                  
+                  <div class="alert-box">
+                    <p><strong>Cher client,</strong></p>
+                    <p>Vous ne pouvez actuellement pas finaliser votre réservation car votre solde de portefeuille est insuffisant.</p>
+                  </div>
+
+                  <div class="info-box">
+                    <p><strong>Détails du solde:</strong></p>
+                    <p>Solde actuel: <strong>${currencySymbol}${userWalletBalance.toFixed(2)}</strong></p>
+                    <p>Solde requis: <strong>${currencySymbol}${requiredCustomerBalance.toFixed(2)}</strong></p>
+                    <p>Détails: Montant réservation (${currencySymbol}${estimatedBookingAmount.toFixed(2)}) + Commission (${currencySymbol}${expectedCustomerCommission.toFixed(2)}) + Minimum requis (${currencySymbol}${minUserWalletBalance.toFixed(2)})</p>
+                    <p>Déficit: <strong>${currencySymbol}${deficit.toFixed(2)}</strong></p>
+                  </div>
+
+                  <p>Pour continuer à effectuer des réservations, veuillez recharger votre portefeuille depuis l'application.</p>
+                  
+                  <div class="info-box">
+                    <p><strong>Besoin d'aide?</strong></p>
+                    <p>Site web: <a href="${websiteLink}" style="color: #007bff; text-decoration: none;">${websiteLink}</a></p>
+                    <p>Email: <a href="mailto:${supportEmail}" style="color: #007bff; text-decoration: none;">${supportEmail}</a></p>
+                    <p>Téléphone: <a href="tel:${contactNumber}" style="color: #007bff; text-decoration: none;">${contactNumber}</a></p>
+                  </div>
+                  
+                  <div class="footer">
+                    <p>Cordialement,<br>L'équipe Skedisy</p>
+                  </div>
+                </div>
+              </body>
+              </html>
+            `;
+
+              const msg = {
+                to: user.email.trim(),
+                from: process.env.EMAIL || "noreply@skedisy.com",
+                subject: `⚠️ Alerte: Solde de Portefeuille Insuffisant - Réservation Non Finalisée`,
+                html: emailHtml,
+              };
+
+              await sgMail.send(msg);
+              console.log(`[Customer Wallet Alert] Email sent successfully to user ${user.fname} ${user.lname} (${user.email})`);
+            } catch (emailError) {
+              console.error(`[Customer Wallet Alert] Error sending email to user ${user.fname} ${user.lname}:`, emailError.message);
+            }
+          }
+        } catch (notificationError) {
+          console.error("[Customer Wallet Alert] Error in notification process:", notificationError.message);
+        }
+      });
+
+      return res.status(200).send({
+        status: false,
+        message: `Insufficient wallet balance. You need ${currencySymbol}${requiredCustomerBalance.toFixed(2)} (booking: ${currencySymbol}${parseFloat(req.body.amount || 0).toFixed(2)} + commission: ${currencySymbol}${expectedCustomerCommission.toFixed(2)} + minimum: ${currencySymbol}${minUserWalletBalance.toFixed(2)}). Your current balance is ${currencySymbol}${userWalletBalance.toFixed(2)}. Please recharge your wallet.`,
+        insufficientWallet: true, // Flag to identify this specific error in frontend
+        currentBalance: userWalletBalance,
+        requiredBalance: requiredCustomerBalance,
+        deficit: deficit,
       });
     }
 
@@ -540,9 +675,15 @@ L'équipe Skedisy`;
     booking.amount = req.body.amount;
     booking.tax = taxAmount.toFixed(2);
 
-    const platformFee = (salon.platformFee * req.body.withoutTax) / 100;
+    // Calculate salon commission (from settings or salon.platformFee as fallback)
+    const platformFee = (salonCommissionPercent * req.body.withoutTax) / 100;
     booking.platformFee = parseInt(platformFee);
-    booking.platformFeePercent = salon.platformFee.toFixed(2);
+    booking.platformFeePercent = salonCommissionPercent.toFixed(2);
+    
+    // Calculate and store customer commission (from settings)
+    const customerCommission = customerCommissionPercent > 0 ? (customerCommissionPercent * req.body.withoutTax) / 100 : 0;
+    booking.customerCommission = parseInt(customerCommission);
+    booking.customerCommissionPercent = customerCommissionPercent.toFixed(2);
 
     const salonCommission = ((req.body.withoutTax - platformFee) * expert.commission) / 100;
     booking.salonCommission = salonCommission.toFixed(2);
@@ -579,18 +720,16 @@ L'équipe Skedisy`;
       salon.wallet = (salon.wallet || 0) - commissionAmount;
       await salon.save();
 
-      // Create wallet history entry
+      // Create wallet history entry using SalonExpertWalletHistory (correct model)
       const uniqueIdForSalonWallet = await generateUniqueIdentifier();
-      await new SalonWalletHistory({
+      await new SalonExpertWalletHistory({
         salon: salon._id,
         booking: booking._id,
         amount: commissionAmount,
-        type: 2, // Commission deduction
-        description: `Commission deducted for booking ${booking.bookingId}`,
+        type: SALON_EXPERT_WALLET_TYPE.DEBIT_PLATFORM_COMMISSION, // Type 3: amount debited for platform commission
         date: moment().format("YYYY-MM-DD"),
         time: moment().format("HH:mm a"),
         uniqueId: uniqueIdForSalonWallet,
-        addedBy: "system",
       }).save();
     }
 
@@ -655,21 +794,43 @@ L'équipe Skedisy`;
       await coupon.save();
     }
 
-    await Promise.all([
+    // Calculate customer commission amount (separate from salon commission)
+    const customerCommissionAmount = customerCommissionPercent > 0 ? parseFloat((customerCommissionPercent * req.body.withoutTax / 100).toFixed(2)) : 0;
+    
+    // Total amount to deduct from customer wallet = booking amount + commission (if any)
+    const totalDeductionAmount = parseFloat(totalAmount) + customerCommissionAmount;
+
+    // Check if customer has sufficient wallet balance for booking + commission (if commission > 0)
+    if (customerCommissionAmount > 0 && user.amount < totalDeductionAmount) {
+      return res.status(200).send({
+        status: false,
+        message: `Insufficient wallet balance. Required: ${totalDeductionAmount.toFixed(2)} (booking: ${totalAmount.toFixed(2)} + commission: ${customerCommissionAmount.toFixed(2)}), Current: ${user.amount.toFixed(2)}. Please recharge your wallet.`,
+      });
+    } else if (user.amount < parseFloat(totalAmount)) {
+      return res.status(200).send({
+        status: false,
+        message: `Insufficient wallet balance. Required: ${totalAmount.toFixed(2)}, Current: ${user.amount.toFixed(2)}. Please recharge your wallet.`,
+      });
+    }
+
+    // Prepare wallet history promises
+    const walletHistoryPromises = [
+      // Deduct booking amount from customer wallet
       User.updateOne(
-        { _id: user._id, amount: { $gt: 0 } },
+        { _id: user._id, amount: { $gte: totalDeductionAmount } },
         {
           $inc: {
-            amount: -totalAmount,
+            amount: -totalDeductionAmount, // Deduct booking amount + commission
           },
         }
       ),
+      // Wallet history for booking payment
       new UserWalletHistory({
         user: user._id,
         amount: totalAmount,
-        type: 2,
+        type: USER_WALLET_TYPE.DEBIT_BOOKING, // Type 2: amount deduct at the time of booking
         date: moment().format("YYYY-MM-DD"),
-        time: moment().format("HH:mm a"), //moment().format("hh:mm A")
+        time: moment().format("HH:mm a"),
         uniqueId: uniqueIdForWalletHistory,
         booking: booking._id,
         couponAmount: discountAmount,
@@ -684,7 +845,25 @@ L'équipe Skedisy`;
             }
           : {},
       }).save(),
-    ]);
+    ];
+
+    // Add commission wallet history only if commission > 0
+    if (customerCommissionAmount > 0) {
+      const uniqueIdForCustomerCommission = await generateUniqueIdentifier();
+      walletHistoryPromises.push(
+        new UserWalletHistory({
+          user: user._id,
+          amount: customerCommissionAmount,
+          type: USER_WALLET_TYPE.DEBIT_COMMISSION, // Type 6: amount deduct for platform commission
+          date: moment().format("YYYY-MM-DD"),
+          time: moment().format("HH:mm a"),
+          uniqueId: uniqueIdForCustomerCommission,
+          booking: booking._id,
+        }).save()
+      );
+    }
+
+    await Promise.all(walletHistoryPromises);
 
     if (expert && expert.fcmToken !== null) {
       const adminPromise = await admin;
