@@ -4,7 +4,7 @@ import Title from "./extras/Title";
 import Button from "./extras/Button";
 import { depositToWallet, getWalletHistory } from "../redux/slice/withDrawSlice";
 import { toast } from "react-toastify";
-import { getCurrency } from "../redux/slice/settingSlice";
+import { getCurrency, getSetting } from "../redux/slice/settingSlice";
 import { useNavigate } from "react-router-dom";
 import withDrawBanner from "../assets/images/withDraw.png";
 
@@ -25,17 +25,22 @@ const Wallet = () => {
     const quickAmounts = ["50", "100", "150", "200", "250", "300", "500"];
     
     // Get available payment methods from settings
+    // Both currency and setting come from salon/getCurrency (which includes payment flags)
+    // Priority: currency > setting
+    const settingsData = currency || setting || {};
+    
     const availablePaymentMethods = [];
-    if (setting?.isStripePay) {
+    if (settingsData?.isStripePay) {
         availablePaymentMethods.push({ value: "Stripe", label: "Stripe" });
     }
-    if (setting?.isZitopay) {
+    if (settingsData?.isZitopay) {
         availablePaymentMethods.push({ value: "Zitopay", label: "Zitopay" });
     }
 
     useEffect(() => {
         dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
         dispatch(getCurrency());
+        dispatch(getSetting()); // Also fetch from salon/getCurrency to ensure we have all data
     }, [dispatch]);
 
     // Set default payment method if available
@@ -120,7 +125,7 @@ const Wallet = () => {
         }
     };
 
-    const minSalonWalletBalance = setting?.minSalonWalletBalance || 0;
+    const minSalonWalletBalance = settingsData?.minSalonWalletBalance || 0;
     const isBalanceInsufficient = walletBalance < minSalonWalletBalance;
     const deficit = minSalonWalletBalance - walletBalance;
 
@@ -137,7 +142,7 @@ const Wallet = () => {
                             My Wallet Balance
                         </div>
                         <div style={{ position: "absolute", top: "20%", left: "16%", transform: "translateX(-50%)", color: "white", fontSize: "40px", zIndex: 2, fontWeight: "bold" }}>
-                            {currency?.currencySymbol || setting?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
+                            {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
                         </div>
 
                         {/* Image */}
@@ -147,13 +152,13 @@ const Wallet = () => {
                         {minSalonWalletBalance > 0 && (
                             <div className="mt-4">
                                 <div className={`alert ${isBalanceInsufficient ? "alert-warning" : "alert-info"}`} role="alert">
-                                    <strong>Minimum Required Balance:</strong> {currency?.currencySymbol || setting?.currencySymbol || ""} {minSalonWalletBalance.toFixed(2)}
+                                    <strong>Minimum Required Balance:</strong> {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {minSalonWalletBalance.toFixed(2)}
                                     <br />
                                     <small>
                                         {isBalanceInsufficient ? (
                                             <>
                                                 Your wallet balance is below the minimum required amount. 
-                                                You need to add at least <strong>{currency?.currencySymbol || setting?.currencySymbol || ""} {deficit.toFixed(2)}</strong> to accept bookings.
+                                                You need to add at least <strong>{currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {deficit.toFixed(2)}</strong> to accept bookings.
                                             </>
                                         ) : (
                                             "Your wallet must have at least this amount plus the commission fee to accept new bookings."
@@ -192,7 +197,7 @@ const Wallet = () => {
                             </label>
                             <div className="input-group mt-2" style={{ position: "relative", display: "flex", alignItems: "center" }}>
                                 <span className="input-group-text fw-bold" style={{ position: "relative", display: "flex", alignItems: "center", background: "#1C2B20", color: "white" }}>
-                                    {currency?.currencySymbol || setting?.currencySymbol || ""}
+                                    {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""}
                                 </span>
                                 <input
                                     type="number"
@@ -235,7 +240,7 @@ const Wallet = () => {
                                         onClick={() => handleAmountSelect(amt)}
                                         style={{ minWidth: "80px", padding: "8px 16px" }}
                                     >
-                                        {currency?.currencySymbol || setting?.currencySymbol || ""} {amt}
+                                        {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {amt}
                                     </button>
                                 ))}
                             </div>

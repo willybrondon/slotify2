@@ -430,7 +430,7 @@ exports.isActive = async (req, res) => {
 
 exports.getCurrency = async (req, res) => {
   try {
-    const setting = await Setting.findOne().select("currencyName currencySymbol");
+    const setting = await Setting.findOne().select("currencyName currencySymbol isStripePay isZitopay isRazorPay isFlutterWave minSalonWalletBalance");
     if (!setting) {
       return res.status(200).send({ status: false, message: "currency Not Found" });
     }

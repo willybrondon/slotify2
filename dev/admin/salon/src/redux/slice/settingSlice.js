@@ -15,7 +15,7 @@ export const getSetting = createAsyncThunk("salon/getSetting", async (payload) =
     return apiInstanceFetch.get("salon/getCurrency")
 })
 export const getCurrency = createAsyncThunk("salon/getCurrency", async (payload) => {
-    return apiInstanceFetch.get("admin/setting")
+    return apiInstanceFetch.get("salon/getCurrency")
 })
 
 
@@ -45,7 +45,9 @@ const settingSlice = createSlice({
 
         builder.addCase(getCurrency.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.currency = action.payload.setting
+            // salon/getCurrency returns { status: true, data: setting }
+            // admin/setting returns { status: true, setting }
+            state.currency = action.payload.data || action.payload.setting
         })
 
         builder.addCase(getCurrency.rejected, (state, action) => {
