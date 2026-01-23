@@ -211,12 +211,16 @@ echo "
 #                INSTALL FRONTEND              #
 ################################################
 "
+# Create config.js in the util directory
 cd /home/admin/frontend/src/util || exit
 cat > config.js << EOF
 export const baseURL = "https://$app_domain/";
 export const secretKey = "$shared_secret_key";
 export const projectName = "$app_name";
 EOF
+
+# Go back to frontend root directory for npm commands
+cd /home/admin/frontend || exit
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
@@ -226,10 +230,34 @@ echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm use 18.20.2
+
+# Build the frontend
+echo "Building frontend..."
 npm run build
+
+# Verify build was successful
+if [ ! -f "/home/admin/frontend/build/index.html" ]; then
+    echo "ERROR: Frontend build failed - index.html not found!"
+    echo "Build directory contents:"
+    ls -la /home/admin/frontend/build/ 2>/dev/null || echo "Build directory does not exist!"
+    exit 1
+fi
+
+echo "Frontend build successful. Deploying to backend..."
+# Remove old public directory and create new one
 sudo rm -rf /home/admin/backend/public
-mkdir -p /home/admin/backend/public
-sudo mv /home/admin/frontend/build/* /home/admin/backend/public
+sudo mkdir -p /home/admin/backend/public
+
+# Copy all build files (using cp instead of mv for better error handling)
+sudo cp -r /home/admin/frontend/build/* /home/admin/backend/public/
+
+# Verify deployment
+if [ ! -f "/home/admin/backend/public/index.html" ]; then
+    echo "ERROR: Failed to deploy frontend build - index.html not found in backend/public!"
+    exit 1
+fi
+
+echo "Frontend deployed successfully!"
 
 # Install salon dependencies and build
 echo "
@@ -237,12 +265,16 @@ echo "
 #                INSTALL SALON              #
 ################################################
 "
+# Create config.js in the util directory
 cd /home/admin/salon/src/util || exit
 cat > config.js << EOF
 export const baseURL = "https://$app_domain/";
 export const secretKey = "$shared_secret_key";
 export const projectName = "$app_name";
 EOF
+
+# Go back to salon root directory for npm commands
+cd /home/admin/salon || exit
 echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
@@ -252,10 +284,34 @@ echo $PATH
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm use 18.20.2
+
+# Build the salon frontend
+echo "Building salon frontend..."
 PUBLIC_URL=/salonpanel npm run build
+
+# Verify build was successful
+if [ ! -f "/home/admin/salon/build/index.html" ]; then
+    echo "ERROR: Salon build failed - index.html not found!"
+    echo "Build directory contents:"
+    ls -la /home/admin/salon/build/ 2>/dev/null || echo "Build directory does not exist!"
+    exit 1
+fi
+
+echo "Salon build successful. Deploying to backend..."
+# Remove old salon directory and create new one
 sudo rm -rf /home/admin/backend/salon
-mkdir -p /home/admin/backend/salon
-sudo mv /home/admin/salon/build/* /home/admin/backend/salon
+sudo mkdir -p /home/admin/backend/salon
+
+# Copy all build files (using cp instead of mv for better error handling)
+sudo cp -r /home/admin/salon/build/* /home/admin/backend/salon/
+
+# Verify deployment
+if [ ! -f "/home/admin/backend/salon/index.html" ]; then
+    echo "ERROR: Failed to deploy salon build - index.html not found in backend/salon!"
+    exit 1
+fi
+
+echo "Salon frontend deployed successfully!"
 
 
 # Deploy salonportal static files
