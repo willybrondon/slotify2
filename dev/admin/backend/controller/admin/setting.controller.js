@@ -54,6 +54,7 @@ exports.update = async (req, res) => {
     if (req.body.mtnMomoSubscriptionKey !== undefined) setting.mtnMomoSubscriptionKey = req.body.mtnMomoSubscriptionKey;
     if (req.body.mtnMomoApiUserId !== undefined) setting.mtnMomoApiUserId = req.body.mtnMomoApiUserId;
     if (req.body.mtnMomoApiKey !== undefined) setting.mtnMomoApiKey = req.body.mtnMomoApiKey;
+    if (req.body.mtnMomoCallbackHost !== undefined) setting.mtnMomoCallbackHost = req.body.mtnMomoCallbackHost;
     if (req.body.mtnMomoEnvironment !== undefined) setting.mtnMomoEnvironment = req.body.mtnMomoEnvironment;
 
     setting.flutterWaveKey = req.body.flutterWaveKey ? req.body.flutterWaveKey : setting.flutterWaveKey;

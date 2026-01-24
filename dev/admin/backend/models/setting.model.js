@@ -23,6 +23,7 @@ const settingSchema = new mongoose.Schema(
     mtnMomoSubscriptionKey: { type: String, default: "" }, // Subscription Key (Primary or Secondary from subscription) - REQUIRED for Ocp-Apim-Subscription-Key header
     mtnMomoApiUserId: { type: String, default: "" }, // API User ID (UUID created when creating API User) - REQUIRED for Basic Auth (Authorization: Basic base64(API_USER_ID:API_KEY))
     mtnMomoApiKey: { type: String, default: "" }, // API Key (generated for API User) - REQUIRED for Basic Auth (Authorization: Basic base64(API_USER_ID:API_KEY))
+    mtnMomoCallbackHost: { type: String, default: "" }, // Callback Host for MTN MoMo (e.g., "skedisy.com" or "api.skedisy.com") - Must match providerCallbackHost in MTN Developer Portal
     mtnMomoEnvironment: { type: String, default: "sandbox" }, // sandbox or production
     // Legacy fields (kept for backward compatibility, but not used for authentication)
     mtnMomoPrimaryKey: { type: String, default: "" }, // Legacy - kept for migration

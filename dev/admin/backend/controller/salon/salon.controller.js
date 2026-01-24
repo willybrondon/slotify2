@@ -1115,27 +1115,36 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     // Construct callback URL
     // IMPORTANT: This must match the providerCallbackHost configured when creating the API User
-    // providerCallbackHost should be set to your main domain (e.g., "https://skedisy.com")
-    // The callback URL will be: {providerCallbackHost}/salon/handleMTNMomoPaymentCallback
-    const baseURL = (process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com").replace(/\/+$/, ''); // Remove trailing slashes
-    
-    // Use the main domain for callback URL (not api subdomain)
-    // Extract domain from baseURL and construct callback URL
+    // If mtnMomoCallbackHost is set in settings, use it; otherwise derive from baseURL
     let callbackUrl;
-    try {
-      const urlObj = new URL(baseURL);
-      const hostname = urlObj.hostname; // Extract domain (e.g., "skedisy.com")
-      
-      // Remove any subdomain (like "api." or "www.") and use main domain
-      const mainDomain = hostname.replace(/^(www\.|api\.)/, ''); // Remove www. or api. prefix
-      callbackUrl = `https://${mainDomain}/salon/handleMTNMomoPaymentCallback`;
-    } catch (error) {
-      // Fallback: use baseURL directly, removing any subdomain
-      const cleanURL = baseURL.replace(/https?:\/\/(www\.|api\.)?/, "https://");
-      callbackUrl = `${cleanURL}/salon/handleMTNMomoPaymentCallback`;
-    }
     
-    console.log("MTN MoMo Callback URL:", callbackUrl);
+    if (setting.mtnMomoCallbackHost && setting.mtnMomoCallbackHost.trim() !== "") {
+      // Use configured callback host from settings
+      const callbackHost = setting.mtnMomoCallbackHost.trim();
+      // Remove protocol if present, then add https://
+      const cleanHost = callbackHost.replace(/^https?:\/\//, '');
+      callbackUrl = `https://${cleanHost}/salon/handleMTNMomoPaymentCallback`;
+      console.log("MTN MoMo Callback URL (from settings):", callbackUrl);
+    } else {
+      // Fallback: derive from baseURL
+      const baseURL = (process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com").replace(/\/+$/, ''); // Remove trailing slashes
+      
+      try {
+        const urlObj = new URL(baseURL);
+        const hostname = urlObj.hostname; // Extract domain (e.g., "skedisy.com")
+        
+        // Remove any subdomain (like "api." or "www.") and use main domain
+        const mainDomain = hostname.replace(/^(www\.|api\.)/, ''); // Remove www. or api. prefix
+        callbackUrl = `https://${mainDomain}/salon/handleMTNMomoPaymentCallback`;
+      } catch (error) {
+        // Fallback: use baseURL directly, removing any subdomain
+        const cleanURL = baseURL.replace(/https?:\/\/(www\.|api\.)?/, "https://");
+        callbackUrl = `${cleanURL}/salon/handleMTNMomoPaymentCallback`;
+      }
+      
+      console.log("MTN MoMo Callback URL (derived from baseURL):", callbackUrl);
+      console.log("⚠️ WARNING: Consider setting mtnMomoCallbackHost in Admin Settings to match your MTN Developer Portal configuration");
+    }
 
     const paymentHeaders = {
       "Authorization": `Bearer ${accessToken}`, // Access Token from OAuth

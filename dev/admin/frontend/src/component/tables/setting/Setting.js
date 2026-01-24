@@ -52,6 +52,7 @@ const Setting = (props) => {
   const [mtnMomoSubscriptionKey, setMtnMomoSubscriptionKey] = useState("");
   const [mtnMomoApiUserId, setMtnMomoApiUserId] = useState("");
   const [mtnMomoApiKey, setMtnMomoApiKey] = useState("");
+  const [mtnMomoCallbackHost, setMtnMomoCallbackHost] = useState("");
   const [mtnMomoEnvironment, setMtnMomoEnvironment] = useState("sandbox");
   // Legacy fields (kept for backward compatibility)
   const [mtnMomoPrimaryKey, setMtnMomoPrimaryKey] = useState("");
@@ -126,6 +127,7 @@ const Setting = (props) => {
       setMtnMomoSubscriptionKey(setting.mtnMomoSubscriptionKey || "");
       setMtnMomoApiUserId(setting.mtnMomoApiUserId || "");
       setMtnMomoApiKey(setting.mtnMomoApiKey || "");
+      setMtnMomoCallbackHost(setting.mtnMomoCallbackHost || "");
       setMtnMomoEnvironment(setting.mtnMomoEnvironment || "sandbox");
       // Legacy fields (for backward compatibility - migrate if needed)
       setMtnMomoPrimaryKey(setting.mtnMomoPrimaryKey || "");
@@ -207,6 +209,7 @@ const Setting = (props) => {
         mtnMomoSubscriptionKey,
         mtnMomoApiUserId,
         mtnMomoApiKey,
+        mtnMomoCallbackHost,
         mtnMomoEnvironment,
         // Legacy fields (kept for backward compatibility)
         mtnMomoPrimaryKey,
@@ -727,6 +730,36 @@ const Setting = (props) => {
                         )}
                         <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
                           Generated for your API User in MTN Developer Portal. Used for Basic Auth (Authorization: Basic base64(API_USER_ID:API_KEY))
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="mtnMomoCallbackHost" className="ms-2 order-1">
+                          MTN MoMo Callback Host (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="mtnMomoCallbackHost"
+                          value={mtnMomoCallbackHost}
+                          placeholder="Enter callback host (e.g., skedisy.com or api.skedisy.com)"
+                          onChange={(e) => {
+                            setMtnMomoCallbackHost(e.target.value);
+                            return setError({
+                              ...error,
+                              mtnMomoCallbackHost: "",
+                            });
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMomoCallbackHost}
+                          </p>
+                        )}
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          Optional: Callback host that matches providerCallbackHost in MTN Developer Portal. 
+                          If not set, will use main domain from baseURL. Example: "skedisy.com" or "api.skedisy.com" (without https://)
                         </label>
                       </div>
                     </div>
