@@ -1113,8 +1113,24 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     // Log the exact payment body being sent
     console.log("MTN MoMo Payment Body (exact):", JSON.stringify(paymentBody, null, 2));
 
+    // Construct callback URL
+    // IMPORTANT: This must match the providerCallbackHost configured when creating the API User
+    // When creating API User, providerCallbackHost should be set to your domain (e.g., "skedisy.com")
+    // The callback URL will be: https://{providerCallbackHost}/salon/handleMTNMomoPaymentCallback
     const baseURL = (process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com").replace(/\/+$/, ''); // Remove trailing slashes
-    const callbackUrl = `${baseURL}/salon/handleMTNMomoPaymentCallback`;
+    
+    // Extract domain from baseURL for callback (MTN MoMo uses domain matching)
+    let callbackUrl;
+    try {
+      const urlObj = new URL(baseURL);
+      const domain = urlObj.hostname; // Extract just the domain (e.g., "skedisy.com")
+      callbackUrl = `https://${domain}/salon/handleMTNMomoPaymentCallback`;
+    } catch (error) {
+      // Fallback if URL parsing fails
+      callbackUrl = `${baseURL}/salon/handleMTNMomoPaymentCallback`;
+    }
+    
+    console.log("MTN MoMo Callback URL:", callbackUrl);
 
     const paymentHeaders = {
       "Authorization": `Bearer ${accessToken}`, // Access Token from OAuth
@@ -1170,7 +1186,26 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
         const errorCode = error.response?.data?.code;
         const errorMsg = error.response?.data?.message || error.response?.data?.error || "Internal server error";
         
-        if (errorCode === "INVALID_CURRENCY" || errorMsg.includes("Currency not supported")) {
+        if (errorCode === "INVALID_CALLBACK_URL_HOST" || errorMsg.includes("Callback URL does not match")) {
+          errorMessage = "INVALID_CALLBACK_URL_HOST Error - Callback URL mismatch!\n\n" +
+            "🔍 PROBLEM: The callback URL doesn't match the providerCallbackHost configured when creating your API User.\n\n" +
+            "Current callback URL: " + callbackUrl + "\n\n" +
+            "✅ SOLUTION:\n" +
+            "1. Go to MTN Developer Portal: https://momodeveloper.mtn.com\n" +
+            "2. Find your API User (UUID: " + (setting.mtnMomoApiUserId?.substring(0, 8) || "N/A") + "...)\n" +
+            "3. Check the providerCallbackHost value (it should be your domain, e.g., 'skedisy.com')\n" +
+            "4. The callback URL must match: https://{providerCallbackHost}/salon/handleMTNMomoPaymentCallback\n\n" +
+            "OPTIONS TO FIX:\n" +
+            "Option A: Update providerCallbackHost in MTN Developer Portal\n" +
+            "  - Go to your API User settings\n" +
+            "  - Update providerCallbackHost to match your domain (e.g., 'skedisy.com')\n\n" +
+            "Option B: Recreate API User with correct providerCallbackHost\n" +
+            "  POST https://sandbox.momodeveloper.mtn.com/v1_0/apiuser\n" +
+            "  Headers: X-Reference-Id: {new-uuid}, Ocp-Apim-Subscription-Key: {your-subscription-key}\n" +
+            "  Body: { \"providerCallbackHost\": \"skedisy.com\" }\n" +
+            "  (Replace 'skedisy.com' with your actual domain)\n\n" +
+            "Note: For sandbox testing, you may need to use a test domain that matches your API User configuration.";
+        } else if (errorCode === "INVALID_CURRENCY" || errorMsg.includes("Currency not supported")) {
           errorMessage = "INVALID_CURRENCY Error - This is usually NOT a currency issue!\n\n" +
             "🔍 DIAGNOSIS: Your request looks correct (currency: XAF, amount: whole number, headers present).\n" +
             "This error typically indicates a configuration issue in MTN Developer Portal.\n\n" +
