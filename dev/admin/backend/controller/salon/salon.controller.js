@@ -976,8 +976,14 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     let tokenResponse;
     try {
       tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
+      
+      // Verify token was generated successfully
+      if (tokenResponse.data && tokenResponse.data.access_token) {
+        console.log("✅ MTN MoMo Token generated successfully");
+        console.log("Token expires in:", tokenResponse.data.expires_in, "seconds");
+      }
     } catch (error) {
-      console.error("MTN MoMo Token Error:", error.response?.data || error.message);
+      console.error("❌ MTN MoMo Token Error:", error.response?.data || error.message);
       console.error("MTN MoMo Token Error Details:", {
         status: error.response?.status,
         statusText: error.response?.statusText,
@@ -987,15 +993,22 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
         hasSubscriptionKey: !!setting.mtnMomoSubscriptionKey,
         hasApiUserId: !!setting.mtnMomoApiUserId,
         hasApiKey: !!setting.mtnMomoApiKey,
+        apiUserIdPrefix: setting.mtnMomoApiUserId?.substring(0, 8) || "N/A",
+        subscriptionKeyPrefix: setting.mtnMomoSubscriptionKey?.substring(0, 8) || "N/A",
       });
       
       // Provide specific guidance based on error
       if (error.response?.status === 401 || error.response?.status === 403) {
-        console.error("⚠️ IMPORTANT: This error usually means:");
-        console.error("1. Subscription Key is from wrong product (Disbursement/Remittance instead of Collection)");
-        console.error("2. API User was created in production URL instead of sandbox");
-        console.error("3. API User ID or API Key is incorrect");
-        console.error("SOLUTION: Recreate API User in sandbox and use Collection subscription key");
+        console.error("⚠️ IMPORTANT: Authentication error - This usually means:");
+        console.error("1. ❌ Subscription Key is from wrong product (Disbursement/Remittance instead of Collection)");
+        console.error("2. ❌ API User was created in production URL instead of sandbox");
+        console.error("3. ❌ API User ID or API Key is incorrect");
+        console.error("✅ SOLUTION: Recreate API User in sandbox and use Collection subscription key");
+      } else if (error.response?.status === 500) {
+        console.error("⚠️ IMPORTANT: Server error - This might indicate:");
+        console.error("1. ❌ Subscription Key is from wrong product");
+        console.error("2. ❌ API User configuration issue");
+        console.error("✅ SOLUTION: Verify subscription key is from Collection product in MTN Developer Portal");
       }
       
       let errorMessage = `Failed to get MTN MoMo access token: ${error.response?.data?.error || error.response?.data?.message || error.message}`;
@@ -1102,7 +1115,7 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
         { headers: paymentHeaders }
       );
     } catch (error) {
-      console.error("MTN MoMo Payment Request Error:", error.response?.data || error.message);
+      console.error("❌ MTN MoMo Payment Request Error:", error.response?.data || error.message);
       console.error("MTN MoMo Payment Request Error Details:", {
         status: error.response?.status,
         statusText: error.response?.statusText,
@@ -1114,6 +1127,8 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
           ...paymentHeaders,
           Authorization: paymentHeaders.Authorization ? "Bearer ***" : undefined,
         },
+        tokenGenerated: !!accessToken,
+        subscriptionKeyPrefix: subscriptionKey?.substring(0, 8) || "N/A",
       });
       
       let errorMessage = `Payment request failed: ${error.response?.data?.message || error.response?.data?.error || error.message}`;
@@ -1125,18 +1140,27 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
         
         if (errorCode === "INVALID_CURRENCY" || errorMsg.includes("Currency not supported")) {
           errorMessage = "INVALID_CURRENCY Error - This is usually NOT a currency issue!\n\n" +
+            "🔍 DIAGNOSIS: Your request looks correct (currency: XAF, amount: whole number, headers present).\n" +
+            "This error typically indicates a configuration issue in MTN Developer Portal.\n\n" +
             "Common causes:\n" +
             "1. ❌ Wrong Subscription Key: Using key from Disbursement/Remittance instead of Collection\n" +
+            "   → Check: MTN Developer Portal > Products > Collection > Subscription (use Primary or Secondary Key)\n" +
             "2. ❌ Wrong API User: API User created in production URL instead of sandbox\n" +
+            "   → Check: API User must be created at https://sandbox.momodeveloper.mtn.com\n" +
             "3. ❌ Wrong Access Token: Token generated from wrong product (not Collection)\n" +
-            "4. ❌ Missing/Incorrect Header: X-Target-Environment missing or wrong value\n\n" +
-            "✅ SOLUTION: Recreate everything cleanly:\n" +
-            "1. Create new API User in sandbox: POST https://sandbox.momodeveloper.mtn.com/v1_0/apiuser\n" +
-            "2. Generate new API Key: POST /v1_0/apiuser/{apiUserId}/apikey\n" +
-            "3. Use Collection subscription key (not Disbursement/Remittance)\n" +
-            "4. Ensure X-Target-Environment: sandbox (lowercase)\n" +
-            "5. Generate new token from Collection API\n\n" +
-            "Note: MTN sandbox sometimes randomly rejects XAF - this is a known MTN limitation.";
+            "   → Check: Token must be from /collection/token/ endpoint\n" +
+            "4. ❌ API User not configured for Collection product\n" +
+            "   → Check: API User must be subscribed to Collection API\n\n" +
+            "✅ SOLUTION - Recreate everything cleanly:\n" +
+            "1. Go to MTN Developer Portal: https://momodeveloper.mtn.com\n" +
+            "2. Navigate to Products > Collection (NOT Disbursement or Remittance)\n" +
+            "3. Create new API User in SANDBOX: POST https://sandbox.momodeveloper.mtn.com/v1_0/apiuser\n" +
+            "4. Generate new API Key: POST /v1_0/apiuser/{apiUserId}/apikey\n" +
+            "5. Copy Collection subscription key (from Products > Collection > Subscription)\n" +
+            "6. Update your admin settings with the new credentials\n" +
+            "7. Ensure X-Target-Environment: sandbox (lowercase) - already correct in code\n\n" +
+            "⚠️ Note: MTN sandbox sometimes randomly rejects XAF - this is a known MTN limitation.\n" +
+            "If issue persists after recreating, try switching to production environment (if available).";
         } else {
           errorMessage = "MTN MoMo server error. Please check:\n" +
             "1. Amount format is correct (whole number for XAF)\n" +
@@ -1150,6 +1174,12 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       return res.status(200).json({
         status: false,
         message: errorMessage,
+        errorCode: error.response?.data?.code || "UNKNOWN_ERROR",
+        details: {
+          status: error.response?.status,
+          error: error.response?.data?.error,
+          message: error.response?.data?.message,
+        },
       });
     }
 
