@@ -49,10 +49,12 @@ exports.update = async (req, res) => {
     setting.zitopayMerchantId = req.body.zitopayMerchantId ? req.body.zitopayMerchantId : setting.zitopayMerchantId;
 
     // MTN MoMo fields
-    setting.mtnMomoPrimaryKey = req.body.mtnMomoPrimaryKey ? req.body.mtnMomoPrimaryKey : setting.mtnMomoPrimaryKey;
-    setting.mtnMomoSecondaryKey = req.body.mtnMomoSecondaryKey ? req.body.mtnMomoSecondaryKey : setting.mtnMomoSecondaryKey;
-    setting.mtnMomoSubscriptionKey = req.body.mtnMomoSubscriptionKey ? req.body.mtnMomoSubscriptionKey : setting.mtnMomoSubscriptionKey;
-    setting.mtnMomoEnvironment = req.body.mtnMomoEnvironment ? req.body.mtnMomoEnvironment : setting.mtnMomoEnvironment;
+    if (req.body.mtnMomoPrimaryKey !== undefined) setting.mtnMomoPrimaryKey = req.body.mtnMomoPrimaryKey;
+    if (req.body.mtnMomoSecondaryKey !== undefined) setting.mtnMomoSecondaryKey = req.body.mtnMomoSecondaryKey;
+    if (req.body.mtnMomoSubscriptionKey !== undefined) setting.mtnMomoSubscriptionKey = req.body.mtnMomoSubscriptionKey;
+    if (req.body.mtnMomoApiUserId !== undefined) setting.mtnMomoApiUserId = req.body.mtnMomoApiUserId;
+    if (req.body.mtnMomoApiKey !== undefined) setting.mtnMomoApiKey = req.body.mtnMomoApiKey;
+    if (req.body.mtnMomoEnvironment !== undefined) setting.mtnMomoEnvironment = req.body.mtnMomoEnvironment;
 
     setting.flutterWaveKey = req.body.flutterWaveKey ? req.body.flutterWaveKey : setting.flutterWaveKey;
     setting.currencySymbol = req.body.currencySymbol ? req.body.currencySymbol : setting.currencySymbol;
