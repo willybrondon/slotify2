@@ -70,8 +70,8 @@ const Wallet = () => {
                 toast.success(data.message || "Payment successful! Wallet credited.");
                 setAmount("");
                 setSelectedAmount("");
-                // Refresh wallet history and balance
-                dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
+                // Refresh wallet history and balance - wait for it to complete
+                await dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
                 // Remove query params from URL
                 navigate("/salonpanel/wallet", { replace: true });
             } else {
@@ -133,7 +133,7 @@ const Wallet = () => {
         setAmountError(false);
     };
 
-    const pollPaymentStatus = async (reference) => {
+    const pollPaymentStatus = (reference) => {
         const maxAttempts = 30; // Poll for up to 30 attempts (about 1.5 minutes)
         let attempts = 0;
 
@@ -180,8 +180,8 @@ const Wallet = () => {
                     setPaymentReference(null);
                     setIsProcessing(false);
                     
-                    // Refresh wallet history and balance
-                    dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
+                    // Refresh wallet history and balance - wait for it to complete
+                    await dispatch(getWalletHistory({ type: "All", startDate: "All", endDate: "All", start: 0, limit: 1 }));
                 } else if (data.paymentStatus === "FAILED" || data.paymentStatus === "CANCELLED") {
                     // Payment failed or cancelled
                     toast.error(data.message || `Payment ${data.paymentStatus}`);
@@ -353,60 +353,50 @@ const Wallet = () => {
         <>
             <style>
                 {`
-                    .wallet-balance-label {
+                    .wallet-balance-container {
                         position: absolute;
-                        top: 14%;
+                        top: 50%;
                         left: 50%;
-                        transform: translateX(-50%);
+                        transform: translate(-50%, -50%);
+                        z-index: 2;
+                        width: 90%;
+                        text-align: center;
+                    }
+                    .wallet-balance-label {
                         color: white;
                         font-size: 30px;
-                        z-index: 2;
                         font-weight: bold;
-                        text-align: center;
-                        width: 90%;
+                        margin-bottom: 10px;
+                        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
                     }
                     .wallet-balance-amount {
-                        position: absolute;
-                        top: 20%;
-                        left: 50%;
-                        transform: translateX(-50%);
                         color: white;
                         font-size: 40px;
-                        z-index: 2;
                         font-weight: bold;
-                        text-align: center;
-                        width: 90%;
+                        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
                     }
                     @media (max-width: 768px) {
-                        .wallet-balance-label {
-                            top: 14%;
-                            left: 50%;
-                            transform: translateX(-50%);
-                            font-size: 24px;
+                        .wallet-balance-container {
                             width: 90%;
                         }
+                        .wallet-balance-label {
+                            font-size: 24px;
+                            margin-bottom: 8px;
+                        }
                         .wallet-balance-amount {
-                            top: 20%;
-                            left: 50%;
-                            transform: translateX(-50%);
                             font-size: 32px;
-                            width: 90%;
                         }
                     }
                     @media (max-width: 480px) {
-                        .wallet-balance-label {
-                            top: 14%;
-                            left: 50%;
-                            transform: translateX(-50%);
-                            font-size: 20px;
+                        .wallet-balance-container {
                             width: 85%;
                         }
+                        .wallet-balance-label {
+                            font-size: 20px;
+                            margin-bottom: 6px;
+                        }
                         .wallet-balance-amount {
-                            top: 20%;
-                            left: 50%;
-                            transform: translateX(-50%);
                             font-size: 28px;
-                            width: 85%;
                         }
                     }
                 `}
@@ -417,16 +407,18 @@ const Wallet = () => {
                 <div className="row">
                     {/* Left Column - Balance Banner */}
                     <div className="col-md-6" style={{ position: "relative" }}>
-                        {/* Text positioned on top of the image */}
-                        <div className="wallet-balance-label">
-                            My Wallet Balance
-                        </div>
-                        <div className="wallet-balance-amount">
-                            {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
-                        </div>
-
                         {/* Image */}
                         <img src={withDrawBanner} alt="Wallet Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
+                        
+                        {/* Text positioned vertically centered on top of the image */}
+                        <div className="wallet-balance-container">
+                            <div className="wallet-balance-label">
+                                My Wallet Balance
+                            </div>
+                            <div className="wallet-balance-amount">
+                                {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
+                            </div>
+                        </div>
 
                         {/* Minimum Balance Info */}
                         {minSalonWalletBalance > 0 && (
