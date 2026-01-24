@@ -880,17 +880,25 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       });
     }
     
-    if (!setting.mtnMomoPrimaryKey || setting.mtnMomoPrimaryKey.trim() === "") {
+    // Validate required MTN MoMo credentials according to official documentation
+    if (!setting.mtnMomoSubscriptionKey || setting.mtnMomoSubscriptionKey.trim() === "") {
       return res.status(200).json({ 
         status: false, 
-        message: "MTN MoMo Primary Key is not configured. Please add it in Admin Settings." 
+        message: "MTN MoMo Subscription Key is required. Get it from MTN Developer Portal > Products > Collection > Subscription (Primary or Secondary Key)." 
       });
     }
     
-    if (!setting.mtnMomoSecondaryKey || setting.mtnMomoSecondaryKey.trim() === "") {
+    if (!setting.mtnMomoApiUserId || setting.mtnMomoApiUserId.trim() === "") {
       return res.status(200).json({ 
         status: false, 
-        message: "MTN MoMo Secondary Key is not configured. Please add it in Admin Settings." 
+        message: "MTN MoMo API User ID is required. Create an API User in MTN Developer Portal and use the UUID as API User ID." 
+      });
+    }
+    
+    if (!setting.mtnMomoApiKey || setting.mtnMomoApiKey.trim() === "") {
+      return res.status(200).json({ 
+        status: false, 
+        message: "MTN MoMo API Key is required. Generate it for your API User in MTN Developer Portal." 
       });
     }
     
@@ -912,92 +920,54 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     }
 
     // Step 1: Get access token
-    // Use API Key if provided, otherwise use Primary Key as Subscription Key
-    const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
+    // According to MTN MoMo documentation:
+    // - Basic Auth uses: base64(API_USER_ID:API_KEY)
+    // - Subscription Key goes in Ocp-Apim-Subscription-Key header
+    const tokenCredentials = Buffer.from(`${setting.mtnMomoApiUserId}:${setting.mtnMomoApiKey}`).toString("base64");
     const targetEnvironment = environment === "production" ? "production" : "sandbox";
     
-    // Determine Subscription Key: Use API Key if provided, otherwise use Primary Key
-    let subscriptionKey = setting.mtnMomoApiKey && setting.mtnMomoApiKey.trim() !== "" 
-      ? setting.mtnMomoApiKey 
-      : setting.mtnMomoPrimaryKey;
+    // Use Subscription Key from subscription (Primary or Secondary from subscription)
+    const subscriptionKey = setting.mtnMomoSubscriptionKey;
     
-    let tokenHeaders = {
-      "Authorization": `Basic ${tokenCredentials}`,
-      "Ocp-Apim-Subscription-Key": subscriptionKey,
+    const tokenHeaders = {
+      "Authorization": `Basic ${tokenCredentials}`, // Basic Auth: base64(API_USER_ID:API_KEY)
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Subscription Key from subscription
       "X-Target-Environment": targetEnvironment,
       "Content-Type": "application/json",
     };
-    
-    // Add X-Reference-Id (API User ID) if provided
-    if (setting.mtnMomoApiUserId && setting.mtnMomoApiUserId.trim() !== "") {
-      tokenHeaders["X-Reference-Id"] = setting.mtnMomoApiUserId;
-    }
 
     let tokenResponse;
     try {
       tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
     } catch (error) {
-      // If Primary Key fails with login_failed, try Secondary Key as Subscription Key
+      console.error("MTN MoMo Token Error:", error.response?.data || error.message);
+      console.error("MTN MoMo Token Error Details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        environment: targetEnvironment,
+        baseUrl: baseUrl,
+        hasSubscriptionKey: !!setting.mtnMomoSubscriptionKey,
+        hasApiUserId: !!setting.mtnMomoApiUserId,
+        hasApiKey: !!setting.mtnMomoApiKey,
+      });
+      
+      let errorMessage = `Failed to get MTN MoMo access token: ${error.response?.data?.error || error.response?.data?.message || error.message}`;
+      
       if (error.response?.status === 500 && error.response?.data?.error === "login_failed") {
-        console.log("Primary Key failed, trying Secondary Key as Subscription Key...");
-        subscriptionKey = setting.mtnMomoSecondaryKey;
-        tokenHeaders["Ocp-Apim-Subscription-Key"] = subscriptionKey;
-        
-        try {
-          tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
-          console.log("Secondary Key worked as Subscription Key!");
-        } catch (retryError) {
-          console.error("MTN MoMo Token Error (both keys tried):", retryError.response?.data || retryError.message);
-          console.error("MTN MoMo Token Error Details:", {
-            status: retryError.response?.status,
-            statusText: retryError.response?.statusText,
-            data: retryError.response?.data,
-            environment: targetEnvironment,
-            baseUrl: baseUrl,
-            triedPrimaryKey: true,
-            triedSecondaryKey: true,
-          });
-          
-          let errorMessage = `Failed to get MTN MoMo access token: ${retryError.response?.data?.error || retryError.response?.data?.message || retryError.message}`;
-          
-          if (retryError.response?.status === 500 && retryError.response?.data?.error === "login_failed") {
-            errorMessage = "Authentication failed (login_failed). Please verify:\n" +
-              "1. Primary Key and Secondary Key are correct in Admin Settings\n" +
-              "2. Environment matches your API credentials (sandbox/production)\n" +
-              "3. API User is created and active in MTN MoMo Developer Portal\n" +
-              "4. The keys are from the same API User (not mixed from different users)\n" +
-              "5. Your API subscription is active in the Developer Portal";
-          }
-          
-          return res.status(200).json({
-            status: false,
-            message: errorMessage,
-          });
-        }
-      } else {
-        console.error("MTN MoMo Token Error:", error.response?.data || error.message);
-        console.error("MTN MoMo Token Error Details:", {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          environment: targetEnvironment,
-          baseUrl: baseUrl,
-        });
-        
-        let errorMessage = `Failed to get MTN MoMo access token: ${error.response?.data?.error || error.response?.data?.message || error.message}`;
-        
-        if (error.response?.status === 500 && error.response?.data?.error === "login_failed") {
-          errorMessage = "Authentication failed (login_failed). Please verify:\n" +
-            "1. Primary Key and Secondary Key are correct in Admin Settings\n" +
-            "2. Environment matches your API credentials (sandbox/production)\n" +
-            "3. API User is created and active in MTN MoMo Developer Portal";
-        }
-        
-        return res.status(200).json({
-          status: false,
-          message: errorMessage,
-        });
+        errorMessage = "Authentication failed (login_failed). Please verify:\n" +
+          "1. Subscription Key is correct (from MTN Developer Portal > Products > Collection > Subscription)\n" +
+          "2. API User ID is correct (UUID format, created when creating API User)\n" +
+          "3. API Key is correct (generated for your API User)\n" +
+          "4. Environment matches your API credentials (sandbox/production)\n" +
+          "5. API User is created and active in MTN MoMo Developer Portal\n" +
+          "6. Your API subscription is active in the Developer Portal";
       }
+      
+      return res.status(200).json({
+        status: false,
+        message: errorMessage,
+      });
     }
 
     if (tokenResponse.status !== 200 || !tokenResponse.data.access_token) {
@@ -1030,18 +1000,13 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     const callbackUrl = `${baseURL}/salon/handleMTNMomoPaymentCallback`;
 
     const paymentHeaders = {
-      "Authorization": `Bearer ${accessToken}`,
-      "Ocp-Apim-Subscription-Key": subscriptionKey, // API Key or Primary Key as Subscription Key
+      "Authorization": `Bearer ${accessToken}`, // Access Token from OAuth
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Subscription Key from subscription
       "X-Target-Environment": targetEnvironment,
-      "X-Reference-Id": reference, // Payment reference (unique for each payment)
+      "X-Reference-Id": reference, // Payment reference (unique UUID for each payment)
       "X-Callback-Url": callbackUrl,
       "Content-Type": "application/json",
     };
-    
-    // Add API User ID (X-Reference-Id for API User) if provided (some configurations require this)
-    if (setting.mtnMomoApiUserId && setting.mtnMomoApiUserId.trim() !== "") {
-      paymentHeaders["X-API-User-Id"] = setting.mtnMomoApiUserId;
-    }
 
     let paymentResponse;
     try {
@@ -1102,12 +1067,17 @@ exports.checkMTNMomoPaymentStatus = async (req, res) => {
       return res.status(200).json({ status: false, message: "Settings not found." });
     }
     
-    if (!setting.mtnMomoPrimaryKey || setting.mtnMomoPrimaryKey.trim() === "") {
-      return res.status(200).json({ status: false, message: "MTN MoMo Primary Key is not configured." });
+    // Validate required MTN MoMo credentials
+    if (!setting.mtnMomoSubscriptionKey || setting.mtnMomoSubscriptionKey.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo Subscription Key is not configured." });
     }
     
-    if (!setting.mtnMomoSecondaryKey || setting.mtnMomoSecondaryKey.trim() === "") {
-      return res.status(200).json({ status: false, message: "MTN MoMo Secondary Key is not configured." });
+    if (!setting.mtnMomoApiUserId || setting.mtnMomoApiUserId.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo API User ID is not configured." });
+    }
+    
+    if (!setting.mtnMomoApiKey || setting.mtnMomoApiKey.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo API Key is not configured." });
     }
 
     // Determine base URL based on environment
@@ -1116,25 +1086,18 @@ exports.checkMTNMomoPaymentStatus = async (req, res) => {
       ? "https://api.momodeveloper.mtn.com"
       : "https://sandbox.momodeveloper.mtn.com";
 
-    // Use API Key if provided, otherwise use Primary Key as Subscription Key
-    const subscriptionKey = setting.mtnMomoApiKey && setting.mtnMomoApiKey.trim() !== "" 
-      ? setting.mtnMomoApiKey 
-      : setting.mtnMomoPrimaryKey;
+    // Use Subscription Key from subscription
+    const subscriptionKey = setting.mtnMomoSubscriptionKey;
 
-    // Get access token
-    const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
+    // Get access token using API User ID and API Key for Basic Auth
+    const tokenCredentials = Buffer.from(`${setting.mtnMomoApiUserId}:${setting.mtnMomoApiKey}`).toString("base64");
     const targetEnvironment = environment === "production" ? "production" : "sandbox";
 
     const tokenHeaders = {
-      "Authorization": `Basic ${tokenCredentials}`,
-      "Ocp-Apim-Subscription-Key": subscriptionKey, // API Key or Primary Key as Subscription Key
+      "Authorization": `Basic ${tokenCredentials}`, // Basic Auth: base64(API_USER_ID:API_KEY)
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Subscription Key from subscription
       "X-Target-Environment": targetEnvironment,
     };
-    
-    // Add X-Reference-Id (API User ID) if provided
-    if (setting.mtnMomoApiUserId && setting.mtnMomoApiUserId.trim() !== "") {
-      tokenHeaders["X-Reference-Id"] = setting.mtnMomoApiUserId;
-    }
 
     let tokenResponse;
     try {
@@ -1263,12 +1226,17 @@ exports.handleMTNMomoPaymentCallback = async (req, res) => {
       return res.status(200).json({ status: false, message: "Settings not found." });
     }
     
-    if (!setting.mtnMomoPrimaryKey || setting.mtnMomoPrimaryKey.trim() === "") {
-      return res.status(200).json({ status: false, message: "MTN MoMo Primary Key is not configured." });
+    // Validate required MTN MoMo credentials
+    if (!setting.mtnMomoSubscriptionKey || setting.mtnMomoSubscriptionKey.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo Subscription Key is not configured." });
     }
     
-    if (!setting.mtnMomoSecondaryKey || setting.mtnMomoSecondaryKey.trim() === "") {
-      return res.status(200).json({ status: false, message: "MTN MoMo Secondary Key is not configured." });
+    if (!setting.mtnMomoApiUserId || setting.mtnMomoApiUserId.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo API User ID is not configured." });
+    }
+    
+    if (!setting.mtnMomoApiKey || setting.mtnMomoApiKey.trim() === "") {
+      return res.status(200).json({ status: false, message: "MTN MoMo API Key is not configured." });
     }
 
     // Determine base URL based on environment
@@ -1277,25 +1245,18 @@ exports.handleMTNMomoPaymentCallback = async (req, res) => {
       ? "https://api.momodeveloper.mtn.com"
       : "https://sandbox.momodeveloper.mtn.com";
 
-    // Use API Key if provided, otherwise use Primary Key as Subscription Key
-    const subscriptionKey = setting.mtnMomoApiKey && setting.mtnMomoApiKey.trim() !== "" 
-      ? setting.mtnMomoApiKey 
-      : setting.mtnMomoPrimaryKey;
+    // Use Subscription Key from subscription
+    const subscriptionKey = setting.mtnMomoSubscriptionKey;
 
-    // Get access token
-    const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
+    // Get access token using API User ID and API Key for Basic Auth
+    const tokenCredentials = Buffer.from(`${setting.mtnMomoApiUserId}:${setting.mtnMomoApiKey}`).toString("base64");
     const targetEnvironment = environment === "production" ? "production" : "sandbox";
 
     const tokenHeaders = {
-      "Authorization": `Basic ${tokenCredentials}`,
-      "Ocp-Apim-Subscription-Key": subscriptionKey, // API Key or Primary Key as Subscription Key
+      "Authorization": `Basic ${tokenCredentials}`, // Basic Auth: base64(API_USER_ID:API_KEY)
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Subscription Key from subscription
       "X-Target-Environment": targetEnvironment,
     };
-    
-    // Add X-Reference-Id (API User ID) if provided
-    if (setting.mtnMomoApiUserId && setting.mtnMomoApiUserId.trim() !== "") {
-      tokenHeaders["X-Reference-Id"] = setting.mtnMomoApiUserId;
-    }
 
     let tokenResponse;
     try {
@@ -1312,15 +1273,10 @@ exports.handleMTNMomoPaymentCallback = async (req, res) => {
 
     // Check payment status
     const statusHeaders = {
-      "Authorization": `Bearer ${accessToken}`,
-      "Ocp-Apim-Subscription-Key": subscriptionKey, // API Key or Primary Key as Subscription Key
+      "Authorization": `Bearer ${accessToken}`, // Access Token from OAuth
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Subscription Key from subscription
       "X-Target-Environment": targetEnvironment,
     };
-    
-    // Add API User ID if provided
-    if (setting.mtnMomoApiUserId && setting.mtnMomoApiUserId.trim() !== "") {
-      statusHeaders["X-API-User-Id"] = setting.mtnMomoApiUserId;
-    }
 
     let statusResponse;
     try {

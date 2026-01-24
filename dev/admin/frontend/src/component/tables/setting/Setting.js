@@ -49,11 +49,13 @@ const Setting = (props) => {
   const [zitopayApiKey, setZitopayApiKey] = useState("");
   const [zitopaySecretKey, setZitopaySecretKey] = useState("");
   const [zitopayMerchantId, setZitopayMerchantId] = useState("");
+  const [mtnMomoSubscriptionKey, setMtnMomoSubscriptionKey] = useState("");
+  const [mtnMomoApiUserId, setMtnMomoApiUserId] = useState("");
+  const [mtnMomoApiKey, setMtnMomoApiKey] = useState("");
+  const [mtnMomoEnvironment, setMtnMomoEnvironment] = useState("sandbox");
+  // Legacy fields (kept for backward compatibility)
   const [mtnMomoPrimaryKey, setMtnMomoPrimaryKey] = useState("");
   const [mtnMomoSecondaryKey, setMtnMomoSecondaryKey] = useState("");
-  const [mtnMomoApiKey, setMtnMomoApiKey] = useState("");
-  const [mtnMomoApiUserId, setMtnMomoApiUserId] = useState("");
-  const [mtnMomoEnvironment, setMtnMomoEnvironment] = useState("sandbox");
   const [minWithdrawalRequestedAmount, setMinWithdrawalRequestedAmount] = useState("");
   const [minSalonWalletBalance, setMinSalonWalletBalance] = useState("");
   const [currencyName, setCurrencyName] = useState();
@@ -121,11 +123,17 @@ const Setting = (props) => {
       setZitopayApiKey(setting.zitopayApiKey || "");
       setZitopaySecretKey(setting.zitopaySecretKey || "");
       setZitopayMerchantId(setting.zitopayMerchantId || "");
+      setMtnMomoSubscriptionKey(setting.mtnMomoSubscriptionKey || "");
+      setMtnMomoApiUserId(setting.mtnMomoApiUserId || "");
+      setMtnMomoApiKey(setting.mtnMomoApiKey || "");
+      setMtnMomoEnvironment(setting.mtnMomoEnvironment || "sandbox");
+      // Legacy fields (for backward compatibility - migrate if needed)
       setMtnMomoPrimaryKey(setting.mtnMomoPrimaryKey || "");
       setMtnMomoSecondaryKey(setting.mtnMomoSecondaryKey || "");
-      setMtnMomoApiKey(setting.mtnMomoApiKey || "");
-      setMtnMomoApiUserId(setting.mtnMomoApiUserId || "");
-      setMtnMomoEnvironment(setting.mtnMomoEnvironment || "sandbox");
+      // If Subscription Key is empty but Primary Key exists, migrate it
+      if (!setting.mtnMomoSubscriptionKey && setting.mtnMomoPrimaryKey) {
+        setMtnMomoSubscriptionKey(setting.mtnMomoPrimaryKey);
+      }
       setRazorPayId(setting.razorPayId);
       setRazorSecretKey(setting.razorSecretKey);
       setTax(setting.tax);
@@ -196,11 +204,13 @@ const Setting = (props) => {
         zitopayApiKey,
         zitopaySecretKey,
         zitopayMerchantId,
+        mtnMomoSubscriptionKey,
+        mtnMomoApiUserId,
+        mtnMomoApiKey,
+        mtnMomoEnvironment,
+        // Legacy fields (kept for backward compatibility)
         mtnMomoPrimaryKey,
         mtnMomoSecondaryKey,
-        mtnMomoApiKey,
-        mtnMomoApiUserId,
-        mtnMomoEnvironment,
         razorPayId,
         razorSecretKey,
         tax,
@@ -612,105 +622,46 @@ const Setting = (props) => {
                     <div className="col-12 ">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label
-                          htmlFor="mtnMomoPrimaryKey"
+                          htmlFor="mtnMomoSubscriptionKey"
                           className="ms-2 order-1"
                         >
-                          MTN MoMo Primary Key
+                          MTN MoMo Subscription Key (Required)
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
-                          id="mtnMomoPrimaryKey"
-                          value={mtnMomoPrimaryKey}
-                          placeholder="Enter MTN MoMo Primary Key"
+                          id="mtnMomoSubscriptionKey"
+                          value={mtnMomoSubscriptionKey}
+                          placeholder="Enter MTN MoMo Subscription Key (Primary or Secondary from subscription)"
                           onChange={(e) => {
-                            setMtnMomoPrimaryKey(e.target.value);
+                            setMtnMomoSubscriptionKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                mtnMomoPrimaryKey: ` MTN MoMo Primary Key Is Required`,
+                                mtnMomoSubscriptionKey: ` MTN MoMo Subscription Key Is Required`,
                               });
                             } else {
                               return setError({
                                 ...error,
-                                mtnMomoPrimaryKey: "",
+                                mtnMomoSubscriptionKey: "",
                               });
                             }
                           }}
                         />
                         {error && (
                           <p className="errorMessage text-start">
-                            {error && error?.mtnMomoPrimaryKey}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="mtnMomoSecondaryKey" className="ms-2 order-1">
-                          MTN MoMo Secondary Key
-                        </label>
-                        <input
-                          type="text"
-                          className="rounded-2"
-                          id="mtnMomoSecondaryKey"
-                          value={mtnMomoSecondaryKey}
-                          placeholder="Enter MTN MoMo Secondary Key"
-                          onChange={(e) => {
-                            setMtnMomoSecondaryKey(e.target.value);
-                            if (!e.target.value) {
-                              return setError({
-                                ...error,
-                                mtnMomoSecondaryKey: ` MTN MoMo Secondary Key Is Required`,
-                              });
-                            } else {
-                              return setError({
-                                ...error,
-                                mtnMomoSecondaryKey: "",
-                              });
-                            }
-                          }}
-                        />
-                        {error && (
-                          <p className="errorMessage text-start">
-                            {error && error?.mtnMomoSecondaryKey}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="mtnMomoApiKey" className="ms-2 order-1">
-                          MTN MoMo API Key (Optional)
-                        </label>
-                        <input
-                          type="text"
-                          className="rounded-2"
-                          id="mtnMomoApiKey"
-                          value={mtnMomoApiKey}
-                          placeholder="Enter MTN MoMo API Key (if different from Primary Key)"
-                          onChange={(e) => {
-                            setMtnMomoApiKey(e.target.value);
-                            return setError({
-                              ...error,
-                              mtnMomoApiKey: "",
-                            });
-                          }}
-                        />
-                        {error && (
-                          <p className="errorMessage text-start">
-                            {error && error?.mtnMomoApiKey}
+                            {error && error?.mtnMomoSubscriptionKey}
                           </p>
                         )}
                         <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
-                          Optional: API Key generated when creating an API User. If provided, this will be used as the Subscription Key instead of Primary Key.
+                          Get this from MTN Developer Portal &gt; Products &gt; Collection &gt; Subscription (Primary or Secondary Key)
                         </label>
                       </div>
                     </div>
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label htmlFor="mtnMomoApiUserId" className="ms-2 order-1">
-                          MTN MoMo API User ID (Optional)
+                          MTN MoMo API User ID (Required)
                         </label>
                         <input
                           type="text"
@@ -720,10 +671,17 @@ const Setting = (props) => {
                           placeholder="Enter MTN MoMo API User ID (UUID format)"
                           onChange={(e) => {
                             setMtnMomoApiUserId(e.target.value);
-                            return setError({
-                              ...error,
-                              mtnMomoApiUserId: "",
-                            });
+                            if (!e.target.value) {
+                              return setError({
+                                ...error,
+                                mtnMomoApiUserId: ` MTN MoMo API User ID Is Required`,
+                              });
+                            } else {
+                              return setError({
+                                ...error,
+                                mtnMomoApiUserId: "",
+                              });
+                            }
                           }}
                         />
                         {error && (
@@ -732,7 +690,43 @@ const Setting = (props) => {
                           </p>
                         )}
                         <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
-                          Optional: API User ID (X-Reference-Id) in UUID format. This is the unique identifier for your API User created in MTN MoMo Developer Portal.
+                          UUID created when creating an API User in MTN Developer Portal. Used for Basic Auth (Authorization: Basic base64(API_USER_ID:API_KEY))
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="mtnMomoApiKey" className="ms-2 order-1">
+                          MTN MoMo API Key (Required)
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="mtnMomoApiKey"
+                          value={mtnMomoApiKey}
+                          placeholder="Enter MTN MoMo API Key"
+                          onChange={(e) => {
+                            setMtnMomoApiKey(e.target.value);
+                            if (!e.target.value) {
+                              return setError({
+                                ...error,
+                                mtnMomoApiKey: ` MTN MoMo API Key Is Required`,
+                              });
+                            } else {
+                              return setError({
+                                ...error,
+                                mtnMomoApiKey: "",
+                              });
+                            }
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMomoApiKey}
+                          </p>
+                        )}
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          Generated for your API User in MTN Developer Portal. Used for Basic Auth (Authorization: Basic base64(API_USER_ID:API_KEY))
                         </label>
                       </div>
                     </div>

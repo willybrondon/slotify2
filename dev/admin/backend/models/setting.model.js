@@ -20,12 +20,13 @@ const settingSchema = new mongoose.Schema(
     zitopayMerchantId: { type: String, default: "" },
 
     isMtnMomo: { type: Boolean, default: false },
-    mtnMomoPrimaryKey: { type: String, default: "" }, // Primary Key (API User ID)
-    mtnMomoSecondaryKey: { type: String, default: "" }, // Secondary Key (API User Secret)
-    mtnMomoSubscriptionKey: { type: String, default: "" }, // Subscription Key (Ocp-Apim-Subscription-Key) - Primary or Secondary from subscription
-    mtnMomoApiKey: { type: String, default: "" }, // API Key (generated when creating API User)
-    mtnMomoApiUserId: { type: String, default: "" }, // API User ID (X-Reference-Id) - UUID format
+    mtnMomoSubscriptionKey: { type: String, default: "" }, // Subscription Key (Primary or Secondary from subscription) - REQUIRED for Ocp-Apim-Subscription-Key header
+    mtnMomoApiUserId: { type: String, default: "" }, // API User ID (UUID created when creating API User) - REQUIRED for Basic Auth (Authorization: Basic base64(API_USER_ID:API_KEY))
+    mtnMomoApiKey: { type: String, default: "" }, // API Key (generated for API User) - REQUIRED for Basic Auth (Authorization: Basic base64(API_USER_ID:API_KEY))
     mtnMomoEnvironment: { type: String, default: "sandbox" }, // sandbox or production
+    // Legacy fields (kept for backward compatibility, but not used for authentication)
+    mtnMomoPrimaryKey: { type: String, default: "" }, // Legacy - kept for migration
+    mtnMomoSecondaryKey: { type: String, default: "" }, // Legacy - kept for migration
 
     maintenanceMode: { type: Boolean, default: false },
 
