@@ -1115,19 +1115,33 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     // Construct callback URL
     // IMPORTANT: This must match the providerCallbackHost configured when creating the API User
-    // When creating API User, providerCallbackHost should be set to your domain (e.g., "skedisy.com")
-    // The callback URL will be: https://{providerCallbackHost}/salon/handleMTNMomoPaymentCallback
+    // providerCallbackHost should be set to your API domain (e.g., "https://api.skedisy.com")
+    // The callback URL will be: {providerCallbackHost}/salon/handleMTNMomoPaymentCallback
     const baseURL = (process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com").replace(/\/+$/, ''); // Remove trailing slashes
     
-    // Extract domain from baseURL for callback (MTN MoMo uses domain matching)
+    // Extract domain and construct API callback URL
+    // If providerCallbackHost is "https://api.skedisy.com", callback should be "https://api.skedisy.com/salon/handleMTNMomoPaymentCallback"
     let callbackUrl;
     try {
       const urlObj = new URL(baseURL);
-      const domain = urlObj.hostname; // Extract just the domain (e.g., "skedisy.com")
-      callbackUrl = `https://${domain}/salon/handleMTNMomoPaymentCallback`;
+      const hostname = urlObj.hostname; // Extract domain (e.g., "skedisy.com")
+      
+      // Check if we should use api subdomain
+      // If baseURL contains "api.", use it, otherwise construct api subdomain
+      if (hostname.includes("api.")) {
+        callbackUrl = `https://${hostname}/salon/handleMTNMomoPaymentCallback`;
+      } else {
+        // Use api subdomain (e.g., api.skedisy.com)
+        callbackUrl = `https://api.${hostname}/salon/handleMTNMomoPaymentCallback`;
+      }
     } catch (error) {
-      // Fallback if URL parsing fails
-      callbackUrl = `${baseURL}/salon/handleMTNMomoPaymentCallback`;
+      // Fallback: try to construct api subdomain from baseURL
+      if (baseURL.includes("api.")) {
+        callbackUrl = `${baseURL}/salon/handleMTNMomoPaymentCallback`;
+      } else {
+        // Replace main domain with api subdomain
+        callbackUrl = baseURL.replace(/https?:\/\/(www\.)?/, "https://api.") + "/salon/handleMTNMomoPaymentCallback";
+      }
     }
     
     console.log("MTN MoMo Callback URL:", callbackUrl);
