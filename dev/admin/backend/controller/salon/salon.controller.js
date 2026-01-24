@@ -845,7 +845,7 @@ exports.walletHistory = async (req, res) => {
 // Create MTN MoMo Payment Request for salon wallet recharge
 exports.createMTNMomoPaymentRequest = async (req, res) => {
   try {
-    const { amount, phoneNumber, currency: requestedCurrency } = req.query;
+    const { amount, phoneNumber } = req.query;
     const salonId = req.salon._id;
 
     if (!amount || parseFloat(amount) <= 0) {
@@ -894,33 +894,33 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       });
     }
     
-    // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
-    const subscriptionKey = setting.mtnMomoPrimaryKey;
-
     // Determine base URL based on environment
     const environment = (setting.mtnMomoEnvironment || "sandbox").toLowerCase();
     const baseUrl = environment === "production"
       ? "https://api.momodeveloper.mtn.com"
       : "https://sandbox.momodeveloper.mtn.com";
 
-    // Get currency - MTN MoMo for Cameroon only supports XAF
-    // If user requests EUR or other currency, we'll use XAF (MTN MoMo requirement)
-    let currency = (requestedCurrency || setting.currencyName || "XAF").toUpperCase();
+    // Get currency from settings - MTN MoMo for Cameroon only supports XAF
+    let currency = (setting.currencyName || "XAF").toUpperCase();
+    let paymentAmount = parseFloat(amount);
     
-    // MTN MoMo for Cameroon only supports XAF - force XAF if other currency is requested
-    if (currency !== "XAF") {
-      console.log(`MTN MoMo only supports XAF. Converting ${currency} to XAF.`);
+    // Convert EUR to XAF if needed (approximate rate: 1 EUR ≈ 655 XAF)
+    if (currency === "EUR") {
       currency = "XAF";
+      paymentAmount = paymentAmount * 655; // Convert EUR to XAF
+      console.log(`Converted ${amount} EUR to ${paymentAmount.toFixed(2)} XAF`);
     }
 
     // Step 1: Get access token
+    // Try Primary Key first as Subscription Key, then Secondary Key if that fails
     const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
-    
     const targetEnvironment = environment === "production" ? "production" : "sandbox";
     
-    const tokenHeaders = {
+    // Try Primary Key as Subscription Key first
+    let subscriptionKey = setting.mtnMomoPrimaryKey;
+    let tokenHeaders = {
       "Authorization": `Basic ${tokenCredentials}`,
-      "Ocp-Apim-Subscription-Key": subscriptionKey, // Use Primary Key as Subscription Key
+      "Ocp-Apim-Subscription-Key": subscriptionKey,
       "X-Target-Environment": targetEnvironment,
       "Content-Type": "application/json",
     };
@@ -929,37 +929,67 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     try {
       tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
     } catch (error) {
-      console.error("MTN MoMo Token Error:", error.response?.data || error.message);
-      console.error("MTN MoMo Token Error Details:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        environment: targetEnvironment,
-        baseUrl: baseUrl,
-      });
-      
-      let errorMessage = `Failed to get MTN MoMo access token: ${error.response?.data?.message || error.message}`;
-      
-      // Provide more specific error messages
-      if (error.response?.status === 401) {
-        errorMessage = "Authentication failed (401). Please verify:\n" +
-          "1. Primary Key and Secondary Key are correct\n" +
-          "2. Environment matches your API credentials (sandbox/production)\n" +
-          "3. API User is created in MTN MoMo Developer Portal";
-      } else if (error.response?.status === 500) {
-        errorMessage = "MTN MoMo API server error (500). Please:\n" +
-          "1. Verify your API credentials are correct\n" +
-          "2. Check if you're using the correct environment (sandbox/production)\n" +
-          "3. Ensure your API subscription is active in MTN MoMo Developer Portal\n" +
-          "4. Verify Primary Key is being used as Subscription Key";
-      } else if (error.response?.status === 403) {
-        errorMessage = "Access forbidden (403). Please verify your subscription key (Primary Key) is correct.";
+      // If Primary Key fails with login_failed, try Secondary Key as Subscription Key
+      if (error.response?.status === 500 && error.response?.data?.error === "login_failed") {
+        console.log("Primary Key failed, trying Secondary Key as Subscription Key...");
+        subscriptionKey = setting.mtnMomoSecondaryKey;
+        tokenHeaders["Ocp-Apim-Subscription-Key"] = subscriptionKey;
+        
+        try {
+          tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
+          console.log("Secondary Key worked as Subscription Key!");
+        } catch (retryError) {
+          console.error("MTN MoMo Token Error (both keys tried):", retryError.response?.data || retryError.message);
+          console.error("MTN MoMo Token Error Details:", {
+            status: retryError.response?.status,
+            statusText: retryError.response?.statusText,
+            data: retryError.response?.data,
+            environment: targetEnvironment,
+            baseUrl: baseUrl,
+            triedPrimaryKey: true,
+            triedSecondaryKey: true,
+          });
+          
+          let errorMessage = `Failed to get MTN MoMo access token: ${retryError.response?.data?.error || retryError.response?.data?.message || retryError.message}`;
+          
+          if (retryError.response?.status === 500 && retryError.response?.data?.error === "login_failed") {
+            errorMessage = "Authentication failed (login_failed). Please verify:\n" +
+              "1. Primary Key and Secondary Key are correct in Admin Settings\n" +
+              "2. Environment matches your API credentials (sandbox/production)\n" +
+              "3. API User is created and active in MTN MoMo Developer Portal\n" +
+              "4. The keys are from the same API User (not mixed from different users)\n" +
+              "5. Your API subscription is active in the Developer Portal";
+          }
+          
+          return res.status(200).json({
+            status: false,
+            message: errorMessage,
+          });
+        }
+      } else {
+        console.error("MTN MoMo Token Error:", error.response?.data || error.message);
+        console.error("MTN MoMo Token Error Details:", {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          environment: targetEnvironment,
+          baseUrl: baseUrl,
+        });
+        
+        let errorMessage = `Failed to get MTN MoMo access token: ${error.response?.data?.error || error.response?.data?.message || error.message}`;
+        
+        if (error.response?.status === 500 && error.response?.data?.error === "login_failed") {
+          errorMessage = "Authentication failed (login_failed). Please verify:\n" +
+            "1. Primary Key and Secondary Key are correct in Admin Settings\n" +
+            "2. Environment matches your API credentials (sandbox/production)\n" +
+            "3. API User is created and active in MTN MoMo Developer Portal";
+        }
+        
+        return res.status(200).json({
+          status: false,
+          message: errorMessage,
+        });
       }
-      
-      return res.status(200).json({
-        status: false,
-        message: errorMessage,
-      });
     }
 
     if (tokenResponse.status !== 200 || !tokenResponse.data.access_token) {
@@ -973,39 +1003,11 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     // Step 2: Create payment request
     const reference = `SALON_${Date.now()}_${salonId}`;
-    
-    // Clean phone number - ensure it's in correct format for MTN MoMo (Cameroon)
-    let cleanPhone = phoneNumber.replace(/\D/g, ""); // Remove non-digits
-    
-    // Ensure Cameroon number format (237XXXXXXXXX)
-    if (!cleanPhone.startsWith("237") && (cleanPhone.startsWith("6") || cleanPhone.startsWith("7"))) {
-      cleanPhone = "237" + cleanPhone;
-    }
-    
-    // Validate phone number format for Cameroon
-    if (!cleanPhone.startsWith("237") || cleanPhone.length !== 12) {
-      return res.status(200).json({
-        status: false,
-        message: "Invalid phone number format. Please use Cameroon format: +237XXXXXXXXX (12 digits total)",
-      });
-    }
-    
-    // Ensure Cameroon number format (237XXXXXXXXX)
-    if (!cleanPhone.startsWith("237") && (cleanPhone.startsWith("6") || cleanPhone.startsWith("7"))) {
-      cleanPhone = "237" + cleanPhone;
-    }
-    
-    // Validate phone number format
-    if (!cleanPhone.startsWith("237") || cleanPhone.length !== 12) {
-      return res.status(200).json({
-        status: false,
-        message: "Invalid phone number format. Please use Cameroon format: +237XXXXXXXXX",
-      });
-    }
+    const cleanPhone = phoneNumber.replace(/\D/g, ""); // Remove non-digits
 
     const paymentBody = {
-      amount: parseFloat(amount).toFixed(2),
-      currency: currency,
+      amount: paymentAmount.toFixed(2), // Use converted amount
+      currency: currency, // XAF for MTN MoMo
       externalId: reference,
       payer: {
         partyIdType: "MSISDN",
