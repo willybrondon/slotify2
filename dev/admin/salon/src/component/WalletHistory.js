@@ -192,22 +192,45 @@ const WalletHistory = () => {
     ];
 
     return (
-        <div className="orderDetails mt-2">
-            <div className="row">
-                <Title name="Wallet History" className="mt-4" />
-                {walletBalance !== undefined && (
-                    <div className="col-12 mb-3">
-                        <div className="betBox p-3" style={{ background: "#f8f9fa", borderRadius: "8px" }}>
-                            <div className="d-flex justify-content-between align-items-center">
-                                <span className="fw-bold" style={{ fontSize: "1.1rem" }}>Current Wallet Balance:</span>
-                                <span className="fw-bold" style={{ fontSize: "1.3rem", color: "#14AF14" }}>
-                                    {setting?.currencySymbol || ""} {walletBalance?.toFixed(2) || "0.00"}
-                                </span>
+        <>
+            <style>
+                {`
+                    @media (max-width: 768px) {
+                        .wallet-balance-label-text {
+                            font-size: 0.95rem !important;
+                            margin-bottom: 8px;
+                        }
+                        .wallet-balance-amount-text {
+                            font-size: 1.1rem !important;
+                        }
+                    }
+                    @media (max-width: 480px) {
+                        .wallet-balance-label-text {
+                            font-size: 0.85rem !important;
+                            margin-bottom: 6px;
+                        }
+                        .wallet-balance-amount-text {
+                            font-size: 1rem !important;
+                        }
+                    }
+                `}
+            </style>
+            <div className="orderDetails mt-2">
+                <div className="row">
+                    <Title name="Wallet History" className="mt-4" />
+                    {walletBalance !== undefined && (
+                        <div className="col-12 mb-3">
+                            <div className="betBox p-3" style={{ background: "#f8f9fa", borderRadius: "8px" }}>
+                                <div className="d-flex justify-content-between align-items-center flex-wrap">
+                                    <span className="fw-bold wallet-balance-label-text" style={{ fontSize: "1.1rem" }}>Current Wallet Balance:</span>
+                                    <span className="fw-bold wallet-balance-amount-text" style={{ fontSize: "1.3rem", color: "#14AF14" }}>
+                                        {setting?.currencySymbol || ""} {walletBalance?.toFixed(2) || "0.00"}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
             <div className="betBox">
                 <div className="inputData pb-2">
                     <label className="styleForTitle" htmlFor="transactionType">
@@ -267,7 +290,8 @@ const WalletHistory = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 totalData={total}
             />
-        </div>
+            </div>
+        </>
     )
 }
 export default WalletHistory

@@ -51,6 +51,8 @@ const Setting = (props) => {
   const [zitopayMerchantId, setZitopayMerchantId] = useState("");
   const [mtnMomoPrimaryKey, setMtnMomoPrimaryKey] = useState("");
   const [mtnMomoSecondaryKey, setMtnMomoSecondaryKey] = useState("");
+  const [mtnMomoApiKey, setMtnMomoApiKey] = useState("");
+  const [mtnMomoApiUserId, setMtnMomoApiUserId] = useState("");
   const [mtnMomoEnvironment, setMtnMomoEnvironment] = useState("sandbox");
   const [minWithdrawalRequestedAmount, setMinWithdrawalRequestedAmount] = useState("");
   const [minSalonWalletBalance, setMinSalonWalletBalance] = useState("");
@@ -78,6 +80,8 @@ const Setting = (props) => {
     zitopayMerchantId: "",
     mtnMomoPrimaryKey: "",
     mtnMomoSecondaryKey: "",
+    mtnMomoApiKey: "",
+    mtnMomoApiUserId: "",
     mtnMomoEnvironment: "",
     adminCommissionCharges: "",
     customerCommissionCharges: "",
@@ -119,6 +123,8 @@ const Setting = (props) => {
       setZitopayMerchantId(setting.zitopayMerchantId || "");
       setMtnMomoPrimaryKey(setting.mtnMomoPrimaryKey || "");
       setMtnMomoSecondaryKey(setting.mtnMomoSecondaryKey || "");
+      setMtnMomoApiKey(setting.mtnMomoApiKey || "");
+      setMtnMomoApiUserId(setting.mtnMomoApiUserId || "");
       setMtnMomoEnvironment(setting.mtnMomoEnvironment || "sandbox");
       setRazorPayId(setting.razorPayId);
       setRazorSecretKey(setting.razorSecretKey);
@@ -192,6 +198,8 @@ const Setting = (props) => {
         zitopayMerchantId,
         mtnMomoPrimaryKey,
         mtnMomoSecondaryKey,
+        mtnMomoApiKey,
+        mtnMomoApiUserId,
         mtnMomoEnvironment,
         razorPayId,
         razorSecretKey,
@@ -672,8 +680,66 @@ const Setting = (props) => {
                     </div>
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="mtnMomoApiKey" className="ms-2 order-1">
+                          MTN MoMo API Key (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="mtnMomoApiKey"
+                          value={mtnMomoApiKey}
+                          placeholder="Enter MTN MoMo API Key (if different from Primary Key)"
+                          onChange={(e) => {
+                            setMtnMomoApiKey(e.target.value);
+                            return setError({
+                              ...error,
+                              mtnMomoApiKey: "",
+                            });
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMomoApiKey}
+                          </p>
+                        )}
                         <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
-                          <strong>Note:</strong> The Subscription Key for <code>Ocp-Apim-Subscription-Key</code> header will be automatically set to your Primary Key. 
+                          Optional: API Key generated when creating an API User. If provided, this will be used as the Subscription Key instead of Primary Key.
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label htmlFor="mtnMomoApiUserId" className="ms-2 order-1">
+                          MTN MoMo API User ID (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          className="rounded-2"
+                          id="mtnMomoApiUserId"
+                          value={mtnMomoApiUserId}
+                          placeholder="Enter MTN MoMo API User ID (UUID format)"
+                          onChange={(e) => {
+                            setMtnMomoApiUserId(e.target.value);
+                            return setError({
+                              ...error,
+                              mtnMomoApiUserId: "",
+                            });
+                          }}
+                        />
+                        {error && (
+                          <p className="errorMessage text-start">
+                            {error && error?.mtnMomoApiUserId}
+                          </p>
+                        )}
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          Optional: API User ID (X-Reference-Id) in UUID format. This is the unique identifier for your API User created in MTN MoMo Developer Portal.
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="inputData text  flex-row justify-content-start text-start">
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          <strong>Note:</strong> The Subscription Key for <code>Ocp-Apim-Subscription-Key</code> header will use API Key if provided, otherwise Primary Key. 
                           You can also use Secondary Key if needed - both work as subscription keys.
                         </label>
                       </div>

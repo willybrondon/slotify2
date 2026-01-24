@@ -22,7 +22,9 @@ const settingSchema = new mongoose.Schema(
     isMtnMomo: { type: Boolean, default: false },
     mtnMomoPrimaryKey: { type: String, default: "" }, // Primary Key (API User ID)
     mtnMomoSecondaryKey: { type: String, default: "" }, // Secondary Key (API User Secret)
-    mtnMomoSubscriptionKey: { type: String, default: "" }, // Subscription Key (Ocp-Apim-Subscription-Key)
+    mtnMomoSubscriptionKey: { type: String, default: "" }, // Subscription Key (Ocp-Apim-Subscription-Key) - Primary or Secondary from subscription
+    mtnMomoApiKey: { type: String, default: "" }, // API Key (generated when creating API User)
+    mtnMomoApiUserId: { type: String, default: "" }, // API User ID (X-Reference-Id) - UUID format
     mtnMomoEnvironment: { type: String, default: "sandbox" }, // sandbox or production
 
     maintenanceMode: { type: Boolean, default: false },

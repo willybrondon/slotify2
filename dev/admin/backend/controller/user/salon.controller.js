@@ -895,6 +895,8 @@ exports.serveSalonWebPage = async (req, res) => {
             left: 0;
             width: 100%;
             height: 100%;
+            min-width: 100%;
+            min-height: 100%;
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
@@ -909,6 +911,8 @@ exports.serveSalonWebPage = async (req, res) => {
             left: 0;
             width: 100%;
             height: 100%;
+            min-width: 100%;
+            min-height: 100%;
             background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7));
             z-index: 1;
         }
@@ -1593,8 +1597,10 @@ exports.serveSalonWebPage = async (req, res) => {
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 100vw;
+                width: 100%;
                 height: 100%;
+                min-width: 100%;
+                min-height: 100%;
                 background-size: cover;
                 background-position: center center;
                 background-repeat: no-repeat;
@@ -1606,7 +1612,10 @@ exports.serveSalonWebPage = async (req, res) => {
                 left: 0;
                 width: 100%;
                 height: 100%;
+                min-width: 100%;
+                min-height: 100%;
                 background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
+                z-index: 1;
             }
             .hero-title,
             .hero-subtitle {
@@ -1677,8 +1686,10 @@ exports.serveSalonWebPage = async (req, res) => {
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 100vw;
+                width: 100%;
                 height: 100%;
+                min-width: 100%;
+                min-height: 100%;
                 background-size: cover;
                 background-position: center center;
                 background-repeat: no-repeat;
@@ -1690,6 +1701,9 @@ exports.serveSalonWebPage = async (req, res) => {
                 left: 0;
                 width: 100%;
                 height: 100%;
+                min-width: 100%;
+                min-height: 100%;
+                z-index: 1;
             }
             .hero-content {
                 position: relative;

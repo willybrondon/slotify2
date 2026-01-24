@@ -331,7 +331,7 @@ const Wallet = () => {
                     pollPaymentStatus(data.reference);
                 } else {
                     toast.error(data.message || data.error || "Failed to create payment request");
-                    setIsProcessing(false);
+                setIsProcessing(false);
                 }
             } else {
                 toast.error("Selected payment method is not supported");
@@ -351,6 +351,66 @@ const Wallet = () => {
 
     return (
         <>
+            <style>
+                {`
+                    .wallet-balance-label {
+                        position: absolute;
+                        top: 14%;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        color: white;
+                        font-size: 30px;
+                        z-index: 2;
+                        font-weight: bold;
+                        text-align: center;
+                        width: 90%;
+                    }
+                    .wallet-balance-amount {
+                        position: absolute;
+                        top: 20%;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        color: white;
+                        font-size: 40px;
+                        z-index: 2;
+                        font-weight: bold;
+                        text-align: center;
+                        width: 90%;
+                    }
+                    @media (max-width: 768px) {
+                        .wallet-balance-label {
+                            top: 14%;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            font-size: 24px;
+                            width: 90%;
+                        }
+                        .wallet-balance-amount {
+                            top: 20%;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            font-size: 32px;
+                            width: 90%;
+                        }
+                    }
+                    @media (max-width: 480px) {
+                        .wallet-balance-label {
+                            top: 14%;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            font-size: 20px;
+                            width: 85%;
+                        }
+                        .wallet-balance-amount {
+                            top: 20%;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            font-size: 28px;
+                            width: 85%;
+                        }
+                    }
+                `}
+            </style>
             <div className="mainExpert">
                 <Title name="Wallet" />
 
@@ -358,10 +418,10 @@ const Wallet = () => {
                     {/* Left Column - Balance Banner */}
                     <div className="col-md-6" style={{ position: "relative" }}>
                         {/* Text positioned on top of the image */}
-                        <div style={{ position: "absolute", top: "14%", left: "29%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>
+                        <div className="wallet-balance-label">
                             My Wallet Balance
                         </div>
-                        <div style={{ position: "absolute", top: "20%", left: "16%", transform: "translateX(-50%)", color: "white", fontSize: "40px", zIndex: 2, fontWeight: "bold" }}>
+                        <div className="wallet-balance-amount">
                             {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
                         </div>
 
@@ -469,10 +529,10 @@ const Wallet = () => {
                         {/* Payment Method Selection */}
                         {availablePaymentMethods.length > 0 ? (
                             <>
-                                <div className="inputData mt-4">
+                            <div className="inputData mt-4">
                                     <label className="styleForTitle">
-                                        Select Payment Method
-                                    </label>
+                                    Select Payment Method
+                                </label>
                                     <div className="mt-2">
                                         {availablePaymentMethods.map((method) => (
                                             <div
@@ -567,7 +627,7 @@ const Wallet = () => {
                                                             color: "#1f2937",
                                                         }}
                                                     >
-                                                        {method.label}
+                                            {method.label}
                                                     </span>
                                                 </div>
                                                 {/* Selection Indicator */}
@@ -630,7 +690,7 @@ const Wallet = () => {
                                         <small className="text-muted mt-1 d-block">
                                             Enter your MTN Mobile Money registered phone number
                                         </small>
-                                    </div>
+                            </div>
                                 )}
                             </>
                         ) : (
