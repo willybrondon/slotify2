@@ -1016,9 +1016,13 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       ? Math.round(paymentAmount).toString() 
       : paymentAmount.toFixed(2);
 
+    // MTN MoMo payment body
+    // IMPORTANT: Currency must be "XAF" for Cameroon MTN MoMo
+    // The sandbox environment should support XAF, but if it doesn't, 
+    // you may need to configure your API User for XAF currency in MTN Developer Portal
     const paymentBody = {
       amount: amountString, // String format, whole number for XAF
-      currency: currency, // XAF for MTN MoMo
+      currency: "XAF", // Hardcoded to XAF - required for Cameroon MTN MoMo
       externalId: externalId, // External reference for tracking
       payer: {
         partyIdType: "MSISDN",
@@ -1027,8 +1031,11 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       payerMessage: `Wallet recharge for ${salon.name}`,
       payeeNote: "Salon Wallet Recharge",
     };
+    
+    // Log the exact payment body being sent
+    console.log("MTN MoMo Payment Body (exact):", JSON.stringify(paymentBody, null, 2));
 
-    const baseURL = process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com";
+    const baseURL = (process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com").replace(/\/+$/, ''); // Remove trailing slashes
     const callbackUrl = `${baseURL}/salon/handleMTNMomoPaymentCallback`;
 
     const paymentHeaders = {
