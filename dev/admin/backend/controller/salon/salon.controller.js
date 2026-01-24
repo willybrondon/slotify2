@@ -894,8 +894,8 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       });
     }
     
-    // Subscription Key is optional - some MTN MoMo API configurations don't require it
-    // We'll try to use it if provided, but won't fail if it's missing
+    // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
+    const subscriptionKey = setting.mtnMomoPrimaryKey;
 
     // Determine base URL based on environment
     const environment = (setting.mtnMomoEnvironment || "sandbox").toLowerCase();
@@ -913,14 +913,10 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     
     const tokenHeaders = {
       "Authorization": `Basic ${tokenCredentials}`,
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Use Primary Key as Subscription Key
       "X-Target-Environment": targetEnvironment,
       "Content-Type": "application/json",
     };
-    
-    // Add Subscription Key only if provided (some MTN MoMo API configurations require it, others don't)
-    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
-      tokenHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
-    }
 
     let tokenResponse;
     try {
@@ -963,16 +959,12 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     const paymentHeaders = {
       "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Use Primary Key as Subscription Key
       "X-Target-Environment": targetEnvironment,
       "X-Reference-Id": reference,
       "X-Callback-Url": callbackUrl,
       "Content-Type": "application/json",
     };
-    
-    // Add Subscription Key only if provided
-    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
-      paymentHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
-    }
 
     let paymentResponse;
     try {
@@ -1041,6 +1033,9 @@ exports.checkMTNMomoPaymentStatus = async (req, res) => {
       return res.status(200).json({ status: false, message: "MTN MoMo Secondary Key is not configured." });
     }
 
+    // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
+    const subscriptionKey = setting.mtnMomoPrimaryKey;
+
     // Determine base URL based on environment
     const environment = (setting.mtnMomoEnvironment || "sandbox").toLowerCase();
     const baseUrl = environment === "production"
@@ -1053,13 +1048,9 @@ exports.checkMTNMomoPaymentStatus = async (req, res) => {
 
     const tokenHeaders = {
       "Authorization": `Basic ${tokenCredentials}`,
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Use Primary Key as Subscription Key
       "X-Target-Environment": targetEnvironment,
     };
-    
-    // Add Subscription Key only if provided (optional - some MTN MoMo API configurations don't require it)
-    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
-      tokenHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
-    }
 
     let tokenResponse;
     try {
@@ -1083,13 +1074,9 @@ exports.checkMTNMomoPaymentStatus = async (req, res) => {
     // Check payment status
     const statusHeaders = {
       "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Use Primary Key as Subscription Key
       "X-Target-Environment": targetEnvironment,
     };
-    
-    // Add Subscription Key only if provided
-    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
-      statusHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
-    }
 
     let statusResponse;
     try {
@@ -1205,15 +1192,14 @@ exports.handleMTNMomoPaymentCallback = async (req, res) => {
     const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
     const targetEnvironment = environment === "production" ? "production" : "sandbox";
 
+    // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
+    const subscriptionKey = setting.mtnMomoPrimaryKey;
+
     const tokenHeaders = {
       "Authorization": `Basic ${tokenCredentials}`,
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Use Primary Key as Subscription Key
       "X-Target-Environment": targetEnvironment,
     };
-    
-    // Add Subscription Key only if provided (optional)
-    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
-      tokenHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
-    }
 
     let tokenResponse;
     try {
@@ -1231,13 +1217,9 @@ exports.handleMTNMomoPaymentCallback = async (req, res) => {
     // Check payment status
     const statusHeaders = {
       "Authorization": `Bearer ${accessToken}`,
+      "Ocp-Apim-Subscription-Key": subscriptionKey, // Use Primary Key as Subscription Key
       "X-Target-Environment": targetEnvironment,
     };
-    
-    // Add Subscription Key only if provided
-    if (setting.mtnMomoSubscriptionKey && setting.mtnMomoSubscriptionKey.trim() !== "") {
-      statusHeaders["Ocp-Apim-Subscription-Key"] = setting.mtnMomoSubscriptionKey;
-    }
 
     let statusResponse;
     try {

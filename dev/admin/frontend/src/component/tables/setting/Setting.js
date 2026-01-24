@@ -51,7 +51,6 @@ const Setting = (props) => {
   const [zitopayMerchantId, setZitopayMerchantId] = useState("");
   const [mtnMomoPrimaryKey, setMtnMomoPrimaryKey] = useState("");
   const [mtnMomoSecondaryKey, setMtnMomoSecondaryKey] = useState("");
-  const [mtnMomoSubscriptionKey, setMtnMomoSubscriptionKey] = useState("");
   const [mtnMomoEnvironment, setMtnMomoEnvironment] = useState("sandbox");
   const [minWithdrawalRequestedAmount, setMinWithdrawalRequestedAmount] = useState("");
   const [minSalonWalletBalance, setMinSalonWalletBalance] = useState("");
@@ -79,7 +78,6 @@ const Setting = (props) => {
     zitopayMerchantId: "",
     mtnMomoPrimaryKey: "",
     mtnMomoSecondaryKey: "",
-    mtnMomoSubscriptionKey: "",
     mtnMomoEnvironment: "",
     adminCommissionCharges: "",
     customerCommissionCharges: "",
@@ -121,7 +119,6 @@ const Setting = (props) => {
       setZitopayMerchantId(setting.zitopayMerchantId || "");
       setMtnMomoPrimaryKey(setting.mtnMomoPrimaryKey || "");
       setMtnMomoSecondaryKey(setting.mtnMomoSecondaryKey || "");
-      setMtnMomoSubscriptionKey(setting.mtnMomoSubscriptionKey || "");
       setMtnMomoEnvironment(setting.mtnMomoEnvironment || "sandbox");
       setRazorPayId(setting.razorPayId);
       setRazorSecretKey(setting.razorSecretKey);
@@ -144,7 +141,6 @@ const Setting = (props) => {
   const onsubmit = async (e) => {
     e.preventDefault();
 
-    ;
     if (
       !privacyPolicyLink ||
       !tnc ||
@@ -196,7 +192,6 @@ const Setting = (props) => {
         zitopayMerchantId,
         mtnMomoPrimaryKey,
         mtnMomoSecondaryKey,
-        mtnMomoSubscriptionKey,
         mtnMomoEnvironment,
         razorPayId,
         razorSecretKey,
@@ -677,37 +672,10 @@ const Setting = (props) => {
                     </div>
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="mtnMomoSubscriptionKey" className="ms-2 order-1">
-                          MTN MoMo Subscription Key (Optional)
-                        </label>
-                        <input
-                          type="text"
-                          className="rounded-2"
-                          id="mtnMomoSubscriptionKey"
-                          value={mtnMomoSubscriptionKey}
-                          placeholder="Enter MTN MoMo Subscription Key (if required by your API)"
-                          onChange={(e) => {
-                            setMtnMomoSubscriptionKey(e.target.value);
-                            return setError({
-                              ...error,
-                              mtnMomoSubscriptionKey: "",
-                            });
-                          }}
-                        />
-                        {error && (
-                          <p className="errorMessage text-start">
-                            {error && error?.mtnMomoSubscriptionKey}
-                          </p>
-                        )}
                         <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
-                          Optional: Some MTN MoMo API configurations require this key (Ocp-Apim-Subscription-Key), 
-                          while others only need Primary and Secondary keys. Leave empty if your API doesn't require it.
+                          <strong>Note:</strong> The Subscription Key for <code>Ocp-Apim-Subscription-Key</code> header will be automatically set to your Primary Key. 
+                          You can also use Secondary Key if needed - both work as subscription keys.
                         </label>
-                        {error && (
-                          <p className="errorMessage text-start">
-                            {error && error?.mtnMomoSubscriptionKey}
-                          </p>
-                        )}
                       </div>
                     </div>
                     <div className="col-12">

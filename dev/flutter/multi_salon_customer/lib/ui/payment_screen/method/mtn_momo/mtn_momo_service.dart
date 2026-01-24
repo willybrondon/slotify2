@@ -96,9 +96,6 @@ class MtnMomoService {
     String secondaryKey = mtnMomoSecondaryKeyParam ??
         splashController.settingCategory?.setting?.mtnMomoSecondaryKey ??
         "";
-    String subscriptionKey = mtnMomoSubscriptionKeyParam ??
-        splashController.settingCategory?.setting?.mtnMomoSubscriptionKey ??
-        "";
     String environment = mtnMomoEnvironmentParam ??
         splashController.settingCategory?.setting?.mtnMomoEnvironment ??
         "sandbox";
@@ -111,14 +108,12 @@ class MtnMomoService {
       throw Exception("MTN MoMo Secondary Key is not configured");
     }
 
-    // Subscription Key is REQUIRED for MTN MoMo API authentication
-    // Without it, the API will return 401 Unauthorized
-    if (subscriptionKey == null || subscriptionKey.isEmpty) {
-      throw Exception("MTN MoMo Subscription Key is required for authentication. Please configure it in Admin Settings.");
-    }
+    // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
+    String subscriptionKey = primaryKey;
 
     log("Using MTN MoMo Primary Key: ${primaryKey.substring(0, 7)}...");
     log("Using MTN MoMo environment: $environment");
+    log("Using Primary Key as Subscription Key: ${subscriptionKey.substring(0, 7)}...");
 
     mtnMomoPrimaryKey = primaryKey;
     mtnMomoSecondaryKey = secondaryKey;
@@ -184,10 +179,8 @@ class MtnMomoService {
       // 4. Subscription Key (Ocp-Apim-Subscription-Key) may be required for some endpoints
       
       // Get access token using Primary Key and Secondary Key
-      // MTN MoMo API requires Subscription Key (Ocp-Apim-Subscription-Key) for authentication
-      if (mtnMomoSubscriptionKey == null || mtnMomoSubscriptionKey!.isEmpty) {
-        throw Exception("MTN MoMo Subscription Key is required. Please configure it in Admin Settings.");
-      }
+      // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
+      String subscriptionKey = mtnMomoPrimaryKey;
       
       String tokenCredentials = base64Encode(utf8.encode('$mtnMomoPrimaryKey:$mtnMomoSecondaryKey'));
       
@@ -200,13 +193,13 @@ class MtnMomoService {
       
       Map<String, String> tokenHeaders = {
         'Authorization': 'Basic $tokenCredentials',
-        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey!, // REQUIRED - always include
+        'Ocp-Apim-Subscription-Key': subscriptionKey, // Use Primary Key as Subscription Key
         'X-Target-Environment': targetEnvironment,
         'Content-Type': 'application/json',
       };
       
       log("MTN MoMo Token Request - Environment: $targetEnvironment");
-      log("MTN MoMo Token Request - Using Subscription Key: ${mtnMomoSubscriptionKey!.substring(0, 7)}...");
+      log("MTN MoMo Token Request - Using Primary Key as Subscription Key: ${subscriptionKey.substring(0, 7)}...");
       
       var tokenResponse = await http.post(
         Uri.parse('$baseUrl/collection/token/'),
@@ -271,11 +264,11 @@ class MtnMomoService {
       log("MTN MoMo request body :: $body");
 
       // Reuse targetEnvironment from above (already set at line 195)
-      // No need to redeclare it
+      // Use Primary Key as Subscription Key (reuse subscriptionKey from above)
       
       Map<String, String> paymentHeaders = {
         'Authorization': 'Bearer $accessToken',
-        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey!, // REQUIRED - always include
+        'Ocp-Apim-Subscription-Key': subscriptionKey, // Use Primary Key as Subscription Key
         'X-Target-Environment': targetEnvironment,
         'X-Reference-Id': reference,
         'X-Callback-Url': 'https://skedisy.com/payment/mtn-momo/callback', // Your webhook URL
@@ -338,11 +331,8 @@ class MtnMomoService {
           : Constant.mtnMomoBaseUrl;
 
       // Get access token first using Primary Key and Secondary Key
-      // Subscription Key is REQUIRED
-      if (mtnMomoSubscriptionKey == null || mtnMomoSubscriptionKey!.isEmpty) {
-        log("Failed to get access token for status check - Subscription Key missing");
-        return;
-      }
+      // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
+      String subscriptionKey = mtnMomoPrimaryKey;
       
       String tokenCredentials = base64Encode(utf8.encode('$mtnMomoPrimaryKey:$mtnMomoSecondaryKey'));
       
@@ -354,7 +344,7 @@ class MtnMomoService {
       
       Map<String, String> tokenHeaders = {
         'Authorization': 'Basic $tokenCredentials',
-        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey!, // REQUIRED - always include
+        'Ocp-Apim-Subscription-Key': subscriptionKey, // Use Primary Key as Subscription Key
         'X-Target-Environment': targetEnvironment,
       };
       
@@ -377,11 +367,11 @@ class MtnMomoService {
       }
 
       // Reuse targetEnvironment from above (already set at line 353)
-      // No need to redeclare it
+      // Use Primary Key as Subscription Key (reuse subscriptionKey from above)
       
       Map<String, String> statusHeaders = {
         'Authorization': 'Bearer $accessToken',
-        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey!, // REQUIRED - always include
+        'Ocp-Apim-Subscription-Key': subscriptionKey, // Use Primary Key as Subscription Key
         'X-Target-Environment': targetEnvironment,
       };
       
