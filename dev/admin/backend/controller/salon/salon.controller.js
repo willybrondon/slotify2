@@ -908,15 +908,28 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       ? "https://api.momodeveloper.mtn.com"
       : "https://sandbox.momodeveloper.mtn.com";
 
-    // Get currency from settings - MTN MoMo for Cameroon only supports XAF
-    let currency = (setting.currencyName || "XAF").toUpperCase();
+    // MTN MoMo for Cameroon only supports XAF currency
+    // Always use XAF regardless of the currency in settings
+    const currency = "XAF"; // Fixed to XAF for MTN MoMo (Cameroon)
     let paymentAmount = parseFloat(amount);
     
-    // Convert EUR to XAF if needed (approximate rate: 1 EUR ≈ 655 XAF)
-    if (currency === "EUR") {
-      currency = "XAF";
-      paymentAmount = paymentAmount * 655; // Convert EUR to XAF
-      console.log(`Converted ${amount} EUR to ${paymentAmount.toFixed(2)} XAF`);
+    // Get the original currency from settings to convert if needed
+    const originalCurrency = (setting.currencyName || "XAF").toUpperCase();
+    
+    // Convert to XAF if the original currency is not XAF
+    if (originalCurrency !== "XAF") {
+      // Conversion rates (approximate)
+      const conversionRates = {
+        "EUR": 655, // 1 EUR ≈ 655 XAF
+        "USD": 600, // 1 USD ≈ 600 XAF (approximate)
+        "GBP": 750, // 1 GBP ≈ 750 XAF (approximate)
+      };
+      
+      const rate = conversionRates[originalCurrency] || 655; // Default to EUR rate if unknown
+      paymentAmount = paymentAmount * rate;
+      console.log(`Converted ${amount} ${originalCurrency} to ${paymentAmount.toFixed(2)} XAF (rate: ${rate})`);
+    } else {
+      console.log(`Using XAF currency directly: ${paymentAmount.toFixed(2)} XAF`);
     }
 
     // Step 1: Get access token
