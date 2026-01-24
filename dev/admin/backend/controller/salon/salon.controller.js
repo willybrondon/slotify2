@@ -980,14 +980,33 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     const accessToken = tokenResponse.data.access_token;
 
     // Step 2: Create payment request
-    // Generate unique payment reference (UUID format preferred, but timestamp-based is acceptable)
-    const reference = `SALON_${Date.now()}_${salonId}`;
+    // Generate unique payment reference - MTN MoMo requires UUID format for X-Reference-Id
+    // Using crypto to generate a UUID v4 format
+    const crypto = require("crypto");
+    const uuid = crypto.randomUUID ? crypto.randomUUID() : 
+      `${crypto.randomBytes(16).toString('hex').substring(0, 8)}-${crypto.randomBytes(16).toString('hex').substring(0, 4)}-4${crypto.randomBytes(16).toString('hex').substring(0, 3)}-${crypto.randomBytes(16).toString('hex').substring(0, 4)}-${crypto.randomBytes(16).toString('hex').substring(0, 12)}`;
+    const reference = uuid; // Use UUID format for X-Reference-Id
+    const externalId = `SALON_${Date.now()}_${salonId}`; // Use timestamp-based for externalId
     const cleanPhone = phoneNumber.replace(/\D/g, ""); // Remove non-digits
 
+    // Validate phone number format (should start with country code, e.g., 237 for Cameroon)
+    if (!cleanPhone || cleanPhone.length < 9) {
+      return res.status(200).json({
+        status: false,
+        message: "Invalid phone number format. Please include country code (e.g., 237XXXXXXXXX for Cameroon).",
+      });
+    }
+
+    // MTN MoMo requires amount as string without decimal points for XAF
+    // For XAF, amount should be a whole number (no decimals)
+    const amountString = currency === "XAF" 
+      ? Math.round(paymentAmount).toString() 
+      : paymentAmount.toFixed(2);
+
     const paymentBody = {
-      amount: paymentAmount.toFixed(2), // Use converted amount
+      amount: amountString, // String format, whole number for XAF
       currency: currency, // XAF for MTN MoMo
-      externalId: reference,
+      externalId: externalId, // External reference for tracking
       payer: {
         partyIdType: "MSISDN",
         partyId: cleanPhone,
@@ -1003,10 +1022,24 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       "Authorization": `Bearer ${accessToken}`, // Access Token from OAuth
       "Ocp-Apim-Subscription-Key": subscriptionKey, // Subscription Key from subscription
       "X-Target-Environment": targetEnvironment,
-      "X-Reference-Id": reference, // Payment reference (unique UUID for each payment)
+      "X-Reference-Id": reference, // Payment reference (UUID format required by MTN MoMo)
       "X-Callback-Url": callbackUrl,
       "Content-Type": "application/json",
     };
+
+    // Log payment request details for debugging
+    console.log("MTN MoMo Payment Request:", {
+      url: `${baseUrl}/collection/v1_0/requesttopay`,
+      amount: amountString,
+      currency: currency,
+      phoneNumber: cleanPhone,
+      reference: reference,
+      externalId: externalId,
+      environment: targetEnvironment,
+      hasAccessToken: !!accessToken,
+      hasSubscriptionKey: !!subscriptionKey,
+    });
+    console.log("MTN MoMo Payment Body:", JSON.stringify(paymentBody, null, 2));
 
     let paymentResponse;
     try {
@@ -1017,9 +1050,34 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       );
     } catch (error) {
       console.error("MTN MoMo Payment Request Error:", error.response?.data || error.message);
+      console.error("MTN MoMo Payment Request Error Details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers,
+        requestUrl: `${baseUrl}/collection/v1_0/requesttopay`,
+        requestBody: paymentBody,
+        requestHeaders: {
+          ...paymentHeaders,
+          Authorization: paymentHeaders.Authorization ? "Bearer ***" : undefined,
+        },
+      });
+      
+      let errorMessage = `Payment request failed: ${error.response?.data?.message || error.response?.data?.error || error.message}`;
+      
+      // Provide more specific error messages
+      if (error.response?.status === 500) {
+        errorMessage = "MTN MoMo server error. Please check:\n" +
+          "1. Amount format is correct (whole number for XAF)\n" +
+          "2. Phone number format is correct (with country code)\n" +
+          "3. X-Reference-Id is in UUID format\n" +
+          "4. All required headers are present\n" +
+          `Error details: ${error.response?.data?.message || error.response?.data?.error || "Internal server error"}`;
+      }
+      
       return res.status(200).json({
         status: false,
-        message: `Payment request failed: ${error.response?.data?.message || error.message}`,
+        message: errorMessage,
       });
     }
 
