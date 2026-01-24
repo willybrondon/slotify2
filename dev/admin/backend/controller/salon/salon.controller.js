@@ -845,7 +845,7 @@ exports.walletHistory = async (req, res) => {
 // Create MTN MoMo Payment Request for salon wallet recharge
 exports.createMTNMomoPaymentRequest = async (req, res) => {
   try {
-    const { amount, phoneNumber } = req.query;
+    const { amount, phoneNumber, currency: requestedCurrency } = req.query;
     const salonId = req.salon._id;
 
     if (!amount || parseFloat(amount) <= 0) {
@@ -903,8 +903,15 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       ? "https://api.momodeveloper.mtn.com"
       : "https://sandbox.momodeveloper.mtn.com";
 
-    // Get currency from settings
-    const currency = (setting.currencyName || "XAF").toUpperCase();
+    // Get currency - MTN MoMo for Cameroon only supports XAF
+    // If user requests EUR or other currency, we'll use XAF (MTN MoMo requirement)
+    let currency = (requestedCurrency || setting.currencyName || "XAF").toUpperCase();
+    
+    // MTN MoMo for Cameroon only supports XAF - force XAF if other currency is requested
+    if (currency !== "XAF") {
+      console.log(`MTN MoMo only supports XAF. Converting ${currency} to XAF.`);
+      currency = "XAF";
+    }
 
     // Step 1: Get access token
     const tokenCredentials = Buffer.from(`${setting.mtnMomoPrimaryKey}:${setting.mtnMomoSecondaryKey}`).toString("base64");
@@ -923,9 +930,35 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       tokenResponse = await axios.post(`${baseUrl}/collection/token/`, {}, { headers: tokenHeaders });
     } catch (error) {
       console.error("MTN MoMo Token Error:", error.response?.data || error.message);
+      console.error("MTN MoMo Token Error Details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        environment: targetEnvironment,
+        baseUrl: baseUrl,
+      });
+      
+      let errorMessage = `Failed to get MTN MoMo access token: ${error.response?.data?.message || error.message}`;
+      
+      // Provide more specific error messages
+      if (error.response?.status === 401) {
+        errorMessage = "Authentication failed (401). Please verify:\n" +
+          "1. Primary Key and Secondary Key are correct\n" +
+          "2. Environment matches your API credentials (sandbox/production)\n" +
+          "3. API User is created in MTN MoMo Developer Portal";
+      } else if (error.response?.status === 500) {
+        errorMessage = "MTN MoMo API server error (500). Please:\n" +
+          "1. Verify your API credentials are correct\n" +
+          "2. Check if you're using the correct environment (sandbox/production)\n" +
+          "3. Ensure your API subscription is active in MTN MoMo Developer Portal\n" +
+          "4. Verify Primary Key is being used as Subscription Key";
+      } else if (error.response?.status === 403) {
+        errorMessage = "Access forbidden (403). Please verify your subscription key (Primary Key) is correct.";
+      }
+      
       return res.status(200).json({
         status: false,
-        message: `Failed to get MTN MoMo access token: ${error.response?.data?.message || error.message}`,
+        message: errorMessage,
       });
     }
 
@@ -940,7 +973,35 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     // Step 2: Create payment request
     const reference = `SALON_${Date.now()}_${salonId}`;
-    const cleanPhone = phoneNumber.replace(/\D/g, ""); // Remove non-digits
+    
+    // Clean phone number - ensure it's in correct format for MTN MoMo (Cameroon)
+    let cleanPhone = phoneNumber.replace(/\D/g, ""); // Remove non-digits
+    
+    // Ensure Cameroon number format (237XXXXXXXXX)
+    if (!cleanPhone.startsWith("237") && (cleanPhone.startsWith("6") || cleanPhone.startsWith("7"))) {
+      cleanPhone = "237" + cleanPhone;
+    }
+    
+    // Validate phone number format for Cameroon
+    if (!cleanPhone.startsWith("237") || cleanPhone.length !== 12) {
+      return res.status(200).json({
+        status: false,
+        message: "Invalid phone number format. Please use Cameroon format: +237XXXXXXXXX (12 digits total)",
+      });
+    }
+    
+    // Ensure Cameroon number format (237XXXXXXXXX)
+    if (!cleanPhone.startsWith("237") && (cleanPhone.startsWith("6") || cleanPhone.startsWith("7"))) {
+      cleanPhone = "237" + cleanPhone;
+    }
+    
+    // Validate phone number format
+    if (!cleanPhone.startsWith("237") || cleanPhone.length !== 12) {
+      return res.status(200).json({
+        status: false,
+        message: "Invalid phone number format. Please use Cameroon format: +237XXXXXXXXX",
+      });
+    }
 
     const paymentBody = {
       amount: parseFloat(amount).toFixed(2),

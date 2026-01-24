@@ -26,6 +26,7 @@ const Wallet = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [phoneError, setPhoneError] = useState(false);
     const [paymentReference, setPaymentReference] = useState(null);
+    const [momoCurrency, setMomoCurrency] = useState("XAF"); // MTN MoMo currency (default XAF for Cameroon)
     
     const quickAmounts = ["50", "100", "150", "200", "250", "300", "500"];
     
@@ -280,10 +281,25 @@ const Wallet = () => {
                     return;
                 }
 
-                // Clean phone number (remove spaces, dashes, etc.)
-                const cleanPhone = phoneNumber.replace(/\D/g, "");
-                if (cleanPhone.length < 9) {
-                    toast.error("Please enter a valid phone number");
+                // Clean phone number (remove spaces, dashes, +, etc.)
+                let cleanPhone = phoneNumber.replace(/\D/g, "");
+                
+                // Handle Cameroon numbers: if starts with 237, keep it; if starts with 6 or 7, add 237
+                if (cleanPhone.startsWith("237")) {
+                    // Already has country code
+                } else if (cleanPhone.startsWith("6") || cleanPhone.startsWith("7")) {
+                    // Cameroon local number, add country code
+                    cleanPhone = "237" + cleanPhone;
+                } else {
+                    toast.error("Please enter a valid Cameroon MTN MoMo phone number");
+                    setPhoneError(true);
+                    setIsProcessing(false);
+                    return;
+                }
+                
+                // Validate Cameroon phone number format (237XXXXXXXXX, should be 12 digits total)
+                if (cleanPhone.length !== 12 || !cleanPhone.startsWith("237")) {
+                    toast.error("Please enter a valid Cameroon phone number (e.g., +237673052269)");
                     setPhoneError(true);
                     setIsProcessing(false);
                     return;
@@ -293,7 +309,7 @@ const Wallet = () => {
 
                 // Create MTN MoMo payment request
                 const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
-                const momoUrl = `${baseUrlClean}/salon/createMTNMomoPaymentRequest?amount=${rechargeAmount}&phoneNumber=${encodeURIComponent(cleanPhone)}`;
+                const momoUrl = `${baseUrlClean}/salon/createMTNMomoPaymentRequest?amount=${rechargeAmount}&phoneNumber=${encodeURIComponent(cleanPhone)}&currency=${momoCurrency}`;
                 
                 const response = await fetch(
                     momoUrl,
@@ -605,32 +621,53 @@ const Wallet = () => {
 
                                 {/* MTN MoMo Phone Number Input */}
                                 {paymentMethod === "MTN MoMo" && (
-                                    <div className="inputData mt-4">
-                                        <label className="styleForTitle" htmlFor="phoneNumber">
-                                            MTN MoMo Phone Number
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            name="phoneNumber"
-                                            className={`form-control fw-bold p-3 ${phoneError ? "border-danger" : ""}`}
-                                            id="phoneNumber"
-                                            placeholder="Enter your MTN MoMo phone number (e.g., 237612345678)"
-                                            value={phoneNumber}
-                                            onChange={(e) => {
-                                                setPhoneNumber(e.target.value);
-                                                setPhoneError(false);
-                                            }}
-                                            disabled={isProcessing}
-                                        />
-                                        {phoneError && (
-                                            <label className="d-flex justify-content-end mt-1" style={{ color: "red", fontSize: "15px" }}>
-                                                *Please enter a valid phone number
+                                    <>
+                                        <div className="inputData mt-4">
+                                            <label className="styleForTitle" htmlFor="phoneNumber">
+                                                MTN MoMo Phone Number
                                             </label>
-                                        )}
-                                        <small className="text-muted mt-1 d-block">
-                                            Enter your MTN Mobile Money registered phone number
-                                        </small>
-                                    </div>
+                                            <input
+                                                type="tel"
+                                                name="phoneNumber"
+                                                className={`form-control fw-bold p-3 ${phoneError ? "border-danger" : ""}`}
+                                                id="phoneNumber"
+                                                placeholder="Enter your MTN MoMo phone number (e.g., +237673052269 or 237673052269)"
+                                                value={phoneNumber}
+                                                onChange={(e) => {
+                                                    setPhoneNumber(e.target.value);
+                                                    setPhoneError(false);
+                                                }}
+                                                disabled={isProcessing}
+                                            />
+                                            {phoneError && (
+                                                <label className="d-flex justify-content-end mt-1" style={{ color: "red", fontSize: "15px" }}>
+                                                    *Please enter a valid phone number
+                                                </label>
+                                            )}
+                                            <small className="text-muted mt-1 d-block">
+                                                Format: +237XXXXXXXXX or 237XXXXXXXXX (Cameroon MTN MoMo number)
+                                            </small>
+                                        </div>
+                                        
+                                        {/* Currency Selection for MTN MoMo */}
+                                        <div className="inputData mt-4">
+                                            <label className="styleForTitle" htmlFor="momoCurrency">
+                                                Payment Currency
+                                            </label>
+                                            <select
+                                                className="form-control p-3"
+                                                id="momoCurrency"
+                                                value={momoCurrency}
+                                                onChange={(e) => setMomoCurrency(e.target.value)}
+                                                disabled={isProcessing}
+                                            >
+                                                <option value="XAF">XAF (Central African CFA Franc) - Required for Cameroon</option>
+                                            </select>
+                                            <small className="text-muted mt-1 d-block" style={{ fontSize: "12px" }}>
+                                                <strong>Note:</strong> MTN MoMo for Cameroon only supports XAF currency. Your amount will be processed in XAF regardless of your wallet currency.
+                                            </small>
+                                        </div>
+                                    </>
                                 )}
                             </>
                         ) : (
