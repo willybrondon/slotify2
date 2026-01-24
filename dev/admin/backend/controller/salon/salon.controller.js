@@ -920,28 +920,56 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
       ? "https://api.momodeveloper.mtn.com"
       : "https://sandbox.momodeveloper.mtn.com";
 
-    // MTN MoMo for Cameroon only supports XAF currency
-    // Always use XAF regardless of the currency in settings
-    const currency = "XAF"; // Fixed to XAF for MTN MoMo (Cameroon)
+    // IMPORTANT: MTN MoMo currency support
+    // - Sandbox: Only supports EUR (country-specific currencies not available)
+    // - Production: Supports country-specific currencies (XAF for Cameroon, UGX for Uganda, etc.)
+    let currency;
     let paymentAmount = parseFloat(amount);
     
-    // Get the original currency from settings to convert if needed
-    const originalCurrency = (setting.currencyName || "XAF").toUpperCase();
-    
-    // Convert to XAF if the original currency is not XAF
-    if (originalCurrency !== "XAF") {
-      // Conversion rates (approximate)
-      const conversionRates = {
-        "EUR": 655, // 1 EUR ≈ 655 XAF
-        "USD": 600, // 1 USD ≈ 600 XAF (approximate)
-        "GBP": 750, // 1 GBP ≈ 750 XAF (approximate)
-      };
+    if (environment === "production") {
+      // Production: Use XAF for Cameroon
+      currency = "XAF";
       
-      const rate = conversionRates[originalCurrency] || 655; // Default to EUR rate if unknown
-      paymentAmount = paymentAmount * rate;
-      console.log(`Converted ${amount} ${originalCurrency} to ${paymentAmount.toFixed(2)} XAF (rate: ${rate})`);
+      // Get the original currency from settings to convert if needed
+      const originalCurrency = (setting.currencyName || "XAF").toUpperCase();
+      
+      // Convert to XAF if the original currency is not XAF
+      if (originalCurrency !== "XAF") {
+        // Conversion rates (approximate)
+        const conversionRates = {
+          "EUR": 655, // 1 EUR ≈ 655 XAF
+          "USD": 600, // 1 USD ≈ 600 XAF (approximate)
+          "GBP": 750, // 1 GBP ≈ 750 XAF (approximate)
+        };
+        
+        const rate = conversionRates[originalCurrency] || 655; // Default to EUR rate if unknown
+        paymentAmount = paymentAmount * rate;
+        console.log(`[Production] Converted ${amount} ${originalCurrency} to ${paymentAmount.toFixed(2)} XAF (rate: ${rate})`);
+      } else {
+        console.log(`[Production] Using XAF currency directly: ${paymentAmount.toFixed(2)} XAF`);
+      }
     } else {
-      console.log(`Using XAF currency directly: ${paymentAmount.toFixed(2)} XAF`);
+      // Sandbox: Only supports EUR
+      currency = "EUR";
+      
+      // Get the original currency from settings to convert if needed
+      const originalCurrency = (setting.currencyName || "EUR").toUpperCase();
+      
+      // Convert to EUR if the original currency is not EUR
+      if (originalCurrency !== "EUR") {
+        // Conversion rates (approximate)
+        const conversionRates = {
+          "XAF": 0.0015, // 1 XAF ≈ 0.0015 EUR (1 EUR ≈ 655 XAF)
+          "USD": 0.92, // 1 USD ≈ 0.92 EUR (approximate)
+          "GBP": 1.15, // 1 GBP ≈ 1.15 EUR (approximate)
+        };
+        
+        const rate = conversionRates[originalCurrency] || 1; // Default to 1 if unknown
+        paymentAmount = paymentAmount * rate;
+        console.log(`[Sandbox] Converted ${amount} ${originalCurrency} to ${paymentAmount.toFixed(2)} EUR (rate: ${rate})`);
+      } else {
+        console.log(`[Sandbox] Using EUR currency directly: ${paymentAmount.toFixed(2)} EUR`);
+      }
     }
 
     // Step 1: Get access token
@@ -1066,9 +1094,13 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
     // IMPORTANT: Currency must be "XAF" for Cameroon MTN MoMo
     // The sandbox environment should support XAF, but if it doesn't, 
     // you may need to configure your API User for XAF currency in MTN Developer Portal
+    // MTN MoMo payment body
+    // IMPORTANT: 
+    // - Sandbox: Only supports EUR (country-specific currencies not available)
+    // - Production: Supports XAF for Cameroon, UGX for Uganda, etc.
     const paymentBody = {
-      amount: amountString, // String format, whole number for XAF
-      currency: "XAF", // Hardcoded to XAF - required for Cameroon MTN MoMo
+      amount: amountString, // String format (whole number for XAF, 2 decimals for EUR)
+      currency: currency, // EUR for sandbox, XAF for production (Cameroon)
       externalId: externalId, // External reference for tracking
       payer: {
         partyIdType: "MSISDN",
