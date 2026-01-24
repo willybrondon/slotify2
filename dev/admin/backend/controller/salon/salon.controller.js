@@ -1115,33 +1115,24 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     // Construct callback URL
     // IMPORTANT: This must match the providerCallbackHost configured when creating the API User
-    // providerCallbackHost should be set to your API domain (e.g., "https://api.skedisy.com")
+    // providerCallbackHost should be set to your main domain (e.g., "https://skedisy.com")
     // The callback URL will be: {providerCallbackHost}/salon/handleMTNMomoPaymentCallback
     const baseURL = (process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com").replace(/\/+$/, ''); // Remove trailing slashes
     
-    // Extract domain and construct API callback URL
-    // If providerCallbackHost is "https://api.skedisy.com", callback should be "https://api.skedisy.com/salon/handleMTNMomoPaymentCallback"
+    // Use the main domain for callback URL (not api subdomain)
+    // Extract domain from baseURL and construct callback URL
     let callbackUrl;
     try {
       const urlObj = new URL(baseURL);
       const hostname = urlObj.hostname; // Extract domain (e.g., "skedisy.com")
       
-      // Check if we should use api subdomain
-      // If baseURL contains "api.", use it, otherwise construct api subdomain
-      if (hostname.includes("api.")) {
-        callbackUrl = `https://${hostname}/salon/handleMTNMomoPaymentCallback`;
-      } else {
-        // Use api subdomain (e.g., api.skedisy.com)
-        callbackUrl = `https://api.${hostname}/salon/handleMTNMomoPaymentCallback`;
-      }
+      // Remove any subdomain (like "api." or "www.") and use main domain
+      const mainDomain = hostname.replace(/^(www\.|api\.)/, ''); // Remove www. or api. prefix
+      callbackUrl = `https://${mainDomain}/salon/handleMTNMomoPaymentCallback`;
     } catch (error) {
-      // Fallback: try to construct api subdomain from baseURL
-      if (baseURL.includes("api.")) {
-        callbackUrl = `${baseURL}/salon/handleMTNMomoPaymentCallback`;
-      } else {
-        // Replace main domain with api subdomain
-        callbackUrl = baseURL.replace(/https?:\/\/(www\.)?/, "https://api.") + "/salon/handleMTNMomoPaymentCallback";
-      }
+      // Fallback: use baseURL directly, removing any subdomain
+      const cleanURL = baseURL.replace(/https?:\/\/(www\.|api\.)?/, "https://");
+      callbackUrl = `${cleanURL}/salon/handleMTNMomoPaymentCallback`;
     }
     
     console.log("MTN MoMo Callback URL:", callbackUrl);
