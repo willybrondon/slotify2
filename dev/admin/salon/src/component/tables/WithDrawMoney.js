@@ -111,14 +111,18 @@ const WithDrawMoney = () => {
 
                 <div className="row">
                     <div className="col-md-6" style={{ position: "relative" }}>
-                        {/* Text positioned on top of the image */}
-                        <div style={{ position: "absolute", top: "14%", left: "29%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>
-                            My Available Balance
-                        </div>
-                        <div style={{ position: "absolute", top: "20%", left: "16%", transform: "translateX(-50%)", color: "white", fontSize: "40px", zIndex: 2, fontWeight: "bold" }}>{currency?.currencySymbol} {admin?.earning}</div>
-
                         {/* Image */}
                         <img src={withDrawBanner} alt="Withdraw Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
+                        
+                        {/* Text positioned at center of the image */}
+                        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 2, textAlign: "center", width: "90%" }}>
+                            <div style={{ color: "white", fontSize: "30px", fontWeight: "bold", marginBottom: "10px", textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)" }}>
+                                My Available Balance
+                            </div>
+                            <div style={{ color: "white", fontSize: "40px", fontWeight: "bold", textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)" }}>
+                                {currency?.currencySymbol || ""} {admin?.earning || "0.00"}
+                            </div>
+                        </div>
 
                         <div className="inputData">
                             <label className="styleForTitle mt-2" htmlFor="withdrawAmount">

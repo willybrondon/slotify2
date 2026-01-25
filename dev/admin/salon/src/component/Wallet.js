@@ -410,12 +410,12 @@ const Wallet = () => {
                         {/* Image */}
                         <img src={withDrawBanner} alt="Wallet Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
                         
-                        {/* Text positioned vertically centered on top of the image */}
-                        <div className="wallet-balance-container">
-                            <div className="wallet-balance-label">
+                        {/* Text positioned at center of the image */}
+                        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 2, textAlign: "center", width: "90%" }}>
+                            <div style={{ color: "white", fontSize: "30px", fontWeight: "bold", marginBottom: "10px", textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)" }}>
                                 My Wallet Balance
                             </div>
-                            <div className="wallet-balance-amount">
+                            <div style={{ color: "white", fontSize: "40px", fontWeight: "bold", textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)" }}>
                                 {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
                             </div>
                         </div>
