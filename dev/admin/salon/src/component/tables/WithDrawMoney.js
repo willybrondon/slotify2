@@ -106,19 +106,73 @@ const WithDrawMoney = () => {
 
     return (
         <>
+            <style>
+                {`
+                    .withdraw-balance-container {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        z-index: 2;
+                        width: 90%;
+                        text-align: center;
+                    }
+                    .withdraw-balance-label {
+                        color: white;
+                        font-size: 30px;
+                        font-weight: bold;
+                        margin-bottom: 10px;
+                        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                    }
+                    .withdraw-balance-amount {
+                        color: white;
+                        font-size: 40px;
+                        font-weight: bold;
+                        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                    }
+                    @media (max-width: 768px) {
+                        .withdraw-balance-container {
+                            width: 90%;
+                        }
+                        .withdraw-balance-label {
+                            font-size: 24px;
+                            margin-bottom: 8px;
+                        }
+                        .withdraw-balance-amount {
+                            font-size: 32px;
+                        }
+                    }
+                    @media (max-width: 480px) {
+                        .withdraw-balance-container {
+                            width: 85%;
+                        }
+                        .withdraw-balance-label {
+                            font-size: 20px;
+                            margin-bottom: 6px;
+                        }
+                        .withdraw-balance-amount {
+                            font-size: 28px;
+                        }
+                    }
+                `}
+            </style>
             <div className="mainExpert">
                 <Title name="Withdraw Money" />
 
                 <div className="row">
                     <div className="col-md-6" style={{ position: "relative" }}>
-                        {/* Text positioned on top of the image */}
-                        <div style={{ position: "absolute", top: "14%", left: "29%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>
-                            My Available Balance
-                        </div>
-                        <div style={{ position: "absolute", top: "20%", left: "16%", transform: "translateX(-50%)", color: "white", fontSize: "40px", zIndex: 2, fontWeight: "bold" }}>{currency?.currencySymbol} {admin?.earning}</div>
-
                         {/* Image */}
-                        <img src={withDrawBanner} alt="Withdraw Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
+                        <img src={withDrawBanner} alt="Withdraw Banner" height={200} className="rounded-4" style={{ width: "100%", display: "block" }} />
+                        
+                        {/* Text positioned vertically centered on top of the image */}
+                        <div className="withdraw-balance-container">
+                            <div className="withdraw-balance-label">
+                                My Available Balance
+                            </div>
+                            <div className="withdraw-balance-amount">
+                                {currency?.currencySymbol || ""} {admin?.earning || "0.00"}
+                            </div>
+                        </div>
 
                         <div className="inputData">
                             <label className="styleForTitle mt-2" htmlFor="withdrawAmount">

@@ -408,7 +408,7 @@ const Wallet = () => {
                     {/* Left Column - Balance Banner */}
                     <div className="col-md-6" style={{ position: "relative" }}>
                         {/* Image */}
-                        <img src={withDrawBanner} alt="Wallet Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
+                        <img src={withDrawBanner} alt="Wallet Banner" height={200} className="rounded-4" style={{ width: "100%", display: "block" }} />
                         
                         {/* Text positioned vertically centered on top of the image */}
                         <div className="wallet-balance-container">
