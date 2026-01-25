@@ -408,10 +408,10 @@ const Wallet = () => {
                     {/* Left Column - Balance Banner */}
                     <div className="col-md-6" style={{ position: "relative" }}>
                         {/* Text positioned on top of the image */}
-                        <div style={{ position: "absolute", top: "14%", left: "29%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>
+                        <div style={{ position: "absolute", top: "5%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "17px", zIndex: 2, fontWeight: "bold" }}>
                             My Wallet Balance
                         </div>
-                        <div style={{ position: "absolute", top: "20%", left: "16%", transform: "translateX(-50%)", color: "white", fontSize: "40px", zIndex: 2, fontWeight: "bold" }}>
+                        <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>
                             {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
                         </div>
 

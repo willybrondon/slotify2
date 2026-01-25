@@ -112,10 +112,10 @@ const WithDrawMoney = () => {
                 <div className="row">
                     <div className="col-md-6" style={{ position: "relative" }}>
                         {/* Text positioned on top of the image */}
-                        <div style={{ position: "absolute", top: "14%", left: "29%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>
+                        <div style={{ position: "absolute", top: "5%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "17px", zIndex: 2, fontWeight: "bold" }}>
                             My Available Balance
                         </div>
-                        <div style={{ position: "absolute", top: "20%", left: "16%", transform: "translateX(-50%)", color: "white", fontSize: "40px", zIndex: 2, fontWeight: "bold" }}>{currency?.currencySymbol} {admin?.earning}</div>
+                        <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>{currency?.currencySymbol} {admin?.earning}</div>
 
                         {/* Image */}
                         <img src={withDrawBanner} alt="Withdraw Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
