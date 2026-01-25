@@ -132,6 +132,9 @@ class PaymentScreenController extends GetxController {
     // Clear all loading states when screen is closed
     log("Payment Screen - onClose called, clearing loading states");
     isLoading.value = false;
+    
+    // Dispose MTN MoMo phone controller
+    mtnMomoPhoneController.dispose();
     update([Constant.idProgressView]);
 
     // Clear booking controller loading state if it exists
@@ -1610,11 +1613,5 @@ class PaymentScreenController extends GetxController {
         update([Constant.idProgressView]);
       }
     }
-  }
-
-  @override
-  void onClose() {
-    mtnMomoPhoneController.dispose();
-    super.onClose();
   }
 }
