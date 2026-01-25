@@ -962,7 +962,11 @@ exports.serveSalonWebPage = async (req, res) => {
                 1px 1px 0 rgba(0,0,0,0.5);
             line-height: 1.6;
         }
-        .hero-subtitle * {
+        .hero-subtitle,
+        .hero-subtitle *,
+        .hero-content .hero-subtitle,
+        .hero-content .hero-subtitle *,
+        p.hero-subtitle {
             color: #ffffff !important;
         }
         .hero-rating {

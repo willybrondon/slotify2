@@ -31,6 +31,7 @@ import 'package:salon_2/utils/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/utils/utils.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
 class PaymentScreenController extends GetxController {
   dynamic args = Get.arguments;
@@ -48,11 +49,20 @@ class PaymentScreenController extends GetxController {
   // Flag to track if screen is closed (to prevent updates after navigation)
   bool isScreenClosed = false;
 
+  // MTN MoMo phone number controller
+  TextEditingController mtnMomoPhoneController = TextEditingController();
+  bool useRegisteredPhoneForMtnMomo = true; // Default to using registered phone
+
   // Booking controller reference for creating bookings
   BookingScreenController? bookingScreenController;
 
   @override
   void onInit() async {
+    // Initialize MTN MoMo phone controller with registered phone number
+    String registeredPhone = Constant.storage.read<String>('UserMobile') ?? "";
+    mtnMomoPhoneController.text = registeredPhone;
+    useRegisteredPhoneForMtnMomo = true;
+    
     await getDataFromArgs();
     // Initialize booking controller and sync coupon data for booking payments
     if (isWalletAdd == false && isCreateOrder == true) {
@@ -446,6 +456,12 @@ class PaymentScreenController extends GetxController {
 
         log("Parsed amount for MTN MoMo: $parsedAmount");
 
+        // Get phone number for MTN MoMo payment
+        String? mtnMomoPhone = null;
+        if (!useRegisteredPhoneForMtnMomo && mtnMomoPhoneController.text.trim().isNotEmpty) {
+          mtnMomoPhone = mtnMomoPhoneController.text.trim();
+        }
+
         // For wallet recharge
         if (isWalletAdd == true) {
           await MtnMomoService().init(
@@ -453,6 +469,7 @@ class PaymentScreenController extends GetxController {
             mtnMomoEnvironmentParam: mtnMomoEnvironment ?? "sandbox",
             totalAmountWithOutTax: parsedAmount,
             paymentType: "wallet_recharge",
+            phoneNumber: mtnMomoPhone, // Pass phone number (null will use registered number)
             // Legacy fields (for backward compatibility)
             mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
             mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
@@ -473,6 +490,7 @@ class PaymentScreenController extends GetxController {
             paymentType: "direct_payment",
             serviceId: bookingData?['serviceId'] ?? "",
             expertId: bookingData?['expertId'] ?? "",
+            phoneNumber: mtnMomoPhone, // Pass phone number (null will use registered number)
             // Legacy fields (for backward compatibility)
             mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
             mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
@@ -1592,5 +1610,11 @@ class PaymentScreenController extends GetxController {
         update([Constant.idProgressView]);
       }
     }
+  }
+
+  @override
+  void onClose() {
+    mtnMomoPhoneController.dispose();
+    super.onClose();
   }
 }

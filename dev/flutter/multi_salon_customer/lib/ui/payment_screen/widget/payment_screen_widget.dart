@@ -93,7 +93,10 @@ class PaymentMethodView extends StatelessWidget {
                   if (logic.selectedPayment == "wallet") const PaymentMyWalletView(),
                   if (logic.selectedPayment == "Stripe" && isStripeEnabled) const PaymentStripeView(),
                   if (logic.selectedPayment == "Zitopay" && isZitopayEnabled) const PaymentZitopayView(),
-                  if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) const PaymentMtnMomoView(),
+                  if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) ...[
+                    const PaymentMtnMomoView(),
+                    const MtnMomoPhoneNumberInput(),
+                  ],
                   if (logic.selectedPayment == "Razorpay" && isRazorPayEnabled) const PaymentRazorPayView(),
                   if (logic.selectedPayment == "flutterWave" && isFlutterWaveEnabled) const PaymentFlutterWaveView(),
                   if (logic.selectedPayment == "cashAfterService")
@@ -1119,6 +1122,115 @@ class PaymentMtnMomoView extends StatelessWidget {
         );
       },
     ).paddingOnly(bottom: 15);
+  }
+}
+
+class MtnMomoPhoneNumberInput extends StatelessWidget {
+  const MtnMomoPhoneNumberInput({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<PaymentScreenController>(
+      id: Constant.idSelectPaymentMethod,
+      builder: (logic) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 15, left: 0, right: 0),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: AppColors.grey.withOpacity(0.2),
+            ),
+            borderRadius: BorderRadius.circular(10),
+            color: AppColors.whiteColor,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "MTN MoMo Phone Number",
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplay,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryTextColor,
+                ),
+              ).paddingOnly(bottom: 8),
+              TextField(
+                controller: logic.mtnMomoPhoneController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  hintText: "Enter phone number with country code (e.g., 237XXXXXXXXX)",
+                  hintStyle: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.greyColor,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: AppColors.grey.withOpacity(0.3),
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: AppColors.grey.withOpacity(0.3),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: AppColors.primaryAppColor,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
+                ),
+                enabled: !logic.useRegisteredPhoneForMtnMomo,
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Checkbox(
+                    value: logic.useRegisteredPhoneForMtnMomo,
+                    onChanged: (value) {
+                      logic.useRegisteredPhoneForMtnMomo = value ?? true;
+                      logic.update([Constant.idSelectPaymentMethod]);
+                    },
+                    activeColor: AppColors.primaryAppColor,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "Use my registered phone number",
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplay,
+                        fontSize: 14,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (!logic.useRegisteredPhoneForMtnMomo && logic.mtnMomoPhoneController.text.trim().isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    "Please enter a valid phone number with country code (e.g., 237 for Cameroon)",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplay,
+                      fontSize: 12,
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 

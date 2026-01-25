@@ -24,6 +24,7 @@ class MtnMomoService {
   static late String mtnMomoApiUserId; // API User ID (UUID created when creating API User)
   static late String mtnMomoApiKey; // API Key (generated for API User)
   static late String mtnMomoEnvironment;
+  static String? mtnMomoPhoneNumber; // Phone number for MTN MoMo payment (optional, falls back to registered number)
   // Legacy fields (kept for backward compatibility)
   static String? mtnMomoPrimaryKey;
   static String? mtnMomoSecondaryKey;
@@ -80,6 +81,7 @@ class MtnMomoService {
     String? expertId,
     String? userId,
     String? paymentType,
+    String? phoneNumber, // Optional phone number for MTN MoMo payment
     Function(Map<String, dynamic>)? onComplete,
   }) async {
     log("mtnMomoSubscriptionKey :: $mtnMomoSubscriptionKeyParam");
@@ -121,6 +123,7 @@ class MtnMomoService {
     mtnMomoApiUserId = apiUserId;
     mtnMomoApiKey = apiKey;
     mtnMomoEnvironment = environment;
+    mtnMomoPhoneNumber = phoneNumber; // Store the phone number (can be null to use registered number)
     // Keep legacy fields for backward compatibility
     mtnMomoPrimaryKey = mtnMomoPrimaryKeyParam ?? splashController.settingCategory?.setting?.mtnMomoPrimaryKey;
     mtnMomoSecondaryKey = mtnMomoSecondaryKeyParam ?? splashController.settingCategory?.setting?.mtnMomoSecondaryKey;
@@ -143,7 +146,8 @@ class MtnMomoService {
     String userId = Constant.storage.read<String>('userId') ?? "";
     String userName = Constant.storage.read<String>('UserName') ?? "";
     String userEmail = Constant.storage.read<String>('UserEmail') ?? "";
-    String userPhone = Constant.storage.read<String>('UserMobile') ?? "";
+    // Use provided phone number or fall back to registered phone number
+    String userPhone = mtnMomoPhoneNumber?.trim() ?? Constant.storage.read<String>('UserMobile') ?? "";
 
     try {
       // Parse and validate amount
