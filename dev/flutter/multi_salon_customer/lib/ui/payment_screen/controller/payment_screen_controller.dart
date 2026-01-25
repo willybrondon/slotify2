@@ -398,10 +398,13 @@ class PaymentScreenController extends GetxController {
         // Get MTN MoMo settings from splash controller
         SplashController splashController = Get.find<SplashController>();
         bool isMtnMomoEnabled = splashController.settingCategory?.setting?.isMtnMomo ?? false;
+        String? mtnMomoSubscriptionKey = splashController.settingCategory?.setting?.mtnMomoSubscriptionKey;
+        String? mtnMomoApiUserId = splashController.settingCategory?.setting?.mtnMomoApiUserId;
+        String? mtnMomoApiKey = splashController.settingCategory?.setting?.mtnMomoApiKey;
+        String? mtnMomoEnvironment = splashController.settingCategory?.setting?.mtnMomoEnvironment;
+        // Legacy fields (kept for backward compatibility)
         String? mtnMomoPrimaryKey = splashController.settingCategory?.setting?.mtnMomoPrimaryKey;
         String? mtnMomoSecondaryKey = splashController.settingCategory?.setting?.mtnMomoSecondaryKey;
-        String? mtnMomoSubscriptionKey = splashController.settingCategory?.setting?.mtnMomoSubscriptionKey;
-        String? mtnMomoEnvironment = splashController.settingCategory?.setting?.mtnMomoEnvironment;
 
         // Check if MTN MoMo is enabled and configured
         if (!isMtnMomoEnabled) {
@@ -411,17 +414,26 @@ class PaymentScreenController extends GetxController {
           return;
         }
 
-        if (mtnMomoPrimaryKey == null || mtnMomoPrimaryKey.isEmpty ||
-            mtnMomoSecondaryKey == null || mtnMomoSecondaryKey.isEmpty) {
+        // Validate required MTN MoMo credentials (matching salon portal)
+        if (mtnMomoSubscriptionKey == null || mtnMomoSubscriptionKey.isEmpty) {
           isLoading(false);
           update([Constant.idProgressView]);
-          Utils.showToast(Get.context!, "MTN MoMo Primary Key and Secondary Key are required. Please contact support.");
+          Utils.showToast(Get.context!, "MTN MoMo Subscription Key is required. Please contact support.");
           return;
         }
-        
-        // Subscription Key is optional - can be empty
-        if (mtnMomoSubscriptionKey == null) {
-          mtnMomoSubscriptionKey = "";
+
+        if (mtnMomoApiUserId == null || mtnMomoApiUserId.isEmpty) {
+          isLoading(false);
+          update([Constant.idProgressView]);
+          Utils.showToast(Get.context!, "MTN MoMo API User ID is required. Please contact support.");
+          return;
+        }
+
+        if (mtnMomoApiKey == null || mtnMomoApiKey.isEmpty) {
+          isLoading(false);
+          update([Constant.idProgressView]);
+          Utils.showToast(Get.context!, "MTN MoMo API Key is required. Please contact support.");
+          return;
         }
 
         // Parse amount properly
@@ -437,12 +449,13 @@ class PaymentScreenController extends GetxController {
         // For wallet recharge
         if (isWalletAdd == true) {
           await MtnMomoService().init(
-            mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
-            mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
             mtnMomoSubscriptionKeyParam: mtnMomoSubscriptionKey ?? "",
             mtnMomoEnvironmentParam: mtnMomoEnvironment ?? "sandbox",
             totalAmountWithOutTax: parsedAmount,
             paymentType: "wallet_recharge",
+            // Legacy fields (for backward compatibility)
+            mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
+            mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
           );
         } else {
           // For direct payment
@@ -454,14 +467,15 @@ class PaymentScreenController extends GetxController {
           }
 
           await MtnMomoService().init(
-            mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
-            mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
             mtnMomoSubscriptionKeyParam: mtnMomoSubscriptionKey ?? "",
             mtnMomoEnvironmentParam: mtnMomoEnvironment ?? "sandbox",
             totalAmountWithOutTax: parsedAmount,
             paymentType: "direct_payment",
             serviceId: bookingData?['serviceId'] ?? "",
             expertId: bookingData?['expertId'] ?? "",
+            // Legacy fields (for backward compatibility)
+            mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
+            mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
             date: bookingData?['date'] ?? "",
             time: bookingData?['time'] ?? "",
             rupee: paymentAmount,

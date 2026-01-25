@@ -176,7 +176,9 @@ exports.newBooking = async (req, res, next) => {
     // Check salon wallet balance before allowing booking
     const setting = await Setting.findOne().sort({ createdAt: -1 });
     const minSalonWalletBalance = setting?.minSalonWalletBalance || 0;
+    const minUserWalletBalance = setting?.minUserWalletBalance || 0;
     const salonWalletBalance = salon.wallet || 0;
+    const userWalletBalance = user.amount || 0;
 
     // Get commission percentages from settings (or fall back to salon.platformFee for backward compatibility)
     const salonCommissionPercent = setting?.salonCommissionCharges || salon.platformFee || 0;

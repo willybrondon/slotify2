@@ -20,10 +20,13 @@ import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class MtnMomoService {
-  static late String mtnMomoPrimaryKey;
-  static late String mtnMomoSecondaryKey;
-  static String? mtnMomoSubscriptionKey; // Optional - may be required for some MTN MoMo setups
+  static late String mtnMomoSubscriptionKey; // Subscription Key (Primary or Secondary from subscription)
+  static late String mtnMomoApiUserId; // API User ID (UUID created when creating API User)
+  static late String mtnMomoApiKey; // API Key (generated for API User)
   static late String mtnMomoEnvironment;
+  // Legacy fields (kept for backward compatibility)
+  static String? mtnMomoPrimaryKey;
+  static String? mtnMomoSecondaryKey;
   static late String dates;
   static late String times;
   static late double rupees;
@@ -79,8 +82,6 @@ class MtnMomoService {
     String? paymentType,
     Function(Map<String, dynamic>)? onComplete,
   }) async {
-    log("mtnMomoPrimaryKey :: $mtnMomoPrimaryKeyParam");
-    log("mtnMomoSecondaryKey :: $mtnMomoSecondaryKeyParam");
     log("mtnMomoSubscriptionKey :: $mtnMomoSubscriptionKeyParam");
     log("mtnMomoEnvironment :: $mtnMomoEnvironmentParam");
     log("totalAmountWithOutTax :: $totalAmountWithOutTax");
@@ -89,36 +90,40 @@ class MtnMomoService {
     log("expertId :: $expertId");
     log("time :: $time");
 
-    // Validate MTN MoMo keys
-    String primaryKey = mtnMomoPrimaryKeyParam ??
-        splashController.settingCategory?.setting?.mtnMomoPrimaryKey ??
+    // Get MTN MoMo credentials from settings (matching salon portal implementation)
+    String subscriptionKey = mtnMomoSubscriptionKeyParam ??
+        splashController.settingCategory?.setting?.mtnMomoSubscriptionKey ??
         "";
-    String secondaryKey = mtnMomoSecondaryKeyParam ??
-        splashController.settingCategory?.setting?.mtnMomoSecondaryKey ??
-        "";
+    String apiUserId = splashController.settingCategory?.setting?.mtnMomoApiUserId ?? "";
+    String apiKey = splashController.settingCategory?.setting?.mtnMomoApiKey ?? "";
     String environment = mtnMomoEnvironmentParam ??
         splashController.settingCategory?.setting?.mtnMomoEnvironment ??
         "sandbox";
 
-    if (primaryKey.isEmpty) {
-      throw Exception("MTN MoMo Primary Key is not configured");
+    // Validate required MTN MoMo credentials
+    if (subscriptionKey.isEmpty) {
+      throw Exception("MTN MoMo Subscription Key is not configured. Please add it in Admin Settings.");
     }
 
-    if (secondaryKey.isEmpty) {
-      throw Exception("MTN MoMo Secondary Key is not configured");
+    if (apiUserId.isEmpty) {
+      throw Exception("MTN MoMo API User ID is not configured. Please add it in Admin Settings.");
     }
 
-    // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
-    String subscriptionKey = primaryKey;
+    if (apiKey.isEmpty) {
+      throw Exception("MTN MoMo API Key is not configured. Please add it in Admin Settings.");
+    }
 
-    log("Using MTN MoMo Primary Key: ${primaryKey.substring(0, 7)}...");
+    log("Using MTN MoMo Subscription Key: ${subscriptionKey.substring(0, 7)}...");
+    log("Using MTN MoMo API User ID: ${apiUserId.substring(0, 8)}...");
     log("Using MTN MoMo environment: $environment");
-    log("Using Primary Key as Subscription Key: ${subscriptionKey.substring(0, 7)}...");
 
-    mtnMomoPrimaryKey = primaryKey;
-    mtnMomoSecondaryKey = secondaryKey;
     mtnMomoSubscriptionKey = subscriptionKey;
+    mtnMomoApiUserId = apiUserId;
+    mtnMomoApiKey = apiKey;
     mtnMomoEnvironment = environment;
+    // Keep legacy fields for backward compatibility
+    mtnMomoPrimaryKey = mtnMomoPrimaryKeyParam ?? splashController.settingCategory?.setting?.mtnMomoPrimaryKey;
+    mtnMomoSecondaryKey = mtnMomoSecondaryKeyParam ?? splashController.settingCategory?.setting?.mtnMomoSecondaryKey;
     this.onComplete = onComplete;
     dates = date ?? "";
     times = time ?? "";
@@ -171,18 +176,13 @@ class MtnMomoService {
           ? "https://api.momodeveloper.mtn.com"
           : Constant.mtnMomoBaseUrl;
 
-      // MTN MoMo Authentication Flow:
+      // MTN MoMo Authentication Flow (matching salon portal implementation):
       // According to MTN MoMo API documentation:
-      // 1. Primary Key = API User ID (X-Reference-Id when creating user)
-      // 2. Secondary Key = API User Secret
-      // 3. To get token, use Basic Auth with Primary Key:Secondary Key
-      // 4. Subscription Key (Ocp-Apim-Subscription-Key) may be required for some endpoints
-      
-      // Get access token using Primary Key and Secondary Key
-      // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
-      String subscriptionKey = mtnMomoPrimaryKey;
-      
-      String tokenCredentials = base64Encode(utf8.encode('$mtnMomoPrimaryKey:$mtnMomoSecondaryKey'));
+      // 1. Subscription Key = Primary or Secondary Key from subscription (Ocp-Apim-Subscription-Key header)
+      // 2. API User ID = UUID created when creating API User
+      // 3. API Key = Generated for API User
+      // 4. To get token, use Basic Auth with base64(API_USER_ID:API_KEY)
+      // 5. Subscription Key goes in Ocp-Apim-Subscription-Key header
       
       // Set environment value - MTN MoMo expects "sandbox" or "production" (lowercase)
       String targetEnvironment = mtnMomoEnvironment.toLowerCase();
@@ -191,15 +191,19 @@ class MtnMomoService {
         targetEnvironment = "sandbox";
       }
       
+      // Use Basic Auth with API User ID and API Key (matching salon portal)
+      String tokenCredentials = base64Encode(utf8.encode('$mtnMomoApiUserId:$mtnMomoApiKey'));
+      
       Map<String, String> tokenHeaders = {
-        'Authorization': 'Basic $tokenCredentials',
-        'Ocp-Apim-Subscription-Key': subscriptionKey, // Use Primary Key as Subscription Key
+        'Authorization': 'Basic $tokenCredentials', // Basic Auth: base64(API_USER_ID:API_KEY)
+        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey, // Subscription Key from subscription
         'X-Target-Environment': targetEnvironment,
         'Content-Type': 'application/json',
       };
       
       log("MTN MoMo Token Request - Environment: $targetEnvironment");
-      log("MTN MoMo Token Request - Using Primary Key as Subscription Key: ${subscriptionKey.substring(0, 7)}...");
+      log("MTN MoMo Token Request - Using Subscription Key: ${mtnMomoSubscriptionKey.substring(0, 7)}...");
+      log("MTN MoMo Token Request - Using API User ID: ${mtnMomoApiUserId.substring(0, 8)}...");
       
       var tokenResponse = await http.post(
         Uri.parse('$baseUrl/collection/token/'),
@@ -246,32 +250,82 @@ class MtnMomoService {
       log("MTN MoMo Access Token received");
 
       // Step 2: Request to pay using access token
-      String reference = "SKEDISY_${DateTime.now().millisecondsSinceEpoch}_$userId";
+      // Generate UUID format reference for X-Reference-Id (matching salon portal)
+      String uuidReference = "${DateTime.now().millisecondsSinceEpoch}_${userId}_${DateTime.now().microsecondsSinceEpoch}";
+      String externalId = "CUSTOMER_${DateTime.now().millisecondsSinceEpoch}_$userId";
+      
+      // Currency handling (matching salon portal)
+      // Sandbox: Only supports EUR
+      // Production: Supports XAF for Cameroon
+      String paymentCurrency;
+      double paymentAmount = amountDouble;
+      
+      if (targetEnvironment == "production") {
+        paymentCurrency = "XAF";
+        // Convert to XAF if needed (matching salon portal logic)
+        if (currency.toUpperCase() != "XAF") {
+          // Conversion rates (approximate)
+          double rate = 655.0; // Default: EUR to XAF
+          if (currency.toUpperCase() == "USD") rate = 600.0;
+          if (currency.toUpperCase() == "GBP") rate = 750.0;
+          paymentAmount = paymentAmount * rate;
+          log("[Production] Converted $amountDouble $currency to ${paymentAmount.toStringAsFixed(2)} XAF");
+        }
+        // Format amount as whole number for XAF
+        paymentAmount = paymentAmount.roundToDouble();
+      } else {
+        // Sandbox: Only supports EUR
+        paymentCurrency = "EUR";
+        // Convert to EUR if needed (matching salon portal logic)
+        if (currency.toUpperCase() != "EUR") {
+          // Conversion rates (approximate)
+          double rate = 0.0015; // Default: XAF to EUR
+          if (currency.toUpperCase() == "USD") rate = 0.92;
+          if (currency.toUpperCase() == "GBP") rate = 1.15;
+          paymentAmount = paymentAmount * rate;
+          log("[Sandbox] Converted $amountDouble $currency to ${paymentAmount.toStringAsFixed(2)} EUR");
+        }
+        // Format amount with 2 decimal places for EUR
+        paymentAmount = double.parse(paymentAmount.toStringAsFixed(2));
+      }
 
-      // Prepare payment request body
+      // Clean phone number (remove non-digits)
+      String cleanPhone = userPhone.replaceAll(RegExp(r'[^\d]'), '');
+      
+      // Validate phone number format (should start with country code)
+      if (cleanPhone.length < 9) {
+        throw Exception("Invalid phone number format. Please include country code (e.g., 237 for Cameroon)");
+      }
+
+      // Prepare payment request body (matching salon portal format)
       Map<String, dynamic> body = {
-        'amount': amountDouble.toStringAsFixed(2),
-        'currency': currency,
-        'externalId': reference,
+        'amount': targetEnvironment == "production" 
+            ? paymentAmount.toStringAsFixed(0) // Whole number for XAF
+            : paymentAmount.toStringAsFixed(2), // 2 decimal places for EUR
+        'currency': paymentCurrency,
+        'externalId': externalId,
         'payer': {
           'partyIdType': 'MSISDN',
-          'partyId': userPhone.replaceAll(RegExp(r'[^\d]'), ''), // Remove non-digits, keep only phone number
+          'partyId': cleanPhone,
         },
-        'payerMessage': 'Payment for Skedisy Booking - $userName',
-        'payeeNote': 'Skedisy Booking Payment',
+        'payerMessage': paymentScreenController.isWalletAdd == true 
+            ? 'Wallet recharge for $userName'
+            : 'Payment for Skedisy Booking - $userName',
+        'payeeNote': paymentScreenController.isWalletAdd == true 
+            ? 'Customer Wallet Recharge'
+            : 'Skedisy Booking Payment',
       };
 
       log("MTN MoMo request body :: $body");
 
-      // Reuse targetEnvironment from above (already set at line 195)
-      // Use Primary Key as Subscription Key (reuse subscriptionKey from above)
+      // Reuse targetEnvironment from above
       
       Map<String, String> paymentHeaders = {
         'Authorization': 'Bearer $accessToken',
-        'Ocp-Apim-Subscription-Key': subscriptionKey, // Use Primary Key as Subscription Key
+        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey, // Subscription Key from subscription
         'X-Target-Environment': targetEnvironment,
-        'X-Reference-Id': reference,
-        'X-Callback-Url': 'https://skedisy.com/payment/mtn-momo/callback', // Your webhook URL
+        'X-Reference-Id': uuidReference, // UUID format reference
+        'X-Callback-Url': 'https://skedisy.com/user/handleMTNMomoPaymentCallback', // Callback URL
         'Content-Type': 'application/json',
       };
       
@@ -293,10 +347,10 @@ class MtnMomoService {
         // Wait a moment for payment processing
         await Future.delayed(const Duration(seconds: 3));
         
-        // Check payment status
-        await _checkPaymentStatus(reference);
+        // Check payment status using uuidReference
+        await _checkPaymentStatus(uuidReference);
         
-        return {"status": "success", "reference": reference};
+        return {"status": "success", "reference": uuidReference};
       } else {
         log("Error during MTN MoMo payment - Status: ${response.statusCode}");
         if (bookingScreenController != null) {
@@ -330,11 +384,8 @@ class MtnMomoService {
           ? "https://api.momodeveloper.mtn.com"
           : Constant.mtnMomoBaseUrl;
 
-      // Get access token first using Primary Key and Secondary Key
-      // Use Primary Key as Subscription Key (either Primary or Secondary can be used as subscription key)
-      String subscriptionKey = mtnMomoPrimaryKey;
-      
-      String tokenCredentials = base64Encode(utf8.encode('$mtnMomoPrimaryKey:$mtnMomoSecondaryKey'));
+      // Get access token using API User ID and API Key (matching salon portal)
+      String tokenCredentials = base64Encode(utf8.encode('$mtnMomoApiUserId:$mtnMomoApiKey'));
       
       // Set environment value - MTN MoMo expects "sandbox" or "production" (lowercase)
       String targetEnvironment = mtnMomoEnvironment.toLowerCase();
@@ -343,8 +394,8 @@ class MtnMomoService {
       }
       
       Map<String, String> tokenHeaders = {
-        'Authorization': 'Basic $tokenCredentials',
-        'Ocp-Apim-Subscription-Key': subscriptionKey, // Use Primary Key as Subscription Key
+        'Authorization': 'Basic $tokenCredentials', // Basic Auth: base64(API_USER_ID:API_KEY)
+        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey, // Subscription Key from subscription
         'X-Target-Environment': targetEnvironment,
       };
       
@@ -366,12 +417,11 @@ class MtnMomoService {
         return;
       }
 
-      // Reuse targetEnvironment from above (already set at line 353)
-      // Use Primary Key as Subscription Key (reuse subscriptionKey from above)
+      // Reuse targetEnvironment from above
       
       Map<String, String> statusHeaders = {
         'Authorization': 'Bearer $accessToken',
-        'Ocp-Apim-Subscription-Key': subscriptionKey, // Use Primary Key as Subscription Key
+        'Ocp-Apim-Subscription-Key': mtnMomoSubscriptionKey, // Subscription Key from subscription
         'X-Target-Environment': targetEnvironment,
       };
       
