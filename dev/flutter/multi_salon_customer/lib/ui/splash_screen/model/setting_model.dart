@@ -80,6 +80,7 @@ class Setting {
     String? mtnMomoSubscriptionKey,
     String? mtnMomoApiUserId,
     String? mtnMomoApiKey,
+    String? mtnMomoCallbackHost,
     String? mtnMomoEnvironment,
     FirebaseKey? firebaseKey,
     bool? isAddProductRequest,
@@ -117,6 +118,7 @@ class Setting {
     _mtnMomoSubscriptionKey = mtnMomoSubscriptionKey;
     _mtnMomoApiUserId = mtnMomoApiUserId;
     _mtnMomoApiKey = mtnMomoApiKey;
+    _mtnMomoCallbackHost = mtnMomoCallbackHost;
     _mtnMomoEnvironment = mtnMomoEnvironment;
     _firebaseKey = firebaseKey;
     _isAddProductRequest = isAddProductRequest;
@@ -156,6 +158,7 @@ class Setting {
     _mtnMomoSubscriptionKey = json['mtnMomoSubscriptionKey'];
     _mtnMomoApiUserId = json['mtnMomoApiUserId'];
     _mtnMomoApiKey = json['mtnMomoApiKey'];
+    _mtnMomoCallbackHost = json['mtnMomoCallbackHost'];
     _mtnMomoEnvironment = json['mtnMomoEnvironment'];
     _firebaseKey = json['firebaseKey'] != null ? FirebaseKey.fromJson(json['firebaseKey']) : null;
     _isAddProductRequest = json['isAddProductRequest'];
@@ -193,6 +196,7 @@ class Setting {
     String? _mtnMomoSubscriptionKey;
     String? _mtnMomoApiUserId;
     String? _mtnMomoApiKey;
+    String? _mtnMomoCallbackHost;
     String? _mtnMomoEnvironment;
   FirebaseKey? _firebaseKey;
   bool? _isAddProductRequest;
@@ -261,6 +265,7 @@ class Setting {
         mtnMomoSubscriptionKey: mtnMomoSubscriptionKey ?? _mtnMomoSubscriptionKey,
         mtnMomoApiUserId: mtnMomoApiUserId ?? _mtnMomoApiUserId,
         mtnMomoApiKey: mtnMomoApiKey ?? _mtnMomoApiKey,
+        mtnMomoCallbackHost: mtnMomoCallbackHost ?? _mtnMomoCallbackHost,
         mtnMomoEnvironment: mtnMomoEnvironment ?? _mtnMomoEnvironment,
         firebaseKey: firebaseKey ?? _firebaseKey,
         isAddProductRequest: isAddProductRequest ?? _isAddProductRequest,
@@ -298,6 +303,7 @@ class Setting {
   String? get mtnMomoSubscriptionKey => _mtnMomoSubscriptionKey;
   String? get mtnMomoApiUserId => _mtnMomoApiUserId;
   String? get mtnMomoApiKey => _mtnMomoApiKey;
+  String? get mtnMomoCallbackHost => _mtnMomoCallbackHost;
   String? get mtnMomoEnvironment => _mtnMomoEnvironment;
   FirebaseKey? get firebaseKey => _firebaseKey;
   bool? get isAddProductRequest => _isAddProductRequest;
@@ -337,6 +343,7 @@ class Setting {
     map['mtnMomoSubscriptionKey'] = _mtnMomoSubscriptionKey;
     map['mtnMomoApiUserId'] = _mtnMomoApiUserId;
     map['mtnMomoApiKey'] = _mtnMomoApiKey;
+    map['mtnMomoCallbackHost'] = _mtnMomoCallbackHost;
     map['mtnMomoEnvironment'] = _mtnMomoEnvironment;
     if (_firebaseKey != null) {
       map['firebaseKey'] = _firebaseKey?.toJson();
