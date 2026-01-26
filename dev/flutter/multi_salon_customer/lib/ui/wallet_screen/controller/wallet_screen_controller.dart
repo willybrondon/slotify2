@@ -90,14 +90,17 @@ class WalletScreenController extends GetxController {
         true, // isWalletAdd
         rechargeAmount, // totalAmount
         false, // isCreateOrder
-        "Stripe", // selectedPayment - default to Stripe for wallet recharge (Razorpay and FlutterWave commented out)
+        null, // selectedPayment - null to show all enabled payment methods
       ],
     )?.then(
       (value) async {
+        // Refresh wallet history after returning from payment
         await onGetWalletHistoryApiCall(
           userId: Constant.storage.read<String>('userId') ?? "",
           month: DateFormat('yyyy-MM').format(DateTime.now()),
         );
+        // Update UI
+        update([Constant.idProgressView]);
       },
     );
   }

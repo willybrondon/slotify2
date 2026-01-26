@@ -178,9 +178,12 @@ class PaymentScreenController extends GetxController {
       }
 
       // Set default payment method if not specified
-      selectedPayment ??= isWalletAdd == true
-          ? "Stripe"
-          : "wallet"; // Changed from "Razorpay" to "Stripe" for wallet recharge
+      // For wallet recharge, leave as null to show all enabled payment methods
+      // For booking, default to wallet
+      if (selectedPayment == null && isWalletAdd != true) {
+        selectedPayment = "wallet";
+      }
+      // For wallet recharge, keep selectedPayment as null to show all enabled methods
 
       log("Payment Screen - Is Wallet Add :: $isWalletAdd");
       log("Payment Screen - Is Create Order :: $isCreateOrder");

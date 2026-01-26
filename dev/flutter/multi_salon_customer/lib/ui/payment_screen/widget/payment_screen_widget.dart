@@ -67,7 +67,44 @@ class PaymentMethodView extends StatelessWidget {
       id: Constant.idSelectPaymentMethod,
       builder: (logic) {
         // Get settings from splash controller to check which payment methods are enabled
-        final SplashController splashController = Get.find<SplashController>();
+        SplashController? splashController;
+        try {
+          splashController = Get.find<SplashController>();
+        } catch (e) {
+          // Splash controller not found, return error widget
+          return Container(
+            padding: const EdgeInsets.all(20),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, color: AppColors.redText, size: 40),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Unable to load payment methods",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.redText,
+                      fontFamily: AppFontFamily.heeBo700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    "Please try again or contact support",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.paymentText,
+                      fontFamily: AppFontFamily.heeBo400,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        
         final isStripeEnabled = splashController.settingCategory?.setting?.isStripePay ?? false;
         final isZitopayEnabled = splashController.settingCategory?.setting?.isZitopay ?? false;
         final isMtnMomoEnabled = splashController.settingCategory?.setting?.isMtnMomo ?? false;
@@ -89,6 +126,42 @@ class PaymentMethodView extends StatelessWidget {
                   ],
                   if (isRazorPayEnabled) const PaymentRazorPayView(),
                   if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
+                  // Show message if no payment methods are enabled
+                  if (!isStripeEnabled && !isZitopayEnabled && !isMtnMomoEnabled && !isRazorPayEnabled && !isFlutterWaveEnabled)
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: AppColors.redText.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.redText.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(Icons.error_outline, color: AppColors.redText, size: 40),
+                          const SizedBox(height: 10),
+                          Text(
+                            "No payment methods are enabled",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.redText,
+                              fontFamily: AppFontFamily.heeBo700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            "Please contact support or enable payment methods in admin settings",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.paymentText,
+                              fontFamily: AppFontFamily.heeBo400,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ).paddingAll(15)
             : Column(
