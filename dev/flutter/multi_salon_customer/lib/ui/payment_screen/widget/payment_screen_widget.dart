@@ -81,7 +81,12 @@ class PaymentMethodView extends StatelessWidget {
                   // Only show enabled payment methods for wallet recharge
                   if (isStripeEnabled) const PaymentStripeView(),
                   if (isZitopayEnabled) const PaymentZitopayView(),
-                  if (isMtnMomoEnabled) const PaymentMtnMomoView(),
+                  if (isMtnMomoEnabled) ...[
+                    const PaymentMtnMomoView(),
+                    // Show phone number input for MTN MoMo wallet recharge (same as normal payment)
+                    // Always show when MTN MoMo is enabled for wallet recharge, so user can enter phone number
+                    const MtnMomoPhoneNumberInput(),
+                  ],
                   if (isRazorPayEnabled) const PaymentRazorPayView(),
                   if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
                 ],
