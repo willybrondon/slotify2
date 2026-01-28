@@ -62,7 +62,24 @@ class PaymentScreenController extends GetxController {
     String registeredPhone = Constant.storage.read<String>('UserMobile') ?? "";
     mtnMomoPhoneController.text = registeredPhone;
     useRegisteredPhoneForMtnMomo = true;
-    
+
+    // Ensure SplashController is initialized and settings are loaded
+    try {
+      final splashController = Get.find<SplashController>();
+      if (splashController.settingCategory == null) {
+        log("Payment Screen - Settings not loaded, loading now...");
+        await splashController.onSettingApiCall();
+      }
+    } catch (e) {
+      log("Payment Screen - SplashController not found, initializing...");
+      try {
+        final splashController = Get.put(SplashController());
+        await splashController.onSettingApiCall();
+      } catch (e2) {
+        log("Payment Screen - Failed to initialize SplashController: $e2");
+      }
+    }
+
     await getDataFromArgs();
     // Initialize booking controller and sync coupon data for booking payments
     if (isWalletAdd == false && isCreateOrder == true) {
@@ -132,7 +149,7 @@ class PaymentScreenController extends GetxController {
     // Clear all loading states when screen is closed
     log("Payment Screen - onClose called, clearing loading states");
     isLoading.value = false;
-    
+
     // Dispose MTN MoMo phone controller
     mtnMomoPhoneController.dispose();
     update([Constant.idProgressView]);
@@ -311,25 +328,34 @@ class PaymentScreenController extends GetxController {
       try {
         // Get Zitopay settings from splash controller
         SplashController splashController = Get.find<SplashController>();
-        bool isZitopayEnabled = splashController.settingCategory?.setting?.isZitopay ?? false;
-        String? zitopayApiKey = splashController.settingCategory?.setting?.zitopayApiKey;
-        String? zitopaySecretKey = splashController.settingCategory?.setting?.zitopaySecretKey;
-        String? zitopayMerchantId = splashController.settingCategory?.setting?.zitopayMerchantId;
+        bool isZitopayEnabled =
+            splashController.settingCategory?.setting?.isZitopay ?? false;
+        String? zitopayApiKey =
+            splashController.settingCategory?.setting?.zitopayApiKey;
+        String? zitopaySecretKey =
+            splashController.settingCategory?.setting?.zitopaySecretKey;
+        String? zitopayMerchantId =
+            splashController.settingCategory?.setting?.zitopayMerchantId;
 
         // Check if Zitopay is enabled and configured
         if (!isZitopayEnabled) {
           isLoading(false);
           update([Constant.idProgressView]);
-          Utils.showToast(Get.context!, "Zitopay payment is not enabled. Please select another payment method.");
+          Utils.showToast(Get.context!,
+              "Zitopay payment is not enabled. Please select another payment method.");
           return;
         }
 
-        if (zitopayApiKey == null || zitopayApiKey.isEmpty ||
-            zitopaySecretKey == null || zitopaySecretKey.isEmpty ||
-            zitopayMerchantId == null || zitopayMerchantId.isEmpty) {
+        if (zitopayApiKey == null ||
+            zitopayApiKey.isEmpty ||
+            zitopaySecretKey == null ||
+            zitopaySecretKey.isEmpty ||
+            zitopayMerchantId == null ||
+            zitopayMerchantId.isEmpty) {
           isLoading(false);
           update([Constant.idProgressView]);
-          Utils.showToast(Get.context!, "Zitopay is not properly configured. Please contact support.");
+          Utils.showToast(Get.context!,
+              "Zitopay is not properly configured. Please contact support.");
           return;
         }
 
@@ -413,20 +439,28 @@ class PaymentScreenController extends GetxController {
       try {
         // Get MTN MoMo settings from splash controller
         SplashController splashController = Get.find<SplashController>();
-        bool isMtnMomoEnabled = splashController.settingCategory?.setting?.isMtnMomo ?? false;
-        String? mtnMomoSubscriptionKey = splashController.settingCategory?.setting?.mtnMomoSubscriptionKey;
-        String? mtnMomoApiUserId = splashController.settingCategory?.setting?.mtnMomoApiUserId;
-        String? mtnMomoApiKey = splashController.settingCategory?.setting?.mtnMomoApiKey;
-        String? mtnMomoEnvironment = splashController.settingCategory?.setting?.mtnMomoEnvironment;
+        bool isMtnMomoEnabled =
+            splashController.settingCategory?.setting?.isMtnMomo ?? false;
+        String? mtnMomoSubscriptionKey =
+            splashController.settingCategory?.setting?.mtnMomoSubscriptionKey;
+        String? mtnMomoApiUserId =
+            splashController.settingCategory?.setting?.mtnMomoApiUserId;
+        String? mtnMomoApiKey =
+            splashController.settingCategory?.setting?.mtnMomoApiKey;
+        String? mtnMomoEnvironment =
+            splashController.settingCategory?.setting?.mtnMomoEnvironment;
         // Legacy fields (kept for backward compatibility)
-        String? mtnMomoPrimaryKey = splashController.settingCategory?.setting?.mtnMomoPrimaryKey;
-        String? mtnMomoSecondaryKey = splashController.settingCategory?.setting?.mtnMomoSecondaryKey;
+        String? mtnMomoPrimaryKey =
+            splashController.settingCategory?.setting?.mtnMomoPrimaryKey;
+        String? mtnMomoSecondaryKey =
+            splashController.settingCategory?.setting?.mtnMomoSecondaryKey;
 
         // Check if MTN MoMo is enabled and configured
         if (!isMtnMomoEnabled) {
           isLoading(false);
           update([Constant.idProgressView]);
-          Utils.showToast(Get.context!, "MTN MoMo payment is not enabled. Please select another payment method.");
+          Utils.showToast(Get.context!,
+              "MTN MoMo payment is not enabled. Please select another payment method.");
           return;
         }
 
@@ -434,21 +468,24 @@ class PaymentScreenController extends GetxController {
         if (mtnMomoSubscriptionKey == null || mtnMomoSubscriptionKey.isEmpty) {
           isLoading(false);
           update([Constant.idProgressView]);
-          Utils.showToast(Get.context!, "MTN MoMo Subscription Key is required. Please contact support.");
+          Utils.showToast(Get.context!,
+              "MTN MoMo Subscription Key is required. Please contact support.");
           return;
         }
 
         if (mtnMomoApiUserId == null || mtnMomoApiUserId.isEmpty) {
           isLoading(false);
           update([Constant.idProgressView]);
-          Utils.showToast(Get.context!, "MTN MoMo API User ID is required. Please contact support.");
+          Utils.showToast(Get.context!,
+              "MTN MoMo API User ID is required. Please contact support.");
           return;
         }
 
         if (mtnMomoApiKey == null || mtnMomoApiKey.isEmpty) {
           isLoading(false);
           update([Constant.idProgressView]);
-          Utils.showToast(Get.context!, "MTN MoMo API Key is required. Please contact support.");
+          Utils.showToast(Get.context!,
+              "MTN MoMo API Key is required. Please contact support.");
           return;
         }
 
@@ -464,7 +501,8 @@ class PaymentScreenController extends GetxController {
 
         // Get phone number for MTN MoMo payment
         String? mtnMomoPhone = null;
-        if (!useRegisteredPhoneForMtnMomo && mtnMomoPhoneController.text.trim().isNotEmpty) {
+        if (!useRegisteredPhoneForMtnMomo &&
+            mtnMomoPhoneController.text.trim().isNotEmpty) {
           mtnMomoPhone = mtnMomoPhoneController.text.trim();
         }
 
@@ -475,7 +513,8 @@ class PaymentScreenController extends GetxController {
             mtnMomoEnvironmentParam: mtnMomoEnvironment ?? "sandbox",
             totalAmountWithOutTax: parsedAmount,
             paymentType: "wallet_recharge",
-            phoneNumber: mtnMomoPhone, // Pass phone number (null will use registered number)
+            phoneNumber:
+                mtnMomoPhone, // Pass phone number (null will use registered number)
             // Legacy fields (for backward compatibility)
             mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
             mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",
@@ -496,7 +535,8 @@ class PaymentScreenController extends GetxController {
             paymentType: "direct_payment",
             serviceId: bookingData?['serviceId'] ?? "",
             expertId: bookingData?['expertId'] ?? "",
-            phoneNumber: mtnMomoPhone, // Pass phone number (null will use registered number)
+            phoneNumber:
+                mtnMomoPhone, // Pass phone number (null will use registered number)
             // Legacy fields (for backward compatibility)
             mtnMomoPrimaryKeyParam: mtnMomoPrimaryKey ?? "",
             mtnMomoSecondaryKeyParam: mtnMomoSecondaryKey ?? "",

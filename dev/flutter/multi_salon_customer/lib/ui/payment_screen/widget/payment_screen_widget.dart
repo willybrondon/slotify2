@@ -66,181 +66,208 @@ class PaymentMethodView extends StatelessWidget {
     return GetBuilder<PaymentScreenController>(
       id: Constant.idSelectPaymentMethod,
       builder: (logic) {
-        // Get settings from splash controller to check which payment methods are enabled
-        SplashController? splashController;
-        try {
-          splashController = Get.find<SplashController>();
-        } catch (e) {
-          // Splash controller not found, return error widget
-          return Container(
-            padding: const EdgeInsets.all(20),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, color: AppColors.redText, size: 40),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Unable to load payment methods",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.redText,
-                      fontFamily: AppFontFamily.heeBo700,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    "Please try again or contact support",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.paymentText,
-                      fontFamily: AppFontFamily.heeBo400,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-        
-        final isStripeEnabled = splashController.settingCategory?.setting?.isStripePay ?? false;
-        final isZitopayEnabled = splashController.settingCategory?.setting?.isZitopay ?? false;
-        final isMtnMomoEnabled = splashController.settingCategory?.setting?.isMtnMomo ?? false;
-        final isRazorPayEnabled = splashController.settingCategory?.setting?.isRazorPay ?? false;
-        final isFlutterWaveEnabled = splashController.settingCategory?.setting?.isFlutterWave ?? false;
-
-        return logic.isWalletAdd == true
-            ? Column(
-                children: [
-                  const PaymentTitleView(),
-                  // Only show enabled payment methods for wallet recharge
-                  if (isStripeEnabled) const PaymentStripeView(),
-                  if (isZitopayEnabled) const PaymentZitopayView(),
-                  if (isMtnMomoEnabled) ...[
-                    const PaymentMtnMomoView(),
-                    // Show phone number input for MTN MoMo wallet recharge (same as normal payment)
-                    // Always show when MTN MoMo is enabled for wallet recharge, so user can enter phone number
-                    const MtnMomoPhoneNumberInput(),
-                  ],
-                  if (isRazorPayEnabled) const PaymentRazorPayView(),
-                  if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
-                  // Show message if no payment methods are enabled
-                  if (!isStripeEnabled && !isZitopayEnabled && !isMtnMomoEnabled && !isRazorPayEnabled && !isFlutterWaveEnabled)
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      margin: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: AppColors.redText.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.redText.withOpacity(0.3)),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(Icons.error_outline, color: AppColors.redText, size: 40),
-                          const SizedBox(height: 10),
-                          Text(
-                            "No payment methods are enabled",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: AppColors.redText,
-                              fontFamily: AppFontFamily.heeBo700,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            "Please contact support or enable payment methods in admin settings",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.paymentText,
-                              fontFamily: AppFontFamily.heeBo400,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ).paddingAll(15)
-            : Column(
-                children: [
-                  const PaymentTitleView(),
-                  // Show the payment method that was already selected in booking screen
-                  if (logic.selectedPayment == "wallet") const PaymentMyWalletView(),
-                  if (logic.selectedPayment == "Stripe" && isStripeEnabled) const PaymentStripeView(),
-                  if (logic.selectedPayment == "Zitopay" && isZitopayEnabled) const PaymentZitopayView(),
-                  if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) ...[
-                    const PaymentMtnMomoView(),
-                    const MtnMomoPhoneNumberInput(),
-                  ],
-                  if (logic.selectedPayment == "Razorpay" && isRazorPayEnabled) const PaymentRazorPayView(),
-                  if (logic.selectedPayment == "flutterWave" && isFlutterWaveEnabled) const PaymentFlutterWaveView(),
-                  if (logic.selectedPayment == "cashAfterService")
-                    const PaymentCashOnHandView(),
-                  // Add other payment methods as needed
-                  // Show all available payment methods if none selected
-                  if (logic.selectedPayment == null || logic.selectedPayment == "")
-                    ...[
-                      const PaymentMyWalletView(),
-                      if (isStripeEnabled) const PaymentStripeView(),
-                      if (isZitopayEnabled) const PaymentZitopayView(),
-                      if (isMtnMomoEnabled) const PaymentMtnMomoView(),
-                      if (isRazorPayEnabled) const PaymentRazorPayView(),
-                      if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
-                      const PaymentCashOnHandView(),
-                    ],
-
-                  // Show a message that payment method is already selected
-                  Container(
-                    width: Get.width,
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.only(top: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryAppColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.primaryAppColor.withOpacity(0.3),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: AppColors.primaryAppColor,
-                          size: 20,
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "Payment method '${logic.selectedPayment}' is already selected. Click Continue to proceed.",
-                            style: TextStyle(
-                              color: AppColors.primaryAppColor,
-                              fontSize: 14,
-                              fontFamily: AppFontFamily.sfProDisplay,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Show discount summary for cash after service when coupon is applied
-                  if (logic.selectedPayment == "cashAfterService" &&
-                      logic.isWalletAdd != true &&
-                      logic.isCreateOrder == true)
-                    PaymentDiscountSummaryView(),
-
-                  // Coupon Section - Show if not wallet add, this is a booking (not wallet recharge), and no payment method is pre-selected
-                  if (logic.isWalletAdd != true &&
-                      logic.isCreateOrder == true &&
-                      logic.selectedPayment == null)
-                    PaymentCouponSection(),
-                ],
-              ).paddingAll(15);
+        // Also listen to SplashController updates to rebuild when settings are loaded
+        // Use GetBuilder without ID to listen to all updates
+        return GetBuilder<SplashController>(
+          builder: (splashLogic) {
+            return _buildPaymentMethods(logic, splashLogic);
+          },
+        );
       },
     );
+  }
+
+  Widget _buildPaymentMethods(
+      PaymentScreenController logic, SplashController splashController) {
+    // Use the splashController passed as parameter (already from GetBuilder)
+
+    // Check if settings are loaded
+    if (splashController.settingCategory == null ||
+        splashController.settingCategory?.setting == null) {
+      log("Payment Screen - Settings not loaded, loading now...");
+      // Try to load settings asynchronously
+      Future.microtask(() async {
+        await splashController.onSettingApiCall();
+        // Trigger rebuild after settings are loaded
+        logic.update([Constant.idSelectPaymentMethod]);
+      });
+      // Return loading widget
+      return Container(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: AppColors.primaryAppColor),
+              const SizedBox(height: 20),
+              Text(
+                "Loading payment methods...",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppColors.primaryTextColor,
+                  fontFamily: AppFontFamily.heeBo400,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    log("Payment Screen - Settings loaded. Status: ${splashController.settingCategory?.status}, Stripe: ${splashController.settingCategory?.setting?.isStripePay}, Zitopay: ${splashController.settingCategory?.setting?.isZitopay}, MTN MoMo: ${splashController.settingCategory?.setting?.isMtnMomo}, Razorpay: ${splashController.settingCategory?.setting?.isRazorPay}, FlutterWave: ${splashController.settingCategory?.setting?.isFlutterWave}");
+
+    final isStripeEnabled =
+        splashController.settingCategory?.setting?.isStripePay ?? false;
+    final isZitopayEnabled =
+        splashController.settingCategory?.setting?.isZitopay ?? false;
+    final isMtnMomoEnabled =
+        splashController.settingCategory?.setting?.isMtnMomo ?? false;
+    final isRazorPayEnabled =
+        splashController.settingCategory?.setting?.isRazorPay ?? false;
+    final isFlutterWaveEnabled =
+        splashController.settingCategory?.setting?.isFlutterWave ?? false;
+
+    return logic.isWalletAdd == true
+        ? Column(
+            children: [
+              const PaymentTitleView(),
+              // Only show enabled payment methods for wallet recharge
+              if (isStripeEnabled) const PaymentStripeView(),
+              if (isZitopayEnabled) const PaymentZitopayView(),
+              if (isMtnMomoEnabled) ...[
+                const PaymentMtnMomoView(),
+                // Show phone number input for MTN MoMo wallet recharge (same as normal payment)
+                // Always show when MTN MoMo is enabled for wallet recharge, so user can enter phone number
+                const MtnMomoPhoneNumberInput(),
+              ],
+              if (isRazorPayEnabled) const PaymentRazorPayView(),
+              if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
+              // Show message if no payment methods are enabled
+              if (!isStripeEnabled &&
+                  !isZitopayEnabled &&
+                  !isMtnMomoEnabled &&
+                  !isRazorPayEnabled &&
+                  !isFlutterWaveEnabled)
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: AppColors.redText.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border:
+                        Border.all(color: AppColors.redText.withOpacity(0.3)),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(Icons.error_outline,
+                          color: AppColors.redText, size: 40),
+                      const SizedBox(height: 10),
+                      Text(
+                        "No payment methods are enabled",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.redText,
+                          fontFamily: AppFontFamily.heeBo700,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        "Please contact support or enable payment methods in admin settings",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.paymentText,
+                          fontFamily: AppFontFamily.heeBo400,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ).paddingAll(15)
+        : Column(
+            children: [
+              const PaymentTitleView(),
+              // Show the payment method that was already selected in booking screen
+              if (logic.selectedPayment == "wallet")
+                const PaymentMyWalletView(),
+              if (logic.selectedPayment == "Stripe" && isStripeEnabled)
+                const PaymentStripeView(),
+              if (logic.selectedPayment == "Zitopay" && isZitopayEnabled)
+                const PaymentZitopayView(),
+              if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) ...[
+                const PaymentMtnMomoView(),
+                const MtnMomoPhoneNumberInput(),
+              ],
+              if (logic.selectedPayment == "Razorpay" && isRazorPayEnabled)
+                const PaymentRazorPayView(),
+              if (logic.selectedPayment == "flutterWave" &&
+                  isFlutterWaveEnabled)
+                const PaymentFlutterWaveView(),
+              if (logic.selectedPayment == "cashAfterService")
+                const PaymentCashOnHandView(),
+              // Add other payment methods as needed
+              // Show all available payment methods if none selected
+              if (logic.selectedPayment == null ||
+                  logic.selectedPayment == "") ...[
+                const PaymentMyWalletView(),
+                if (isStripeEnabled) const PaymentStripeView(),
+                if (isZitopayEnabled) const PaymentZitopayView(),
+                if (isMtnMomoEnabled) const PaymentMtnMomoView(),
+                if (isRazorPayEnabled) const PaymentRazorPayView(),
+                if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
+                const PaymentCashOnHandView(),
+              ],
+
+              // Show a message that payment method is already selected
+              Container(
+                width: Get.width,
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(top: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryAppColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.primaryAppColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: AppColors.primaryAppColor,
+                      size: 20,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "Payment method '${logic.selectedPayment}' is already selected. Click Continue to proceed.",
+                        style: TextStyle(
+                          color: AppColors.primaryAppColor,
+                          fontSize: 14,
+                          fontFamily: AppFontFamily.sfProDisplay,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Show discount summary for cash after service when coupon is applied
+              if (logic.selectedPayment == "cashAfterService" &&
+                  logic.isWalletAdd != true &&
+                  logic.isCreateOrder == true)
+                PaymentDiscountSummaryView(),
+
+              // Coupon Section - Show if not wallet add, this is a booking (not wallet recharge), and no payment method is pre-selected
+              if (logic.isWalletAdd != true &&
+                  logic.isCreateOrder == true &&
+                  logic.selectedPayment == null)
+                PaymentCouponSection(),
+            ],
+          ).paddingAll(15);
   }
 }
 
@@ -1238,7 +1265,8 @@ class MtnMomoPhoneNumberInput extends StatelessWidget {
                 controller: logic.mtnMomoPhoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  hintText: "Enter phone number with country code (e.g., 237XXXXXXXXX)",
+                  hintText:
+                      "Enter phone number with country code (e.g., 237XXXXXXXXX)",
                   hintStyle: TextStyle(
                     fontSize: 14,
                     color: AppColors.greyColor,
@@ -1292,7 +1320,8 @@ class MtnMomoPhoneNumberInput extends StatelessWidget {
                   ),
                 ],
               ),
-              if (!logic.useRegisteredPhoneForMtnMomo && logic.mtnMomoPhoneController.text.trim().isEmpty)
+              if (!logic.useRegisteredPhoneForMtnMomo &&
+                  logic.mtnMomoPhoneController.text.trim().isEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(

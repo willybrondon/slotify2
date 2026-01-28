@@ -102,7 +102,10 @@ class SplashController extends GetxController {
 
       log("Setting Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Setting Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -113,6 +116,10 @@ class SplashController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         settingCategory = SettingModel.fromJson(jsonResponse);
+        log("Settings loaded successfully. Status: ${settingCategory?.status}");
+        // Update to trigger rebuilds in widgets listening to SplashController
+        update(); // Update all listeners
+        update([Constant.idProgressView]); // Also update specific ID listeners
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
@@ -120,7 +127,8 @@ class SplashController extends GetxController {
       log("Error call Setting Api :: $e");
     } finally {
       isLoading(false);
-      update([Constant.idProgressView]);
+      update(); // Update all listeners
+      update([Constant.idProgressView]); // Also update specific ID listeners
     }
   }
 }
