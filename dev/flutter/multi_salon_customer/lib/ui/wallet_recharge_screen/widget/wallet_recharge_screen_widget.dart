@@ -15,7 +15,6 @@ class WalletRechargeScreenWidget extends StatelessWidget {
     // Get controller from binding (already initialized)
     // The binding should have initialized it, but we'll handle errors gracefully
     return GetBuilder<WalletRechargeController>(
-      id: Constant.idProgressView,
       builder: (logic) {
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -208,6 +207,38 @@ class WalletRechargeScreenWidget extends StatelessWidget {
   Widget _buildPaymentMethodSection(WalletRechargeController logic) {
     final availableMethods = logic.getAvailablePaymentMethods();
     
+    // Settings not loaded yet -> show loading instead of "No payment methods"
+    if (logic.isSettingsLoading) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.primaryAppColor.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.primaryAppColor.withOpacity(0.2)),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "Loading payment methods...",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.primaryTextColor,
+                  fontFamily: AppFontFamily.heeBo400,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (availableMethods.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),

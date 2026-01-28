@@ -34,6 +34,9 @@ class WalletRechargeController extends GetxController {
   
   // Processing state
   bool isProcessing = false;
+
+  // Settings loading state (for payment methods list)
+  bool isSettingsLoading = false;
   
   // Get settings
   SplashController? splashController;
@@ -57,6 +60,22 @@ class WalletRechargeController extends GetxController {
         } catch (e2) {
           log("Failed to initialize SplashController: $e2");
         }
+      }
+
+      // Ensure settings are loaded (otherwise payment methods will look empty)
+      if (splashController?.settingCategory == null) {
+        isSettingsLoading = true;
+        update();
+        Future.microtask(() async {
+          try {
+            await splashController?.onSettingApiCall();
+          } catch (e) {
+            log("Error loading settings in WalletRechargeController: $e");
+          } finally {
+            isSettingsLoading = false;
+            update();
+          }
+        });
       }
     } catch (e) {
       log("Error in WalletRechargeController onInit: $e");
@@ -98,14 +117,14 @@ class WalletRechargeController extends GetxController {
     selectedAmount = amount;
     amountController.text = amount;
     amountError = false;
-    update([Constant.idSelectAmount]);
+    update();
   }
   
   // Handle amount input change
   void onAmountChanged(String value) {
     selectedAmount = "";
     amountError = false;
-    update([Constant.idSelectAmount]);
+    update();
   }
   
   // Select payment method
@@ -115,7 +134,7 @@ class WalletRechargeController extends GetxController {
     phoneNumberController.text = Constant.storage.read<String>('UserMobile') ?? "";
     useRegisteredPhone = true;
     phoneError = false;
-    update([Constant.idSelectPaymentMethod]);
+    update();
   }
   
   // Toggle phone number usage
@@ -125,7 +144,7 @@ class WalletRechargeController extends GetxController {
       phoneNumberController.text = Constant.storage.read<String>('UserMobile') ?? "";
     }
     phoneError = false;
-    update([Constant.idSelectPaymentMethod]);
+    update();
   }
   
   // Validate inputs
@@ -158,7 +177,7 @@ class WalletRechargeController extends GetxController {
       }
     }
     
-    update([Constant.idSelectAmount, Constant.idSelectPaymentMethod]);
+    update();
     return isValid;
   }
   
@@ -179,7 +198,7 @@ class WalletRechargeController extends GetxController {
     }
     
     isProcessing = true;
-    update([Constant.idProgressView]);
+    update();
     
     try {
       // Navigate to payment screen with selected payment method
@@ -217,7 +236,7 @@ class WalletRechargeController extends GetxController {
       Utils.showToast(Get.context!, "Error: $e");
     } finally {
       isProcessing = false;
-      update([Constant.idProgressView]);
+      update();
     }
   }
   
