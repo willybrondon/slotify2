@@ -12,8 +12,8 @@ class WalletRechargeScreenWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(WalletRechargeController());
-    
+    // Get controller from binding (already initialized)
+    // The binding should have initialized it, but we'll handle errors gracefully
     return GetBuilder<WalletRechargeController>(
       id: Constant.idProgressView,
       builder: (logic) {

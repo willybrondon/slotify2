@@ -41,15 +41,25 @@ class WalletRechargeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Get registered phone number
-    String registeredPhone = Constant.storage.read<String>('UserMobile') ?? "";
-    phoneNumberController.text = registeredPhone;
-    
-    // Get splash controller
     try {
-      splashController = Get.find<SplashController>();
+      // Get registered phone number
+      String registeredPhone = Constant.storage.read<String>('UserMobile') ?? "";
+      phoneNumberController.text = registeredPhone;
+      
+      // Get splash controller
+      try {
+        splashController = Get.find<SplashController>();
+      } catch (e) {
+        log("SplashController not found: $e");
+        // Try to put it if not found
+        try {
+          splashController = Get.put(SplashController());
+        } catch (e2) {
+          log("Failed to initialize SplashController: $e2");
+        }
+      }
     } catch (e) {
-      log("SplashController not found: $e");
+      log("Error in WalletRechargeController onInit: $e");
     }
   }
   

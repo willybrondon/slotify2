@@ -333,6 +333,11 @@ class AppPages {
       binding: WalletScreenBinding(),
     ),
     GetPage(
+      name: AppRoutes.walletRecharge,
+      page: () => const WalletRechargeScreen(),
+      binding: WalletRechargeBinding(),
+    ),
+    GetPage(
       name: AppRoutes.history,
       page: () => const HistoryScreen(),
       binding: HistoryScreenBinding(),

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/constant.dart';
+import 'package:salon_2/utils/utils.dart';
 
 class WalletAppBarView extends StatelessWidget {
   const WalletAppBarView({super.key});
@@ -94,17 +96,28 @@ class WalletButtonView extends StatelessWidget {
         Expanded(
           child: GestureDetector(
             onTap: () {
-              Get.toNamed(AppRoutes.walletRecharge)?.then(
-                (value) async {
-                  // Refresh wallet after returning from recharge
-                  final walletController = Get.find<WalletScreenController>();
-                  await walletController.onGetWalletHistoryApiCall(
-                    userId: Constant.storage.read<String>('userId') ?? "",
-                    month: DateFormat('yyyy-MM').format(DateTime.now()),
-                  );
-                  walletController.update([Constant.idProgressView]);
-                },
-              );
+              try {
+                Get.toNamed(AppRoutes.walletRecharge)?.then(
+                  (value) async {
+                    // Refresh wallet after returning from recharge
+                    try {
+                      final walletController =
+                          Get.find<WalletScreenController>();
+                      await walletController.onGetWalletHistoryApiCall(
+                        userId: Constant.storage.read<String>('userId') ?? "",
+                        month: DateFormat('yyyy-MM').format(DateTime.now()),
+                      );
+                      walletController.update([Constant.idProgressView]);
+                    } catch (e) {
+                      log("Error refreshing wallet: $e");
+                    }
+                  },
+                );
+              } catch (e) {
+                log("Error navigating to wallet recharge: $e");
+                Utils.showToast(
+                    Get.context!, "Error: Unable to open recharge screen");
+              }
             },
             child: Container(
               decoration: BoxDecoration(
