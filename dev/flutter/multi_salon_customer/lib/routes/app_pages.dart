@@ -105,6 +105,8 @@ import 'package:salon_2/ui/view_all_category/binding/view_all_category_binding.d
 import 'package:salon_2/ui/view_all_category/view/view_all_category.dart';
 import 'package:salon_2/ui/wallet_screen/binding/wallet_screen_binding.dart';
 import 'package:salon_2/ui/wallet_screen/view/wallet_screen.dart';
+import 'package:salon_2/ui/wallet_recharge_screen/binding/wallet_recharge_binding.dart';
+import 'package:salon_2/ui/wallet_recharge_screen/view/wallet_recharge_screen.dart';
 import 'package:salon_2/ui/wishlist_screen/binding/wishlist_binding.dart';
 import 'package:salon_2/ui/wishlist_screen/view/wishlist_screen.dart';
 

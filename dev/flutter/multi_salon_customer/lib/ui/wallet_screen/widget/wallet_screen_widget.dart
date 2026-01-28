@@ -94,11 +94,15 @@ class WalletButtonView extends StatelessWidget {
         Expanded(
           child: GestureDetector(
             onTap: () {
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext context) {
-                  return const PaymentBottomSheet(isRecharge: true);
+              Get.toNamed(AppRoutes.walletRecharge)?.then(
+                (value) async {
+                  // Refresh wallet after returning from recharge
+                  final walletController = Get.find<WalletScreenController>();
+                  await walletController.onGetWalletHistoryApiCall(
+                    userId: Constant.storage.read<String>('userId') ?? "",
+                    month: DateFormat('yyyy-MM').format(DateTime.now()),
+                  );
+                  walletController.update([Constant.idProgressView]);
                 },
               );
             },

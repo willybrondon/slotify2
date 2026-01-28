@@ -43,6 +43,7 @@ class AppRoutes {
   static const String notification = '/notification';
   static const String profile = '/profile';
   static const String wallet = '/wallet';
+  static const String walletRecharge = '/walletRecharge';
   static const String history = '/history';
   static const String order = '/order';
   static const String orderDetail = '/orderDetail';
