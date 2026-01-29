@@ -147,43 +147,24 @@ class WalletRechargeController extends GetxController {
     update();
   }
   
-  // Validate inputs
-  bool validateInputs() {
-    bool isValid = true;
-    
-    // Validate amount
+  // Validate amount only (payment method will be selected on payment screen)
+  bool validateAmount() {
     String amount = amountController.text.trim();
     if (amount.isEmpty || double.tryParse(amount) == null || double.parse(amount) <= 0) {
       amountError = true;
-      isValid = false;
+      update();
+      return false;
     } else {
       amountError = false;
+      update();
+      return true;
     }
-    
-    // Validate payment method
-    if (selectedPaymentMethod == null || selectedPaymentMethod!.isEmpty) {
-      Utils.showToast(Get.context!, "Please select a payment method");
-      isValid = false;
-    }
-    
-    // Validate MTN MoMo phone number
-    if (selectedPaymentMethod == "MTN MoMo") {
-      String phone = phoneNumberController.text.trim();
-      if (phone.isEmpty || !phone.startsWith("237") || phone.length < 12) {
-        phoneError = true;
-        isValid = false;
-      } else {
-        phoneError = false;
-      }
-    }
-    
-    update();
-    return isValid;
   }
   
-  // Handle recharge
-  Future<void> handleRecharge() async {
-    if (!validateInputs()) {
+  // Handle continue to payment screen
+  Future<void> handleContinue() async {
+    if (!validateAmount()) {
+      Utils.showToast(Get.context!, "Please enter a valid amount");
       return;
     }
     
@@ -201,38 +182,23 @@ class WalletRechargeController extends GetxController {
     update();
     
     try {
-      // Navigate to payment screen with selected payment method
-      String? phoneNumber = selectedPaymentMethod == "MTN MoMo" 
-          ? phoneNumberController.text.trim() 
-          : null;
-      
-      // Store phone number for MTN MoMo if provided
-      if (phoneNumber != null && phoneNumber.isNotEmpty) {
-        MtnMomoService.mtnMomoPhoneNumber = phoneNumber;
-      }
-      
-      var result = await Get.toNamed(
+      // Navigate to payment screen without pre-selected payment method
+      // Pass null for selectedPayment so all methods are shown
+      await Get.toNamed(
         AppRoutes.payment,
         arguments: [
           true, // isWalletAdd
           amount, // totalAmount
           false, // isCreateOrder
-          selectedPaymentMethod, // selectedPayment
+          null, // selectedPayment - null means show all payment methods
         ],
-      );
-      
-      // After payment (success or cancel), go back to wallet screen
-      // The payment screen will handle showing success dialog and going back
-      // We just need to ensure we're back on wallet screen
-      if (Get.currentRoute == AppRoutes.payment) {
-        // If still on payment screen, go back
-        Get.back();
-      }
-      
-      // Go back to wallet screen
-      Get.back();
+      )?.then((value) {
+        // After returning from payment screen, go back to wallet screen
+        // The payment screen will handle showing success dialog
+        Get.back(); // Go back to wallet screen
+      });
     } catch (e) {
-      log("Error in handleRecharge: $e");
+      log("Error in handleContinue: $e");
       Utils.showToast(Get.context!, "Error: $e");
     } finally {
       isProcessing = false;
