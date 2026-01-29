@@ -228,6 +228,13 @@ class PaymentScreenController extends GetxController {
   }
 
   onClickPayNow() async {
+    // Validate that a payment method is selected for wallet recharge
+    if (isWalletAdd == true &&
+        (selectedPayment == null || selectedPayment!.isEmpty)) {
+      Utils.showToast(Get.context!, "Please select a payment method");
+      return;
+    }
+
     // if (selectedPayment == "Razorpay") {
     //   log("it's Razorpay ");
     //   RazorPayService().init(

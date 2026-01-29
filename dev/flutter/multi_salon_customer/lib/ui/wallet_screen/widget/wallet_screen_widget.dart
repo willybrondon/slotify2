@@ -99,7 +99,7 @@ class WalletButtonView extends StatelessWidget {
               try {
                 Get.toNamed(AppRoutes.walletRecharge)?.then(
                   (value) async {
-                    // Refresh wallet after returning from recharge
+                    // Refresh wallet after returning from recharge (especially if payment was successful)
                     try {
                       final walletController =
                           Get.find<WalletScreenController>();

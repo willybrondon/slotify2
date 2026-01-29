@@ -184,7 +184,7 @@ class WalletRechargeController extends GetxController {
     try {
       // Navigate to payment screen without pre-selected payment method
       // Pass null for selectedPayment so all methods are shown
-      await Get.toNamed(
+      var result = await Get.toNamed(
         AppRoutes.payment,
         arguments: [
           true, // isWalletAdd
@@ -192,11 +192,16 @@ class WalletRechargeController extends GetxController {
           false, // isCreateOrder
           null, // selectedPayment - null means show all payment methods
         ],
-      )?.then((value) {
-        // After returning from payment screen, go back to wallet screen
-        // The payment screen will handle showing success dialog
-        Get.back(); // Go back to wallet screen
-      });
+      );
+      
+      // After returning from payment screen, check if payment was successful
+      if (result == 'success') {
+        // Payment was successful, go back to wallet screen
+        Get.back(result: 'success');
+      } else {
+        // Payment was cancelled or failed, stay on recharge screen
+        // User can try again or go back manually
+      }
     } catch (e) {
       log("Error in handleContinue: $e");
       Utils.showToast(Get.context!, "Error: $e");

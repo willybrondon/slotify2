@@ -164,7 +164,8 @@ class ZitopayService {
           'XAF';
 
       // Generate unique reference
-      String reference = "SKEDISY_${DateTime.now().millisecondsSinceEpoch}_$userId";
+      String reference =
+          "SKEDISY_${DateTime.now().millisecondsSinceEpoch}_$userId";
 
       // Prepare payment request body
       Map<String, dynamic> body = {
@@ -176,14 +177,16 @@ class ZitopayService {
         'customer_email': userEmail,
         'customer_name': userName,
         'customer_phone': userPhone,
-        'callback_url': '${Constant.zitopayBaseUrl}/webhook', // Zitopay webhook callback URL
+        'callback_url':
+            '${Constant.zitopayBaseUrl}/webhook', // Zitopay webhook callback URL
         'return_url': 'skedisy://payment/success',
       };
 
       log("Zitopay request body :: $body");
 
       // Create authorization header (Basic Auth with API key and secret)
-      String credentials = base64Encode(utf8.encode('$zitopayApiKeys:$zitopaySecretKeys'));
+      String credentials =
+          base64Encode(utf8.encode('$zitopayApiKeys:$zitopaySecretKeys'));
 
       var response = await http.post(
         Uri.parse('${Constant.zitopayBaseUrl}/payments'),
@@ -200,30 +203,32 @@ class ZitopayService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
-        
-        if (responseData['status'] == 'success' && responseData['data'] != null) {
+
+        if (responseData['status'] == 'success' &&
+            responseData['data'] != null) {
           String paymentUrl = responseData['data']['payment_url'] ?? '';
-          
+
           if (paymentUrl.isNotEmpty) {
             // Open payment URL in browser
             Uri paymentUri = Uri.parse(paymentUrl);
             if (await canLaunchUrl(paymentUri)) {
               await launchUrl(paymentUri, mode: LaunchMode.externalApplication);
-              
+
               // Show success message
-              Utils.showToast(Get.context!, "Redirecting to Zitopay payment...");
-              
+              Utils.showToast(
+                  Get.context!, "Redirecting to Zitopay payment...");
+
               // Note: In production, you should implement webhook handling
               // to verify payment status from Zitopay callback
               // For now, we'll process after a short delay to allow payment completion
               // In production, implement proper webhook verification
-              
+
               // Wait a moment for payment processing
               await Future.delayed(const Duration(seconds: 3));
-              
+
               // Process payment completion
               await _processPaymentSuccess();
-              
+
               return responseData;
             } else {
               throw Exception("Could not launch payment URL");
@@ -232,7 +237,8 @@ class ZitopayService {
             throw Exception("Payment URL not received from Zitopay");
           }
         } else {
-          throw Exception(responseData['message'] ?? 'Payment initiation failed');
+          throw Exception(
+              responseData['message'] ?? 'Payment initiation failed');
         }
       } else {
         log("Error during Zitopay payment - Status: ${response.statusCode}");
@@ -242,8 +248,7 @@ class ZitopayService {
 
         try {
           final errorResponse = jsonDecode(response.body);
-          final errorMessage =
-              errorResponse['message'] ?? 'Payment failed';
+          final errorMessage = errorResponse['message'] ?? 'Payment failed';
           Utils.showToast(Get.context!, errorMessage);
           throw errorMessage;
         } catch (parseError) {
@@ -264,9 +269,11 @@ class ZitopayService {
   Future<void> _processPaymentSuccess() async {
     try {
       // Check if booking controller is available
-      if (bookingScreenController == null && paymentScreenController.isWalletAdd != true) {
+      if (bookingScreenController == null &&
+          paymentScreenController.isWalletAdd != true) {
         log("Error: BookingScreenController not available for direct payment");
-        Utils.showToast(Get.context!, "Error: Booking controller not available");
+        Utils.showToast(
+            Get.context!, "Error: Booking controller not available");
         return;
       }
 
@@ -275,7 +282,7 @@ class ZitopayService {
         bookingScreenController!.isLoading(true);
         bookingScreenController!.update([Constant.idProgressView]);
       }
-      
+
       if (paymentScreenController.isWalletAdd == true) {
         // Wallet recharge
         await paymentScreenController.onDepositToWalletApiCall(
@@ -289,17 +296,16 @@ class ZitopayService {
             bookingScreenController!.isLoading(false);
             bookingScreenController!.update([Constant.idProgressView]);
           }
-          Utils.showToast(
-              Get.context!,
+          Utils.showToast(Get.context!,
               paymentScreenController.depositToWalletModel?.message ?? "");
-          Get.back();
+          // For wallet recharge, return success result so recharge screen can navigate back to wallet
+          Get.back(result: 'success');
         } else {
           if (bookingScreenController != null) {
             bookingScreenController!.isLoading(false);
             bookingScreenController!.update([Constant.idProgressView]);
           }
-          Utils.showToast(
-              Get.context!,
+          Utils.showToast(Get.context!,
               paymentScreenController.depositToWalletModel?.message ?? "");
         }
       } else {
@@ -319,7 +325,8 @@ class ZitopayService {
             : 0.0;
 
         if (bookingScreenController == null) {
-          Utils.showToast(Get.context!, "Error: Booking controller not available");
+          Utils.showToast(
+              Get.context!, "Error: Booking controller not available");
           return;
         }
 
@@ -340,7 +347,8 @@ class ZitopayService {
           time: times.isNotEmpty
               ? times
               : bookingScreenController!.slotsString.toString(),
-          amount: finalAmount, // Use recalculated totalPrice with coupon discount
+          amount:
+              finalAmount, // Use recalculated totalPrice with coupon discount
           withoutTax: withoutTaxValue, // Send as double with 2 decimal places
           paymentType: "Zitopay", // Use Zitopay as payment type
           atPlace: bookingScreenController!.selectedVenue == "At Salon" ? 1 : 2,
@@ -350,9 +358,8 @@ class ZitopayService {
         if (bookingScreenController!.createBookingCategory?.status == true) {
           bookingScreenController!.isLoading(false);
           bookingScreenController!.update([Constant.idProgressView]);
-          
-          Utils.showToast(
-              Get.context!, "Payment successful! Booking created.");
+
+          Utils.showToast(Get.context!, "Payment successful! Booking created.");
 
           // Navigate back to home screen
           Get.offAndToNamed(AppRoutes.bottom);
@@ -368,7 +375,7 @@ class ZitopayService {
         } else {
           bookingScreenController!.isLoading(false);
           bookingScreenController!.update([Constant.idProgressView]);
-          
+
           Utils.showToast(
               Get.context!,
               bookingScreenController!.createBookingCategory?.message ??
@@ -385,4 +392,3 @@ class ZitopayService {
     }
   }
 }
-

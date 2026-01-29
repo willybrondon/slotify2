@@ -1499,15 +1499,21 @@ class PaymentScreenBottomView extends StatelessWidget {
                   const Spacer(),
                   AppButton(
                     height: 46,
-                    buttonColor: AppColors.primaryAppColor,
+                    buttonColor: (logic.isWalletAdd == true &&
+                            logic.selectedPayment == null)
+                        ? AppColors.greyColor.withOpacity(0.5)
+                        : AppColors.primaryAppColor,
                     color: AppColors.whiteColor,
                     fontFamily: AppFontFamily.sfProDisplay,
                     fontSize: 15,
                     buttonText: logic.isWalletAdd == true ? "Pay" : "Continue",
                     width: Get.width * 0.28,
-                    onTap: () {
-                      logic.onClickPayNow();
-                    },
+                    onTap: (logic.isWalletAdd == true &&
+                            logic.selectedPayment == null)
+                        ? null
+                        : () {
+                            logic.onClickPayNow();
+                          },
                   ),
                 ],
               );

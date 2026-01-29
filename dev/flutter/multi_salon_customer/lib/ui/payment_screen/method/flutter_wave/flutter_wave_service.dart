@@ -95,8 +95,8 @@ class FlutterWaveService {
       if (paymentScreenController.depositToWalletModel?.status == true) {
         Utils.showToast(Get.context!,
             paymentScreenController.depositToWalletModel?.message ?? "");
-
-        Get.back();
+        // For wallet recharge, return success result so recharge screen can navigate back to wallet
+        Get.back(result: 'success');
       } else {
         Utils.showToast(Get.context!,
             paymentScreenController.depositToWalletModel?.message ?? "");

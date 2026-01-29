@@ -612,7 +612,8 @@ class MtnMomoService {
           }
           Utils.showToast(Get.context!,
               paymentScreenController.depositToWalletModel?.message ?? "");
-          Get.back();
+          // For wallet recharge, return success result so recharge screen can navigate back to wallet
+          Get.back(result: 'success');
         } else {
           if (bookingScreenController != null) {
             bookingScreenController!.isLoading(false);
