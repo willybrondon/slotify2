@@ -1451,73 +1451,70 @@ class PaymentScreenBottomView extends StatelessWidget {
       child: GetBuilder<PaymentScreenController>(
         id: Constant.idSelectPaymentMethod,
         builder: (logic) {
-          // Get updated total from booking controller if available (for coupon discounts)
-          // Also listen to coupon updates
-          return GetBuilder<BookingScreenController>(
-            id: Constant.idApplyCoupon,
-            builder: (bookingLogic) {
-              String displayAmount = logic.totalAmount ?? "0";
-              if (logic.isWalletAdd == false && logic.bookingData != null) {
-                try {
-                  displayAmount = bookingLogic.totalPrice.toStringAsFixed(2);
-                } catch (e) {
-                  // If booking controller not found, use original amount
-                }
-              }
+          String displayAmount = logic.totalAmount ?? "0";
 
-              return Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          // For booking payments, try to get updated total from booking controller
+          if (logic.isWalletAdd == false && logic.bookingData != null) {
+            try {
+              final bookingController = Get.find<BookingScreenController>();
+              displayAmount = bookingController.totalPrice.toStringAsFixed(2);
+            } catch (e) {
+              // If booking controller not found, use original amount
+              log("BookingScreenController not found, using original amount: $e");
+            }
+          }
+
+          return Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "txtTotalAmount".tr,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.heeBo700,
+                        fontSize: 17,
+                        color: AppColors.appText,
+                      ),
+                    ).paddingOnly(left: 5, bottom: 7),
+                    Row(
                       children: [
                         Text(
-                          "txtTotalAmount".tr,
+                          "$currency $displayAmount",
                           style: TextStyle(
-                            fontFamily: AppFontFamily.heeBo700,
-                            fontSize: 17,
-                            color: AppColors.appText,
+                            fontFamily: AppFontFamily.heeBo800,
+                            fontSize: 18,
+                            color: AppColors.primaryAppColor,
                           ),
-                        ).paddingOnly(left: 5, bottom: 7),
-                        Row(
-                          children: [
-                            Text(
-                              "$currency $displayAmount",
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.heeBo800,
-                                fontSize: 18,
-                                color: AppColors.primaryAppColor,
-                              ),
-                            ),
-                            SizedBox(width: Get.width * 0.02),
-                          ],
-                        ).paddingOnly(left: 5)
+                        ),
+                        SizedBox(width: Get.width * 0.02),
                       ],
-                    ),
-                  ),
-                  const Spacer(),
-                  AppButton(
-                    height: 46,
-                    buttonColor: (logic.isWalletAdd == true &&
-                            logic.selectedPayment == null)
+                    ).paddingOnly(left: 5)
+                  ],
+                ),
+              ),
+              const Spacer(),
+              AppButton(
+                height: 46,
+                buttonColor:
+                    (logic.isWalletAdd == true && logic.selectedPayment == null)
                         ? AppColors.greyColor.withOpacity(0.5)
                         : AppColors.primaryAppColor,
-                    color: AppColors.whiteColor,
-                    fontFamily: AppFontFamily.sfProDisplay,
-                    fontSize: 15,
-                    buttonText: logic.isWalletAdd == true ? "Pay" : "Continue",
-                    width: Get.width * 0.28,
-                    onTap: (logic.isWalletAdd == true &&
-                            logic.selectedPayment == null)
+                color: AppColors.whiteColor,
+                fontFamily: AppFontFamily.sfProDisplay,
+                fontSize: 15,
+                buttonText: logic.isWalletAdd == true ? "Pay" : "Continue",
+                width: Get.width * 0.28,
+                onTap:
+                    (logic.isWalletAdd == true && logic.selectedPayment == null)
                         ? null
                         : () {
                             logic.onClickPayNow();
                           },
-                  ),
-                ],
-              );
-            },
+              ),
+            ],
           );
         },
       ),
