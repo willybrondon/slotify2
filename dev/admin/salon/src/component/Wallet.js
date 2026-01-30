@@ -38,9 +38,6 @@ const Wallet = () => {
     if (settingsData?.isStripePay) {
         availablePaymentMethods.push({ value: "Stripe", label: "Stripe" });
     }
-    if (settingsData?.isZitopay) {
-        availablePaymentMethods.push({ value: "Zitopay", label: "Zitopay" });
-    }
     if (settingsData?.isMtnMomo) {
         availablePaymentMethods.push({ value: "MTN MoMo", label: "MTN Mobile Money" });
     }
@@ -267,10 +264,6 @@ const Wallet = () => {
                     toast.error(data.message || data.error || "Failed to create payment session");
                     setIsProcessing(false);
                 }
-            } else if (paymentMethod === "Zitopay") {
-                // TODO: Implement Zitopay payment flow for web
-                toast.info("Zitopay payment integration for web is coming soon. Please use Stripe for now.");
-                setIsProcessing(false);
             } else if (paymentMethod === "MTN MoMo") {
                 // Validate phone number
                 if (!phoneNumber || phoneNumber.trim() === "") {
@@ -446,7 +439,7 @@ const Wallet = () => {
                                 </label>
                                 <div style={{ fontSize: "14px", lineHeight: "25px", color: "#A5A5A5" }}>
                                     <div>
-                                        To recharge your wallet, select or enter the desired amount and choose your preferred payment method (Stripe, Zitopay, or MTN MoMo). 
+                                        To recharge your wallet, select or enter the desired amount and choose your preferred payment method (Stripe or MTN MoMo). 
                                         Once the payment is processed successfully, the amount will be automatically credited to your wallet. 
                                         Your wallet balance must meet the minimum required amount plus commission fees to accept new bookings.
                                     </div>
@@ -604,8 +597,6 @@ const Wallet = () => {
                                                                     }}
                                                                 />
                                                             </div>
-                                                        ) : method.value === "Zitopay" ? (
-                                                            <span style={{ fontWeight: "bold", color: "#1ebc1e", fontSize: "14px" }}>ZP</span>
                                                         ) : (
                                                             <span style={{ fontWeight: "bold", color: "#6b7280", fontSize: "14px" }}>{method.label.charAt(0)}</span>
                                                         )}
@@ -687,7 +678,7 @@ const Wallet = () => {
                             <div className="alert alert-warning mt-4" role="alert">
                                 <strong>No Payment Methods Available</strong>
                                 <br />
-                                <small>Please contact admin to enable payment methods (Stripe, Zitopay, or MTN MoMo).</small>
+                                <small>Please contact admin to enable payment methods (Stripe or MTN MoMo).</small>
                             </div>
                         )}
 

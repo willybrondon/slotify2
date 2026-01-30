@@ -20,7 +20,6 @@ import 'package:salon_2/ui/select_branch_screen/controller/select_branch_control
 import 'package:salon_2/ui/view_all_category/controller/view_all_category_controller.dart';
 import 'package:salon_2/ui/expert/expert_detail/controller/expert_detail_controller.dart';
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
-import 'package:salon_2/ui/payment_screen/method/zitopay/zitopay_service.dart';
 import 'package:salon_2/ui/payment_screen/method/mtn_momo/mtn_momo_service.dart';
 import 'package:salon_2/ui/payment_screen/model/deposit_to_wallet_model.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
@@ -326,117 +325,6 @@ class PaymentScreenController extends GetxController {
               Get.context!, "Payment initialization failed: ${e.toString()}");
         }
         log("Stripe initialization error: $e");
-      }
-    } else if (selectedPayment == "Zitopay") {
-      log("it's Zitopay");
-      isLoading(true);
-      update([Constant.idProgressView]);
-
-      try {
-        // Get Zitopay settings from splash controller
-        SplashController splashController = Get.find<SplashController>();
-        bool isZitopayEnabled =
-            splashController.settingCategory?.setting?.isZitopay ?? false;
-        String? zitopayApiKey =
-            splashController.settingCategory?.setting?.zitopayApiKey;
-        String? zitopaySecretKey =
-            splashController.settingCategory?.setting?.zitopaySecretKey;
-        String? zitopayMerchantId =
-            splashController.settingCategory?.setting?.zitopayMerchantId;
-
-        // Check if Zitopay is enabled and configured
-        if (!isZitopayEnabled) {
-          isLoading(false);
-          update([Constant.idProgressView]);
-          Utils.showToast(Get.context!,
-              "Zitopay payment is not enabled. Please select another payment method.");
-          return;
-        }
-
-        if (zitopayApiKey == null ||
-            zitopayApiKey.isEmpty ||
-            zitopaySecretKey == null ||
-            zitopaySecretKey.isEmpty ||
-            zitopayMerchantId == null ||
-            zitopayMerchantId.isEmpty) {
-          isLoading(false);
-          update([Constant.idProgressView]);
-          Utils.showToast(Get.context!,
-              "Zitopay is not properly configured. Please contact support.");
-          return;
-        }
-
-        // Parse amount properly
-        int parsedAmount = 0;
-        if (totalAmount != null && totalAmount!.isNotEmpty) {
-          // Remove any currency symbols and parse
-          String cleanAmount = totalAmount!.replaceAll(RegExp(r'[^\d.]'), '');
-          double amountDouble = double.tryParse(cleanAmount) ?? 0.0;
-          parsedAmount = amountDouble.toInt();
-        }
-
-        log("Parsed amount for Zitopay: $parsedAmount");
-
-        // For wallet recharge
-        if (isWalletAdd == true) {
-          await ZitopayService().init(
-            zitopayApiKey: zitopayApiKey ?? "",
-            zitopaySecretKey: zitopaySecretKey ?? "",
-            zitopayMerchantId: zitopayMerchantId ?? "",
-            totalAmountWithOutTax: parsedAmount,
-            paymentType: "wallet_recharge",
-          );
-        } else {
-          // For direct payment - use passed booking data
-          double paymentAmount = (bookingData?['amount'] ?? 0.0).toDouble();
-          if (bookingScreenController != null) {
-            // Recalculate to get latest total with coupon
-            bookingScreenController!.calculateTotalWithDiscount();
-            paymentAmount = bookingScreenController!.totalPrice;
-            parsedAmount = paymentAmount.toInt();
-          }
-
-          await ZitopayService().init(
-            zitopayApiKey: zitopayApiKey ?? "",
-            zitopaySecretKey: zitopaySecretKey ?? "",
-            zitopayMerchantId: zitopayMerchantId ?? "",
-            totalAmountWithOutTax: parsedAmount,
-            paymentType: "direct_payment",
-            serviceId: bookingData?['serviceId'] ?? "",
-            expertId: bookingData?['expertId'] ?? "",
-            date: bookingData?['date'] ?? "",
-            time: bookingData?['time'] ?? "",
-            rupee: paymentAmount,
-            userId: Constant.storage.read<String>('userId') ?? "",
-          );
-        }
-
-        log("Called Zitopay Init");
-
-        await ZitopayService().zitopayPay().then((value) {
-          // Only update if screen is still active
-          if (isScreenActive) {
-            isLoading(false);
-            update([Constant.idProgressView]);
-          }
-        }).catchError((e) {
-          log("Zitopay payment error: $e");
-          // Only update if screen is still active
-          if (isScreenActive) {
-            isLoading(false);
-            update([Constant.idProgressView]);
-            Utils.showToast(Get.context!, "Payment failed: ${e.toString()}");
-          }
-        });
-      } catch (e) {
-        // Only update if screen is still active
-        if (isScreenActive) {
-          isLoading(false);
-          update([Constant.idProgressView]);
-          Utils.showToast(
-              Get.context!, "Payment initialization failed: ${e.toString()}");
-        }
-        log("Zitopay initialization error: $e");
       }
     } else if (selectedPayment == "MTN MoMo") {
       log("it's MTN MoMo");

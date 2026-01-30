@@ -96,9 +96,10 @@ exports.handleSwitch = async (req, res) => {
     if (type == 4) {
       setting.isFlutterWave = !setting.isFlutterWave;
     }
-    if (type == 5) {
-      setting.isZitopay = !setting.isZitopay;
-    }
+    // Deprecated: Zitopay removed from platform (kept for backward compatibility)
+    // if (type == 5) {
+    //   setting.isZitopay = !setting.isZitopay;
+    // }
     if (type == 6) {
       setting.isAddProductRequest = !setting.isAddProductRequest;
     }

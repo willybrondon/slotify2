@@ -8,7 +8,6 @@ import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/services/app_exception/app_exception.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
-import 'package:salon_2/ui/payment_screen/method/zitopay/zitopay_service.dart';
 import 'package:salon_2/ui/payment_screen/method/mtn_momo/mtn_momo_service.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
@@ -95,9 +94,6 @@ class WalletRechargeController extends GetxController {
     
     if (splashController?.settingCategory?.setting?.isStripePay ?? false) {
       methods.add({"value": "Stripe", "label": "Stripe"});
-    }
-    if (splashController?.settingCategory?.setting?.isZitopay ?? false) {
-      methods.add({"value": "Zitopay", "label": "Zitopay"});
     }
     if (splashController?.settingCategory?.setting?.isMtnMomo ?? false) {
       methods.add({"value": "MTN MoMo", "label": "MTN Mobile Money"});

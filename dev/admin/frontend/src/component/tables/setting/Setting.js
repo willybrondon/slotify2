@@ -46,9 +46,6 @@ const Setting = (props) => {
   // box 5
   const [stripePublishableKey, setStripePublishableKey] = useState("");
   const [stripeSecretKey, setStripeSecretKey] = useState("");
-  const [zitopayApiKey, setZitopayApiKey] = useState("");
-  const [zitopaySecretKey, setZitopaySecretKey] = useState("");
-  const [zitopayMerchantId, setZitopayMerchantId] = useState("");
   const [mtnMomoSubscriptionKey, setMtnMomoSubscriptionKey] = useState("");
   const [mtnMomoApiUserId, setMtnMomoApiUserId] = useState("");
   const [mtnMomoApiKey, setMtnMomoApiKey] = useState("");
@@ -78,9 +75,6 @@ const Setting = (props) => {
     currencyName: "",
     currencySymbol: "",
     flutterWaveKey: "",
-    zitopayApiKey: "",
-    zitopaySecretKey: "",
-    zitopayMerchantId: "",
     mtnMomoPrimaryKey: "",
     mtnMomoSecondaryKey: "",
     mtnMomoApiKey: "",
@@ -121,9 +115,6 @@ const Setting = (props) => {
       setCurrencySymbol(setting.currencySymbol);
       setStripePublishableKey(setting.stripePublishableKey);
       setStripeSecretKey(setting.stripeSecretKey);
-      setZitopayApiKey(setting.zitopayApiKey || "");
-      setZitopaySecretKey(setting.zitopaySecretKey || "");
-      setZitopayMerchantId(setting.zitopayMerchantId || "");
       setMtnMomoSubscriptionKey(setting.mtnMomoSubscriptionKey || "");
       setMtnMomoApiUserId(setting.mtnMomoApiUserId || "");
       setMtnMomoApiKey(setting.mtnMomoApiKey || "");
@@ -203,9 +194,6 @@ const Setting = (props) => {
         tnc,
         stripePublishableKey,
         stripeSecretKey,
-        zitopayApiKey,
-        zitopaySecretKey,
-        zitopayMerchantId,
         mtnMomoSubscriptionKey,
         mtnMomoApiUserId,
         mtnMomoApiKey,
@@ -498,124 +486,6 @@ const Setting = (props) => {
                   </div>
                 </div>
 
-                <div className="col-12 col-md-6 mt-3 ">
-                  <div className="settingBoxOuter">
-                    <div className="settingBoxHeader">
-                      <h4>ZITOPAY SETTING</h4>
-                    </div>
-                    <div className="col-12 ">
-                      <div className="inputData text  flex-row justify-content-start text-start">
-                        <label
-                          htmlFor="zitopayApiKey"
-                          className="ms-2 order-1"
-                        >
-                          Zitopay API Key
-                        </label>
-                        <input
-                          type="text"
-                          className="rounded-2"
-                          id="zitopayApiKey"
-                          value={zitopayApiKey}
-                          placeholder="Enter Zitopay API Key"
-                          onChange={(e) => {
-                            setZitopayApiKey(e.target.value);
-                            if (!e.target.value) {
-                              return setError({
-                                ...error,
-                                zitopayApiKey: ` Zitopay API Key Is Required`,
-                              });
-                            } else {
-                              return setError({
-                                ...error,
-                                zitopayApiKey: "",
-                              });
-                            }
-                          }}
-                        />
-                        {error && (
-                          <p className="errorMessage text-start">
-                            {error && error?.zitopayApiKey}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="zitopaySecretKey" className="ms-2 order-1">
-                          Zitopay Secret Key
-                        </label>
-                        <input
-                          type="text"
-                          className="rounded-2"
-                          id="zitopaySecretKey"
-                          value={zitopaySecretKey}
-                          placeholder="Enter Zitopay Secret Key"
-                          onChange={(e) => {
-                            setZitopaySecretKey(e.target.value);
-                            if (!e.target.value) {
-                              return setError({
-                                ...error,
-                                zitopaySecretKey: ` Zitopay Secret Key Is Required`,
-                              });
-                            } else {
-                              return setError({
-                                ...error,
-                                zitopaySecretKey: "",
-                              });
-                            }
-                          }}
-                        />
-                        {error && (
-                          <p className="errorMessage text-start">
-                            {error && error?.zitopaySecretKey}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="zitopayMerchantId" className="ms-2 order-1">
-                          Zitopay Merchant ID
-                        </label>
-                        <input
-                          type="text"
-                          className="rounded-2"
-                          id="zitopayMerchantId"
-                          value={zitopayMerchantId}
-                          placeholder="Enter Zitopay Merchant ID"
-                          onChange={(e) => {
-                            setZitopayMerchantId(e.target.value);
-                            if (!e.target.value) {
-                              return setError({
-                                ...error,
-                                zitopayMerchantId: ` Zitopay Merchant ID Is Required`,
-                              });
-                            } else {
-                              return setError({
-                                ...error,
-                                zitopayMerchantId: "",
-                              });
-                            }
-                          }}
-                        />
-                        {error && (
-                          <p className="errorMessage text-start">
-                            {error && error?.zitopayMerchantId}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="inputData">
-                      <div>
-                        <label className="my-3">Zitopay active (enable/disable zitopay)</label>
-                      </div>
-                      <ToggleSwitch
-                        onClick={() => handleSettingSwitch(setting?._id, 5)}
-                        value={setting?.isZitopay}
-                      />
-                    </div>
-                  </div>
-                </div>
 
                 <div className="col-12 col-md-6 mt-3 ">
                   <div className="settingBoxOuter">

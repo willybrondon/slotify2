@@ -606,7 +606,7 @@ class BookingScreenController extends GetxController {
   onGetSlotsList() {
     morningSlots.clear();
     afternoonSlots.clear();
-    
+
     // Reset flags to default values
     hasMorningSlots = true;
     hasAfternoonSlots = true;
@@ -922,10 +922,11 @@ class BookingScreenController extends GetxController {
       String? couponIdToSend = selectedCouponId;
 
       // If discount is applied but no coupon ID, try to find it
-      if (couponDiscountAmount > 0 && (couponIdToSend == null || couponIdToSend.isEmpty)) {
+      if (couponDiscountAmount > 0 &&
+          (couponIdToSend == null || couponIdToSend.isEmpty)) {
         log("Create Booking - ⚠️ CRITICAL: Discount applied (${couponDiscountAmount}) but coupon ID missing!");
         log("Create Booking - Attempting to find coupon ID to prevent 'book failed' error...");
-        
+
         // First, try to find in existing coupon list
         if (manualCouponCode != null && getCouponModel?.data != null) {
           for (var coupon in getCouponModel!.data!) {
@@ -937,9 +938,10 @@ class BookingScreenController extends GetxController {
             }
           }
         }
-        
+
         // If still not found, try fetching coupons
-        if ((couponIdToSend == null || couponIdToSend.isEmpty) && withOutTaxRupee > 0) {
+        if ((couponIdToSend == null || couponIdToSend.isEmpty) &&
+            withOutTaxRupee > 0) {
           log("Create Booking - Coupon ID not found in list, fetching coupons...");
           try {
             String userId = Constant.storage.read<String>('userId') ?? "";
@@ -949,11 +951,12 @@ class BookingScreenController extends GetxController {
                 type: "2", // Type 2 for booking
                 amount: withOutTaxRupee.toInt().toString(),
               );
-              
+
               // Try finding again after fetch
               if (manualCouponCode != null && getCouponModel?.data != null) {
                 for (var coupon in getCouponModel!.data!) {
-                  if (coupon.code?.toUpperCase() == manualCouponCode!.toUpperCase()) {
+                  if (coupon.code?.toUpperCase() ==
+                      manualCouponCode!.toUpperCase()) {
                     couponIdToSend = coupon.id;
                     selectedCouponId = coupon.id;
                     log("Create Booking - ✅ Found coupon ID after fetch: $couponIdToSend");
@@ -966,30 +969,36 @@ class BookingScreenController extends GetxController {
             log("Create Booking - Error fetching coupons: $e");
           }
         }
-        
+
         // FIX Issue 1: CRITICAL - If discount is applied but still no coupon ID, prevent booking
         // This will cause backend to return "book failed - Amount mismatch"
         if (couponIdToSend == null || couponIdToSend.isEmpty) {
           log("Create Booking - ❌ ERROR: Discount applied (${couponDiscountAmount}) but coupon ID cannot be found!");
           log("Create Booking - ❌ Backend will reject this booking with 'book failed' error");
           log("Create Booking - ❌ Resetting coupon to prevent booking failure...");
-          
+
           // Reset coupon and recalculate without discount
           resetCoupon();
           calculateTotalWithDiscount();
-          
+
           // Clear loading state
           isLoading(false);
-          update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
-          
+          update([
+            Constant.idProgressView,
+            Constant.idGetCoupon,
+            Constant.idApplyCoupon
+          ]);
+
           // Show error to user
-          Utils.showToast(Get.context!, 
+          Utils.showToast(Get.context!,
               "Coupon validation failed. The coupon may have expired or is no longer valid. Please remove it and try again.");
-          
+
           // Don't proceed with booking - it will fail anyway
           return;
         }
-      } else if (couponIdToSend == null && manualCouponCode != null && getCouponModel?.data != null) {
+      } else if (couponIdToSend == null &&
+          manualCouponCode != null &&
+          getCouponModel?.data != null) {
         // If no discount but manual code exists, try to find it (for logging purposes)
         for (var coupon in getCouponModel!.data!) {
           if (coupon.code?.toUpperCase() == manualCouponCode!.toUpperCase()) {
@@ -1000,31 +1009,36 @@ class BookingScreenController extends GetxController {
           }
         }
       }
-      
+
       log("Create Booking - Final couponIdToSend: $couponIdToSend");
       log("Create Booking - couponDiscountAmount: $couponDiscountAmount");
       log("Create Booking - manualCouponCode: $manualCouponCode");
-      
+
       // CRITICAL VALIDATION: If discount is applied, coupon ID MUST be present
-      if (couponDiscountAmount > 0 && (couponIdToSend == null || couponIdToSend.isEmpty)) {
+      if (couponDiscountAmount > 0 &&
+          (couponIdToSend == null || couponIdToSend.isEmpty)) {
         log("Create Booking - ❌❌❌ CRITICAL ERROR: Discount applied but coupon ID is missing!");
         log("Create Booking - ❌ This WILL cause 'book failed - Amount mismatch'");
         log("Create Booking - ❌ Frontend sends: $finalAmount (with discount)");
         log("Create Booking - ❌ Backend expects: ${(finalAmount + couponDiscountAmount).toStringAsFixed(2)} (without discount, no couponId)");
         log("Create Booking - ❌ Resetting coupon to prevent booking failure...");
-        
+
         // Reset coupon and recalculate without discount
         resetCoupon();
         calculateTotalWithDiscount();
-        
+
         // Clear loading state
         isLoading(false);
-        update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
-        
+        update([
+          Constant.idProgressView,
+          Constant.idGetCoupon,
+          Constant.idApplyCoupon
+        ]);
+
         // Show error to user
-        Utils.showToast(Get.context!, 
+        Utils.showToast(Get.context!,
             "Coupon validation failed. The coupon may have expired or is no longer valid. Please remove it and try again.");
-        
+
         // Don't proceed with booking - it will fail anyway
         return;
       }
@@ -1043,7 +1057,7 @@ class BookingScreenController extends GetxController {
         "atPlace": atPlace,
         "address": address,
       };
-      
+
       // CRITICAL: If discount is applied, coupon ID MUST be included
       // If it's missing, we've already returned early above, but double-check here as final safeguard
       if (couponDiscountAmount > 0) {
@@ -1055,19 +1069,23 @@ class BookingScreenController extends GetxController {
           log("Create Booking - ❌❌❌ FATAL: Discount applied but couponId is missing in request body!");
           log("Create Booking - ❌ This will cause 'book failed' error");
           log("Create Booking - ❌ Resetting coupon and preventing booking...");
-          
+
           // Reset coupon and recalculate
           resetCoupon();
           calculateTotalWithDiscount();
-          
+
           // Clear loading state
           isLoading(false);
-          update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
-          
+          update([
+            Constant.idProgressView,
+            Constant.idGetCoupon,
+            Constant.idApplyCoupon
+          ]);
+
           // Show error
-          Utils.showToast(Get.context!, 
+          Utils.showToast(Get.context!,
               "Coupon validation error. Please remove the coupon and try again.");
-          
+
           // Don't proceed with booking
           return;
         }
@@ -1109,21 +1127,28 @@ class BookingScreenController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         createBookingCategory = CreateBookingModel.fromJson(jsonResponse);
-        
+
         // Check if booking failed due to insufficient wallet balance
         // Check both the status and the insufficientWallet flag
-        if (jsonResponse['status'] == false && jsonResponse['insufficientWallet'] == true) {
+        if (jsonResponse['status'] == false &&
+            jsonResponse['insufficientWallet'] == true) {
           log("Booking failed due to insufficient wallet balance");
-          
+
           try {
-            final currentBalance = (jsonResponse['currentBalance'] ?? 0.0).toDouble();
-            final requiredBalance = (jsonResponse['requiredBalance'] ?? 0.0).toDouble();
-            final deficit = (jsonResponse['deficit'] ?? (requiredBalance - currentBalance)).toDouble();
-            
+            final currentBalance =
+                (jsonResponse['currentBalance'] ?? 0.0).toDouble();
+            final requiredBalance =
+                (jsonResponse['requiredBalance'] ?? 0.0).toDouble();
+            final deficit =
+                (jsonResponse['deficit'] ?? (requiredBalance - currentBalance))
+                    .toDouble();
+
             // Get currency symbol from settings
-            final SplashController splashController = Get.find<SplashController>();
-            final currencySymbol = splashController.settingCategory?.setting?.currencySymbol ?? "";
-            
+            final SplashController splashController =
+                Get.find<SplashController>();
+            final currencySymbol =
+                splashController.settingCategory?.setting?.currencySymbol ?? "";
+
             // Show insufficient wallet dialog
             Get.dialog(
               barrierColor: AppColors.blackColor.withOpacity(0.8),
@@ -1139,7 +1164,7 @@ class BookingScreenController extends GetxController {
                 ),
               ),
             );
-            
+
             // Don't show toast for this error as we're showing a dialog
             return;
           } catch (e) {
@@ -1152,24 +1177,30 @@ class BookingScreenController extends GetxController {
       // Check if booking failed due to inactive/invalid coupon
       if (createBookingCategory?.status == false) {
         String errorMessage = createBookingCategory?.message.toString() ?? "";
-        
+
         // Also check error message for insufficient wallet (fallback)
         if (errorMessage.toLowerCase().contains("insufficient wallet") ||
             errorMessage.toLowerCase().contains("solde insuffisant") ||
             errorMessage.toLowerCase().contains("minimum balance")) {
           log("Booking failed due to insufficient wallet balance (detected from message)");
-          
+
           // Try to parse balance details from error message or use defaults
           try {
             final jsonResponse = jsonDecode(response.body);
-            final currentBalance = (jsonResponse['currentBalance'] ?? 0.0).toDouble();
-            final requiredBalance = (jsonResponse['requiredBalance'] ?? 0.0).toDouble();
-            final deficit = (jsonResponse['deficit'] ?? (requiredBalance - currentBalance)).toDouble();
-            
+            final currentBalance =
+                (jsonResponse['currentBalance'] ?? 0.0).toDouble();
+            final requiredBalance =
+                (jsonResponse['requiredBalance'] ?? 0.0).toDouble();
+            final deficit =
+                (jsonResponse['deficit'] ?? (requiredBalance - currentBalance))
+                    .toDouble();
+
             // Get currency symbol from settings
-            final SplashController splashController = Get.find<SplashController>();
-            final currencySymbol = splashController.settingCategory?.setting?.currencySymbol ?? "";
-            
+            final SplashController splashController =
+                Get.find<SplashController>();
+            final currencySymbol =
+                splashController.settingCategory?.setting?.currencySymbol ?? "";
+
             // Show insufficient wallet dialog
             Get.dialog(
               barrierColor: AppColors.blackColor.withOpacity(0.8),
@@ -1185,7 +1216,7 @@ class BookingScreenController extends GetxController {
                 ),
               ),
             );
-            
+
             // Don't show toast for this error as we're showing a dialog
             return;
           } catch (e) {
@@ -1193,7 +1224,7 @@ class BookingScreenController extends GetxController {
             // Fall through to show toast if parsing fails
           }
         }
-        
+
         // If error is about inactive/invalid coupon, reset the coupon
         if (errorMessage.toLowerCase().contains("inactive coupon") ||
             errorMessage.toLowerCase().contains("invalid coupon")) {
@@ -1405,7 +1436,7 @@ class BookingScreenController extends GetxController {
     } else {
       log("onApplyManualCouponCode - Coupon validated successfully");
       log("  - Discount Amount: $couponDiscountAmount");
-      
+
       // CRITICAL FIX: Must find coupon ID after validation
       // First, try to find in existing list
       if (getCouponModel?.data != null) {
@@ -1423,14 +1454,14 @@ class BookingScreenController extends GetxController {
       // This is CRITICAL - without coupon ID, booking will fail with "book failed"
       if (selectedCouponId == null || selectedCouponId!.isEmpty) {
         log("onApplyManualCouponCode - ⚠️ Coupon not found in current list, fetching coupons...");
-        
+
         // Fetch coupon list to find the ID
         await getCouponApiCall(
           userId: userId,
           type: "2", // Type 2 for booking
           amount: withOutTaxRupee.toInt().toString(),
         );
-        
+
         // Try finding again after fetch
         if (getCouponModel?.data != null) {
           for (int i = 0; i < getCouponModel!.data!.length; i++) {
@@ -1442,7 +1473,7 @@ class BookingScreenController extends GetxController {
             }
           }
         }
-        
+
         // If still not found, this is a problem - coupon is valid but not in available list
         // This might happen if coupon was just created or has special conditions
         if (selectedCouponId == null || selectedCouponId!.isEmpty) {
@@ -1451,7 +1482,7 @@ class BookingScreenController extends GetxController {
           // We'll try to find it again during booking creation
         }
       }
-      
+
       if (selectedCouponId != null && selectedCouponId!.isNotEmpty) {
         Utils.showToast(Get.context!, "Coupon applied successfully!");
       } else {
@@ -1696,8 +1727,8 @@ class BookingScreenController extends GetxController {
         // For non-wallet payments (Stripe, Cash After Service)
         log("it's ${selectedPayment} payment");
 
-        if (selectedPayment == "Stripe" || selectedPayment == "Zitopay" || selectedPayment == "MTN MoMo") {
-          // For Stripe, Zitopay, or MTN MoMo, collect booking data and navigate to payment screen
+        if (selectedPayment == "Stripe" || selectedPayment == "MTN MoMo") {
+          // For Stripe or MTN MoMo, collect booking data and navigate to payment screen
           Map<String, dynamic> bookingData = {
             'isWalletAdd': false, // This is a direct service payment
             'totalAmount': totalPrice.toString(),
@@ -1739,7 +1770,7 @@ class BookingScreenController extends GetxController {
           // FIX Issue 4: Recalculate total with discount before navigating
           // This ensures the correct amount (with coupon discount) is passed to payment screen
           calculateTotalWithDiscount();
-          
+
           // CRITICAL FIX: Ensure coupon ID is found BEFORE navigating to payment screen
           // If discount is applied, we MUST have a coupon ID, otherwise booking will fail
           if (couponDiscountAmount > 0) {
@@ -1747,20 +1778,22 @@ class BookingScreenController extends GetxController {
             if (selectedCouponId == null || selectedCouponId!.isEmpty) {
               log("Cash Service - ⚠️ CRITICAL: Discount applied (${couponDiscountAmount}) but coupon ID missing!");
               log("Cash Service - Attempting to find coupon ID before navigation...");
-              
+
               // First, try to find in existing coupon list
               if (manualCouponCode != null && getCouponModel?.data != null) {
                 for (var coupon in getCouponModel!.data!) {
-                  if (coupon.code?.toUpperCase() == manualCouponCode!.toUpperCase()) {
+                  if (coupon.code?.toUpperCase() ==
+                      manualCouponCode!.toUpperCase()) {
                     selectedCouponId = coupon.id;
                     log("Cash Service - ✅ Found coupon ID in existing list: $selectedCouponId");
                     break;
                   }
                 }
               }
-              
+
               // If still not found, fetch coupon list
-              if ((selectedCouponId == null || selectedCouponId!.isEmpty) && withOutTaxRupee > 0) {
+              if ((selectedCouponId == null || selectedCouponId!.isEmpty) &&
+                  withOutTaxRupee > 0) {
                 log("Cash Service - Coupon ID not found in list, fetching coupons...");
                 String userId = Constant.storage.read<String>('userId') ?? "";
                 if (userId.isNotEmpty) {
@@ -1769,11 +1802,13 @@ class BookingScreenController extends GetxController {
                     type: "2",
                     amount: withOutTaxRupee.toInt().toString(),
                   );
-                  
+
                   // Try finding again after fetch
-                  if (manualCouponCode != null && getCouponModel?.data != null) {
+                  if (manualCouponCode != null &&
+                      getCouponModel?.data != null) {
                     for (var coupon in getCouponModel!.data!) {
-                      if (coupon.code?.toUpperCase() == manualCouponCode!.toUpperCase()) {
+                      if (coupon.code?.toUpperCase() ==
+                          manualCouponCode!.toUpperCase()) {
                         selectedCouponId = coupon.id;
                         log("Cash Service - ✅ Found coupon ID after fetch: $selectedCouponId");
                         break;
@@ -1782,33 +1817,34 @@ class BookingScreenController extends GetxController {
                   }
                 }
               }
-              
+
               // CRITICAL: If still not found, prevent navigation to avoid "book failed"
               if (selectedCouponId == null || selectedCouponId!.isEmpty) {
                 log("Cash Service - ❌ ERROR: Cannot proceed - discount applied but coupon ID not found!");
                 log("Cash Service - ❌ Navigating to payment screen will cause 'book failed' error");
                 log("Cash Service - ❌ Resetting coupon to prevent booking failure...");
-                
+
                 // Reset coupon and recalculate
                 resetCoupon();
                 calculateTotalWithDiscount();
-                
+
                 // Show error to user
-                Utils.showToast(Get.context!, 
+                Utils.showToast(Get.context!,
                     "Coupon validation failed. The coupon may have expired or is no longer valid. Please remove it and try again.");
-                
+
                 // Don't navigate - prevent booking failure
                 return;
               }
             }
-            
+
             log("Cash Service - ✅ Coupon ID validated before navigation: $selectedCouponId");
           }
-          
+
           // For Cash After Service, navigate to payment screen to show confirmation
           Map<String, dynamic> bookingData = {
             'isWalletAdd': false,
-            'totalAmount': totalPrice.toString(), // Use recalculated totalPrice with discount
+            'totalAmount': totalPrice
+                .toString(), // Use recalculated totalPrice with discount
             'isCreateOrder': true,
             'selectedPayment': selectedPayment,
             'serviceId': serviceId.join(","),

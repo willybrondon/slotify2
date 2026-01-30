@@ -115,12 +115,10 @@ class PaymentMethodView extends StatelessWidget {
       );
     }
 
-    log("Payment Screen - Settings loaded. Status: ${splashController.settingCategory?.status}, Stripe: ${splashController.settingCategory?.setting?.isStripePay}, Zitopay: ${splashController.settingCategory?.setting?.isZitopay}, MTN MoMo: ${splashController.settingCategory?.setting?.isMtnMomo}, Razorpay: ${splashController.settingCategory?.setting?.isRazorPay}, FlutterWave: ${splashController.settingCategory?.setting?.isFlutterWave}");
+    log("Payment Screen - Settings loaded. Status: ${splashController.settingCategory?.status}, Stripe: ${splashController.settingCategory?.setting?.isStripePay}, MTN MoMo: ${splashController.settingCategory?.setting?.isMtnMomo}, Razorpay: ${splashController.settingCategory?.setting?.isRazorPay}, FlutterWave: ${splashController.settingCategory?.setting?.isFlutterWave}");
 
     final isStripeEnabled =
         splashController.settingCategory?.setting?.isStripePay ?? false;
-    final isZitopayEnabled =
-        splashController.settingCategory?.setting?.isZitopay ?? false;
     final isMtnMomoEnabled =
         splashController.settingCategory?.setting?.isMtnMomo ?? false;
     final isRazorPayEnabled =
@@ -134,7 +132,6 @@ class PaymentMethodView extends StatelessWidget {
               const PaymentTitleView(),
               // Only show enabled payment methods for wallet recharge
               if (isStripeEnabled) const PaymentStripeView(),
-              if (isZitopayEnabled) const PaymentZitopayView(),
               if (isMtnMomoEnabled) ...[
                 const PaymentMtnMomoView(),
                 // Show phone number input for MTN MoMo wallet recharge (same as normal payment)
@@ -145,7 +142,6 @@ class PaymentMethodView extends StatelessWidget {
               if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
               // Show message if no payment methods are enabled
               if (!isStripeEnabled &&
-                  !isZitopayEnabled &&
                   !isMtnMomoEnabled &&
                   !isRazorPayEnabled &&
                   !isFlutterWaveEnabled)
@@ -195,8 +191,6 @@ class PaymentMethodView extends StatelessWidget {
                 const PaymentMyWalletView(),
               if (logic.selectedPayment == "Stripe" && isStripeEnabled)
                 const PaymentStripeView(),
-              if (logic.selectedPayment == "Zitopay" && isZitopayEnabled)
-                const PaymentZitopayView(),
               if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) ...[
                 const PaymentMtnMomoView(),
                 const MtnMomoPhoneNumberInput(),
@@ -214,7 +208,6 @@ class PaymentMethodView extends StatelessWidget {
                   logic.selectedPayment == "") ...[
                 const PaymentMyWalletView(),
                 if (isStripeEnabled) const PaymentStripeView(),
-                if (isZitopayEnabled) const PaymentZitopayView(),
                 if (isMtnMomoEnabled) const PaymentMtnMomoView(),
                 if (isRazorPayEnabled) const PaymentRazorPayView(),
                 if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
@@ -1027,99 +1020,6 @@ class PaymentStripeView extends StatelessWidget {
                     ),
                   ),
                   child: logic.selectedPayment == "Stripe"
-                      ? Image.asset(
-                          AppAsset.icCheck,
-                          color: AppColors.primaryAppColor,
-                          height: 15,
-                          width: 15,
-                        )
-                      : const SizedBox(),
-                ).paddingOnly(right: 10),
-              ],
-            ),
-          ),
-        );
-      },
-    ).paddingOnly(bottom: 15);
-  }
-}
-
-class PaymentZitopayView extends StatelessWidget {
-  const PaymentZitopayView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GetBuilder<PaymentScreenController>(
-      id: Constant.idSelectPaymentMethod,
-      builder: (logic) {
-        return InkWell(
-          overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-          onTap: () {
-            logic.onSelectPaymentMethod("Zitopay");
-          },
-          child: Container(
-            height: 60,
-            width: Get.width,
-            padding: const EdgeInsets.only(left: 10, right: 5),
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 1,
-                color: AppColors.grey.withOpacity(0.1),
-              ),
-              borderRadius: BorderRadius.circular(10),
-              color: AppColors.whiteColor,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 40,
-                      width: 40,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.roundBg,
-                      ),
-                      child: Image.asset(
-                        AppAsset.icZitopay,
-                        height: 30,
-                        width: 30,
-                        errorBuilder: (context, error, stackTrace) {
-                          // Fallback icon if Zitopay icon not found
-                          return Icon(
-                            Icons.payment,
-                            size: 30,
-                            color: AppColors.primaryAppColor,
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(width: Get.width * 0.04),
-                    Text(
-                      "Zitopay",
-                      style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplay,
-                        fontSize: 16.5,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  height: 25,
-                  width: 25,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: logic.selectedPayment == "Zitopay"
-                          ? AppColors.primaryAppColor
-                          : AppColors.greyColor.withOpacity(0.3),
-                    ),
-                  ),
-                  child: logic.selectedPayment == "Zitopay"
                       ? Image.asset(
                           AppAsset.icCheck,
                           color: AppColors.primaryAppColor,

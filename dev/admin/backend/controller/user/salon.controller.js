@@ -1800,8 +1800,8 @@ exports.serveSalonWebPage = async (req, res) => {
             <div class="hero-overlay"></div>
             <div class="hero-content">
                 <div class="container">
-                    <h1 class="hero-title" data-original-title="${valuePropTitle.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${valuePropTitle}</h1>
-                    ${valuePropDescription ? `<p class="hero-subtitle">${valuePropDescription.length > 150 ? valuePropDescription.substring(0, 150) + '...' : valuePropDescription}</p>` : `<p class="hero-subtitle">${salonDescription.length > 150 ? salonDescription.substring(0, 150) + '...' : salonDescription}</p>`}
+                    <h1 class="hero-title">${valuePropTitle}</h1>
+                    ${valuePropDescription ? `<p class="hero-subtitle" data-original-subtitle="${valuePropDescription.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${valuePropDescription.length > 150 ? valuePropDescription.substring(0, 150) + '...' : valuePropDescription}</p>` : `<p class="hero-subtitle" data-original-subtitle="${salonDescription.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${salonDescription.length > 150 ? salonDescription.substring(0, 150) + '...' : salonDescription}</p>`}
                     ${ratingBadgeHtml ? `<div class="hero-rating">${ratingBadgeHtml}</div>` : ''}
                     <button onclick="openApp()" class="hero-cta-btn">
                         <i class="fas fa-calendar-check"></i> Book Now
@@ -1958,13 +1958,13 @@ exports.serveSalonWebPage = async (req, res) => {
     
     <script src="${baseURL}/script.js"></script>
     <script>
-        // Truncate hero-title to 46 characters on mobile only
+        // Truncate hero-subtitle to 46 characters on mobile only
         (function() {
-            const heroTitle = document.querySelector('.hero-title');
-            if (!heroTitle) return;
+            const heroSubtitle = document.querySelector('.hero-subtitle');
+            if (!heroSubtitle) return;
             
             // Get original text from data attribute (most reliable)
-            let originalText = heroTitle.getAttribute('data-original-title');
+            let originalText = heroSubtitle.getAttribute('data-original-subtitle');
             
             // Decode HTML entities if present
             if (originalText) {
@@ -1973,7 +1973,7 @@ exports.serveSalonWebPage = async (req, res) => {
                 originalText = tempDiv.textContent || tempDiv.innerText || originalText;
             } else {
                 // Fallback to current text content
-                originalText = heroTitle.textContent || heroTitle.innerText || '';
+                originalText = heroSubtitle.textContent || heroSubtitle.innerText || '';
             }
             
             // Check if screen is mobile (max-width: 768px)
@@ -1985,9 +1985,9 @@ exports.serveSalonWebPage = async (req, res) => {
                 if (!originalText) return;
                 
                 if (isMobile() && originalText.length > 46) {
-                    heroTitle.textContent = originalText.substring(0, 46) + '...';
+                    heroSubtitle.textContent = originalText.substring(0, 46) + '...';
                 } else {
-                    heroTitle.textContent = originalText;
+                    heroSubtitle.textContent = originalText;
                 }
             }
             

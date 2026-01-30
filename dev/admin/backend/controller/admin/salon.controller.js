@@ -690,7 +690,7 @@ exports.addMoneyToSalonWallet = async (req, res) => {
       amount: requestedAmount,
       paymentGateway: paymentGatewayNum,
       type: 4, // Admin manual addition
-      description: description || `Admin added funds via ${paymentGatewayNum === PAYMENT_GATEWAY.STRIPE ? 'Stripe' : paymentGatewayNum === PAYMENT_GATEWAY.ZITOPAY ? 'Zitopay' : 'Payment Gateway'}`,
+      description: description || `Admin added funds via ${paymentGatewayNum === PAYMENT_GATEWAY.STRIPE ? 'Stripe' : 'Payment Gateway'}`,
       date: moment().format("YYYY-MM-DD"),
       time: moment().format("HH:mm a"),
       uniqueId: uniqueId,
