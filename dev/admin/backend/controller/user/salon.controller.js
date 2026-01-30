@@ -796,56 +796,68 @@ exports.serveSalonWebPage = async (req, res) => {
     
     <!-- Fallback redirect to app store or app -->
     <script>
-        // Try to open app, fallback to app store or show page
+        // Try to open app, fallback to app store or download page
         function openApp() {
             const deepLink = "${deepLink}";
             const androidPackage = "${androidPackage}";
-            const iosAppStoreId = "${iosAppStoreId}";
+            const iosAppStoreIdRaw = "${iosAppStoreId}";
+            const iosAppStoreId = (iosAppStoreIdRaw && iosAppStoreIdRaw !== "undefined" && iosAppStoreIdRaw !== "null" && iosAppStoreIdRaw.trim() !== "") 
+                ? iosAppStoreIdRaw 
+                : "6752954525"; // Fallback to Skedisy iOS App Store ID
             const androidStoreUrl = "https://play.google.com/store/apps/details?id=" + androidPackage;
-            const iosStoreUrl = iosAppStoreId ? "https://apps.apple.com/app/id" + iosAppStoreId : "https://apps.apple.com/search?term=skedisy";
+            const iosStoreUrl = "https://apps.apple.com/app/id" + iosAppStoreId;
+            const baseURL = "${baseURL}";
+            const downloadPageUrl = (baseURL && baseURL !== "undefined" && baseURL.trim() !== "") ? baseURL : "https://skedisy.com";
             
             // Detect device
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isAndroid = /Android/.test(navigator.userAgent);
             const isMobile = isIOS || isAndroid;
             
-            // Try to open app
+            // For desktop/computer: redirect to download page
+            if (!isMobile) {
+                window.location.href = downloadPageUrl;
+                return;
+            }
+            
+            // For mobile devices: try to open app, fallback to app store
             let appOpened = false;
+            let pageHidden = false;
             const startTime = Date.now();
             
-            // Try deep link
+            // Track if page becomes hidden (indicates app might have opened)
+            const handleVisibilityChange = function() {
+                if (document.hidden) {
+                    pageHidden = true;
+                }
+            };
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            
+            // Track if page loses focus (another indicator app opened)
+            const handleBlur = function() {
+                pageHidden = true;
+            };
+            window.addEventListener('blur', handleBlur);
+            
+            // Try to open app via deep link
             window.location.href = deepLink;
             
-            // For mobile devices, check if we're still on the page after a short delay
-            if (isMobile) {
-                setTimeout(function() {
-                    const timeElapsed = Date.now() - startTime;
-                    // If less than 2 seconds passed, app likely didn't open
-                    if (timeElapsed < 2000) {
-                        // Redirect to app store
-                        if (isIOS) {
-                            window.location.href = iosStoreUrl;
-                        } else if (isAndroid) {
-                            window.location.href = androidStoreUrl;
-                        } else {
-                            // Show download section for other devices
-                            document.getElementById('download-section').style.display = 'block';
-                        }
-                    } else {
-                        // App might have opened, show download section as fallback
-                        setTimeout(function() {
-                            if (document.hasFocus()) {
-                                document.getElementById('download-section').style.display = 'block';
-                            }
-                        }, 1000);
+            // Check if app opened after a short delay
+            setTimeout(function() {
+                // Remove event listeners
+                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                window.removeEventListener('blur', handleBlur);
+                
+                // If page is still visible and focused, app likely didn't open
+                // Redirect to appropriate app store
+                if (!pageHidden && document.hasFocus()) {
+                    if (isIOS) {
+                        window.location.href = iosStoreUrl;
+                    } else if (isAndroid) {
+                        window.location.href = androidStoreUrl;
                     }
-                }, 500);
-            } else {
-                // For desktop, show download section immediately
-                setTimeout(function() {
-                    document.getElementById('download-section').style.display = 'block';
-                }, 1000);
-            }
+                }
+            }, 2500); // Wait 2.5 seconds to check if app opened
         }
     </script>
     
@@ -1788,11 +1800,11 @@ exports.serveSalonWebPage = async (req, res) => {
             <div class="hero-overlay"></div>
             <div class="hero-content">
                 <div class="container">
-                    <h1 class="hero-title">${valuePropTitle}</h1>
+                    <h1 class="hero-title" data-original-title="${valuePropTitle.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${valuePropTitle}</h1>
                     ${valuePropDescription ? `<p class="hero-subtitle">${valuePropDescription.length > 150 ? valuePropDescription.substring(0, 150) + '...' : valuePropDescription}</p>` : `<p class="hero-subtitle">${salonDescription.length > 150 ? salonDescription.substring(0, 150) + '...' : salonDescription}</p>`}
                     ${ratingBadgeHtml ? `<div class="hero-rating">${ratingBadgeHtml}</div>` : ''}
                     <button onclick="openApp()" class="hero-cta-btn">
-                        <i class="fas fa-calendar-check"></i> Book Your Appointment Now
+                        <i class="fas fa-calendar-check"></i> Book Now
                     </button>
                 </div>
             </div>
@@ -1945,6 +1957,51 @@ exports.serveSalonWebPage = async (req, res) => {
     </div>
     
     <script src="${baseURL}/script.js"></script>
+    <script>
+        // Truncate hero-title to 46 characters on mobile only
+        (function() {
+            const heroTitle = document.querySelector('.hero-title');
+            if (!heroTitle) return;
+            
+            // Get original text from data attribute (most reliable)
+            let originalText = heroTitle.getAttribute('data-original-title');
+            
+            // Decode HTML entities if present
+            if (originalText) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = originalText;
+                originalText = tempDiv.textContent || tempDiv.innerText || originalText;
+            } else {
+                // Fallback to current text content
+                originalText = heroTitle.textContent || heroTitle.innerText || '';
+            }
+            
+            // Check if screen is mobile (max-width: 768px)
+            function isMobile() {
+                return window.innerWidth <= 768;
+            }
+            
+            function applyTruncation() {
+                if (!originalText) return;
+                
+                if (isMobile() && originalText.length > 46) {
+                    heroTitle.textContent = originalText.substring(0, 46) + '...';
+                } else {
+                    heroTitle.textContent = originalText;
+                }
+            }
+            
+            // Apply on load
+            applyTruncation();
+            
+            // Re-apply on window resize (debounced)
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(applyTruncation, 100);
+            });
+        })();
+    </script>
 </body>
 </html>`;
 
