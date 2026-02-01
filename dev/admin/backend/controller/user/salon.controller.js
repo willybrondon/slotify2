@@ -28,6 +28,21 @@ const generateSlug = (name) => {
     .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
 };
 
+// Helper function to get translated category name
+const getTranslatedCategoryName = (category, language = 'fr') => {
+  if (!category) return 'Other Services';
+  
+  // Map language codes to field names
+  const translationMap = {
+    'en': category.nameEn || category.name,
+    'fr': category.nameFr || category.nameEn || category.name,
+    'pt': category.namePt || category.nameEn || category.name,
+  };
+  
+  // Default to French if language not found
+  return translationMap[language] || category.name || 'Other Services';
+};
+
 // Find salon by short ID (first 6 characters of ObjectId)
 const findSalonByShortId = async (shortId) => {
   try {
@@ -253,7 +268,13 @@ exports.salonData = async (req, res) => {
       _id: salonId,
       isActive: true,
       isDelete: false,
-    }).populate("serviceIds.id");
+    }).populate({
+      path: "serviceIds.id",
+      populate: {
+        path: "categoryId",
+        select: "name nameEn nameFr namePt"
+      }
+    });
 
     if (!salon) {
       return res.status(404).send({
@@ -462,7 +483,7 @@ exports.serveSalonWebPage = async (req, res) => {
       path: "serviceIds.id",
       populate: {
         path: "categoryId",
-        select: "name image"
+        select: "name nameEn nameFr namePt image"
       }
     });
 
@@ -546,7 +567,7 @@ exports.serveSalonWebPage = async (req, res) => {
       salon.serviceIds.forEach(service => {
         if (service.id && service.id.categoryId) {
           const categoryId = service.id.categoryId._id?.toString() || service.id.categoryId?.toString() || 'other';
-          const categoryName = service.id.categoryId?.name || 'Other Services';
+          const categoryName = getTranslatedCategoryName(service.id.categoryId, 'fr') || 'Other Services';
           if (!servicesByCategory[categoryId]) {
             servicesByCategory[categoryId] = {
               name: categoryName,

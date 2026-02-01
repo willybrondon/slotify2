@@ -448,8 +448,14 @@ exports.serveCategoryPage = async (req, res) => {
     });
 
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
+    
+    // Detect language from URL or default to French for French URLs
+    // If URL contains French characters or French slug pattern, use French
+    const language = 'fr'; // Default to French for skedisy.com
+    const categoryDisplayName = getTranslatedName(category, language) || category.name;
+    
     // Generate the new slug format for category URL
-    const categorySlug = generateSlug(category.name);
+    const categorySlug = generateSlug(categoryDisplayName);
     const categoryShortId = category._id.toString().substring(0, 6);
     const categorySlugWithId = `${categorySlug}-${categoryShortId}`;
     const categoryUrl = `${baseURL}/category/${categorySlugWithId}`;
@@ -491,30 +497,30 @@ exports.serveCategoryPage = async (req, res) => {
         }).join('')
       : '<div class="no-results"><p>No salons found for this category.</p></div>';
 
-    const categoryDescription = category.description || `Find the best ${category.name} services at top-rated salons near you. Book your appointment today!`;
+    const categoryDescription = category.description || `Find the best ${categoryDisplayName} services at top-rated salons near you. Book your appointment today!`;
     const categoryImage = category.image || `${baseURL}/logo.png`;
 
     const html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${category.name} - Skedisy | Book ${category.name} Services Online</title>
+    <title>${categoryDisplayName} - Skedisy | Book ${categoryDisplayName} Services Online</title>
     <meta name="description" content="${categoryDescription.replace(/"/g, '&quot;')}">
-    <meta name="keywords" content="${category.name}, salon services, beauty services, book appointment, ${category.name.toLowerCase()}">
+    <meta name="keywords" content="${categoryDisplayName}, salon services, beauty services, book appointment, ${categoryDisplayName.toLowerCase()}">
     <link rel="canonical" href="${categoryUrl}">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="${categoryUrl}">
-    <meta property="og:title" content="${category.name} - Skedisy">
+    <meta property="og:title" content="${categoryDisplayName} - Skedisy">
     <meta property="og:description" content="${categoryDescription.replace(/"/g, '&quot;')}">
     <meta property="og:image" content="${categoryImage}">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="${categoryUrl}">
-    <meta property="twitter:title" content="${category.name} - Skedisy">
+    <meta property="twitter:title" content="${categoryDisplayName} - Skedisy">
     <meta property="twitter:description" content="${categoryDescription.replace(/"/g, '&quot;')}">
     <meta property="twitter:image" content="${categoryImage}">
     
@@ -523,7 +529,7 @@ exports.serveCategoryPage = async (req, res) => {
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "${category.name} Services",
+      "name": "${categoryDisplayName} Services",
       "description": "${categoryDescription.replace(/"/g, '\\"')}",
       "url": "${categoryUrl}",
       "image": "${categoryImage}",
@@ -961,11 +967,11 @@ exports.serveCategoryPage = async (req, res) => {
     <!-- Hero Section -->
     <div class="category-hero-section">
         <div class="category-hero-background"></div>
-        ${categoryImage ? `<div class="category-hero-image-overlay"><img src="${categoryImage}" alt="${category.name}" onerror="this.style.display='none'"></div>` : ''}
+        ${categoryImage ? `<div class="category-hero-image-overlay"><img src="${categoryImage}" alt="${categoryDisplayName}" onerror="this.style.display='none'"></div>` : ''}
         <div class="category-hero-overlay"></div>
         <div class="category-hero-content">
             <div class="category-header-content">
-                <h1 class="category-hero-title">${category.name}</h1>
+                <h1 class="category-hero-title">${categoryDisplayName}</h1>
                 <p class="category-hero-description">${categoryDescription}</p>
                 <div class="category-hero-stats">
                     <span><strong>${formattedSalons.length}</strong> Salons</span>
@@ -977,7 +983,7 @@ exports.serveCategoryPage = async (req, res) => {
     
     <div class="category-header">
         <div class="category-header-content">
-            <h2 class="category-subtitle">Discover Top ${category.name} Salons</h2>
+            <h2 class="category-subtitle">Discover Top ${categoryDisplayName} Salons</h2>
             <p class="category-description">${categoryDescription}</p>
         </div>
     </div>
