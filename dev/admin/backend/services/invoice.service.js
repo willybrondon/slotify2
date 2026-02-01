@@ -7,9 +7,11 @@ const moment = require('moment');
  * Generate PDF invoice for salon settlement
  * @param {Object} settlement - Settlement data with populated salon
  * @param {Array} bookings - Array of booking details (optional)
+ * @param {String} currencyCode - Currency code (EUR, USD, XAF, etc.) - optional, defaults to EUR
+ * @param {String} currencySymbol - Currency symbol (€, $, xaf, etc.) - optional
  * @returns {Promise<String>} - Path to generated PDF file
  */
-exports.generateInvoicePDF = async (settlement, bookings = []) => {
+exports.generateInvoicePDF = async (settlement, bookings = [], currencyCode = 'EUR', currencySymbol = '€') => {
   return new Promise((resolve, reject) => {
     try {
       // Create invoices directory if it doesn't exist
@@ -115,7 +117,7 @@ exports.generateInvoicePDF = async (settlement, bookings = []) => {
          .fill('#f5f5f5')
          .fillColor('#000')
          .text('Gains du salon', 60, yPosition + 6)
-         .text(`${formatCurrency(settlement.salonEarning || 0)}`, 450, yPosition + 6, { align: 'right' });
+         .text(`${formatCurrency(settlement.salonEarning || 0, currencyCode, currencySymbol)}`, 450, yPosition + 6, { align: 'right' });
       yPosition += 25;
 
       // Commission
@@ -124,7 +126,7 @@ exports.generateInvoicePDF = async (settlement, bookings = []) => {
            .fill('#fff')
            .fillColor('#000')
            .text(`Commission (${settlement.salonCommissionPercent || 0}%)`, 60, yPosition + 6)
-           .text(`-${formatCurrency(settlement.salonCommission)}`, 450, yPosition + 6, { align: 'right' });
+           .text(`-${formatCurrency(settlement.salonCommission, currencyCode, currencySymbol)}`, 450, yPosition + 6, { align: 'right' });
         yPosition += 25;
       }
 
@@ -134,7 +136,7 @@ exports.generateInvoicePDF = async (settlement, bookings = []) => {
            .fill('#f5f5f5')
            .fillColor('#000')
            .text('Bonus', 60, yPosition + 6)
-           .text(`+${formatCurrency(settlement.bonus)}`, 450, yPosition + 6, { align: 'right' });
+           .text(`+${formatCurrency(settlement.bonus, currencyCode, currencySymbol)}`, 450, yPosition + 6, { align: 'right' });
         yPosition += 25;
       }
 
@@ -151,7 +153,7 @@ exports.generateInvoicePDF = async (settlement, bookings = []) => {
       doc.fontSize(12)
          .fillColor('#667eea')
          .text('Montant total', 60, yPosition)
-         .text(formatCurrency(settlement.finalAmount || 0), 450, yPosition, { align: 'right' });
+         .text(formatCurrency(settlement.finalAmount || 0, currencyCode, currencySymbol), 450, yPosition, { align: 'right' });
 
       // Payment status
       yPosition += 40;
@@ -202,12 +204,34 @@ exports.generateInvoicePDF = async (settlement, bookings = []) => {
 
 /**
  * Format currency amount
+ * @param {Number} amount - Amount to format
+ * @param {String} currencyCode - Currency code (EUR, USD, XAF, etc.)
+ * @param {String} currencySymbol - Currency symbol (€, $, xaf, etc.)
  */
-function formatCurrency(amount) {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR'
-  }).format(amount || 0);
+function formatCurrency(amount, currencyCode = 'EUR', currencySymbol = '€') {
+  // For XAF, use custom formatting since it doesn't have a standard symbol
+  if (currencyCode.toUpperCase() === 'XAF') {
+    return `${currencySymbol} ${(amount || 0).toFixed(2)}`;
+  }
+  
+  // For other currencies, use Intl.NumberFormat
+  try {
+    // Map currency codes to locale
+    const localeMap = {
+      'EUR': 'fr-FR',
+      'USD': 'en-US',
+      'GBP': 'en-GB',
+    };
+    
+    const locale = localeMap[currencyCode.toUpperCase()] || 'fr-FR';
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currencyCode.toUpperCase()
+    }).format(amount || 0);
+  } catch (error) {
+    // Fallback to simple formatting
+    return `${currencySymbol} ${(amount || 0).toFixed(2)}`;
+  }
 }
 
 /**

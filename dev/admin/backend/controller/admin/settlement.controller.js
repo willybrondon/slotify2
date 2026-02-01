@@ -2,6 +2,7 @@ const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const SalonSettlement = require("../../models/salonSettlement.model");
 const ExpertSettlement = require("../../models/expertSettlement.model");
+const Setting = require("../../models/setting.model");
 const moment = require("moment");
 const fs = require("fs");
 const path = require("path");
@@ -620,8 +621,13 @@ exports.generateSalonInvoice = async (req, res) => {
 
     console.log(`[Invoice] Generating PDF invoice for settlement ${settlement._id}`);
 
+    // Get currency from settings
+    const setting = await Setting.findOne().select("currencyName currencySymbol").sort({ createdAt: -1 });
+    const currencyCode = (setting?.currencyName || "EUR").toUpperCase();
+    const currencySymbol = setting?.currencySymbol || (currencyCode === "XAF" ? "xaf" : currencyCode === "USD" ? "$" : "€");
+
     // Generate PDF
-    const pdfPath = await generateInvoicePDF(settlement, settlement.bookingId || []);
+    const pdfPath = await generateInvoicePDF(settlement, settlement.bookingId || [], currencyCode, currencySymbol);
 
     // Send PDF as download
     const filename = path.basename(pdfPath);
@@ -716,8 +722,13 @@ exports.sendSalonInvoice = async (req, res) => {
 
     console.log(`[Invoice] Generating and sending invoice to ${salon.email}`);
 
+    // Get currency from settings
+    const setting = await Setting.findOne().select("currencyName currencySymbol").sort({ createdAt: -1 });
+    const currencyCode = (setting?.currencyName || "EUR").toUpperCase();
+    const currencySymbol = setting?.currencySymbol || (currencyCode === "XAF" ? "xaf" : currencyCode === "USD" ? "$" : "€");
+
     // Generate PDF
-    const pdfPath = await generateInvoicePDF(settlement, settlement.bookingId || []);
+    const pdfPath = await generateInvoicePDF(settlement, settlement.bookingId || [], currencyCode, currencySymbol);
 
     // Read PDF file
     const pdfBuffer = fs.readFileSync(pdfPath);

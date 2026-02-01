@@ -161,6 +161,7 @@ class StripeService {
       log("stripeAmount in cents :: $stripeAmount");
 
       // Get currency from settings
+      // Supported currencies: USD ($), EUR (€), XAF (xaf - CFA Franc for Cameroon)
       String currency = splashController.settingCategory?.setting?.currencyName
               ?.toLowerCase() ??
           'usd';
@@ -170,6 +171,9 @@ class StripeService {
       if (currency.isEmpty) {
         currency = 'usd'; // Default to USD if not set
       }
+      
+      // Note: XAF (CFA Franc) uses "xaf" as both currency code and symbol
+      // Stripe may not support XAF directly - consider alternative payment methods for XAF
 
       Map<String, dynamic> body = {
         'amount': stripeAmount.toString(),
