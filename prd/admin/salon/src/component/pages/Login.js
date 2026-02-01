@@ -47,7 +47,9 @@ const Login = (props) => {
         <div className="loginDiv" style={{ width: "100%" }}>
           <div className="loginPage m-auto">
             <div className="loginTitle mb-3  d-flex ">
-              <img src={logo} style={{ width: "50px" }} alt="logo" />
+              <a href="https://skedisy.com" style={{ textDecoration: "none", display: "inline-block" }}>
+                <img src={logo} style={{ width: "50px" }} alt="logo" />
+              </a>
             </div>
             <div className="fw-bold text-theme  me-auto my-auto welComeTitle">
               Welcome Back
