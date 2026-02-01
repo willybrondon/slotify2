@@ -182,6 +182,16 @@ class InsufficientWalletDialog extends StatelessWidget {
                             fontSize: 13,
                           ),
                         ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Pour recharger votre portefeuille : allez dans Profil, puis Portefeuille et ajoutez de l'argent.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplay,
+                            color: AppColors.currencyGrey,
+                            fontSize: 13,
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -1135,13 +1135,11 @@ class BookingScreenController extends GetxController {
           log("Booking failed due to insufficient wallet balance");
 
           try {
-            final currentBalance =
-                (jsonResponse['currentBalance'] ?? 0.0).toDouble();
+            // Use global walletAmount instead of API response to ensure synchronization
+            final currentBalance = (walletAmount ?? 0.0).toDouble();
             final requiredBalance =
-                (jsonResponse['requiredBalance'] ?? 0.0).toDouble();
-            final deficit =
-                (jsonResponse['deficit'] ?? (requiredBalance - currentBalance))
-                    .toDouble();
+                (jsonResponse['requiredBalance'] ?? totalPrice).toDouble();
+            final deficit = (requiredBalance - currentBalance).toDouble();
 
             // Get currency symbol from settings
             final SplashController splashController =
@@ -1187,13 +1185,11 @@ class BookingScreenController extends GetxController {
           // Try to parse balance details from error message or use defaults
           try {
             final jsonResponse = jsonDecode(response.body);
-            final currentBalance =
-                (jsonResponse['currentBalance'] ?? 0.0).toDouble();
+            // Use global walletAmount instead of API response to ensure synchronization
+            final currentBalance = (walletAmount ?? 0.0).toDouble();
             final requiredBalance =
-                (jsonResponse['requiredBalance'] ?? 0.0).toDouble();
-            final deficit =
-                (jsonResponse['deficit'] ?? (requiredBalance - currentBalance))
-                    .toDouble();
+                (jsonResponse['requiredBalance'] ?? totalPrice).toDouble();
+            final deficit = (requiredBalance - currentBalance).toDouble();
 
             // Get currency symbol from settings
             final SplashController splashController =
