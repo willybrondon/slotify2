@@ -20,8 +20,9 @@ class PaymentAppBarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final paymentController = Get.find<PaymentScreenController>();
     return AppBarCustom(
-      title: "txtPayment".tr,
+      title: paymentController.isWalletAdd == true ? "txtRechargeWallet".tr : "txtPayment".tr,
       method: InkWell(
         overlayColor: WidgetStatePropertyAll(AppColors.transparent),
         onTap: () {
@@ -131,6 +132,7 @@ class PaymentMethodView extends StatelessWidget {
             children: [
               const PaymentTitleView(),
               // Only show enabled payment methods for wallet recharge
+              // Razorpay and Flutterwave are not available for wallet recharge
               if (isStripeEnabled) const PaymentStripeView(),
               if (isMtnMomoEnabled) ...[
                 const PaymentMtnMomoView(),
@@ -138,13 +140,9 @@ class PaymentMethodView extends StatelessWidget {
                 // Always show when MTN MoMo is enabled for wallet recharge, so user can enter phone number
                 const MtnMomoPhoneNumberInput(),
               ],
-              if (isRazorPayEnabled) const PaymentRazorPayView(),
-              if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
               // Show message if no payment methods are enabled
               if (!isStripeEnabled &&
-                  !isMtnMomoEnabled &&
-                  !isRazorPayEnabled &&
-                  !isFlutterWaveEnabled)
+                  !isMtnMomoEnabled)
                 Container(
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.all(15),

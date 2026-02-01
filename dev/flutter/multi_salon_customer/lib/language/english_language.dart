@@ -104,6 +104,7 @@ final Map<String, String> enUS = {
   "txtStaff": "Staff",
   "txtDateTime": "Date & Time",
   "txtPayment": "Payment",
+  "txtRechargeWallet": "Recharge Wallet",
   "txtChooseYourExpert": "Choose Your Expert",
   "txtNext": "Next",
   "txtSelectDate": "Select Date",

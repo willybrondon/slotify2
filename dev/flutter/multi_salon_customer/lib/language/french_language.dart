@@ -83,6 +83,7 @@ final Map<String, String> frCH = {
   "txtStaff": "Personnel",
   "txtDateTime": "Date et heure",
   "txtPayment": "Paiement",
+  "txtRechargeWallet": "Recharger le portefeuille",
   "txtChooseYourExpert": "Choisissez votre expert",
   "txtNext": "Suivant",
   "txtSelectDate": "Sélectionner une date",
