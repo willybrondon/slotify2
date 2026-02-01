@@ -10,60 +10,308 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .documentation-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 120px 20px 60px;
+        .documentation-wrapper {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            padding-top: 70px;
         }
-        .documentation-header {
-            text-align: center;
-            margin-bottom: 60px;
+
+        /* Sidebar Navigation */
+        .doc-sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #e5e5e5;
+            position: fixed;
+            left: 0;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            padding: 30px 0;
+            z-index: 100;
         }
-        .documentation-header h1 {
-            font-size: 3rem;
+
+        .doc-sidebar h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 30px;
+            margin-bottom: 12px;
+        }
+
+        .doc-sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .doc-sidebar li {
+            margin: 0;
+        }
+
+        .doc-sidebar a {
+            display: block;
+            padding: 12px 30px;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 400;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .doc-sidebar a:hover {
+            background: #f8f8f8;
+            color: #111;
+        }
+
+        .doc-sidebar a.active {
+            background: #f8f8f8;
+            color: #111;
+            border-left-color: #111;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .doc-main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 60px 80px;
+            max-width: 1000px;
+        }
+
+        .doc-section {
+            margin-bottom: 80px;
+        }
+
+        .doc-section h1 {
+            font-size: 2.5rem;
             font-weight: 700;
             color: #111;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .doc-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #111;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .doc-section h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #111;
+            margin-top: 40px;
             margin-bottom: 16px;
         }
-        .documentation-header p {
-            font-size: 1.2rem;
-            color: #666;
+
+        .doc-section h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #111;
+            margin-top: 30px;
+            margin-bottom: 12px;
         }
-        .documentation-content {
-            background: #f8f8f8;
-            border-radius: 16px;
-            padding: 60px;
+
+        .doc-section p {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .doc-section ul, .doc-section ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        .doc-section li {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        /* Image Container */
+        .doc-image-container {
+            margin: 40px 0;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .doc-image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            display: block;
+        }
+
+        .doc-image-caption {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
             text-align: center;
-            min-height: 400px;
+        }
+
+        /* Step-by-step guides */
+        .doc-step {
+            background: #f8f8f8;
+            border-left: 4px solid #111;
+            padding: 24px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        .doc-step h4 {
+            margin-top: 0;
+            color: #111;
+        }
+
+        .doc-step-number {
+            display: inline-block;
+            background: #111;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 12px;
+        }
+
+        /* Code blocks */
+        .doc-code {
+            background: #f5f5f5;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        /* Info boxes */
+        .doc-info {
+            background: #f0f7ff;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        .doc-warning {
+            background: #fff8e1;
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        /* Table of contents */
+        .doc-toc {
+            background: #f8f8f8;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+
+        .doc-toc h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .doc-toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .doc-toc li {
+            margin-bottom: 12px;
+        }
+
+        .doc-toc a {
+            color: #111;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .doc-toc a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .documentation-wrapper {
+                flex-direction: column;
+            }
+
+            .doc-sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                top: 0;
+                border-right: none;
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            .doc-main-content {
+                margin-left: 0;
+                padding: 40px 20px;
+            }
+
+            .doc-section h1 {
+                font-size: 2rem;
+            }
+
+            .doc-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Back to top */
+        .doc-back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #111;
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            text-decoration: none;
         }
-        .documentation-content p {
-            font-size: 1.1rem;
-            color: #999;
+
+        .doc-back-to-top.visible {
+            opacity: 1;
+        }
+
+        .doc-back-to-top:hover {
+            background: #333;
         }
     </style>
 </head>
 <body>
-    <!-- Login Button Above QR Code -->
-    <div class="login-above-qr">
-        <a href="https://skedisy.com/salonpanel/" class="btn-login-above">Login</a>
-    </div>
-    
-    <!-- QR Code Top Right Floating -->
-    <div class="qr-topright">
-        <div class="qr-top-flex">
-            <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
-                <div id="qr-customer-top"></div>
-                <div class="qr-label">Download Customer App</div>
-            </div>
-            <div class="qr-top-block" data-app-type="expert" onclick="openPhoneSelection('expert')">
-                <div id="qr-expert-top"></div>
-                <div class="qr-label">Download the Expert App</div>
-            </div>
-        </div>
-    </div>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -101,7 +349,7 @@
                 <!-- Mobile Login Button -->
                 <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu">Login</a>
                 <!-- Mobile Documentation Link -->
-                <a href="documentation.html" class="mobile-documentation-link">Documentation</a>
+                <a href="documentation.html" class="btn-documentation-mobile-menu">Documentation</a>
                 <!-- AI Concierge Button - More Prominent -->
                 <a href="ai-concierge.html" class="btn-ai-concierge-mobile">
                     <i class="fas fa-robot"></i> AI Concierge
@@ -113,16 +361,2183 @@
         </div>
     </nav>
 
-    <!-- Documentation Content -->
-    <div class="documentation-container">
-        <div class="documentation-header">
-            <h1>Documentation</h1>
-            <p>Coming soon...</p>
-        </div>
-        <div class="documentation-content">
-            <p>This page will be filled with documentation content in the future.</p>
-        </div>
+    <!-- Documentation Wrapper -->
+    <div class="documentation-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="doc-sidebar">
+            <h3>Customer App</h3>
+            <ul>
+                <li><a href="#getting-started" class="active">Getting Started</a></li>
+                <li><a href="#home-screen">Home Screen</a></li>
+                <li><a href="#booking-process">Booking Process</a></li>
+                <li><a href="#booking-screen">Booking Screen</a></li>
+                <li><a href="#product-category">Product Category</a></li>
+                <li><a href="#notifications">Notifications</a></li>
+                <li><a href="#profile">Profile</a></li>
+                <li><a href="#wallet">Wallet</a></li>
+            </ul>
+            <h3>Expert App</h3>
+            <ul>
+                <li><a href="#expert-getting-started">Getting Started</a></li>
+                <li><a href="#expert-revenue">My Revenue</a></li>
+                <li><a href="#expert-reservations">Reservation Details</a></li>
+                <li><a href="#expert-slots">Slot Management</a></li>
+                <li><a href="#expert-orders">Order Details</a></li>
+                <li><a href="#expert-profile">Expert Profile</a></li>
+            </ul>
+            <h3>Salon Owner Portal</h3>
+            <ul>
+                <li><a href="#salon-getting-started">Getting Started</a></li>
+                <li><a href="#salon-dashboard">Dashboard</a></li>
+                <li><a href="#salon-experts">Experts Management</a></li>
+                <li><a href="#salon-reviews">Reviews</a></li>
+                <li><a href="#salon-complaints">Complaints</a></li>
+                <li><a href="#salon-attendance">Expert Attendance</a></li>
+                <li><a href="#salon-orders">Orders</a></li>
+                <li><a href="#salon-services">Services</a></li>
+                <li><a href="#salon-products">Products</a></li>
+                <li><a href="#salon-attributes">Attributes</a></li>
+                <li><a href="#salon-time">Salon Time</a></li>
+                <li><a href="#salon-holiday">Salon Holiday</a></li>
+                <li><a href="#salon-wallet">Wallet</a></li>
+                <li><a href="#salon-wallet-history">Wallet History</a></li>
+                <li><a href="#salon-withdraw">Withdraw Money</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="doc-main-content">
+            <!-- Getting Started -->
+            <section id="getting-started" class="doc-section">
+                <h1>Customer App Documentation</h1>
+                <p>Welcome to the Skedisy Customer App documentation. This comprehensive guide will walk you through every feature and functionality of the customer application, helping you make the most of your booking experience.</p>
+
+                <div class="doc-toc">
+                    <h3>Table of Contents - Customer App</h3>
+                    <ul>
+                        <li><a href="#home-screen">Home Screen</a></li>
+                        <li><a href="#booking-process">Booking Process</a></li>
+                        <li><a href="#booking-screen">Booking Screen</a></li>
+                        <li><a href="#product-category">Product Category</a></li>
+                        <li><a href="#notifications">Notifications</a></li>
+                        <li><a href="#profile">Profile</a></li>
+                        <li><a href="#wallet">Wallet</a></li>
+                    </ul>
+                    <p style="margin-top: 20px; font-weight: 600;">Looking for Expert App documentation? <a href="#expert-getting-started" style="color: #111; text-decoration: underline;">Click here</a> to jump to the Expert App section.</p>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Note:</strong> The Skedisy Customer App is designed with a mobile-first approach, providing an intuitive and seamless experience for booking salon services, managing appointments, and accessing your account information.
+                </div>
+            </section>
+
+            <!-- Home Screen -->
+            <section id="home-screen" class="doc-section">
+                <h2>Home Screen</h2>
+                <p>The Home Screen is your main entry point to the Skedisy app. It provides quick access to service categories, nearby salons, and search functionality.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/customer-app-home.png" alt="Skedisy Customer App Home Screen">
+                    <div class="doc-image-caption">Home Screen - Main interface showing categories and nearby salons</div>
+                </div>
+
+                <h3>Header Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Brand Name & Location</h4>
+                    <p>The top left displays the <strong>"Skedisy"</strong> brand name with your location indicator (e.g., "Nb" for your current area).</p>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Action Icons</h4>
+                    <p>On the top right, you'll find two outline icons:</p>
+                    <ul>
+                        <li><strong>Heart Icon:</strong> Access your favorites and saved salons</li>
+                        <li><strong>Shopping Bag Icon:</strong> View your cart or current bookings</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Search Bar</h4>
+                    <p>The prominent search bar allows you to quickly find services by typing keywords. Simply tap the search bar and enter what you're looking for (e.g., "haircut", "manicure", "facial").</p>
+                </div>
+
+                <h3>Category Section</h3>
+                <p>Below the search bar, you'll find a horizontal scrollable list of service categories. Each category is represented by:</p>
+                <ul>
+                    <li><strong>Icon:</strong> Visual representation of the service type</li>
+                    <li><strong>Label:</strong> Category name (e.g., "Body Care", "Makeup Services", "Nail Care", "Hair Services", "Skin & Facial")</li>
+                </ul>
+                <p>Tap on any category to view available services in that category. You can also tap <strong>"View All"</strong> to see all categories at once.</p>
+
+                <h3>Nearby Salons Section</h3>
+                <p>The "Nearby Salons" section displays salons in your area, sorted by proximity. Each salon card shows:</p>
+                <ul>
+                    <li><strong>Salon Image:</strong> Visual preview of the salon interior</li>
+                    <li><strong>Salon Name:</strong> The business name (e.g., "Coiffure Beauté Brasil")</li>
+                    <li><strong>Rating:</strong> Star rating and review score</li>
+                    <li><strong>Location:</strong> Full address with map pin icon</li>
+                    <li><strong>Distance:</strong> Distance from your current location in kilometers</li>
+                    <li><strong>Status:</strong> Open/Closed indicator with color-coded button</li>
+                    <li><strong>Favorite Icon:</strong> Heart icon to save the salon to your favorites</li>
+                </ul>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Viewing Salon Details</h4>
+                    <p>Tap on any salon card to view detailed information, including:</p>
+                    <ul>
+                        <li>Complete service offerings</li>
+                        <li>Available time slots</li>
+                        <li>Expert profiles</li>
+                        <li>Pricing information</li>
+                        <li>Customer reviews</li>
+                    </ul>
+                </div>
+
+                <h3>Bottom Navigation</h3>
+                <p>The bottom navigation bar provides quick access to the main sections of the app:</p>
+                <ul>
+                    <li><strong>Home (House Icon):</strong> Return to the home screen</li>
+                    <li><strong>Calendar:</strong> View your appointments and bookings</li>
+                    <li><strong>Shopping Bag:</strong> Access your cart and bookings</li>
+                    <li><strong>Bell:</strong> View notifications</li>
+                    <li><strong>Profile:</strong> Access your account settings and wallet</li>
+                </ul>
+            </section>
+
+            <!-- Booking Process -->
+            <section id="booking-process" class="doc-section">
+                <h2>Booking Process</h2>
+                <p>The booking process in Skedisy is a streamlined, step-by-step journey that guides you through selecting a salon, service, expert, date, time, and payment method. This section covers the complete booking workflow from start to finish.</p>
+
+                <div class="doc-toc">
+                    <h3>Booking Steps</h3>
+                    <ul>
+                        <li><a href="#booking-step-1">Step 1: Select Salon</a></li>
+                        <li><a href="#booking-step-2">Step 2: Choose Service Venue</a></li>
+                        <li><a href="#booking-step-3">Step 3: Select Expert</a></li>
+                        <li><a href="#booking-step-4">Step 4: Choose Date & Time</a></li>
+                        <li><a href="#booking-step-5">Step 5: Select Payment Method</a></li>
+                        <li><a href="#booking-step-6">Step 6: Confirm Booking</a></li>
+                    </ul>
+                </div>
+
+                <h3>Booking Process Overview</h3>
+                <p>The booking process consists of four main steps, clearly indicated at the top of each booking screen:</p>
+                <ol>
+                    <li><strong>Venue</strong> - Choose service location (At Salon or At Home)</li>
+                    <li><strong>Personnel</strong> - Select your preferred expert</li>
+                    <li><strong>Date et heure</strong> - Pick date and time slot</li>
+                    <li><strong>Paiement</strong> - Select payment method and confirm</li>
+                </ol>
+                <p>Each completed step shows a checkmark, and the current step is highlighted.</p>
+
+                <!-- Step 1: Select Salon -->
+                <div id="booking-step-1">
+                    <h3>Step 1: Select Salon</h3>
+                    <p>Begin your booking by choosing a salon from the available options.</p>
+
+                    <div class="doc-image-container">
+                        <img src="images/booking-select-salon.png" alt="Select Salon Screen">
+                        <div class="doc-image-caption">Select Salon - Browse and choose from nearby salons</div>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">1</span>Salon Listings</h4>
+                        <p>The "Sélectionnez le salon" (Select the salon) screen displays available salons with:</p>
+                        <ul>
+                            <li><strong>Salon Image:</strong> Visual preview of the salon interior</li>
+                            <li><strong>Salon Name:</strong> Business name (e.g., "Solivans Hair", "Prestige Paris")</li>
+                            <li><strong>Rating:</strong> Star rating (e.g., "5.0") displayed with a gold star icon</li>
+                            <li><strong>Address:</strong> Full location with map pin icon</li>
+                            <li><strong>Distance:</strong> Distance from your location (e.g., "5441.15 KM Depuis votre emplacement")</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">2</span>Viewing Salon Details</h4>
+                        <p>Tap on any salon card to view detailed information, including:</p>
+                        <ul>
+                            <li>Complete service offerings</li>
+                            <li>Service prices and durations</li>
+                            <li>Available experts/staff</li>
+                            <li>Customer reviews</li>
+                            <li>Contact information</li>
+                            <li>Directions and calling options</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">3</span>Salon Detail Page</h4>
+                        <p>On the salon detail page, you'll find:</p>
+                        <ul>
+                            <li><strong>Salon Image:</strong> Large interior photo at the top</li>
+                            <li><strong>Salon Information:</strong> Name, address, rating, and review count</li>
+                            <li><strong>Action Buttons:</strong> "Direction" (Directions) and "Appeler le salon" (Call the salon)</li>
+                            <li><strong>Service Tabs:</strong> "Prestations de service" (Services), "Product", and "Personnel" (Staff)</li>
+                            <li><strong>Service Cards:</strong> Each service shows:
+                                <ul>
+                                    <li>Service icon</li>
+                                    <li>Service name</li>
+                                    <li>Rating</li>
+                                    <li>Duration (e.g., "30 Minutes", "55 Minutes")</li>
+                                    <li>Price (e.g., "€ 15.00", "€ 30.00")</li>
+                                    <li>Add button (green circle with plus sign)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">4</span>Selecting a Service</h4>
+                        <p>To start booking:</p>
+                        <ol>
+                            <li>Browse the services in the "Prestations de service" tab</li>
+                            <li>Tap the green plus button on the service you want</li>
+                            <li>The service will be added to your booking</li>
+                            <li>You'll proceed to the booking process</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Step 2: Choose Service Venue -->
+                <div id="booking-step-2">
+                    <h3>Step 2: Choose Service Venue</h3>
+                    <p>Select where you want to receive the service - at the salon or at your home.</p>
+
+                    <div class="doc-image-container">
+                        <img src="images/booking-venue-selection.png" alt="Service Venue Selection">
+                        <div class="doc-image-caption">Venue Selection - Choose between At Salon or At Home</div>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">1</span>Venue Options</h4>
+                        <p>The "Select Service Venue" screen offers two options:</p>
+                        <ul>
+                            <li><strong>"At Salon":</strong> Service will be performed at the salon location
+                                <ul>
+                                    <li>Shows a building/shop icon</li>
+                                    <li>Selected with a black circle and white checkmark</li>
+                                </ul>
+                            </li>
+                            <li><strong>"At Home":</strong> Service will be performed at your location
+                                <ul>
+                                    <li>Shows a house icon</li>
+                                    <li>Unselected shows an empty grey circle</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">2</span>Making Your Selection</h4>
+                        <p>Tap on your preferred option. The selected venue will be highlighted with a checkmark. Then tap <strong>"Suivant"</strong> (Next) to proceed.</p>
+                    </div>
+
+                    <div class="doc-info">
+                        <strong>Note:</strong> Some services may only be available at the salon. If "At Home" is not available for your selected service, only the "At Salon" option will be shown.
+                    </div>
+                </div>
+
+                <!-- Step 3: Select Expert -->
+                <div id="booking-step-3">
+                    <h3>Step 3: Select Expert</h3>
+                    <p>Choose your preferred expert or staff member to perform the service.</p>
+
+                    <div class="doc-image-container">
+                        <img src="images/booking-expert-selection.png" alt="Expert Selection Screen">
+                        <div class="doc-image-caption">Expert Selection - Choose your preferred service provider</div>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">1</span>Expert Grid</h4>
+                        <p>The "Choisissez votre expert" (Choose your expert) screen displays available experts in a grid layout:</p>
+                        <ul>
+                            <li><strong>Profile Picture:</strong> Circular photo of each expert</li>
+                            <li><strong>Expert Name:</strong> Full name displayed below the photo</li>
+                            <li><strong>Rating:</strong> Star rating (if available)</li>
+                            <li><strong>Selection Indicator:</strong> Radio button in the top right corner
+                                <ul>
+                                    <li>Selected: Black circle with white checkmark</li>
+                                    <li>Unselected: Empty white circle</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">2</span>Viewing Expert Details</h4>
+                        <p>Tap on an expert card to view their detailed profile:</p>
+                        <ul>
+                            <li><strong>Profile Information:</strong> Large profile picture, name, and rating</li>
+                            <li><strong>Contact Details:</strong> Email, phone number</li>
+                            <li><strong>Salon Information:</strong> Salon name and address</li>
+                            <li><strong>Services:</strong> List of services the expert provides</li>
+                            <li><strong>Comments:</strong> Customer reviews and feedback</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">3</span>Selecting an Expert</h4>
+                        <p>To choose an expert:</p>
+                        <ol>
+                            <li>Browse the available experts</li>
+                            <li>Tap on the expert you prefer</li>
+                            <li>The selected expert will show a checkmark</li>
+                            <li>Tap <strong>"Suivant"</strong> (Next) to continue</li>
+                        </ol>
+                    </div>
+
+                    <div class="doc-image-container">
+                        <img src="images/booking-expert-details.png" alt="Expert Details Screen">
+                        <div class="doc-image-caption">Expert Details - View expert profile and services</div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Choose Date & Time -->
+                <div id="booking-step-4">
+                    <h3>Step 4: Choose Date & Time</h3>
+                    <p>Select your preferred date and available time slot for the appointment.</p>
+
+                    <div class="doc-image-container">
+                        <img src="images/booking-date-time.png" alt="Date and Time Selection">
+                        <div class="doc-image-caption">Date and Time Selection - Calendar and time slot picker</div>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">1</span>Date Selection</h4>
+                        <p>The "Sélectionner une date" (Select a date) section includes:</p>
+                        <ul>
+                            <li><strong>Current Date Display:</strong> Shows the selected month and date (e.g., "2 February, 2026")</li>
+                            <li><strong>Month Navigation:</strong> "Feb" with arrow to navigate to other months</li>
+                            <li><strong>Calendar View:</strong> Days of the week (SUN, MON, TUE, WED, THU, FRI, SAT) with dates</li>
+                            <li><strong>Selected Date:</strong> Highlighted with a light grey background (e.g., "MON 2")</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">2</span>Time Slot Selection</h4>
+                        <p>The "Créneaux disponibles" (Available slots) section shows:</p>
+                        <ul>
+                            <li><strong>Time Categories:</strong> Organized by "Matin" (Morning), "Après-midi" (Afternoon), etc.</li>
+                            <li><strong>Available Slots:</strong> Displayed as light green buttons with white text (e.g., "09:00 AM", "09:15 AM")</li>
+                            <li><strong>Selected Slots:</strong> Displayed as black buttons with white text</li>
+                            <li><strong>Unavailable Slots:</strong> Greyed out or not shown</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">3</span>Selecting Date and Time</h4>
+                        <p>To choose your appointment time:</p>
+                        <ol>
+                            <li>Tap on a date in the calendar</li>
+                            <li>View available time slots for that date</li>
+                            <li>Tap on your preferred time slot</li>
+                            <li>You can select multiple slots if booking multiple services</li>
+                            <li>Selected slots will appear in black</li>
+                            <li>Tap <strong>"Suivant"</strong> (Next) to proceed to payment</li>
+                        </ol>
+                    </div>
+
+                    <div class="doc-info">
+                        <strong>Tip:</strong> Time slots are typically in 15-minute intervals. If a slot is unavailable, it may be greyed out or not displayed. Book in advance to secure your preferred time.
+                    </div>
+                </div>
+
+                <!-- Step 5: Select Payment Method -->
+                <div id="booking-step-5">
+                    <h3>Step 5: Select Payment Method</h3>
+                    <p>Choose how you want to pay for your booking.</p>
+
+                    <div class="doc-image-container">
+                        <img src="images/booking-payment-method.png" alt="Payment Method Selection">
+                        <div class="doc-image-caption">Payment Method - Choose wallet, Stripe, or cash payment</div>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">1</span>Payment Options</h4>
+                        <p>The "Mode de paiement" (Payment Mode) screen offers three payment methods:</p>
+                        <ul>
+                            <li><strong>"Mon portefeuille" (My wallet):</strong>
+                                <ul>
+                                    <li>Pay using your wallet balance</li>
+                                    <li>Shows current balance (e.g., "€ 86.10 dans ton portefeuille")</li>
+                                    <li>Selected with a green checkmark in a white square</li>
+                                    <li>Wallet icon displayed</li>
+                                </ul>
+                            </li>
+                            <li><strong>"Stripe":</strong>
+                                <ul>
+                                    <li>Pay with credit/debit card via Stripe</li>
+                                    <li>Shows Stripe logo</li>
+                                    <li>Unselected shows empty white checkbox</li>
+                                </ul>
+                            </li>
+                            <li><strong>"Cash After Service":</strong>
+                                <ul>
+                                    <li>Pay in cash when the service is completed</li>
+                                    <li>Shows banknotes icon</li>
+                                    <li>Unselected shows empty white checkbox</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">2</span>Selecting Payment Method</h4>
+                        <p>To choose a payment method:</p>
+                        <ol>
+                            <li>Review the available payment options</li>
+                            <li>Check your wallet balance if using wallet payment</li>
+                            <li>Tap on your preferred payment method</li>
+                            <li>The selected method will show a checkmark</li>
+                            <li>Review the price breakdown at the bottom</li>
+                            <li>Tap <strong>"Confirmer"</strong> (Confirm) to proceed</li>
+                        </ol>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">3</span>Price Summary</h4>
+                        <p>The bottom of the screen shows:</p>
+                        <ul>
+                            <li><strong>Service Name:</strong> The selected service (e.g., "Blow Dry & Styling")</li>
+                            <li><strong>Price Breakdown:</strong> Base price + tax = total
+                                <ul>
+                                    <li>Example: "€ 15.00 (€2.70 Impôt) = € 17.70"</li>
+                                    <li>Base price: €15.00</li>
+                                    <li>Tax (Impôt): €2.70</li>
+                                    <li>Total: €17.70</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-warning">
+                        <strong>Important:</strong> If using wallet payment, ensure your balance is sufficient to cover the total amount (including tax). If your balance is insufficient, you'll need to recharge your wallet or choose another payment method.
+                    </div>
+                </div>
+
+                <!-- Step 6: Confirm Booking -->
+                <div id="booking-step-6">
+                    <h3>Step 6: Confirm Booking</h3>
+                    <p>Review your booking details and confirm the reservation.</p>
+
+                    <div class="doc-image-container">
+                        <img src="images/booking-confirmation.png" alt="Booking Confirmation Popup">
+                        <div class="doc-image-caption">Booking Confirmation - Final confirmation dialog</div>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">1</span>Confirmation Dialog</h4>
+                        <p>After selecting payment method and tapping "Confirmer", a confirmation popup appears with:</p>
+                        <ul>
+                            <li><strong>Header:</strong> "Confirmer la réservation" (Confirm the reservation) in black header</li>
+                            <li><strong>Service Name:</strong> Displayed with a green checkmark (e.g., "Blow Dry & Styling")</li>
+                            <li><strong>Confirmation Question:</strong> "Voulez-vous confirmer cette réservation?" (Do you want to confirm this reservation?)</li>
+                            <li><strong>Terms Checkbox:</strong> "J'ai lu l'avertissement et je suis d'accord sur les termes et conditions." (I have read the warning and I agree to the terms and conditions.)</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">2</span>Accepting Terms</h4>
+                        <p>Before confirming:</p>
+                        <ol>
+                            <li>Read the terms and conditions</li>
+                            <li>Check the checkbox to accept the terms</li>
+                            <li>The checkbox must be checked to proceed</li>
+                        </ol>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">3</span>Final Confirmation</h4>
+                        <p>The dialog provides two options:</p>
+                        <ul>
+                            <li><strong>"Annuler" (Cancel):</strong> White button to go back and make changes</li>
+                            <li><strong>"Confirmer" (Confirm):</strong> Green button to finalize the booking</li>
+                        </ul>
+                        <p>Once you tap "Confirmer", your booking will be processed and confirmed.</p>
+                    </div>
+
+                    <div class="doc-step">
+                        <h4><span class="doc-step-number">4</span>After Confirmation</h4>
+                        <p>After confirming your booking:</p>
+                        <ul>
+                            <li>You'll receive a booking confirmation</li>
+                            <li>A booking ID will be generated</li>
+                            <li>You'll receive a notification about the booking</li>
+                            <li>The booking will appear in your "Booking" screen</li>
+                            <li>You can view, modify, or cancel it from there</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-info">
+                        <strong>Note:</strong> Make sure all details are correct before confirming. Once confirmed, you may need to contact the salon directly to make changes, depending on their cancellation policy.
+                    </div>
+                </div>
+
+                <h3>Booking Process Summary</h3>
+                <p>The complete booking process follows these steps:</p>
+                <ol>
+                    <li><strong>Select Salon:</strong> Browse and choose a salon, then select a service</li>
+                    <li><strong>Choose Venue:</strong> Decide between "At Salon" or "At Home"</li>
+                    <li><strong>Select Expert:</strong> Choose your preferred service provider</li>
+                    <li><strong>Pick Date & Time:</strong> Select your preferred appointment slot</li>
+                    <li><strong>Payment Method:</strong> Choose wallet, Stripe, or cash payment</li>
+                    <li><strong>Confirm:</strong> Review and confirm your booking</li>
+                </ol>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> You can save your favorite salons and experts for faster booking in the future. Also, ensure your wallet is funded if you plan to use wallet payment.
+                </div>
+            </section>
+
+            <!-- Booking Screen -->
+            <section id="booking-screen" class="doc-section">
+                <h2>Booking Screen</h2>
+                <p>The Booking Screen allows you to view and manage all your appointments. You can filter bookings by status and see detailed information about each appointment.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/customer-app-booking.png" alt="Skedisy Customer App Booking Screen">
+                    <div class="doc-image-caption">Booking Screen - Viewing cancelled appointments with filter options</div>
+                </div>
+
+                <h3>Header & Search</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Screen Title</h4>
+                    <p>The screen displays <strong>"Booking"</strong> as the main title at the top.</p>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Search Functionality</h4>
+                    <p>Use the search bar with the magnifying glass icon to quickly find specific bookings by:</p>
+                    <ul>
+                        <li>Booking ID</li>
+                        <li>Service name</li>
+                        <li>Salon name</li>
+                        <li>Expert name</li>
+                    </ul>
+                </div>
+
+                <h3>Filter Tabs</h3>
+                <p>Three filter tabs allow you to organize your bookings:</p>
+                <ul>
+                    <li><strong>Pending:</strong> Appointments that are scheduled but not yet completed</li>
+                    <li><strong>Cancelled:</strong> Appointments that have been cancelled (shown with red banner)</li>
+                    <li><strong>Completed:</strong> Past appointments that have been finished</li>
+                </ul>
+                <p>The active tab is highlighted with a black background and white text.</p>
+
+                <h3>Booking Cards</h3>
+                <p>Each booking is displayed as a card with the following information:</p>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Booking Details</h4>
+                    <ul>
+                        <li><strong>Service Icon:</strong> Visual representation of the service type (e.g., hairdryer, scissors)</li>
+                        <li><strong>Booking ID:</strong> Unique identifier displayed in a black tag (e.g., "#1783990")</li>
+                        <li><strong>Service Name:</strong> Full description of the service (e.g., "Blow Dry & Hair Services")</li>
+                        <li><strong>Price:</strong> Total cost in bold (e.g., "€ 53.10")</li>
+                        <li><strong>Expert:</strong> Profile picture and name of the service provider (e.g., "Bobun Bom")</li>
+                        <li><strong>Booking Date:</strong> Calendar icon with date (e.g., "2025-09-22")</li>
+                        <li><strong>Booking Time:</strong> Clock icon with time (e.g., "04:45 PM")</li>
+                        <li><strong>Status Banner:</strong> Color-coded status indicator (red for cancelled, green for confirmed, etc.)</li>
+                    </ul>
+                </div>
+
+                <div class="doc-warning">
+                    <strong>Note:</strong> Cancelled appointments are clearly marked with a red banner stating "This appointment is cancelled". You can tap on any booking card to view more details or take actions like rescheduling or contacting the salon.
+                </div>
+
+                <h3>Managing Bookings</h3>
+                <p>From the booking screen, you can:</p>
+                <ul>
+                    <li>View detailed information about each appointment</li>
+                    <li>Cancel upcoming appointments</li>
+                    <li>Reschedule appointments (if allowed by the salon)</li>
+                    <li>Contact the salon or expert</li>
+                    <li>Leave reviews for completed services</li>
+                </ul>
+            </section>
+
+            <!-- Product Category -->
+            <section id="product-category" class="doc-section">
+                <h2>Product Category</h2>
+                <p>The Product Category screen helps you browse and discover services organized by category. This screen provides an organized way to explore all available services.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/customer-app-category.png" alt="Skedisy Customer App Product Category Screen">
+                    <div class="doc-image-caption">Product Category Screen - Browsing service categories in a grid layout</div>
+                </div>
+
+                <h3>Header Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Screen Title</h4>
+                    <p>The screen displays <strong>"Product Category"</strong> as the main title, with a welcoming subtitle: <strong>"You Have Been Missed For A Long Time."</strong></p>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Navigation Icons</h4>
+                    <ul>
+                        <li><strong>Left:</strong> Shopping bag with heart icon - access your favorites</li>
+                        <li><strong>Right:</strong> System status indicators</li>
+                    </ul>
+                </div>
+
+                <h3>Search Functionality</h3>
+                <p>The search bar at the top allows you to quickly find specific products or services. Simply type keywords related to what you're looking for, and the app will filter the results accordingly.</p>
+
+                <h3>Category Grid</h3>
+                <p>The main content area displays categories in a clean 2x3 grid layout. Each category card includes:</p>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Category Cards</h4>
+                    <p>Each category is presented as a white card with rounded corners containing:</p>
+                    <ul>
+                        <li><strong>Icon:</strong> Visual representation of the category</li>
+                        <li><strong>Category Name:</strong> Full or abbreviated category title</li>
+                    </ul>
+                </div>
+
+                <h4>Available Categories</h4>
+                <ul>
+                    <li><strong>Hygiene & Sal...</strong> - Personal care and hygiene services</li>
+                    <li><strong>Tools & Equip...</strong> - Professional tools and equipment</li>
+                    <li><strong>Makeup & Dec...</strong> - Makeup services and decorative treatments</li>
+                    <li><strong>Nail Care</strong> - Manicure, pedicure, and nail art services</li>
+                    <li><strong>Skin & Spa</strong> - Facial treatments and spa services</li>
+                    <li><strong>Hair Care</strong> - Haircut, styling, and hair treatment services</li>
+                </ul>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Browsing Categories</h4>
+                    <p>Tap on any category card to:</p>
+                    <ul>
+                        <li>View all services within that category</li>
+                        <li>See available salons offering those services</li>
+                        <li>Filter by price, location, or rating</li>
+                        <li>Book services directly</li>
+                    </ul>
+                </div>
+
+                <h3>Navigation</h3>
+                <p>The bottom navigation bar shows the shopping bag icon highlighted, indicating you're in the product/category browsing section.</p>
+            </section>
+
+            <!-- Notifications -->
+            <section id="notifications" class="doc-section">
+                <h2>Notifications</h2>
+                <p>The Notifications screen keeps you informed about important updates, booking confirmations, reminders, and other relevant information about your appointments and account.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/customer-app-notifications.png" alt="Skedisy Customer App Notifications Screen">
+                    <div class="doc-image-caption">Notifications Screen - List of booking confirmations and updates</div>
+                </div>
+
+                <h3>Header Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Screen Title</h4>
+                    <p>The screen displays a bell icon and the title <strong>"Notifications"</strong> with a subtitle: <strong>"Vous manquez depuis longtemps"</strong> (You've been missed for a long time).</p>
+                </div>
+
+                <h3>Notification List</h3>
+                <p>Notifications are displayed as individual cards, each containing:</p>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Notification Card Elements</h4>
+                    <ul>
+                        <li><strong>Icon:</strong> Circular icon representing the notification type (schedule, salon interior, service icon, etc.)</li>
+                        <li><strong>Title:</strong> Brief notification title (e.g., "Booking Confirm", "titel")</li>
+                        <li><strong>Description:</strong> Detailed message about the notification</li>
+                        <li><strong>Date/Time:</strong> Timestamp showing when the notification was received (format: M/D/YYYY H:MM)</li>
+                    </ul>
+                </div>
+
+                <h3>Notification Types</h3>
+                <h4>Booking Confirmations</h4>
+                <p>Most notifications are booking-related, such as:</p>
+                <ul>
+                    <li><strong>"Booking Confirm"</strong> - Notifications when your booking is confirmed</li>
+                    <li><strong>"Your Booking with Id [ID] is Starting Soon"</strong> - Reminders before your appointment</li>
+                    <li>Booking status updates (confirmed, cancelled, rescheduled)</li>
+                </ul>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Viewing Notification Details</h4>
+                    <p>Tap on any notification card to:</p>
+                    <ul>
+                        <li>View full details about the booking</li>
+                        <li>Navigate directly to the booking screen</li>
+                        <li>Take actions like confirming or cancelling</li>
+                    </ul>
+                </div>
+
+                <h3>Notification Management</h3>
+                <p>The notifications screen helps you:</p>
+                <ul>
+                    <li>Stay updated on your appointment status</li>
+                    <li>Receive reminders before your bookings</li>
+                    <li>Get notified about special offers and promotions</li>
+                    <li>Track important account updates</li>
+                </ul>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Regular notifications ensure you never miss an appointment. Make sure push notifications are enabled in your device settings to receive real-time updates.
+                </div>
+            </section>
+
+            <!-- Profile -->
+            <section id="profile" class="doc-section">
+                <h2>Profile & Wallet</h2>
+                <p>The Profile screen is your personal account hub, providing access to account management, wallet management, order history, and app settings.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/customer-app-profile.png" alt="Skedisy Customer App Profile Screen">
+                    <div class="doc-image-caption">Profile Screen - Account management and wallet access</div>
+                </div>
+
+                <h3>User Profile Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Profile Information</h4>
+                    <p>The top of the screen displays:</p>
+                    <ul>
+                        <li><strong>Profile Picture:</strong> Your profile photo (circular avatar)</li>
+                        <li><strong>Name:</strong> Your full name (e.g., "Brins Bfi")</li>
+                        <li><strong>Email:</strong> Your registered email address (e.g., "brondonwilly@gmail.com")</li>
+                    </ul>
+                </div>
+
+                <h3>Menu Options</h3>
+                <p>The profile screen provides four main menu options, each displayed as a card with an icon, title, description, and navigation arrow:</p>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Mon compte (My Account)</h4>
+                    <p>Access your account details including:</p>
+                    <ul>
+                        <li>Account information and settings</li>
+                        <li>Email and messaging ID</li>
+                        <li>Contact information</li>
+                        <li>Profile editing options</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Mon portefeuille (My Wallet)</h4>
+                    <p>This is a crucial section for managing your finances:</p>
+                    <ul>
+                        <li><strong>Wallet Balance:</strong> View your current wallet balance</li>
+                        <li><strong>Transaction History:</strong> See all your wallet transactions</li>
+                        <li><strong>Add Money:</strong> Recharge your wallet using various payment methods</li>
+                        <li><strong>Payment Methods:</strong> Manage your payment options</li>
+                    </ul>
+                    <div class="doc-warning">
+                        <strong>Important:</strong> To recharge your wallet, go to <strong>Profil → Mon portefeuille → Add Money</strong>. This is essential for making bookings when your balance is insufficient.
+                    </div>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Ma commande (My Order)</h4>
+                    <p>View and manage your orders:</p>
+                    <ul>
+                        <li>Order history</li>
+                        <li>Current and past bookings</li>
+                        <li>Order details and receipts</li>
+                        <li>Service history</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">5</span>Paramètre (Settings)</h4>
+                    <p>Configure your app preferences:</p>
+                    <ul>
+                        <li><strong>Language:</strong> Change the application language</li>
+                        <li><strong>Account Management:</strong> Delete account or update preferences</li>
+                        <li><strong>Notifications:</strong> Manage notification settings</li>
+                        <li><strong>Privacy:</strong> Control privacy and data settings</li>
+                    </ul>
+                </div>
+
+                <h3>Wallet Recharge Process</h3>
+                <p>When you need to add money to your wallet:</p>
+                <ol>
+                    <li>Navigate to <strong>Profile</strong> (person icon in bottom navigation)</li>
+                    <li>Tap on <strong>"Mon portefeuille"</strong> (My Wallet)</li>
+                    <li>Select <strong>"Add Money"</strong> or <strong>"Recharge Wallet"</strong></li>
+                    <li>Choose your payment method (Stripe, MTN MoMo, etc.)</li>
+                    <li>Enter the amount you want to add</li>
+                    <li>Complete the payment process</li>
+                    <li>Your wallet balance will be updated immediately</li>
+                </ol>
+
+                <div class="doc-info">
+                    <strong>Note:</strong> The wallet feature allows you to make quick payments for services without entering payment details each time. It's especially useful for regular customers who frequently book services.
+                </div>
+
+                <h3>Bottom Navigation</h3>
+                <p>The profile icon in the bottom navigation is highlighted when you're on this screen, indicating your current location in the app.</p>
+            </section>
+
+            <!-- Wallet -->
+            <section id="wallet" class="doc-section">
+                <h2>Wallet</h2>
+                <p>The Wallet section allows you to manage your account balance, add funds, and view your transaction history. This is essential for making quick payments when booking services.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/customer-app-wallet.png" alt="Skedisy Customer App Wallet Screen">
+                    <div class="doc-image-caption">Wallet Screen - Balance display and quick actions</div>
+                </div>
+
+                <h3>Wallet Balance Display</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Current Balance</h4>
+                    <p>The prominent teal/green balance card displays:</p>
+                    <ul>
+                        <li><strong>"Mon solde" (My balance):</strong> Label in white text</li>
+                        <li><strong>Balance Amount:</strong> Current balance in large, bold white text (e.g., "€ 86.10")</li>
+                        <li><strong>Visual Elements:</strong> Stylized wallet or coin graphics in lighter teal</li>
+                    </ul>
+                    <p>This card provides an at-a-glance view of your available funds.</p>
+                </div>
+
+                <h3>Quick Actions</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Action Buttons</h4>
+                    <p>Two action buttons are available below the balance card:</p>
+                    <ul>
+                        <li><strong>"Ajouter un montant" (Add an amount):</strong> 
+                            <ul>
+                                <li>Red button with white text</li>
+                                <li>Takes you to the wallet recharge screen</li>
+                                <li>Allows you to add money using various payment methods</li>
+                            </ul>
+                        </li>
+                        <li><strong>"Histoire" (History):</strong>
+                            <ul>
+                                <li>Black button with white text</li>
+                                <li>Opens your transaction history</li>
+                                <li>Shows all wallet activities (recharges, payments, refunds)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <h3>Recharging Your Wallet</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Adding Funds</h4>
+                    <p>To add money to your wallet:</p>
+                    <ol>
+                        <li>Tap the <strong>"Ajouter un montant"</strong> (Add an amount) button</li>
+                        <li>Enter the amount you want to add</li>
+                        <li>Select your payment method (Stripe or MTN MoMo)</li>
+                        <li>Complete the payment process</li>
+                        <li>Your balance will be updated immediately after successful payment</li>
+                    </ol>
+                </div>
+
+                <h3>Viewing Transaction History</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>History Access</h4>
+                    <p>To view your wallet transactions:</p>
+                    <ol>
+                        <li>Tap the <strong>"Histoire"</strong> (History) button</li>
+                        <li>View all your wallet activities including:
+                            <ul>
+                                <li>Wallet recharges (credits)</li>
+                                <li>Service payments (debits)</li>
+                                <li>Refunds (credits)</li>
+                                <li>Transaction dates and times</li>
+                                <li>Transaction IDs</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Using Wallet for Payments</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">5</span>Payment Process</h4>
+                    <p>When booking a service:</p>
+                    <ul>
+                        <li>Select "Mon portefeuille" (My wallet) as your payment method</li>
+                        <li>Ensure your balance is sufficient to cover the total (including tax)</li>
+                        <li>The amount will be deducted from your wallet upon confirmation</li>
+                        <li>If balance is insufficient, you'll be prompted to recharge</li>
+                    </ul>
+                </div>
+
+                <div class="doc-warning">
+                    <strong>Important:</strong> Always ensure your wallet has sufficient balance before booking. If your balance is insufficient, you'll need to either recharge your wallet or choose another payment method (Stripe or Cash After Service).
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Keeping your wallet funded makes booking faster and more convenient. You can set up automatic reminders to recharge when your balance gets low.
+                </div>
+            </section>
+
+            <!-- Expert App Getting Started -->
+            <section id="expert-getting-started" class="doc-section">
+                <h1>Expert App Documentation</h1>
+                <p>Welcome to the Skedisy Expert App documentation. This comprehensive guide will help you understand and utilize all features of the expert application, designed to help service providers manage their bookings, revenue, schedules, and customer interactions efficiently.</p>
+
+                <div class="doc-toc">
+                    <h3>Table of Contents</h3>
+                    <ul>
+                        <li><a href="#expert-revenue">My Revenue</a></li>
+                        <li><a href="#expert-reservations">Reservation Details</a></li>
+                        <li><a href="#expert-slots">Slot Management</a></li>
+                        <li><a href="#expert-orders">Order Details</a></li>
+                        <li><a href="#expert-profile">Expert Profile</a></li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Note:</strong> The Skedisy Expert App is designed specifically for service providers (experts) to manage their business operations, track earnings, manage availability, and handle customer bookings seamlessly.
+                </div>
+            </section>
+
+            <!-- Expert Revenue -->
+            <section id="expert-revenue" class="doc-section">
+                <h2>My Revenue</h2>
+                <p>The My Revenue screen provides a comprehensive overview of your earnings, allowing you to track your income across different time periods and view reservation statistics.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/expert-app-revenue.png" alt="Skedisy Expert App My Revenue Screen">
+                    <div class="doc-image-caption">My Revenue Screen - Revenue dashboard with balance and reservation statistics</div>
+                </div>
+
+                <h3>Header Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>App Name & User</h4>
+                    <p>The top of the screen displays:</p>
+                    <ul>
+                        <li><strong>"Skedisy"</strong> - The app name in bold black text</li>
+                        <li><strong>User Name</strong> - Your name (e.g., "Bobun") displayed below the app name</li>
+                    </ul>
+                </div>
+
+                <h3>Date Filters</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Time Period Selection</h4>
+                    <p>The "Mes revenus" (My Revenue) section includes date filter buttons:</p>
+                    <ul>
+                        <li><strong>"Aujourd'hui"</strong> (Today) - Selected by default, shown with black background and white text</li>
+                        <li><strong>"Hier"</strong> (Yesterday) - View yesterday's revenue</li>
+                        <li><strong>"Cette semaine"</strong> (This week) - View weekly revenue summary</li>
+                    </ul>
+                    <p>Tap any filter button to view revenue for that specific time period.</p>
+                </div>
+
+                <h3>Balance Card</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Current Balance</h4>
+                    <p>The prominent teal balance card displays:</p>
+                    <ul>
+                        <li><strong>"Mon solde"</strong> (My balance) - Label in white text</li>
+                        <li><strong>Balance Amount</strong> - Your current balance in large, bold white text (e.g., "€ 0.00")</li>
+                        <li><strong>Visual Icon</strong> - A stylized graphic on the right side of the card</li>
+                    </ul>
+                    <p>This card provides an at-a-glance view of your current earnings balance.</p>
+                </div>
+
+                <h3>Reservation Details Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Reservation Statistics</h4>
+                    <p>The "Les détails de réservation" (Reservation Details) section shows three key metrics:</p>
+                    <ul>
+                        <li><strong>"Réservation en attente"</strong> (Pending reservation) - Number of upcoming bookings</li>
+                        <li><strong>"Réservation complète"</strong> (Completed reservation) - Number of finished appointments</li>
+                        <li><strong>"Annuler la réservation"</strong> (Cancel reservation) - Number of cancelled bookings</li>
+                    </ul>
+                    <p>Each metric displays a count on the right side. Tap on any card to view detailed information about that category.</p>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Use the date filters to analyze your revenue trends and identify your busiest periods. This helps you optimize your schedule and pricing strategy.
+                </div>
+            </section>
+
+            <!-- Expert Reservations -->
+            <section id="expert-reservations" class="doc-section">
+                <h2>Reservation Details</h2>
+                <p>The Reservation Details screen allows you to view and manage all your customer bookings. You can filter by status and take actions on individual reservations.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/expert-app-reservations.png" alt="Skedisy Expert App Reservation Details Screen">
+                    <div class="doc-image-caption">Reservation Details Screen - Managing bookings with action buttons</div>
+                </div>
+
+                <h3>Header & Welcome</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Screen Information</h4>
+                    <p>The screen displays:</p>
+                    <ul>
+                        <li><strong>App Name:</strong> "Skedisy" in bold black text</li>
+                        <li><strong>Welcome Message:</strong> "Welcome to our best services, [Your Name]"</li>
+                    </ul>
+                </div>
+
+                <h3>Filter Tabs</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Reservation Status Filters</h4>
+                    <p>Three filter tabs help you organize bookings:</p>
+                    <ul>
+                        <li><strong>"Commande en cours"</strong> (Order in progress) - Currently active bookings, highlighted with black background</li>
+                        <li><strong>"annuler la commande"</strong> (Cancel the order) - Cancelled bookings</li>
+                        <li><strong>"Co"</strong> - Additional filter option (likely "Completed")</li>
+                    </ul>
+                    <p>The active tab is highlighted with a black background and white text.</p>
+                </div>
+
+                <h3>Booking Cards</h3>
+                <p>Each booking is displayed as a detailed card containing:</p>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Booking Information</h4>
+                    <ul>
+                        <li><strong>Service Icon:</strong> Visual representation of the service (e.g., hairdryer icon)</li>
+                        <li><strong>Service Name:</strong> Full service description (e.g., "Blow Dry & Styling")</li>
+                        <li><strong>Category:</strong> Service category (e.g., "Coiffure" - Hairdressing)</li>
+                        <li><strong>Price:</strong> Service price displayed in a light gray pill (e.g., "€ 40.19")</li>
+                        <li><strong>Provider Name:</strong> Your name or the service provider (e.g., "Sonwall Sonwall")</li>
+                        <li><strong>Booking ID:</strong> Unique identifier in a black pill (e.g., "#1536935")</li>
+                        <li><strong>Booking Date:</strong> Calendar icon with date (e.g., "2026-01-21")</li>
+                        <li><strong>Booking Time:</strong> Clock icon with time (e.g., "04:15 PM")</li>
+                    </ul>
+                </div>
+
+                <h3>Action Buttons</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Managing Bookings</h4>
+                    <p>Each booking card includes two action buttons at the bottom:</p>
+                    <ul>
+                        <li><strong>"Enregistrement"</strong> (Registration/Save) - Green button to confirm or save the booking</li>
+                        <li><strong>"Annuler"</strong> (Cancel) - Red button to cancel the reservation</li>
+                    </ul>
+                    <p>Use these buttons to manage individual bookings based on your availability and customer needs.</p>
+                </div>
+
+                <div class="doc-warning">
+                    <strong>Important:</strong> Cancelling a booking may affect your rating and customer relationships. Always communicate with customers when possible before cancelling.
+                </div>
+            </section>
+
+            <!-- Expert Slot Management -->
+            <section id="expert-slots" class="doc-section">
+                <h2>Slot Management</h2>
+                <p>The Slot Management screen allows you to control your availability, set vacation mode, and manage your time slots for bookings. This is essential for maintaining an organized schedule.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/expert-app-slots.png" alt="Skedisy Expert App Slot Management Screen">
+                    <div class="doc-image-caption">Slot Management Screen - Date picker, vacation mode, and available time slots</div>
+                </div>
+
+                <h3>Header Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Screen Title</h4>
+                    <p>The screen displays <strong>"Gestion des créneaux"</strong> (Slot Management) in bold dark green text, indicating this is the availability management section.</p>
+                </div>
+
+                <h3>Date Picker</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Selecting Dates</h4>
+                    <p>The date picker interface includes:</p>
+                    <ul>
+                        <li><strong>Current Date Display:</strong> Shows the selected date (e.g., "October 2, 2025")</li>
+                        <li><strong>Month Navigation:</strong> "Oct" with arrow icon to navigate between months</li>
+                        <li><strong>Day Selector:</strong> Horizontal row showing days of the week with dates:
+                            <ul>
+                                <li>WED 1, THU 2 (selected - highlighted in blue-gray), FRI 3, SAT 4, SUN 5, MON 6</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p>Tap on any day to view and manage slots for that specific date.</p>
+                </div>
+
+                <h3>Vacation Mode</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Setting Vacation Mode</h4>
+                    <p>The "Mode vacances" (Vacation Mode) section allows you to:</p>
+                    <ul>
+                        <li><strong>Toggle Vacation Mode:</strong> Red toggle switch to enable/disable vacation mode</li>
+                        <li><strong>Status Message:</strong> "Maintenant non disponible pour..." (Now unavailable for...)</li>
+                        <li><strong>Visual Indicator:</strong> Red banner with sun/umbrella icon</li>
+                    </ul>
+                    <p>When vacation mode is ON (red toggle), you won't receive new bookings during that period.</p>
+                </div>
+
+                <div class="doc-warning">
+                    <strong>Note:</strong> When vacation mode is active, existing bookings remain, but new bookings cannot be made. Make sure to inform customers about your unavailability.
+                </div>
+
+                <h3>Available Slots</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Time Slot Management</h4>
+                    <p>The "Créneaux disponibles" (Available Slots) section displays:</p>
+                    <ul>
+                        <li><strong>Legend:</strong> Color-coded indicators:
+                            <ul>
+                                <li><strong>"Pas disponible"</strong> (Not available) - Light pink-beige color</li>
+                                <li><strong>"Disponible"</strong> (Available) - Light green color</li>
+                            </ul>
+                        </li>
+                        <li><strong>Time Slot Grid:</strong> Organized by time periods (e.g., "Matin" - Morning)</li>
+                    </ul>
+                </div>
+
+                <h4>Time Slot Examples</h4>
+                <p>The morning section shows slots in 15-minute intervals:</p>
+                <ul>
+                    <li>09:00 AM, 09:15 AM, 09:30 AM</li>
+                    <li>09:45 AM, 10:00 AM, 10:15 AM</li>
+                    <li>10:30 AM, 10:45 AM, 11:00 AM</li>
+                    <li>11:15 AM, 11:30 AM, 11:45 AM</li>
+                </ul>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">5</span>Managing Slots</h4>
+                    <p>To manage your availability:</p>
+                    <ol>
+                        <li>Select the date you want to manage</li>
+                        <li>Tap on any time slot to toggle its availability</li>
+                        <li>Green slots are available for booking</li>
+                        <li>Pink-beige slots are blocked/unavailable</li>
+                        <li>Changes are saved automatically</li>
+                    </ol>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Regularly update your slot availability to ensure customers can book when you're actually available. This reduces cancellations and improves customer satisfaction.
+                </div>
+            </section>
+
+            <!-- Expert Order Details -->
+            <section id="expert-orders" class="doc-section">
+                <h2>Order Details</h2>
+                <p>The Order Details screen provides a comprehensive view of all your orders and transactions, allowing you to track your business activity over different time periods.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/expert-app-orders.png" alt="Skedisy Expert App Order Details Screen">
+                    <div class="doc-image-caption">Order Details Screen - Date filters and order history</div>
+                </div>
+
+                <h3>Header Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Screen Title</h4>
+                    <p>The screen displays:</p>
+                    <ul>
+                        <li><strong>App Name:</strong> "Skedisy" in bold black text</li>
+                        <li><strong>Welcome Message:</strong> "Welcome to our best services, [Your Name]"</li>
+                        <li><strong>Section Title:</strong> "détails de la commande" (Order details) in bold black text</li>
+                    </ul>
+                </div>
+
+                <h3>Date Filters</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Time Period Selection</h4>
+                    <p>Filter your orders by time period using the filter buttons:</p>
+                    <ul>
+                        <li><strong>"Aujourd'hui"</strong> (Today) - Selected by default, shown with black background and white text</li>
+                        <li><strong>"Hier"</strong> (Yesterday) - View yesterday's orders</li>
+                        <li><strong>"Cette semaine"</strong> (This week) - View weekly orders</li>
+                        <li><strong>"Ce mois-c"</strong> (This month) - View monthly orders</li>
+                    </ul>
+                    <p>Tap any filter to view orders for that specific time period.</p>
+                </div>
+
+                <h3>No Data State</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Empty State</h4>
+                    <p>When there are no orders for the selected period, the screen displays:</p>
+                    <ul>
+                        <li><strong>Illustration:</strong> A large magnifying glass with a sad face icon</li>
+                        <li><strong>Supporting Icons:</strong> Question marks and document icons around the magnifying glass</li>
+                        <li><strong>Message:</strong> "Aucune donnée disponible..!" (No data available..!)</li>
+                    </ul>
+                    <p>This indicates that no orders match the selected filter criteria.</p>
+                </div>
+
+                <h3>Viewing Order Details</h3>
+                <p>When orders are available, you can:</p>
+                <ul>
+                    <li>View detailed information about each order</li>
+                    <li>See customer information and booking details</li>
+                    <li>Track payment status and amounts</li>
+                    <li>Access order history for analysis</li>
+                </ul>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Use the date filters to analyze your business performance over time. This helps you identify trends, peak periods, and areas for improvement.
+                </div>
+            </section>
+
+            <!-- Expert Profile -->
+            <section id="expert-profile" class="doc-section">
+                <h2>Expert Profile</h2>
+                <p>The Expert Profile screen is your personal account hub, providing access to account management, wallet/revenue tracking, settings, and support options.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/expert-app-profile.png" alt="Skedisy Expert App Profile Screen">
+                    <div class="doc-image-caption">Expert Profile Screen - Account management and settings</div>
+                </div>
+
+                <h3>Profile Header</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Profile Information</h4>
+                    <p>The top of the screen displays:</p>
+                    <ul>
+                        <li><strong>Screen Title:</strong> "Profil" (Profile) in bold black text</li>
+                        <li><strong>Profile Picture:</strong> Your circular profile photo</li>
+                        <li><strong>Name:</strong> Your full name (e.g., "Bobun Bom")</li>
+                        <li><strong>User ID:</strong> Your unique identifier (e.g., "ID :- 1358173")</li>
+                    </ul>
+                </div>
+
+                <h3>Menu Options</h3>
+                <p>The profile screen provides five main menu options, each displayed as a card with an icon, title, description, and navigation arrow:</p>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Mon compte (My Account)</h4>
+                    <p>Access your account details including:</p>
+                    <ul>
+                        <li>Account information and settings</li>
+                        <li>Messaging ID and contact details</li>
+                        <li>Profile editing options</li>
+                        <li>Personal information management</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Portefeuille (Wallet)</h4>
+                    <p>Manage your earnings and finances:</p>
+                    <ul>
+                        <li><strong>My Revenue:</strong> View your earnings summary</li>
+                        <li><strong>Order Summary:</strong> Track your order history and payments</li>
+                        <li><strong>Transaction History:</strong> View all financial transactions</li>
+                        <li><strong>Payout Management:</strong> Access withdrawal options</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Paramètre (Settings)</h4>
+                    <p>Configure your app preferences:</p>
+                    <ul>
+                        <li><strong>Notifications:</strong> Manage notification preferences</li>
+                        <li><strong>Languages:</strong> Change the application language</li>
+                        <li><strong>App Settings:</strong> Customize your app experience</li>
+                        <li><strong>Privacy Settings:</strong> Control your privacy options</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">5</span>À propos de l'application (About the Application)</h4>
+                    <p>Access important information:</p>
+                    <ul>
+                        <li><strong>Privacy Policy:</strong> Read the privacy policy</li>
+                        <li><strong>Terms of Use (CGU):</strong> Review terms and conditions</li>
+                        <li><strong>App Version:</strong> Check your app version</li>
+                        <li><strong>Legal Information:</strong> Access legal documents</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">6</span>Se plaindre (Complain/Report)</h4>
+                    <p>Report issues or provide feedback:</p>
+                    <ul>
+                        <li><strong>Submit Complaints:</strong> Report problems or concerns</li>
+                        <li><strong>Complaint History:</strong> View your previous reports</li>
+                        <li><strong>Support Access:</strong> Contact customer support</li>
+                        <li><strong>Feedback:</strong> Share your suggestions</li>
+                    </ul>
+                </div>
+
+                <h3>Bottom Navigation</h3>
+                <p>The profile icon in the bottom navigation is highlighted when you're on this screen, indicating your current location in the app. The navigation bar includes:</p>
+                <ul>
+                    <li><strong>Briefcase with $:</strong> Revenue/Dashboard</li>
+                    <li><strong>Calendar:</strong> Schedule/Bookings</li>
+                    <li><strong>Document/List:</strong> Orders/Details</li>
+                    <li><strong>Another Document:</strong> Additional features</li>
+                    <li><strong>Profile:</strong> Your account (currently active)</li>
+                </ul>
+
+                <div class="doc-info">
+                    <strong>Note:</strong> Keep your profile information up to date to ensure customers can contact you and view your services accurately. Regular updates help maintain your professional presence on the platform.
+                </div>
+            </section>
+
+            <!-- Salon Owner Portal Getting Started -->
+            <section id="salon-getting-started" class="doc-section">
+                <h1>Salon Owner Portal Documentation</h1>
+                <p>Welcome to the Skedisy Salon Owner Portal documentation. This comprehensive guide will help you understand and utilize all features of the web-based administrative dashboard, designed to help salon owners manage their business operations, staff, services, finances, and customer interactions efficiently.</p>
+
+                <div class="doc-toc">
+                    <h3>Table of Contents</h3>
+                    <ul>
+                        <li><a href="#salon-dashboard">Dashboard Overview</a></li>
+                        <li><a href="#salon-experts">Experts Management</a></li>
+                        <li><a href="#salon-reviews">Reviews</a></li>
+                        <li><a href="#salon-complaints">Complaints</a></li>
+                        <li><a href="#salon-attendance">Expert Attendance</a></li>
+                        <li><a href="#salon-orders">Orders</a></li>
+                        <li><a href="#salon-services">Services</a></li>
+                        <li><a href="#salon-products">Products</a></li>
+                        <li><a href="#salon-attributes">Attributes</a></li>
+                        <li><a href="#salon-time">Salon Time</a></li>
+                        <li><a href="#salon-holiday">Salon Holiday</a></li>
+                        <li><a href="#salon-wallet">Wallet</a></li>
+                        <li><a href="#salon-wallet-history">Wallet History</a></li>
+                        <li><a href="#salon-withdraw">Withdraw Money</a></li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Note:</strong> The Skedisy Salon Owner Portal is a comprehensive web-based dashboard that provides salon owners with complete control over their business operations, from managing staff and services to tracking finances and customer feedback.
+                </div>
+
+                <h3>Navigation Structure</h3>
+                <p>The portal features a left sidebar navigation with the following main sections:</p>
+                <ul>
+                    <li><strong>Menu:</strong> Dashboard access</li>
+                    <li><strong>Expert:</strong> Staff management, reviews, complaints, and attendance</li>
+                    <li><strong>Order:</strong> Order management</li>
+                    <li><strong>Services:</strong> Service catalog management</li>
+                    <li><strong>E-Commerce:</strong> Products and attributes</li>
+                    <li><strong>Finance:</strong> Wallet, withdrawals, and transaction history</li>
+                    <li><strong>Report:</strong> Salon time and holiday management</li>
+                </ul>
+            </section>
+
+            <!-- Salon Dashboard -->
+            <section id="salon-dashboard" class="doc-section">
+                <h2>Dashboard Overview</h2>
+                <p>The Dashboard is your main control center, providing a comprehensive overview of your salon's performance, key metrics, and business analytics.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-dashboard.png" alt="Skedisy Salon Owner Portal Dashboard">
+                    <div class="doc-image-caption">Dashboard - Overview with key metrics and analytics</div>
+                </div>
+
+                <h3>Header Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Welcome Message</h4>
+                    <p>The top of the dashboard displays a personalized welcome message: <strong>"Welcome back, Salon! 👋"</strong> with a friendly emoji.</p>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>User Profile</h4>
+                    <p>On the top right, you'll see:</p>
+                    <ul>
+                        <li>Your salon profile picture</li>
+                        <li>Salon name (e.g., "Solivans Hair")</li>
+                        <li>User type indicator ("Salon")</li>
+                    </ul>
+                </div>
+
+                <h3>Key Metrics Cards</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Dashboard Overview Cards</h4>
+                    <p>The dashboard displays four key metric cards:</p>
+                    <ul>
+                        <li><strong>TOTAL EXPERTS:</strong> Number of staff members (e.g., "7")</li>
+                        <li><strong>COMPLETED BOOKING:</strong> Total completed appointments (e.g., "2")</li>
+                        <li><strong>TOTAL REVENUE:</strong> Total earnings (e.g., "70.80 €")</li>
+                        <li><strong>SALES COMMISSION:</strong> Platform commission (e.g., "6.00 €")</li>
+                    </ul>
+                    <p>Each card includes a visual icon representing the metric type.</p>
+                </div>
+
+                <h3>Data Analysis Section</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Revenue and Booking Analytics</h4>
+                    <p>The "Data Analysis" section provides:</p>
+                    <ul>
+                        <li><strong>Graph Title:</strong> "SALON REVENUE AND BOOKING DATA"</li>
+                        <li><strong>Visual Chart:</strong> Line graph showing revenue trends over time</li>
+                        <li><strong>Y-Axis:</strong> Represents values (10, 15, 20, 25, 30)</li>
+                        <li><strong>Current Value Indicator:</strong> Horizontal line at the current value</li>
+                    </ul>
+                    <p>Use this graph to track your salon's performance trends and identify peak periods.</p>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Regularly review your dashboard metrics to understand your business performance and make data-driven decisions about staffing, pricing, and promotions.
+                </div>
+            </section>
+
+            <!-- Salon Experts -->
+            <section id="salon-experts" class="doc-section">
+                <h2>Experts Management</h2>
+                <p>The Experts section allows you to manage all your staff members, including adding new experts, viewing their details, setting commission rates, and managing their status.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-experts.png" alt="Skedisy Salon Owner Portal Experts Management">
+                    <div class="doc-image-caption">Experts Management - Staff listing with details and controls</div>
+                </div>
+
+                <h3>Header & Search</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Page Navigation</h4>
+                    <p>The page displays:</p>
+                    <ul>
+                        <li><strong>Breadcrumbs:</strong> "Dashboard > Experts"</li>
+                        <li><strong>Search Bar:</strong> "Searching for..." with magnifying glass icon to find specific experts</li>
+                    </ul>
+                </div>
+
+                <h3>Adding Experts</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Add New Expert</h4>
+                    <p>Click the <strong>"+ Add expert"</strong> button to:</p>
+                    <ul>
+                        <li>Create a new staff member profile</li>
+                        <li>Enter expert details (name, email, mobile, etc.)</li>
+                        <li>Set commission rates</li>
+                        <li>Upload profile image</li>
+                    </ul>
+                </div>
+
+                <h3>Experts Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Expert Information</h4>
+                    <p>The table displays the following columns for each expert:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Sequential number</li>
+                        <li><strong>IMAGE:</strong> Profile picture</li>
+                        <li><strong>NAME:</strong> Full name</li>
+                        <li><strong>EMAIL:</strong> Email address</li>
+                        <li><strong>MOBILE NO:</strong> Contact number</li>
+                        <li><strong>UNIQUE ID:</strong> System-generated identifier</li>
+                        <li><strong>COMMISSION:</strong> Commission percentage (sortable)</li>
+                        <li><strong>RATING:</strong> Average customer rating (sortable)</li>
+                        <li><strong>BLOCK:</strong> Toggle to block/unblock expert (sortable)</li>
+                        <li><strong>BOOKING:</strong> Icon to view booking details</li>
+                    </ul>
+                </div>
+
+                <h3>Managing Experts</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Expert Actions</h4>
+                    <p>For each expert, you can:</p>
+                    <ul>
+                        <li><strong>View Details:</strong> Click on the expert row to see full information</li>
+                        <li><strong>Block/Unblock:</strong> Toggle the block switch (red = blocked, green = active)</li>
+                        <li><strong>View Bookings:</strong> Click the booking icon to see all appointments</li>
+                        <li><strong>Edit Commission:</strong> Modify commission rates as needed</li>
+                    </ul>
+                </div>
+
+                <div class="doc-warning">
+                    <strong>Important:</strong> Blocking an expert will prevent them from receiving new bookings. Existing bookings will remain, but they won't appear in the booking system for new appointments.
+                </div>
+            </section>
+
+            <!-- Salon Reviews -->
+            <section id="salon-reviews" class="doc-section">
+                <h2>Reviews</h2>
+                <p>The Reviews section allows you to view and manage all customer reviews for your salon and individual experts.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-reviews.png" alt="Skedisy Salon Owner Portal Reviews">
+                    <div class="doc-image-caption">Reviews - Customer feedback and ratings</div>
+                </div>
+
+                <h3>Page Structure</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Navigation</h4>
+                    <p>The page displays breadcrumbs: <strong>"Dashboard > Reviews"</strong></p>
+                </div>
+
+                <h3>Reviews Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Review Information</h4>
+                    <p>Each review displays:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Sequential number</li>
+                        <li><strong>USER:</strong> Customer profile picture/avatar</li>
+                        <li><strong>REVIEW:</strong> Review text (e.g., "Bon Travaille. Service Impeccable. Je Recommande")</li>
+                        <li><strong>RATING:</strong> Star rating (1-5 stars, displayed in yellow)</li>
+                        <li><strong>USER:</strong> Customer name (e.g., "Brins Bfi")</li>
+                        <li><strong>BOOKINGID:</strong> Associated booking ID (e.g., "1770459")</li>
+                        <li><strong>EXPERT:</strong> Expert name who provided the service (e.g., "BRON WILL")</li>
+                        <li><strong>CREATED AT:</strong> Review date (e.g., "2025-10-23")</li>
+                    </ul>
+                </div>
+
+                <h3>Pagination</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Viewing Reviews</h4>
+                    <p>Use the pagination controls at the bottom to:</p>
+                    <ul>
+                        <li>Select number of reviews per page (default: 10)</li>
+                        <li>Navigate between pages</li>
+                        <li>View total review count</li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Regularly monitor reviews to understand customer satisfaction and identify areas for improvement. Respond to reviews when possible to show you value customer feedback.
+                </div>
+            </section>
+
+            <!-- Salon Complaints -->
+            <section id="salon-complaints" class="doc-section">
+                <h2>Complaints</h2>
+                <p>The Complaints section allows you to view and manage complaints from both customers (users) and experts (staff members).</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-complaints.png" alt="Skedisy Salon Owner Portal Complaints">
+                    <div class="doc-image-caption">Complaints - User and expert complaint management</div>
+                </div>
+
+                <h3>Complaint Types</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Filtering Complaints</h4>
+                    <p>The page provides two tabs:</p>
+                    <ul>
+                        <li><strong>"User complain":</strong> Complaints from customers (highlighted when selected)</li>
+                        <li><strong>"Expert complain":</strong> Complaints from staff members</li>
+                    </ul>
+                    <p>Switch between tabs to view different types of complaints.</p>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Complaint Type Filter</h4>
+                    <p>Use the <strong>"Complain type"</strong> dropdown to filter by:</p>
+                    <ul>
+                        <li><strong>"ALL":</strong> View all complaints</li>
+                        <li>Specific complaint categories</li>
+                    </ul>
+                </div>
+
+                <h3>Complaints Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Complaint Details</h4>
+                    <p>When complaints are available, the table displays:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Sequential number</li>
+                        <li><strong>IMAGE:</strong> Profile picture of complainant</li>
+                        <li><strong>BOOKINGID:</strong> Related booking ID</li>
+                        <li><strong>USER NAME:</strong> Name of the person filing the complaint</li>
+                        <li><strong>DETAILS:</strong> Complaint description</li>
+                        <li><strong>DATE:</strong> Date of complaint</li>
+                        <li><strong>TIME:</strong> Time of complaint</li>
+                        <li><strong>STATUS:</strong> Current status (pending, resolved, etc.)</li>
+                        <li><strong>INFO:</strong> Additional information or actions</li>
+                    </ul>
+                </div>
+
+                <div class="doc-warning">
+                    <strong>Important:</strong> Address complaints promptly to maintain customer satisfaction and staff morale. Use the INFO column to take appropriate actions or add notes.
+                </div>
+            </section>
+
+            <!-- Salon Attendance -->
+            <section id="salon-attendance" class="doc-section">
+                <h2>Expert Attendance</h2>
+                <p>The Expert Attendance section allows you to track staff attendance, view available days, absent days, and total working days for each expert.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-attendance.png" alt="Skedisy Salon Owner Portal Expert Attendance">
+                    <div class="doc-image-caption">Expert Attendance - Staff attendance tracking</div>
+                </div>
+
+                <h3>Month Selection</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Selecting Time Period</h4>
+                    <p>Use the <strong>"Select month"</strong> field to choose the month and year you want to view (e.g., "2026/02" for February 2026).</p>
+                </div>
+
+                <h3>Attendance Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Attendance Data</h4>
+                    <p>The table displays the following columns:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Sequential number</li>
+                        <li><strong>IMAGE:</strong> Expert profile picture</li>
+                        <li><strong>NAME:</strong> Expert name</li>
+                        <li><strong>MONTH YEAR:</strong> Selected month and year</li>
+                        <li><strong>AVAILABLE DAYS:</strong> Number of days the expert was available</li>
+                        <li><strong>ABSENT DAYS:</strong> Number of days the expert was absent</li>
+                        <li><strong>TOTAL DAYS:</strong> Total working days in the month</li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Use attendance data to identify patterns, plan schedules, and ensure adequate staffing during peak periods.
+                </div>
+            </section>
+
+            <!-- Salon Orders -->
+            <section id="salon-orders" class="doc-section">
+                <h2>Orders</h2>
+                <p>The Orders section allows you to view and manage all e-commerce orders placed through your salon's online store.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-orders.png" alt="Skedisy Salon Owner Portal Orders">
+                    <div class="doc-image-caption">Orders - E-commerce order management</div>
+                </div>
+
+                <h3>Order Filtering</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Filter by Order Type</h4>
+                    <p>Use the <strong>"Order type"</strong> dropdown to filter orders:</p>
+                    <ul>
+                        <li><strong>"All":</strong> View all orders</li>
+                        <li>Specific order types (pending, completed, cancelled, etc.)</li>
+                    </ul>
+                </div>
+
+                <h3>Orders Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Order Information</h4>
+                    <p>When orders are available, the table displays:</p>
+                    <ul>
+                        <li><strong>No:</strong> Sequential number</li>
+                        <li><strong>Order Id:</strong> Unique order identifier</li>
+                        <li><strong>User Info:</strong> Customer details</li>
+                        <li><strong>Items:</strong> Products ordered</li>
+                        <li><strong>Price:</strong> Order total</li>
+                        <li><strong>Shipping Charge:</strong> Shipping cost</li>
+                        <li><strong>Status:</strong> Order status (pending, processing, shipped, delivered, etc.)</li>
+                        <li><strong>Edit:</strong> Action to modify order details</li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Note:</strong> Orders are separate from service bookings. This section specifically manages product orders from your e-commerce store.
+                </div>
+            </section>
+
+            <!-- Salon Services -->
+            <section id="salon-services" class="doc-section">
+                <h2>Services</h2>
+                <p>The Services section allows you to manage your salon's service catalog, including selecting from admin services, editing existing services, and removing services.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-services.png" alt="Skedisy Salon Owner Portal Services">
+                    <div class="doc-image-caption">Services - Service catalog management</div>
+                </div>
+
+                <h3>Two-Panel Layout</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>SELECT ADMIN SERVICES (Left Panel)</h4>
+                    <p>The left panel displays available services from the admin catalog:</p>
+                    <ul>
+                        <li>Each service shows an icon, name, and duration</li>
+                        <li>Checkboxes allow you to select services to add</li>
+                        <li>Examples: "Hair coloring", "Scalp Treatment", "Basic Clen-up", "Chemical Peels"</li>
+                        <li>Scroll to see more available services</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>EDIT OUR SERVICES & REMOVE SERVICES (Right Panel)</h4>
+                    <p>The right panel shows your current salon services with editable fields:</p>
+                    <ul>
+                        <li><strong>Service Icon:</strong> Visual representation</li>
+                        <li><strong>Service Name:</strong> Editable text field (e.g., "Blow Dry &", "Haircut (M", "Facials")</li>
+                        <li><strong>Service Charge:</strong> Editable price field with currency symbol (e.g., "€ 15", "€ 30", "€ 50")</li>
+                        <li><strong>Service Duration:</strong> Editable duration in minutes (e.g., "30", "55")</li>
+                        <li><strong>Edit Button:</strong> Green pencil icon to save changes</li>
+                        <li><strong>Delete Button:</strong> Red trash icon to remove service</li>
+                    </ul>
+                </div>
+
+                <h3>Managing Services</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Adding Services</h4>
+                    <p>To add a new service:</p>
+                    <ol>
+                        <li>Browse the left panel for available services</li>
+                        <li>Check the box next to the service you want to add</li>
+                        <li>The service will be added to your catalog</li>
+                    </ol>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Editing Services</h4>
+                    <p>To modify an existing service:</p>
+                    <ol>
+                        <li>Find the service in the right panel</li>
+                        <li>Edit the name, charge, or duration fields</li>
+                        <li>Click the green Edit (pencil) icon to save changes</li>
+                    </ol>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">5</span>Removing Services</h4>
+                    <p>To remove a service:</p>
+                    <ol>
+                        <li>Find the service in the right panel</li>
+                        <li>Click the red Delete (trash) icon</li>
+                        <li>Confirm the deletion</li>
+                    </ol>
+                </div>
+
+                <div class="doc-warning">
+                    <strong>Note:</strong> Removing a service will prevent new bookings for that service. Existing bookings will remain, but customers won't be able to book it in the future.
+                </div>
+            </section>
+
+            <!-- Salon Products -->
+            <section id="salon-products" class="doc-section">
+                <h2>Products</h2>
+                <p>The Products section allows you to manage your e-commerce product catalog, including adding products, setting prices, managing inventory, and controlling product availability.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-products.png" alt="Skedisy Salon Owner Portal Products">
+                    <div class="doc-image-caption">Products - E-commerce product management</div>
+                </div>
+
+                <h3>Adding Products</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Create New Product</h4>
+                    <p>Click the <strong>"+ Add Products"</strong> button to:</p>
+                    <ul>
+                        <li>Create a new product entry</li>
+                        <li>Upload product images</li>
+                        <li>Set product details (name, brand, category, price, etc.)</li>
+                        <li>Configure shipping and availability</li>
+                    </ul>
+                </div>
+
+                <h3>Products Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Product Information</h4>
+                    <p>The table displays comprehensive product details:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Sequential number</li>
+                        <li><strong>PRODUCT CODE:</strong> Unique product identifier (e.g., "095615")</li>
+                        <li><strong>NAME:</strong> Product name (e.g., "Hair Masks & Deep Treatments")</li>
+                        <li><strong>BRAND:</strong> Brand name (e.g., "Savalnia HAIR Brand")</li>
+                        <li><strong>CATEGORY:</strong> Product category (e.g., "Hair Care")</li>
+                        <li><strong>IMAGE:</strong> Product thumbnail</li>
+                        <li><strong>PRICE:</strong> Selling price (e.g., "45")</li>
+                        <li><strong>MRP:</strong> Maximum Retail Price (e.g., "60")</li>
+                        <li><strong>SHIPPING CHARGES:</strong> Shipping cost (e.g., "7")</li>
+                        <li><strong>STATUS:</strong> Approval status (e.g., "Approved" in orange)</li>
+                        <li><strong>IS OUTOFSTOCK:</strong> Toggle switch (red = out of stock, green = in stock)</li>
+                        <li><strong>CITIES:</strong> Edit button to manage city availability</li>
+                    </ul>
+                </div>
+
+                <h3>Managing Products</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Product Actions</h4>
+                    <p>For each product, you can:</p>
+                    <ul>
+                        <li><strong>Edit Details:</strong> Modify product information</li>
+                        <li><strong>Toggle Stock:</strong> Mark products as in stock or out of stock</li>
+                        <li><strong>Manage Cities:</strong> Control which cities the product is available in</li>
+                        <li><strong>View Status:</strong> Check approval status</li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Keep product information up to date, especially stock status and pricing, to ensure accurate customer experience and prevent order issues.
+                </div>
+            </section>
+
+            <!-- Salon Attributes -->
+            <section id="salon-attributes" class="doc-section">
+                <h2>Attributes</h2>
+                <p>The Attributes section allows you to manage product attributes, which are used to categorize and filter products in your e-commerce store.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-attributes.png" alt="Skedisy Salon Owner Portal Attributes">
+                    <div class="doc-image-caption">Attributes - Product attribute management</div>
+                </div>
+
+                <h3>Adding Attributes</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Create New Attribute</h4>
+                    <p>Click the <strong>"+ Add Attribute"</strong> button to:</p>
+                    <ul>
+                        <li>Create a new product attribute</li>
+                        <li>Set attribute name</li>
+                        <li>Add attribute details/description</li>
+                    </ul>
+                </div>
+
+                <h3>Attributes Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Attribute Information</h4>
+                    <p>The table structure includes:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Sequential number</li>
+                        <li><strong>NAME:</strong> Attribute name</li>
+                        <li><strong>DETAILS:</strong> Attribute description</li>
+                        <li><strong>CREATED AT:</strong> Creation date</li>
+                        <li><strong>ACTION:</strong> Edit or delete options</li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Note:</strong> Attributes help organize your product catalog and make it easier for customers to find products. Examples include size, color, brand, or product type.
+                </div>
+            </section>
+
+            <!-- Salon Time -->
+            <section id="salon-time" class="doc-section">
+                <h2>Salon Time</h2>
+                <p>The Salon Time section allows you to manage your salon's operating hours and break times for each day of the week.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-time.png" alt="Skedisy Salon Owner Portal Salon Time">
+                    <div class="doc-image-caption">Salon Time - Operating hours and break time management</div>
+                </div>
+
+                <h3>Operating Hours Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Weekly Schedule</h4>
+                    <p>The table displays your salon's schedule for each day with the following columns:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Day number (1-7)</li>
+                        <li><strong>DAY:</strong> Day of the week (Monday through Sunday)</li>
+                        <li><strong>OPEN TIME:</strong> Salon opening time (e.g., "09:00 AM")</li>
+                        <li><strong>CLOSE TIME:</strong> Salon closing time (e.g., "10:00 PM", "09:00 PM")</li>
+                        <li><strong>SALON BREAK START TIME:</strong> Break start time (e.g., "01:30 PM" or "-" if no break)</li>
+                        <li><strong>SALON BREAK END TIME:</strong> Break end time (e.g., "02:30 PM" or "-" if no break)</li>
+                        <li><strong>EDIT:</strong> Blue pencil icon to modify the schedule</li>
+                    </ul>
+                </div>
+
+                <h3>Editing Schedule</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Modifying Hours</h4>
+                    <p>To change operating hours or break times:</p>
+                    <ol>
+                        <li>Click the Edit (pencil) icon for the desired day</li>
+                        <li>Update the opening time, closing time, or break times</li>
+                        <li>Save your changes</li>
+                    </ol>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Break Times</h4>
+                    <p>Break times are optional:</p>
+                    <ul>
+                        <li>If no break is needed, the break time columns show "-"</li>
+                        <li>Set break times for days when you need a lunch break or maintenance period</li>
+                        <li>During break times, no bookings will be available</li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Set accurate operating hours to ensure customers can only book during your available times. Regular break times help maintain service quality.
+                </div>
+            </section>
+
+            <!-- Salon Holiday -->
+            <section id="salon-holiday" class="doc-section">
+                <h2>Salon Holiday</h2>
+                <p>The Salon Holiday section allows you to manage holidays and special dates when your salon will be closed.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-holiday.png" alt="Skedisy Salon Owner Portal Salon Holiday">
+                    <div class="doc-image-caption">Salon Holiday - Holiday and closure management</div>
+                </div>
+
+                <h3>Holiday Management</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Adding Holidays</h4>
+                    <p>Click the <strong>"+ New holiday"</strong> button to:</p>
+                    <ul>
+                        <li>Add a new holiday date</li>
+                        <li>Set the reason for closure</li>
+                        <li>Block bookings for that date</li>
+                    </ul>
+                </div>
+
+                <h3>Holidays Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Holiday Information</h4>
+                    <p>The table displays:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Sequential number</li>
+                        <li><strong>DATE:</strong> Holiday date (e.g., "2026-01-27")</li>
+                        <li><strong>REASON:</strong> Reason for closure (e.g., "Out Of The Office")</li>
+                    </ul>
+                </div>
+
+                <h3>Filtering</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>View Options</h4>
+                    <p>Use the <strong>"ALL"</strong> filter button to:</p>
+                    <ul>
+                        <li>View all holidays</li>
+                        <li>Filter by specific criteria (if additional filters are available)</li>
+                    </ul>
+                </div>
+
+                <div class="doc-warning">
+                    <strong>Important:</strong> When you add a holiday, the salon will be closed on that date, and no new bookings will be accepted. Existing bookings may need to be rescheduled or cancelled.
+                </div>
+            </section>
+
+            <!-- Salon Wallet -->
+            <section id="salon-wallet" class="doc-section">
+                <h2>Wallet</h2>
+                <p>The Wallet section allows you to view your current balance, recharge your wallet, and understand minimum balance requirements for accepting bookings.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-wallet.png" alt="Skedisy Salon Owner Portal Wallet">
+                    <div class="doc-image-caption">Wallet - Balance and recharge management</div>
+                </div>
+
+                <h3>Wallet Balance</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Current Balance</h4>
+                    <p>The teal balance card displays:</p>
+                    <ul>
+                        <li><strong>"My Wallet Balance":</strong> Label at the top</li>
+                        <li><strong>Balance Amount:</strong> Current balance in large, bold text (e.g., "€ 121.25")</li>
+                        <li><strong>Visual Icon:</strong> Wallet or money symbol graphic</li>
+                    </ul>
+                </div>
+
+                <h3>Minimum Balance Requirement</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Balance Alert</h4>
+                    <p>A yellow alert box shows:</p>
+                    <ul>
+                        <li><strong>Minimum Required Balance:</strong> Amount needed (e.g., "€ 200.00")</li>
+                        <li><strong>Shortfall Message:</strong> How much you need to add (e.g., "You need to add at least € 78.75")</li>
+                        <li><strong>Purpose:</strong> "to accept bookings" - explains why the minimum is required</li>
+                    </ul>
+                </div>
+
+                <h3>Recharge Options</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Enter Amount</h4>
+                    <p>Use the <strong>"Enter Recharge Amount"</strong> field to:</p>
+                    <ul>
+                        <li>Type a custom amount</li>
+                        <li>Use the "€" button for currency formatting</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Quick Amount Selection</h4>
+                    <p>Click predefined amount buttons for quick recharge:</p>
+                    <ul>
+                        <li>€ 50, € 100, € 150, € 200, € 250, € 300, € 500</li>
+                        <li>Buttons are highlighted when selected</li>
+                    </ul>
+                </div>
+
+                <h3>Payment Methods</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">5</span>Select Payment Method</h4>
+                    <p>Choose your preferred payment method:</p>
+                    <ul>
+                        <li><strong>Stripe:</strong> Credit/debit card payments (green border, checkmark when selected)</li>
+                        <li><strong>MTN Mobile Money:</strong> Mobile money payments (grey border, checkbox when selected)</li>
+                    </ul>
+                </div>
+
+                <h3>Recharge Process</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">6</span>Completing Recharge</h4>
+                    <p>To recharge your wallet:</p>
+                    <ol>
+                        <li>Enter or select the recharge amount</li>
+                        <li>Choose your payment method</li>
+                        <li>Click <strong>"Recharge Wallet"</strong> button</li>
+                        <li>Complete the payment process</li>
+                        <li>Balance will be updated automatically after successful payment</li>
+                    </ol>
+                </div>
+
+                <h3>Wallet Instructions</h3>
+                <p>The page includes detailed instructions explaining:</p>
+                <ul>
+                    <li>How to recharge your wallet</li>
+                    <li>Payment method options (Stripe or MTN MoMo)</li>
+                    <li>Automatic credit after successful payment</li>
+                    <li>Minimum balance requirement for accepting bookings</li>
+                    <li>Commission fee considerations</li>
+                    <li>How to view transaction history</li>
+                </ul>
+
+                <div class="doc-info">
+                    <strong>Note:</strong> Your wallet balance must meet the minimum required amount plus commission fees to accept new bookings. Keep your wallet adequately funded to ensure uninterrupted service.
+                </div>
+            </section>
+
+            <!-- Salon Wallet History -->
+            <section id="salon-wallet-history" class="doc-section">
+                <h2>Wallet History</h2>
+                <p>The Wallet History section provides a detailed transaction log of all wallet activities, including recharges, commissions, and other financial transactions.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-wallet-history.png" alt="Skedisy Salon Owner Portal Wallet History">
+                    <div class="doc-image-caption">Wallet History - Transaction history and details</div>
+                </div>
+
+                <h3>Current Balance</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Balance Display</h4>
+                    <p>The top of the page shows:</p>
+                    <ul>
+                        <li><strong>"Current Wallet Balance:"</strong> Label</li>
+                        <li><strong>Balance Amount:</strong> Highlighted in green (e.g., "€ 121.25")</li>
+                    </ul>
+                </div>
+
+                <h3>Filtering Transactions</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Transaction Type Filter</h4>
+                    <p>Use the <strong>"Transaction Type"</strong> dropdown to filter:</p>
+                    <ul>
+                        <li><strong>"All":</strong> View all transactions</li>
+                        <li><strong>"Debit":</strong> View only deductions (commissions, fees)</li>
+                        <li><strong>"Credit":</strong> View only additions (recharges, refunds)</li>
+                    </ul>
+                </div>
+
+                <h3>Transactions Table</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Transaction Details</h4>
+                    <p>Each transaction displays:</p>
+                    <ul>
+                        <li><strong>NO:</strong> Sequential number</li>
+                        <li><strong>UNIQUEID:</strong> Unique transaction identifier (e.g., "#ZDPOFRNCB", "Ae79bd94-Dad9-4520-8ff9-E7fe3b13b3b3")</li>
+                        <li><strong>AMOUNT (€):</strong> Transaction amount</li>
+                        <li><strong>DATE:</strong> Transaction date (e.g., "2026-01-26", "2026-01-25")</li>
+                        <li><strong>TIME:</strong> Transaction time (e.g., "13:39 pm", "15:43 pm")</li>
+                        <li><strong>TRANSACTION TYPE:</strong> Color-coded button:
+                            <ul>
+                                <li><strong>Red "Debit":</strong> Money deducted (commissions, fees)</li>
+                                <li><strong>Green "Credit":</strong> Money added (recharges, refunds)</li>
+                            </ul>
+                        </li>
+                        <li><strong>TRANSACTION DETAILS:</strong> Description with icon:
+                            <ul>
+                                <li><strong>Red button with up arrow:</strong> "Platform Commission"</li>
+                                <li><strong>Green button with padlock:</strong> "Wallet Recharge"</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <h3>Understanding Transactions</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Transaction Types</h4>
+                    <p><strong>Debit Transactions:</strong></p>
+                    <ul>
+                        <li>Platform commissions deducted from bookings</li>
+                        <li>Service fees</li>
+                        <li>Other deductions</li>
+                    </ul>
+                    <p><strong>Credit Transactions:</strong></p>
+                    <ul>
+                        <li>Wallet recharges via Stripe or MTN MoMo</li>
+                        <li>Refunds</li>
+                        <li>Adjustments</li>
+                    </ul>
+                </div>
+
+                <div class="doc-info">
+                    <strong>Tip:</strong> Regularly review your wallet history to track your earnings, understand commission deductions, and monitor your financial activity. This helps with financial planning and identifying any discrepancies.
+                </div>
+            </section>
+
+            <!-- Salon Withdraw -->
+            <section id="salon-withdraw" class="doc-section">
+                <h2>Withdraw Money</h2>
+                <p>The Withdraw Money section allows you to transfer funds from your wallet to your registered payment account.</p>
+
+                <div class="doc-image-container">
+                    <img src="images/salon-withdraw.png" alt="Skedisy Salon Owner Portal Withdraw Money">
+                    <div class="doc-image-caption">Withdraw Money - Fund withdrawal management</div>
+                </div>
+
+                <h3>Available Balance</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">1</span>Balance Card</h4>
+                    <p>The teal balance card displays:</p>
+                    <ul>
+                        <li><strong>"My Available Balance":</strong> Label</li>
+                        <li><strong>Balance Amount:</strong> Current withdrawable balance in large, bold white text (e.g., "€ 0")</li>
+                        <li><strong>Visual Elements:</strong> Stylized currency symbols or coins</li>
+                    </ul>
+                </div>
+
+                <h3>Withdrawal Form</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">2</span>Payment Option</h4>
+                    <p>Select your withdrawal method using the <strong>"Select Payment Option"</strong> dropdown (e.g., "test3" or your registered payment method).</p>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">3</span>Payment Details</h4>
+                    <p>Enter payment information:</p>
+                    <ul>
+                        <li><strong>"Enter Your remove money from [Method] method":</strong> Account details or payment identifier</li>
+                        <li>This field varies based on your selected payment method</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">4</span>Withdrawal Amount</h4>
+                    <p>Enter the amount you want to withdraw:</p>
+                    <ul>
+                        <li>Use the <strong>"Enter Withdraw Amount"</strong> field</li>
+                        <li>Click the "€" button for currency formatting</li>
+                        <li>Note the maximum withdrawal amount limit shown in red text below the field</li>
+                    </ul>
+                </div>
+
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">5</span>Additional Information</h4>
+                    <p>The <strong>"Enter Your add more"</strong> field allows you to:</p>
+                    <ul>
+                        <li>Add notes or additional information</li>
+                        <li>Provide special instructions</li>
+                        <li>Include reference numbers if needed</li>
+                    </ul>
+                </div>
+
+                <h3>Submitting Withdrawal</h3>
+                <div class="doc-step">
+                    <h4><span class="doc-step-number">6</span>Complete Withdrawal</h4>
+                    <p>To withdraw funds:</p>
+                    <ol>
+                        <li>Select your payment option</li>
+                        <li>Enter payment method details</li>
+                        <li>Enter the withdrawal amount</li>
+                        <li>Add any additional information if needed</li>
+                        <li>Click the green <strong>"Submit"</strong> button</li>
+                        <li>Wait for processing confirmation</li>
+                    </ol>
+                </div>
+
+                <h3>Withdrawal Instructions</h3>
+                <p>The page includes detailed instructions covering:</p>
+                <ul>
+                    <li>Minimum withdrawal amount requirements</li>
+                    <li>Processing timeframes</li>
+                    <li>Fund transfer process</li>
+                    <li>Account verification requirements</li>
+                    <li>Support contact information</li>
+                </ul>
+
+                <div class="doc-warning">
+                    <strong>Important:</strong> Ensure your payment method details are correct before submitting. Withdrawal processing times vary by payment method. Contact support if you encounter any issues.
+                </div>
+            </section>
+
+            <!-- Footer Note -->
+            <div class="doc-section" style="margin-top: 80px; padding-top: 40px; border-top: 2px solid #e5e5e5;">
+                <p style="text-align: center; color: #666; font-size: 0.9rem;">
+                    This documentation is continuously updated. For the latest features and updates, please check back regularly or contact our support team.
+                </p>
+            </div>
+        </main>
     </div>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="doc-back-to-top" id="backToTop" title="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </a>
 
     <!-- Footer -->
     <footer class="footer">
@@ -177,6 +2592,65 @@
 
     <script src="cookie-consent.js"></script>
     <script src="script.js"></script>
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Update active state in sidebar
+                    document.querySelectorAll('.doc-sidebar a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Update active sidebar link on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.doc-section');
+            const sidebarLinks = document.querySelectorAll('.doc-sidebar a[href^="#"]');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
 </body>
 </html>
-
