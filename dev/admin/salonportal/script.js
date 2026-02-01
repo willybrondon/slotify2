@@ -406,13 +406,13 @@ function renderCategories(categories) {
     
     if (!desktopMenu || !mobileMenu) return;
     
-    // Desktop menu
+    // Desktop menu - add Documentation at the end with spacing
     desktopMenu.innerHTML = categories.map(category => {
         const slug = generateCategorySlug(category.name);
         const shortId = category._id.toString().substring(0, 6);
         const categoryUrl = `/category/${slug}-${shortId}`;
         return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
-    }).join('');
+    }).join('') + '<a href="documentation.html" class="category-link documentation-link">Documentation</a>';
     
     // Mobile menu
     mobileMenu.innerHTML = categories.map(category => {

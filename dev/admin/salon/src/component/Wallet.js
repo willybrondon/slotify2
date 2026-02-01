@@ -310,7 +310,7 @@ const Wallet = () => {
                         errorMessage = errorText || `Server error: ${response.status}`;
                     }
                     toast.error(errorMessage);
-                    setIsProcessing(false);
+                setIsProcessing(false);
                     return;
                 }
 
@@ -552,7 +552,7 @@ const Wallet = () => {
                                                         e.currentTarget.style.backgroundColor = "#ffffff";
                                                     }
                                                 }}
-                                            >
+                                >
                                                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                                                     {/* Payment Method Logo */}
                                                     <div
@@ -640,7 +640,7 @@ const Wallet = () => {
                                                     )}
                                                 </div>
                                             </div>
-                                        ))}
+                                    ))}
                                     </div>
                                 </div>
 

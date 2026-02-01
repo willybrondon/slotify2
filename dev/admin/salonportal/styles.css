@@ -81,6 +81,19 @@ html {
     color: #111;
 }
 
+/* Documentation link at end of categories - desktop */
+.nav-menu-center .documentation-link {
+    margin-left: 1.5rem;
+    font-weight: 700 !important;
+    border-left: 1px solid #e0e0e0;
+    padding-left: 1.5rem;
+}
+
+.nav-menu-center .documentation-link:hover {
+    background: #f5f5f5;
+    color: #111;
+}
+
 .nav-container {
     position: relative;
     max-width: 1200px;
@@ -328,6 +341,32 @@ html {
     text-decoration: none;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Mobile Documentation Link - styled like category links but bold */
+.mobile-documentation-link {
+    display: block !important;
+    text-decoration: none;
+    color: #111;
+    font-weight: 700 !important;
+    font-size: 1rem;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+    width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 3 !important;
+    text-align: left;
+}
+
+.mobile-documentation-link:hover {
+    background: #f5f5f5;
+    border-color: #111;
+    text-decoration: none;
 }
 
 /* AI Concierge Button in Mobile Menu - More Prominent */

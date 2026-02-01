@@ -616,10 +616,10 @@ const Setting = (props) => {
                           placeholder="Enter callback host (e.g., skedisy.com or api.skedisy.com)"
                           onChange={(e) => {
                             setMtnMomoCallbackHost(e.target.value);
-                            return setError({
-                              ...error,
+                              return setError({
+                                ...error,
                               mtnMomoCallbackHost: "",
-                            });
+                              });
                           }}
                         />
                         {error && (
