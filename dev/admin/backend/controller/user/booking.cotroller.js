@@ -312,9 +312,11 @@ L'équipe Skedisy`;
         }
       });
 
+      // Return simple message to customer (without price details)
+      // Detailed message with amounts is sent to salon owner via SMS/Email
       return res.status(200).send({
         status: false,
-        message: `Salon wallet balance is insufficient. Required: ${requiredBalance.toFixed(2)}, Current: ${salonWalletBalance.toFixed(2)}. Please recharge your wallet to accept bookings.`,
+        message: `Now the salon does not accept booking.`,
       });
     }
 
