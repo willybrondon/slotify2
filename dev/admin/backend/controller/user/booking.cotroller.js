@@ -27,6 +27,147 @@ if (process.env.SENDGRID_API_KEY) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 }
 
+// Language helper functions for localized messages
+const getLanguage = (req) => {
+  return req.body?.language || req.query?.language || 'en';
+};
+
+const getLocalizedMessages = (language = 'en') => {
+  const lang = language.toLowerCase() === 'fr' ? 'fr' : 'en';
+  
+  return {
+    // Customer messages - Salon insufficient wallet
+    salonCannotAcceptBooking: {
+      en: "The salon cannot accept the booking for now. Please retry later.",
+      fr: "Le salon ne peut pas accepter la réservation pour le moment. Veuillez réessayer plus tard."
+    },
+    
+    // Customer messages - Customer insufficient wallet
+    customerInsufficientWallet: {
+      en: "You cannot book because you don't have enough money in your wallet for booking. Please recharge your wallet to continue.",
+      fr: "Vous ne pouvez pas réserver car vous n'avez pas assez d'argent dans votre portefeuille pour la réservation. Veuillez recharger votre portefeuille pour continuer."
+    },
+    
+    // Salon owner SMS - Insufficient wallet
+    salonOwnerSMSAlert: {
+      en: "⚠️ ALERT: Insufficient Wallet Balance!\n\nSomeone tried to book a service at your salon \"{salonName}\" but your salon cannot accept new bookings because your wallet balance is insufficient.\n\nCurrent Balance: {currencySymbol}{currentBalance}\nRequired Balance: {currencySymbol}{requiredBalance}\n\nPlease recharge your wallet from your salon dashboard to continue accepting bookings.\n\nThank you,\nSkedisy Team",
+      fr: "⚠️ ALERTE: Solde de portefeuille insuffisant!\n\nQuelqu'un a essayé de réserver un service dans votre salon \"{salonName}\" mais votre salon ne peut pas accepter de nouvelles réservations car votre solde de portefeuille est insuffisant.\n\nSolde actuel: {currencySymbol}{currentBalance}\nSolde requis: {currencySymbol}{requiredBalance}\n\nVeuillez recharger votre portefeuille depuis votre tableau de bord salon pour continuer à accepter des réservations.\n\nMerci,\nL'équipe Skedisy"
+    },
+    
+    // Salon owner Email - Subject
+    salonOwnerEmailSubject: {
+      en: "⚠️ Alert: Insufficient Wallet Balance - {salonName}",
+      fr: "⚠️ Alerte: Solde de portefeuille insuffisant - {salonName}"
+    },
+    
+    // Salon owner Email - Content
+    salonOwnerEmailTitle: {
+      en: "⚠️ Alert: Insufficient Wallet Balance",
+      fr: "⚠️ Alerte: Solde de Portefeuille Insuffisant"
+    },
+    
+    salonOwnerEmailGreeting: {
+      en: "Dear Salon Owner,",
+      fr: "Cher propriétaire de salon,"
+    },
+    
+    salonOwnerEmailMessage: {
+      en: "Someone tried to book a service at your salon <strong>\"{salonName}\"</strong> but your salon cannot currently accept new bookings because your wallet balance is insufficient.",
+      fr: "Quelqu'un a essayé de réserver un service dans votre salon <strong>\"{salonName}\"</strong> mais votre salon ne peut actuellement pas accepter de nouvelles réservations car votre solde de portefeuille est insuffisant."
+    },
+    
+    salonOwnerEmailBalanceDetails: {
+      en: "Balance Details:",
+      fr: "Détails du solde:"
+    },
+    
+    salonOwnerEmailCurrentBalance: {
+      en: "Current Balance:",
+      fr: "Solde actuel:"
+    },
+    
+    salonOwnerEmailRequiredBalance: {
+      en: "Required Balance:",
+      fr: "Solde requis:"
+    },
+    
+    salonOwnerEmailDeficit: {
+      en: "Deficit:",
+      fr: "Déficit:"
+    },
+    
+    salonOwnerEmailRechargeMessage: {
+      en: "To continue accepting bookings, please recharge your wallet from your salon dashboard.",
+      fr: "Pour continuer à accepter des réservations, veuillez recharger votre portefeuille depuis votre tableau de bord salon."
+    },
+    
+    salonOwnerEmailRechargeButton: {
+      en: "Recharge My Wallet",
+      fr: "Recharger mon portefeuille"
+    },
+    
+    salonOwnerEmailNeedHelp: {
+      en: "Need Help?",
+      fr: "Besoin d'aide?"
+    },
+    
+    salonOwnerEmailWebsite: {
+      en: "Website:",
+      fr: "Site web:"
+    },
+    
+    salonOwnerEmailEmail: {
+      en: "Email:",
+      fr: "Email:"
+    },
+    
+    salonOwnerEmailPhone: {
+      en: "Phone:",
+      fr: "Téléphone:"
+    },
+    
+    salonOwnerEmailFooter: {
+      en: "Best regards,<br>Skedisy Team",
+      fr: "Cordialement,<br>L'équipe Skedisy"
+    },
+    
+    // Customer Email - Subject
+    customerEmailSubject: {
+      en: "Booking Alert - Insufficient Wallet Balance",
+      fr: "Alerte de réservation - Solde de portefeuille insuffisant"
+    },
+    
+    // Customer Email - Content
+    customerEmailTitle: {
+      en: "Booking Alert",
+      fr: "Alerte de réservation"
+    },
+    
+    customerEmailGreeting: {
+      en: "Dear Customer,",
+      fr: "Cher client,"
+    },
+    
+    customerEmailFooter: {
+      en: "Best regards,<br>Skedisy Team",
+      fr: "Cordialement,<br>L'équipe Skedisy"
+    }
+  };
+};
+
+const getMessage = (key, language = 'en', replacements = {}) => {
+  const messages = getLocalizedMessages(language);
+  const lang = language.toLowerCase() === 'fr' ? 'fr' : 'en';
+  let message = messages[key]?.[lang] || messages[key]?.['en'] || '';
+  
+  // Replace placeholders
+  Object.keys(replacements).forEach(placeholder => {
+    message = message.replace(new RegExp(`{${placeholder}}`, 'g'), replacements[placeholder]);
+  });
+  
+  return message;
+};
+
 exports.getBookingBasedDate = async (req, res) => {
   try {
     // Validate required parameters
@@ -173,6 +314,9 @@ exports.newBooking = async (req, res, next) => {
       return res.status(200).send({ status: false, message: "Salon not found" });
     }
 
+    // Get user language preference (from request or default to 'en')
+    const userLanguage = getLanguage(req);
+    
     // Check salon wallet balance before allowing booking
     const setting = await Setting.findOne().sort({ createdAt: -1 });
     const minSalonWalletBalance = setting?.minSalonWalletBalance || 0;
@@ -203,24 +347,21 @@ exports.newBooking = async (req, res, next) => {
     if (salonWalletBalance < requiredBalance) {
       // Send SMS and Email notification to salon owner about insufficient wallet balance
       // Use setImmediate to send notifications asynchronously without blocking the response
+      // Note: Salon owner messages use user's language (or default to 'en')
       setImmediate(async () => {
         try {
           const currencySymbol = global.settingJSON?.currencySymbol || "";
+          const salonLanguage = userLanguage; // Use customer's language for salon notifications
           
           // SMS Notification
           if (salon.mobile && salon.mobile.trim() !== "") {
             try {
-              const smsMessage = `⚠️ ALERTE: Votre solde de portefeuille est insuffisant!
-
-Votre salon "${salon.name}" ne peut pas accepter de nouvelles réservations.
-
-Solde actuel: ${currencySymbol}${salonWalletBalance.toFixed(2)}
-Solde requis: ${currencySymbol}${requiredBalance.toFixed(2)}
-
-Veuillez recharger votre portefeuille depuis votre tableau de bord salon pour continuer à accepter des réservations.
-
-Merci,
-L'équipe Skedisy`;
+              const smsMessage = getMessage('salonOwnerSMSAlert', salonLanguage, {
+                salonName: salon.name,
+                currencySymbol: currencySymbol,
+                currentBalance: salonWalletBalance.toFixed(2),
+                requiredBalance: requiredBalance.toFixed(2)
+              });
 
               const smsResult = await sendSMS(salon.mobile, smsMessage);
               if (smsResult.success) {
@@ -242,7 +383,7 @@ L'équipe Skedisy`;
 
               const emailHtml = `
               <!DOCTYPE html>
-              <html lang="fr">
+              <html lang="${salonLanguage}">
               <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -260,33 +401,33 @@ L'équipe Skedisy`;
               </head>
               <body>
                 <div class="container">
-                  <h2>⚠️ Alerte: Solde de Portefeuille Insuffisant</h2>
+                  <h2>${getMessage('salonOwnerEmailTitle', salonLanguage)}</h2>
                   
                   <div class="alert-box">
-                    <p><strong>Cher propriétaire de salon,</strong></p>
-                    <p>Votre salon <strong>"${salon.name}"</strong> ne peut actuellement pas accepter de nouvelles réservations car votre solde de portefeuille est insuffisant.</p>
+                    <p><strong>${getMessage('salonOwnerEmailGreeting', salonLanguage)}</strong></p>
+                    <p>${getMessage('salonOwnerEmailMessage', salonLanguage, { salonName: salon.name })}</p>
                   </div>
 
                   <div class="info-box">
-                    <p><strong>Détails du solde:</strong></p>
-                    <p>Solde actuel: <strong>${currencySymbol}${salonWalletBalance.toFixed(2)}</strong></p>
-                    <p>Solde requis: <strong>${currencySymbol}${requiredBalance.toFixed(2)}</strong></p>
-                    <p>Déficit: <strong>${currencySymbol}${(requiredBalance - salonWalletBalance).toFixed(2)}</strong></p>
+                    <p><strong>${getMessage('salonOwnerEmailBalanceDetails', salonLanguage)}</strong></p>
+                    <p>${getMessage('salonOwnerEmailCurrentBalance', salonLanguage)} <strong>${currencySymbol}${salonWalletBalance.toFixed(2)}</strong></p>
+                    <p>${getMessage('salonOwnerEmailRequiredBalance', salonLanguage)} <strong>${currencySymbol}${requiredBalance.toFixed(2)}</strong></p>
+                    <p>${getMessage('salonOwnerEmailDeficit', salonLanguage)} <strong>${currencySymbol}${(requiredBalance - salonWalletBalance).toFixed(2)}</strong></p>
                   </div>
 
-                  <p>Pour continuer à accepter des réservations, veuillez recharger votre portefeuille depuis votre tableau de bord salon.</p>
+                  <p>${getMessage('salonOwnerEmailRechargeMessage', salonLanguage)}</p>
                   
-                  <a href="${websiteLink}/salonpanel/wallet" class="button">Recharger mon portefeuille</a>
+                  <a href="${websiteLink}/salonpanel/wallet" class="button">${getMessage('salonOwnerEmailRechargeButton', salonLanguage)}</a>
 
                   <div class="info-box">
-                    <p><strong>Besoin d'aide?</strong></p>
-                    <p>Site web: <a href="${websiteLink}" style="color: #007bff; text-decoration: none;">${websiteLink}</a></p>
-                    <p>Email: <a href="mailto:${supportEmail}" style="color: #007bff; text-decoration: none;">${supportEmail}</a></p>
-                    <p>Téléphone: <a href="tel:${contactNumber}" style="color: #007bff; text-decoration: none;">${contactNumber}</a></p>
+                    <p><strong>${getMessage('salonOwnerEmailNeedHelp', salonLanguage)}</strong></p>
+                    <p>${getMessage('salonOwnerEmailWebsite', salonLanguage)} <a href="${websiteLink}" style="color: #007bff; text-decoration: none;">${websiteLink}</a></p>
+                    <p>${getMessage('salonOwnerEmailEmail', salonLanguage)} <a href="mailto:${supportEmail}" style="color: #007bff; text-decoration: none;">${supportEmail}</a></p>
+                    <p>${getMessage('salonOwnerEmailPhone', salonLanguage)} <a href="tel:${contactNumber}" style="color: #007bff; text-decoration: none;">${contactNumber}</a></p>
                   </div>
                   
                   <div class="footer">
-                    <p>Cordialement,<br>L'équipe Skedisy</p>
+                    <p>${getMessage('salonOwnerEmailFooter', salonLanguage)}</p>
                   </div>
                 </div>
               </body>
@@ -296,7 +437,7 @@ L'équipe Skedisy`;
               const msg = {
                 to: salon.email.trim(),
                 from: process.env.EMAIL || "noreply@skedisy.com",
-                subject: `⚠️ Alerte: Solde de Portefeuille Insuffisant - ${salon.name}`,
+                subject: getMessage('salonOwnerEmailSubject', salonLanguage, { salonName: salon.name }),
                 html: emailHtml,
               };
 
@@ -316,7 +457,7 @@ L'équipe Skedisy`;
       // Detailed message with amounts is sent to salon owner via SMS/Email
       return res.status(200).send({
         status: false,
-        message: `Now the salon does not accept booking.`,
+        message: getMessage('salonCannotAcceptBooking', userLanguage),
       });
     }
 
@@ -338,18 +479,7 @@ L'équipe Skedisy`;
           // SMS Notification
           if (user.mobile && user.mobile.trim() !== "") {
             try {
-              const smsMessage = `⚠️ ALERTE: Votre solde de portefeuille est insuffisant!
-
-Vous ne pouvez pas finaliser votre réservation car votre solde de portefeuille est insuffisant.
-
-Solde actuel: ${currencySymbol}${userWalletBalance.toFixed(2)}
-Solde requis: ${currencySymbol}${requiredCustomerBalance.toFixed(2)}
-Détails: Réservation (${currencySymbol}${parseFloat(req.body.amount || 0).toFixed(2)}) + Commission (${currencySymbol}${expectedCustomerCommission.toFixed(2)}) + Minimum (${currencySymbol}${minUserWalletBalance.toFixed(2)})
-
-Veuillez recharger votre portefeuille depuis l'application pour continuer à effectuer des réservations.
-
-Merci,
-L'équipe Skedisy`;
+              const smsMessage = getMessage('customerInsufficientWallet', userLanguage);
 
               const smsResult = await sendSMS(user.mobile, smsMessage);
               if (smsResult.success) {
@@ -371,7 +501,7 @@ L'équipe Skedisy`;
 
               const emailHtml = `
               <!DOCTYPE html>
-              <html lang="fr">
+              <html lang="${userLanguage}">
               <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -380,41 +510,20 @@ L'équipe Skedisy`;
                   .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
                   h2 { color: #d32f2f; }
                   .alert-box { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0; }
-                  .info-box { background-color: #f0f8ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
-                  .info-box p { margin: 8px 0; }
-                  .button { display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                  .button:hover { background-color: #0056b3; }
                   .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9em; }
                 </style>
               </head>
               <body>
                 <div class="container">
-                  <h2>⚠️ Alerte: Solde de Portefeuille Insuffisant</h2>
+                  <h2>${getMessage('customerEmailTitle', userLanguage)}</h2>
                   
                   <div class="alert-box">
-                    <p><strong>Cher client,</strong></p>
-                    <p>Vous ne pouvez actuellement pas finaliser votre réservation car votre solde de portefeuille est insuffisant.</p>
-                  </div>
-
-                  <div class="info-box">
-                    <p><strong>Détails du solde:</strong></p>
-                    <p>Solde actuel: <strong>${currencySymbol}${userWalletBalance.toFixed(2)}</strong></p>
-                    <p>Solde requis: <strong>${currencySymbol}${requiredCustomerBalance.toFixed(2)}</strong></p>
-                    <p>Détails: Montant réservation (${currencySymbol}${estimatedBookingAmount.toFixed(2)}) + Commission (${currencySymbol}${expectedCustomerCommission.toFixed(2)}) + Minimum requis (${currencySymbol}${minUserWalletBalance.toFixed(2)})</p>
-                    <p>Déficit: <strong>${currencySymbol}${deficit.toFixed(2)}</strong></p>
-                  </div>
-
-                  <p>Pour continuer à effectuer des réservations, veuillez recharger votre portefeuille depuis l'application.</p>
-                  
-                  <div class="info-box">
-                    <p><strong>Besoin d'aide?</strong></p>
-                    <p>Site web: <a href="${websiteLink}" style="color: #007bff; text-decoration: none;">${websiteLink}</a></p>
-                    <p>Email: <a href="mailto:${supportEmail}" style="color: #007bff; text-decoration: none;">${supportEmail}</a></p>
-                    <p>Téléphone: <a href="tel:${contactNumber}" style="color: #007bff; text-decoration: none;">${contactNumber}</a></p>
+                    <p><strong>${getMessage('customerEmailGreeting', userLanguage)}</strong></p>
+                    <p>${getMessage('customerInsufficientWallet', userLanguage)}</p>
                   </div>
                   
                   <div class="footer">
-                    <p>Cordialement,<br>L'équipe Skedisy</p>
+                    <p>${getMessage('customerEmailFooter', userLanguage)}</p>
                   </div>
                 </div>
               </body>
@@ -424,7 +533,7 @@ L'équipe Skedisy`;
               const msg = {
                 to: user.email.trim(),
                 from: process.env.EMAIL || "noreply@skedisy.com",
-                subject: `⚠️ Alerte: Solde de Portefeuille Insuffisant - Réservation Non Finalisée`,
+                subject: getMessage('customerEmailSubject', userLanguage),
                 html: emailHtml,
               };
 
@@ -441,7 +550,7 @@ L'équipe Skedisy`;
 
       return res.status(200).send({
         status: false,
-        message: `Insufficient wallet balance. You need ${currencySymbol}${requiredCustomerBalance.toFixed(2)} (booking: ${currencySymbol}${parseFloat(req.body.amount || 0).toFixed(2)} + commission: ${currencySymbol}${expectedCustomerCommission.toFixed(2)} + minimum: ${currencySymbol}${minUserWalletBalance.toFixed(2)}). Your current balance is ${currencySymbol}${userWalletBalance.toFixed(2)}. Please recharge your wallet.`,
+        message: getMessage('customerInsufficientWallet', userLanguage),
         insufficientWallet: true, // Flag to identify this specific error in frontend
         currentBalance: userWalletBalance,
         requiredBalance: requiredCustomerBalance,
