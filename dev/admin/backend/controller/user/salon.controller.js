@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const Review = require("../../models/review.model");
@@ -310,12 +311,18 @@ exports.salonData = async (req, res) => {
         salonId: salon._id,
         isBlock: false,
         isDelete: false,
-      }).select("fname lname image review reviewCount serviceId"),
+      }).select("fname lname image review reviewCount serviceId").populate({
+        path: "serviceId",
+        select: "name nameEn nameFr namePt duration categoryId image",
+        populate: {
+          path: "categoryId",
+          select: "name nameEn nameFr namePt image"
+        }
+      }),
       Product.aggregate([
         { $match: { 
-          createStatus: "Approved"
-          // Temporarily remove salon filter to see all products
-          // salon: salon._id // Filter products by salon ID (ObjectId)
+          createStatus: "Approved",
+          salon: new mongoose.Types.ObjectId(salon._id)
         } },
         {
           $project: {
