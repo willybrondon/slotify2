@@ -131,13 +131,12 @@ class PaymentMethodView extends StatelessWidget {
         ? Column(
             children: [
               const PaymentTitleView(),
-              // Only show enabled payment methods for wallet recharge
-              // Razorpay and Flutterwave are not available for wallet recharge
+              // Only show Stripe and MTN MoMo for wallet recharge (same as profile/wallet/add money)
+              // Razorpay, Flutterwave, and Cash on Hand are not available for wallet recharge
               if (isStripeEnabled) const PaymentStripeView(),
               if (isMtnMomoEnabled) ...[
                 const PaymentMtnMomoView(),
-                // Show phone number input for MTN MoMo wallet recharge (same as normal payment)
-                // Always show when MTN MoMo is enabled for wallet recharge, so user can enter phone number
+                // Show phone number input for MTN MoMo wallet recharge
                 const MtnMomoPhoneNumberInput(),
               ],
               // Show message if no payment methods are enabled
