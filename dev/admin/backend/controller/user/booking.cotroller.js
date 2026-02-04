@@ -329,10 +329,13 @@ exports.newBooking = async (req, res, next) => {
     const customerCommissionPercent = setting?.customerCommissionCharges || 0;
 
     // Calculate expected commission for this booking (will be calculated again later, but need early check)
-    const services = req.body.serviceId.split(",");
+    const services = req.body.serviceId.split(",").map(s => s.trim());
     const servicesDataForCheck = await Service.find({ _id: { $in: services } });
+    // Convert service IDs to strings for proper comparison
+    const serviceIdStrings = services.map(id => id.toString());
     const matchedServicesForCheck = salon.serviceIds.filter((service) => {
-      return services.toString().includes(service.id?._id);
+      // Convert ObjectId to string and check if it's in the requested services array
+      return service.id && service.id._id && serviceIdStrings.includes(service.id._id.toString());
     });
     let totalServicePriceForCheck = 0;
     matchedServicesForCheck.forEach((service) => {
@@ -578,8 +581,13 @@ exports.newBooking = async (req, res, next) => {
       });
     }
 
-    // services is already declared above (line 161) for wallet check, reuse it
-    const expertServices = services.every((service) => expert.serviceId.includes(service.trim()));
+    // services is already declared above (line 332) for wallet check, reuse it
+    // Convert expert.serviceId (ObjectIds) to strings for comparison
+    const expertServiceIdStrings = expert.serviceId.map(id => id.toString());
+    const expertServices = services.every((service) => {
+      const serviceIdStr = service.trim();
+      return expertServiceIdStrings.includes(serviceIdStr);
+    });
 
     if (!expertServices) {
       return res.status(200).send({
@@ -640,8 +648,10 @@ exports.newBooking = async (req, res, next) => {
 
     const servicesData = await Service.find({ _id: { $in: services } });
 
+    // Convert service IDs to strings for proper comparison (serviceIdStrings is already defined above)
     const matchedServices = salon.serviceIds.filter((service) => {
-      return services.toString().includes(service.id?._id);
+      // Convert ObjectId to string and check if it's in the requested services array
+      return service.id && service.id._id && serviceIdStrings.includes(service.id._id.toString());
     });
 
     let totalServicePrice = 0;
@@ -1098,9 +1108,13 @@ exports.checkSlots = async (req, res, next) => {
       });
     }
 
-    const services = req.body.serviceId.split(",");
-
-    const expertServices = services.every((service) => expert.serviceId.includes(service.trim()));
+    const services = req.body.serviceId.split(",").map(s => s.trim());
+    
+    // Convert expert.serviceId (ObjectIds) to strings for comparison
+    const expertServiceIdStrings = expert.serviceId.map(id => id.toString());
+    const expertServices = services.every((service) => {
+      return expertServiceIdStrings.includes(service);
+    });
 
     if (!expertServices) {
       return res.status(200).send({
@@ -1146,8 +1160,11 @@ exports.checkSlots = async (req, res, next) => {
 
     const servicesData = await Service.find({ _id: { $in: services } });
 
+    // Convert service IDs to strings for proper comparison
+    const serviceIdStringsForCheck = services.map(id => id.toString());
     const matchedServices = salon.serviceIds.filter((service) => {
-      return services.toString().includes(service.id?._id);
+      // Convert ObjectId to string and check if it's in the requested services array
+      return service.id && service.id._id && serviceIdStringsForCheck.includes(service.id._id.toString());
     });
 
     let totalServicePrice = 0;

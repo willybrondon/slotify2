@@ -232,12 +232,13 @@ exports.salonData = async (req, res) => {
     console.log("Salon Data API - Received city:", city);
     console.log("Salon Data API - Query params:", req.query);
 
-    if (!city) {
-      return res.status(200).json({
-        status: false,
-        message: "City is required in query parameters.",
-      });
-    }
+    // City is optional - don't block API if not provided
+    // if (!city) {
+    //   return res.status(200).json({
+    //     status: false,
+    //     message: "City is required in query parameters.",
+    //   });
+    // }
 
     if (!req.query.salonId) {
       return res.status(200).send({ status: false, message: "Invalid salon details." });
@@ -291,11 +292,25 @@ exports.salonData = async (req, res) => {
       allowCities: s.allowCities?.map(ac => ac.city)
     })));
 
-    // Show all services for the salon regardless of city filtering
-    // This ensures all services are displayed as requested
-    let finalServices = salon.serviceIds;
+    // Filter out services where the populated service (id) is null/undefined
+    // This happens when service references are invalid (deleted services)
+    // Preserve the original structure but ensure all fields are present
+    let finalServices = salon.serviceIds
+      .filter(service => {
+        // Keep service if id exists and is not null (valid service reference)
+        return service.id && service.id._id;
+      })
+      .map(service => {
+        // Ensure all required fields are present with defaults
+        return {
+          id: service.id,
+          price: service.price !== null && service.price !== undefined ? service.price : 0,
+          allowCities: service.allowCities || [],
+          _id: service._id || service.id._id
+        };
+      });
     
-    console.log("Salon Data API - Showing all services for salon:", finalServices.length);
+    console.log("Salon Data API - Valid services (after filtering null):", finalServices.length);
     console.log("Salon Data API - Service names:", finalServices.map(s => s.id?.name));
 
     console.log("Salon Data API - Fetching products for salon ID:", salon._id.toString());
@@ -366,32 +381,48 @@ exports.salonData = async (req, res) => {
       return res.status(200).send({ status: false, message: "Tax settings not found." });
     }
 
+    // Convert salon to plain object and ensure serviceIds are properly set
     let salonData = salon.toObject();
+    
+    // Replace serviceIds with filtered and formatted services
+    salonData.serviceIds = finalServices;
+    
+    // Add distance if coordinates are provided
     if (req.query.latitude && req.query.longitude) {
       const device1 = {
         latitude: parseFloat(req.query.latitude),
         longitude: parseFloat(req.query.longitude),
       };
       const device2 = {
-        latitude: parseFloat(salon.locationCoordinates.latitude),
-        longitude: parseFloat(salon.locationCoordinates.longitude),
+        latitude: parseFloat(salon.locationCoordinates.latitude || 0),
+        longitude: parseFloat(salon.locationCoordinates.longitude || 0),
       };
-      const distanceInKilometers = geolib.getDistance(device1, device2) / 1000;
-
-      salonData = { ...salonData, distance: distanceInKilometers };
+      
+      if (device2.latitude && device2.longitude) {
+        const distanceInKilometers = geolib.getDistance(device1, device2) / 1000;
+        salonData.distance = distanceInKilometers;
+      }
     }
 
-    salonData.serviceIds = finalServices;
-
-    return res.status(200).json({
+    // Ensure all required fields are present in the response
+    const responseData = {
       status: true,
       message: "Success",
-      salon: salonData,
-      product,
-      reviews,
-      experts,
-      tax,
-    });
+      salon: {
+        ...salonData,
+        serviceIds: finalServices, // Ensure services are included
+      },
+      product: product || [],
+      reviews: reviews || [],
+      experts: experts || [],
+      tax: tax || 0,
+    };
+
+    console.log("Salon Data API - Final response - Services count:", responseData.salon.serviceIds.length);
+    console.log("Salon Data API - Final response - Experts count:", responseData.experts.length);
+    console.log("Salon Data API - Final response - Products count:", responseData.product.length);
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error(error);
     return res.status(500).json({
