@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="cookie-consent.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="language.js" defer></script>
     <style>
         .documentation-wrapper {
             display: flex;
@@ -323,14 +324,18 @@
             <!-- Desktop Categories Menu -->
             <div class="nav-menu-center desktop-only" id="categoriesMenu">
                 <!-- Categories will be loaded dynamically -->
+                <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
+                <!-- Language Switcher - Desktop -->
+                <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>English</span>
+                </button>
             </div>
-            <!-- Desktop Right Menu (Documentation and Login) -->
-            <!-- <div class="nav-right desktop-only">
-                <a href="documentation.html" class="nav-link-right">Documentation</a>
-                <a href="https://skedisy.com/salonpanel/" class="btn-login-right">Login</a>
-            </div> -->
             <!-- Mobile Menu - Hamburger positioned where login button was -->
             <div class="mobile-menu-wrapper">
+                <!-- Language Switcher - Mobile (before hamburger) -->
+                <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>EN</span>
+                </button>
                 <div class="hamburger mobile-only" id="mobileMenuToggle">
                     <span></span>
                     <span></span>
@@ -342,17 +347,17 @@
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
-                <h3>Menu</h3>
+                <h3 data-translate="nav.menu">Menu</h3>
                 <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
             </div>
             <div class="mobile-menu-content">
                 <!-- Mobile Login Button -->
-                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu">Login</a>
+                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Login</a>
                 <!-- Mobile Documentation Link -->
-                <a href="documentation.html" class="btn-documentation-mobile-menu">Documentation</a>
+                <a href="documentation.html" class="btn-documentation-mobile-menu" data-translate="nav.documentation">Documentation</a>
                 <!-- AI Concierge Button - More Prominent -->
                 <a href="ai-concierge.html" class="btn-ai-concierge-mobile">
-                    <i class="fas fa-robot"></i> AI Concierge
+                    <i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span>
                 </a>
                 <div class="mobile-categories" id="mobileCategories">
                     <!-- Categories will be loaded dynamically -->

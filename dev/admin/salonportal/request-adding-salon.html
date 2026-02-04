@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="language.js" defer></script>
     <style>
         .salon-request-container {
             max-width: 800px;
@@ -149,6 +150,22 @@
             </div>
             <div class="nav-menu-center desktop-only" id="categoriesMenu">
                 <!-- Categories will be loaded dynamically -->
+                <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
+                <!-- Language Switcher - Desktop -->
+                <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>English</span>
+                </button>
+            </div>
+            <div class="mobile-menu-wrapper">
+                <!-- Language Switcher - Mobile -->
+                <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>EN</span>
+                </button>
+                <div class="hamburger mobile-only" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </div>
     </nav>

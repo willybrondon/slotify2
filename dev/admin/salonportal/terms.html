@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="language.js" defer></script>
     <style>
         .terms-container {
             max-width: 800px;
@@ -116,14 +117,29 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <h2>Skedisy</h2>
+                <a href="https://skedisy.com" style="text-decoration: none; color: inherit;">
+                    <h2>Skedisy</h2>
+                </a>
             </div>
-            <div class="hamburger mobile-hide">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="nav-menu-center desktop-only">
+                <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
+                <!-- Language Switcher - Desktop -->
+                <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>English</span>
+                </button>
             </div>
-            <a href="https://skedisy.com/salonpanel" class="btn-login-mobile">Login</a>
+            <div class="mobile-menu-wrapper">
+                <!-- Language Switcher - Mobile -->
+                <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>EN</span>
+                </button>
+                <div class="hamburger mobile-hide">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <a href="https://skedisy.com/salonpanel" class="btn-login-mobile" data-translate="nav.login">Login</a>
         </div>
     </nav>
 

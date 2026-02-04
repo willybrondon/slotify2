@@ -387,6 +387,45 @@ exports.salonData = async (req, res) => {
     // Replace serviceIds with filtered and formatted services
     salonData.serviceIds = finalServices;
     
+    // Ensure addressDetails is properly formatted (not null) with all required fields
+    if (!salonData.addressDetails || typeof salonData.addressDetails !== 'object') {
+      salonData.addressDetails = {
+        addressLine1: "",
+        landMark: "",
+        city: "",
+        state: "",
+        country: ""
+      };
+    } else {
+      // Ensure all address fields exist, defaulting to empty string if null/undefined
+      salonData.addressDetails = {
+        addressLine1: salonData.addressDetails.addressLine1 || "",
+        landMark: salonData.addressDetails.landMark || "",
+        city: salonData.addressDetails.city || "",
+        state: salonData.addressDetails.state || "",
+        country: salonData.addressDetails.country || ""
+      };
+    }
+    
+    // Ensure locationCoordinates is properly formatted
+    if (!salonData.locationCoordinates || typeof salonData.locationCoordinates !== 'object') {
+      salonData.locationCoordinates = {
+        latitude: "",
+        longitude: ""
+      };
+    } else {
+      salonData.locationCoordinates = {
+        latitude: salonData.locationCoordinates.latitude || "",
+        longitude: salonData.locationCoordinates.longitude || ""
+      };
+    }
+    
+    // Ensure mainImage is always a string (not null)
+    salonData.mainImage = salonData.mainImage || salonData.heroImage || (salonData.image && salonData.image.length > 0 ? salonData.image[0] : "") || "";
+    
+    // Ensure image array is always present (not null)
+    salonData.image = Array.isArray(salonData.image) ? salonData.image : [];
+    
     // Add distance if coordinates are provided
     if (req.query.latitude && req.query.longitude) {
       const device1 = {
@@ -394,8 +433,8 @@ exports.salonData = async (req, res) => {
         longitude: parseFloat(req.query.longitude),
       };
       const device2 = {
-        latitude: parseFloat(salon.locationCoordinates.latitude || 0),
-        longitude: parseFloat(salon.locationCoordinates.longitude || 0),
+        latitude: parseFloat(salonData.locationCoordinates.latitude || 0),
+        longitude: parseFloat(salonData.locationCoordinates.longitude || 0),
       };
       
       if (device2.latitude && device2.longitude) {
@@ -411,6 +450,10 @@ exports.salonData = async (req, res) => {
       salon: {
         ...salonData,
         serviceIds: finalServices, // Ensure services are included
+        addressDetails: salonData.addressDetails, // Ensure addressDetails is included
+        locationCoordinates: salonData.locationCoordinates, // Ensure locationCoordinates is included
+        mainImage: salonData.mainImage, // Ensure mainImage is included
+        image: salonData.image, // Ensure image array is included
       },
       product: product || [],
       reviews: reviews || [],
@@ -421,6 +464,9 @@ exports.salonData = async (req, res) => {
     console.log("Salon Data API - Final response - Services count:", responseData.salon.serviceIds.length);
     console.log("Salon Data API - Final response - Experts count:", responseData.experts.length);
     console.log("Salon Data API - Final response - Products count:", responseData.product.length);
+    console.log("Salon Data API - Address Details:", JSON.stringify(responseData.salon.addressDetails));
+    console.log("Salon Data API - Main Image:", responseData.salon.mainImage);
+    console.log("Salon Data API - Image Array Length:", responseData.salon.image?.length || 0);
 
     return res.status(200).json(responseData);
   } catch (error) {

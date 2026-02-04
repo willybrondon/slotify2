@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="language.js" defer></script>
     <style>
         .cookie-policy-container {
             max-width: 900px;
@@ -155,6 +156,19 @@
                 <a href="index.html" style="text-decoration: none; color: inherit;">
                     <h2>Skedisy</h2>
                 </a>
+            </div>
+            <div class="nav-menu-center desktop-only">
+                <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
+                <!-- Language Switcher - Desktop -->
+                <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>English</span>
+                </button>
+            </div>
+            <div class="mobile-menu-wrapper">
+                <!-- Language Switcher - Mobile -->
+                <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>EN</span>
+                </button>
             </div>
         </div>
     </nav>

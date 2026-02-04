@@ -94,6 +94,58 @@ html {
     color: #111;
 }
 
+/* Language Switcher Styles */
+.lang-switcher {
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #111;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    margin-left: 1rem;
+}
+
+.lang-switcher:hover {
+    background: #f5f5f5;
+    border-color: #d0d0d0;
+}
+
+.lang-switcher i {
+    font-size: 0.9rem;
+}
+
+/* Desktop Language Switcher */
+.lang-switcher.desktop-only {
+    margin-left: 1.5rem;
+    border-left: 1px solid #e0e0e0;
+    padding-left: 1.5rem;
+}
+
+/* Mobile Language Switcher */
+.lang-switcher.mobile-only {
+    margin-right: 0.5rem;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.lang-switcher.mobile-only span {
+    font-weight: 600;
+}
+
+.lang-switcher.mobile-only i {
+    font-size: 0.8rem;
+}
+
 .nav-container {
     position: relative;
     max-width: 1200px;
@@ -503,6 +555,16 @@ html {
     .mobile-menu-wrapper {
         display: flex !important;
         justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    /* Ensure mobile language switcher is visible */
+    .lang-switcher.mobile-only {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
         align-items: center;
         visibility: visible !important;
     }

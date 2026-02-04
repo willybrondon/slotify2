@@ -1,5 +1,11 @@
 // Navigation functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize language system (if language.js is loaded)
+    if (typeof setLanguage === 'function') {
+        const savedLang = localStorage.getItem('skedisy-language') || 'fr';
+        setLanguage(savedLang);
+    }
+    
     // Load categories
     loadCategories();
     

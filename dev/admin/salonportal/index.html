@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="cookie-consent.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="language.js" defer></script>
 </head>
 <body>
     <!-- Login Button Above QR Code -->
@@ -21,11 +22,11 @@
         <div class="qr-top-flex">
             <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
                 <div id="qr-customer-top"></div>
-                <div class="qr-label">Download Customer App</div>
+                <div class="qr-label" data-translate="qr.customerApp">Download Customer App</div>
             </div>
             <div class="qr-top-block" data-app-type="expert" onclick="openPhoneSelection('expert')">
                 <div id="qr-expert-top"></div>
-                <div class="qr-label">Download the Expert App</div>
+                <div class="qr-label" data-translate="qr.expertApp">Download the Expert App</div>
             </div>
         </div>
     </div>
@@ -40,10 +41,19 @@
             <!-- Desktop Categories Menu -->
             <div class="nav-menu-center desktop-only" id="categoriesMenu">
                 <!-- Categories will be loaded dynamically -->
-                <a href="ai-concierge.html" class="nav-link">AI Concierge</a>
+                <a href="ai-concierge.html" class="nav-link" data-translate="nav.aiConcierge">AI Concierge</a>
+                <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
+                <!-- Language Switcher - Desktop -->
+                <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>English</span>
+                </button>
             </div>
             <!-- Mobile Menu - Hamburger positioned where login button was -->
             <div class="mobile-menu-wrapper">
+                <!-- Language Switcher - Mobile (before hamburger) -->
+                <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>EN</span>
+                </button>
                 <div class="hamburger mobile-only" id="mobileMenuToggle">
                     <span></span>
                     <span></span>
@@ -55,17 +65,17 @@
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
-                <h3>Menu</h3>
+                <h3 data-translate="nav.menu">Menu</h3>
                 <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
             </div>
             <div class="mobile-menu-content">
                 <!-- Mobile Login Button -->
-                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu">Login</a>
+                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Login</a>
                 <!-- Mobile Documentation Link -->
-                <a href="documentation.html" class="mobile-documentation-link">Documentation</a>
+                <a href="documentation.html" class="mobile-documentation-link" data-translate="nav.documentation">Documentation</a>
                 <!-- AI Concierge Button - More Prominent -->
                 <a href="ai-concierge.html" class="btn-ai-concierge-mobile">
-                    <i class="fas fa-robot"></i> AI Concierge
+                    <i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span>
                 </a>
                 <div class="mobile-categories" id="mobileCategories">
                     <!-- Categories will be loaded dynamically -->
@@ -77,15 +87,15 @@
     <!-- Floating AI Concierge Button for Mobile -->
     <a href="ai-concierge.html" class="floating-ai-btn mobile-only" id="floatingAiBtn">
         <i class="fas fa-robot"></i>
-        <span>AI Concierge</span>
+        <span data-translate="nav.aiConcierge">AI Concierge</span>
     </a>
     
     <!-- Download App Button for Mobile -->
-    <a href="#" id="download-app-btn" class="download-app-btn" onclick="openPhoneSelection('customer'); return false;">Download the App</a>
+    <a href="#" id="download-app-btn" class="download-app-btn" onclick="openPhoneSelection('customer'); return false;" data-translate="modal.download">Download the App</a>
     <!-- Mobile Fixed Download Buttons (only visible on mobile) -->
     <div class="mobile-download-btns">
-      <a href="#" class="mobile-download-btn customer" onclick="openPhoneSelection('customer'); return false;">Download Customer App</a>
-      <a href="#" class="mobile-download-btn expert" onclick="openPhoneSelection('expert'); return false;">Download Expert App</a>
+      <a href="#" class="mobile-download-btn customer" onclick="openPhoneSelection('customer'); return false;" data-translate="qr.customerApp">Download Customer App</a>
+      <a href="#" class="mobile-download-btn expert" onclick="openPhoneSelection('expert'); return false;" data-translate="qr.expertApp">Download Expert App</a>
     </div>
     <!-- Hero Section -->
     <section class="hero">
@@ -94,32 +104,32 @@
                 <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Salon Management">
             </div>
             <div class="hero-content">
-                <h1>The #1 Platform to Manage Your Salon</h1>
-                <p class="hero-subtitle">
+                <h1 data-translate="hero.title">The #1 Platform to Manage Your Salon</h1>
+                <p class="hero-subtitle" data-translate-html="hero.subtitle">
                     <strong>50,000+ salons</strong> trust our beauty industry reference, used by <strong>10M+ users</strong> every month.
                 </p>
                 <div class="hero-buttons">
-                    <a href="#demo" class="btn-primary">Add My Salon</a>
+                    <a href="#demo" class="btn-primary" data-translate="hero.addSalon">Add My Salon</a>
                     <a href="ai-concierge.html" class="btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <i class="fas fa-robot"></i> Try AI Concierge
+                        <i class="fas fa-robot"></i> <span data-translate="hero.tryAI">Try AI Concierge</span>
                     </a>
                     <div class="trust-badge">
                         <i class="fas fa-star"></i>
-                        <span>4.8/5 on Trustpilot</span>
+                        <span data-translate="hero.trustBadge">4.8/5 on Trustpilot</span>
                     </div>
                 </div>
                 <div class="hero-features">
                     <div class="feature-item">
                         <i class="fas fa-calendar-alt"></i>
-                        <span>Booking management</span>
+                        <span data-translate="hero.bookingManagement">Booking management</span>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-credit-card"></i>
-                        <span>Simplified payments</span>
+                        <span data-translate="hero.simplifiedPayments">Simplified payments</span>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-shield-alt"></i>
-                        <span>No commitment</span>
+                        <span data-translate="hero.noCommitment">No commitment</span>
                     </div>
                 </div>
             </div>
@@ -132,13 +142,13 @@
             <div class="request-buttons-container">
                 <!-- Salon Owner Button -->
                 <div class="request-button-card">
-                    <h3>Would you like to integrate your salon on Skedisy platform?</h3>
-                    <a href="/request-adding-salon.html" class="btn-request">Make your Request</a>
+                    <h3 data-translate="request.salonTitle">Would you like to integrate your salon on Skedisy platform?</h3>
+                    <a href="/request-adding-salon.html" class="btn-request" data-translate="request.salonButton">Make your Request</a>
                 </div>
                 <!-- Customer Button -->
                 <div class="request-button-card">
-                    <h3>Would you like to book services from a salon?</h3>
-                    <a href="#" class="btn-request" onclick="openPhoneSelection('customer'); return false;">Book here</a>
+                    <h3 data-translate="request.customerTitle">Would you like to book services from a salon?</h3>
+                    <a href="#" class="btn-request" onclick="openPhoneSelection('customer'); return false;" data-translate="request.customerButton">Book here</a>
                 </div>
             </div>
         </div>
@@ -149,15 +159,15 @@
         <div class="stats-container">
             <div class="stat-item">
                 <h3>50,000+</h3>
-                <p>Professionals</p>
+                <p data-translate="stats.professionals">Professionals</p>
             </div>
             <div class="stat-item">
                 <h3>12M+</h3>
-                <p>Appointments managed monthly</p>
+                <p data-translate="stats.appointments">Appointments managed monthly</p>
             </div>
             <div class="stat-item">
                 <h3>50%</h3>
-                <p>Online bookings outside business hours</p>
+                <p data-translate="stats.onlineBookings">Online bookings outside business hours</p>
             </div>
         </div>
     </section>
@@ -166,12 +176,12 @@
     <section class="planity-features">
         <div class="container planity-features-flex">
             <div class="planity-feature-block">
-                <h2>Book Your Appointment Online</h2>
-                <p>Find your favorite salon and book your beauty appointment 24/7, instantly and easily. No more waiting on the phone—just a few clicks and your spot is reserved!</p>
+                <h2 data-translate="features.bookTitle">Book Your Appointment Online</h2>
+                <p data-translate="features.bookDesc">Find your favorite salon and book your beauty appointment 24/7, instantly and easily. No more waiting on the phone—just a few clicks and your spot is reserved!</p>
             </div>
             <div class="planity-feature-block">
-                <h2>Manage Your Salon Effortlessly</h2>
-                <p>Salon owners can manage bookings, staff, and schedules from anywhere. Simplify your daily operations and focus on what matters most: your clients.</p>
+                <h2 data-translate="features.manageTitle">Manage Your Salon Effortlessly</h2>
+                <p data-translate="features.manageDesc">Salon owners can manage bookings, staff, and schedules from anywhere. Simplify your daily operations and focus on what matters most: your clients.</p>
             </div>
         </div>
     </section>
@@ -180,14 +190,14 @@
     <section class="new-clients">
         <div class="container">
             <div class="clients-content">
-                <h2>New Clients.<br>Continuously.</h2>
-                <p>Some are looking for exactly your specialty. Some are new to the neighborhood. Some have decided to take care of themselves. Let them find their rare pearl: you.</p>
+                <h2 data-translate-html="clients.title">New Clients.<br>Continuously.</h2>
+                <p data-translate="clients.desc">Some are looking for exactly your specialty. Some are new to the neighborhood. Some have decided to take care of themselves. Let them find their rare pearl: you.</p>
                 <ul>
-                    <li>Showcase page for your establishment</li>
-                    <li>Certified client reviews</li>
-                    <li>Optimized Google ranking</li>
+                    <li data-translate="clients.showcase">Showcase page for your establishment</li>
+                    <li data-translate="clients.reviews">Certified client reviews</li>
+                    <li data-translate="clients.ranking">Optimized Google ranking</li>
                 </ul>
-                <a href="#demo" class="btn-secondary">Discover for Free</a>
+                <a href="#demo" class="btn-secondary" data-translate="clients.discover">Discover for Free</a>
             </div>
             <div class="clients-image">
                 <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Professional Stylist">
@@ -199,14 +209,14 @@
     <section class="pro-stats-section">
         <div class="container pro-stats-flex no-img">
             <div class="pro-stats-content">
-                <h2 class="pro-stats-title">Are you a beauty professional?<br>Discover online appointment booking!</h2>
+                <h2 class="pro-stats-title" data-translate-html="proStats.title">Are you a beauty professional?<br>Discover online appointment booking!</h2>
                 <div class="pro-stats-grid">
-                    <div class="pro-stats-cell"><span class="pro-stats-main">+ 50%</span><br><span class="pro-stats-desc">increase in frequency for online bookings</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">4x</span><br><span class="pro-stats-desc">fewer no-shows with SMS appointment reminders</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">50%</span><br><span class="pro-stats-desc">of online bookings made outside business hours</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">+50 000</span><br><span class="pro-stats-desc">Salons & institutes</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">5 RDV</span><br><span class="pro-stats-desc">Booked every second</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">&gt; 5 billion €</span><br><span class="pro-stats-desc">in appointments sold</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">+ 50%</span><br><span class="pro-stats-desc" data-translate="proStats.increase">increase in frequency for online bookings</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">4x</span><br><span class="pro-stats-desc" data-translate="proStats.noShows">fewer no-shows with SMS appointment reminders</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">50%</span><br><span class="pro-stats-desc" data-translate="proStats.outsideHours">of online bookings made outside business hours</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">+50 000</span><br><span class="pro-stats-desc" data-translate="proStats.salons">Salons & institutes</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">5 RDV</span><br><span class="pro-stats-desc" data-translate="proStats.booked">Booked every second</span></div>
+                    <div class="pro-stats-cell"><span class="pro-stats-main">&gt; 5 billion €</span><br><span class="pro-stats-desc" data-translate="proStats.sold">in appointments sold</span></div>
                 </div>
             </div>
         </div>
@@ -217,24 +227,24 @@
         <div class="container platform-features-flex">
             <div class="platform-feature-card">
                 <div class="platform-feature-icon">📅</div>
-                <h3>Manage</h3>
-                <p>Control every aspect of your business: bookings, sales, clients, locations, and team members. Analyze your business with detailed reports and statistics.</p>
+                <h3 data-translate="platform.manage">Manage</h3>
+                <p data-translate="platform.manageDesc">Control every aspect of your business: bookings, sales, clients, locations, and team members. Analyze your business with detailed reports and statistics.</p>
             </div>
             <div class="platform-feature-card">
                 <div class="platform-feature-icon">🚀</div>
-                <h3>Grow</h3>
-                <p>Attract new clients on the world’s largest beauty & wellness marketplace and keep them coming back with built-in marketing tools.</p>
+                <h3 data-translate="platform.grow">Grow</h3>
+                <p data-translate="platform.growDesc">Attract new clients on the world's largest beauty & wellness marketplace and keep them coming back with built-in marketing tools.</p>
                     </div>
             <div class="platform-feature-card">
                 <div class="platform-feature-icon">💳</div>
-                <h3>Get Paid</h3>
-                <p>Get paid quickly and securely with integrated payments, reduce no-shows with deposits, and simplify your checkout process.</p>
+                <h3 data-translate="platform.getPaid">Get Paid</h3>
+                <p data-translate="platform.getPaidDesc">Get paid quickly and securely with integrated payments, reduce no-shows with deposits, and simplify your checkout process.</p>
             </div>
             <div class="platform-feature-card" style="cursor: pointer;" onclick="window.location.href='ai-concierge.html'">
                 <div class="platform-feature-icon">🤖</div>
-                <h3>AI Beauty Concierge</h3>
-                <p>Get personalized beauty recommendations powered by AI. Upload your selfie and discover the perfect services for you.</p>
-                <a href="ai-concierge.html" style="color: #3498db; text-decoration: none; margin-top: 10px; display: inline-block;">Try Now →</a>
+                <h3 data-translate="platform.aiTitle">AI Beauty Concierge</h3>
+                <p data-translate="platform.aiDesc">Get personalized beauty recommendations powered by AI. Upload your selfie and discover the perfect services for you.</p>
+                <a href="ai-concierge.html" style="color: #3498db; text-decoration: none; margin-top: 10px; display: inline-block;" data-translate="platform.tryNow">Try Now →</a>
             </div>
         </div>
     </section>
@@ -243,9 +253,9 @@
     <section class="cta-section">
         <div class="container cta-flex">
             <div class="cta-content">
-                <h2>Ready to grow your business?</h2>
-                <p>Join thousands of professionals who trust SalonPortal to manage and grow their business. Start for free today!</p>
-                <a href="#" class="btn-primary cta-btn">Get Started</a>
+                <h2 data-translate="cta.ready">Ready to grow your business?</h2>
+                <p data-translate="cta.join">Join thousands of professionals who trust SalonPortal to manage and grow their business. Start for free today!</p>
+                <a href="#" class="btn-primary cta-btn" data-translate="cta.getStarted">Get Started</a>
             </div>
         </div>
     </section>
@@ -253,10 +263,10 @@
     <!-- FAQ Section -->
     <section class="faq">
         <div class="container">
-            <h2>Frequently Asked Questions</h2>
+            <h2 data-translate="faq.title">Frequently Asked Questions</h2>
             <div class="faq-grid">
                 <div class="faq-item collapsible">
-                    <h3>How to create a customer account on Skedisy?</h3>
+                    <h3 data-translate="faq.customerAccount">How to create a customer account on Skedisy?</h3>
                                          <div class="faq-content">
                          <ol>
                              <li>Download the Skedisy Customer App by scanning the QR code above.</li>
@@ -267,7 +277,7 @@
                      </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3>How to create a salon owner account?</h3>
+                    <h3 data-translate="faq.salonAccount">How to create a salon owner account?</h3>
                                          <div class="faq-content">
                          <ol>
                              <li>Download the Skedisy Customer App and sign up as a customer first.</li>
@@ -278,20 +288,20 @@
                      </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3>How does an expert get their credentials?</h3>
+                    <h3 data-translate="faq.expertCredentials">How does an expert get their credentials?</h3>
                                          <div class="faq-content">
                          <p>The salon owner creates expert accounts during salon registration. Each expert receives their login credentials from the salon owner.</p>
                      </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3>How to download the app?</h3>
+                    <h3 data-translate="faq.downloadApp">How to download the app?</h3>
                     <div class="faq-content">
                         <p>Simply scan the QR code above with your phone’s camera. You will be redirected to the download page for the app.</p>
 
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3>What is the difference between the Customer and Expert app?</h3>
+                    <h3 data-translate="faq.appDifference">What is the difference between the Customer and Expert app?</h3>
                     <div class="faq-content">
                         <ul>
                             <li><b>Customer App:</b> For booking appointments, managing your profile, and accessing salon services.</li>
@@ -301,7 +311,7 @@
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3>How does a customer book a service from a salon on the customer app?</h3>
+                    <h3 data-translate="faq.bookService">How does a customer book a service from a salon on the customer app?</h3>
                     <div class="faq-content">
                         <p><b>Booking from a Salon:</b></p>
                         <ol>
@@ -332,7 +342,7 @@
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3>How can an expert accept or refuse a reservation on the expert app?</h3>
+                    <h3 data-translate="faq.acceptReservation">How can an expert accept or refuse a reservation on the expert app?</h3>
                     <div class="faq-content">
                         <p><b>Viewing Reservations:</b></p>
                         <ol>
@@ -387,7 +397,7 @@
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3>How can a salon owner add a new expert, add services, and manage their business on the business owner platform?</h3>
+                    <h3 data-translate="faq.manageBusiness">How can a salon owner add a new expert, add services, and manage their business on the business owner platform?</h3>
                     <div class="faq-content">
                         <p><b>Adding a New Expert:</b></p>
                         <ol>
@@ -462,9 +472,9 @@
                 </div>
                 <!-- Keep a couple of the original FAQ items for completeness -->
                 <div class="faq-item collapsible">
-                    <h3>Will SalonPortal bring me new clients?</h3>
+                    <h3 data-translate="faq.newClients">Will SalonPortal bring me new clients?</h3>
                     <div class="faq-content">
-                        <p>Your salon will be visible to our 10 million monthly users and listed on search networks like Google to easily find your establishment. Verified reviews from your previous appointments will encourage visitors to book simply, without fees.</p>
+                        <p data-translate="faq.newClientsDesc">Your salon will be visible to our 10 million monthly users and listed on search networks like Google to easily find your establishment. Verified reviews from your previous appointments will encourage visitors to book simply, without fees.</p>
                     </div>
                 </div>
             </div>
@@ -475,9 +485,9 @@
     <section class="cta">
         <div class="container">
             <div class="cta-content">
-                <h2>10,000,000</h2>
-                <p>10 million people book a beauty appointment every month on SalonPortal. Take care of them.</p>
-                <a href="#demo" class="btn-primary">Discover for Free</a>
+                <h2 data-translate="cta.million">10,000,000</h2>
+                <p data-translate="cta.millionDesc">10 million people book a beauty appointment every month on SalonPortal. Take care of them.</p>
+                <a href="#demo" class="btn-primary" data-translate="clients.discover">Discover for Free</a>
             </div>
         </div>
     </section>
@@ -485,8 +495,8 @@
     <!-- Final CTA -->
     <section class="final-cta">
         <div class="container">
-            <h2>More than 50,000 professionals have transformed their days with SalonPortal. Join them.</h2>
-            <a href="#demo" class="btn-primary">Discover for Free</a>
+            <h2 data-translate="cta.final">More than 50,000 professionals have transformed their days with SalonPortal. Join them.</h2>
+            <a href="#demo" class="btn-primary" data-translate="clients.discover">Discover for Free</a>
         </div>
     </section>
 
@@ -496,43 +506,43 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Skedisy</h3>
-                    <p>Transform your salon management with our all-in-one solution.</p>
+                    <p data-translate="footer.tagline">Transform your salon management with our all-in-one solution.</p>
                     <div class="contact-info">
                         <p><i class="fas fa-envelope"></i> support@skedisy.com</p>
                         <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
                     </div>
                 </div>
                 <div class="footer-section">
-                    <h4>About</h4>
+                    <h4 data-translate="footer.about">About</h4>
                     <ul>
-                        <li><a href="#">My Skedisy Account</a></li>
-                        <li><a href="#">Sign Up</a></li>
-                        <li><a href="#">Pricing</a></li>
-                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#" data-translate="footer.myAccount">My Skedisy Account</a></li>
+                        <li><a href="#" data-translate="footer.signUp">Sign Up</a></li>
+                        <li><a href="#" data-translate="footer.pricing">Pricing</a></li>
+                        <li><a href="#" data-translate="footer.helpCenter">Help Center</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Our Solutions</h4>
+                    <h4 data-translate="footer.solutions">Our Solutions</h4>
                     <ul>
-                        <li><a href="#">24/7 Online Booking</a></li>
-                        <li><a href="#">Calendar Management</a></li>
-                        <li><a href="#">Certified POS</a></li>
-                        <li><a href="#">Payment Terminal</a></li>
-                        <li><a href="#">Work Time Management</a></li>
-                        <li><a href="#">Marketing Solutions</a></li>
+                        <li><a href="#" data-translate="footer.onlineBooking">24/7 Online Booking</a></li>
+                        <li><a href="#" data-translate="footer.calendar">Calendar Management</a></li>
+                        <li><a href="#" data-translate="footer.pos">Certified POS</a></li>
+                        <li><a href="#" data-translate="footer.payment">Payment Terminal</a></li>
+                        <li><a href="#" data-translate="footer.workTime">Work Time Management</a></li>
+                        <li><a href="#" data-translate="footer.marketing">Marketing Solutions</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                                                <h4>Legal</h4>
-                            <ul>
-                                <li><a href="terms.html">Terms of Service</a></li>
-                                <li><a href="privacy.html">Privacy Policy</a></li>
-                                <li><a href="cookies.html" id="cookie-management-link">Cookie Management</a></li>
-                            </ul>
+                    <h4 data-translate="footer.legal">Legal</h4>
+                    <ul>
+                        <li><a href="terms.html" data-translate="footer.terms">Terms of Service</a></li>
+                        <li><a href="privacy.html" data-translate="footer.privacy">Privacy Policy</a></li>
+                        <li><a href="cookies.html" id="cookie-management-link" data-translate="footer.cookies">Cookie Management</a></li>
+                    </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Skedisy. All rights reserved.</p>
+                <p data-translate="footer.rights">&copy; 2024 Skedisy. All rights reserved.</p>
                 <p style="margin-top: 10px; font-size: 0.9rem;">
                     <a href="/sitemap.xml" style="color: #999; text-decoration: none;">Sitemap</a> | 
                     <a href="/robots.txt" style="color: #999; text-decoration: none;">Robots.txt</a>
@@ -545,29 +555,29 @@
     <div id="phone-selection-modal" class="modal">
         <div class="modal-content phone-selection">
             <span class="close">&times;</span>
-            <h2 id="modal-title">Choose Your Platform</h2>
-            <p id="modal-description">Select your device to download the app</p>
+                    <h2 id="modal-title" data-translate="modal.choosePlatform">Choose Your Platform</h2>
+                    <p id="modal-description" data-translate="modal.selectDevice">Select your device to download the app</p>
             <div class="phone-options">
                 <div class="phone-option" data-platform="android">
                     <div class="store-logo">
                         <i class="fab fa-google-play"></i>
                     </div>
-                    <h3>Android</h3>
-                    <p>Download from Google Play Store</p>
+                    <h3 data-translate="modal.android">Android</h3>
+                    <p data-translate="modal.downloadAndroid">Download from Google Play Store</p>
                     <div class="download-link" id="android-link">
                         <i class="fas fa-download"></i>
-                        <span>Download</span>
+                        <span data-translate="modal.download">Download</span>
                     </div>
                 </div>
                 <div class="phone-option" data-platform="ios">
                     <div class="store-logo">
                         <i class="fab fa-apple"></i>
                     </div>
-                    <h3>iPhone</h3>
-                    <p>Download from App Store</p>
+                    <h3 data-translate="modal.iphone">iPhone</h3>
+                    <p data-translate="modal.downloadIOS">Download from App Store</p>
                     <div class="download-link" id="ios-link">
                         <i class="fas fa-download"></i>
-                        <span>Download</span>
+                        <span data-translate="modal.download">Download</span>
                     </div>
                 </div>
             </div>
@@ -578,14 +588,14 @@
     <div id="demo" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Request a Demo</h2>
-            <p>Send your request to: <a href="mailto:support@skedisy.com" style="color: #3498db; text-decoration: none; font-weight: 600;">support@skedisy.com</a></p>
-            <p>Please include the following information in your email:</p>
+            <h2 data-translate="modal.requestDemo">Request a Demo</h2>
+            <p data-translate="modal.sendRequest">Send your request to: <a href="mailto:support@skedisy.com" style="color: #3498db; text-decoration: none; font-weight: 600;">support@skedisy.com</a></p>
+            <p data-translate="modal.includeInfo">Please include the following information in your email:</p>
             <ul style="text-align: left; display: inline-block; margin: 20px 0; padding-left: 20px; color: #666; line-height: 1.8;">
-                <li>Manager Name</li>
-                <li>Phone Number</li>
-                <li>Email Address</li>
-                <li>Type of Establishment?</li>
+                <li data-translate="modal.managerName">Manager Name</li>
+                <li data-translate="modal.phoneNumber">Phone Number</li>
+                <li data-translate="modal.emailAddress">Email Address</li>
+                <li data-translate="modal.establishmentType">Type of Establishment?</li>
             </ul>
         </div>
     </div>
