@@ -317,12 +317,41 @@ exports.salonData = async (req, res) => {
         return true;
       })
       .map(service => {
+        // Convert ObjectIds to strings for proper JSON serialization
+        const serviceId = service.id;
+        const categoryId = serviceId.categoryId;
+        
+        // Build the service object with all required fields, converting ObjectIds to strings
+        const serviceObject = {
+          _id: serviceId._id ? String(serviceId._id) : null,
+          name: serviceId.name || "",
+          nameEn: serviceId.nameEn || "",
+          nameFr: serviceId.nameFr || "",
+          namePt: serviceId.namePt || "",
+          duration: serviceId.duration || 0,
+          status: serviceId.status !== undefined ? serviceId.status : true,
+          isDelete: serviceId.isDelete !== undefined ? serviceId.isDelete : false,
+          image: serviceId.image || "",
+          categoryId: categoryId ? (categoryId._id ? String(categoryId._id) : String(categoryId)) : null,
+          createdAt: serviceId.createdAt ? serviceId.createdAt.toISOString() : null,
+          updatedAt: serviceId.updatedAt ? serviceId.updatedAt.toISOString() : null,
+        };
+        
+        // If categoryId is populated as an object, include category details
+        if (categoryId && typeof categoryId === 'object' && categoryId._id) {
+          serviceObject.categoryId = String(categoryId._id);
+          // Optionally include category name if needed
+          if (categoryId.name) {
+            serviceObject.categoryName = categoryId.name;
+          }
+        }
+        
         // Ensure all required fields are present with defaults
         return {
-          id: service.id,
+          id: serviceObject,
           price: service.price !== null && service.price !== undefined ? service.price : 0,
           allowCities: service.allowCities || [],
-          _id: service._id || service.id._id
+          _id: service._id ? String(service._id) : String(service.id._id)
         };
       });
     
@@ -480,21 +509,75 @@ exports.salonData = async (req, res) => {
       }
     }
 
+    // Convert all ObjectIds to strings for proper JSON serialization
+    // This is critical for the Flutter app to parse the response correctly
+    const salonResponse = {
+      ...salonResponseData,
+      _id: salonResponseData._id ? String(salonResponseData._id) : null,
+      serviceIds: finalServices, // Ensure services are included
+      addressDetails: salonResponseData.addressDetails, // Ensure addressDetails is included
+      locationCoordinates: salonResponseData.locationCoordinates, // Ensure locationCoordinates is included
+      mainImage: salonResponseData.mainImage, // Ensure mainImage is included
+      image: salonResponseData.image, // Ensure image array is included
+    };
+    
+    // Convert experts ObjectIds to strings
+    // Experts are already populated, so we need to handle them carefully
+    const expertsData = (experts || []).map(expert => {
+      const expertObj = expert.toObject ? expert.toObject() : expert;
+      // Handle serviceId - it might be an array of service objects or ObjectIds
+      let serviceIdArray = [];
+      if (Array.isArray(expertObj.serviceId)) {
+        serviceIdArray = expertObj.serviceId.map(sid => {
+          if (typeof sid === 'object' && sid._id) {
+            return String(sid._id);
+          }
+          return String(sid);
+        });
+      } else if (expertObj.serviceId) {
+        serviceIdArray = [String(expertObj.serviceId)];
+      }
+      
+      return {
+        ...expertObj,
+        _id: expertObj._id ? String(expertObj._id) : null,
+        salonId: expertObj.salonId ? String(expertObj.salonId) : null,
+        serviceId: serviceIdArray,
+        userId: expertObj.userId ? String(expertObj.userId) : null,
+      };
+    });
+    
+    // Convert reviews ObjectIds to strings
+    const reviewsData = (reviews || []).map(review => {
+      const reviewObj = review.toObject ? review.toObject() : review;
+      const userIdObj = reviewObj.userId;
+      return {
+        ...reviewObj,
+        _id: reviewObj._id ? String(reviewObj._id) : null,
+        salonId: reviewObj.salonId ? String(reviewObj.salonId) : null,
+        userId: userIdObj ? (userIdObj._id ? String(userIdObj._id) : (typeof userIdObj === 'string' ? userIdObj : String(userIdObj))) : null,
+        expertId: reviewObj.expertId ? String(reviewObj.expertId) : null,
+      };
+    });
+    
+    // Convert products ObjectIds to strings
+    const productsData = (product || []).map(prod => {
+      return {
+        ...prod,
+        _id: prod._id ? String(prod._id) : null,
+        salon: prod.salon ? String(prod.salon) : null,
+        category: prod.category ? String(prod.category) : null,
+      };
+    });
+
     // Ensure all required fields are present in the response
     const responseData = {
       status: true,
       message: "Success",
-      salon: {
-        ...salonResponseData,
-        serviceIds: finalServices, // Ensure services are included
-        addressDetails: salonResponseData.addressDetails, // Ensure addressDetails is included
-        locationCoordinates: salonResponseData.locationCoordinates, // Ensure locationCoordinates is included
-        mainImage: salonResponseData.mainImage, // Ensure mainImage is included
-        image: salonResponseData.image, // Ensure image array is included
-      },
-      product: product || [],
-      reviews: reviews || [],
-      experts: experts || [],
+      salon: salonResponse,
+      product: productsData,
+      reviews: reviewsData,
+      experts: expertsData,
       tax: tax || 0,
     };
 
@@ -504,17 +587,28 @@ exports.salonData = async (req, res) => {
     console.log("Salon Data API - Address Details:", JSON.stringify(responseData.salon.addressDetails));
     console.log("Salon Data API - Main Image:", responseData.salon.mainImage);
     console.log("Salon Data API - Image Array Length:", responseData.salon.image?.length || 0);
-    console.log("Salon Data API - Service IDs in response:", responseData.salon.serviceIds.map(s => ({ 
+    console.log("Salon Data API - Salon _id:", responseData.salon._id);
+    console.log("Salon Data API - Service IDs in response:", JSON.stringify(responseData.salon.serviceIds.map(s => ({ 
       serviceId: s.id?._id, 
       serviceName: s.id?.name,
-      price: s.price 
-    })));
+      price: s.price,
+      categoryId: s.id?.categoryId
+    })), null, 2));
+    console.log("Salon Data API - First service structure:", JSON.stringify(responseData.salon.serviceIds[0], null, 2));
 
     // Final validation - ensure critical fields are not null
     if (!responseData.salon.addressDetails || 
         responseData.salon.addressDetails.addressLine1 === null ||
         responseData.salon.addressDetails.city === null) {
       console.warn("Salon Data API - WARNING: Address details still contain null values!");
+    }
+    
+    // Validate service structure
+    if (responseData.salon.serviceIds.length > 0) {
+      const firstService = responseData.salon.serviceIds[0];
+      if (!firstService.id || !firstService.id._id) {
+        console.error("Salon Data API - ERROR: Service structure is invalid! Service:", JSON.stringify(firstService, null, 2));
+      }
     }
 
     return res.status(200).json(responseData);
