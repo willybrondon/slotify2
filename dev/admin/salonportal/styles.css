@@ -94,6 +94,28 @@ html {
     color: #111;
 }
 
+/* Language switcher in nav-menu-center - desktop */
+.nav-menu-center .lang-switcher.desktop-only {
+    margin-left: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #111;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+}
+
+.nav-menu-center .lang-switcher.desktop-only:hover {
+    background: #f5f5f5;
+    border-color: #d0d0d0;
+}
+
 /* Language Switcher Styles */
 .lang-switcher {
     background: transparent;
@@ -121,26 +143,54 @@ html {
     font-size: 0.9rem;
 }
 
-/* Desktop Language Switcher */
-.lang-switcher.desktop-only {
-    margin-left: 0;
+/* Desktop Language Switcher in nav-menu-center */
+.nav-menu-center .lang-switcher.desktop-only {
+    margin-left: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #111;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
 }
 
-/* Mobile Language Switcher */
-.lang-switcher.mobile-only {
+.nav-menu-center .lang-switcher.desktop-only:hover {
+    background: #f5f5f5;
+    border-color: #d0d0d0;
+}
+
+/* Mobile Language Switcher in mobile-menu-wrapper */
+.mobile-menu-wrapper .lang-switcher.mobile-only {
     margin-right: 0.5rem;
     padding: 6px 12px;
     font-size: 0.85rem;
     display: flex;
     align-items: center;
     gap: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: transparent;
+    color: #111;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.lang-switcher.mobile-only span {
+.mobile-menu-wrapper .lang-switcher.mobile-only:hover {
+    background: #f5f5f5;
+    border-color: #d0d0d0;
+}
+
+.mobile-menu-wrapper .lang-switcher.mobile-only span {
     font-weight: 600;
 }
 
-.lang-switcher.mobile-only i {
+.mobile-menu-wrapper .lang-switcher.mobile-only i {
     font-size: 0.8rem;
 }
 
@@ -220,7 +270,7 @@ html {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 8px;
 }
 
 .hamburger {
