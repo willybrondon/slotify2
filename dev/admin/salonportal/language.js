@@ -146,70 +146,70 @@ const translations = {
         'hero.noCommitment': 'Sans engagement',
         
         // Request Buttons
-        'request.salonTitle': 'Souhaitez-vous intégrer votre salon sur la plateforme Skedisy ?',
+        'request.salonTitle': 'Intégrer votre salon sur Skedisy ?',
         'request.salonButton': 'Faire une Demande',
-        'request.customerTitle': 'Souhaitez-vous réserver des services dans un salon ?',
+        'request.customerTitle': 'Réserver des services ?',
         'request.customerButton': 'Réserver ici',
         
         // Stats
         'stats.professionals': 'Professionnels',
-        'stats.appointments': 'Rendez-vous gérés mensuellement',
-        'stats.onlineBookings': 'Réservations en ligne en dehors des heures d\'ouverture',
+        'stats.appointments': 'Rendez-vous mensuels',
+        'stats.onlineBookings': 'Réservations hors heures',
         
         // Features
-        'features.bookTitle': 'Réservez Votre Rendez-vous en Ligne',
-        'features.bookDesc': 'Trouvez votre salon préféré et réservez votre rendez-vous beauté 24/7, instantanément et facilement. Plus besoin d\'attendre au téléphone—quelques clics et votre place est réservée !',
-        'features.manageTitle': 'Gérez Votre Salon Sans Effort',
-        'features.manageDesc': 'Les propriétaires de salon peuvent gérer les réservations, le personnel et les horaires de n\'importe où. Simplifiez vos opérations quotidiennes et concentrez-vous sur ce qui compte le plus : vos clients.',
+        'features.bookTitle': 'Réservez en Ligne',
+        'features.bookDesc': 'Trouvez votre salon et réservez 24/7. Quelques clics suffisent !',
+        'features.manageTitle': 'Gérez Votre Salon',
+        'features.manageDesc': 'Gérez réservations, personnel et horaires depuis n\'importe où.',
         
         // New Clients
         'clients.title': 'Nouveaux Clients.<br>En Continu.',
-        'clients.desc': 'Certains recherchent exactement votre spécialité. Certains sont nouveaux dans le quartier. Certains ont décidé de prendre soin d\'eux-mêmes. Laissez-les trouver leur perle rare : vous.',
-        'clients.showcase': 'Page de présentation pour votre établissement',
-        'clients.reviews': 'Avis clients certifiés',
-        'clients.ranking': 'Classement Google optimisé',
+        'clients.desc': 'Laissez-les vous trouver.',
+        'clients.showcase': 'Page de présentation',
+        'clients.reviews': 'Avis certifiés',
+        'clients.ranking': 'Classement Google',
         'clients.discover': 'Découvrir Gratuitement',
         
         // Professional Stats
-        'proStats.title': 'Êtes-vous un professionnel de la beauté ?<br>Découvrez la réservation de rendez-vous en ligne !',
-        'proStats.increase': 'd\'augmentation de la fréquence des réservations en ligne',
-        'proStats.noShows': 'moins d\'absences avec les rappels de rendez-vous par SMS',
-        'proStats.outsideHours': 'des réservations en ligne effectuées en dehors des heures d\'ouverture',
+        'proStats.title': 'Professionnel de la beauté ?<br>Découvrez la réservation en ligne !',
+        'proStats.increase': 'd\'augmentation des réservations en ligne',
+        'proStats.noShows': 'moins d\'absences avec SMS',
+        'proStats.outsideHours': 'réservations hors heures',
         'proStats.salons': 'Salons & instituts',
         'proStats.booked': 'Réservé chaque seconde',
         'proStats.sold': 'en rendez-vous vendus',
         
         // Platform Features
         'platform.manage': 'Gérer',
-        'platform.manageDesc': 'Contrôlez tous les aspects de votre entreprise : réservations, ventes, clients, emplacements et membres de l\'équipe. Analysez votre entreprise avec des rapports et statistiques détaillés.',
+        'platform.manageDesc': 'Contrôlez réservations, ventes, clients et équipe. Analysez avec des rapports détaillés.',
         'platform.grow': 'Croître',
-        'platform.growDesc': 'Attirez de nouveaux clients sur le plus grand marché de la beauté et du bien-être au monde et gardez-les avec des outils marketing intégrés.',
+        'platform.growDesc': 'Attirez de nouveaux clients et fidélisez-les avec des outils marketing intégrés.',
         'platform.getPaid': 'Se Faire Payer',
-        'platform.getPaidDesc': 'Recevez des paiements rapidement et en toute sécurité avec des paiements intégrés, réduisez les absences avec des acomptes et simplifiez votre processus de paiement.',
+        'platform.getPaidDesc': 'Paiements rapides et sécurisés. Réduisez les absences avec des acomptes.',
         'platform.aiTitle': 'Concierge Beauté IA',
-        'platform.aiDesc': 'Obtenez des recommandations beauté personnalisées alimentées par l\'IA. Téléchargez votre selfie et découvrez les services parfaits pour vous.',
-        'platform.tryNow': 'Essayer Maintenant →',
+        'platform.aiDesc': 'Recommandations beauté personnalisées par IA. Téléchargez votre selfie.',
+        'platform.tryNow': 'Essayer →',
         
         // CTA
         'cta.ready': 'Prêt à développer votre entreprise ?',
-        'cta.join': 'Rejoignez des milliers de professionnels qui font confiance à SalonPortal pour gérer et développer leur entreprise. Commencez gratuitement dès aujourd\'hui !',
+        'cta.join': 'Rejoignez des milliers de professionnels. Commencez gratuitement !',
         'cta.getStarted': 'Commencer',
         'cta.million': '10 000 000',
-        'cta.millionDesc': '10 millions de personnes réservent un rendez-vous beauté chaque mois sur SalonPortal. Prenez soin d\'eux.',
-        'cta.final': 'Plus de 50 000 professionnels ont transformé leurs journées avec SalonPortal. Rejoignez-les.',
+        'cta.millionDesc': '10 millions de personnes réservent chaque mois sur SalonPortal.',
+        'cta.final': 'Plus de 50 000 professionnels nous font confiance. Rejoignez-les.',
         
         // FAQ
-        'faq.title': 'Questions Fréquemment Posées',
-        'faq.customerAccount': 'Comment créer un compte client sur Skedisy ?',
-        'faq.salonAccount': 'Comment créer un compte propriétaire de salon ?',
-        'faq.expertCredentials': 'Comment un expert obtient-il ses identifiants ?',
-        'faq.downloadApp': 'Comment télécharger l\'application ?',
-        'faq.appDifference': 'Quelle est la différence entre l\'application Client et Expert ?',
-        'faq.bookService': 'Comment un client réserve-t-il un service dans un salon sur l\'application client ?',
-        'faq.acceptReservation': 'Comment un expert peut-il accepter ou refuser une réservation sur l\'application expert ?',
-        'faq.manageBusiness': 'Comment un propriétaire de salon peut-il ajouter un nouvel expert, ajouter des services et gérer son entreprise sur la plateforme propriétaire ?',
+        'faq.title': 'Questions Fréquentes',
+        'faq.customerAccount': 'Comment créer un compte client ?',
+        'faq.salonAccount': 'Comment créer un compte propriétaire ?',
+        'faq.expertCredentials': 'Comment obtenir les identifiants expert ?',
+        'faq.downloadApp': 'Comment télécharger l\'app ?',
+        'faq.appDifference': 'Différence entre app Client et Expert ?',
+        'faq.bookService': 'Comment réserver un service ?',
+        'faq.acceptReservation': 'Comment accepter/refuser une réservation ?',
+        'faq.manageBusiness': 'Comment gérer son salon (experts, services) ?',
         'faq.newClients': 'SalonPortal m\'apportera-t-il de nouveaux clients ?',
-        'faq.newClientsDesc': 'Votre salon sera visible par nos 10 millions d\'utilisateurs mensuels et répertorié sur les réseaux de recherche comme Google pour trouver facilement votre établissement. Les avis vérifiés de vos rendez-vous précédents encourageront les visiteurs à réserver simplement, sans frais.',
+        'faq.newClientsDesc': 'Votre salon sera visible par 10 millions d\'utilisateurs mensuels et sur Google. Avis vérifiés encouragent les réservations.',
         
         // Footer
         'footer.tagline': 'Transformez la gestion de votre salon avec notre solution tout-en-un.',
@@ -233,18 +233,18 @@ const translations = {
         
         // Modal
         'modal.choosePlatform': 'Choisissez Votre Plateforme',
-        'modal.selectDevice': 'Sélectionnez votre appareil pour télécharger l\'application',
+        'modal.selectDevice': 'Sélectionnez votre appareil',
         'modal.android': 'Android',
-        'modal.downloadAndroid': 'Télécharger depuis Google Play Store',
+        'modal.downloadAndroid': 'Télécharger depuis Google Play',
         'modal.download': 'Télécharger',
         'modal.iphone': 'iPhone',
         'modal.downloadIOS': 'Télécharger depuis l\'App Store',
         'modal.requestDemo': 'Demander une Démo',
         'modal.sendRequest': 'Envoyez votre demande à :',
-        'modal.includeInfo': 'Veuillez inclure les informations suivantes dans votre e-mail :',
+        'modal.includeInfo': 'Informations à inclure :',
         'modal.managerName': 'Nom du Gérant',
-        'modal.phoneNumber': 'Numéro de Téléphone',
-        'modal.emailAddress': 'Adresse E-mail',
+        'modal.phoneNumber': 'Téléphone',
+        'modal.emailAddress': 'E-mail',
         'modal.establishmentType': 'Type d\'Établissement ?',
         
         // QR Code
@@ -334,18 +334,17 @@ function initLanguage() {
     const savedLang = localStorage.getItem('skedisy-language') || 'fr';
     setLanguage(savedLang);
     
-    // Add click handlers to language switchers
-    document.querySelectorAll('.lang-switcher').forEach(switcher => {
-        // Remove existing listeners to avoid duplicates
-        const newSwitcher = switcher.cloneNode(true);
-        switcher.parentNode.replaceChild(newSwitcher, switcher);
-        
-        newSwitcher.addEventListener('click', function(e) {
+    // Use event delegation for language switchers to avoid duplicate listeners
+    document.addEventListener('click', function(e) {
+        const switcher = e.target.closest('.lang-switcher');
+        if (switcher) {
             e.preventDefault();
             e.stopPropagation();
-            const newLang = this.getAttribute('data-lang') || (currentLanguage === 'fr' ? 'en' : 'fr');
-            setLanguage(newLang);
-        });
+            const newLang = switcher.getAttribute('data-lang') || (currentLanguage === 'fr' ? 'en' : 'fr');
+            if (newLang !== currentLanguage) {
+                setLanguage(newLang);
+            }
+        }
     });
 }
 

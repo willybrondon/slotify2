@@ -266,17 +266,12 @@ exports.salonData = async (req, res) => {
       }
     }
 
+    // First, get the salon without populate to check if it exists
     const salon = await Salon.findOne({
       _id: salonId,
       isActive: true,
       isDelete: false,
-    }).populate({
-      path: "serviceIds.id",
-      populate: {
-        path: "categoryId",
-        select: "name nameEn nameFr namePt"
-      }
-    });
+    }).lean();
 
     if (!salon) {
       return res.status(404).send({
@@ -285,20 +280,41 @@ exports.salonData = async (req, res) => {
       });
     }
 
-    console.log("Salon Data API - Salon found:", salon.name);
-    console.log("Salon Data API - Total services in salon:", salon.serviceIds.length);
-    console.log("Salon Data API - Services with allowCities:", salon.serviceIds.map(s => ({
-      name: s.id?.name,
-      allowCities: s.allowCities?.map(ac => ac.city)
-    })));
+    // Now populate services separately to handle errors better
+    const salonWithServices = await Salon.findOne({
+      _id: salonId,
+      isActive: true,
+      isDelete: false,
+    }).populate({
+      path: "serviceIds.id",
+      match: { isDelete: false, status: true }, // Only populate active, non-deleted services
+      populate: {
+        path: "categoryId",
+        select: "name nameEn nameFr namePt",
+        match: { isDelete: false } // Only populate non-deleted categories
+      }
+    }).lean();
+
+    // Use salonWithServices if available, otherwise fallback to salon
+    const salonData = salonWithServices || salon;
+
+    console.log("Salon Data API - Salon found:", salonData.name);
+    console.log("Salon Data API - Total services in salon:", salonData.serviceIds?.length || 0);
+    console.log("Salon Data API - Raw addressDetails:", JSON.stringify(salonData.addressDetails));
+    console.log("Salon Data API - Raw mainImage:", salonData.mainImage);
+    console.log("Salon Data API - Raw image array:", salonData.image);
 
     // Filter out services where the populated service (id) is null/undefined
     // This happens when service references are invalid (deleted services)
     // Preserve the original structure but ensure all fields are present
-    let finalServices = salon.serviceIds
+    let finalServices = (salonData.serviceIds || [])
       .filter(service => {
         // Keep service if id exists and is not null (valid service reference)
-        return service.id && service.id._id;
+        // Also check if the service itself is not deleted and is active
+        if (!service || !service.id) return false;
+        // Check if service has _id and is not deleted
+        if (!service.id._id || service.id.isDelete === true || service.id.status === false) return false;
+        return true;
       })
       .map(service => {
         // Ensure all required fields are present with defaults
@@ -381,15 +397,19 @@ exports.salonData = async (req, res) => {
       return res.status(200).send({ status: false, message: "Tax settings not found." });
     }
 
-    // Convert salon to plain object and ensure serviceIds are properly set
-    let salonData = salon.toObject();
+    // salonData is already a plain object from lean(), create a copy for modification
+    let salonResponseData = { ...salonData };
     
     // Replace serviceIds with filtered and formatted services
-    salonData.serviceIds = finalServices;
+    salonResponseData.serviceIds = finalServices;
     
     // Ensure addressDetails is properly formatted (not null) with all required fields
-    if (!salonData.addressDetails || typeof salonData.addressDetails !== 'object') {
-      salonData.addressDetails = {
+    // Handle cases where addressDetails might be null, undefined, or have null fields
+    if (!salonResponseData.addressDetails || 
+        typeof salonResponseData.addressDetails !== 'object' || 
+        salonResponseData.addressDetails === null ||
+        Object.keys(salonResponseData.addressDetails).length === 0) {
+      salonResponseData.addressDetails = {
         addressLine1: "",
         landMark: "",
         city: "",
@@ -398,33 +418,50 @@ exports.salonData = async (req, res) => {
       };
     } else {
       // Ensure all address fields exist, defaulting to empty string if null/undefined
-      salonData.addressDetails = {
-        addressLine1: salonData.addressDetails.addressLine1 || "",
-        landMark: salonData.addressDetails.landMark || "",
-        city: salonData.addressDetails.city || "",
-        state: salonData.addressDetails.state || "",
-        country: salonData.addressDetails.country || ""
+      salonResponseData.addressDetails = {
+        addressLine1: (salonResponseData.addressDetails.addressLine1 !== null && salonResponseData.addressDetails.addressLine1 !== undefined) ? String(salonResponseData.addressDetails.addressLine1) : "",
+        landMark: (salonResponseData.addressDetails.landMark !== null && salonResponseData.addressDetails.landMark !== undefined) ? String(salonResponseData.addressDetails.landMark) : "",
+        city: (salonResponseData.addressDetails.city !== null && salonResponseData.addressDetails.city !== undefined) ? String(salonResponseData.addressDetails.city) : "",
+        state: (salonResponseData.addressDetails.state !== null && salonResponseData.addressDetails.state !== undefined) ? String(salonResponseData.addressDetails.state) : "",
+        country: (salonResponseData.addressDetails.country !== null && salonResponseData.addressDetails.country !== undefined) ? String(salonResponseData.addressDetails.country) : ""
       };
     }
     
     // Ensure locationCoordinates is properly formatted
-    if (!salonData.locationCoordinates || typeof salonData.locationCoordinates !== 'object') {
-      salonData.locationCoordinates = {
+    if (!salonResponseData.locationCoordinates || 
+        typeof salonResponseData.locationCoordinates !== 'object' || 
+        salonResponseData.locationCoordinates === null) {
+      salonResponseData.locationCoordinates = {
         latitude: "",
         longitude: ""
       };
     } else {
-      salonData.locationCoordinates = {
-        latitude: salonData.locationCoordinates.latitude || "",
-        longitude: salonData.locationCoordinates.longitude || ""
+      salonResponseData.locationCoordinates = {
+        latitude: (salonResponseData.locationCoordinates.latitude !== null && salonResponseData.locationCoordinates.latitude !== undefined) ? String(salonResponseData.locationCoordinates.latitude) : "",
+        longitude: (salonResponseData.locationCoordinates.longitude !== null && salonResponseData.locationCoordinates.longitude !== undefined) ? String(salonResponseData.locationCoordinates.longitude) : ""
       };
     }
     
     // Ensure mainImage is always a string (not null)
-    salonData.mainImage = salonData.mainImage || salonData.heroImage || (salonData.image && salonData.image.length > 0 ? salonData.image[0] : "") || "";
+    // Try multiple fallback options
+    let mainImageValue = "";
+    if (salonResponseData.mainImage && salonResponseData.mainImage !== null && salonResponseData.mainImage !== undefined) {
+      mainImageValue = String(salonResponseData.mainImage);
+    } else if (salonResponseData.heroImage && salonResponseData.heroImage !== null && salonResponseData.heroImage !== undefined) {
+      mainImageValue = String(salonResponseData.heroImage);
+    } else if (salonResponseData.image && Array.isArray(salonResponseData.image) && salonResponseData.image.length > 0) {
+      // Find first non-null image in array
+      const firstImage = salonResponseData.image.find(img => img && img !== null && img !== undefined && img !== "");
+      mainImageValue = firstImage ? String(firstImage) : "";
+    }
+    salonResponseData.mainImage = mainImageValue;
     
-    // Ensure image array is always present (not null)
-    salonData.image = Array.isArray(salonData.image) ? salonData.image : [];
+    // Ensure image array is always present (not null) and filter out null/empty values
+    if (Array.isArray(salonResponseData.image)) {
+      salonResponseData.image = salonResponseData.image.filter(img => img && img !== null && img !== undefined && img !== "");
+    } else {
+      salonResponseData.image = [];
+    }
     
     // Add distance if coordinates are provided
     if (req.query.latitude && req.query.longitude) {
@@ -433,13 +470,13 @@ exports.salonData = async (req, res) => {
         longitude: parseFloat(req.query.longitude),
       };
       const device2 = {
-        latitude: parseFloat(salonData.locationCoordinates.latitude || 0),
-        longitude: parseFloat(salonData.locationCoordinates.longitude || 0),
+        latitude: parseFloat(salonResponseData.locationCoordinates.latitude || 0),
+        longitude: parseFloat(salonResponseData.locationCoordinates.longitude || 0),
       };
       
       if (device2.latitude && device2.longitude) {
         const distanceInKilometers = geolib.getDistance(device1, device2) / 1000;
-        salonData.distance = distanceInKilometers;
+        salonResponseData.distance = distanceInKilometers;
       }
     }
 
@@ -448,12 +485,12 @@ exports.salonData = async (req, res) => {
       status: true,
       message: "Success",
       salon: {
-        ...salonData,
+        ...salonResponseData,
         serviceIds: finalServices, // Ensure services are included
-        addressDetails: salonData.addressDetails, // Ensure addressDetails is included
-        locationCoordinates: salonData.locationCoordinates, // Ensure locationCoordinates is included
-        mainImage: salonData.mainImage, // Ensure mainImage is included
-        image: salonData.image, // Ensure image array is included
+        addressDetails: salonResponseData.addressDetails, // Ensure addressDetails is included
+        locationCoordinates: salonResponseData.locationCoordinates, // Ensure locationCoordinates is included
+        mainImage: salonResponseData.mainImage, // Ensure mainImage is included
+        image: salonResponseData.image, // Ensure image array is included
       },
       product: product || [],
       reviews: reviews || [],
@@ -467,6 +504,18 @@ exports.salonData = async (req, res) => {
     console.log("Salon Data API - Address Details:", JSON.stringify(responseData.salon.addressDetails));
     console.log("Salon Data API - Main Image:", responseData.salon.mainImage);
     console.log("Salon Data API - Image Array Length:", responseData.salon.image?.length || 0);
+    console.log("Salon Data API - Service IDs in response:", responseData.salon.serviceIds.map(s => ({ 
+      serviceId: s.id?._id, 
+      serviceName: s.id?.name,
+      price: s.price 
+    })));
+
+    // Final validation - ensure critical fields are not null
+    if (!responseData.salon.addressDetails || 
+        responseData.salon.addressDetails.addressLine1 === null ||
+        responseData.salon.addressDetails.city === null) {
+      console.warn("Salon Data API - WARNING: Address details still contain null values!");
+    }
 
     return res.status(200).json(responseData);
   } catch (error) {
