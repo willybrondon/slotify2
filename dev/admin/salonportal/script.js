@@ -423,13 +423,12 @@ function renderCategories(categories) {
     // Get current language for the switcher button
     const currentLang = localStorage.getItem('skedisy-language') || 'fr';
     const switchToLang = currentLang === 'fr' ? 'en' : 'fr';
-    const switchToText = switchToLang === 'fr' ? 'Français' : 'English';
+    const switchToShort = switchToLang.toUpperCase(); // EN or FR
     
     desktopMenu.innerHTML = categoriesHtml + 
-        '<a href="ai-concierge.html" class="nav-link" data-translate="nav.aiConcierge">AI Concierge</a>' +
         '<a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>' +
-        `<button class="lang-switcher desktop-only" data-lang="${switchToLang}" title="Switch to ${switchToText}">
-            <i class="fas fa-globe"></i> <span>${switchToText}</span>
+        `<button class="lang-switcher desktop-only" data-lang="${switchToLang}" title="Switch to ${switchToShort}">
+            <i class="fas fa-globe"></i> <span>${switchToShort}</span>
         </button>`;
     
     // Mobile menu

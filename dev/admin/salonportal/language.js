@@ -393,18 +393,14 @@ function updateLanguageSwitcher() {
         const span = switcher.querySelector('span');
         
         if (span) {
-            // Mobile shows short name, desktop shows full name
-            if (switcher.classList.contains('mobile-only')) {
-                span.textContent = shortName;
-            } else {
-                span.textContent = newLangName;
-            }
+            // Both mobile and desktop show short name (EN/FR)
+            span.textContent = shortName;
         } else {
             // If no span, update entire content but preserve icon
             if (icon) {
-                switcher.innerHTML = icon.outerHTML + ' <span>' + (switcher.classList.contains('mobile-only') ? shortName : newLangName) + '</span>';
+                switcher.innerHTML = icon.outerHTML + ' <span>' + shortName + '</span>';
             } else {
-                switcher.innerHTML = '<i class="fas fa-globe"></i> <span>' + (switcher.classList.contains('mobile-only') ? shortName : newLangName) + '</span>';
+                switcher.innerHTML = '<i class="fas fa-globe"></i> <span>' + shortName + '</span>';
             }
         }
     });
