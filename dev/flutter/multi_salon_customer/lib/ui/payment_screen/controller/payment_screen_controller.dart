@@ -176,8 +176,24 @@ class PaymentScreenController extends GetxController {
     if (args != null) {
       log("Payment Screen - Args length: ${args.length}");
 
+      // First, check if this is a wallet recharge by examining args[0]
+      // This must be done BEFORE any assignments to ensure correct detection
+      bool isWalletRechargeArg = false;
+      if (args.length >= 3) {
+        // Check if first argument indicates wallet recharge
+        if (args[0] == true || args[0] == "true" || args[0] == 1) {
+          isWalletRechargeArg = true;
+          log("Payment Screen - Detected wallet recharge from args[0]: ${args[0]}");
+        }
+      }
+
       if (args.length >= 4) {
-        isWalletAdd = args[0] as bool? ?? false;
+        // Explicitly check for wallet recharge first
+        if (isWalletRechargeArg) {
+          isWalletAdd = true;
+        } else {
+          isWalletAdd = args[0] as bool? ?? false;
+        }
         totalAmount = args[1] as String?;
         isCreateOrder = args[2] as bool? ?? false;
         selectedPayment = args[3] as String?;
@@ -185,19 +201,23 @@ class PaymentScreenController extends GetxController {
           bookingData = args[4] as Map<String, dynamic>?; // Additional booking data
         }
       } else if (args.length >= 3) {
-        // Handle wallet recharge case with 3 arguments
-        isWalletAdd = args[0] as bool? ?? false;
+        // Handle wallet recharge case with 3 or 4 arguments
+        if (isWalletRechargeArg) {
+          isWalletAdd = true;
+          log("Payment Screen - Wallet recharge confirmed with 3 arguments");
+        } else {
+          isWalletAdd = args[0] as bool? ?? false;
+        }
         totalAmount = args[1] as String?;
         isCreateOrder = args[2] as bool? ?? false;
         selectedPayment = null; // Will be set to default below
-        log("Payment Screen - Wallet recharge detected with 3 arguments");
       }
 
-      // Ensure isWalletAdd is explicitly true for wallet recharge
-      // If isWalletAdd was passed as true, keep it true
-      if (args.length >= 3 && (args[0] == true || args[0] == "true")) {
+      // Double-check: Ensure isWalletAdd is explicitly true for wallet recharge
+      // This is a safety check in case the above logic missed it
+      if (args.length >= 3 && (args[0] == true || args[0] == "true" || args[0] == 1)) {
         isWalletAdd = true;
-        log("Payment Screen - Confirmed: This is a wallet recharge");
+        log("Payment Screen - Final confirmation: This is a wallet recharge");
       }
 
       // Set default payment method if not specified
@@ -208,7 +228,7 @@ class PaymentScreenController extends GetxController {
       }
       // For wallet recharge, keep selectedPayment as null to show only Stripe and MTN MoMo
 
-      log("Payment Screen - Is Wallet Add :: $isWalletAdd");
+      log("Payment Screen - Is Wallet Add :: $isWalletAdd (type: ${isWalletAdd.runtimeType})");
       log("Payment Screen - Is Create Order :: $isCreateOrder");
       log("Payment Screen - Total Amount :: '$totalAmount'");
       log("Payment Screen - Selected Payment :: '$selectedPayment'");

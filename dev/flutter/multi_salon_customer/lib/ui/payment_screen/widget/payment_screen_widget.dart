@@ -127,9 +127,17 @@ class PaymentMethodView extends StatelessWidget {
     final isFlutterWaveEnabled =
         splashController.settingCategory?.setting?.isFlutterWave ?? false;
 
-    // Check if this is wallet recharge - handle both true and null cases properly
-    // If isWalletAdd is null but we're in recharge flow, treat it as wallet recharge
+    // Check if this is wallet recharge - explicitly check for true
+    // Only show wallet recharge payment methods (Stripe, MTN MoMo) when isWalletAdd is explicitly true
+    // If isWalletAdd is null or false, show booking payment methods
     final bool isWalletRecharge = logic.isWalletAdd == true;
+    
+    // Debug logging
+    if (logic.isWalletAdd != null) {
+      log("Payment Screen Widget - isWalletAdd: ${logic.isWalletAdd}, isWalletRecharge: $isWalletRecharge");
+    } else {
+      log("Payment Screen Widget - WARNING: isWalletAdd is null! Defaulting to booking payment methods.");
+    }
     
     return isWalletRecharge
         ? Column(
@@ -188,6 +196,9 @@ class PaymentMethodView extends StatelessWidget {
             children: [
               const PaymentTitleView(),
               // Show the payment method that was already selected in booking screen
+              // NOTE: This branch is for booking payments, NOT wallet recharge
+              // If isWalletAdd is somehow false/null but this is actually a recharge, 
+              // the widget should have caught it in the isWalletRecharge check above
               if (logic.selectedPayment == "wallet")
                 const PaymentMyWalletView(),
               if (logic.selectedPayment == "Stripe" && isStripeEnabled)
@@ -205,8 +216,10 @@ class PaymentMethodView extends StatelessWidget {
                 const PaymentCashOnHandView(),
               // Add other payment methods as needed
               // Show all available payment methods if none selected
-              if (logic.selectedPayment == null ||
-                  logic.selectedPayment == "") ...[
+              // IMPORTANT: Only show these for booking payments, not wallet recharge
+              if ((logic.selectedPayment == null ||
+                  logic.selectedPayment == "") &&
+                  logic.isWalletAdd != true) ...[
                 const PaymentMyWalletView(),
                 if (isStripeEnabled) const PaymentStripeView(),
                 if (isMtnMomoEnabled) const PaymentMtnMomoView(),
