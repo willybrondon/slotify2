@@ -505,26 +505,49 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
    */
   async getSalonMatches(services, context, analysis = null) {
     try {
-      if (!services || services.length === 0) {
-        return { salons: [], experts: [] };
-      }
-
-      const serviceIds = services.map(s => s._id);
+      // Always try to get salon recommendations, even if no services found
+      // This ensures users always see salon recommendations
+      const serviceIds = services && services.length > 0 ? services.map(s => s._id) : [];
 
       // Find salons that offer these services
-      let salons = await Salon.find({
-        'serviceIds.id': { $in: serviceIds },
-        isActive: true,
-        isDelete: false
-      })
-        .populate({
-          path: 'serviceIds.id',
-          populate: {
-            path: 'categoryId',
-            select: 'name'
-          }
+      // If no services found, still try to get some salons (fallback)
+      let salons = [];
+      
+      if (serviceIds && serviceIds.length > 0) {
+        salons = await Salon.find({
+          'serviceIds.id': { $in: serviceIds },
+          isActive: true,
+          isDelete: false
         })
-        .lean(); // Use lean() for better JSON serialization
+          .populate({
+            path: 'serviceIds.id',
+            populate: {
+              path: 'categoryId',
+              select: 'name'
+            }
+          })
+          .lean(); // Use lean() for better JSON serialization
+      }
+      
+      // If no salons found with matching services, get top-rated salons as fallback
+      // This ensures we always have salon recommendations
+      if (salons.length === 0) {
+        console.log('[Selfie Analysis] No salons found with matching services, using fallback: top-rated salons');
+        salons = await Salon.find({
+          isActive: true,
+          isDelete: false
+        })
+          .populate({
+            path: 'serviceIds.id',
+            populate: {
+              path: 'categoryId',
+              select: 'name'
+            }
+          })
+          .sort({ review: -1, reviewCount: -1 })
+          .limit(10)
+          .lean();
+      }
       
       // Score and rank salons based on service type matching
       salons = this.scoreSalonsByServiceTypes(salons, services, analysis);
@@ -541,35 +564,86 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
           longitude: parseFloat(context.longitude)
         };
         
-        salons = salons.map(salon => {
-          if (salon.locationCoordinates && salon.locationCoordinates.latitude && salon.locationCoordinates.longitude) {
-            const salonLocation = {
-              latitude: parseFloat(salon.locationCoordinates.latitude),
-              longitude: parseFloat(salon.locationCoordinates.longitude)
-            };
-            const distanceInMeters = geolib.getDistance(userLocation, salonLocation);
-            salon.distance = distanceInMeters / 1000; // Convert to kilometers
-          } else {
-            salon.distance = null;
-          }
-          return salon;
-        });
+        // Check if coordinates are valid (not NaN)
+        const isValidLocation = !isNaN(userLocation.latitude) && !isNaN(userLocation.longitude);
         
-        // Filter to only nearby salons (within 50km) and sort by service match score, then distance, then rating
-        salons = salons
-          .filter(salon => salon.distance !== null && salon.distance <= 50)
-          .sort((a, b) => {
+        if (isValidLocation) {
+          salons = salons.map(salon => {
+            if (salon.locationCoordinates && salon.locationCoordinates.latitude && salon.locationCoordinates.longitude) {
+              const salonLat = parseFloat(salon.locationCoordinates.latitude);
+              const salonLng = parseFloat(salon.locationCoordinates.longitude);
+              
+              // Check if salon coordinates are valid
+              if (!isNaN(salonLat) && !isNaN(salonLng)) {
+                const salonLocation = {
+                  latitude: salonLat,
+                  longitude: salonLng
+                };
+                try {
+                  const distanceInMeters = geolib.getDistance(userLocation, salonLocation);
+                  salon.distance = distanceInMeters / 1000; // Convert to kilometers
+                } catch (distanceError) {
+                  console.error('[Selfie Analysis] Distance calculation error:', distanceError);
+                  salon.distance = null;
+                }
+              } else {
+                salon.distance = null;
+              }
+            } else {
+              salon.distance = null;
+            }
+            return salon;
+          });
+          
+          // Separate salons with and without distance
+          const salonsWithDistance = salons.filter(salon => salon.distance !== null);
+          const salonsWithoutDistance = salons.filter(salon => salon.distance === null);
+          
+          // Filter nearby salons (within 100km for better coverage, especially for Cameroon)
+          // If no salons within 100km, include all salons with distance
+          const nearbySalons = salonsWithDistance.filter(salon => salon.distance <= 100);
+          const salonsToShow = nearbySalons.length > 0 ? nearbySalons : salonsWithDistance;
+          
+          // Sort by service match score first, then distance, then rating
+          salonsToShow.sort((a, b) => {
             // Sort by service match score first (if available), then distance, then rating
             if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
               if (b.serviceMatchScore !== a.serviceMatchScore) {
                 return b.serviceMatchScore - a.serviceMatchScore;
               }
             }
-            if (a.distance !== b.distance) {
-              return a.distance - b.distance;
+            if (a.distance !== null && b.distance !== null) {
+              if (a.distance !== b.distance) {
+                return a.distance - b.distance;
+              }
             }
             return (b.review || 0) - (a.review || 0);
           });
+          
+          // Add salons without distance at the end (sorted by score and rating)
+          salonsWithoutDistance.sort((a, b) => {
+            if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
+              if (b.serviceMatchScore !== a.serviceMatchScore) {
+                return b.serviceMatchScore - a.serviceMatchScore;
+              }
+            }
+            return (b.review || 0) - (a.review || 0);
+          });
+          
+          // Combine: nearby salons first, then salons without distance
+          salons = [...salonsToShow, ...salonsWithoutDistance];
+        } else {
+          console.warn('[Selfie Analysis] Invalid location coordinates provided');
+          // If location is invalid, treat as no location
+          salons.sort((a, b) => {
+            if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
+              if (b.serviceMatchScore !== a.serviceMatchScore) {
+                return b.serviceMatchScore - a.serviceMatchScore;
+              }
+            }
+            return (b.review || 0) - (a.review || 0);
+          });
+        }
       } else {
         // If no location, sort by service match score first, then rating
         salons.sort((a, b) => {
@@ -582,8 +656,8 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
         });
       }
       
-      // Limit to top 3-5 most relevant salons (closest and best rated)
-      const maxSalons = context.latitude && context.longitude ? 5 : 3;
+      // Limit to top 5-8 most relevant salons (increased for better coverage)
+      const maxSalons = context.latitude && context.longitude ? 8 : 5;
       salons = salons.slice(0, maxSalons);
       
       // Format salons to ensure _id is included and properly formatted

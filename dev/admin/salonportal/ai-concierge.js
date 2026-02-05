@@ -139,16 +139,43 @@ function analyzeImage() {
     formData.append('image', selectedFile);
     
     // Get user location if available
+    // Use timeout to prevent hanging if geolocation is slow or blocked
     if (navigator.geolocation) {
+        const locationTimeout = setTimeout(() => {
+            // If location takes too long, proceed without it
+            console.warn('Location request timed out, proceeding without location');
+            sendAnalysisRequest(formData);
+        }, 5000); // 5 second timeout
+        
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                formData.append('latitude', position.coords.latitude);
-                formData.append('longitude', position.coords.longitude);
+                clearTimeout(locationTimeout);
+                // Validate coordinates (check for valid numbers and reasonable ranges)
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                // Check if coordinates are valid (not NaN and within valid ranges)
+                if (!isNaN(lat) && !isNaN(lng) && 
+                    lat >= -90 && lat <= 90 && 
+                    lng >= -180 && lng <= 180) {
+                    formData.append('latitude', lat);
+                    formData.append('longitude', lng);
+                    console.log('Location obtained:', lat, lng);
+                } else {
+                    console.warn('Invalid location coordinates, proceeding without location');
+                }
                 sendAnalysisRequest(formData);
             },
-            () => {
-                // Location permission denied, continue without location
+            (error) => {
+                clearTimeout(locationTimeout);
+                // Location permission denied or error, continue without location
+                console.warn('Location error:', error.message);
                 sendAnalysisRequest(formData);
+            },
+            {
+                enableHighAccuracy: false, // Don't require high accuracy (faster)
+                timeout: 4000, // 4 second timeout
+                maximumAge: 300000 // Accept cached location up to 5 minutes old
             }
         );
     } else {
@@ -293,13 +320,14 @@ function displayRecommendations(recommendations) {
         `;
     }
     
-    // Salons
+    // Salons - Always show salon recommendations section
+    html += `
+        <div class="recommendations-section">
+            <h3><i class="fas fa-store"></i> Recommended Salons</h3>
+    `;
+    
     if (recommendations.salons && recommendations.salons.length > 0) {
-        html += `
-            <div class="recommendations-section">
-                <h3><i class="fas fa-store"></i> Recommended Salons</h3>
-                <div class="salon-list">
-        `;
+        html += `<div class="salon-list">`;
         
         recommendations.salons.forEach((salon, index) => {
             const salonId = salon._id || salon.id;
@@ -323,17 +351,25 @@ function displayRecommendations(recommendations) {
                         ${salon.address || (salon.addressDetails && salon.addressDetails.addressLine1) 
                             ? `<p>${salon.address || salon.addressDetails.addressLine1}</p>` 
                             : ''}
+                        ${salon.distance ? `<p style="color: #666; font-size: 12px;"><i class="fas fa-map-marker-alt"></i> ${salon.distance.toFixed(1)} km away</p>` : ''}
                     </div>
                     <i class="fas fa-chevron-right" style="color: #999;"></i>
                 </div>
             `;
         });
         
+        html += `</div>`;
+    } else {
+        // Show message if no salons found
         html += `
-                </div>
+            <div style="padding: 20px; text-align: center; color: #666;">
+                <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px; color: #999;"></i>
+                <p>No salons found at the moment. Please check back later or try again.</p>
             </div>
         `;
     }
+    
+    html += `</div>`;
     
     // Beauty Tips
     if (recommendations.beautyTips && recommendations.beautyTips.length > 0) {
