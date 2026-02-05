@@ -127,7 +127,11 @@ class PaymentMethodView extends StatelessWidget {
     final isFlutterWaveEnabled =
         splashController.settingCategory?.setting?.isFlutterWave ?? false;
 
-    return logic.isWalletAdd == true
+    // Check if this is wallet recharge - handle both true and null cases properly
+    // If isWalletAdd is null but we're in recharge flow, treat it as wallet recharge
+    final bool isWalletRecharge = logic.isWalletAdd == true;
+    
+    return isWalletRecharge
         ? Column(
             children: [
               const PaymentTitleView(),

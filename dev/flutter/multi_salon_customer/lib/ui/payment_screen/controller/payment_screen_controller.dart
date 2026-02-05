@@ -177,29 +177,36 @@ class PaymentScreenController extends GetxController {
       log("Payment Screen - Args length: ${args.length}");
 
       if (args.length >= 4) {
-        isWalletAdd = args[0];
-        totalAmount = args[1];
-        isCreateOrder = args[2];
-        selectedPayment = args[3];
+        isWalletAdd = args[0] as bool? ?? false;
+        totalAmount = args[1] as String?;
+        isCreateOrder = args[2] as bool? ?? false;
+        selectedPayment = args[3] as String?;
         if (args.length > 4) {
-          bookingData = args[4]; // Additional booking data
+          bookingData = args[4] as Map<String, dynamic>?; // Additional booking data
         }
       } else if (args.length >= 3) {
         // Handle wallet recharge case with 3 arguments
-        isWalletAdd = args[0];
-        totalAmount = args[1];
-        isCreateOrder = args[2];
+        isWalletAdd = args[0] as bool? ?? false;
+        totalAmount = args[1] as String?;
+        isCreateOrder = args[2] as bool? ?? false;
         selectedPayment = null; // Will be set to default below
         log("Payment Screen - Wallet recharge detected with 3 arguments");
       }
 
+      // Ensure isWalletAdd is explicitly true for wallet recharge
+      // If isWalletAdd was passed as true, keep it true
+      if (args.length >= 3 && (args[0] == true || args[0] == "true")) {
+        isWalletAdd = true;
+        log("Payment Screen - Confirmed: This is a wallet recharge");
+      }
+
       // Set default payment method if not specified
-      // For wallet recharge, leave as null to show all enabled payment methods
+      // For wallet recharge, leave as null to show only Stripe and MTN MoMo
       // For booking, default to wallet
       if (selectedPayment == null && isWalletAdd != true) {
         selectedPayment = "wallet";
       }
-      // For wallet recharge, keep selectedPayment as null to show all enabled methods
+      // For wallet recharge, keep selectedPayment as null to show only Stripe and MTN MoMo
 
       log("Payment Screen - Is Wallet Add :: $isWalletAdd");
       log("Payment Screen - Is Create Order :: $isCreateOrder");
@@ -215,6 +222,8 @@ class PaymentScreenController extends GetxController {
       }
     } else {
       log("Payment Screen - WARNING: No arguments received!");
+      // Default to false if no args (shouldn't happen, but safety check)
+      isWalletAdd = false;
     }
     update([Constant.idSelectPaymentMethod]);
   }
