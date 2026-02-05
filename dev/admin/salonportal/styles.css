@@ -369,6 +369,43 @@ html {
     font-weight: 700;
 }
 
+.mobile-menu-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Language Switcher in mobile-menu-header */
+.mobile-menu-header .lang-switcher.mobile-only {
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mobile-menu-header .lang-switcher.mobile-only:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.mobile-menu-header .lang-switcher.mobile-only span {
+    font-weight: 600;
+    color: #fff;
+}
+
+.mobile-menu-header .lang-switcher.mobile-only i {
+    font-size: 0.8rem;
+    color: #fff;
+}
+
 .mobile-menu-close {
     background: none;
     border: none;

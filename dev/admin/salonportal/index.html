@@ -40,21 +40,12 @@
             </div>
             <!-- Desktop Categories Menu -->
             <div class="nav-menu-center desktop-only" id="categoriesMenu">
-                <!-- Categories will be loaded dynamically -->
-                <a href="ai-concierge.html" class="nav-link" data-translate="nav.aiConcierge">AI Concierge</a>
-                <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
-                <!-- Language Switcher - Desktop (on same line as categories and documentation) -->
-                <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
-                    <i class="fas fa-globe"></i> <span>English</span>
-                </button>
+                <!-- Categories, Documentation, and Language Switcher will be loaded dynamically -->
             </div>
         
             <!-- Mobile Menu - Hamburger positioned where login button was -->
             <div class="mobile-menu-wrapper">
-                <!-- Language Switcher - Mobile (on same line as hamburger menu) -->
-                <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
-                    <i class="fas fa-globe"></i> <span>EN</span>
-                </button>
+                
                 <div class="hamburger mobile-only" id="mobileMenuToggle">
                     <span></span>
                     <span></span>
@@ -67,17 +58,19 @@
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
                 <h3 data-translate="nav.menu">Menu</h3>
-                <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+                <div class="mobile-menu-header-right">
+                    <!-- Language Switcher - Mobile (in header) -->
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
+                        <i class="fas fa-globe"></i> <span>EN</span>
+                    </button>
+                    <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+                </div>
             </div>
             <div class="mobile-menu-content">
                 <!-- Mobile Login Button -->
                 <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Login</a>
                 <!-- Mobile Documentation Link -->
                 <a href="documentation.html" class="mobile-documentation-link" data-translate="nav.documentation">Documentation</a>
-                <!-- Language Switcher - Mobile -->
-                <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
-                    <i class="fas fa-globe"></i> <span>EN</span>
-                </button>
                 <!-- AI Concierge Button - More Prominent -->
                 <a href="ai-concierge.html" class="btn-ai-concierge-mobile">
                     <i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span>

@@ -412,13 +412,25 @@ function renderCategories(categories) {
     
     if (!desktopMenu || !mobileMenu) return;
     
-    // Desktop menu - add Documentation at the end with spacing
-    desktopMenu.innerHTML = categories.map(category => {
+    // Desktop menu - add Documentation and Language Switcher at the end
+    const categoriesHtml = categories.map(category => {
         const slug = generateCategorySlug(category.name);
         const shortId = category._id.toString().substring(0, 6);
         const categoryUrl = `/category/${slug}-${shortId}`;
         return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
-    }).join('') + '<a href="documentation.html" class="category-link documentation-link">Documentation</a>';
+    }).join('');
+    
+    // Get current language for the switcher button
+    const currentLang = localStorage.getItem('skedisy-language') || 'fr';
+    const switchToLang = currentLang === 'fr' ? 'en' : 'fr';
+    const switchToText = switchToLang === 'fr' ? 'Français' : 'English';
+    
+    desktopMenu.innerHTML = categoriesHtml + 
+        '<a href="ai-concierge.html" class="nav-link" data-translate="nav.aiConcierge">AI Concierge</a>' +
+        '<a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>' +
+        `<button class="lang-switcher desktop-only" data-lang="${switchToLang}" title="Switch to ${switchToText}">
+            <i class="fas fa-globe"></i> <span>${switchToText}</span>
+        </button>`;
     
     // Mobile menu
     mobileMenu.innerHTML = categories.map(category => {
@@ -427,6 +439,17 @@ function renderCategories(categories) {
         const categoryUrl = `/category/${slug}-${shortId}`;
         return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
     }).join('');
+    
+    // Update language switcher display after categories are loaded
+    // The event delegation in initLanguage should handle clicks, but we need to update the display
+    if (typeof updateLanguageSwitcher === 'function') {
+        updateLanguageSwitcher();
+    }
+    
+    // Re-translate the page to update the new elements
+    if (typeof translatePage === 'function') {
+        translatePage();
+    }
 } 
 
 // App download links configuration
