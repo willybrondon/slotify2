@@ -80,13 +80,13 @@ class PaymentScreenController extends GetxController {
     }
 
     await getDataFromArgs();
-    
+
     // CRITICAL: After parsing arguments, ensure wallet recharge has null selectedPayment
     // This prevents any accidental inheritance of booking payment methods
     log("Payment Screen - onInit() after getDataFromArgs()");
     log("   - isWalletAdd: $isWalletAdd");
     log("   - selectedPayment: $selectedPayment");
-    
+
     if (isWalletAdd == true) {
       log("✅ Payment Screen - Confirmed wallet recharge in onInit()");
       if (selectedPayment != null && selectedPayment != "") {
@@ -95,14 +95,14 @@ class PaymentScreenController extends GetxController {
         update([Constant.idSelectPaymentMethod]);
       }
       log("✅ Payment Screen - Wallet recharge: selectedPayment is now '$selectedPayment'");
-      
+
       // CRITICAL: For wallet recharge, DO NOT initialize BookingScreenController
       // This prevents reading selectedPayment from booking controller
       log("✅ Payment Screen - Skipping BookingScreenController initialization for wallet recharge");
     } else {
       log("Payment Screen - This is NOT a wallet recharge, proceeding with booking flow");
     }
-    
+
     // Initialize booking controller and sync coupon data for booking payments ONLY
     // DO NOT initialize for wallet recharge to prevent interference
     if (isWalletAdd == false && isCreateOrder == true) {
@@ -205,7 +205,7 @@ class PaymentScreenController extends GetxController {
 
     if (args != null) {
       log("Payment Screen - Args length: ${args.length}");
-      
+
       // Log each argument individually
       for (int i = 0; i < args.length; i++) {
         log("Payment Screen - Args[$i]: ${args[i]} (type: ${args[i].runtimeType})");
@@ -246,7 +246,8 @@ class PaymentScreenController extends GetxController {
         totalAmount = args[1] as String?;
         isCreateOrder = args[2] as bool? ?? false;
         if (args.length > 4) {
-          bookingData = args[4] as Map<String, dynamic>?; // Additional booking data
+          bookingData =
+              args[4] as Map<String, dynamic>?; // Additional booking data
         }
       } else if (args.length >= 3) {
         log("Payment Screen - Processing 3 arguments");
@@ -270,7 +271,8 @@ class PaymentScreenController extends GetxController {
 
       // Double-check: Ensure isWalletAdd is explicitly true for wallet recharge
       // This is a safety check in case the above logic missed it
-      if (args.length >= 3 && (args[0] == true || args[0] == "true" || args[0] == 1)) {
+      if (args.length >= 3 &&
+          (args[0] == true || args[0] == "true" || args[0] == 1)) {
         log("Payment Screen - Double-checking wallet recharge condition...");
         isWalletAdd = true;
         // CRITICAL: For wallet recharge, ensure selectedPayment is null
@@ -307,20 +309,14 @@ class PaymentScreenController extends GetxController {
     log("Payment Screen - Is Create Order :: $isCreateOrder");
     log("Payment Screen - Total Amount :: '$totalAmount'");
     log("Payment Screen - Selected Payment :: '$selectedPayment'");
-      log("Payment Screen - Booking Data :: $bookingData");
+    log("Payment Screen - Booking Data :: $bookingData");
 
-      // Validate total amount
-      if (totalAmount == null || totalAmount!.isEmpty) {
-        log("Payment Screen - WARNING: Total amount is null or empty!");
-      } else {
-        log("Payment Screen - Total amount is valid: '$totalAmount'");
-      }
+    // Validate total amount
+    if (totalAmount == null || totalAmount!.isEmpty) {
+      log("Payment Screen - WARNING: Total amount is null or empty!");
     } else {
-      log("Payment Screen - WARNING: No arguments received!");
-      // Default to false if no args (shouldn't happen, but safety check)
-      isWalletAdd = false;
+      log("Payment Screen - Total amount is valid: '$totalAmount'");
     }
-    update([Constant.idSelectPaymentMethod]);
   }
 
   onSelectPaymentMethod(String value) {
