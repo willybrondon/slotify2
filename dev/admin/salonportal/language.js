@@ -367,6 +367,8 @@ function translatePage() {
         } else if (element.hasAttribute('data-translate-html')) {
             element.innerHTML = translation;
         } else {
+            // Clear textContent first to prevent duplication, then set translation
+            element.textContent = '';
             element.textContent = translation;
         }
     });

@@ -84,17 +84,21 @@ class WalletScreenController extends GetxController {
       return;
     }
 
+    // CRITICAL: Use the same flow as Profile -> Wallet -> Add Money
+    // Navigate to WalletRechargeScreen first, which will then navigate to payment screen
+    // This ensures the same clean state and payment method selection as the profile flow
+    log("Wallet Recharge - Navigating to WalletRechargeScreen (same as Profile -> Wallet -> Add Money flow)");
+    
+    // Close the bottom sheet first if it's open
+    Get.back();
+    
+    // Navigate to wallet recharge screen with the amount pre-filled
     Get.toNamed(
-      AppRoutes.payment,
-      arguments: [
-        true, // isWalletAdd
-        rechargeAmount, // totalAmount
-        false, // isCreateOrder
-        null, // selectedPayment - null to show all enabled payment methods
-      ],
+      AppRoutes.walletRecharge,
+      arguments: rechargeAmount, // Pre-fill the amount
     )?.then(
       (value) async {
-        // Refresh wallet history after returning from payment
+        // Refresh wallet history after returning from recharge
         await onGetWalletHistoryApiCall(
           userId: Constant.storage.read<String>('userId') ?? "",
           month: DateFormat('yyyy-MM').format(DateTime.now()),

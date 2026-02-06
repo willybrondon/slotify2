@@ -44,6 +44,28 @@ class WalletRechargeController extends GetxController {
   void onInit() {
     super.onInit();
     try {
+      // Check if amount was passed as argument (from insufficient wallet flow)
+      dynamic args = Get.arguments;
+      if (args != null) {
+        if (args is String) {
+          // Single argument: amount as string
+          String prefillAmount = args;
+          if (prefillAmount.isNotEmpty && double.tryParse(prefillAmount) != null) {
+            amountController.text = prefillAmount;
+            selectedAmount = prefillAmount;
+            log("WalletRechargeController - Pre-filled amount from arguments: $prefillAmount");
+          }
+        } else if (args is List && args.isNotEmpty) {
+          // List argument: first element is amount
+          String prefillAmount = args[0].toString();
+          if (prefillAmount.isNotEmpty && double.tryParse(prefillAmount) != null) {
+            amountController.text = prefillAmount;
+            selectedAmount = prefillAmount;
+            log("WalletRechargeController - Pre-filled amount from arguments: $prefillAmount");
+          }
+        }
+      }
+      
       // Get registered phone number
       String registeredPhone = Constant.storage.read<String>('UserMobile') ?? "";
       phoneNumberController.text = registeredPhone;
