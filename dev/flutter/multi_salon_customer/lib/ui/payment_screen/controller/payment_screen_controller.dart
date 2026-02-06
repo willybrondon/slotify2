@@ -57,6 +57,11 @@ class PaymentScreenController extends GetxController {
 
   @override
   void onInit() async {
+    // CRITICAL: Initialize selectedPayment to null FIRST, before anything else
+    // This prevents any pre-existing values from being used
+    selectedPayment = null;
+    isWalletAdd = false;
+
     // Initialize MTN MoMo phone controller with registered phone number
     String registeredPhone = Constant.storage.read<String>('UserMobile') ?? "";
     mtnMomoPhoneController.text = registeredPhone;

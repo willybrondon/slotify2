@@ -186,11 +186,13 @@ class PaymentMethodView extends StatelessWidget {
     if (isWalletRecharge && logic.selectedPayment != null && logic.selectedPayment != "") {
       log("⚠️ Payment Screen Widget - FORCING clear of selectedPayment '${logic.selectedPayment}' for wallet recharge");
       // Clear immediately and update UI
-      Future.microtask(() {
-        logic.selectedPayment = null;
-        logic.update([Constant.idSelectPaymentMethod]);
-      });
+      logic.selectedPayment = null;
+      logic.update([Constant.idSelectPaymentMethod]);
     }
+    
+    // CRITICAL: For wallet recharge, ensure selectedPayment is ALWAYS null before rendering
+    // This ensures no payment method appears as selected
+    final String? displaySelectedPayment = isWalletRecharge ? null : logic.selectedPayment;
     
     return isWalletRecharge
         ? Column(
@@ -1095,6 +1097,11 @@ class PaymentStripeView extends StatelessWidget {
     return GetBuilder<PaymentScreenController>(
       id: Constant.idSelectPaymentMethod,
       builder: (logic) {
+        // CRITICAL: For wallet recharge, never show as selected (even if selectedPayment is somehow set)
+        final bool isSelected = logic.isWalletAdd == true 
+            ? false  // Always false for wallet recharge - user must explicitly select
+            : logic.selectedPayment == "Stripe";
+        
         return InkWell(
           overlayColor: WidgetStatePropertyAll(AppColors.transparent),
           onTap: () {
@@ -1149,12 +1156,12 @@ class PaymentStripeView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: logic.selectedPayment == "Stripe"
+                      color: isSelected
                           ? AppColors.primaryAppColor
                           : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
-                  child: logic.selectedPayment == "Stripe"
+                  child: isSelected
                       ? Image.asset(
                           AppAsset.icCheck,
                           color: AppColors.primaryAppColor,
@@ -1180,6 +1187,11 @@ class PaymentMtnMomoView extends StatelessWidget {
     return GetBuilder<PaymentScreenController>(
       id: Constant.idSelectPaymentMethod,
       builder: (logic) {
+        // CRITICAL: For wallet recharge, never show as selected (even if selectedPayment is somehow set)
+        final bool isSelected = logic.isWalletAdd == true 
+            ? false  // Always false for wallet recharge - user must explicitly select
+            : logic.selectedPayment == "MTN MoMo";
+        
         return InkWell(
           overlayColor: WidgetStatePropertyAll(AppColors.transparent),
           onTap: () {
@@ -1242,12 +1254,12 @@ class PaymentMtnMomoView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: logic.selectedPayment == "MTN MoMo"
+                      color: isSelected
                           ? AppColors.primaryAppColor
                           : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
-                  child: logic.selectedPayment == "MTN MoMo"
+                  child: isSelected
                       ? Image.asset(
                           AppAsset.icCheck,
                           color: AppColors.primaryAppColor,
