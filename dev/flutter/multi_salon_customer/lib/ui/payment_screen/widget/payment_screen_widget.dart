@@ -136,8 +136,20 @@ class PaymentMethodView extends StatelessWidget {
     log("Payment Screen Widget - logic.isWalletAdd: ${logic.isWalletAdd} (type: ${logic.isWalletAdd.runtimeType})");
     log("Payment Screen Widget - logic.selectedPayment: '${logic.selectedPayment}'");
     
+    // CRITICAL: Explicitly check for true, and if null, default to false (booking)
+    // This ensures wallet recharge is only true when explicitly set
     final bool isWalletRecharge = logic.isWalletAdd == true;
     log("Payment Screen Widget - isWalletRecharge calculated: $isWalletRecharge");
+    
+    // CRITICAL: If this is wallet recharge but selectedPayment is not null, force clear it
+    if (isWalletRecharge && logic.selectedPayment != null && logic.selectedPayment != "") {
+      log("⚠️ Payment Screen Widget - CRITICAL: Wallet recharge but selectedPayment is '${logic.selectedPayment}', forcing clear!");
+      // Force clear in controller
+      Future.microtask(() {
+        logic.selectedPayment = null;
+        logic.update([Constant.idSelectPaymentMethod]);
+      });
+    }
     
     // CRITICAL: For wallet recharge, ensure selectedPayment is null
     // This prevents showing "Cash on Service" or any booking payment method
@@ -169,12 +181,24 @@ class PaymentMethodView extends StatelessWidget {
     log("Payment Screen Widget - Will show: ${isWalletRecharge ? 'WALLET RECHARGE' : 'BOOKING'} payment methods");
     log("═══════════════════════════════════════════════════════════");
     
+    // CRITICAL: For wallet recharge, FORCE clear selectedPayment if it's somehow set
+    // This prevents "Cash on Service" from appearing when recharging wallet
+    if (isWalletRecharge && logic.selectedPayment != null && logic.selectedPayment != "") {
+      log("⚠️ Payment Screen Widget - FORCING clear of selectedPayment '${logic.selectedPayment}' for wallet recharge");
+      // Clear immediately and update UI
+      Future.microtask(() {
+        logic.selectedPayment = null;
+        logic.update([Constant.idSelectPaymentMethod]);
+      });
+    }
+    
     return isWalletRecharge
         ? Column(
             children: [
               const PaymentTitleView(),
               // Only show Stripe and MTN MoMo for wallet recharge (same as profile/wallet/add money)
-              // Razorpay, Flutterwave, and Cash on Hand are not available for wallet recharge
+              // Razorpay, Flutterwave, and Cash on Hand are NOT available for wallet recharge
+              // CRITICAL: Never show PaymentCashOnHandView for wallet recharge
               if (isStripeEnabled) const PaymentStripeView(),
               if (isMtnMomoEnabled) ...[
                 const PaymentMtnMomoView(),

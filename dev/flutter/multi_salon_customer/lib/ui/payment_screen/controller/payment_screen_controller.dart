@@ -203,6 +203,10 @@ class PaymentScreenController extends GetxController {
     log("Payment Screen - Args received: $args");
     log("Payment Screen - Args type: ${args.runtimeType}");
 
+    // CRITICAL: Initialize isWalletAdd to false by default to prevent null issues
+    isWalletAdd = false;
+    selectedPayment = null;
+
     if (args != null) {
       log("Payment Screen - Args length: ${args.length}");
 
@@ -317,6 +321,19 @@ class PaymentScreenController extends GetxController {
     } else {
       log("Payment Screen - Total amount is valid: '$totalAmount'");
     }
+
+    // CRITICAL FINAL CHECK: For wallet recharge, ensure selectedPayment is ALWAYS null
+    // This prevents any "Cash on Service" from being shown
+    if (isWalletAdd == true) {
+      if (selectedPayment != null && selectedPayment != "") {
+        log("⚠️ Payment Screen - FINAL FIX: Force clearing selectedPayment '$selectedPayment' for wallet recharge");
+        selectedPayment = null;
+      }
+      log("✅ Payment Screen - Final check: Wallet recharge confirmed, selectedPayment is: $selectedPayment");
+    }
+
+    // Update UI immediately after parsing arguments
+    update([Constant.idSelectPaymentMethod]);
   }
 
   onSelectPaymentMethod(String value) {
