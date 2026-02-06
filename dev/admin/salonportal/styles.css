@@ -88,17 +88,19 @@ html {
     border-left: 1px solid #e0e0e0;
     padding-left: 1.5rem;
     text-decoration: none !important;
+    color: #000 !important; /* Black color for documentation text */
 }
 
 .nav-menu-center .documentation-link:hover {
     background: #f5f5f5;
-    color: #111;
+    color: #000 !important; /* Keep black on hover */
     text-decoration: none !important;
 }
 
 /* Language switcher in nav-menu-center - desktop */
+/* Position it close to the documentation button container, not overlapping the text */
 .nav-menu-center .lang-switcher.desktop-only {
-    margin-left: 0.25rem;
+    margin-left: 1rem; /* Spacing to separate from documentation link container */
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     padding: 8px 16px;
@@ -111,6 +113,9 @@ html {
     align-items: center;
     gap: 6px;
     background: transparent;
+    /* Ensure it's a separate element, not inside documentation link */
+    position: relative;
+    white-space: nowrap; /* Prevent wrapping */
 }
 
 .nav-menu-center .lang-switcher.desktop-only:hover {
@@ -650,9 +655,7 @@ html {
         display: flex !important;
         visibility: visible !important;
         opacity: 1 !important;
-    }
         align-items: center;
-        visibility: visible !important;
     }
 }
 

@@ -80,10 +80,36 @@ class PaymentScreenController extends GetxController {
     }
 
     await getDataFromArgs();
-    // Initialize booking controller and sync coupon data for booking payments
+    
+    // CRITICAL: After parsing arguments, ensure wallet recharge has null selectedPayment
+    // This prevents any accidental inheritance of booking payment methods
+    log("Payment Screen - onInit() after getDataFromArgs()");
+    log("   - isWalletAdd: $isWalletAdd");
+    log("   - selectedPayment: $selectedPayment");
+    
+    if (isWalletAdd == true) {
+      log("✅ Payment Screen - Confirmed wallet recharge in onInit()");
+      if (selectedPayment != null && selectedPayment != "") {
+        log("⚠️ Payment Screen - CRITICAL FIX: Clearing selectedPayment '$selectedPayment' for wallet recharge");
+        selectedPayment = null;
+        update([Constant.idSelectPaymentMethod]);
+      }
+      log("✅ Payment Screen - Wallet recharge: selectedPayment is now '$selectedPayment'");
+      
+      // CRITICAL: For wallet recharge, DO NOT initialize BookingScreenController
+      // This prevents reading selectedPayment from booking controller
+      log("✅ Payment Screen - Skipping BookingScreenController initialization for wallet recharge");
+    } else {
+      log("Payment Screen - This is NOT a wallet recharge, proceeding with booking flow");
+    }
+    
+    // Initialize booking controller and sync coupon data for booking payments ONLY
+    // DO NOT initialize for wallet recharge to prevent interference
     if (isWalletAdd == false && isCreateOrder == true) {
+      log("Payment Screen - Initializing BookingScreenController for booking payment");
       try {
         bookingScreenController = Get.find<BookingScreenController>();
+        log("Payment Screen - Found BookingScreenController, selectedPayment in booking controller: ${bookingScreenController?.selectedPayment}");
 
         // Sync coupon data from bookingData if available
         if (bookingData != null) {
@@ -171,53 +197,91 @@ class PaymentScreenController extends GetxController {
   bool get isScreenActive => !isScreenClosed;
 
   getDataFromArgs() {
+    log("═══════════════════════════════════════════════════════════");
+    log("Payment Screen - getDataFromArgs() START");
+    log("═══════════════════════════════════════════════════════════");
     log("Payment Screen - Args received: $args");
+    log("Payment Screen - Args type: ${args.runtimeType}");
 
     if (args != null) {
       log("Payment Screen - Args length: ${args.length}");
+      
+      // Log each argument individually
+      for (int i = 0; i < args.length; i++) {
+        log("Payment Screen - Args[$i]: ${args[i]} (type: ${args[i].runtimeType})");
+      }
 
       // First, check if this is a wallet recharge by examining args[0]
       // This must be done BEFORE any assignments to ensure correct detection
       bool isWalletRechargeArg = false;
       if (args.length >= 3) {
         // Check if first argument indicates wallet recharge
+        log("Payment Screen - Checking args[0] for wallet recharge: ${args[0]} (type: ${args[0].runtimeType})");
         if (args[0] == true || args[0] == "true" || args[0] == 1) {
           isWalletRechargeArg = true;
-          log("Payment Screen - Detected wallet recharge from args[0]: ${args[0]}");
+          log("✅ Payment Screen - Detected wallet recharge from args[0]: ${args[0]}");
+        } else {
+          log("❌ Payment Screen - NOT a wallet recharge, args[0] is: ${args[0]}");
         }
       }
 
       if (args.length >= 4) {
+        log("Payment Screen - Processing 4+ arguments");
         // Explicitly check for wallet recharge first
         if (isWalletRechargeArg) {
           isWalletAdd = true;
+          // For wallet recharge, explicitly set selectedPayment to null
+          // This ensures we don't accidentally use a previous payment method
+          selectedPayment = null;
+          log("✅ Payment Screen - Wallet recharge detected with 4 arguments");
+          log("   - isWalletAdd set to: $isWalletAdd");
+          log("   - selectedPayment set to: $selectedPayment");
         } else {
           isWalletAdd = args[0] as bool? ?? false;
+          selectedPayment = args[3] as String?;
+          log("Payment Screen - Booking payment detected with 4 arguments");
+          log("   - isWalletAdd set to: $isWalletAdd");
+          log("   - selectedPayment set to: $selectedPayment");
         }
         totalAmount = args[1] as String?;
         isCreateOrder = args[2] as bool? ?? false;
-        selectedPayment = args[3] as String?;
         if (args.length > 4) {
           bookingData = args[4] as Map<String, dynamic>?; // Additional booking data
         }
       } else if (args.length >= 3) {
+        log("Payment Screen - Processing 3 arguments");
         // Handle wallet recharge case with 3 or 4 arguments
         if (isWalletRechargeArg) {
           isWalletAdd = true;
-          log("Payment Screen - Wallet recharge confirmed with 3 arguments");
+          selectedPayment = null; // Explicitly null for wallet recharge
+          log("✅ Payment Screen - Wallet recharge confirmed with 3 arguments");
+          log("   - isWalletAdd set to: $isWalletAdd");
+          log("   - selectedPayment set to: $selectedPayment");
         } else {
           isWalletAdd = args[0] as bool? ?? false;
+          selectedPayment = null; // Will be set to default below
+          log("Payment Screen - Booking payment with 3 arguments");
+          log("   - isWalletAdd set to: $isWalletAdd");
+          log("   - selectedPayment set to: $selectedPayment");
         }
         totalAmount = args[1] as String?;
         isCreateOrder = args[2] as bool? ?? false;
-        selectedPayment = null; // Will be set to default below
       }
 
       // Double-check: Ensure isWalletAdd is explicitly true for wallet recharge
       // This is a safety check in case the above logic missed it
       if (args.length >= 3 && (args[0] == true || args[0] == "true" || args[0] == 1)) {
+        log("Payment Screen - Double-checking wallet recharge condition...");
         isWalletAdd = true;
-        log("Payment Screen - Final confirmation: This is a wallet recharge");
+        // CRITICAL: For wallet recharge, ensure selectedPayment is null
+        // This prevents showing "Cash on Service" or any other booking payment method
+        if (selectedPayment != null && selectedPayment != "") {
+          log("⚠️ Payment Screen - WARNING: selectedPayment was set to '$selectedPayment' for wallet recharge, clearing it");
+          selectedPayment = null;
+        }
+        log("✅ Payment Screen - Final confirmation: This is a wallet recharge");
+        log("   - isWalletAdd: $isWalletAdd");
+        log("   - selectedPayment: $selectedPayment");
       }
 
       // Set default payment method if not specified
@@ -225,13 +289,24 @@ class PaymentScreenController extends GetxController {
       // For booking, default to wallet
       if (selectedPayment == null && isWalletAdd != true) {
         selectedPayment = "wallet";
+        log("Payment Screen - Set default selectedPayment to 'wallet' for booking");
       }
       // For wallet recharge, keep selectedPayment as null to show only Stripe and MTN MoMo
 
-      log("Payment Screen - Is Wallet Add :: $isWalletAdd (type: ${isWalletAdd.runtimeType})");
-      log("Payment Screen - Is Create Order :: $isCreateOrder");
-      log("Payment Screen - Total Amount :: '$totalAmount'");
-      log("Payment Screen - Selected Payment :: '$selectedPayment'");
+      log("Payment Screen - Final values after getDataFromArgs():");
+      log("   - isWalletAdd: $isWalletAdd (type: ${isWalletAdd.runtimeType})");
+      log("   - selectedPayment: $selectedPayment");
+      log("   - totalAmount: $totalAmount");
+      log("   - isCreateOrder: $isCreateOrder");
+    } else {
+      log("⚠️ Payment Screen - Args is null!");
+    }
+    log("═══════════════════════════════════════════════════════════");
+    log("Payment Screen - getDataFromArgs() END");
+    log("═══════════════════════════════════════════════════════════");
+    log("Payment Screen - Is Create Order :: $isCreateOrder");
+    log("Payment Screen - Total Amount :: '$totalAmount'");
+    log("Payment Screen - Selected Payment :: '$selectedPayment'");
       log("Payment Screen - Booking Data :: $bookingData");
 
       // Validate total amount
