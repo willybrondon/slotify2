@@ -275,13 +275,36 @@ app.get("/service/:slugWithId", serviceController.serveServicePage);
 app.get("/api/public/categories", async (req, res) => {
   try {
     const Category = require("./models/category.model");
+    const language = req.query.language || 'fr'; // Get language from query, default to French
+    
     const categories = await Category.find({ isDelete: false, status: true })
-      .select("name image _id")
+      .select("name nameEn nameFr namePt image _id")
       .sort({ createdAt: -1 });
+    
+    // Map categories with translated names based on language
+    const translatedCategories = categories.map(category => {
+      let translatedName = category.name; // Default fallback
+      
+      if (language === 'en' && category.nameEn) {
+        translatedName = category.nameEn;
+      } else if (language === 'fr' && category.nameFr) {
+        translatedName = category.nameFr;
+      } else if (language === 'pt' && category.namePt) {
+        translatedName = category.namePt;
+      } else if (category.name) {
+        translatedName = category.name;
+      }
+      
+      return {
+        _id: category._id,
+        name: translatedName,
+        image: category.image,
+      };
+    });
     
     return res.json({
       status: true,
-      data: categories,
+      data: translatedCategories,
     });
   } catch (error) {
     console.error("[Public Categories] Error:", error);

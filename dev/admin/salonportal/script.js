@@ -366,7 +366,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // Load categories from API
 function loadCategories() {
     const baseURL = window.location.origin;
-    const apiUrl = `${baseURL}/api/public/categories`;
+    // Get current language from localStorage, default to French
+    const currentLang = localStorage.getItem('skedisy-language') || 'fr';
+    const apiUrl = `${baseURL}/api/public/categories?language=${currentLang}`;
     
     fetch(apiUrl)
         .then(response => response.json())
