@@ -141,21 +141,20 @@ class PaymentMethodView extends StatelessWidget {
     final bool isWalletRecharge = logic.isWalletAdd == true;
     log("Payment Screen Widget - isWalletRecharge calculated: $isWalletRecharge");
     
-    // CRITICAL: If this is wallet recharge but selectedPayment is not null, force clear it
-    if (isWalletRecharge && logic.selectedPayment != null && logic.selectedPayment != "") {
-      log("⚠️ Payment Screen Widget - CRITICAL: Wallet recharge but selectedPayment is '${logic.selectedPayment}', forcing clear!");
-      // Force clear in controller
-      Future.microtask(() {
+    // CRITICAL: For wallet recharge, FORCE clear selectedPayment IMMEDIATELY if it's somehow set
+    // This prevents "Cash on Service" from appearing when recharging wallet
+    if (isWalletRecharge) {
+      if (logic.selectedPayment != null && logic.selectedPayment != "") {
+        log("⚠️ Payment Screen Widget - CRITICAL: Wallet recharge detected but selectedPayment is '${logic.selectedPayment}'!");
+        log("⚠️ Payment Screen Widget - FORCING immediate clear of selectedPayment!");
+        // Clear immediately (synchronously) - don't use Future.microtask
         logic.selectedPayment = null;
+        // Update UI immediately
         logic.update([Constant.idSelectPaymentMethod]);
-      });
-    }
-    
-    // CRITICAL: For wallet recharge, ensure selectedPayment is null
-    // This prevents showing "Cash on Service" or any booking payment method
-    if (isWalletRecharge && logic.selectedPayment != null && logic.selectedPayment != "") {
-      log("⚠️ Payment Screen Widget - CRITICAL WARNING: Wallet recharge detected but selectedPayment is '${logic.selectedPayment}', this should be null!");
-      log("⚠️ Payment Screen Widget - This indicates a bug - selectedPayment should be null for wallet recharge!");
+        log("✅ Payment Screen Widget - selectedPayment cleared to null");
+      } else {
+        log("✅ Payment Screen Widget - Wallet recharge confirmed, selectedPayment is already null");
+      }
     }
     
     // Debug logging
@@ -173,26 +172,15 @@ class PaymentMethodView extends StatelessWidget {
       if (isWalletRecharge && bookingController.selectedPayment != null) {
         log("⚠️ Payment Screen Widget - CRITICAL: BookingScreenController has selectedPayment '${bookingController.selectedPayment}' but this is a wallet recharge!");
         log("⚠️ Payment Screen Widget - This BookingScreenController should NOT affect wallet recharge flow!");
+        log("⚠️ Payment Screen Widget - Ignoring BookingScreenController.selectedPayment for wallet recharge");
       }
     } catch (e) {
       log("✅ Payment Screen Widget - BookingScreenController not found (this is OK for wallet recharge)");
     }
     
     log("Payment Screen Widget - Will show: ${isWalletRecharge ? 'WALLET RECHARGE' : 'BOOKING'} payment methods");
+    log("Payment Screen Widget - Payment methods enabled - Stripe: $isStripeEnabled, MTN MoMo: $isMtnMomoEnabled");
     log("═══════════════════════════════════════════════════════════");
-    
-    // CRITICAL: For wallet recharge, FORCE clear selectedPayment if it's somehow set
-    // This prevents "Cash on Service" from appearing when recharging wallet
-    if (isWalletRecharge && logic.selectedPayment != null && logic.selectedPayment != "") {
-      log("⚠️ Payment Screen Widget - FORCING clear of selectedPayment '${logic.selectedPayment}' for wallet recharge");
-      // Clear immediately and update UI
-      logic.selectedPayment = null;
-      logic.update([Constant.idSelectPaymentMethod]);
-    }
-    
-    // CRITICAL: For wallet recharge, ensure selectedPayment is ALWAYS null before rendering
-    // This ensures no payment method appears as selected
-    final String? displaySelectedPayment = isWalletRecharge ? null : logic.selectedPayment;
     
     return isWalletRecharge
         ? Column(

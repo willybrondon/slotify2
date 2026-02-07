@@ -57,10 +57,15 @@ class PaymentScreenController extends GetxController {
 
   @override
   void onInit() async {
+    log("═══════════════════════════════════════════════════════════");
+    log("Payment Screen - onInit() START");
+    log("═══════════════════════════════════════════════════════════");
+
     // CRITICAL: Initialize selectedPayment to null FIRST, before anything else
     // This prevents any pre-existing values from being used
     selectedPayment = null;
     isWalletAdd = false;
+    log("Payment Screen - Initialized: selectedPayment = null, isWalletAdd = false");
 
     // Initialize MTN MoMo phone controller with registered phone number
     String registeredPhone = Constant.storage.read<String>('UserMobile') ?? "";
@@ -86,12 +91,12 @@ class PaymentScreenController extends GetxController {
 
     await getDataFromArgs();
 
-    // CRITICAL: After parsing arguments, ensure wallet recharge has null selectedPayment
-    // This prevents any accidental inheritance of booking payment methods
     log("Payment Screen - onInit() after getDataFromArgs()");
     log("   - isWalletAdd: $isWalletAdd");
     log("   - selectedPayment: $selectedPayment");
 
+    // CRITICAL: After parsing arguments, ensure wallet recharge has null selectedPayment
+    // This prevents any accidental inheritance of booking payment methods
     if (isWalletAdd == true) {
       log("✅ Payment Screen - Confirmed wallet recharge in onInit()");
       if (selectedPayment != null && selectedPayment != "") {
@@ -209,8 +214,10 @@ class PaymentScreenController extends GetxController {
     log("Payment Screen - Args type: ${args.runtimeType}");
 
     // CRITICAL: Initialize isWalletAdd to false by default to prevent null issues
+    // CRITICAL: Initialize selectedPayment to null FIRST to prevent any pre-existing values
     isWalletAdd = false;
     selectedPayment = null;
+    log("Payment Screen - Initialized defaults: isWalletAdd = false, selectedPayment = null");
 
     if (args != null) {
       log("Payment Screen - Args length: ${args.length}");
@@ -342,9 +349,19 @@ class PaymentScreenController extends GetxController {
   }
 
   onSelectPaymentMethod(String value) {
-    selectedPayment = value;
+    // CRITICAL: For wallet recharge, only allow Stripe or MTN MoMo
+    if (isWalletAdd == true) {
+      if (value != "Stripe" && value != "MTN MoMo") {
+        log("⚠️ Payment Screen - WARNING: Attempted to select '$value' for wallet recharge, but only Stripe and MTN MoMo are allowed!");
+        log("⚠️ Payment Screen - Ignoring invalid payment method selection");
+        return;
+      }
+      log("✅ Payment Screen - Wallet recharge: Selected payment method: $value");
+    }
 
-    log("Current Index payment :: $selectedPayment");
+    selectedPayment = value;
+    log("Payment Screen - Current selected payment: $selectedPayment");
+    log("Payment Screen - isWalletAdd: $isWalletAdd");
     update([Constant.idSelectPaymentMethod]);
   }
 
