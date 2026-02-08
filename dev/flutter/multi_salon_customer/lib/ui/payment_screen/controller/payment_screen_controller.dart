@@ -99,16 +99,24 @@ class PaymentScreenController extends GetxController {
     // This prevents any accidental inheritance of booking payment methods
     if (isWalletAdd == true) {
       log("✅ Payment Screen - Confirmed wallet recharge in onInit()");
+      
+      // CRITICAL FIX: Force clear selectedPayment for wallet recharge - no exceptions
+      // This prevents "cash on service" or any booking payment method from appearing
       if (selectedPayment != null && selectedPayment != "") {
         log("⚠️ Payment Screen - CRITICAL FIX: Clearing selectedPayment '$selectedPayment' for wallet recharge");
         selectedPayment = null;
-        update([Constant.idSelectPaymentMethod]);
       }
-      log("✅ Payment Screen - Wallet recharge: selectedPayment is now '$selectedPayment'");
+      
+      // DOUBLE CHECK: Ensure it's null even if somehow it wasn't cleared above
+      selectedPayment = null;
+      log("✅ Payment Screen - Wallet recharge: selectedPayment is now '$selectedPayment' (forced null)");
 
       // CRITICAL: For wallet recharge, DO NOT initialize BookingScreenController
       // This prevents reading selectedPayment from booking controller
+      // Also ensure bookingScreenController is null to prevent any accidental access
+      bookingScreenController = null;
       log("✅ Payment Screen - Skipping BookingScreenController initialization for wallet recharge");
+      log("✅ Payment Screen - bookingScreenController set to null to prevent interference");
     } else {
       log("Payment Screen - This is NOT a wallet recharge, proceeding with booking flow");
     }

@@ -254,7 +254,7 @@ html {
 }
 
 .mobile-menu-wrapper {
-    display: flex;
+    display: none; /* Hidden on desktop by default */
     align-items: center;
     justify-content: flex-end;
     gap: 8px;
