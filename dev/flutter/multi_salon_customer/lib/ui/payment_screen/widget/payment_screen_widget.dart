@@ -141,18 +141,21 @@ class PaymentMethodView extends StatelessWidget {
     final bool isWalletRecharge = logic.isWalletAdd == true;
     log("Payment Screen Widget - isWalletRecharge calculated: $isWalletRecharge");
     
-    // ROLLBACK: For wallet recharge from profile, preserve the working flow
-    // Only clear selectedPayment if it's a booking-specific method (cashAfterService) that leaked in
-    // This allows profile wallet recharge to work as before while preventing booking methods from appearing
+    // CRITICAL FIX: For wallet recharge, ALWAYS force selectedPayment to null
+    // This prevents "cash on service" or any booking payment method from appearing
+    // Even if user selected "cash on service" in booking, wallet recharge must show Stripe/MTN MoMo
     if (isWalletRecharge) {
-      // Only clear booking-specific payment methods that shouldn't appear for wallet recharge
-      // Don't clear Stripe/MTN MoMo selections - those should work for profile recharge
-      if (logic.selectedPayment == "cashAfterService") {
-        log("⚠️ Payment Screen Widget - Clearing booking payment method 'cashAfterService' for wallet recharge");
+      // CRITICAL: Force selectedPayment to null for wallet recharge, regardless of previous selection
+      // This is especially important when recharging from booking flow where user may have selected "cashAfterService"
+      if (logic.selectedPayment != null && logic.selectedPayment != "") {
+        log("⚠️ Payment Screen Widget - CRITICAL FIX: Clearing selectedPayment '${logic.selectedPayment}' for wallet recharge");
+        log("⚠️ Payment Screen Widget - This prevents booking payment method (e.g., 'cashAfterService') from appearing during wallet recharge");
         logic.selectedPayment = null;
         logic.update([Constant.idSelectPaymentMethod]);
       }
-      log("✅ Payment Screen Widget - Wallet recharge: selectedPayment is '${logic.selectedPayment}'");
+      // Force to null one more time to be absolutely sure
+      logic.selectedPayment = null;
+      log("✅ Payment Screen Widget - Wallet recharge: selectedPayment is '${logic.selectedPayment}' (forced null)");
     }
     
     // Debug logging
