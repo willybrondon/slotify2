@@ -141,24 +141,18 @@ class PaymentMethodView extends StatelessWidget {
     final bool isWalletRecharge = logic.isWalletAdd == true;
     log("Payment Screen Widget - isWalletRecharge calculated: $isWalletRecharge");
     
-    // CRITICAL: For wallet recharge, FORCE clear selectedPayment IMMEDIATELY if it's somehow set
-    // This prevents "Cash on Service" or any other booking payment method from appearing when recharging wallet
-    // The issue: When user selects "cash on service" in booking, then tries to recharge wallet,
-    // the selectedPayment might be "cashAfterService" which should NOT be shown for wallet recharge
+    // ROLLBACK: For wallet recharge from profile, preserve the working flow
+    // Only clear selectedPayment if it's a booking-specific method (cashAfterService) that leaked in
+    // This allows profile wallet recharge to work as before while preventing booking methods from appearing
     if (isWalletRecharge) {
-      // CRITICAL FIX: Always clear selectedPayment for wallet recharge, even if it's null
-      // This ensures no booking payment method can leak into wallet recharge flow
-      if (logic.selectedPayment != null && logic.selectedPayment != "") {
-        log("⚠️ Payment Screen Widget - CRITICAL: Wallet recharge detected but selectedPayment is '${logic.selectedPayment}'!");
-        log("⚠️ Payment Screen Widget - This likely came from booking screen (e.g., 'cashAfterService')");
-        log("⚠️ Payment Screen Widget - FORCING immediate clear of selectedPayment to prevent showing wrong payment method!");
+      // Only clear booking-specific payment methods that shouldn't appear for wallet recharge
+      // Don't clear Stripe/MTN MoMo selections - those should work for profile recharge
+      if (logic.selectedPayment == "cashAfterService") {
+        log("⚠️ Payment Screen Widget - Clearing booking payment method 'cashAfterService' for wallet recharge");
+        logic.selectedPayment = null;
+        logic.update([Constant.idSelectPaymentMethod]);
       }
-      // Always force to null for wallet recharge - no exceptions
-      logic.selectedPayment = null;
-      // Update UI immediately to reflect the change
-      logic.update([Constant.idSelectPaymentMethod]);
-      log("✅ Payment Screen Widget - selectedPayment forced to null for wallet recharge");
-      log("✅ Payment Screen Widget - Only Stripe and MTN MoMo will be shown for wallet recharge");
+      log("✅ Payment Screen Widget - Wallet recharge: selectedPayment is '${logic.selectedPayment}'");
     }
     
     // Debug logging
@@ -189,21 +183,10 @@ class PaymentMethodView extends StatelessWidget {
     log("Payment Screen Widget - Payment methods enabled - Stripe: $isStripeEnabled, MTN MoMo: $isMtnMomoEnabled");
     log("═══════════════════════════════════════════════════════════");
     
-    // FINAL SAFETY CHECK: If isWalletRecharge is true, NEVER show booking payment methods
-    // This is a final protection against any edge cases or timing issues
+    // ROLLBACK: Return wallet recharge methods for profile flow (preserve working behavior)
+    // Only prevent booking-specific methods from appearing, but allow Stripe/MTN MoMo selection
     if (isWalletRecharge) {
-      // CRITICAL: Force clear selectedPayment one more time as a final safety measure
-      // This ensures that even if there was a timing issue, we catch it here
-      if (logic.selectedPayment != null && logic.selectedPayment != "") {
-        log("⚠️ Payment Screen Widget - FINAL SAFETY CHECK: Clearing selectedPayment '${logic.selectedPayment}'");
-        logic.selectedPayment = null;
-      // Force immediate UI update after frame is built
-      Future.microtask(() {
-        logic.update([Constant.idSelectPaymentMethod]);
-      });
-      }
-      
-      // Return wallet recharge methods ONLY - no booking methods can leak through
+      // Return wallet recharge methods - profile flow should work as before
       return Column(
         children: [
           const PaymentTitleView(),
