@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -376,6 +377,14 @@ class PaymentScreenController extends GetxController {
   }
 
   onClickPayNow() async {
+    // CRITICAL: Ensure isLoading is false at the start to prevent stuck loading state
+    // This fixes the issue where payment screen gets stuck on "payment is load.."
+    if (isLoading.value == true) {
+      log("⚠️ Payment Screen - WARNING: isLoading was already true, clearing it first");
+      isLoading.value = false;
+      update([Constant.idProgressView]);
+    }
+
     // Validate that a payment method is selected for wallet recharge
     if (isWalletAdd == true &&
         (selectedPayment == null || selectedPayment!.isEmpty)) {
@@ -450,7 +459,20 @@ class PaymentScreenController extends GetxController {
 
         log("Called stripe Init");
 
-        await StripeService().stripePay().then((value) {
+        // CRITICAL: Add timeout protection to prevent stuck loading state
+        // This fixes the issue where payment screen gets stuck on "payment is load.."
+        await StripeService().stripePay().timeout(
+          const Duration(seconds: 30),
+          onTimeout: () {
+            log("⚠️ Payment Screen - Stripe payment timeout after 30 seconds");
+            if (isScreenActive) {
+              isLoading(false);
+              update([Constant.idProgressView]);
+              Utils.showToast(Get.context!, "Payment timeout. Please try again.");
+            }
+            throw TimeoutException("Stripe payment timeout");
+          },
+        ).then((value) {
           // Only update if screen is still active
           if (isScreenActive) {
             isLoading(false);
@@ -462,7 +484,9 @@ class PaymentScreenController extends GetxController {
           if (isScreenActive) {
             isLoading(false);
             update([Constant.idProgressView]);
-            Utils.showToast(Get.context!, "Payment failed: ${e.toString()}");
+            if (e is! TimeoutException) {
+              Utils.showToast(Get.context!, "Payment failed: ${e.toString()}");
+            }
           }
         });
       } catch (e) {
@@ -593,7 +617,20 @@ class PaymentScreenController extends GetxController {
 
         log("Called MTN MoMo Init");
 
-        await MtnMomoService().mtnMomoPay().then((value) {
+        // CRITICAL: Add timeout protection to prevent stuck loading state
+        // This fixes the issue where payment screen gets stuck on "payment is load.."
+        await MtnMomoService().mtnMomoPay().timeout(
+          const Duration(seconds: 30),
+          onTimeout: () {
+            log("⚠️ Payment Screen - MTN MoMo payment timeout after 30 seconds");
+            if (isScreenActive) {
+              isLoading(false);
+              update([Constant.idProgressView]);
+              Utils.showToast(Get.context!, "Payment timeout. Please try again.");
+            }
+            throw TimeoutException("MTN MoMo payment timeout");
+          },
+        ).then((value) {
           if (isScreenActive) {
             isLoading(false);
             update([Constant.idProgressView]);
@@ -603,7 +640,9 @@ class PaymentScreenController extends GetxController {
           if (isScreenActive) {
             isLoading(false);
             update([Constant.idProgressView]);
-            Utils.showToast(Get.context!, "Payment failed: ${e.toString()}");
+            if (e is! TimeoutException) {
+              Utils.showToast(Get.context!, "Payment failed: ${e.toString()}");
+            }
           }
         });
       } catch (e) {
