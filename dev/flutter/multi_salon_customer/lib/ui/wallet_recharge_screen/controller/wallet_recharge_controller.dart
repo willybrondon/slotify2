@@ -40,6 +40,9 @@ class WalletRechargeController extends GetxController {
   // Get settings
   SplashController? splashController;
   
+  // Track if this recharge is from booking flow
+  bool isFromBooking = false;
+  
   @override
   void onInit() {
     super.onInit();
@@ -47,9 +50,19 @@ class WalletRechargeController extends GetxController {
       // Check if amount was passed as argument (from insufficient wallet flow)
       dynamic args = Get.arguments;
       if (args != null) {
-        if (args is String) {
-          // Single argument: amount as string
+        if (args is Map && args['isFromBooking'] == true) {
+          // Map argument: contains amount and booking context
+          String prefillAmount = args['amount']?.toString() ?? "";
+          isFromBooking = true;
+          if (prefillAmount.isNotEmpty && double.tryParse(prefillAmount) != null) {
+            amountController.text = prefillAmount;
+            selectedAmount = prefillAmount;
+            log("WalletRechargeController - Pre-filled amount from booking: $prefillAmount");
+          }
+        } else if (args is String) {
+          // Single argument: amount as string (from profile wallet)
           String prefillAmount = args;
+          isFromBooking = false;
           if (prefillAmount.isNotEmpty && double.tryParse(prefillAmount) != null) {
             amountController.text = prefillAmount;
             selectedAmount = prefillAmount;
@@ -58,6 +71,7 @@ class WalletRechargeController extends GetxController {
         } else if (args is List && args.isNotEmpty) {
           // List argument: first element is amount
           String prefillAmount = args[0].toString();
+          isFromBooking = false;
           if (prefillAmount.isNotEmpty && double.tryParse(prefillAmount) != null) {
             amountController.text = prefillAmount;
             selectedAmount = prefillAmount;
@@ -223,11 +237,21 @@ class WalletRechargeController extends GetxController {
       
       // After returning from payment screen, check if payment was successful
       if (result == 'success') {
-        // Payment was successful, go back to wallet screen
-        Get.back(result: 'success');
+        // Payment was successful
+        if (isFromBooking) {
+          // If from booking, return 'success' to indicate successful recharge
+          // The booking controller will handle retrying the wallet payment
+          log("WalletRechargeController - Recharge successful from booking, returning to booking screen");
+          Get.back(result: 'success');
+        } else {
+          // If from profile wallet, go back to wallet screen
+          log("WalletRechargeController - Recharge successful from profile, returning to wallet screen");
+          Get.back(result: 'success');
+        }
       } else {
         // Payment was cancelled or failed, stay on recharge screen
         // User can try again or go back manually
+        log("WalletRechargeController - Payment cancelled or failed");
       }
     } catch (e) {
       log("Error in handleContinue: $e");

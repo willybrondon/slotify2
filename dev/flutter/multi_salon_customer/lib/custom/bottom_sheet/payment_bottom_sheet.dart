@@ -11,8 +11,9 @@ import 'package:salon_2/utils/constant.dart';
 
 class PaymentBottomSheet extends StatelessWidget {
   final bool isRecharge;
+  final bool isFromBooking; // New parameter to indicate if this is from booking flow
 
-  const PaymentBottomSheet({super.key, required this.isRecharge});
+  const PaymentBottomSheet({super.key, required this.isRecharge, this.isFromBooking = false});
 
   @override
   Widget build(BuildContext context) {
@@ -574,7 +575,7 @@ class PaymentBottomSheet extends StatelessWidget {
                     buttonColor: AppColors.primaryAppColor,
                     buttonText: "Recharge Now",
                     onTap: () {
-                      logic.onRechargeClick();
+                      logic.onRechargeClick(isFromBooking: isFromBooking);
                     },
                   ).paddingOnly(top: 25, left: 12.5, right: 12.5, bottom: 8);
                 },

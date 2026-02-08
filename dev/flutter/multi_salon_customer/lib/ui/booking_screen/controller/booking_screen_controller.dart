@@ -320,18 +320,53 @@ class BookingScreenController extends GetxController {
 
       if (selectedPayment == "wallet") {
         if (totalPrice > double.parse(walletAmount.toString())) {
+          // Wallet insufficient - show recharge bottom sheet with booking context
           showModalBottomSheet(
             isScrollControlled: true,
             context: context,
             builder: (BuildContext context) {
-              return const PaymentBottomSheet(isRecharge: false);
+              return const PaymentBottomSheet(isRecharge: false, isFromBooking: true);
             },
           ).then(
             (value) async {
+              // Refresh wallet history to get updated balance
               await walletScreenController.onGetWalletHistoryApiCall(
                 userId: Constant.storage.read<String>('userId') ?? "",
                 month: DateFormat('yyyy-MM').format(DateTime.now()),
               );
+              
+              // If recharge was successful, check wallet again and proceed with booking
+              if (value == 'booking_recharge_success') {
+                log("Booking - Wallet recharge successful, checking balance again");
+                // Wait a moment for wallet to update
+                await Future.delayed(const Duration(milliseconds: 500));
+                
+                // The global walletAmount should already be updated by walletScreenController.onGetWalletHistoryApiCall
+                // But let's ensure it's synced
+                if (walletScreenController.getWalletHistoryModel != null) {
+                  walletAmount = walletScreenController.getWalletHistoryModel?.total ?? 0.0;
+                }
+                
+                log("Booking - Current wallet balance: $walletAmount, Required: $totalPrice");
+                
+                // Check if wallet now has sufficient balance
+                if (totalPrice <= double.parse(walletAmount.toString())) {
+                  log("Booking - Wallet now has sufficient balance, showing confirm dialog");
+                  // Show confirm dialog to proceed with booking
+                  Get.dialog(
+                    barrierColor: AppColors.blackColor.withOpacity(0.8),
+                    Dialog(
+                      backgroundColor: AppColors.transparent,
+                      shadowColor: AppColors.transparent,
+                      elevation: 0,
+                      child: const ConfirmDialog(),
+                    ),
+                  );
+                } else {
+                  log("Booking - Wallet still insufficient after recharge");
+                  Utils.showToast(Get.context!, "Wallet balance is still insufficient. Please recharge more.");
+                }
+              }
             },
           );
         } else {

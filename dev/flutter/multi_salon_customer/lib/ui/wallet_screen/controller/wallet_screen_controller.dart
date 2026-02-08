@@ -68,7 +68,7 @@ class WalletScreenController extends GetxController {
     update([Constant.idSelectAmount]);
   }
 
-  onRechargeClick() {
+  onRechargeClick({bool isFromBooking = false}) {
     // Validate amount before proceeding
     String rechargeAmount = currencyController.text.trim();
     if (rechargeAmount.isEmpty) {
@@ -78,6 +78,7 @@ class WalletScreenController extends GetxController {
     log("Wallet Recharge - Amount: $rechargeAmount");
     log("Wallet Recharge - Selected Amount: $amount");
     log("Wallet Recharge - Controller Text: ${currencyController.text}");
+    log("Wallet Recharge - Is From Booking: $isFromBooking");
     
     if (rechargeAmount.isEmpty || rechargeAmount == "0" || rechargeAmount == "0.0") {
       Utils.showToast(Get.context!, "Please select a valid amount to recharge");
@@ -92,10 +93,12 @@ class WalletScreenController extends GetxController {
     // Close the bottom sheet first if it's open
     Get.back();
     
-    // Navigate to wallet recharge screen with the amount pre-filled
+    // Navigate to wallet recharge screen with the amount pre-filled and booking context
     Get.toNamed(
       AppRoutes.walletRecharge,
-      arguments: rechargeAmount, // Pre-fill the amount
+      arguments: isFromBooking 
+        ? {'amount': rechargeAmount, 'isFromBooking': true} 
+        : rechargeAmount, // Pre-fill the amount
     )?.then(
       (value) async {
         // Refresh wallet history after returning from recharge
@@ -105,6 +108,11 @@ class WalletScreenController extends GetxController {
         );
         // Update UI
         update([Constant.idProgressView]);
+        
+        // If from booking, return 'booking_recharge_success' to indicate successful recharge
+        if (isFromBooking && value == 'success') {
+          Get.back(result: 'booking_recharge_success');
+        }
       },
     );
   }
