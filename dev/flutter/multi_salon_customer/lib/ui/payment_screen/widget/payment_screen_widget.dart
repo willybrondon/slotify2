@@ -142,16 +142,20 @@ class PaymentMethodView extends StatelessWidget {
     log("Payment Screen Widget - isWalletRecharge calculated: $isWalletRecharge");
     
     // CRITICAL: For wallet recharge, FORCE clear selectedPayment IMMEDIATELY if it's somehow set
-    // This prevents "Cash on Service" from appearing when recharging wallet
+    // This prevents "Cash on Service" or any other booking payment method from appearing when recharging wallet
+    // The issue: When user selects "cash on service" in booking, then tries to recharge wallet,
+    // the selectedPayment might be "cashAfterService" which should NOT be shown for wallet recharge
     if (isWalletRecharge) {
       if (logic.selectedPayment != null && logic.selectedPayment != "") {
         log("⚠️ Payment Screen Widget - CRITICAL: Wallet recharge detected but selectedPayment is '${logic.selectedPayment}'!");
-        log("⚠️ Payment Screen Widget - FORCING immediate clear of selectedPayment!");
+        log("⚠️ Payment Screen Widget - This likely came from booking screen (e.g., 'cashAfterService')");
+        log("⚠️ Payment Screen Widget - FORCING immediate clear of selectedPayment to prevent showing wrong payment method!");
         // Clear immediately (synchronously) - don't use Future.microtask
         logic.selectedPayment = null;
         // Update UI immediately
         logic.update([Constant.idSelectPaymentMethod]);
         log("✅ Payment Screen Widget - selectedPayment cleared to null");
+        log("✅ Payment Screen Widget - Only Stripe and MTN MoMo will be shown for wallet recharge");
       } else {
         log("✅ Payment Screen Widget - Wallet recharge confirmed, selectedPayment is already null");
       }
@@ -258,13 +262,15 @@ class PaymentMethodView extends StatelessWidget {
                 if (logic.selectedPayment == "flutterWave" &&
                     isFlutterWaveEnabled)
                   const PaymentFlutterWaveView(),
-                if (logic.selectedPayment == "cashAfterService")
+                // CRITICAL: NEVER show "Cash on Service" for wallet recharge
+                // Even if selectedPayment is somehow set to "cashAfterService", don't show it for wallet recharge
+                if (logic.selectedPayment == "cashAfterService" && logic.isWalletAdd != true)
                   const PaymentCashOnHandView(),
                 // Add other payment methods as needed
                 // Show all available payment methods if none selected
                 // IMPORTANT: Only show these for booking payments, not wallet recharge
                 if ((logic.selectedPayment == null ||
-                    logic.selectedPayment == "")) ...[
+                    logic.selectedPayment == "") && logic.isWalletAdd != true) ...[
                   const PaymentMyWalletView(),
                   if (isStripeEnabled) const PaymentStripeView(),
                   if (isMtnMomoEnabled) const PaymentMtnMomoView(),

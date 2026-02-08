@@ -153,6 +153,10 @@ class PaymentScreenController extends GetxController {
           totalAmount = bookingScreenController!.totalPrice.toString();
         }
 
+        // NOTE: This block only runs for booking payments (isWalletAdd == false)
+        // For wallet recharge, booking controller is not initialized (see line 111)
+        // So we don't need to check isWalletAdd here - it's already false
+
         // Fetch coupons if not already fetched (for payment screen)
         if (bookingScreenController!.getCouponModel == null &&
             bookingScreenController!.withOutTaxRupee > 0) {
@@ -335,13 +339,15 @@ class PaymentScreenController extends GetxController {
     }
 
     // CRITICAL FINAL CHECK: For wallet recharge, ensure selectedPayment is ALWAYS null
-    // This prevents any "Cash on Service" from being shown
+    // This prevents any "Cash on Service" or other booking payment methods from being shown
     if (isWalletAdd == true) {
       if (selectedPayment != null && selectedPayment != "") {
         log("⚠️ Payment Screen - FINAL FIX: Force clearing selectedPayment '$selectedPayment' for wallet recharge");
+        log("⚠️ Payment Screen - This prevents 'Cash on Service' or other booking methods from appearing during wallet recharge");
         selectedPayment = null;
       }
       log("✅ Payment Screen - Final check: Wallet recharge confirmed, selectedPayment is: $selectedPayment");
+      log("✅ Payment Screen - Only Stripe and MTN MoMo will be shown for wallet recharge");
     }
 
     // Update UI immediately after parsing arguments
