@@ -4,6 +4,7 @@
 
 ### Issues Found and Fixed
 
+
 1. **✅ Fixed: Cookie Link Handler**
    - **Issue**: `setupPreferencesButton()` was preventing default on ALL cookie links, including links to `cookies.html`
    - **Fix**: Updated to only intercept links that don't go to `cookies.html`
