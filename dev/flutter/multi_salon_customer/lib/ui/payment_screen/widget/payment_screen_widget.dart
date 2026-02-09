@@ -186,10 +186,27 @@ class PaymentMethodView extends StatelessWidget {
     log("Payment Screen Widget - Payment methods enabled - Stripe: $isStripeEnabled, MTN MoMo: $isMtnMomoEnabled");
     log("═══════════════════════════════════════════════════════════");
     
-    // ROLLBACK: Return wallet recharge methods for profile flow (preserve working behavior)
-    // Only prevent booking-specific methods from appearing, but allow Stripe/MTN MoMo selection
+    // CRITICAL FIX: For wallet recharge, ALWAYS return only Stripe and MTN MoMo
+    // This prevents "cash on service" from appearing, even if selectedPayment was somehow set
     if (isWalletRecharge) {
-      // Return wallet recharge methods - profile flow should work as before
+      // CRITICAL: Double-check that selectedPayment is null before building UI
+      // This is the final safety check to prevent "cash on service" from appearing
+      if (logic.selectedPayment != null && logic.selectedPayment != "") {
+        log("⚠️ Payment Screen Widget - FINAL CHECK: selectedPayment is '${logic.selectedPayment}' for wallet recharge - forcing to null");
+        log("⚠️ Payment Screen Widget - This prevents 'cashAfterService' from appearing during wallet recharge");
+        logic.selectedPayment = null;
+        // Force immediate UI update
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          logic.update([Constant.idSelectPaymentMethod]);
+        });
+      }
+      // Force to null one more time to be absolutely sure
+      logic.selectedPayment = null;
+      
+      // CRITICAL: Return wallet recharge methods ONLY - never show booking methods
+      // This ensures "cash on service" never appears for wallet recharge
+      log("✅ Payment Screen Widget - Returning wallet recharge methods (Stripe and MTN MoMo only)");
+      log("✅ Payment Screen Widget - selectedPayment is: '${logic.selectedPayment}' (forced null)");
       return Column(
         children: [
           const PaymentTitleView(),
