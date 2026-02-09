@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:salon_2/custom/dialog/continue_booking_dialog.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/services/app_exception/app_exception.dart';
@@ -10,6 +11,7 @@ import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/ui/payment_screen/method/stripe_payment/stripe_service.dart';
 import 'package:salon_2/ui/payment_screen/method/mtn_momo/mtn_momo_service.dart';
 import 'package:salon_2/utils/api_constant.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:http/http.dart' as http;
@@ -239,10 +241,31 @@ class WalletRechargeController extends GetxController {
       if (result == 'success') {
         // Payment was successful
         if (isFromBooking) {
-          // If from booking, return 'success' to indicate successful recharge
-          // The booking controller will handle retrying the wallet payment
-          log("WalletRechargeController - Recharge successful from booking, returning to booking screen");
-          Get.back(result: 'success');
+          // If from booking, show confirmation dialog asking if user wants to continue booking
+          log("WalletRechargeController - Recharge successful from booking, showing continue booking dialog");
+          
+          // Show dialog asking if user wants to continue booking
+          Get.dialog(
+            barrierColor: AppColors.blackColor.withOpacity(0.8),
+            Dialog(
+              backgroundColor: AppColors.transparent,
+              shadowColor: AppColors.transparent,
+              elevation: 0,
+              child: const ContinueBookingDialog(),
+            ),
+          ).then(
+            (dialogResult) {
+              if (dialogResult == 'continue_booking') {
+                // User chose to continue booking - return to booking screen
+                log("WalletRechargeController - User chose to continue booking");
+                Get.back(result: 'continue_booking');
+              } else {
+                // User chose to cancel - stay on wallet screen
+                log("WalletRechargeController - User chose to stay on wallet page");
+                Get.back(result: 'cancel');
+              }
+            },
+          );
         } else {
           // If from profile wallet, go back to wallet screen
           log("WalletRechargeController - Recharge successful from profile, returning to wallet screen");

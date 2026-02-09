@@ -320,30 +320,41 @@ class BookingScreenController extends GetxController {
 
       if (selectedPayment == "wallet") {
         if (totalPrice > double.parse(walletAmount.toString())) {
-          // Wallet insufficient - show recharge bottom sheet with booking context
-          showModalBottomSheet(
-            isScrollControlled: true,
-            context: context,
-            builder: (BuildContext context) {
-              return const PaymentBottomSheet(
-                  isRecharge: false, isFromBooking: true);
-            },
-          ).then(
-            (value) async {
-              // Refresh wallet history to get updated balance
-              await walletScreenController.onGetWalletHistoryApiCall(
-                userId: Constant.storage.read<String>('userId') ?? "",
-                month: DateFormat('yyyy-MM').format(DateTime.now()),
-              );
+          // Wallet insufficient - redirect to profile/wallet to recharge
+          // Store booking context to return after recharge
+          log("Booking - Wallet insufficient, redirecting to profile/wallet for recharge");
+          log("Booking - Required amount: $totalPrice, Current balance: $walletAmount");
 
-              // If recharge was successful, check wallet again and proceed with booking
-              if (value == 'booking_recharge_success') {
-                log("Booking - Wallet recharge successful, checking balance again");
+          // Calculate deficit amount to pre-fill in wallet recharge
+          double deficit = totalPrice - double.parse(walletAmount.toString());
+          String rechargeAmount = deficit.toStringAsFixed(2);
+
+          // Navigate to wallet screen with booking context
+          // Pass the deficit amount and booking context
+          Get.toNamed(
+            AppRoutes.wallet,
+            arguments: {
+              'fromBooking': true,
+              'requiredAmount': totalPrice.toString(),
+              'currentBalance': walletAmount.toString(),
+              'deficitAmount': rechargeAmount,
+            },
+          )?.then(
+            (value) async {
+              // If user chose to continue booking after recharge
+              if (value == 'continue_booking') {
+                log("Booking - User chose to continue booking after wallet recharge");
+
+                // Refresh wallet history to get updated balance
+                await walletScreenController.onGetWalletHistoryApiCall(
+                  userId: Constant.storage.read<String>('userId') ?? "",
+                  month: DateFormat('yyyy-MM').format(DateTime.now()),
+                );
+
                 // Wait a moment for wallet to update
                 await Future.delayed(const Duration(milliseconds: 500));
 
-                // The global walletAmount should already be updated by walletScreenController.onGetWalletHistoryApiCall
-                // But let's ensure it's synced
+                // Update global walletAmount
                 if (walletScreenController.getWalletHistoryModel != null) {
                   walletAmount =
                       walletScreenController.getWalletHistoryModel?.total ??
@@ -354,7 +365,6 @@ class BookingScreenController extends GetxController {
                 log("Booking - Selected payment method preserved: $selectedPayment");
 
                 // CRITICAL: Ensure payment method is still "wallet" (preserve user's selection)
-                // Don't change it to cashAfterService or any other method
                 if (selectedPayment != "wallet") {
                   log("Booking - WARNING: Payment method was changed, restoring to wallet");
                   selectedPayment = "wallet";
@@ -376,13 +386,12 @@ class BookingScreenController extends GetxController {
                   );
                 } else {
                   log("Booking - Wallet still insufficient after recharge");
-                  // CRITICAL: Don't force change payment method - let user choose
-                  // Show message but keep wallet selected so user can recharge again or choose another method
                   Utils.showToast(Get.context!,
                       "Wallet balance is still insufficient. Please recharge more or select another payment method.");
-                  // Update UI to show current state
                   update([Constant.idStep3, Constant.idConfirm]);
                 }
+              } else {
+                log("Booking - User chose to stay on wallet page, not continuing booking");
               }
             },
           );

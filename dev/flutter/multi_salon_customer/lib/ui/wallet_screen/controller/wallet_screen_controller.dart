@@ -25,12 +25,33 @@ class WalletScreenController extends GetxController {
 
   TextEditingController currencyController = TextEditingController();
 
+  // Track if we came from booking flow
+  bool isFromBooking = false;
+  String? deficitAmount;
+
   @override
   void onInit() async {
     log("Enter in wallet screen controller");
 
-    amount = directAmount[0];
-    currencyController.text = amount;
+    // Check if we came from booking flow
+    dynamic args = Get.arguments;
+    if (args != null && args is Map) {
+      isFromBooking = args['fromBooking'] == true;
+      deficitAmount = args['deficitAmount']?.toString();
+      
+      if (isFromBooking && deficitAmount != null) {
+        log("WalletScreen - Came from booking flow, deficit amount: $deficitAmount");
+        // Pre-fill the deficit amount
+        amount = deficitAmount!;
+        currencyController.text = amount;
+      } else {
+        amount = directAmount[0];
+        currencyController.text = amount;
+      }
+    } else {
+      amount = directAmount[0];
+      currencyController.text = amount;
+    }
 
     await getCouponApiCall(
       userId: Constant.storage.read('userId'),

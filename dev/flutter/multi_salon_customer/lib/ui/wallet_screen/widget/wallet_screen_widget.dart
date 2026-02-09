@@ -97,16 +97,29 @@ class WalletButtonView extends StatelessWidget {
           child: GestureDetector(
             onTap: () {
               try {
-                Get.toNamed(AppRoutes.walletRecharge)?.then(
+                final walletController = Get.find<WalletScreenController>();
+                // Pass booking context if we came from booking
+                Get.toNamed(
+                  AppRoutes.walletRecharge,
+                  arguments: walletController.isFromBooking
+                      ? {
+                          'amount': walletController.deficitAmount ?? walletController.amount,
+                          'isFromBooking': true,
+                        }
+                      : walletController.amount,
+                )?.then(
                   (value) async {
                     // Refresh wallet after returning from recharge (especially if payment was successful)
                     try {
-                      final walletController =
-                          Get.find<WalletScreenController>();
                       await walletController.onGetWalletHistoryApiCall(
                         userId: Constant.storage.read<String>('userId') ?? "",
                         month: DateFormat('yyyy-MM').format(DateTime.now()),
                       );
+                      
+                      // If from booking and user chose to continue, return to booking
+                      if (walletController.isFromBooking && value == 'continue_booking') {
+                        Get.back(result: 'continue_booking');
+                      }
                       walletController.update([Constant.idProgressView]);
                     } catch (e) {
                       log("Error refreshing wallet: $e");
