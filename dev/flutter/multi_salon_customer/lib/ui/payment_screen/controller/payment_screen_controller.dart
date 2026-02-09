@@ -62,10 +62,13 @@ class PaymentScreenController extends GetxController {
     log("Payment Screen - onInit() START");
     log("═══════════════════════════════════════════════════════════");
 
-    // ROLLBACK: Don't force initialize selectedPayment to null here
-    // Let getDataFromArgs() handle it properly to preserve profile flow
+    // CRITICAL: Initialize selectedPayment to null FIRST to prevent any pre-existing values
+    // This is especially important when coming from booking flow where user may have selected "cashAfterService"
+    // This MUST be done before getDataFromArgs() to prevent any booking payment method from leaking in
+    selectedPayment = null;
     isWalletAdd = false;
-    log("Payment Screen - Initialized: isWalletAdd = false");
+    log("Payment Screen - Initialized: selectedPayment = null, isWalletAdd = false");
+    log("Payment Screen - This prevents 'cashAfterService' from being set before we detect wallet recharge");
 
     // Initialize MTN MoMo phone controller with registered phone number
     String registeredPhone = Constant.storage.read<String>('UserMobile') ?? "";
@@ -123,11 +126,19 @@ class PaymentScreenController extends GetxController {
 
     // Initialize booking controller and sync coupon data for booking payments ONLY
     // DO NOT initialize for wallet recharge to prevent interference
+    // CRITICAL: Double-check isWalletAdd to prevent any accidental access to BookingScreenController
     if (isWalletAdd == false && isCreateOrder == true) {
       log("Payment Screen - Initializing BookingScreenController for booking payment");
       try {
-        bookingScreenController = Get.find<BookingScreenController>();
-        log("Payment Screen - Found BookingScreenController, selectedPayment in booking controller: ${bookingScreenController?.selectedPayment}");
+        // CRITICAL: Only get BookingScreenController if this is NOT a wallet recharge
+        // This prevents any booking payment method from leaking into wallet recharge
+        if (isWalletAdd != true) {
+          bookingScreenController = Get.find<BookingScreenController>();
+          log("Payment Screen - Found BookingScreenController, selectedPayment in booking controller: ${bookingScreenController?.selectedPayment}");
+        } else {
+          log("⚠️ Payment Screen - CRITICAL: Attempted to initialize BookingScreenController for wallet recharge - blocking it");
+          bookingScreenController = null;
+        }
 
         // Sync coupon data from bookingData if available
         if (bookingData != null) {
@@ -356,13 +367,17 @@ class PaymentScreenController extends GetxController {
     if (isWalletAdd == true) {
       // CRITICAL: Force selectedPayment to null for wallet recharge, regardless of previous selection
       // This is especially important when recharging from booking flow where user may have selected "cashAfterService"
-      if (selectedPayment != null && selectedPayment != "") {
-        log("⚠️ Payment Screen - CRITICAL FIX: Final check - Clearing selectedPayment '$selectedPayment' for wallet recharge");
-        log("⚠️ Payment Screen - This prevents booking payment method (e.g., 'cashAfterService') from appearing during wallet recharge");
-        selectedPayment = null;
-      }
+      // Clear it multiple times to ensure it's never set to "cashAfterService" or any booking method
+      selectedPayment = null;
+      log("⚠️ Payment Screen - CRITICAL FIX: Final check - Force clearing selectedPayment for wallet recharge");
+      log("⚠️ Payment Screen - This prevents booking payment method (e.g., 'cashAfterService') from appearing during wallet recharge");
+      
       // Force to null one more time to be absolutely sure
       selectedPayment = null;
+      
+      // Update UI immediately to reflect the change
+      update([Constant.idSelectPaymentMethod]);
+      
       log("✅ Payment Screen - Final check: Wallet recharge confirmed, selectedPayment is: $selectedPayment (forced null)");
       log("✅ Payment Screen - Only Stripe and MTN MoMo will be shown for wallet recharge");
     }
@@ -679,8 +694,13 @@ class PaymentScreenController extends GetxController {
 
         try {
           // Get booking controller
-          if (bookingScreenController == null) {
+          // CRITICAL: Only get BookingScreenController if this is NOT a wallet recharge
+          // This prevents any booking payment method from leaking into wallet recharge
+          if (bookingScreenController == null && isWalletAdd != true) {
             bookingScreenController = Get.find<BookingScreenController>();
+          } else if (isWalletAdd == true) {
+            log("⚠️ Payment Screen - CRITICAL: Attempted to get BookingScreenController for wallet recharge - blocking it");
+            bookingScreenController = null;
           }
 
           // Ensure coupon data is properly set - use controller's current state (already synced in onInit)

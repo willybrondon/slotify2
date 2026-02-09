@@ -173,12 +173,17 @@ class PaymentMethodView extends StatelessWidget {
       log("✅ Payment Screen Widget - Wallet recharge: Only Stripe and MTN MoMo will be shown");
     } else {
       // Only check BookingScreenController for booking payments
-      try {
-        final bookingController = Get.find<BookingScreenController>();
-        log("Payment Screen Widget - BookingScreenController found for booking payment");
-        log("   - BookingScreenController.selectedPayment: '${bookingController.selectedPayment}'");
-      } catch (e) {
-        log("Payment Screen Widget - BookingScreenController not found (this is OK)");
+      // CRITICAL: Double-check isWalletRecharge to prevent any accidental access
+      if (!isWalletRecharge) {
+        try {
+          final bookingController = Get.find<BookingScreenController>();
+          log("Payment Screen Widget - BookingScreenController found for booking payment");
+          log("   - BookingScreenController.selectedPayment: '${bookingController.selectedPayment}'");
+        } catch (e) {
+          log("Payment Screen Widget - BookingScreenController not found (this is OK)");
+        }
+      } else {
+        log("⚠️ Payment Screen Widget - CRITICAL: Attempted to access BookingScreenController for wallet recharge - blocking it");
       }
     }
     
@@ -189,17 +194,16 @@ class PaymentMethodView extends StatelessWidget {
     // CRITICAL FIX: For wallet recharge, ALWAYS return only Stripe and MTN MoMo
     // This prevents "cash on service" from appearing, even if selectedPayment was somehow set
     if (isWalletRecharge) {
-      // CRITICAL: Double-check that selectedPayment is null before building UI
+      // CRITICAL: ALWAYS force selectedPayment to null for wallet recharge - no exceptions
       // This is the final safety check to prevent "cash on service" from appearing
-      if (logic.selectedPayment != null && logic.selectedPayment != "") {
-        log("⚠️ Payment Screen Widget - FINAL CHECK: selectedPayment is '${logic.selectedPayment}' for wallet recharge - forcing to null");
-        log("⚠️ Payment Screen Widget - This prevents 'cashAfterService' from appearing during wallet recharge");
-        logic.selectedPayment = null;
-        // Force immediate UI update
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          logic.update([Constant.idSelectPaymentMethod]);
-        });
-      }
+      // Even if it was somehow set to "cashAfterService" from booking, we MUST clear it
+      logic.selectedPayment = null;
+      log("⚠️ Payment Screen Widget - FINAL CHECK: Force clearing selectedPayment for wallet recharge");
+      log("⚠️ Payment Screen Widget - This prevents 'cashAfterService' from appearing during wallet recharge");
+      
+      // Force immediate UI update BEFORE building the widget
+      logic.update([Constant.idSelectPaymentMethod]);
+      
       // Force to null one more time to be absolutely sure
       logic.selectedPayment = null;
       
@@ -279,14 +283,35 @@ class PaymentMethodView extends StatelessWidget {
         ],
       ).paddingAll(15);
     }
+    // CRITICAL: Final check - if isWalletAdd is true, we should have returned above
+    // But if we're here, force wallet recharge methods to prevent "cash on service" from appearing
+    if (logic.isWalletAdd == true) {
+      log("⚠️ Payment Screen Widget - CRITICAL: isWalletAdd is true but we're in booking branch - forcing wallet recharge methods");
+      // Force selectedPayment to null
+      logic.selectedPayment = null;
+      logic.update([Constant.idSelectPaymentMethod]);
+      // Return wallet recharge methods
+      return Column(
+        children: [
+          const PaymentTitleView(),
+          if (isStripeEnabled) const PaymentStripeView(),
+          if (isMtnMomoEnabled) ...[
+            const PaymentMtnMomoView(),
+            const MtnMomoPhoneNumberInput(),
+          ],
+        ],
+      ).paddingAll(15);
+    }
+    
     return Column(
       children: [
         const PaymentTitleView(),
         // Show the payment method that was already selected in booking screen
         // NOTE: This branch is for booking payments, NOT wallet recharge
         // CRITICAL: Double-check that this is NOT a wallet recharge
-        // Even if isWalletAdd is somehow false/null, we should not show wallet recharge methods here
-        if (logic.isWalletAdd != true) ...[
+        // Must be explicitly false (not null or true) to show booking methods
+        // If isWalletAdd is null or true, we should NOT show booking methods
+        if (logic.isWalletAdd == false) ...[
                 // Only show booking payment methods if this is NOT a wallet recharge
                 if (logic.selectedPayment == "wallet")
                   const PaymentMyWalletView(),
@@ -303,19 +328,27 @@ class PaymentMethodView extends StatelessWidget {
                   const PaymentFlutterWaveView(),
                 // CRITICAL: NEVER show "Cash on Service" for wallet recharge
                 // Even if selectedPayment is somehow set to "cashAfterService", don't show it for wallet recharge
-                if (logic.selectedPayment == "cashAfterService" && logic.isWalletAdd != true)
+                // Double-check isWalletAdd to be absolutely sure - must be explicitly false, not null or true
+                if (logic.selectedPayment == "cashAfterService" && 
+                    logic.isWalletAdd == false)
                   const PaymentCashOnHandView(),
                 // Add other payment methods as needed
                 // Show all available payment methods if none selected
                 // IMPORTANT: Only show these for booking payments, not wallet recharge
+                // CRITICAL: Double-check isWalletAdd to prevent wallet recharge methods from appearing
+                // Must be explicitly false, not null or true
                 if ((logic.selectedPayment == null ||
-                    logic.selectedPayment == "") && logic.isWalletAdd != true) ...[
+                    logic.selectedPayment == "") && 
+                    logic.isWalletAdd == false) ...[
                   const PaymentMyWalletView(),
                   if (isStripeEnabled) const PaymentStripeView(),
                   if (isMtnMomoEnabled) const PaymentMtnMomoView(),
                   if (isRazorPayEnabled) const PaymentRazorPayView(),
                   if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
-                  const PaymentCashOnHandView(),
+                  // CRITICAL: Only show Cash on Service for booking, never for wallet recharge
+                  // Must be explicitly false to show
+                  if (logic.isWalletAdd == false)
+                    const PaymentCashOnHandView(),
                 ],
               ] else ...[
                 // CRITICAL FALLBACK: If somehow we're in the booking branch but isWalletAdd is true,
@@ -381,7 +414,8 @@ class PaymentMethodView extends StatelessWidget {
 
               // Show a message that payment method is already selected
               // ONLY show this for booking payments, NOT wallet recharge
-              if (logic.isWalletAdd != true && 
+              // Must be explicitly false to show
+              if (logic.isWalletAdd == false && 
                   logic.selectedPayment != null && 
                   logic.selectedPayment != "")
                 Container(
@@ -419,13 +453,15 @@ class PaymentMethodView extends StatelessWidget {
 
               // Show discount summary for cash after service when coupon is applied
               // ONLY for booking payments, NOT wallet recharge
+              // Must be explicitly false to show
               if (logic.selectedPayment == "cashAfterService" &&
-                  logic.isWalletAdd != true &&
+                  logic.isWalletAdd == false &&
                   logic.isCreateOrder == true)
                 PaymentDiscountSummaryView(),
 
               // Coupon Section - Show if not wallet add, this is a booking (not wallet recharge), and no payment method is pre-selected
-              if (logic.isWalletAdd != true &&
+              // Must be explicitly false to show
+              if (logic.isWalletAdd == false &&
                   logic.isCreateOrder == true &&
                   logic.selectedPayment == null)
                 PaymentCouponSection(),
@@ -439,6 +475,18 @@ class PaymentCouponSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // CRITICAL: Check if this is a wallet recharge before accessing BookingScreenController
+    // This prevents any booking-related data from leaking into wallet recharge flow
+    try {
+      final paymentController = Get.find<PaymentScreenController>();
+      if (paymentController.isWalletAdd == true) {
+        log("⚠️ PaymentCouponSection - CRITICAL: Attempted to show coupon section for wallet recharge - blocking it");
+        return const SizedBox.shrink(); // Return empty widget for wallet recharge
+      }
+    } catch (e) {
+      log("PaymentCouponSection - PaymentScreenController not found: $e");
+    }
+    
     return GetBuilder<BookingScreenController>(
       id: Constant.idGetCoupon,
       builder: (bookingLogic) {
@@ -702,6 +750,18 @@ class PaymentDiscountSummaryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // CRITICAL: Check if this is a wallet recharge before accessing BookingScreenController
+    // This prevents any booking-related data from leaking into wallet recharge flow
+    try {
+      final paymentController = Get.find<PaymentScreenController>();
+      if (paymentController.isWalletAdd == true) {
+        log("⚠️ PaymentDiscountSummaryView - CRITICAL: Attempted to show discount summary for wallet recharge - blocking it");
+        return const SizedBox.shrink(); // Return empty widget for wallet recharge
+      }
+    } catch (e) {
+      log("PaymentDiscountSummaryView - PaymentScreenController not found: $e");
+    }
+    
     return GetBuilder<BookingScreenController>(
       id: Constant.idApplyCoupon,
       builder: (bookingLogic) {
@@ -960,6 +1020,13 @@ class PaymentCashOnHandView extends StatelessWidget {
     return GetBuilder<PaymentScreenController>(
       id: Constant.idSelectPaymentMethod,
       builder: (logic) {
+        // CRITICAL: Never show "Cash on Service" for wallet recharge
+        // This is a final safety check to prevent it from appearing
+        if (logic.isWalletAdd == true) {
+          log("⚠️ PaymentCashOnHandView - CRITICAL: Attempted to show Cash on Service for wallet recharge - blocking it");
+          return const SizedBox.shrink(); // Return empty widget
+        }
+        
         return InkWell(
           overlayColor: WidgetStatePropertyAll(AppColors.transparent),
           onTap: () {
@@ -1530,10 +1597,15 @@ class PaymentScreenBottomView extends StatelessWidget {
           String displayAmount = logic.totalAmount ?? "0";
 
           // For booking payments, try to get updated total from booking controller
+          // CRITICAL: Only access BookingScreenController if this is NOT a wallet recharge
+          // Must be explicitly false, not null or true
           if (logic.isWalletAdd == false && logic.bookingData != null) {
             try {
-              final bookingController = Get.find<BookingScreenController>();
-              displayAmount = bookingController.totalPrice.toStringAsFixed(2);
+              // Double-check to prevent any accidental access for wallet recharge
+              if (logic.isWalletAdd != true) {
+                final bookingController = Get.find<BookingScreenController>();
+                displayAmount = bookingController.totalPrice.toStringAsFixed(2);
+              }
             } catch (e) {
               // If booking controller not found, use original amount
               log("BookingScreenController not found, using original amount: $e");
