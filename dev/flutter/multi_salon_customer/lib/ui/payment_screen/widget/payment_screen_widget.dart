@@ -22,7 +22,9 @@ class PaymentAppBarView extends StatelessWidget {
   Widget build(BuildContext context) {
     final paymentController = Get.find<PaymentScreenController>();
     return AppBarCustom(
-      title: paymentController.isWalletAdd == true ? "txtRechargeWallet".tr : "txtPayment".tr,
+      title: paymentController.isWalletAdd == true
+          ? "txtRechargeWallet".tr
+          : "txtPayment".tr,
       method: InkWell(
         overlayColor: WidgetStatePropertyAll(AppColors.transparent),
         onTap: () {
@@ -80,6 +82,23 @@ class PaymentMethodView extends StatelessWidget {
 
   Widget _buildPaymentMethods(
       PaymentScreenController logic, SplashController splashController) {
+    // CRITICAL: Force selectedPayment to null IMMEDIATELY if this is a wallet recharge
+    // This must be done BEFORE any widget construction to prevent "cash on service" from appearing
+    // IMPORTANT: For wallet recharge, we MUST show ALL available payment methods (Stripe and MTN MoMo)
+    // regardless of what payment method was selected during booking reservation
+    if (logic.isWalletAdd == true) {
+      // CRITICAL: Force selectedPayment to null IMMEDIATELY - before any widget construction
+      // This prevents "cash on service" from being displayed even if it was set before
+      if (logic.selectedPayment != null && logic.selectedPayment != "") {
+        log("⚠️ Payment Screen Widget - CRITICAL: Clearing selectedPayment '${logic.selectedPayment}' IMMEDIATELY for wallet recharge");
+        logic.selectedPayment = null;
+        // Force UI update immediately
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          logic.update([Constant.idSelectPaymentMethod]);
+        });
+      }
+    }
+
     // Use the splashController passed as parameter (already from GetBuilder)
 
     // Check if settings are loaded
@@ -135,12 +154,21 @@ class PaymentMethodView extends StatelessWidget {
     log("═══════════════════════════════════════════════════════════");
     log("Payment Screen Widget - logic.isWalletAdd: ${logic.isWalletAdd} (type: ${logic.isWalletAdd.runtimeType})");
     log("Payment Screen Widget - logic.selectedPayment: '${logic.selectedPayment}'");
-    
+
     // CRITICAL: Explicitly check for true, and if null, default to false (booking)
     // This ensures wallet recharge is only true when explicitly set
+    // IMPORTANT: For wallet recharge, we MUST show ALL available payment methods (Stripe and MTN MoMo)
+    // regardless of what payment method was selected during booking reservation
     final bool isWalletRecharge = logic.isWalletAdd == true;
     log("Payment Screen Widget - isWalletRecharge calculated: $isWalletRecharge");
-    
+
+    // CRITICAL: If this is a wallet recharge, ensure bookingScreenController is null
+    // This prevents any accidental reading of booking payment method
+    if (isWalletRecharge && logic.bookingScreenController != null) {
+      log("⚠️ Payment Screen Widget - CRITICAL: Clearing bookingScreenController for wallet recharge");
+      logic.bookingScreenController = null;
+    }
+
     // CRITICAL FIX: For wallet recharge, ALWAYS force selectedPayment to null
     // This prevents "cash on service" or any booking payment method from appearing
     // Even if user selected "cash on service" in booking, wallet recharge must show Stripe/MTN MoMo
@@ -157,14 +185,14 @@ class PaymentMethodView extends StatelessWidget {
       logic.selectedPayment = null;
       log("✅ Payment Screen Widget - Wallet recharge: selectedPayment is '${logic.selectedPayment}' (forced null)");
     }
-    
+
     // Debug logging
     if (logic.isWalletAdd != null) {
       log("Payment Screen Widget - isWalletAdd: ${logic.isWalletAdd}, isWalletRecharge: $isWalletRecharge, selectedPayment: '${logic.selectedPayment}'");
     } else {
       log("⚠️ Payment Screen Widget - WARNING: isWalletAdd is null! Defaulting to booking payment methods.");
     }
-    
+
     // CRITICAL: For wallet recharge, ensure BookingScreenController is NOT accessed
     // This prevents any booking payment method from leaking into wallet recharge flow
     if (isWalletRecharge) {
@@ -186,86 +214,82 @@ class PaymentMethodView extends StatelessWidget {
         log("⚠️ Payment Screen Widget - CRITICAL: Attempted to access BookingScreenController for wallet recharge - blocking it");
       }
     }
-    
+
     log("Payment Screen Widget - Will show: ${isWalletRecharge ? 'WALLET RECHARGE' : 'BOOKING'} payment methods");
     log("Payment Screen Widget - Payment methods enabled - Stripe: $isStripeEnabled, MTN MoMo: $isMtnMomoEnabled");
     log("═══════════════════════════════════════════════════════════");
-    
-    // CRITICAL FIX: For wallet recharge, ALWAYS return only Stripe and MTN MoMo
-    // This prevents "cash on service" from appearing, even if selectedPayment was somehow set
+
+    // CRITICAL FIX: For wallet recharge, ALWAYS show ALL available payment methods
+    // This is different from booking payment where we show only the selected method
+    // For wallet recharge, user MUST choose between Stripe and MTN MoMo (not cash on service)
+    // We IGNORE the booking payment method selection completely
     if (isWalletRecharge) {
-      // CRITICAL: ALWAYS force selectedPayment to null for wallet recharge - no exceptions
-      // This is the final safety check to prevent "cash on service" from appearing
-      // Even if it was somehow set to "cashAfterService" from booking, we MUST clear it
+      // CRITICAL: Force selectedPayment to null - user will choose payment method
+      // We NEVER use the booking payment method for wallet recharge
       logic.selectedPayment = null;
-      log("⚠️ Payment Screen Widget - FINAL CHECK: Force clearing selectedPayment for wallet recharge");
-      log("⚠️ Payment Screen Widget - This prevents 'cashAfterService' from appearing during wallet recharge");
-      
-      // Force immediate UI update BEFORE building the widget
       logic.update([Constant.idSelectPaymentMethod]);
-      
-      // Force to null one more time to be absolutely sure
-      logic.selectedPayment = null;
-      
-      // CRITICAL: Return wallet recharge methods ONLY - never show booking methods
-      // This ensures "cash on service" never appears for wallet recharge
-      log("✅ Payment Screen Widget - Returning wallet recharge methods (Stripe and MTN MoMo only)");
-      log("✅ Payment Screen Widget - selectedPayment is: '${logic.selectedPayment}' (forced null)");
+
+      log("═══════════════════════════════════════════════════════════");
+      log("✅ Payment Screen Widget - WALLET RECHARGE");
+      log("═══════════════════════════════════════════════════════════");
+      log("✅ Payment Screen Widget - IGNORING booking payment method");
+      log("✅ Payment Screen Widget - Showing ALL wallet recharge methods");
+      log("✅ Payment Screen Widget - User will choose: Stripe or MTN MoMo");
+      log("═══════════════════════════════════════════════════════════");
+
+      // Return ALL available wallet recharge methods (Stripe and MTN MoMo)
+      // User must choose one - we don't pre-select anything
       return Column(
         children: [
           const PaymentTitleView(),
-          // Only show Stripe and MTN MoMo for wallet recharge (same as profile/wallet/add money)
-          // Razorpay, Flutterwave, and Cash on Hand are NOT available for wallet recharge
-          // CRITICAL: Never show PaymentCashOnHandView for wallet recharge
+          // Show ALL available payment methods for wallet recharge
+          // User will choose between Stripe and MTN MoMo
+          // We NEVER show "cash on service" for wallet recharge
           if (isStripeEnabled) const PaymentStripeView(),
           if (isMtnMomoEnabled) ...[
             const PaymentMtnMomoView(),
-            // Show phone number input for MTN MoMo wallet recharge
             const MtnMomoPhoneNumberInput(),
           ],
-              // Show message if no payment methods are enabled
-              if (!isStripeEnabled &&
-                  !isMtnMomoEnabled)
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  margin: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: AppColors.redText.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border:
-                        Border.all(color: AppColors.redText.withOpacity(0.3)),
+          // Show message if no payment methods are enabled
+          if (!isStripeEnabled && !isMtnMomoEnabled)
+            Container(
+              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: AppColors.redText.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.redText.withOpacity(0.3)),
+              ),
+              child: Column(
+                children: [
+                  Icon(Icons.error_outline, color: AppColors.redText, size: 40),
+                  const SizedBox(height: 10),
+                  Text(
+                    "No payment methods are enabled",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.redText,
+                      fontFamily: AppFontFamily.heeBo700,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  child: Column(
-                    children: [
-                      Icon(Icons.error_outline,
-                          color: AppColors.redText, size: 40),
-                      const SizedBox(height: 10),
-                      Text(
-                        "No payment methods are enabled",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.redText,
-                          fontFamily: AppFontFamily.heeBo700,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        "Please contact support or enable payment methods in admin settings",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.paymentText,
-                          fontFamily: AppFontFamily.heeBo400,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                  const SizedBox(height: 5),
+                  Text(
+                    "Please contact support or enable payment methods in admin settings",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.paymentText,
+                      fontFamily: AppFontFamily.heeBo400,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-            ],
-          ).paddingAll(15);
+                ],
+              ),
+            ),
+        ],
+      ).paddingAll(15);
     }
-    
+
     // This is the booking payment branch - only show booking methods
     // FINAL SAFETY CHECK: Ensure isWalletRecharge is false before showing booking methods
     if (isWalletRecharge) {
@@ -302,7 +326,7 @@ class PaymentMethodView extends StatelessWidget {
         ],
       ).paddingAll(15);
     }
-    
+
     return Column(
       children: [
         const PaymentTitleView(),
@@ -312,161 +336,157 @@ class PaymentMethodView extends StatelessWidget {
         // Must be explicitly false (not null or true) to show booking methods
         // If isWalletAdd is null or true, we should NOT show booking methods
         if (logic.isWalletAdd == false) ...[
-                // Only show booking payment methods if this is NOT a wallet recharge
-                if (logic.selectedPayment == "wallet")
-                  const PaymentMyWalletView(),
-                if (logic.selectedPayment == "Stripe" && isStripeEnabled)
-                  const PaymentStripeView(),
-                if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) ...[
-                  const PaymentMtnMomoView(),
-                  const MtnMomoPhoneNumberInput(),
-                ],
-                if (logic.selectedPayment == "Razorpay" && isRazorPayEnabled)
-                  const PaymentRazorPayView(),
-                if (logic.selectedPayment == "flutterWave" &&
-                    isFlutterWaveEnabled)
-                  const PaymentFlutterWaveView(),
-                // CRITICAL: NEVER show "Cash on Service" for wallet recharge
-                // Even if selectedPayment is somehow set to "cashAfterService", don't show it for wallet recharge
-                // Double-check isWalletAdd to be absolutely sure - must be explicitly false, not null or true
-                if (logic.selectedPayment == "cashAfterService" && 
-                    logic.isWalletAdd == false)
-                  const PaymentCashOnHandView(),
-                // Add other payment methods as needed
-                // Show all available payment methods if none selected
-                // IMPORTANT: Only show these for booking payments, not wallet recharge
-                // CRITICAL: Double-check isWalletAdd to prevent wallet recharge methods from appearing
-                // Must be explicitly false, not null or true
-                if ((logic.selectedPayment == null ||
-                    logic.selectedPayment == "") && 
-                    logic.isWalletAdd == false) ...[
-                  const PaymentMyWalletView(),
+          // Only show booking payment methods if this is NOT a wallet recharge
+          if (logic.selectedPayment == "wallet") const PaymentMyWalletView(),
+          if (logic.selectedPayment == "Stripe" && isStripeEnabled)
+            const PaymentStripeView(),
+          if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) ...[
+            const PaymentMtnMomoView(),
+            const MtnMomoPhoneNumberInput(),
+          ],
+          if (logic.selectedPayment == "Razorpay" && isRazorPayEnabled)
+            const PaymentRazorPayView(),
+          if (logic.selectedPayment == "flutterWave" && isFlutterWaveEnabled)
+            const PaymentFlutterWaveView(),
+          // CRITICAL: NEVER show "Cash on Service" for wallet recharge
+          // Even if selectedPayment is somehow set to "cashAfterService", don't show it for wallet recharge
+          // Double-check isWalletAdd to be absolutely sure - must be explicitly false, not null or true
+          if (logic.selectedPayment == "cashAfterService" &&
+              logic.isWalletAdd == false)
+            const PaymentCashOnHandView(),
+          // Add other payment methods as needed
+          // Show all available payment methods if none selected
+          // IMPORTANT: Only show these for booking payments, not wallet recharge
+          // CRITICAL: Double-check isWalletAdd to prevent wallet recharge methods from appearing
+          // Must be explicitly false, not null or true
+          if ((logic.selectedPayment == null || logic.selectedPayment == "") &&
+              logic.isWalletAdd == false) ...[
+            const PaymentMyWalletView(),
+            if (isStripeEnabled) const PaymentStripeView(),
+            if (isMtnMomoEnabled) const PaymentMtnMomoView(),
+            if (isRazorPayEnabled) const PaymentRazorPayView(),
+            if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
+            // CRITICAL: Only show Cash on Service for booking, never for wallet recharge
+            // Must be explicitly false to show
+            if (logic.isWalletAdd == false) const PaymentCashOnHandView(),
+          ],
+        ] else ...[
+          // CRITICAL FALLBACK: If somehow we're in the booking branch but isWalletAdd is true,
+          // this is a bug - log it and show wallet recharge methods instead
+          Builder(
+            builder: (context) {
+              log("⚠️ Payment Screen Widget - CRITICAL BUG DETECTED!");
+              log("   - We're in the booking branch but isWalletAdd is true!");
+              log("   - This should never happen - showing wallet recharge methods as fallback");
+              return Column(
+                children: [
+                  const PaymentTitleView(),
                   if (isStripeEnabled) const PaymentStripeView(),
-                  if (isMtnMomoEnabled) const PaymentMtnMomoView(),
-                  if (isRazorPayEnabled) const PaymentRazorPayView(),
-                  if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
-                  // CRITICAL: Only show Cash on Service for booking, never for wallet recharge
-                  // Must be explicitly false to show
-                  if (logic.isWalletAdd == false)
-                    const PaymentCashOnHandView(),
-                ],
-              ] else ...[
-                // CRITICAL FALLBACK: If somehow we're in the booking branch but isWalletAdd is true,
-                // this is a bug - log it and show wallet recharge methods instead
-                Builder(
-                  builder: (context) {
-                    log("⚠️ Payment Screen Widget - CRITICAL BUG DETECTED!");
-                    log("   - We're in the booking branch but isWalletAdd is true!");
-                    log("   - This should never happen - showing wallet recharge methods as fallback");
-                    return Column(
-                      children: [
-                        const PaymentTitleView(),
-                        if (isStripeEnabled) const PaymentStripeView(),
-                        if (isMtnMomoEnabled) ...[
-                          const PaymentMtnMomoView(),
-                          const MtnMomoPhoneNumberInput(),
-                        ],
-                        if (!isStripeEnabled && !isMtnMomoEnabled)
-                          Container(
-                            width: Get.width,
-                            padding: const EdgeInsets.all(16),
-                            margin: const EdgeInsets.only(top: 16),
-                            decoration: BoxDecoration(
-                              color: AppColors.redText.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.redText,
-                                width: 1,
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Icon(Icons.error_outline,
-                                    color: AppColors.redText, size: 40),
-                                const SizedBox(height: 10),
-                                Text(
-                                  "No payment methods are enabled",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.redText,
-                                    fontFamily: AppFontFamily.heeBo700,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  "Please contact support or enable payment methods in admin settings",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.paymentText,
-                                    fontFamily: AppFontFamily.heeBo400,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ).paddingAll(15);
-                  },
-                ),
-              ],
-
-              // Show a message that payment method is already selected
-              // ONLY show this for booking payments, NOT wallet recharge
-              // Must be explicitly false to show
-              if (logic.isWalletAdd == false && 
-                  logic.selectedPayment != null && 
-                  logic.selectedPayment != "")
-                Container(
-                  width: Get.width,
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.only(top: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryAppColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.primaryAppColor.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        color: AppColors.primaryAppColor,
-                        size: 20,
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          "Payment method '${logic.selectedPayment}' is already selected. Click Continue to proceed.",
-                          style: TextStyle(
-                            color: AppColors.primaryAppColor,
-                            fontSize: 14,
-                            fontFamily: AppFontFamily.sfProDisplay,
-                          ),
+                  if (isMtnMomoEnabled) ...[
+                    const PaymentMtnMomoView(),
+                    const MtnMomoPhoneNumberInput(),
+                  ],
+                  if (!isStripeEnabled && !isMtnMomoEnabled)
+                    Container(
+                      width: Get.width,
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(top: 16),
+                      decoration: BoxDecoration(
+                        color: AppColors.redText.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.redText,
+                          width: 1,
                         ),
                       ),
-                    ],
+                      child: Column(
+                        children: [
+                          Icon(Icons.error_outline,
+                              color: AppColors.redText, size: 40),
+                          const SizedBox(height: 10),
+                          Text(
+                            "No payment methods are enabled",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.redText,
+                              fontFamily: AppFontFamily.heeBo700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            "Please contact support or enable payment methods in admin settings",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.paymentText,
+                              fontFamily: AppFontFamily.heeBo400,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ).paddingAll(15);
+            },
+          ),
+        ],
+
+        // Show a message that payment method is already selected
+        // ONLY show this for booking payments, NOT wallet recharge
+        // Must be explicitly false to show
+        if (logic.isWalletAdd == false &&
+            logic.selectedPayment != null &&
+            logic.selectedPayment != "")
+          Container(
+            width: Get.width,
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(top: 16),
+            decoration: BoxDecoration(
+              color: AppColors.primaryAppColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppColors.primaryAppColor.withOpacity(0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: AppColors.primaryAppColor,
+                  size: 20,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    "Payment method '${logic.selectedPayment}' is already selected. Click Continue to proceed.",
+                    style: TextStyle(
+                      color: AppColors.primaryAppColor,
+                      fontSize: 14,
+                      fontFamily: AppFontFamily.sfProDisplay,
+                    ),
                   ),
                 ),
+              ],
+            ),
+          ),
 
-              // Show discount summary for cash after service when coupon is applied
-              // ONLY for booking payments, NOT wallet recharge
-              // Must be explicitly false to show
-              if (logic.selectedPayment == "cashAfterService" &&
-                  logic.isWalletAdd == false &&
-                  logic.isCreateOrder == true)
-                PaymentDiscountSummaryView(),
+        // Show discount summary for cash after service when coupon is applied
+        // ONLY for booking payments, NOT wallet recharge
+        // Must be explicitly false to show
+        if (logic.selectedPayment == "cashAfterService" &&
+            logic.isWalletAdd == false &&
+            logic.isCreateOrder == true)
+          PaymentDiscountSummaryView(),
 
-              // Coupon Section - Show if not wallet add, this is a booking (not wallet recharge), and no payment method is pre-selected
-              // Must be explicitly false to show
-              if (logic.isWalletAdd == false &&
-                  logic.isCreateOrder == true &&
-                  logic.selectedPayment == null)
-                PaymentCouponSection(),
-            ],
-          ).paddingAll(15);
+        // Coupon Section - Show if not wallet add, this is a booking (not wallet recharge), and no payment method is pre-selected
+        // Must be explicitly false to show
+        if (logic.isWalletAdd == false &&
+            logic.isCreateOrder == true &&
+            logic.selectedPayment == null)
+          PaymentCouponSection(),
+      ],
+    ).paddingAll(15);
   }
 }
 
@@ -481,12 +501,13 @@ class PaymentCouponSection extends StatelessWidget {
       final paymentController = Get.find<PaymentScreenController>();
       if (paymentController.isWalletAdd == true) {
         log("⚠️ PaymentCouponSection - CRITICAL: Attempted to show coupon section for wallet recharge - blocking it");
-        return const SizedBox.shrink(); // Return empty widget for wallet recharge
+        return const SizedBox
+            .shrink(); // Return empty widget for wallet recharge
       }
     } catch (e) {
       log("PaymentCouponSection - PaymentScreenController not found: $e");
     }
-    
+
     return GetBuilder<BookingScreenController>(
       id: Constant.idGetCoupon,
       builder: (bookingLogic) {
@@ -756,12 +777,13 @@ class PaymentDiscountSummaryView extends StatelessWidget {
       final paymentController = Get.find<PaymentScreenController>();
       if (paymentController.isWalletAdd == true) {
         log("⚠️ PaymentDiscountSummaryView - CRITICAL: Attempted to show discount summary for wallet recharge - blocking it");
-        return const SizedBox.shrink(); // Return empty widget for wallet recharge
+        return const SizedBox
+            .shrink(); // Return empty widget for wallet recharge
       }
     } catch (e) {
       log("PaymentDiscountSummaryView - PaymentScreenController not found: $e");
     }
-    
+
     return GetBuilder<BookingScreenController>(
       id: Constant.idApplyCoupon,
       builder: (bookingLogic) {
@@ -1022,14 +1044,33 @@ class PaymentCashOnHandView extends StatelessWidget {
       builder: (logic) {
         // CRITICAL: Never show "Cash on Service" for wallet recharge
         // This is a final safety check to prevent it from appearing
+        // IMPORTANT: For wallet recharge, we MUST show ALL available payment methods (Stripe and MTN MoMo)
+        // regardless of what payment method was selected during booking reservation
         if (logic.isWalletAdd == true) {
           log("⚠️ PaymentCashOnHandView - CRITICAL: Attempted to show Cash on Service for wallet recharge - blocking it");
+          log("⚠️ PaymentCashOnHandView - Wallet recharge must use Stripe or MTN MoMo, not cash on service");
           return const SizedBox.shrink(); // Return empty widget
         }
-        
+
+        // CRITICAL: Double-check selectedPayment - if it's "cashAfterService" but isWalletAdd is true,
+        // force it to null to prevent display
+        // This handles edge cases where selectedPayment might be set incorrectly
+        bool isSelected = logic.selectedPayment == "cashAfterService" &&
+            logic.isWalletAdd != true;
+
+        // CRITICAL: If isWalletAdd is true, never show as selected
+        if (logic.isWalletAdd == true) {
+          isSelected = false;
+        }
+
         return InkWell(
           overlayColor: WidgetStatePropertyAll(AppColors.transparent),
           onTap: () {
+            // CRITICAL: Only allow selection if this is NOT a wallet recharge
+            if (logic.isWalletAdd == true) {
+              log("⚠️ PaymentCashOnHandView - CRITICAL: Attempted to select Cash on Service for wallet recharge - blocking it");
+              return;
+            }
             logic.onSelectPaymentMethod("cashAfterService");
           },
           child: Container(
@@ -1081,12 +1122,12 @@ class PaymentCashOnHandView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: logic.selectedPayment == "cashAfterService"
+                      color: isSelected
                           ? AppColors.primaryAppColor
                           : AppColors.greyColor.withOpacity(0.3),
                     ),
                   ),
-                  child: logic.selectedPayment == "cashAfterService"
+                  child: isSelected
                       ? Image.asset(
                           AppAsset.icCheck,
                           color: AppColors.primaryAppColor,
@@ -1199,7 +1240,7 @@ class PaymentStripeView extends StatelessWidget {
       builder: (logic) {
         // FIX: Allow selection for wallet recharge - check selectedPayment regardless of isWalletAdd
         final bool isSelected = logic.selectedPayment == "Stripe";
-        
+
         return InkWell(
           overlayColor: WidgetStatePropertyAll(AppColors.transparent),
           onTap: () {
@@ -1287,7 +1328,7 @@ class PaymentMtnMomoView extends StatelessWidget {
       builder: (logic) {
         // FIX: Allow selection for wallet recharge - check selectedPayment regardless of isWalletAdd
         final bool isSelected = logic.selectedPayment == "MTN MoMo";
-        
+
         return InkWell(
           overlayColor: WidgetStatePropertyAll(AppColors.transparent),
           onTap: () {

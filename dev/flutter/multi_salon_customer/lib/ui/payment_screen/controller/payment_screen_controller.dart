@@ -39,7 +39,11 @@ class PaymentScreenController extends GetxController {
   bool? isWalletAdd;
   bool? isCreateOrder;
   String? totalAmount;
-  String? selectedPayment;
+  // CRITICAL: Initialize selectedPayment to null to prevent any pre-existing values
+  // This is especially important when coming from booking flow where user may have selected "cashAfterService"
+  // For wallet recharge, we MUST show ALL available payment methods (Stripe and MTN MoMo)
+  // regardless of what payment method was selected during booking reservation
+  String? selectedPayment = null;
   Map<String, dynamic>?
       bookingData; // Additional booking data for direct payments
 
@@ -65,9 +69,13 @@ class PaymentScreenController extends GetxController {
     // CRITICAL: Initialize selectedPayment to null FIRST to prevent any pre-existing values
     // This is especially important when coming from booking flow where user may have selected "cashAfterService"
     // This MUST be done before getDataFromArgs() to prevent any booking payment method from leaking in
+    // IMPORTANT: For wallet recharge, we MUST show ALL available payment methods (Stripe and MTN MoMo)
+    // regardless of what payment method was selected during booking reservation
     selectedPayment = null;
     isWalletAdd = false;
-    log("Payment Screen - Initialized: selectedPayment = null, isWalletAdd = false");
+    bookingScreenController =
+        null; // CRITICAL: Clear booking controller to prevent any accidental access
+    log("Payment Screen - Initialized: selectedPayment = null, isWalletAdd = false, bookingScreenController = null");
     log("Payment Screen - This prevents 'cashAfterService' from being set before we detect wallet recharge");
 
     // Initialize MTN MoMo phone controller with registered phone number
@@ -99,27 +107,30 @@ class PaymentScreenController extends GetxController {
     log("   - selectedPayment: $selectedPayment");
 
     // CRITICAL FIX: For wallet recharge, ALWAYS force selectedPayment to null
-    // This prevents "cash on service" or any booking payment method from appearing
-    // Even if user selected "cash on service" in booking, wallet recharge must show Stripe/MTN MoMo
+    // IMPORTANT: For wallet recharge, we MUST show ALL available payment methods (Stripe and MTN MoMo)
+    // regardless of what payment method was selected during booking reservation
+    // The user will choose the payment method for wallet recharge (Stripe or MTN MoMo)
     if (isWalletAdd == true) {
-      log("✅ Payment Screen - Confirmed wallet recharge in onInit()");
-      
-      // CRITICAL: Force selectedPayment to null for wallet recharge, regardless of previous selection
-      // This is especially important when recharging from booking flow where user may have selected "cashAfterService"
-      if (selectedPayment != null && selectedPayment != "") {
-        log("⚠️ Payment Screen - CRITICAL FIX: Clearing selectedPayment '$selectedPayment' for wallet recharge");
-        log("⚠️ Payment Screen - This prevents booking payment method (e.g., 'cashAfterService') from appearing during wallet recharge");
-        selectedPayment = null;
-        update([Constant.idSelectPaymentMethod]);
-      }
-      // Force to null one more time to be absolutely sure (even if it was already null)
+      log("═══════════════════════════════════════════════════════════");
+      log("✅ Payment Screen - CONFIRMED WALLET RECHARGE");
+      log("═══════════════════════════════════════════════════════════");
+      log("✅ Payment Screen - IGNORING booking payment method selection completely");
+      log("✅ Payment Screen - Will show ALL wallet recharge methods (Stripe and MTN MoMo)");
+      log("✅ Payment Screen - User will choose payment method for wallet recharge");
+      log("═══════════════════════════════════════════════════════════");
+
+      // CRITICAL: Force selectedPayment to null - ALWAYS for wallet recharge
+      // We NEVER use the booking payment method for wallet recharge
+      // User must choose between Stripe and MTN MoMo
       selectedPayment = null;
-      log("✅ Payment Screen - Wallet recharge: selectedPayment is '$selectedPayment' (forced null)");
+      update([Constant.idSelectPaymentMethod]);
+      log("✅ Payment Screen - selectedPayment forced to null for wallet recharge");
 
       // CRITICAL: For wallet recharge, DO NOT initialize BookingScreenController
       // This prevents reading selectedPayment from booking controller
       bookingScreenController = null;
-      log("✅ Payment Screen - Skipping BookingScreenController initialization for wallet recharge");
+      log("✅ Payment Screen - BookingScreenController set to null for wallet recharge");
+      log("═══════════════════════════════════════════════════════════");
     } else {
       log("Payment Screen - This is NOT a wallet recharge, proceeding with booking flow");
     }
@@ -242,7 +253,7 @@ class PaymentScreenController extends GetxController {
     selectedPayment = null;
     log("Payment Screen - Initialized defaults: isWalletAdd = false, selectedPayment = null");
 
-    if (args != null) {
+    if (args != null && args is List && args.length >= 3) {
       log("Payment Screen - Args length: ${args.length}");
 
       // Log each argument individually
@@ -250,109 +261,79 @@ class PaymentScreenController extends GetxController {
         log("Payment Screen - Args[$i]: ${args[i]} (type: ${args[i].runtimeType})");
       }
 
-      // First, check if this is a wallet recharge by examining args[0]
-      // This must be done BEFORE any assignments to ensure correct detection
-      bool isWalletRechargeArg = false;
-      if (args.length >= 3) {
-        // Check if first argument indicates wallet recharge
-        log("Payment Screen - Checking args[0] for wallet recharge: ${args[0]} (type: ${args[0].runtimeType})");
-        if (args[0] == true || args[0] == "true" || args[0] == 1) {
-          isWalletRechargeArg = true;
-          log("✅ Payment Screen - Detected wallet recharge from args[0]: ${args[0]}");
-        } else {
-          log("❌ Payment Screen - NOT a wallet recharge, args[0] is: ${args[0]}");
-        }
-      }
+      // CRITICAL: Check if this is a wallet recharge FIRST
+      // For wallet recharge, args[0] must be true
+      bool isWalletRechargeArg =
+          (args[0] == true || args[0] == "true" || args[0] == 1);
 
-      if (args.length >= 4) {
-        log("Payment Screen - Processing 4+ arguments");
-        // Explicitly check for wallet recharge first
-        if (isWalletRechargeArg) {
-          isWalletAdd = true;
-          // For wallet recharge, explicitly set selectedPayment to null
-          // This ensures we don't accidentally use a previous payment method
-          selectedPayment = null;
-          log("✅ Payment Screen - Wallet recharge detected with 4 arguments");
-          log("   - isWalletAdd set to: $isWalletAdd");
-          log("   - selectedPayment set to: $selectedPayment");
-        } else {
-          isWalletAdd = args[0] as bool? ?? false;
-          selectedPayment = args[3] as String?;
-          log("Payment Screen - Booking payment detected with 4 arguments");
-          log("   - isWalletAdd set to: $isWalletAdd");
-          log("   - selectedPayment set to: $selectedPayment");
-        }
-        totalAmount = args[1] as String?;
-        isCreateOrder = args[2] as bool? ?? false;
-        if (args.length > 4) {
-          bookingData =
-              args[4] as Map<String, dynamic>?; // Additional booking data
-        }
-      } else if (args.length >= 3) {
-        log("Payment Screen - Processing 3 arguments");
-        // Handle wallet recharge case with 3 or 4 arguments
-        if (isWalletRechargeArg) {
-          isWalletAdd = true;
-          selectedPayment = null; // Explicitly null for wallet recharge
-          log("✅ Payment Screen - Wallet recharge confirmed with 3 arguments");
-          log("   - isWalletAdd set to: $isWalletAdd");
-          log("   - selectedPayment set to: $selectedPayment");
-        } else {
-          isWalletAdd = args[0] as bool? ?? false;
-          selectedPayment = null; // Will be set to default below
-          log("Payment Screen - Booking payment with 3 arguments");
-          log("   - isWalletAdd set to: $isWalletAdd");
-          log("   - selectedPayment set to: $selectedPayment");
-        }
-        totalAmount = args[1] as String?;
-        isCreateOrder = args[2] as bool? ?? false;
-      }
+      if (isWalletRechargeArg) {
+        // THIS IS A WALLET RECHARGE - IGNORE ANY BOOKING PAYMENT METHOD
+        log("═══════════════════════════════════════════════════════════");
+        log("✅ Payment Screen - WALLET RECHARGE DETECTED");
+        log("═══════════════════════════════════════════════════════════");
+        log("✅ Payment Screen - IGNORING booking payment method selection");
+        log("✅ Payment Screen - Will show ALL wallet recharge methods (Stripe and MTN MoMo)");
+        log("═══════════════════════════════════════════════════════════");
 
-      // Double-check: Ensure isWalletAdd is explicitly true for wallet recharge
-      // This is a safety check in case the above logic missed it
-      if (args.length >= 3 &&
-          (args[0] == true || args[0] == "true" || args[0] == 1)) {
-        log("Payment Screen - Double-checking wallet recharge condition...");
         isWalletAdd = true;
-        // CRITICAL FIX: For wallet recharge from booking, ALWAYS force selectedPayment to null
-        // This prevents "cash on service" or any booking payment method from appearing
-        // The user selected "cash on service" in booking, but for wallet recharge we need Stripe/MTN MoMo
-        if (selectedPayment != null && selectedPayment != "") {
-          log("⚠️ Payment Screen - CRITICAL FIX: Clearing selectedPayment '$selectedPayment' for wallet recharge from booking");
-          log("⚠️ Payment Screen - This prevents booking payment method (e.g., 'cashAfterService') from appearing during wallet recharge");
-          selectedPayment = null;
-        }
-        // Force to null one more time to be absolutely sure
+        // CRITICAL: Force selectedPayment to null - NEVER use booking payment method for wallet recharge
+        // Even if user selected "cash on service" for booking, wallet recharge needs Stripe/MTN MoMo
         selectedPayment = null;
-        log("✅ Payment Screen - Final confirmation: This is a wallet recharge");
+
+        totalAmount = args[1]?.toString();
+        isCreateOrder = args[2] as bool? ?? false;
+
+        log("✅ Payment Screen - Wallet recharge configuration:");
         log("   - isWalletAdd: $isWalletAdd");
-        log("   - selectedPayment: $selectedPayment (forced null for wallet recharge)");
-      }
+        log("   - selectedPayment: $selectedPayment (forced null - user will choose)");
+        log("   - totalAmount: $totalAmount");
+        log("   - isCreateOrder: $isCreateOrder");
 
-      // Set default payment method if not specified
-      // For wallet recharge, leave as null to show only Stripe and MTN MoMo
-      // For booking, default to wallet
-      if (selectedPayment == null && isWalletAdd != true) {
-        selectedPayment = "wallet";
-        log("Payment Screen - Set default selectedPayment to 'wallet' for booking");
-      }
-      // For wallet recharge, keep selectedPayment as null to show only Stripe and MTN MoMo
+        // DO NOT set default payment method for wallet recharge
+        // User must choose between Stripe and MTN MoMo
+        return; // Exit early - wallet recharge is configured
+      } else {
+        // THIS IS A BOOKING PAYMENT - use the selected payment method
+        log("Payment Screen - Booking payment detected");
 
-      log("Payment Screen - Final values after getDataFromArgs():");
-      log("   - isWalletAdd: $isWalletAdd (type: ${isWalletAdd.runtimeType})");
-      log("   - selectedPayment: $selectedPayment");
-      log("   - totalAmount: $totalAmount");
-      log("   - isCreateOrder: $isCreateOrder");
+        isWalletAdd = false;
+        totalAmount = args[1]?.toString();
+        isCreateOrder = args[2] as bool? ?? false;
+
+        // Get selectedPayment from args if provided (for booking payments only)
+        if (args.length >= 4) {
+          selectedPayment = args[3] as String?;
+        }
+
+        // Set default payment method if not specified (for booking only)
+        if (selectedPayment == null || selectedPayment == "") {
+          selectedPayment = "wallet";
+          log("Payment Screen - Set default selectedPayment to 'wallet' for booking");
+        }
+
+        if (args.length > 4) {
+          bookingData = args[4] as Map<String, dynamic>?;
+        }
+
+        log("Payment Screen - Booking payment configuration:");
+        log("   - isWalletAdd: $isWalletAdd");
+        log("   - selectedPayment: $selectedPayment");
+        log("   - totalAmount: $totalAmount");
+        log("   - isCreateOrder: $isCreateOrder");
+      }
     } else {
-      log("⚠️ Payment Screen - Args is null!");
+      log("⚠️ Payment Screen - Args is null or invalid!");
     }
+
     log("═══════════════════════════════════════════════════════════");
     log("Payment Screen - getDataFromArgs() END");
     log("═══════════════════════════════════════════════════════════");
-    log("Payment Screen - Is Create Order :: $isCreateOrder");
-    log("Payment Screen - Total Amount :: '$totalAmount'");
-    log("Payment Screen - Selected Payment :: '$selectedPayment'");
-    log("Payment Screen - Booking Data :: $bookingData");
+    log("Payment Screen - Final values:");
+    log("   - isWalletAdd: $isWalletAdd (type: ${isWalletAdd.runtimeType})");
+    log("   - selectedPayment: $selectedPayment");
+    log("   - totalAmount: $totalAmount");
+    log("   - isCreateOrder: $isCreateOrder");
+    log("   - Booking Data: $bookingData");
 
     // Validate total amount
     if (totalAmount == null || totalAmount!.isEmpty) {
@@ -371,13 +352,13 @@ class PaymentScreenController extends GetxController {
       selectedPayment = null;
       log("⚠️ Payment Screen - CRITICAL FIX: Final check - Force clearing selectedPayment for wallet recharge");
       log("⚠️ Payment Screen - This prevents booking payment method (e.g., 'cashAfterService') from appearing during wallet recharge");
-      
+
       // Force to null one more time to be absolutely sure
       selectedPayment = null;
-      
+
       // Update UI immediately to reflect the change
       update([Constant.idSelectPaymentMethod]);
-      
+
       log("✅ Payment Screen - Final check: Wallet recharge confirmed, selectedPayment is: $selectedPayment (forced null)");
       log("✅ Payment Screen - Only Stripe and MTN MoMo will be shown for wallet recharge");
     }
@@ -495,7 +476,8 @@ class PaymentScreenController extends GetxController {
             if (isScreenActive) {
               isLoading(false);
               update([Constant.idProgressView]);
-              Utils.showToast(Get.context!, "Payment timeout. Please try again.");
+              Utils.showToast(
+                  Get.context!, "Payment timeout. Please try again.");
             }
             throw TimeoutException("Stripe payment timeout");
           },
@@ -653,7 +635,8 @@ class PaymentScreenController extends GetxController {
             if (isScreenActive) {
               isLoading(false);
               update([Constant.idProgressView]);
-              Utils.showToast(Get.context!, "Payment timeout. Please try again.");
+              Utils.showToast(
+                  Get.context!, "Payment timeout. Please try again.");
             }
             throw TimeoutException("MTN MoMo payment timeout");
           },
