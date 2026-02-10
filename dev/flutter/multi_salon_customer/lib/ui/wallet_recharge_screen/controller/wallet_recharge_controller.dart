@@ -217,23 +217,14 @@ class WalletRechargeController extends GetxController {
     
     try {
       // Navigate to payment screen without pre-selected payment method
-      // Pass null for selectedPayment so all methods are shown
-      log("═══════════════════════════════════════════════════════════");
-      log("WalletRechargeController - Navigating to Payment Screen");
-      log("═══════════════════════════════════════════════════════════");
-      log("WalletRechargeController - Amount: $amount");
-      log("WalletRechargeController - Arguments: [true, '$amount', false, null]");
-      log("WalletRechargeController - isWalletAdd: true (wallet recharge)");
-      log("WalletRechargeController - selectedPayment: null (no pre-selection)");
-      log("═══════════════════════════════════════════════════════════");
-      
+      // Pass null for selectedPayment so user can choose between Stripe and MTN MoMo
       var result = await Get.toNamed(
         AppRoutes.payment,
         arguments: [
-          true, // isWalletAdd - CRITICAL: Must be true for wallet recharge
+          true, // isWalletAdd - Must be true for wallet recharge
           amount, // totalAmount
           false, // isCreateOrder - false for wallet recharge
-          null, // selectedPayment - CRITICAL: Must be null to show only Stripe and MTN MoMo
+          null, // selectedPayment - null to show all wallet recharge methods (Stripe and MTN MoMo)
         ],
       );
       
