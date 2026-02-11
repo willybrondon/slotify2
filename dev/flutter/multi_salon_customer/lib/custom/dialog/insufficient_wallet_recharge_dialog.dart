@@ -196,7 +196,7 @@ class InsufficientWalletRechargeDialog extends StatelessWidget {
               AppButton(
                 buttonColor: AppColors.whiteColor,
                 buttonText: "Cancel",
-                textColor: AppColors.primaryAppColor,
+                color: AppColors.primaryAppColor,
                 borderColor: AppColors.greyColor.withOpacity(0.2),
                 borderWidth: 1,
                 fontFamily: AppFontFamily.sfProDisplay,
@@ -208,7 +208,7 @@ class InsufficientWalletRechargeDialog extends StatelessWidget {
               AppButton(
                 buttonColor: AppColors.primaryAppColor,
                 buttonText: "Recharge",
-                textColor: AppColors.whiteColor,
+                color: AppColors.whiteColor,
                 fontFamily: AppFontFamily.sfProDisplay,
                 fontSize: 16.5,
                 height: 46,

@@ -353,7 +353,7 @@ class BookingScreenController extends GetxController {
                   arguments: {
                     'amount': rechargeAmount,
                     'isFromBooking': true,
-                    'bookingId': createBookingCategory?.booking?.id,
+                    'bookingId': createBookingCategory?.data?.id,
                     'totalPrice': totalPrice,
                   },
                 );
