@@ -319,80 +319,93 @@ class BookingScreenController extends GetxController {
       // This is critical when coupon is applied to ensure correct amount is displayed
       calculateTotalWithDiscount();
 
-      // Check insufficient funds for ALL payment methods (wallet, Stripe, MTN MoMo, cash on service)
-      // If wallet balance is insufficient, show "Your money is insufficient" dialog with Cancel/Recharge
-      if (totalPrice > double.parse(walletAmount.toString())) {
-        log("Booking - Insufficient funds for $selectedPayment, showing dialog");
-        log("Booking - Required amount: $totalPrice, Current balance: $walletAmount");
+      // Check insufficient funds ONLY for wallet payment
+      // Stripe, MTN MoMo, and cash on service continue normally (no wallet balance check)
+      if (selectedPayment == "wallet") {
+        if (totalPrice > double.parse(walletAmount.toString())) {
+          log("Booking - Wallet insufficient, showing dialog");
+          log("Booking - Required amount: $totalPrice, Current balance: $walletAmount");
 
-        double deficit = totalPrice - double.parse(walletAmount.toString());
-        String currencySymbol =
-            Constant.storage.read<String>('currencySymbol') ?? "\$";
+          double deficit = totalPrice - double.parse(walletAmount.toString());
+          String currencySymbol =
+              Constant.storage.read<String>('currencySymbol') ?? "\$";
 
-        Get.dialog(
-          barrierColor: AppColors.blackColor.withOpacity(0.8),
-          Dialog(
-            backgroundColor: AppColors.transparent,
-            shadowColor: AppColors.transparent,
-            elevation: 0,
-            child: InsufficientWalletRechargeDialog(
-              currentBalance: double.parse(walletAmount.toString()),
-              requiredBalance: totalPrice,
-              deficit: deficit,
-              currencySymbol: currencySymbol,
-              onCancel: () {
-                Get.back(); // Close dialog
-              },
-              onRecharge: () async {
-                Get.back(); // Close dialog
+          Get.dialog(
+            barrierColor: AppColors.blackColor.withOpacity(0.8),
+            Dialog(
+              backgroundColor: AppColors.transparent,
+              shadowColor: AppColors.transparent,
+              elevation: 0,
+              child: InsufficientWalletRechargeDialog(
+                currentBalance: double.parse(walletAmount.toString()),
+                requiredBalance: totalPrice,
+                deficit: deficit,
+                currencySymbol: currencySymbol,
+                onCancel: () {
+                  Get.back(); // Close dialog
+                },
+                onRecharge: () async {
+                  Get.back(); // Close dialog
 
-                String rechargeAmount = deficit.toStringAsFixed(2);
+                  String rechargeAmount = deficit.toStringAsFixed(2);
 
-                var result = await Get.toNamed(
-                  AppRoutes.walletRecharge,
-                  arguments: {
-                    'amount': rechargeAmount,
-                    'isFromBooking': true,
-                    'bookingId': createBookingCategory?.data?.id,
-                    'totalPrice': totalPrice,
-                  },
-                );
-
-                if (result == 'continue_booking' || result == 'success') {
-                  await walletScreenController.onGetWalletHistoryApiCall(
-                    userId: Constant.storage.read<String>('userId') ?? "",
-                    month: DateFormat('yyyy-MM').format(DateTime.now()),
+                  var result = await Get.toNamed(
+                    AppRoutes.walletRecharge,
+                    arguments: {
+                      'amount': rechargeAmount,
+                      'isFromBooking': true,
+                      'bookingId': createBookingCategory?.data?.id,
+                      'totalPrice': totalPrice,
+                    },
                   );
 
-                  await Future.delayed(const Duration(milliseconds: 500));
-
-                  if (walletScreenController.getWalletHistoryModel != null) {
-                    walletAmount =
-                        walletScreenController.getWalletHistoryModel?.total ??
-                            0.0;
-                  }
-
-                  if (totalPrice <= double.parse(walletAmount.toString())) {
-                    Get.dialog(
-                      barrierColor: AppColors.blackColor.withOpacity(0.8),
-                      Dialog(
-                        backgroundColor: AppColors.transparent,
-                        shadowColor: AppColors.transparent,
-                        elevation: 0,
-                        child: const ConfirmDialog(),
-                      ),
+                  if (result == 'continue_booking' || result == 'success') {
+                    await walletScreenController.onGetWalletHistoryApiCall(
+                      userId: Constant.storage.read<String>('userId') ?? "",
+                      month: DateFormat('yyyy-MM').format(DateTime.now()),
                     );
-                  } else {
-                    Utils.showToast(Get.context!,
-                        "Wallet balance is still insufficient. Please recharge more or select another payment method.");
-                    update([Constant.idStep3, Constant.idConfirm]);
+
+                    await Future.delayed(const Duration(milliseconds: 500));
+
+                    if (walletScreenController.getWalletHistoryModel != null) {
+                      walletAmount =
+                          walletScreenController.getWalletHistoryModel?.total ??
+                              0.0;
+                    }
+
+                    if (totalPrice <= double.parse(walletAmount.toString())) {
+                      Get.dialog(
+                        barrierColor: AppColors.blackColor.withOpacity(0.8),
+                        Dialog(
+                          backgroundColor: AppColors.transparent,
+                          shadowColor: AppColors.transparent,
+                          elevation: 0,
+                          child: const ConfirmDialog(),
+                        ),
+                      );
+                    } else {
+                      Utils.showToast(Get.context!,
+                          "Wallet balance is still insufficient. Please recharge more or select another payment method.");
+                      update([Constant.idStep3, Constant.idConfirm]);
+                    }
                   }
-                }
-              },
+                },
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          Get.dialog(
+            barrierColor: AppColors.blackColor.withOpacity(0.8),
+            Dialog(
+              backgroundColor: AppColors.transparent,
+              shadowColor: AppColors.transparent,
+              elevation: 0,
+              child: const ConfirmDialog(),
+            ),
+          );
+        }
       } else {
+        // Stripe, MTN MoMo, Cash on service - continue normally without wallet check
         Get.dialog(
           barrierColor: AppColors.blackColor.withOpacity(0.8),
           Dialog(
