@@ -248,11 +248,9 @@ class WalletRechargeController extends GetxController {
             (dialogResult) {
               if (dialogResult == 'continue_booking') {
                 // User chose to continue booking - return to booking screen
-                log("WalletRechargeController - User chose to continue booking");
                 Get.back(result: 'continue_booking');
               } else {
                 // User chose to cancel - stay on wallet screen
-                log("WalletRechargeController - User chose to stay on wallet page");
                 Get.back(result: 'cancel');
               }
             },

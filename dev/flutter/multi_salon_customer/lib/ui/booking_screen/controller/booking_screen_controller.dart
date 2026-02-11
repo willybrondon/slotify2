@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:salon_2/custom/bottom_sheet/payment_bottom_sheet.dart';
 import 'package:salon_2/custom/dialog/confirm_dialog.dart';
 import 'package:salon_2/custom/dialog/insufficient_wallet_dialog.dart';
+import 'package:salon_2/custom/dialog/insufficient_wallet_recharge_dialog.dart';
 import 'package:salon_2/custom/dialog/success_dialog.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
@@ -318,94 +319,79 @@ class BookingScreenController extends GetxController {
       // This is critical when coupon is applied to ensure correct amount is displayed
       calculateTotalWithDiscount();
 
-      if (selectedPayment == "wallet") {
-        if (totalPrice > double.parse(walletAmount.toString())) {
-          // Wallet insufficient - redirect to profile/wallet to recharge
-          // Store booking context to return after recharge
-          log("Booking - Wallet insufficient, redirecting to profile/wallet for recharge");
-          log("Booking - Required amount: $totalPrice, Current balance: $walletAmount");
+      // Check insufficient funds for ALL payment methods (wallet, Stripe, MTN MoMo, cash on service)
+      // If wallet balance is insufficient, show "Your money is insufficient" dialog with Cancel/Recharge
+      if (totalPrice > double.parse(walletAmount.toString())) {
+        log("Booking - Insufficient funds for $selectedPayment, showing dialog");
+        log("Booking - Required amount: $totalPrice, Current balance: $walletAmount");
 
-          // Calculate deficit amount to pre-fill in wallet recharge
-          double deficit = totalPrice - double.parse(walletAmount.toString());
-          String rechargeAmount = deficit.toStringAsFixed(2);
+        double deficit = totalPrice - double.parse(walletAmount.toString());
+        String currencySymbol =
+            Constant.storage.read<String>('currencySymbol') ?? "\$";
 
-          // Navigate to wallet screen with booking context
-          // Pass the deficit amount and booking context
-          Get.toNamed(
-            AppRoutes.wallet,
-            arguments: {
-              'fromBooking': true,
-              'requiredAmount': totalPrice.toString(),
-              'currentBalance': walletAmount.toString(),
-              'deficitAmount': rechargeAmount,
-            },
-          )?.then(
-            (value) async {
-              // If user chose to continue booking after recharge
-              if (value == 'continue_booking') {
-                log("Booking - User chose to continue booking after wallet recharge");
+        Get.dialog(
+          barrierColor: AppColors.blackColor.withOpacity(0.8),
+          Dialog(
+            backgroundColor: AppColors.transparent,
+            shadowColor: AppColors.transparent,
+            elevation: 0,
+            child: InsufficientWalletRechargeDialog(
+              currentBalance: double.parse(walletAmount.toString()),
+              requiredBalance: totalPrice,
+              deficit: deficit,
+              currencySymbol: currencySymbol,
+              onCancel: () {
+                Get.back(); // Close dialog
+              },
+              onRecharge: () async {
+                Get.back(); // Close dialog
 
-                // Refresh wallet history to get updated balance
-                await walletScreenController.onGetWalletHistoryApiCall(
-                  userId: Constant.storage.read<String>('userId') ?? "",
-                  month: DateFormat('yyyy-MM').format(DateTime.now()),
+                String rechargeAmount = deficit.toStringAsFixed(2);
+
+                var result = await Get.toNamed(
+                  AppRoutes.walletRecharge,
+                  arguments: {
+                    'amount': rechargeAmount,
+                    'isFromBooking': true,
+                    'bookingId': createBookingCategory?.booking?.id,
+                    'totalPrice': totalPrice,
+                  },
                 );
 
-                // Wait a moment for wallet to update
-                await Future.delayed(const Duration(milliseconds: 500));
-
-                // Update global walletAmount
-                if (walletScreenController.getWalletHistoryModel != null) {
-                  walletAmount =
-                      walletScreenController.getWalletHistoryModel?.total ??
-                          0.0;
-                }
-
-                log("Booking - Current wallet balance: $walletAmount, Required: $totalPrice");
-                log("Booking - Selected payment method preserved: $selectedPayment");
-
-                // CRITICAL: Ensure payment method is still "wallet" (preserve user's selection)
-                if (selectedPayment != "wallet") {
-                  log("Booking - WARNING: Payment method was changed, restoring to wallet");
-                  selectedPayment = "wallet";
-                  update([Constant.idStep3, Constant.idConfirm]);
-                }
-
-                // Check if wallet now has sufficient balance
-                if (totalPrice <= double.parse(walletAmount.toString())) {
-                  log("Booking - Wallet now has sufficient balance, showing confirm dialog");
-                  // Show confirm dialog to proceed with booking
-                  Get.dialog(
-                    barrierColor: AppColors.blackColor.withOpacity(0.8),
-                    Dialog(
-                      backgroundColor: AppColors.transparent,
-                      shadowColor: AppColors.transparent,
-                      elevation: 0,
-                      child: const ConfirmDialog(),
-                    ),
+                if (result == 'continue_booking' || result == 'success') {
+                  await walletScreenController.onGetWalletHistoryApiCall(
+                    userId: Constant.storage.read<String>('userId') ?? "",
+                    month: DateFormat('yyyy-MM').format(DateTime.now()),
                   );
-                } else {
-                  log("Booking - Wallet still insufficient after recharge");
-                  Utils.showToast(Get.context!,
-                      "Wallet balance is still insufficient. Please recharge more or select another payment method.");
-                  update([Constant.idStep3, Constant.idConfirm]);
+
+                  await Future.delayed(const Duration(milliseconds: 500));
+
+                  if (walletScreenController.getWalletHistoryModel != null) {
+                    walletAmount =
+                        walletScreenController.getWalletHistoryModel?.total ??
+                            0.0;
+                  }
+
+                  if (totalPrice <= double.parse(walletAmount.toString())) {
+                    Get.dialog(
+                      barrierColor: AppColors.blackColor.withOpacity(0.8),
+                      Dialog(
+                        backgroundColor: AppColors.transparent,
+                        shadowColor: AppColors.transparent,
+                        elevation: 0,
+                        child: const ConfirmDialog(),
+                      ),
+                    );
+                  } else {
+                    Utils.showToast(Get.context!,
+                        "Wallet balance is still insufficient. Please recharge more or select another payment method.");
+                    update([Constant.idStep3, Constant.idConfirm]);
+                  }
                 }
-              } else {
-                log("Booking - User chose to stay on wallet page, not continuing booking");
-              }
-            },
-          );
-        } else {
-          Get.dialog(
-            barrierColor: AppColors.blackColor.withOpacity(0.8),
-            Dialog(
-              backgroundColor: AppColors.transparent,
-              shadowColor: AppColors.transparent,
-              elevation: 0,
-              child: const ConfirmDialog(),
+              },
             ),
-          );
-        }
+          ),
+        );
       } else {
         Get.dialog(
           barrierColor: AppColors.blackColor.withOpacity(0.8),
@@ -771,10 +757,10 @@ class BookingScreenController extends GetxController {
         [Constant.idUpdateSlots0, Constant.idConfirm, Constant.idUpdateSlots]);
   }
 
-  onStep3(String value) {
+  onStep3(String value) async {
+    // No check here - user selects payment method freely. Insufficient funds check
+    // happens only in onConfirmButton when user clicks Confirm.
     selectedPayment = value;
-
-    log("currentIndex::$selectedPayment");
     update([Constant.idStep3, Constant.idConfirm]);
   }
 

@@ -88,8 +88,7 @@ class ContinueBookingDialog extends StatelessWidget {
                 width: Get.width * 0.33,
                 onTap: () {
                   // Stay on wallet page from profile
-                  Get.back(); // Close dialog
-                  Get.back(); // Go back to wallet screen
+                  Get.back(result: 'cancel'); // Close dialog and return cancel
                 },
               ),
               Button(
