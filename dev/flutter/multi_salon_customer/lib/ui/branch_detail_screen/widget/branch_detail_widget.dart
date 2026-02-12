@@ -68,6 +68,10 @@ void _showQRCodeDialog(BuildContext context, BranchDetailController logic) {
                         size: 250.0,
                         backgroundColor: AppColors.whiteColor,
                         errorCorrectionLevel: QrErrorCorrectLevel.H,
+                        eyeStyle: const QrEyeStyle(
+                          eyeShape: QrEyeShape.circle,
+                          color: AppColors.blackColor,
+                        ),
                         embeddedImage: AssetImage(AppAsset.icSkedisyLogo),
                         embeddedImageStyle: QrEmbeddedImageStyle(
                           size: Size(56, 56),
@@ -250,7 +254,7 @@ class BranchDetailTopView extends StatelessWidget {
                               Icon(Icons.share,
                                   color: AppColors.primaryAppColor),
                               const SizedBox(width: 10),
-                              Text('Share Link'),
+                              Text('txtShareLink'.tr),
                             ],
                           ),
                         ),
@@ -261,7 +265,7 @@ class BranchDetailTopView extends StatelessWidget {
                               Icon(Icons.copy,
                                   color: AppColors.primaryAppColor),
                               const SizedBox(width: 10),
-                              Text('Copy Link'),
+                              Text('txtCopyLink'.tr),
                             ],
                           ),
                         ),
@@ -272,7 +276,7 @@ class BranchDetailTopView extends StatelessWidget {
                               Icon(Icons.qr_code,
                                   color: AppColors.primaryAppColor),
                               const SizedBox(width: 10),
-                              Text('Show QR Code'),
+                              Text('txtShowQRCode'.tr),
                             ],
                           ),
                         ),
@@ -1492,6 +1496,22 @@ class BranchDetailTabBarReviewView extends StatelessWidget {
                                           : AppAsset.icRedStar,
                                       height: 15,
                                       width: 15,
+                                      color: (logic
+                                                              .getSalonDetailCategory
+                                                              ?.reviews?[index]
+                                                              .rating ??
+                                                          0) >=
+                                                      4
+                                          ? AppColors.blackColor
+                                          : null,
+                                      colorBlendMode: (logic
+                                                              .getSalonDetailCategory
+                                                              ?.reviews?[index]
+                                                              .rating ??
+                                                          0) >=
+                                                      4
+                                          ? BlendMode.srcIn
+                                          : null,
                                     ),
                                     SizedBox(width: Get.width * 0.02),
                                     Text(

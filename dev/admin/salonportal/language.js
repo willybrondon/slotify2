@@ -431,13 +431,13 @@ const translations = {
         'nav.aiConcierge': 'Concierge IA',
         'nav.documentation': 'Documentation',
         'nav.menu': 'Menu',
-        'nav.login': 'Connexion',
+        'nav.login': 'Connecter',
         
         // Hero Section
         'hero.title': 'La Plateforme #1 pour Gérer Votre Salon',
-        'hero.subtitle': '<strong>50 000+ salons</strong> font confiance à notre référence de l\'industrie de la beauté, utilisée par <strong>10M+ d\'utilisateurs</strong> chaque mois.',
-        'hero.addSalon': 'Ajouter Mon Salon',
-        'hero.tryAI': 'Essayer le Concierge IA',
+        'hero.subtitle': '<strong>50 000+ salons</strong> nous font confiance. <strong>10M+ d\'utilisateurs</strong> chaque mois.',
+        'hero.addSalon': 'Ajouter',
+        'hero.tryAI': 'Essayer',
         'hero.trustBadge': '4,8/5 sur Trustpilot',
         'hero.bookingManagement': 'Gestion des réservations',
         'hero.simplifiedPayments': 'Paiements simplifiés',
@@ -445,9 +445,9 @@ const translations = {
         
         // Request Buttons
         'request.salonTitle': 'Intégrer votre salon sur Skedisy ?',
-        'request.salonButton': 'Faire une Demande',
+        'request.salonButton': 'Demander',
         'request.customerTitle': 'Réserver des services ?',
-        'request.customerButton': 'Réserver ici',
+        'request.customerButton': 'Réserver',
         
         // Stats
         'stats.professionals': 'Professionnels',
@@ -466,7 +466,7 @@ const translations = {
         'clients.showcase': 'Page de présentation',
         'clients.reviews': 'Avis certifiés',
         'clients.ranking': 'Classement Google',
-        'clients.discover': 'Découvrir Gratuitement',
+        'clients.discover': 'Découvrir',
         
         // Professional Stats
         'proStats.title': 'Professionnel de la beauté ?<br>Découvrez la réservation en ligne !',
@@ -479,22 +479,22 @@ const translations = {
         
         // Platform Features
         'platform.manage': 'Gérer',
-        'platform.manageDesc': 'Contrôlez réservations, ventes, clients et équipe. Analysez avec des rapports détaillés.',
+        'platform.manageDesc': 'Contrôlez tout : réservations, ventes, équipe.',
         'platform.grow': 'Croître',
-        'platform.growDesc': 'Attirez de nouveaux clients et fidélisez-les avec des outils marketing intégrés.',
+        'platform.growDesc': 'Nouveaux clients et fidélisation.',
         'platform.getPaid': 'Se Faire Payer',
-        'platform.getPaidDesc': 'Paiements rapides et sécurisés. Réduisez les absences avec des acomptes.',
+        'platform.getPaidDesc': 'Paiements rapides. Moins d\'absences.',
         'platform.aiTitle': 'Concierge Beauté IA',
-        'platform.aiDesc': 'Recommandations beauté personnalisées par IA. Téléchargez votre selfie.',
+        'platform.aiDesc': 'Recommandations beauté personnalisées par IA.',
         'platform.tryNow': 'Essayer →',
         
         // CTA
         'cta.ready': 'Prêt à développer votre entreprise ?',
-        'cta.join': 'Rejoignez des milliers de professionnels. Commencez gratuitement !',
+        'cta.join': 'Rejoignez des milliers de pros. Gratuit !',
         'cta.getStarted': 'Commencer',
         'cta.million': '10 000 000',
-        'cta.millionDesc': '10 millions de personnes réservent chaque mois sur SalonPortal.',
-        'cta.final': 'Plus de 50 000 professionnels nous font confiance. Rejoignez-les.',
+        'cta.millionDesc': '10M de réservations beauté chaque mois.',
+        'cta.final': '50 000+ professionnels nous font confiance.',
         
         // FAQ
         'faq.title': 'Questions Fréquentes',
@@ -507,13 +507,13 @@ const translations = {
         'faq.acceptReservation': 'Comment accepter/refuser une réservation ?',
         'faq.manageBusiness': 'Comment gérer son salon (experts, services) ?',
         'faq.newClients': 'SalonPortal m\'apportera-t-il de nouveaux clients ?',
-        'faq.newClientsDesc': 'Votre salon sera visible par 10 millions d\'utilisateurs mensuels et sur Google. Avis vérifiés encouragent les réservations.',
+        'faq.newClientsDesc': 'Visible par 10M d\'utilisateurs et sur Google.',
         
         // Footer
-        'footer.tagline': 'Transformez la gestion de votre salon avec notre solution tout-en-un.',
+        'footer.tagline': 'Gérez votre salon avec notre solution tout-en-un.',
         'footer.about': 'À Propos',
         'footer.myAccount': 'Mon Compte Skedisy',
-        'footer.signUp': 'S\'inscrire',
+        'footer.signUp': 'Inscrire',
         'footer.pricing': 'Tarification',
         'footer.helpCenter': 'Centre d\'Aide',
         'footer.solutions': 'Nos Solutions',
@@ -530,14 +530,14 @@ const translations = {
         'footer.rights': '© 2024 Skedisy. Tous droits réservés.',
         
         // Modal
-        'modal.choosePlatform': 'Choisissez Votre Plateforme',
-        'modal.selectDevice': 'Sélectionnez votre appareil',
+        'modal.choosePlatform': 'Plateforme',
+        'modal.selectDevice': 'Appareil',
         'modal.android': 'Android',
         'modal.downloadAndroid': 'Télécharger depuis Google Play',
         'modal.download': 'Télécharger',
         'modal.iphone': 'iPhone',
         'modal.downloadIOS': 'Télécharger depuis l\'App Store',
-        'modal.requestDemo': 'Demander une Démo',
+        'modal.requestDemo': 'Démo',
         'modal.sendRequest': 'Envoyez votre demande à :',
         'modal.includeInfo': 'Informations à inclure :',
         'modal.managerName': 'Nom du Gérant',
@@ -585,15 +585,15 @@ const translations = {
         'doc.salonHoliday': 'Congés du Salon',
         'doc.walletHistory': 'Historique du Portefeuille',
         'doc.withdrawMoney': 'Retirer de l\'Argent',
-        'doc.customerAppWelcome': 'Bienvenue dans la documentation de l\'application client Skedisy. Ce guide complet vous accompagne à travers chaque fonctionnalité de l\'application client, vous aidant à tirer le meilleur parti de votre expérience de réservation.',
+        'doc.customerAppWelcome': 'Guide complet de l\'app client Skedisy pour réserver vos rendez-vous.',
         'doc.tableOfContentsCustomer': 'Table des Matières - Application Client',
         'doc.lookingForExpertApp': 'Vous cherchez la documentation de l\'application Expert ?',
         'doc.clickHere': 'Cliquez ici',
         'doc.note': 'Note :',
-        'doc.customerAppNote': 'L\'application client Skedisy est conçue avec une approche mobile-first, offrant une expérience intuitive et fluide pour réserver des services de salon, gérer les rendez-vous et accéder aux informations de votre compte.',
-        'doc.homeScreenDesc': 'L\'écran d\'accueil est votre point d\'entrée principal vers l\'application Skedisy. Il offre un accès rapide aux catégories de services, aux salons à proximité et à la fonctionnalité de recherche.',
-        'doc.expertAppWelcome': 'Bienvenue dans la documentation de l\'application Expert Skedisy. Ce guide complet vous aidera à comprendre et utiliser toutes les fonctionnalités de l\'application expert, conçue pour aider les prestataires de services à gérer leurs réservations, revenus, horaires et interactions avec les clients efficacement.',
-        'doc.salonOwnerPortalWelcome': 'Bienvenue dans la documentation du Portail Propriétaire Skedisy. Ce guide complet vous aidera à comprendre et utiliser toutes les fonctionnalités du tableau de bord administratif web, conçu pour aider les propriétaires de salon à gérer leurs opérations commerciales, leur personnel, leurs services, leurs finances et leurs interactions avec les clients efficacement.',
+        'doc.customerAppNote': 'App mobile intuitive pour réserver et gérer vos rendez-vous.',
+        'doc.homeScreenDesc': 'Point d\'entrée : catégories, salons proches, recherche.',
+        'doc.expertAppWelcome': 'Guide pour les experts : réservations, revenus, horaires.',
+        'doc.salonOwnerPortalWelcome': 'Guide du portail propriétaire : gérer salon, personnel, services.',
         
         // Documentation - Common Sections (French)
         'doc.headerSection': 'Section En-tête',
@@ -633,12 +633,12 @@ const translations = {
         'doc.shoppingBagIcon': 'Icône Sac de Courses',
         'doc.accessFavorites': 'Accéder à vos favoris et salons enregistrés',
         'doc.viewCart': 'Voir votre panier ou réservations en cours',
-        'doc.findServices': 'La barre de recherche vous permet de trouver rapidement des services en tapant des mots-clés. Appuyez simplement sur la barre de recherche et entrez ce que vous recherchez (ex: "coupe", "manucure", "soin du visage").',
+        'doc.findServices': 'Recherchez des services par mot-clé (ex: coupe, manucure).',
         'doc.categoryList': 'Sous la barre de recherche, vous trouverez une liste horizontale défilable de catégories de services. Chaque catégorie est représentée par:',
         'doc.iconLabel': 'Icône: Représentation visuelle du type de service',
         'doc.categoryName': 'Libellé: Nom de la catégorie (ex: "Soins du Corps", "Services de Maquillage", "Soins des Ongles", "Services Capillaires", "Peau & Visage")',
         'doc.tapCategory': 'Appuyez sur une catégorie pour voir les services disponibles dans cette catégorie. Vous pouvez également appuyer sur "Voir Tout" pour voir toutes les catégories à la fois.',
-        'doc.nearbySalonsDesc': 'La section "Salons Proches" affiche les salons de votre région, triés par proximité. Chaque carte de salon affiche:',
+        'doc.nearbySalonsDesc': 'Salons proches affichés par distance :',
         'doc.salonImage': 'Image du Salon: Aperçu visuel de l\'intérieur du salon',
         'doc.salonName': 'Nom du Salon: Le nom de l\'établissement',
         'doc.rating': 'Note: Note étoilée et score d\'avis',
@@ -647,7 +647,7 @@ const translations = {
         'doc.status': 'Statut: Indicateur Ouvert/Fermé avec bouton codé par couleur',
         'doc.favoriteIcon': 'Icône Favori: Icône cœur pour sauvegarder le salon dans vos favoris',
         'doc.tapSalonCard': 'Appuyez sur une carte de salon pour voir des informations détaillées, notamment:',
-        'doc.bottomNavDesc': 'La barre de navigation inférieure fournit un accès rapide aux sections principales de l\'application:',
+        'doc.bottomNavDesc': 'Accès rapide aux sections principales :',
         'doc.homeIcon': 'Accueil (Icône Maison): Retourner à l\'écran d\'accueil',
         'doc.calendar': 'Calendrier: Voir vos rendez-vous et réservations',
         'doc.shoppingBag': 'Sac de Courses: Accéder à votre panier et réservations',
@@ -663,7 +663,7 @@ const translations = {
         'doc.step4': 'Étape 4',
         'doc.step5': 'Étape 5',
         'doc.step6': 'Étape 6',
-        'doc.bookingProcessDesc': 'Le processus de réservation dans Skedisy est un parcours simplifié étape par étape qui vous guide dans la sélection d\'un salon, d\'un service, d\'un expert, d\'une date, d\'une heure et d\'un mode de paiement. Cette section couvre le flux de travail de réservation complet du début à la fin.',
+        'doc.bookingProcessDesc': 'Réservation en plusieurs étapes : salon, service, expert, date, paiement.',
         'doc.step1SelectSalon': 'Étape 1 : Sélectionner un Salon',
         'doc.step2ChooseVenue': 'Étape 2 : Choisir le Lieu du Service',
         'doc.step3SelectExpert': 'Étape 3 : Sélectionner un Expert',
@@ -876,20 +876,24 @@ function getTranslation(key) {
 }
 
 function translatePage() {
-    // Find all elements with data-translate attribute
-    document.querySelectorAll('[data-translate]').forEach(element => {
+    // Find all elements with data-translate attribute (excludes data-translate-html only)
+    document.querySelectorAll('[data-translate]:not([data-translate-html])').forEach(element => {
         const key = element.getAttribute('data-translate');
         const translation = getTranslation(key);
         
         if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
             element.placeholder = translation;
-        } else if (element.hasAttribute('data-translate-html')) {
-            element.innerHTML = translation;
         } else {
-            // Clear textContent first to prevent duplication, then set translation
-            element.textContent = '';
-            element.textContent = translation;
+            // Use replaceChildren to prevent any duplication - ensures clean single replacement
+            element.replaceChildren(document.createTextNode(translation));
         }
+    });
+    
+    // Process data-translate-html elements (allows HTML in translation)
+    document.querySelectorAll('[data-translate-html]').forEach(element => {
+        const key = element.getAttribute('data-translate-html');
+        const translation = getTranslation(key);
+        element.innerHTML = translation;
     });
     
     // Update page title

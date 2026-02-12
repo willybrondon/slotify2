@@ -329,7 +329,7 @@ class AiConciergeResultsView extends StatelessWidget {
                           controller.clearImage();
                         },
                         icon: const Icon(Icons.refresh),
-                        label: const Text("Analyze Another"),
+                        label: Text("txtAnalyzeAnother".tr),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(

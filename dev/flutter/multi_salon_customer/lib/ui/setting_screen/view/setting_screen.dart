@@ -152,7 +152,7 @@ class SettingScreen extends StatelessWidget {
                                 height: 30,
                                 child: Switch(
                                   value: logic.isSwitchOn ?? true,
-                                  activeColor: AppColors.greenColor,
+                                  activeColor: AppColors.blackColor,
                                   activeTrackColor: AppColors.whiteColor,
                                   inactiveThumbColor: AppColors.redText,
                                   inactiveTrackColor: AppColors.whiteColor,

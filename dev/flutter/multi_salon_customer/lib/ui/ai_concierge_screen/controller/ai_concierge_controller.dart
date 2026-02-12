@@ -71,13 +71,13 @@ class AiConciergeController extends GetxController {
   showImageSourceDialog() {
     Get.dialog(
       AlertDialog(
-        title: const Text("Select Image Source"),
+        title: Text("txtSelectImageSource".tr),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text("Gallery"),
+              title: Text("txtGallery".tr),
               onTap: () {
                 Get.back();
                 onPickImage();
@@ -85,7 +85,7 @@ class AiConciergeController extends GetxController {
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text("Camera"),
+              title: Text("txtCamera".tr),
               onTap: () {
                 Get.back();
                 onPickImageFromCamera();

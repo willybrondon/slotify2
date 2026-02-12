@@ -50,7 +50,7 @@ class WalletRechargeScreenWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Enter Recharge Amount",
+          "txtEnterRechargeAmount".tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -85,7 +85,7 @@ class WalletRechargeScreenWidget extends StatelessWidget {
                 controller: logic.amountController,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
-                  hintText: "Enter amount",
+                  hintText: "txtEnterAmount".tr,
                   border: OutlineInputBorder(
                     borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(10),
@@ -132,7 +132,7 @@ class WalletRechargeScreenWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              "*Please enter a valid amount",
+              "txtPleaseEnterValidAmount".tr,
               style: TextStyle(
                 color: AppColors.redText,
                 fontSize: 14,
@@ -150,7 +150,7 @@ class WalletRechargeScreenWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Or Select Quick Amount",
+          "txtOrSelectQuickAmount".tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -213,7 +213,7 @@ class WalletRechargeScreenWidget extends StatelessWidget {
           ),
         ),
         child: Text(
-          logic.isProcessing ? "Processing..." : "Continue to Payment",
+          logic.isProcessing ? "txtProcessing".tr : "txtContinueToPayment".tr,
           style: TextStyle(
             color: AppColors.whiteColor,
             fontSize: 16,
@@ -245,7 +245,7 @@ class WalletRechargeScreenWidget extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              "Your wallet will be credited immediately after successful payment",
+              "txtWalletCreditedInfo".tr,
               style: TextStyle(
                 color: AppColors.primaryAppColor,
                 fontSize: 14,

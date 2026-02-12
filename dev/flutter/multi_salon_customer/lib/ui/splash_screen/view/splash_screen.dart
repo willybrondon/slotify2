@@ -81,26 +81,25 @@ class _SplashScreenState extends State<SplashScreen> {
             log("is LogIn Splash :: ${Constant.storage.read<bool>('isLogIn')}");
             log("is Update Splash :: ${Constant.storage.read<bool>('isUpdate')}");
 
-            if (Constant.storage.read("isOnBoarding") == true) {
-              loginScreenController.isLogIn == true &&
-                      loginScreenController.isUpdate == false
-                  ? Get.offAllNamed(
-                      AppRoutes.editProfile,
-                      arguments: [
-                        profileScreenController.getUserCategory?.user?.fname,
-                        profileScreenController.getUserCategory?.user?.lname,
-                        profileScreenController.getUserCategory?.user?.email,
-                        profileScreenController.getUserCategory?.user?.mobile,
-                        0,
-                        profileScreenController.getUserCategory?.user?.bio,
-                        profileScreenController
-                            .getUserCategory?.user?.loginType,
-                        false,
-                      ],
-                    )
-                  : Get.offAllNamed(AppRoutes.bottom);
+            // Skip onboarding - go directly to menu after splash
+            if (loginScreenController.isLogIn == true &&
+                loginScreenController.isUpdate == false) {
+              Get.offAllNamed(
+                AppRoutes.editProfile,
+                arguments: [
+                  profileScreenController.getUserCategory?.user?.fname,
+                  profileScreenController.getUserCategory?.user?.lname,
+                  profileScreenController.getUserCategory?.user?.email,
+                  profileScreenController.getUserCategory?.user?.mobile,
+                  0,
+                  profileScreenController.getUserCategory?.user?.bio,
+                  profileScreenController
+                      .getUserCategory?.user?.loginType,
+                  false,
+                ],
+              );
             } else {
-              Get.offAllNamed(AppRoutes.onBoarding);
+              Get.offAllNamed(AppRoutes.bottom);
             }
           }
         } else {

@@ -39,9 +39,9 @@ class BranchDetailController extends GetxController
 
   var tabs = [
     Tab(child: Text("txtServices".tr)),
-    const Tab(child: Text("Product")),
+    Tab(child: Text("txtProduct".tr)),
     Tab(child: Text("txtStaff".tr)),
-    const Tab(child: Text("Gallery")),
+    Tab(child: Text("txtGallery".tr)),
     Tab(child: Text("txtReviews".tr)),
     Tab(child: Text("txtAbout".tr)),
   ];
