@@ -555,7 +555,7 @@ window.addEventListener('DOMContentLoaded', function() {
         var customerQR = document.getElementById('qr-customer-top');
         var expertQR = document.getElementById('qr-expert-top');
         
-        // Generate QR codes that trigger phone selection modal
+        // Generate QR codes with Skedisy logo (H error correction for logo overlay)
         if (customerQR) {
             new QRCode(customerQR, {
                 text: 'https://skedisy.com/#download-customer',

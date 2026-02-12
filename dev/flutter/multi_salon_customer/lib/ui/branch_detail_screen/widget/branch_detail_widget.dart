@@ -49,11 +49,30 @@ void _showQRCodeDialog(BuildContext context, BranchDetailController logic) {
                     return const CircularProgressIndicator();
                   }
                   if (snapshot.hasData && snapshot.data != null) {
-                    return QrImageView(
-                      data: snapshot.data!,
-                      version: QrVersions.auto,
-                      size: 250.0,
-                      backgroundColor: AppColors.whiteColor,
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.whiteColor,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.blackColor.withOpacity(0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: QrImageView(
+                        data: snapshot.data!,
+                        version: QrVersions.auto,
+                        size: 250.0,
+                        backgroundColor: AppColors.whiteColor,
+                        errorCorrectionLevel: QrErrorCorrectLevel.H,
+                        embeddedImage: AssetImage(AppAsset.icSkedisyLogo),
+                        embeddedImageStyle: QrEmbeddedImageStyle(
+                          size: Size(56, 56),
+                        ),
+                      ),
                     );
                   }
                   return Text(

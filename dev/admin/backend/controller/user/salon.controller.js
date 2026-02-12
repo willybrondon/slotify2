@@ -1993,11 +1993,17 @@ exports.serveSalonWebPage = async (req, res) => {
     <div class="qr-topright">
         <div class="qr-top-flex">
             <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
-                <div id="qr-customer-top"></div>
+                <div class="qr-code-wrapper">
+                    <div id="qr-customer-top"></div>
+                    <img class="qr-logo-overlay" src="${baseURL}/images/logo.png" alt="Skedisy">
+                </div>
                 <div class="qr-label">Download Customer App</div>
             </div>
             <div class="qr-top-block" data-app-type="expert" onclick="openPhoneSelection('expert')">
-                <div id="qr-expert-top"></div>
+                <div class="qr-code-wrapper">
+                    <div id="qr-expert-top"></div>
+                    <img class="qr-logo-overlay" src="${baseURL}/images/logo.png" alt="Skedisy">
+                </div>
                 <div class="qr-label">Download the Expert App</div>
             </div>
         </div>

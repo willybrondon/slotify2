@@ -11,6 +11,9 @@ class PaymentScreen extends StatelessWidget {
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: AppColors.whiteColor,
+        foregroundColor: AppColors.blackColor,
+        iconTheme: IconThemeData(color: AppColors.blackColor),
         flexibleSpace: const PaymentAppBarView(),
       ),
       bottomNavigationBar: const PaymentScreenBottomView(),

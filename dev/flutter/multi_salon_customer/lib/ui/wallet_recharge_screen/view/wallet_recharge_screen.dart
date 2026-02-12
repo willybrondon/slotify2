@@ -10,9 +10,13 @@ class WalletRechargeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
-        title: const Text("Recharge Wallet"),
-        backgroundColor: AppColors.primaryAppColor,
-        foregroundColor: AppColors.whiteColor,
+        title: Text(
+          "Recharge Wallet",
+          style: TextStyle(color: AppColors.blackColor),
+        ),
+        backgroundColor: AppColors.whiteColor,
+        foregroundColor: AppColors.blackColor,
+        iconTheme: IconThemeData(color: AppColors.blackColor),
       ),
       body: const WalletRechargeScreenWidget(),
     );

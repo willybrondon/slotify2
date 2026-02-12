@@ -1965,6 +1965,29 @@ html {
     align-items: center;
     min-width: 100px;
 }
+/* QR code wrapper with Skedisy logo overlay (matches Flutter app styling) */
+.qr-code-wrapper {
+    position: relative;
+    padding: 12px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.qr-code-wrapper canvas {
+    display: block;
+}
+.qr-logo-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    padding: 6px;
+    background: #fff;
+    border-radius: 8px;
+    pointer-events: none;
+}
 .qr-label {
     font-weight: 700;
     font-size: 0.9rem;
