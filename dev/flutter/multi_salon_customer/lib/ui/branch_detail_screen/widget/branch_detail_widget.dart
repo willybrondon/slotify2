@@ -68,7 +68,7 @@ void _showQRCodeDialog(BuildContext context, BranchDetailController logic) {
                         size: 250.0,
                         backgroundColor: AppColors.whiteColor,
                         errorCorrectionLevel: QrErrorCorrectLevel.H,
-                        eyeStyle: const QrEyeStyle(
+                        eyeStyle: QrEyeStyle(
                           eyeShape: QrEyeShape.circle,
                           color: AppColors.blackColor,
                         ),
