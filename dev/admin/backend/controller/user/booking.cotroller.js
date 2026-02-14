@@ -464,6 +464,11 @@ exports.newBooking = async (req, res, next) => {
       });
     }
 
+    // Only check customer wallet balance when payment is via WALLET.
+    // For Stripe, MTN MoMo, Cash on service - skip wallet check (customer pays externally).
+    const paymentType = (req.body.paymentType || "").toString().trim();
+    const isWalletPayment = !["Stripe", "MTN MoMo", "cashAfterService"].includes(paymentType);
+
     // Calculate commission that will be deducted from customer wallet
     // Use customerCommissionPercent from settings (or 0 if not set)
     const expectedCustomerCommission = customerCommissionPercent > 0 ? (customerCommissionPercent * totalServicePriceForCheck) / 100 : 0;
@@ -471,8 +476,8 @@ exports.newBooking = async (req, res, next) => {
     // Note: req.body.amount is the final amount (with tax, minus discount), which is what will be deducted
     const requiredCustomerBalance = minUserWalletBalance + parseFloat(req.body.amount) + expectedCustomerCommission;
     
-    // Check if customer has minimum wallet balance + booking amount + commission
-    if (userWalletBalance < requiredCustomerBalance) {
+    // Check if customer has minimum wallet balance + booking amount + commission (WALLET payment only)
+    if (isWalletPayment && userWalletBalance < requiredCustomerBalance) {
       const currencySymbol = global.settingJSON?.currencySymbol || "";
       const deficit = requiredCustomerBalance - userWalletBalance;
       
@@ -917,6 +922,9 @@ exports.newBooking = async (req, res, next) => {
       await coupon.save();
     }
 
+    // Only deduct from customer wallet when payment is via WALLET.
+    // For Stripe, MTN MoMo, Cash on service - payment is done externally, no wallet deduction.
+    if (isWalletPayment) {
     // Calculate customer commission amount (separate from salon commission)
     const customerCommissionAmount = customerCommissionPercent > 0 ? parseFloat((customerCommissionPercent * req.body.withoutTax / 100).toFixed(2)) : 0;
     
@@ -987,6 +995,7 @@ exports.newBooking = async (req, res, next) => {
     }
 
     await Promise.all(walletHistoryPromises);
+    }
 
     if (expert && expert.fcmToken !== null) {
       const adminPromise = await admin;
