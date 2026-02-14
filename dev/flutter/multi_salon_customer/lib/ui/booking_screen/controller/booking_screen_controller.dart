@@ -1189,8 +1189,10 @@ class BookingScreenController extends GetxController {
         createBookingCategory = CreateBookingModel.fromJson(jsonResponse);
 
         // Check if booking failed due to insufficient wallet balance
-        // Check both the status and the insufficientWallet flag
-        if (jsonResponse['status'] == false &&
+        // Only show insufficient wallet dialog when user selected WALLET payment.
+        // For Stripe, MTN MoMo, Cash on service - pay directly without wallet check.
+        if (selectedPayment == "wallet" &&
+            jsonResponse['status'] == false &&
             jsonResponse['insufficientWallet'] == true) {
           log("Booking failed due to insufficient wallet balance");
 
@@ -1237,9 +1239,11 @@ class BookingScreenController extends GetxController {
         String errorMessage = createBookingCategory?.message.toString() ?? "";
 
         // Also check error message for insufficient wallet (fallback)
-        if (errorMessage.toLowerCase().contains("insufficient wallet") ||
-            errorMessage.toLowerCase().contains("solde insuffisant") ||
-            errorMessage.toLowerCase().contains("minimum balance")) {
+        // Only show insufficient wallet dialog when user selected WALLET payment.
+        if (selectedPayment == "wallet" &&
+            (errorMessage.toLowerCase().contains("insufficient wallet") ||
+                errorMessage.toLowerCase().contains("solde insuffisant") ||
+                errorMessage.toLowerCase().contains("minimum balance"))) {
           log("Booking failed due to insufficient wallet balance (detected from message)");
 
           // Try to parse balance details from error message or use defaults
