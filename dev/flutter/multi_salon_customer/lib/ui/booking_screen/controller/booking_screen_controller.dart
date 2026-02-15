@@ -192,6 +192,11 @@ class BookingScreenController extends GetxController {
 
     await Stripe.instance.applySettings();
 
+    // Ensure loading states are cleared when venue step is ready (fixes stuck loading on iOS/Android)
+    isLoading1(false);
+    isLoading(false);
+    update([Constant.idProgressView, Constant.idSelectBranch]);
+
     super.onInit();
   }
 
@@ -1315,7 +1320,7 @@ class BookingScreenController extends GetxController {
       required String amount}) async {
     try {
       isLoading(true);
-      update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+      update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
 
       final queryParameters = {
         "userId": userId,
@@ -1354,7 +1359,7 @@ class BookingScreenController extends GetxController {
       log("Error call Get Coupon Api :: $e");
     } finally {
       isLoading(false);
-      update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+      update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
     }
   }
 
@@ -1365,7 +1370,7 @@ class BookingScreenController extends GetxController {
       required String amount}) async {
     try {
       isLoading(true);
-      update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+      update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
 
       final queryParameters = {
         "userId": userId,
@@ -1414,7 +1419,7 @@ class BookingScreenController extends GetxController {
       return false;
     } finally {
       isLoading(false);
-      update([Constant.idGetCoupon, Constant.idApplyCoupon]);
+      update([Constant.idProgressView, Constant.idGetCoupon, Constant.idApplyCoupon]);
     }
   }
 

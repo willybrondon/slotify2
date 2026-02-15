@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -106,7 +108,7 @@ class AiConciergeController extends GetxController {
     String? occasion,
   }) async {
     try {
-      if (selectImageFile == null) {
+      if (image == null && selectImageFile == null) {
         Utils.showToast(Get.context!, "Please select an image first");
         return;
       }
@@ -119,20 +121,38 @@ class AiConciergeController extends GetxController {
 
       var request = http.MultipartRequest("POST", uri);
 
-      // Add image file - use bytes for reliable upload (handles Android content URIs and cache paths)
-      final imageBytes = await selectImageFile!.readAsBytes();
-      final ext = selectImageFile!.path.toLowerCase().endsWith('.png')
-          ? 'png'
-          : selectImageFile!.path.toLowerCase().endsWith('.webp')
-              ? 'webp'
-              : 'jpg';
+      // Use XFile.readAsBytes() for reliable upload on iOS/Android - handles content URIs,
+      // temporary cache paths, and scoped storage. File(path) fails on Android content:// URIs.
+      final Uint8List imageBytes = image != null
+          ? await image!.readAsBytes()
+          : await selectImageFile!.readAsBytes();
+
+      if (imageBytes.isEmpty) {
+        Utils.showToast(Get.context!, "Failed to read image. Please try again.");
+        return;
+      }
+
+      // Determine extension from path or name (path may be invalid on mobile)
+      String ext = 'jpg';
+      if (image != null) {
+        final pathOrName = (image!.path.isNotEmpty ? image!.path : image!.name).toLowerCase();
+        if (pathOrName.endsWith('.png')) ext = 'png';
+        else if (pathOrName.endsWith('.webp')) ext = 'webp';
+      } else if (selectImageFile != null) {
+        final p = selectImageFile!.path.toLowerCase();
+        if (p.endsWith('.png')) ext = 'png';
+        else if (p.endsWith('.webp')) ext = 'webp';
+      }
+
+      final mimeType = ext == 'png' ? 'image/png' : ext == 'webp' ? 'image/webp' : 'image/jpeg';
       final addImage = http.MultipartFile.fromBytes(
         "image",
         imageBytes,
         filename: "selfie.$ext",
+        contentType: MediaType.parse(mimeType),
       );
       request.files.add(addImage);
-      log("Image path :: ${selectImageFile!.path}, size: ${imageBytes.length} bytes");
+      log("Image size: ${imageBytes.length} bytes, ext: $ext");
 
       // Add headers
       request.headers.addAll({"key": ApiConstant.SECRET_KEY});
@@ -158,15 +178,34 @@ class AiConciergeController extends GetxController {
       log("Analyze Selfie Body :: $requestBody");
       request.fields.addAll(requestBody);
 
-      // Send request
-      var res1 = await request.send();
+      // Send request with timeout (60s for AI analysis)
+      var res1 = await request.send().timeout(
+        const Duration(seconds: 60),
+        onTimeout: () => throw Exception('Request timed out. Please check your connection and try again.'),
+      );
       var res = await http.Response.fromStream(res1);
       log("Analyze Selfie Status Code :: ${res.statusCode}");
       log("Analyze Selfie Response :: ${res.body}");
 
       if (res.statusCode == 200) {
-        final jsonResponse = jsonDecode(res.body);
-        aiConciergeModel = AiConciergeModel.fromJson(jsonResponse);
+        dynamic jsonResponse;
+        try {
+          jsonResponse = jsonDecode(res.body);
+        } catch (parseError) {
+          log("Analyze Selfie JSON parse error: $parseError, body: ${res.body}");
+          Utils.showToast(Get.context!, "Invalid server response. Please try again.");
+          return;
+        }
+        try {
+          aiConciergeModel = AiConciergeModel.fromJson(jsonResponse);
+        } catch (modelError) {
+          log("Analyze Selfie model parse error: $modelError");
+          final msg = jsonResponse is Map && jsonResponse['message'] != null
+              ? jsonResponse['message'].toString()
+              : "Failed to analyze image. Please try again.";
+          Utils.showToast(Get.context!, msg);
+          return;
+        }
 
         if (aiConciergeModel?.status == true) {
           beautyAnalysis = aiConciergeModel?.data?.analysis;
@@ -197,14 +236,25 @@ class AiConciergeController extends GetxController {
           );
         }
       } else {
-        log("Analyze Selfie Error Status Code :: ${res.statusCode}");
-        Utils.showToast(
-            Get.context!, "Failed to analyze image. Please try again.");
+        log("Analyze Selfie Error Status Code :: ${res.statusCode}, body: ${res.body}");
+        String errMsg = "Failed to analyze image. Please try again.";
+        try {
+          final errJson = jsonDecode(res.body);
+          if (errJson is Map && errJson['message'] != null) {
+            errMsg = errJson['message'].toString();
+          }
+        } catch (_) {}
+        Utils.showToast(Get.context!, errMsg);
       }
     } catch (e) {
       log("Analyze Selfie Error :: $e");
-      Utils.showToast(Get.context!, "Error: ${e.toString()}");
-      throw Exception(e);
+      final errStr = e.toString();
+      final msg = errStr.contains('SocketException') || errStr.contains('Connection')
+          ? "Network error. Please check your connection and try again."
+          : errStr.contains('timed out')
+              ? "Request timed out. Please try again."
+              : "Failed to analyze image. Please try again.";
+      Utils.showToast(Get.context!, msg);
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
