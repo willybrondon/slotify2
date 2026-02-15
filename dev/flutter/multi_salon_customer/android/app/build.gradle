@@ -54,7 +54,7 @@ android {
         applicationId "com.skedisy.customer"
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 8
+        versionCode 9
         versionName "1.2.2"
         multiDexEnabled true
         
