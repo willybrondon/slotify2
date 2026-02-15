@@ -186,9 +186,13 @@ class ResetPasswordScreen extends StatelessWidget {
                             currentFocus.focusedChild?.unfocus();
                           }
 
+                          if (logic.emailId == null || logic.emailId!.isEmpty) {
+                            Utils.showToast(Get.context!, "Email is required. Please go back and try again.");
+                            return;
+                          }
                           if (logic.passwordController.text.isNotEmpty && logic.confirmPasswordController.text.isNotEmpty) {
                             await logic.onResetPasswordApiCall(
-                                email: logic.emailId.toString(),
+                                email: logic.emailId!,
                                 newPassword: logic.passwordController.text,
                                 confirmPassword: logic.confirmPasswordController.text);
 

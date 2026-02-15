@@ -400,7 +400,11 @@ exports.deleteUser = async (req, res) => {
 
 exports.setPassword = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    if (!req.body || !req.body.email || !req.body.newPassword || !req.body.confirmPassword) {
+      return res.status(200).json({ status: false, message: "Oops ! Invalid details!!" });
+    }
+
+    const user = await User.findOne({ email: req.body.email.trim(), isDelete: false });
     if (!user) {
       return res.status(200).json({ status: false, message: "User does not found!!" });
     }
@@ -409,23 +413,28 @@ exports.setPassword = async (req, res) => {
       return res.status(200).json({ status: false, message: "you are blocked by admin!" });
     }
 
-    if (!req.body || !req.body.newPassword || !req.body.confirmPassword)
-      return res.status(200).json({ status: false, message: "Oops ! Invalid details!!" });
-
-    if (req.body.newPassword === req.body.confirmPassword) {
-      user.password = cryptr.encrypt(req.body.newPassword);
-      await user.save();
-
-      user.password = await cryptr.decrypt(user.password);
-
-      return res.status(200).json({
-        status: true,
-        message: "Password Changed Successfully!!",
-        user,
-      });
-    } else {
+    if (req.body.newPassword !== req.body.confirmPassword) {
       return res.status(200).json({ status: false, message: "Password does not matched!!" });
     }
+
+    // Use findOneAndUpdate to ensure password is explicitly written to database.
+    // Document.save() can sometimes fail to persist in edge cases.
+    const encryptedPassword = cryptr.encrypt(req.body.newPassword.trim());
+    const updatedUser = await User.findOneAndUpdate(
+      { email: req.body.email.trim(), isDelete: false },
+      { $set: { password: encryptedPassword } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(200).json({ status: false, message: "Failed to update password. Please try again." });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "Password Changed Successfully!!",
+      user: updatedUser,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({

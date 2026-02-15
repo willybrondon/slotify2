@@ -296,27 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Add typing effect for hero title
-    const heroTitle = document.querySelector('.hero-content h1');
-    if (heroTitle) {
-        const text = heroTitle.textContent;
-        heroTitle.textContent = '';
-        heroTitle.style.borderRight = '2px solid white';
-        
-        let i = 0;
-        const typeWriter = () => {
-            if (i < text.length) {
-                heroTitle.textContent += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 100);
-            } else {
-                heroTitle.style.borderRight = 'none';
-            }
-        };
-        
-        // Start typing effect after a short delay
-        setTimeout(typeWriter, 500);
-    }
+    // Typing effect removed - was causing duplicate hero title when translation is in French
 
     // Add floating animation to payment interface
     const paymentInterface = document.querySelector('.payment-interface');

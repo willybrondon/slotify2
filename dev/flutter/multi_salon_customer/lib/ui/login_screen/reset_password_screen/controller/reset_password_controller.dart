@@ -52,8 +52,12 @@ class ResetPasswordController extends GetxController {
       isLoading(true);
       update([Constant.idProgressView]);
 
-      final body =
-          json.encode({"email": email, "newPassword": newPassword, "confirmPassword": confirmPassword});
+      // Trim values to avoid whitespace issues that could prevent password update
+      final body = json.encode({
+        "email": email.trim(),
+        "newPassword": newPassword.trim(),
+        "confirmPassword": confirmPassword.trim(),
+      });
 
       dev.log("Reset Password Body :: $body");
 

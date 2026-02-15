@@ -8,7 +8,7 @@ const translations = {
         'nav.login': 'Login',
         
         // Hero Section
-        'hero.title': 'The #1 Platform to Manage Your Salon',
+        'hero.title': 'The #1 Platform to Manage Your Salon.',
         'hero.subtitle': '<strong>50,000+ salons</strong> trust our beauty industry reference, used by <strong>10M+ users</strong> every month.',
         'hero.addSalon': 'Add My Salon',
         'hero.tryAI': 'Try AI Concierge',
@@ -431,67 +431,67 @@ const translations = {
         'nav.aiConcierge': 'Concierge IA',
         'nav.documentation': 'Documentation',
         'nav.menu': 'Menu',
-        'nav.login': 'Connecter',
+        'nav.login': 'Connexion',
         
         // Hero Section
-        'hero.title': 'La Plateforme #1 pour Gérer Votre Salon',
+        'hero.title': 'La Plateforme #1 pour Gérer Votre Salon.',
         'hero.subtitle': '<strong>50 000+ salons</strong> nous font confiance. <strong>10M+ d\'utilisateurs</strong> chaque mois.',
-        'hero.addSalon': 'Ajouter',
-        'hero.tryAI': 'Essayer',
+        'hero.addSalon': 'Ajouter mon<br>salon',
+        'hero.tryAI': 'Essayer l\'IA',
         'hero.trustBadge': '4,8/5 sur Trustpilot',
         'hero.bookingManagement': 'Gestion des réservations',
         'hero.simplifiedPayments': 'Paiements simplifiés',
         'hero.noCommitment': 'Sans engagement',
         
         // Request Buttons
-        'request.salonTitle': 'Intégrer votre salon sur Skedisy ?',
-        'request.salonButton': 'Demander',
-        'request.customerTitle': 'Réserver des services ?',
-        'request.customerButton': 'Réserver',
+        'request.salonTitle': 'Souhaitez-vous intégrer votre salon sur Skedisy ?',
+        'request.salonButton': 'Faire ma demande',
+        'request.customerTitle': 'Souhaitez-vous réserver des services en salon ?',
+        'request.customerButton': 'Réserver ici',
         
         // Stats
         'stats.professionals': 'Professionnels',
         'stats.appointments': 'Rendez-vous mensuels',
-        'stats.onlineBookings': 'Réservations hors heures',
+        'stats.onlineBookings': 'Réservations en ligne hors heures d\'ouverture',
         
         // Features
-        'features.bookTitle': 'Réservez en Ligne',
-        'features.bookDesc': 'Trouvez votre salon et réservez 24/7. Quelques clics suffisent !',
-        'features.manageTitle': 'Gérez Votre Salon',
-        'features.manageDesc': 'Gérez réservations, personnel et horaires depuis n\'importe où.',
+        'features.bookTitle': 'Réservez votre rendez-vous en ligne',
+        'features.bookDesc': 'Trouvez votre salon préféré et réservez votre rendez-vous beauté 24h/24 et 7j/7. Plus besoin d\'attendre au téléphone !',
+        'features.manageTitle': 'Gérez votre salon en toute simplicité',
+        'features.manageDesc': 'Les propriétaires de salon peuvent gérer les réservations, le personnel et les horaires depuis n\'importe où.',
         
         // New Clients
         'clients.title': 'Nouveaux Clients.<br>En Continu.',
-        'clients.desc': 'Laissez-les vous trouver.',
-        'clients.showcase': 'Page de présentation',
-        'clients.reviews': 'Avis certifiés',
-        'clients.ranking': 'Classement Google',
-        'clients.discover': 'Découvrir',
+        'clients.desc': 'Certains cherchent exactement votre spécialité. D\'autres sont nouveaux dans le quartier. Laissez-les vous trouver.',
+        'clients.showcase': 'Page vitrine pour votre établissement',
+        'clients.reviews': 'Avis clients certifiés',
+        'clients.ranking': 'Classement Google optimisé',
+        'clients.discover': 'Découvrir gratuitement',
         
         // Professional Stats
         'proStats.title': 'Professionnel de la beauté ?<br>Découvrez la réservation en ligne !',
         'proStats.increase': 'd\'augmentation des réservations en ligne',
         'proStats.noShows': 'moins d\'absences avec SMS',
-        'proStats.outsideHours': 'réservations hors heures',
+        'proStats.outsideHours': 'réservations faites hors heures d\'ouverture',
         'proStats.salons': 'Salons & instituts',
         'proStats.booked': 'Réservé chaque seconde',
         'proStats.sold': 'en rendez-vous vendus',
         
         // Platform Features
         'platform.manage': 'Gérer',
-        'platform.manageDesc': 'Contrôlez tout : réservations, ventes, équipe.',
-        'platform.grow': 'Croître',
-        'platform.growDesc': 'Nouveaux clients et fidélisation.',
-        'platform.getPaid': 'Se Faire Payer',
-        'platform.getPaidDesc': 'Paiements rapides. Moins d\'absences.',
+        'platform.manageDesc': 'Contrôlez tous les aspects : réservations, ventes, clients, emplacements et équipe.',
+        'platform.grow': 'Développez',
+        'platform.growDesc': 'Attirez de nouveaux clients sur la plus grande place de marché beauté et bien-être.',
+        'platform.getPaid': 'Recevez vos paiements',
+        'platform.getPaidDesc': 'Recevez vos paiements rapidement et en toute sécurité. Réduisez les absences avec les acomptes.',
         'platform.aiTitle': 'Concierge Beauté IA',
         'platform.aiDesc': 'Recommandations beauté personnalisées par IA.',
-        'platform.tryNow': 'Essayer →',
+        'platform.tryNow': 'Essayer l\'IA →',
         
         // CTA
         'cta.ready': 'Prêt à développer votre entreprise ?',
         'cta.join': 'Rejoignez des milliers de pros. Gratuit !',
-        'cta.getStarted': 'Commencer',
+        'cta.getStarted': 'Commencer gratuitement',
         'cta.million': '10 000 000',
         'cta.millionDesc': '10M de réservations beauté chaque mois.',
         'cta.final': '50 000+ professionnels nous font confiance.',
@@ -502,7 +502,7 @@ const translations = {
         'faq.salonAccount': 'Comment créer un compte propriétaire ?',
         'faq.expertCredentials': 'Comment obtenir les identifiants expert ?',
         'faq.downloadApp': 'Comment télécharger l\'app ?',
-        'faq.appDifference': 'Différence entre app Client et Expert ?',
+        'faq.appDifference': 'Quelle est la différence entre l\'app Client et l\'app Expert ?',
         'faq.bookService': 'Comment réserver un service ?',
         'faq.acceptReservation': 'Comment accepter/refuser une réservation ?',
         'faq.manageBusiness': 'Comment gérer son salon (experts, services) ?',
@@ -513,7 +513,7 @@ const translations = {
         'footer.tagline': 'Gérez votre salon avec notre solution tout-en-un.',
         'footer.about': 'À Propos',
         'footer.myAccount': 'Mon Compte Skedisy',
-        'footer.signUp': 'Inscrire',
+        'footer.signUp': 'S\'inscrire',
         'footer.pricing': 'Tarification',
         'footer.helpCenter': 'Centre d\'Aide',
         'footer.solutions': 'Nos Solutions',
@@ -530,14 +530,14 @@ const translations = {
         'footer.rights': '© 2024 Skedisy. Tous droits réservés.',
         
         // Modal
-        'modal.choosePlatform': 'Plateforme',
-        'modal.selectDevice': 'Appareil',
+        'modal.choosePlatform': 'Choisissez votre plateforme',
+        'modal.selectDevice': 'Sélectionnez votre appareil pour télécharger l\'app',
         'modal.android': 'Android',
         'modal.downloadAndroid': 'Télécharger depuis Google Play',
         'modal.download': 'Télécharger',
         'modal.iphone': 'iPhone',
         'modal.downloadIOS': 'Télécharger depuis l\'App Store',
-        'modal.requestDemo': 'Démo',
+        'modal.requestDemo': 'Demander une démo',
         'modal.sendRequest': 'Envoyez votre demande à :',
         'modal.includeInfo': 'Informations à inclure :',
         'modal.managerName': 'Nom du Gérant',
@@ -884,8 +884,8 @@ function translatePage() {
         if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
             element.placeholder = translation;
         } else {
-            // Use replaceChildren to prevent any duplication - ensures clean single replacement
-            element.replaceChildren(document.createTextNode(translation));
+            // Use textContent for clean single replacement - prevents any duplication
+            element.textContent = translation;
         }
     });
     
