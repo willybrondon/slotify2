@@ -1,26 +1,18 @@
 /**
- * QR code generation with rounded corners (matches customer app share link style)
- * Uses qr-code-styling for rounded finder patterns
+ * QR code generation with logo embedded inside and rounded corner squares
+ * Uses qr-code-styling via ES module (matches customer app share link style)
  */
 (function() {
-    function loadQRCodeStyling(callback) {
-        var script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.0/lib/qr-code-styling.common.js';
-        script.async = false;
-        script.onload = callback;
-        script.onerror = function() { callback(null); };
-        document.head.appendChild(script);
-    }
-
-    function generateWithFallback() {
-        loadQRCodeStyling(function() {
-            var QRCodeStyling = window.QRCodeStyling;
-            if (QRCodeStyling) {
+    function run() {
+        import('https://cdn.skypack.dev/qr-code-styling@1.9.2')
+            .then(function(module) {
+                var QRCodeStyling = module.default;
                 generateStyledQR(QRCodeStyling);
-            } else {
+            })
+            .catch(function(err) {
+                console.warn('qr-code-styling failed to load:', err);
                 generateFallbackQR();
-            }
-        });
+            });
     }
 
     function generateStyledQR(QRCodeStyling) {
@@ -63,8 +55,8 @@
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', generateWithFallback);
+        document.addEventListener('DOMContentLoaded', run);
     } else {
-        generateWithFallback();
+        run();
     }
 })();
