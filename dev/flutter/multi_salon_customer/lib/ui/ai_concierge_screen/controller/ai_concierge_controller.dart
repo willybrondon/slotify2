@@ -119,13 +119,20 @@ class AiConciergeController extends GetxController {
 
       var request = http.MultipartRequest("POST", uri);
 
-      // Add image file
-      var addImage = await http.MultipartFile.fromPath(
+      // Add image file - use bytes for reliable upload (handles Android content URIs and cache paths)
+      final imageBytes = await selectImageFile!.readAsBytes();
+      final ext = selectImageFile!.path.toLowerCase().endsWith('.png')
+          ? 'png'
+          : selectImageFile!.path.toLowerCase().endsWith('.webp')
+              ? 'webp'
+              : 'jpg';
+      final addImage = http.MultipartFile.fromBytes(
         "image",
-        selectImageFile!.path,
+        imageBytes,
+        filename: "selfie.$ext",
       );
       request.files.add(addImage);
-      log("Image path :: ${selectImageFile!.path}");
+      log("Image path :: ${selectImageFile!.path}, size: ${imageBytes.length} bytes");
 
       // Add headers
       request.headers.addAll({"key": ApiConstant.SECRET_KEY});

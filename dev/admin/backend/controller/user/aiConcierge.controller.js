@@ -7,15 +7,17 @@ const fs = require('fs');
  */
 exports.analyzeSelfie = async (req, res) => {
   try {
-    // Check if image file is uploaded
+    // Check if image file is uploaded (multer stores in req.file for single upload)
     if (!req.file) {
+      console.error('[AI Concierge] No file received. Check: 1) Field name must be "image" 2) Content-Type: multipart/form-data 3) File size under 10MB');
       return res.status(200).send({
         status: false,
-        message: 'Please upload a selfie image'
+        message: 'Please upload a selfie image. Make sure to select or take a photo first.'
       });
     }
 
-    const imagePath = req.file.path;
+    // Use absolute path for file access (handles different working directories)
+    const imagePath = path.isAbsolute(req.file.path) ? req.file.path : path.resolve(process.cwd(), req.file.path);
     const userId = req.body.userId || req.query.userId || null;
     
     // Context information (optional)

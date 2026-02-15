@@ -2,9 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
-import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
-import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/select_branch_screen/controller/select_branch_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
@@ -40,16 +38,11 @@ class SelectBranchScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: GetBuilder<HomeScreenController>(
+      body: GetBuilder<SelectBranchController>(
         id: Constant.idProgressView,
         builder: (logic) {
           return RefreshIndicator(
-            onRefresh: () => logic.onGetServiceBasedSalonApiCall(
-              serviceId: logic.serviceId.join(","),
-              latitude: latitude ?? 0.0,
-              longitude: longitude ?? 0.0,
-              city: city ?? "",
-            ),
+            onRefresh: () => logic.onGetServiceBasedSalonApiCall(),
             backgroundColor: AppColors.primaryAppColor,
             child: logic.isLoading.value
                 ? Shimmers.nearByBranchesWithLocationShimmer()
@@ -76,7 +69,7 @@ class SelectBranchScreen extends StatelessWidget {
                         ),
                       )
                     : ListView.builder(
-                        itemCount: logic.getServiceBaseSalonCategory?.data?.length,
+                        itemCount: logic.getServiceBaseSalonCategory?.data?.length ?? 0,
                         physics: const BouncingScrollPhysics(),
                         scrollDirection: Axis.vertical,
                         itemBuilder: (context, index) {

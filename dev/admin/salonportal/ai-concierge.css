@@ -1,19 +1,20 @@
-/* AI Concierge Styles */
+/* AI Concierge Styles - aligned with skedisy.com main page */
 .ai-concierge-section {
     padding: 120px 20px 60px;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #f8f9fa;
 }
 
 .ai-concierge-header {
     text-align: center;
-    color: white;
+    color: #111;
     margin-bottom: 50px;
 }
 
 .ai-icon {
     font-size: 80px;
     margin-bottom: 20px;
+    color: #667eea;
     animation: float 3s ease-in-out infinite;
 }
 
@@ -26,19 +27,19 @@
     font-size: 48px;
     font-weight: 700;
     margin-bottom: 15px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    color: #111;
 }
 
 .subtitle {
     font-size: 24px;
     font-weight: 500;
     margin-bottom: 10px;
-    opacity: 0.95;
+    color: #333;
 }
 
 .description {
     font-size: 16px;
-    opacity: 0.9;
+    color: #555;
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;

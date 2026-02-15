@@ -1,8 +1,14 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
+import 'package:salon_2/ui/home_screen/model/get_service_base_salon_model.dart';
+import 'package:salon_2/utils/api_constant.dart';
+import 'package:salon_2/utils/constant.dart';
+import 'package:salon_2/utils/utils.dart';
 
 class SelectBranchController extends GetxController {
   List checkItem = [];
@@ -14,32 +20,70 @@ class SelectBranchController extends GetxController {
   int selectBranch = -1;
   dynamic args = Get.arguments;
 
-  HomeScreenController homeScreenController = Get.find<HomeScreenController>();
+  RxBool isLoading = false.obs;
+  GetServiceBaseSalonModel? getServiceBaseSalonCategory;
+
+  HomeScreenController? homeScreenController;
 
   @override
   void onInit() async {
     log("message SelectBranchController");
     await getDataFromArgs();
 
-    // Update homeScreenController serviceId to match our serviceId
-    if (serviceId.isNotEmpty) {
-      homeScreenController.serviceId = List.from(serviceId);
-      log("SelectBranch: Updated homeScreenController.serviceId = ${homeScreenController.serviceId}");
+    // Update homeScreenController serviceId if it exists (for other flows)
+    try {
+      homeScreenController = Get.find<HomeScreenController>();
+      if (serviceId.isNotEmpty) {
+        homeScreenController!.serviceId = List.from(serviceId);
+        log("SelectBranch: Updated homeScreenController.serviceId = ${homeScreenController!.serviceId}");
+      }
+    } catch (e) {
+      log("SelectBranch: HomeScreenController not found (expected when coming from category): $e");
     }
 
-    // Call API to get salons for the service
+    // Fetch salons directly - avoid dependency on HomeScreenController loading state
     if (serviceId.isNotEmpty) {
-      homeScreenController.onGetServiceBasedSalonApiCall(
-        serviceId: serviceId.join(","),
-        latitude: latitude ?? 0.0,
-        longitude: longitude ?? 0.0,
-        city: city ?? "",
-      );
+      await onGetServiceBasedSalonApiCall();
     } else {
       log("SelectBranch: No serviceId provided, cannot fetch salons");
+      isLoading(false);
     }
 
     super.onInit();
+  }
+
+  Future<void> onGetServiceBasedSalonApiCall() async {
+    try {
+      isLoading(true);
+      update([Constant.idProgressView, Constant.idSelectBranch]);
+
+      final url = Uri.parse(
+        '${ApiConstant.BASE_URL}${ApiConstant.getServiceBasedSalon}?serviceId=${serviceId.join(",")}&latitude=${(latitude ?? 0.0) == 0.0 ? null : latitude}&longitude=${(longitude ?? 0.0) == 0.0 ? null : longitude}&city=${city ?? ""}',
+      );
+
+      log("SelectBranch: Get Service Based Salon Url :: $url");
+
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      log("SelectBranch: StatusCode :: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        getServiceBaseSalonCategory =
+            GetServiceBaseSalonModel.fromJson(jsonResponse);
+      }
+    } catch (e) {
+      log("SelectBranch: Error call Get Service Based Salon Api :: $e");
+      Utils.showToast(Get.context!, "$e");
+    } finally {
+      isLoading(false);
+      update([Constant.idProgressView, Constant.idSelectBranch]);
+    }
   }
 
   getDataFromArgs() {

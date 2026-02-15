@@ -83,7 +83,7 @@ class NotificationController extends GetxController {
     try {
       // Validate inputs
       if (notificationId.isEmpty || userId.isEmpty) {
-        Utils.showToast(Get.context!, "Invalid notification data");
+        Utils.showToast(Get.context!, "desInvalidNotificationData".tr);
         return;
       }
 
@@ -131,7 +131,7 @@ class NotificationController extends GetxController {
               Utils.showToast(
                   Get.context!,
                   jsonResponse['message'] ??
-                      "Notification deleted successfully");
+                      "desNotificationDeletedSuccess".tr);
             } else {
               // If not found by ID, try using the provided index
               if (index < notificationCategory!.notification!.length) {
@@ -140,7 +140,7 @@ class NotificationController extends GetxController {
                 Utils.showToast(
                     Get.context!,
                     jsonResponse['message'] ??
-                        "Notification deleted successfully");
+                        "desNotificationDeletedSuccess".tr);
               } else {
                 // Refresh the list if index is out of bounds
                 log("Index out of bounds, refreshing notification list");
@@ -148,28 +148,28 @@ class NotificationController extends GetxController {
                 Utils.showToast(
                     Get.context!,
                     jsonResponse['message'] ??
-                        "Notification deleted successfully");
+                        "desNotificationDeletedSuccess".tr);
               }
             }
           } else {
             // Refresh the list if notification list is null
             await onGetNotificationApiCall(userId: userId);
             Utils.showToast(Get.context!,
-                jsonResponse['message'] ?? "Notification deleted successfully");
+                jsonResponse['message'] ?? "desNotificationDeletedSuccess".tr);
           }
         } else {
           Utils.showToast(Get.context!,
-              jsonResponse['message'] ?? "Failed to delete notification");
+              jsonResponse['message'] ?? "desNotificationDeleteFailed".tr);
         }
       } else {
         // Handle non-200 status codes
         try {
           final jsonResponse = jsonDecode(response.body);
           Utils.showToast(Get.context!,
-              jsonResponse['message'] ?? "Failed to delete notification");
+              jsonResponse['message'] ?? "desNotificationDeleteFailed".tr);
         } catch (e) {
           Utils.showToast(
-              Get.context!, "Failed to delete notification. Please try again.");
+              Get.context!, "desNotificationDeleteFailed".tr);
         }
       }
     } on AppException catch (exception) {
@@ -177,7 +177,7 @@ class NotificationController extends GetxController {
     } catch (e) {
       log("Error call Delete Notification Api :: $e");
       Utils.showToast(
-          Get.context!, "Error deleting notification: ${e.toString()}");
+          Get.context!, "desErrorDeletingNotification".tr + ": ${e.toString()}");
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);

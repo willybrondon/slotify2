@@ -23,14 +23,12 @@
             <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
                 <div class="qr-code-wrapper">
                     <div id="qr-customer-top"></div>
-                    <img class="qr-logo-overlay" src="images/logo.png" alt="Skedisy">
                 </div>
                 <div class="qr-label" data-translate="qr.customerApp">Download Customer App</div>
             </div>
             <div class="qr-top-block" data-app-type="expert" onclick="openPhoneSelection('expert')">
                 <div class="qr-code-wrapper">
                     <div id="qr-expert-top"></div>
-                    <img class="qr-logo-overlay" src="images/logo.png" alt="Skedisy">
                 </div>
                 <div class="qr-label" data-translate="qr.expertApp">Download the Expert App</div>
             </div>
@@ -244,11 +242,11 @@
                 <h3 data-translate="platform.getPaid">Get Paid</h3>
                 <p data-translate="platform.getPaidDesc">Get paid quickly and securely with integrated payments, reduce no-shows with deposits, and simplify your checkout process.</p>
             </div>
-            <div class="platform-feature-card" style="cursor: pointer;" onclick="window.location.href='ai-concierge.html'">
+            <div class="platform-feature-card">
                 <div class="platform-feature-icon">🤖</div>
                 <h3 data-translate="platform.aiTitle">AI Beauty Concierge</h3>
                 <p data-translate="platform.aiDesc">Get personalized beauty recommendations powered by AI. Upload your selfie and discover the perfect services for you.</p>
-                <a href="ai-concierge.html" style="color: #3498db; text-decoration: none; margin-top: 10px; display: inline-block;" data-translate="platform.tryNow">Try Now →</a>
+                <a href="ai-concierge.html" class="btn-ai-try" data-translate="platform.tryNow">Try Now →</a>
             </div>
         </div>
     </section>
@@ -605,6 +603,7 @@
     </div>
 
     <script src="cookie-consent.js"></script>
+    <script src="qr-code-init.js"></script>
     <script src="script.js"></script>
 </body>
 </html> 

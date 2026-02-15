@@ -21,16 +21,14 @@
                 </a>
             </div>
             <div class="nav-menu-center desktop-only">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="ai-concierge.html" class="nav-link active" data-translate="nav.aiConcierge">AI Concierge</a>
                 <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
                 <!-- Language Switcher - Desktop -->
                 <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
-                    <i class="fas fa-globe"></i> <span>English</span>
+                    <i class="fas fa-globe"></i> <span>EN</span>
                 </button>
             </div>
             <div class="mobile-menu-wrapper">
-                <!-- Language Switcher - Mobile (before hamburger) -->
+                <!-- Language Switcher - Mobile -->
                 <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
                     <i class="fas fa-globe"></i> <span>EN</span>
                 </button>
@@ -39,6 +37,30 @@
                     <span></span>
                     <span></span>
                 </div>
+            </div>
+            <a href="https://skedisy.com/salonpanel" class="btn-login-mobile" data-translate="nav.login">Login</a>
+        </div>
+        <!-- Mobile Slide-in Menu -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3 data-translate="nav.menu">Menu</h3>
+                <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
+                        <i class="fas fa-globe"></i> <span>EN</span>
+                    </button>
+                    <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+                </div>
+            </div>
+            <div class="mobile-menu-content">
+                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Login</a>
+                <a href="documentation.html" class="mobile-documentation-link" data-translate="nav.documentation">Documentation</a>
+                <a href="ai-concierge.html" class="btn-ai-concierge-mobile">
+                    <i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span>
+                </a>
+                <a href="index.html" class="mobile-documentation-link">
+                    <i class="fas fa-home"></i> <span>Home</span>
+                </a>
             </div>
         </div>
     </nav>
@@ -131,6 +153,7 @@
         </div>
     </footer>
 
+    <script src="script.js"></script>
     <script src="ai-concierge.js"></script>
 </body>
 </html>

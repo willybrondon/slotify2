@@ -24,6 +24,7 @@ class SettingController extends GetxController {
 
   onSwitch(value) {
     isSwitchOn = value;
+    Constant.storage.write("notification", value);
     update([Constant.idSwitchOn]);
   }
 

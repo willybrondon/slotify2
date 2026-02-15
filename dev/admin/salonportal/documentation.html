@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <script src="language.js" defer></script>
     <style>
         .documentation-wrapper {
@@ -74,12 +74,15 @@
             font-weight: 600;
         }
 
-        /* Main Content */
+        /* Main Content - Scientific/Technical Documentation Style */
         .doc-main-content {
             flex: 1;
             margin-left: 280px;
             padding: 60px 80px;
-            max-width: 1000px;
+            max-width: 900px;
+            font-family: 'Source Serif 4', Georgia, serif;
+            background: #fafafa;
+            counter-reset: doc-section;
         }
 
         .doc-section {
@@ -87,56 +90,84 @@
         }
 
         .doc-section h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            color: #111;
-            margin-bottom: 20px;
-            line-height: 1.2;
+            color: #1a1a2e;
+            margin-bottom: 24px;
+            line-height: 1.3;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #2c3e50;
+            font-family: 'Source Serif 4', Georgia, serif;
         }
         
         .doc-section h2 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            color: #111;
-            margin-top: 50px;
-            margin-bottom: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e5e5;
+            color: #1a1a2e;
+            margin-top: 48px;
+            margin-bottom: 16px;
+            padding-top: 24px;
+            padding-left: 20px;
+            border-left: 4px solid #3498db;
+            counter-increment: doc-section;
+            counter-reset: doc-subsection;
+            font-family: 'Source Serif 4', Georgia, serif;
+        }
+
+        .doc-section h2::before {
+            content: counter(doc-section) ". ";
+            color: #3498db;
+            font-weight: 700;
         }
 
         .doc-section h3 {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            color: #111;
-            margin-top: 40px;
-            margin-bottom: 16px;
+            color: #2c3e50;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            counter-increment: doc-subsection;
+            font-family: 'Source Serif 4', Georgia, serif;
+        }
+
+        .doc-section h3::before {
+            content: counter(doc-section) "." counter(doc-subsection) " ";
+            color: #555;
+            font-size: 0.95em;
         }
 
         .doc-section h4 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            color: #111;
-            margin-top: 30px;
-            margin-bottom: 12px;
+            color: #34495e;
+            margin-top: 24px;
+            margin-bottom: 10px;
+            font-family: 'Source Serif 4', Georgia, serif;
         }
 
         .doc-section p {
             font-size: 1rem;
-            line-height: 1.8;
-            color: #333;
-            margin-bottom: 20px;
+            line-height: 1.85;
+            color: #2c3e50;
+            margin-bottom: 18px;
+            text-align: justify;
         }
 
         .doc-section ul, .doc-section ol {
-            margin: 20px 0;
-            padding-left: 30px;
+            margin: 18px 0;
+            padding-left: 28px;
         }
 
         .doc-section li {
             font-size: 1rem;
             line-height: 1.8;
-            color: #333;
-            margin-bottom: 12px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .doc-section strong, .doc-section b {
+            color: #1a1a2e;
+            font-weight: 600;
         }
 
         /* Image Container */
@@ -254,6 +285,14 @@
             text-decoration: underline;
         }
 
+        .doc-toc h3::before {
+            content: none;
+        }
+
+        .doc-step h4 .doc-step-number {
+            margin-right: 8px;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .documentation-wrapper {
@@ -324,7 +363,7 @@
             <!-- Desktop Categories Menu -->
             <div class="nav-menu-center desktop-only" id="categoriesMenu">
                 <!-- Categories will be loaded dynamically -->
-                <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
+                <a href="/documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
                 <!-- Language Switcher - Desktop (on same line as categories and documentation) -->
                 <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
                     <i class="fas fa-globe"></i> <span>English</span>
@@ -354,7 +393,7 @@
                 <!-- Mobile Login Button -->
                 <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Login</a>
                 <!-- Mobile Documentation Link -->
-                <a href="documentation.html" class="btn-documentation-mobile-menu" data-translate="nav.documentation">Documentation</a>
+                <a href="/documentation.html" class="btn-documentation-mobile-menu" data-translate="nav.documentation">Documentation</a>
                 <!-- AI Concierge Button - More Prominent -->
                 <a href="ai-concierge.html" class="btn-ai-concierge-mobile">
                     <i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span>
@@ -992,113 +1031,113 @@
 
             <!-- Product Category -->
             <section id="product-category" class="doc-section">
-                <h2>Product Category</h2>
-                <p>The Product Category screen helps you browse and discover services organized by category. This screen provides an organized way to explore all available services.</p>
+                <h2 data-translate="doc.productCategory">Product Category</h2>
+                <p data-translate="doc.productCategoryDesc">The Product Category screen helps you browse and discover services organized by category. This screen provides an organized way to explore all available services.</p>
 
                 <div class="doc-image-container">
                     <img src="/salonportal/images/cus_tab3_product.png" alt="Skedisy Customer App Product Category Screen">
-                    <div class="doc-image-caption">Product Category Screen - Browsing service categories in a grid layout</div>
+                    <div class="doc-image-caption" data-translate="doc.productCategoryCaption">Product Category Screen - Browsing service categories in a grid layout</div>
                 </div>
 
-                <h3>Header Section</h3>
+                <h3 data-translate="doc.headerSection">Header Section</h3>
                 <div class="doc-step">
-                    <h4><span class="doc-step-number">1</span>Screen Title</h4>
-                    <p>The screen displays <strong>"Product Category"</strong> as the main title, with a welcoming subtitle: <strong>"You Have Been Missed For A Long Time."</strong></p>
+                    <h4><span class="doc-step-number">1</span><span data-translate="doc.screenTitle">Screen Title</span></h4>
+                    <p data-translate-html="doc.productCategoryScreenTitle">The screen displays <strong>"Product Category"</strong> as the main title, with a welcoming subtitle: <strong>"You Have Been Missed For A Long Time."</strong></p>
                 </div>
 
                 <div class="doc-step">
-                    <h4><span class="doc-step-number">2</span>Navigation Icons</h4>
+                    <h4><span class="doc-step-number">2</span><span data-translate="doc.navigationIcons">Navigation Icons</span></h4>
                     <ul>
-                        <li><strong>Left:</strong> Shopping bag with heart icon - access your favorites</li>
-                        <li><strong>Right:</strong> System status indicators</li>
+                        <li data-translate="doc.navIconsLeft"><strong>Left:</strong> Shopping bag with heart icon - access your favorites</li>
+                        <li data-translate="doc.navIconsRight"><strong>Right:</strong> System status indicators</li>
                     </ul>
                 </div>
 
-                <h3>Search Functionality</h3>
-                <p>The search bar at the top allows you to quickly find specific products or services. Simply type keywords related to what you're looking for, and the app will filter the results accordingly.</p>
+                <h3 data-translate="doc.searchFunctionality">Search Functionality</h3>
+                <p data-translate="doc.productSearchDesc">The search bar at the top allows you to quickly find specific products or services. Simply type keywords related to what you're looking for, and the app will filter the results accordingly.</p>
 
-                <h3>Category Grid</h3>
-                <p>The main content area displays categories in a clean 2x3 grid layout. Each category card includes:</p>
+                <h3 data-translate="doc.categoryGrid">Category Grid</h3>
+                <p data-translate="doc.categoryGridDesc">The main content area displays categories in a clean 2x3 grid layout. Each category card includes:</p>
 
                 <div class="doc-step">
-                    <h4><span class="doc-step-number">3</span>Category Cards</h4>
-                    <p>Each category is presented as a white card with rounded corners containing:</p>
+                    <h4><span class="doc-step-number">3</span><span data-translate="doc.categoryCards">Category Cards</span></h4>
+                    <p data-translate="doc.categoryCardsDesc">Each category is presented as a white card with rounded corners containing:</p>
                     <ul>
-                        <li><strong>Icon:</strong> Visual representation of the category</li>
-                        <li><strong>Category Name:</strong> Full or abbreviated category title</li>
+                        <li><strong data-translate="doc.iconLabel">Icon:</strong> <span data-translate="doc.visualRepresentation">Visual representation of the category</span></li>
+                        <li><strong data-translate="doc.categoryName">Category Name:</strong> <span data-translate="doc.fullOrAbbreviated">Full or abbreviated category title</span></li>
                     </ul>
                 </div>
 
-                <h4>Available Categories</h4>
+                <h4 data-translate="doc.availableCategories">Available Categories</h4>
                 <ul>
-                    <li><strong>Hygiene & Sal...</strong> - Personal care and hygiene services</li>
-                    <li><strong>Tools & Equip...</strong> - Professional tools and equipment</li>
-                    <li><strong>Makeup & Dec...</strong> - Makeup services and decorative treatments</li>
-                    <li><strong>Nail Care</strong> - Manicure, pedicure, and nail art services</li>
-                    <li><strong>Skin & Spa</strong> - Facial treatments and spa services</li>
-                    <li><strong>Hair Care</strong> - Haircut, styling, and hair treatment services</li>
+                    <li data-translate="doc.catHygiene">Hygiene & Sal... - Personal care and hygiene services</li>
+                    <li data-translate="doc.catTools">Tools & Equip... - Professional tools and equipment</li>
+                    <li data-translate="doc.catMakeup">Makeup & Dec... - Makeup services and decorative treatments</li>
+                    <li data-translate="doc.catNail">Nail Care - Manicure, pedicure, and nail art services</li>
+                    <li data-translate="doc.catSkin">Skin & Spa - Facial treatments and spa services</li>
+                    <li data-translate="doc.catHair">Hair Care - Haircut, styling, and hair treatment services</li>
                 </ul>
 
                 <div class="doc-step">
-                    <h4><span class="doc-step-number">4</span>Browsing Categories</h4>
-                    <p>Tap on any category card to:</p>
+                    <h4><span class="doc-step-number">4</span><span data-translate="doc.browsingCategories">Browsing Categories</span></h4>
+                    <p data-translate="doc.tapCategoryCard">Tap on any category card to:</p>
                     <ul>
-                        <li>View all services within that category</li>
-                        <li>See available salons offering those services</li>
-                        <li>Filter by price, location, or rating</li>
-                        <li>Book services directly</li>
+                        <li data-translate="doc.browseViewServices">View all services within that category</li>
+                        <li data-translate="doc.browseSeeSalons">See available salons offering those services</li>
+                        <li data-translate="doc.browseFilter">Filter by price, location, or rating</li>
+                        <li data-translate="doc.browseBook">Book services directly</li>
                     </ul>
                 </div>
 
-                <h3>Navigation</h3>
-                <p>The bottom navigation bar shows the shopping bag icon highlighted, indicating you're in the product/category browsing section.</p>
+                <h3 data-translate="doc.navigation">Navigation</h3>
+                <p data-translate="doc.productNavDesc">The bottom navigation bar shows the shopping bag icon highlighted, indicating you're in the product/category browsing section.</p>
             </section>
 
             <!-- Notifications -->
             <section id="notifications" class="doc-section">
-                <h2>Notifications</h2>
-                <p>The Notifications screen keeps you informed about important updates, booking confirmations, reminders, and other relevant information about your appointments and account.</p>
+                <h2 data-translate="doc.notifications">Notifications</h2>
+                <p data-translate="doc.notificationsDesc">The Notifications screen keeps you informed about important updates, booking confirmations, reminders, and other relevant information about your appointments and account.</p>
 
                 <div class="doc-image-container">
                     <img src="/salonportal/images/cus_tab4_notification.png" alt="Skedisy Customer App Notifications Screen">
-                    <div class="doc-image-caption">Notifications Screen - List of booking confirmations and updates</div>
+                    <div class="doc-image-caption" data-translate="doc.notificationsCaption">Notifications Screen - List of booking confirmations and updates</div>
                 </div>
 
-                <h3>Header Section</h3>
+                <h3 data-translate="doc.headerSection">Header Section</h3>
                 <div class="doc-step">
-                    <h4><span class="doc-step-number">1</span>Screen Title</h4>
-                    <p>The screen displays a bell icon and the title <strong>"Notifications"</strong> with a subtitle: <strong>"Vous manquez depuis longtemps"</strong> (You've been missed for a long time).</p>
+                    <h4><span class="doc-step-number">1</span><span data-translate="doc.screenTitle">Screen Title</span></h4>
+                    <p data-translate-html="doc.notificationsScreenTitle">The screen displays a bell icon and the title <strong>"Notifications"</strong> with a subtitle: <strong>"Vous manquez depuis longtemps"</strong> (You've been missed for a long time).</p>
                 </div>
 
-                <h3>Notification List</h3>
-                <p>Notifications are displayed as individual cards, each containing:</p>
+                <h3 data-translate="doc.notificationList">Notification List</h3>
+                <p data-translate="doc.notificationListDesc">Notifications are displayed as individual cards, each containing:</p>
 
                 <div class="doc-step">
-                    <h4><span class="doc-step-number">2</span>Notification Card Elements</h4>
+                    <h4><span class="doc-step-number">2</span><span data-translate="doc.notificationCardElements">Notification Card Elements</span></h4>
                     <ul>
-                        <li><strong>Icon:</strong> Circular icon representing the notification type (schedule, salon interior, service icon, etc.)</li>
-                        <li><strong>Title:</strong> Brief notification title (e.g., "Booking Confirm", "titel")</li>
-                        <li><strong>Description:</strong> Detailed message about the notification</li>
-                        <li><strong>Date/Time:</strong> Timestamp showing when the notification was received (format: M/D/YYYY H:MM)</li>
+                        <li data-translate="doc.notifIcon"><strong>Icon:</strong> Circular icon representing the notification type (schedule, salon interior, service icon, etc.)</li>
+                        <li data-translate="doc.notifTitle"><strong>Title:</strong> Brief notification title (e.g., "Booking Confirm", "titel")</li>
+                        <li data-translate="doc.notifDesc"><strong>Description:</strong> Detailed message about the notification</li>
+                        <li data-translate="doc.notifDateTime"><strong>Date/Time:</strong> Timestamp showing when the notification was received (format: M/D/YYYY H:MM)</li>
                     </ul>
                 </div>
 
-                <h3>Notification Types</h3>
-                <h4>Booking Confirmations</h4>
-                <p>Most notifications are booking-related, such as:</p>
+                <h3 data-translate="doc.notificationTypes">Notification Types</h3>
+                <h4 data-translate="doc.bookingConfirmations">Booking Confirmations</h4>
+                <p data-translate="doc.bookingNotifDesc">Most notifications are booking-related, such as:</p>
                 <ul>
-                    <li><strong>"Booking Confirm"</strong> - Notifications when your booking is confirmed</li>
-                    <li><strong>"Your Booking with Id [ID] is Starting Soon"</strong> - Reminders before your appointment</li>
-                    <li>Booking status updates (confirmed, cancelled, rescheduled)</li>
+                    <li data-translate="doc.notifBookingConfirm">"Booking Confirm" - Notifications when your booking is confirmed</li>
+                    <li data-translate="doc.notifBookingReminder">"Your Booking with Id [ID] is Starting Soon" - Reminders before your appointment</li>
+                    <li data-translate="doc.notifStatusUpdates">Booking status updates (confirmed, cancelled, rescheduled)</li>
                 </ul>
 
                 <div class="doc-step">
-                    <h4><span class="doc-step-number">3</span>Viewing Notification Details</h4>
-                    <p>Tap on any notification card to:</p>
+                    <h4><span class="doc-step-number">3</span><span data-translate="doc.viewingNotificationDetails">Viewing Notification Details</span></h4>
+                    <p data-translate="doc.tapNotificationCard">Tap on any notification card to:</p>
                     <ul>
-                        <li>View full details about the booking</li>
-                        <li>Navigate directly to the booking screen</li>
-                        <li>Take actions like confirming or cancelling</li>
+                        <li data-translate="doc.notifViewDetails">View full details about the booking</li>
+                        <li data-translate="doc.notifNavigate">Navigate directly to the booking screen</li>
+                        <li data-translate="doc.notifTakeActions">Take actions like confirming or cancelling</li>
                     </ul>
                 </div>
 

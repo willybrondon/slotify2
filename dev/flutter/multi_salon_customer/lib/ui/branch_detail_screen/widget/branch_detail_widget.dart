@@ -175,110 +175,107 @@ class BranchDetailTopView extends StatelessWidget {
                   },
                 ),
               ),
-              // Back arrow and share button positioned like profile screen
+              // Back arrow and share button aligned horizontally in same row
               Positioned(
                 top: 0,
                 left: 0,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: () {
-                        Get.back();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AppColors.whiteColor,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.blackColor.withOpacity(0.1),
-                              offset: const Offset(0, 2),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: AppColors.blackColor,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // Share button positioned on the right side
-              Positioned(
-                top: 0,
                 right: 0,
                 child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.all(8),
-                    child: PopupMenuButton<String>(
-                      icon: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: AppColors.whiteColor,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.blackColor.withOpacity(0.1),
+                                  offset: const Offset(0, 2),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: AppColors.blackColor,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          icon: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: AppColors.whiteColor,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.blackColor.withOpacity(0.1),
+                                  offset: const Offset(0, 2),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.share,
+                              color: AppColors.blackColor,
+                              size: 20,
+                            ),
+                          ),
                           color: AppColors.whiteColor,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.blackColor.withOpacity(0.1),
-                              offset: const Offset(0, 2),
-                              blurRadius: 4,
+                          onSelected: (value) async {
+                            if (value == 'share') {
+                              await logic.shareSalonLink();
+                            } else if (value == 'copy') {
+                              await logic.copySalonLink();
+                            } else if (value == 'qr') {
+                              _showQRCodeDialog(context, logic);
+                            }
+                          },
+                          itemBuilder: (BuildContext context) => [
+                            PopupMenuItem<String>(
+                              value: 'share',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.share,
+                                      color: AppColors.primaryAppColor),
+                                  const SizedBox(width: 10),
+                                  Text('txtShareLink'.tr),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'copy',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.copy,
+                                      color: AppColors.primaryAppColor),
+                                  const SizedBox(width: 10),
+                                  Text('txtCopyLink'.tr),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'qr',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.qr_code,
+                                      color: AppColors.primaryAppColor),
+                                  const SizedBox(width: 10),
+                                  Text('txtShowQRCode'.tr),
+                                ],
+                              ),
                             ),
                           ],
-                        ),
-                        child: Icon(
-                          Icons.share,
-                          color: AppColors.blackColor,
-                          size: 20,
-                        ),
-                      ),
-                      color: AppColors.whiteColor,
-                      onSelected: (value) async {
-                        if (value == 'share') {
-                          await logic.shareSalonLink();
-                        } else if (value == 'copy') {
-                          await logic.copySalonLink();
-                        } else if (value == 'qr') {
-                          _showQRCodeDialog(context, logic);
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<String>(
-                          value: 'share',
-                          child: Row(
-                            children: [
-                              Icon(Icons.share,
-                                  color: AppColors.primaryAppColor),
-                              const SizedBox(width: 10),
-                              Text('txtShareLink'.tr),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'copy',
-                          child: Row(
-                            children: [
-                              Icon(Icons.copy,
-                                  color: AppColors.primaryAppColor),
-                              const SizedBox(width: 10),
-                              Text('txtCopyLink'.tr),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'qr',
-                          child: Row(
-                            children: [
-                              Icon(Icons.qr_code,
-                                  color: AppColors.primaryAppColor),
-                              const SizedBox(width: 10),
-                              Text('txtShowQRCode'.tr),
-                            ],
-                          ),
                         ),
                       ],
                     ),
@@ -1497,19 +1494,19 @@ class BranchDetailTabBarReviewView extends StatelessWidget {
                                       height: 15,
                                       width: 15,
                                       color: (logic
-                                                              .getSalonDetailCategory
-                                                              ?.reviews?[index]
-                                                              .rating ??
-                                                          0) >=
-                                                      4
+                                                      .getSalonDetailCategory
+                                                      ?.reviews?[index]
+                                                      .rating ??
+                                                  0) >=
+                                              4
                                           ? AppColors.blackColor
                                           : null,
                                       colorBlendMode: (logic
-                                                              .getSalonDetailCategory
-                                                              ?.reviews?[index]
-                                                              .rating ??
-                                                          0) >=
-                                                      4
+                                                      .getSalonDetailCategory
+                                                      ?.reviews?[index]
+                                                      .rating ??
+                                                  0) >=
+                                              4
                                           ? BlendMode.srcIn
                                           : null,
                                     ),

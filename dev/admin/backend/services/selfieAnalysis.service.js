@@ -125,8 +125,13 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
       } else {
         try {
           // Try different model names in order of preference (use valid models that support image analysis)
-          const modelNames = [         // Primary: Fast and supports images
-            'gemini-2.5-flash' // Fallback: Latest flash model
+          const modelNames = [
+            'gemini-2.5-flash',      // Latest flash model (if available)
+            'gemini-1.5-flash',      // Widely available, fast, supports images
+            'gemini-1.5-pro',        // Higher quality
+            'gemini-1.5-flash-8b',   // Lighter variant
+            'gemini-pro-vision',     // Legacy vision model
+            'gemini-1.0-pro-vision'  // Fallback vision model
           ];
           
           let model = null;

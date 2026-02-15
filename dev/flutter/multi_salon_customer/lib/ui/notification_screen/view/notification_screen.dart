@@ -350,7 +350,7 @@ class NotificationScreen extends StatelessWidget {
                                                                           Get.dialog(
                                                                             AlertDialog(
                                                                               title: Text(
-                                                                                "Delete Notification",
+                                                                                "txtDeleteNotification".tr,
                                                                                 style: TextStyle(
                                                                                   fontFamily: AppFontFamily.sfProDisplayBold,
                                                                                   fontSize: 18,
@@ -358,7 +358,7 @@ class NotificationScreen extends StatelessWidget {
                                                                                 ),
                                                                               ),
                                                                               content: Text(
-                                                                                "Are you sure you want to delete this notification?",
+                                                                                "desDeleteNotificationConfirm".tr,
                                                                                 style: TextStyle(
                                                                                   fontFamily: AppFontFamily.sfProDisplay,
                                                                                   fontSize: 14,
@@ -369,7 +369,7 @@ class NotificationScreen extends StatelessWidget {
                                                                                 TextButton(
                                                                                   onPressed: () => Get.back(),
                                                                                   child: Text(
-                                                                                    "Cancel",
+                                                                                    "txtCancel".tr,
                                                                                     style: TextStyle(
                                                                                       fontFamily: AppFontFamily.sfProDisplay,
                                                                                       fontSize: 14,
@@ -387,7 +387,7 @@ class NotificationScreen extends StatelessWidget {
                                                                                     );
                                                                                   },
                                                                                   child: Text(
-                                                                                    "Delete",
+                                                                                    "txtDelete".tr,
                                                                                     style: TextStyle(
                                                                                       fontFamily: AppFontFamily.sfProDisplayBold,
                                                                                       fontSize: 14,

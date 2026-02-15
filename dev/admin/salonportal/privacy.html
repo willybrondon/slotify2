@@ -3,168 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Politique de Confidentialité - Skedisy</title>
+    <title data-translate="privacy.pageTitle">Politique de Confidentialité - Skedisy</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="language.js" defer></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
+        .terms-container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f8f9fa;
+            padding: 100px 20px 40px;
+            line-height: 1.6;
         }
-        .container {
+        
+        .terms-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .terms-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .terms-header .version {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .terms-content {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        h1 {
+        
+        .terms-content h2 {
             color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-        h2 {
-            color: #34495e;
+            font-size: 1.5rem;
             margin-top: 30px;
             margin-bottom: 15px;
-            font-size: 1.5em;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
         }
-        h3 {
-            color: #2c3e50;
+        
+        .terms-content h3 {
+            color: #34495e;
+            font-size: 1.2rem;
             margin-top: 25px;
             margin-bottom: 10px;
         }
-        p {
+        
+        .terms-content p {
             margin-bottom: 15px;
-            text-align: justify;
+            color: #555;
         }
-        ul {
+        
+        .terms-content ul, .terms-content ol {
             margin-bottom: 15px;
             padding-left: 20px;
         }
-        li {
+        
+        .terms-content li {
             margin-bottom: 8px;
+            color: #555;
         }
+        
         .back-link {
             display: inline-block;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             color: #3498db;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
         }
+        
         .back-link:hover {
             text-decoration: underline;
         }
-        .date {
-            text-align: center;
-            color: #7f8c8d;
-            font-style: italic;
-            margin-bottom: 30px;
+        
+        .back-link i {
+            margin-right: 8px;
+        }
+        
+        .contact-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .contact-info p {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .contact-info a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        
+        .terms-content a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .terms-content a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="index.html" class="back-link">← Retour à l'accueil</a>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="https://skedisy.com" style="text-decoration: none; color: inherit;">
+                    <h2>Skedisy</h2>
+                </a>
+            </div>
+            <div class="nav-menu-center desktop-only">
+                <a href="documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>
+                <!-- Language Switcher - Desktop -->
+                <button class="lang-switcher desktop-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>EN</span>
+                </button>
+            </div>
+            <div class="mobile-menu-wrapper">
+                <!-- Language Switcher - Mobile -->
+                <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
+                    <i class="fas fa-globe"></i> <span>EN</span>
+                </button>
+                <div class="hamburger mobile-hide">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <a href="https://skedisy.com/salonpanel" class="btn-login-mobile" data-translate="nav.login">Login</a>
+        </div>
+    </nav>
+
+    <div class="terms-container">
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            <span data-translate="privacy.backLink">Retour à l'accueil</span>
+        </a>
         
-        <h1>Politique de Confidentialité</h1>
-        <p class="date">Version du 15 janvier 2024</p>
+        <div class="terms-header">
+            <h1 data-translate="privacy.title">Politique de Confidentialité</h1>
+            <div class="version" data-translate="privacy.version">Version du 15 janvier 2024</div>
+        </div>
+        
+        <div class="terms-content">
+            <h2 data-translate="privacy.s1Title">1. Introduction</h2>
+            <p data-translate="privacy.s1Content">La présente Politique de Confidentialité décrit comment Skedisy ("nous", "notre", "nos") collecte, utilise et protège vos informations personnelles lorsque vous utilisez notre plateforme de gestion de salon de beauté et nos services associés.</p>
 
-        <h2>1. Introduction</h2>
-        <p>La présente Politique de Confidentialité décrit comment Skedisy ("nous", "notre", "nos") collecte, utilise et protège vos informations personnelles lorsque vous utilisez notre plateforme de gestion de salon de beauté et nos services associés.</p>
+            <h2 data-translate="privacy.s2Title">2. Informations que nous collectons</h2>
+            <h3 data-translate="privacy.s2aTitle">2.1 Informations que vous nous fournissez</h3>
+            <ul>
+                <li data-translate="privacy.s2a1">Informations d'identification personnelle (nom, prénom, adresse e-mail, numéro de téléphone)</li>
+                <li data-translate="privacy.s2a2">Informations de compte (nom d'utilisateur, mot de passe)</li>
+                <li data-translate="privacy.s2a3">Informations professionnelles (pour les experts et propriétaires de salon)</li>
+                <li data-translate="privacy.s2a4">Informations de paiement (traitées de manière sécurisée par nos prestataires de paiement)</li>
+            </ul>
 
-        <h2>2. Informations que nous collectons</h2>
-        <h3>2.1 Informations que vous nous fournissez</h3>
-        <ul>
-            <li>Informations d'identification personnelle (nom, prénom, adresse e-mail, numéro de téléphone)</li>
-            <li>Informations de compte (nom d'utilisateur, mot de passe)</li>
-            <li>Informations professionnelles (pour les experts et propriétaires de salon)</li>
-            <li>Informations de paiement (traitées de manière sécurisée par nos prestataires de paiement)</li>
-        </ul>
+            <h3 data-translate="privacy.s2bTitle">2.2 Informations collectées automatiquement</h3>
+            <ul>
+                <li data-translate="privacy.s2b1">Données de navigation (adresse IP, type de navigateur, pages visitées)</li>
+                <li data-translate="privacy.s2b2">Données d'utilisation (fréquence d'utilisation, fonctionnalités utilisées)</li>
+                <li data-translate="privacy.s2b3">Informations techniques (système d'exploitation, résolution d'écran)</li>
+            </ul>
 
-        <h3>2.2 Informations collectées automatiquement</h3>
-        <ul>
-            <li>Données de navigation (adresse IP, type de navigateur, pages visitées)</li>
-            <li>Données d'utilisation (fréquence d'utilisation, fonctionnalités utilisées)</li>
-            <li>Informations techniques (système d'exploitation, résolution d'écran)</li>
-        </ul>
+            <h2 data-translate="privacy.s3Title">3. Utilisation des informations</h2>
+            <p data-translate="privacy.s3Intro">Nous utilisons vos informations personnelles pour :</p>
+            <ul>
+                <li data-translate="privacy.s3a">Fournir et maintenir nos services</li>
+                <li data-translate="privacy.s3b">Traiter vos réservations et paiements</li>
+                <li data-translate="privacy.s3c">Communiquer avec vous concernant votre compte et nos services</li>
+                <li data-translate="privacy.s3d">Améliorer nos services et développer de nouvelles fonctionnalités</li>
+                <li data-translate="privacy.s3e">Respecter nos obligations légales</li>
+                <li data-translate="privacy.s3f">Prévenir la fraude et assurer la sécurité</li>
+            </ul>
 
-        <h2>3. Utilisation des informations</h2>
-        <p>Nous utilisons vos informations personnelles pour :</p>
-        <ul>
-            <li>Fournir et maintenir nos services</li>
-            <li>Traiter vos réservations et paiements</li>
-            <li>Communiquer avec vous concernant votre compte et nos services</li>
-            <li>Améliorer nos services et développer de nouvelles fonctionnalités</li>
-            <li>Respecter nos obligations légales</li>
-            <li>Prévenir la fraude et assurer la sécurité</li>
-        </ul>
+            <h2 data-translate="privacy.s4Title">4. Partage des informations</h2>
+            <p data-translate="privacy.s4Intro">Nous ne vendons, n'échangeons ni ne louons vos informations personnelles à des tiers, sauf dans les cas suivants :</p>
+            <ul>
+                <li data-translate="privacy.s4a">Avec votre consentement explicite</li>
+                <li data-translate="privacy.s4b">Avec nos prestataires de services (paiement, hébergement, support)</li>
+                <li data-translate="privacy.s4c">Pour respecter des obligations légales</li>
+                <li data-translate="privacy.s4d">Pour protéger nos droits et notre sécurité</li>
+            </ul>
 
-        <h2>4. Partage des informations</h2>
-        <p>Nous ne vendons, n'échangeons ni ne louons vos informations personnelles à des tiers, sauf dans les cas suivants :</p>
-        <ul>
-            <li>Avec votre consentement explicite</li>
-            <li>Avec nos prestataires de services (paiement, hébergement, support)</li>
-            <li>Pour respecter des obligations légales</li>
-            <li>Pour protéger nos droits et notre sécurité</li>
-        </ul>
+            <h2 data-translate="privacy.s5Title">5. Sécurité des données</h2>
+            <p data-translate="privacy.s5Content">Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles appropriées pour protéger vos informations personnelles contre l'accès non autorisé, la modification, la divulgation ou la destruction.</p>
 
-        <h2>5. Sécurité des données</h2>
-        <p>Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles appropriées pour protéger vos informations personnelles contre l'accès non autorisé, la modification, la divulgation ou la destruction.</p>
+            <h2 data-translate="privacy.s6Title">6. Conservation des données</h2>
+            <p data-translate="privacy.s6Content">Nous conservons vos informations personnelles aussi longtemps que nécessaire pour fournir nos services et respecter nos obligations légales. Les données peuvent être conservées plus longtemps si nécessaire pour des raisons légales, fiscales ou de sécurité.</p>
 
-        <h2>6. Conservation des données</h2>
-        <p>Nous conservons vos informations personnelles aussi longtemps que nécessaire pour fournir nos services et respecter nos obligations légales. Les données peuvent être conservées plus longtemps si nécessaire pour des raisons légales, fiscales ou de sécurité.</p>
+            <h2 data-translate="privacy.s7Title">7. Vos droits</h2>
+            <p data-translate="privacy.s7Intro">Conformément au Règlement Général sur la Protection des Données (RGPD), vous avez les droits suivants :</p>
+            <ul>
+                <li data-translate="privacy.s7a">Droit d'accès à vos données personnelles</li>
+                <li data-translate="privacy.s7b">Droit de rectification des données inexactes</li>
+                <li data-translate="privacy.s7c">Droit à l'effacement de vos données</li>
+                <li data-translate="privacy.s7d">Droit à la limitation du traitement</li>
+                <li data-translate="privacy.s7e">Droit à la portabilité des données</li>
+                <li data-translate="privacy.s7f">Droit d'opposition au traitement</li>
+                <li data-translate="privacy.s7g">Droit de retirer votre consentement</li>
+            </ul>
 
-        <h2>7. Vos droits</h2>
-        <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous avez les droits suivants :</p>
-        <ul>
-            <li>Droit d'accès à vos données personnelles</li>
-            <li>Droit de rectification des données inexactes</li>
-            <li>Droit à l'effacement de vos données</li>
-            <li>Droit à la limitation du traitement</li>
-            <li>Droit à la portabilité des données</li>
-            <li>Droit d'opposition au traitement</li>
-            <li>Droit de retirer votre consentement</li>
-        </ul>
+            <h2 data-translate="privacy.s8Title">8. Cookies et technologies similaires</h2>
+            <p data-translate="privacy.s8Intro">Nous utilisons des cookies et des technologies similaires pour améliorer votre expérience utilisateur, analyser l'utilisation de notre site et personnaliser le contenu.</p>
+            <p data-translate="privacy.s8Intro2">Nous utilisons les catégories de cookies suivantes :</p>
+            <ul>
+                <li data-translate-html="privacy.s8a"><strong>Cookies essentiels :</strong> Nécessaires au fonctionnement du site web. Ces cookies ne peuvent pas être désactivés.</li>
+                <li data-translate-html="privacy.s8b"><strong>Cookies fonctionnels :</strong> Permettent de mémoriser vos préférences et d'améliorer votre expérience.</li>
+                <li data-translate-html="privacy.s8c"><strong>Cookies d'analyse :</strong> Nous aident à comprendre comment les visiteurs utilisent notre site web.</li>
+                <li data-translate-html="privacy.s8d"><strong>Cookies marketing :</strong> Utilisés pour diffuser des publicités pertinentes (actuellement non utilisés).</li>
+            </ul>
+            <p data-translate-html="privacy.s8Link">Vous pouvez gérer vos préférences de cookies à tout moment via notre <a href="cookies.html" style="color: #3498db; text-decoration: underline;">Politique des Cookies</a> ou en utilisant les paramètres de votre navigateur.</p>
+            <p data-translate-html="privacy.s8Link2">Pour plus d'informations détaillées sur notre utilisation des cookies, consultez notre <a href="cookies.html" style="color: #3498db; text-decoration: underline;">Politique des Cookies complète</a>.</p>
 
-        <h2>8. Cookies et technologies similaires</h2>
-        <p>Nous utilisons des cookies et des technologies similaires pour améliorer votre expérience utilisateur, analyser l'utilisation de notre site et personnaliser le contenu.</p>
-        <p>Nous utilisons les catégories de cookies suivantes :</p>
-        <ul>
-            <li><strong>Cookies essentiels :</strong> Nécessaires au fonctionnement du site web. Ces cookies ne peuvent pas être désactivés.</li>
-            <li><strong>Cookies fonctionnels :</strong> Permettent de mémoriser vos préférences et d'améliorer votre expérience.</li>
-            <li><strong>Cookies d'analyse :</strong> Nous aident à comprendre comment les visiteurs utilisent notre site web.</li>
-            <li><strong>Cookies marketing :</strong> Utilisés pour diffuser des publicités pertinentes (actuellement non utilisés).</li>
-        </ul>
-        <p>Vous pouvez gérer vos préférences de cookies à tout moment via notre <a href="cookies.html" style="color: #3498db; text-decoration: underline;">Politique des Cookies</a> ou en utilisant les paramètres de votre navigateur.</p>
-        <p>Pour plus d'informations détaillées sur notre utilisation des cookies, consultez notre <a href="cookies.html" style="color: #3498db; text-decoration: underline;">Politique des Cookies complète</a>.</p>
+            <h2 data-translate="privacy.s9Title">9. Transferts internationaux</h2>
+            <p data-translate="privacy.s9Content">Vos informations peuvent être transférées et traitées dans des pays autres que votre pays de résidence. Nous nous assurons que ces transferts sont effectués conformément aux lois applicables sur la protection des données.</p>
 
-        <h2>9. Transferts internationaux</h2>
-        <p>Vos informations peuvent être transférées et traitées dans des pays autres que votre pays de résidence. Nous nous assurons que ces transferts sont effectués conformément aux lois applicables sur la protection des données.</p>
-        <h2>10. Modifications de cette politique</h2>
-        <p>Nous pouvons mettre à jour cette Politique de Confidentialité de temps à autre. Nous vous informerons de tout changement significatif en publiant la nouvelle politique sur notre site web ou en vous envoyant une notification.</p>
+            <h2 data-translate="privacy.s10Title">10. Modifications de cette politique</h2>
+            <p data-translate="privacy.s10Content">Nous pouvons mettre à jour cette Politique de Confidentialité de temps à autre. Nous vous informerons de tout changement significatif en publiant la nouvelle politique sur notre site web ou en vous envoyant une notification.</p>
 
-        <h2>11. Demande de suppression de compte et des données associées</h2>
-        <p>Vous pouvez demander la suppression de votre compte Skedisy (applications Skedisy Customer ou Skedisy Expert) ainsi que des données associées de deux manières :</p>
-        <ol>
-            <li><strong>Depuis l'application :</strong> rendez-vous dans <em>Profil &gt; Paramètres &gt; Supprimer mon compte</em>. La suppression est immédiate et entraîne l'effacement de toutes vos données (profil, historique de rendez-vous, avis, documents téléchargés), à l'exception des informations que nous devons conserver pour des raisons légales ou réglementaires.</li>
-            <li><strong>Par e-mail :</strong> envoyez une demande à l'adresse <a href="mailto:support@skedisy.com">support@skedisy.com</a> avec pour objet « Suppression de compte Skedisy » en précisant vos nom, prénom, numéro de téléphone ou adresse e-mail associés à votre compte, ainsi que l'identifiant unique de votre salon le cas échéant. Nous accusons réception sous 5 jours ouvrés et procédons à la suppression définitive sous 30 jours, sauf obligations légales contraires.</li>
-        </ol>
-        <p>Certaines données strictement nécessaires (telles que les preuves de transaction ou les écritures comptables) peuvent être conservées pendant la durée requise par la loi avant d'être supprimées ou anonymisées.</p>
-        <h2>12. Contact</h2>
-        <p>Si vous avez des questions concernant cette Politique de Confidentialité ou nos pratiques en matière de protection des données, veuillez nous contacter à :</p>
-        <ul>
-            <li>E-mail : privacy@skedisy.com</li>
-            <li>Adresse : [Adresse de l'entreprise]</li>
-            <li>Téléphone : [Numéro de téléphone]</li>
-        </ul>
+            <h2 data-translate="privacy.s11Title">11. Demande de suppression de compte et des données associées</h2>
+            <p data-translate="privacy.s11Intro">Vous pouvez demander la suppression de votre compte Skedisy (applications Skedisy Customer ou Skedisy Expert) ainsi que des données associées de deux manières :</p>
+            <ol>
+                <li data-translate-html="privacy.s11a"><strong>Depuis l'application :</strong> rendez-vous dans <em>Profil &gt; Paramètres &gt; Supprimer mon compte</em>. La suppression est immédiate et entraîne l'effacement de toutes vos données (profil, historique de rendez-vous, avis, documents téléchargés), à l'exception des informations que nous devons conserver pour des raisons légales ou réglementaires.</li>
+                <li data-translate-html="privacy.s11b"><strong>Par e-mail :</strong> envoyez une demande à l'adresse <a href="mailto:support@skedisy.com">support@skedisy.com</a> avec pour objet « Suppression de compte Skedisy » en précisant vos nom, prénom, numéro de téléphone ou adresse e-mail associés à votre compte, ainsi que l'identifiant unique de votre salon le cas échéant. Nous accusons réception sous 5 jours ouvrés et procédons à la suppression définitive sous 30 jours, sauf obligations légales contraires.</li>
+            </ol>
+            <p data-translate="privacy.s11Note">Certaines données strictement nécessaires (telles que les preuves de transaction ou les écritures comptables) peuvent être conservées pendant la durée requise par la loi avant d'être supprimées ou anonymisées.</p>
 
-        <h2>13. Autorité de contrôle</h2>
-        <p>Si vous estimez que le traitement de vos données personnelles constitue une violation du RGPD, vous avez le droit de déposer une plainte auprès de l'autorité de contrôle compétente de votre pays de résidence.</p>
+            <h2 data-translate="privacy.s12Title">12. Contact</h2>
+            <div class="contact-info">
+                <h3 data-translate="privacy.contactTitle">Contact</h3>
+                <p data-translate="privacy.contactIntro">Si vous avez des questions concernant cette Politique de Confidentialité ou nos pratiques en matière de protection des données, veuillez nous contacter à :</p>
+                <ul>
+                    <li>E-mail : <a href="mailto:privacy@skedisy.com">privacy@skedisy.com</a></li>
+                    <li data-translate="privacy.contactAddr">Adresse : [Adresse de l'entreprise]</li>
+                    <li data-translate="privacy.contactPhone">Téléphone : [Numéro de téléphone]</li>
+                </ul>
+            </div>
+
+            <h2 data-translate="privacy.s13Title">13. Autorité de contrôle</h2>
+            <p data-translate="privacy.s13Content">Si vous estimez que le traitement de vos données personnelles constitue une violation du RGPD, vous avez le droit de déposer une plainte auprès de l'autorité de contrôle compétente de votre pays de résidence.</p>
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Skedisy</h3>
+                    <p data-translate="footer.tagline">Transform your salon management with our all-in-one solution.</p>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> contact@skedisy.com</p>
+                        <p><i class="fas fa-phone"></i> +237 93129753</p>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.about">About</h4>
+                    <ul>
+                        <li><a href="#" data-translate="footer.myAccount">My Skedisy Account</a></li>
+                        <li><a href="#" data-translate="footer.signUp">Sign Up</a></li>
+                        <li><a href="#" data-translate="footer.pricing">Pricing</a></li>
+                        <li><a href="#" data-translate="footer.helpCenter">Help Center</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.solutions">Our Solutions</h4>
+                    <ul>
+                        <li><a href="#" data-translate="footer.onlineBooking">24/7 Online Booking</a></li>
+                        <li><a href="#" data-translate="footer.calendar">Calendar Management</a></li>
+                        <li><a href="#" data-translate="footer.pos">Certified POS</a></li>
+                        <li><a href="#" data-translate="footer.payment">Payment Terminal</a></li>
+                        <li><a href="#" data-translate="footer.workTime">Work Time Management</a></li>
+                        <li><a href="#" data-translate="footer.marketing">Marketing Solutions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.legal">Legal</h4>
+                    <ul>
+                        <li><a href="terms.html" data-translate="footer.terms">Terms of Service</a></li>
+                        <li><a href="privacy.html" data-translate="footer.privacy">Privacy Policy</a></li>
+                        <li><a href="cookies.html" data-translate="footer.cookies">Cookie Management</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-translate="footer.rights">© 2024 Skedisy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
