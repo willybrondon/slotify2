@@ -1,0 +1,162 @@
+/**
+ * Skedisy Documentation - Cucumber.io inspired styling
+ * Reference: https://cucumber.io/docs
+ * 
+ * Applies the same documentation format, structure, and visual style
+ * as Cucumber's documentation for consistency and better readability.
+ */
+
+/* ========== Breadcrumb Navigation (Cucumber-style) ========== */
+.doc-breadcrumb {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.doc-breadcrumb a {
+    color: #666;
+    text-decoration: none;
+}
+
+.doc-breadcrumb a:hover {
+    color: #111;
+    text-decoration: underline;
+}
+
+.doc-breadcrumb span {
+    margin: 0 8px;
+    color: #999;
+}
+
+/* ========== "On this page" - Cucumber TOC ========== */
+.doc-on-this-page {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 24px 0 40px 0;
+}
+
+.doc-on-this-page h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
+    padding: 0;
+}
+
+.doc-on-this-page ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.doc-on-this-page li {
+    margin: 8px 0;
+}
+
+.doc-on-this-page a {
+    color: #212529;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.doc-on-this-page a:hover {
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
+/* ========== Cucumber-style typography ========== */
+.doc-main-content.doc-cucumber-style .doc-section h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #212529;
+    border-bottom: none;
+    padding-bottom: 8px;
+}
+
+.doc-main-content.doc-cucumber-style .doc-section h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #212529;
+    border-left: none;
+    padding-left: 0;
+    margin-top: 40px;
+}
+
+.doc-main-content.doc-cucumber-style .doc-section h2::before {
+    content: none;
+}
+
+.doc-main-content.doc-cucumber-style .doc-section h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.doc-main-content.doc-cucumber-style .doc-section h3::before {
+    content: none;
+}
+
+.doc-main-content.doc-cucumber-style .doc-section p {
+    line-height: 1.7;
+}
+
+/* ========== Learn more / Next - Cucumber bottom nav ========== */
+.doc-learn-more {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #e9ecef;
+}
+
+.doc-learn-more h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
+}
+
+.doc-learn-more ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.doc-learn-more li {
+    margin: 8px 0;
+}
+
+.doc-learn-more a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.doc-learn-more a:hover {
+    text-decoration: underline;
+}
+
+/* ========== Code blocks - Cucumber style ========== */
+.doc-main-content.doc-cucumber-style .doc-code {
+    background: #f6f8fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.875rem;
+}
+
+/* ========== Info/Warning boxes - Cucumber style ========== */
+.doc-main-content.doc-cucumber-style .doc-info {
+    background: #e7f3ff;
+    border-left: 4px solid #0d6efd;
+}
+
+.doc-main-content.doc-cucumber-style .doc-warning {
+    background: #fff8e6;
+    border-left: 4px solid #ffc107;
+}

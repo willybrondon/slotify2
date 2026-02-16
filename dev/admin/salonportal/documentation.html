@@ -7,6 +7,7 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
+    <link rel="stylesheet" href="doc-cucumber-style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <script src="language.js" defer></script>
@@ -450,11 +451,36 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="doc-main-content">
+        <main class="doc-main-content doc-cucumber-style">
             <!-- Getting Started -->
             <section id="getting-started" class="doc-section">
+                <!-- Breadcrumb - Cucumber style -->
+                <nav class="doc-breadcrumb" aria-label="Breadcrumb">
+                    <a href="https://skedisy.com">Skedisy</a>
+                    <span>›</span>
+                    <a href="documentation.html" data-translate="doc.documentation">Documentation</a>
+                    <span>›</span>
+                    <span data-translate="doc.customerApp">Customer App</span>
+                </nav>
                 <h1><strong data-translate="doc.customerApp">Customer App</strong> <span data-translate="doc.documentation">Documentation</span></h1>
                 <p data-translate="doc.customerAppWelcome">Welcome to the Skedisy Customer App documentation. This comprehensive guide will walk you through every feature and functionality of the customer application, helping you make the most of your booking experience.</p>
+
+                <!-- On this page - Cucumber style TOC -->
+                <div class="doc-on-this-page">
+                    <h4 data-translate="doc.onThisPage">On this page</h4>
+                    <ul>
+                        <li><a href="#getting-started" data-translate="doc.gettingStarted">Getting Started</a></li>
+                        <li><a href="#home-screen" data-translate="doc.homeScreen">Home Screen</a></li>
+                        <li><a href="#booking-process" data-translate="doc.bookingProcess">Booking Process</a></li>
+                        <li><a href="#booking-screen" data-translate="doc.bookingScreen">Booking Screen</a></li>
+                        <li><a href="#product-category" data-translate="doc.productCategory">Product Category</a></li>
+                        <li><a href="#notifications" data-translate="doc.notifications">Notifications</a></li>
+                        <li><a href="#profile" data-translate="doc.profile">Profile</a></li>
+                        <li><a href="#wallet" data-translate="doc.wallet">Wallet</a></li>
+                        <li><a href="#expert-getting-started" data-translate="doc.expertApp">Expert App</a></li>
+                        <li><a href="#salon-getting-started" data-translate="doc.salonOwnerPortal">Salon Owner Portal</a></li>
+                    </ul>
+                </div>
 
                 <div class="doc-toc">
                     <h3 data-translate="doc.tableOfContentsCustomer">Table of Contents - Customer App</h3>
@@ -2595,6 +2621,18 @@
                     <strong>Important:</strong> Ensure your payment method details are correct before submitting. Withdrawal processing times vary by payment method. Contact support if you encounter any issues.
                 </div>
             </section>
+
+            <!-- Learn more - Cucumber style bottom navigation -->
+            <div class="doc-learn-more doc-section">
+                <h4 data-translate="doc.learnMore">Learn more</h4>
+                <ul>
+                    <li><a href="#getting-started" data-translate="doc.gettingStarted">Getting Started</a> — <span data-translate="doc.gettingStartedDesc">Welcome to the Skedisy Customer App documentation</span></li>
+                    <li><a href="#expert-getting-started" data-translate="doc.expertApp">Expert App</a> — <span data-translate="doc.expertAppDocs">Documentation for salon experts and staff</span></li>
+                    <li><a href="#salon-getting-started" data-translate="doc.salonOwnerPortal">Salon Owner Portal</a> — <span data-translate="doc.salonPortalDocs">Manage your salon dashboard and settings</span></li>
+                    <li><a href="ai-concierge.html" data-translate="nav.aiConcierge">AI Concierge</a> — <span data-translate="doc.aiConciergeDesc">Get personalized beauty recommendations</span></li>
+                    <li><a href="index.html">Skedisy Home</a> — <span data-translate="doc.backToHome">Return to the main website</span></li>
+                </ul>
+            </div>
 
             <!-- Footer Note -->
             <div class="doc-section" style="margin-top: 80px; padding-top: 40px; border-top: 2px solid #e5e5e5;">
