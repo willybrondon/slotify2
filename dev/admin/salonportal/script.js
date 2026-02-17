@@ -408,7 +408,7 @@ function renderCategories(categories) {
     const switchToShort = switchToLang.toUpperCase(); // EN or FR
     
     desktopMenu.innerHTML = categoriesHtml + 
-        '<a href="/documentation.html" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>' +
+        '<a href="/docs/" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>' +
         `<button class="lang-switcher desktop-only" data-lang="${switchToLang}" title="Switch to ${switchToShort}">
             <i class="fas fa-globe"></i> <span>${switchToShort}</span>
         </button>`;

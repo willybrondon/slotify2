@@ -950,9 +950,9 @@ exports.serveSalonWebPage = async (req, res) => {
                 <div class="footer-section">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="${baseURL}/terms.html">Terms of Service</a></li>
-                        <li><a href="${baseURL}/privacy.html">Privacy Policy</a></li>
-                        <li><a href="${baseURL}">Cookie Management</a></li>
+                        <li><a href="${baseURL}/terms/">Terms of Service</a></li>
+                        <li><a href="${baseURL}/privacy/">Privacy Policy</a></li>
+                        <li><a href="${baseURL}/cookies/">Cookie Management</a></li>
                     </ul>
                 </div>
             </div>

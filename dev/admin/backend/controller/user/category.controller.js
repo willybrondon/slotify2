@@ -1087,6 +1087,7 @@ exports.serveCategoryPage = async (req, res) => {
             }).join('');
         }
     </script>
+    <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
 </body>
 </html>`;

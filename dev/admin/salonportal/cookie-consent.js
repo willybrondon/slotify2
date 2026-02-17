@@ -76,8 +76,8 @@
                         <h3>🍪 We Value Your Privacy</h3>
                         <p>We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. By clicking "Accept All", you consent to our use of cookies. You can manage your preferences at any time.</p>
                         <p class="cookie-consent-links">
-                            <a href="cookies.html" target="_blank">Cookie Policy</a> | 
-                            <a href="privacy.html" target="_blank">Privacy Policy</a>
+                            <a href="/cookies/" target="_blank">Cookie Policy</a> | 
+                            <a href="/privacy/" target="_blank">Privacy Policy</a>
                         </p>
                     </div>
                     <div class="cookie-consent-buttons">
@@ -438,7 +438,7 @@
             const cookieLinks = document.querySelectorAll('a[href*="Cookie"], a[href*="cookie"]');
             cookieLinks.forEach(link => {
                 // Only intercept links that don't go to cookies.html
-                if (link.href && !link.href.includes('cookies.html')) {
+                if (link.href && !link.href.includes('/cookies/')) {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
                         this.showPreferencesModal();

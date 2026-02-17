@@ -19,6 +19,7 @@
         var customerQR = document.getElementById('qr-customer-top');
         var expertQR = document.getElementById('qr-expert-top');
 
+        var origin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : 'https://skedisy.com';
         var baseOptions = {
             width: 128,
             height: 128,
@@ -28,7 +29,7 @@
             cornersSquareOptions: { color: '#111', type: 'extra-rounded' },
             cornersDotOptions: { color: '#111', type: 'dot' },
             backgroundOptions: { color: '#fff' },
-            image: 'images/logo.png',
+            image: origin + '/images/logo.png',
             imageOptions: { hideBackgroundDots: true, imageSize: 0.35, margin: 8 }
         };
 

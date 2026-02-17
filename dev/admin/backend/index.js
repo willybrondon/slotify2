@@ -769,6 +769,18 @@ cp -r build/* ${salonPath}/</pre>
 }
 
 
+// Clean URL redirects: /docs, /terms, /privacy, /cookies (no trailing slash) -> with trailing slash
+app.get("/docs", (req, res) => res.redirect(301, "/docs/"));
+app.get("/terms", (req, res) => res.redirect(301, "/terms/"));
+app.get("/privacy", (req, res) => res.redirect(301, "/privacy/"));
+app.get("/cookies", (req, res) => res.redirect(301, "/cookies/"));
+
+// Backward compatibility: redirect old .html URLs to clean URLs
+app.get("/documentation.html", (req, res) => res.redirect(301, "/docs/"));
+app.get("/terms.html", (req, res) => res.redirect(301, "/terms/"));
+app.get("/privacy.html", (req, res) => res.redirect(301, "/privacy/"));
+app.get("/cookies.html", (req, res) => res.redirect(301, "/cookies/"));
+
 // Serve static files for salonportal at root path (main page) - MUST BE LAST
 app.use("/", express.static(path.join(__dirname, "..", "salonportal")));
 // Direct route for salonportal as main page - MUST BE LAST
