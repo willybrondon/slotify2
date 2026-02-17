@@ -74,6 +74,28 @@ global.updateSettingFile = (settingData) => {
 const indexRoute = require("./route/index");
 app.use(indexRoute);
 
+// Docs, terms, privacy, cookies - explicit routes (must be early to avoid conflicts)
+app.get("/docs", (req, res) => res.redirect(301, "/docs/"));
+app.get("/terms", (req, res) => res.redirect(301, "/terms/"));
+app.get("/privacy", (req, res) => res.redirect(301, "/privacy/"));
+app.get("/cookies", (req, res) => res.redirect(301, "/cookies/"));
+app.get("/docs/", (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "docs", "index.html"));
+});
+app.get("/terms/", (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "terms", "index.html"));
+});
+app.get("/privacy/", (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "privacy", "index.html"));
+});
+app.get("/cookies/", (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "cookies", "index.html"));
+});
+app.get("/documentation.html", (req, res) => res.redirect(301, "/docs/"));
+app.get("/terms.html", (req, res) => res.redirect(301, "/terms/"));
+app.get("/privacy.html", (req, res) => res.redirect(301, "/privacy/"));
+app.get("/cookies.html", (req, res) => res.redirect(301, "/cookies/"));
+
 // Public web route for salon claim page
 app.get("/salon/claim", (req, res) => {
   const filePath = path.join(__dirname, "public", "salon-claim.html");
@@ -769,17 +791,6 @@ cp -r build/* ${salonPath}/</pre>
 }
 
 
-// Clean URL redirects: /docs, /terms, /privacy, /cookies (no trailing slash) -> with trailing slash
-app.get("/docs", (req, res) => res.redirect(301, "/docs/"));
-app.get("/terms", (req, res) => res.redirect(301, "/terms/"));
-app.get("/privacy", (req, res) => res.redirect(301, "/privacy/"));
-app.get("/cookies", (req, res) => res.redirect(301, "/cookies/"));
-
-// Backward compatibility: redirect old .html URLs to clean URLs
-app.get("/documentation.html", (req, res) => res.redirect(301, "/docs/"));
-app.get("/terms.html", (req, res) => res.redirect(301, "/terms/"));
-app.get("/privacy.html", (req, res) => res.redirect(301, "/privacy/"));
-app.get("/cookies.html", (req, res) => res.redirect(301, "/cookies/"));
 
 // Serve static files for salonportal at root path (main page) - MUST BE LAST
 app.use("/", express.static(path.join(__dirname, "..", "salonportal")));
