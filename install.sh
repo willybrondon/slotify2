@@ -352,7 +352,7 @@ echo "
 "
 sudo rm -rf /home/admin/backend/salonportal
 mkdir -p /home/admin/backend/salonportal
-sudo cp /home/admin/salonportal/* /home/admin/backend/salonportal
+sudo cp -r /home/admin/salonportal/* /home/admin/backend/salonportal/
 
 
 # Configure Nginx

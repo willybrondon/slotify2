@@ -74,22 +74,47 @@ global.updateSettingFile = (settingData) => {
 const indexRoute = require("./route/index");
 app.use(indexRoute);
 
+// Resolve salonportal path (works for both dev: ../salonportal and prod: backend/salonportal)
+const salonportalPath = fs.existsSync(path.join(__dirname, "salonportal", "index.html"))
+  ? path.join(__dirname, "salonportal")
+  : path.join(__dirname, "..", "salonportal");
+
 // Docs, terms, privacy, cookies - explicit routes (must be early to avoid conflicts)
 app.get("/docs", (req, res) => res.redirect(301, "/docs/"));
 app.get("/terms", (req, res) => res.redirect(301, "/terms/"));
 app.get("/privacy", (req, res) => res.redirect(301, "/privacy/"));
 app.get("/cookies", (req, res) => res.redirect(301, "/cookies/"));
 app.get("/docs/", (req, res) => {
-  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "docs", "index.html"));
+  const filePath = path.join(salonportalPath, "docs", "index.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(filePath);
+  } else {
+    res.status(404).send(`<h1>404 - Documentation not found</h1><p>Expected at: ${filePath}</p><p><a href="/">Return to Skedisy</a></p>`);
+  }
 });
 app.get("/terms/", (req, res) => {
-  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "terms", "index.html"));
+  const filePath = path.join(salonportalPath, "terms", "index.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(filePath);
+  } else {
+    res.status(404).send(`<h1>404 - Terms not found</h1><p><a href="/">Return to Skedisy</a></p>`);
+  }
 });
 app.get("/privacy/", (req, res) => {
-  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "privacy", "index.html"));
+  const filePath = path.join(salonportalPath, "privacy", "index.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(filePath);
+  } else {
+    res.status(404).send(`<h1>404 - Privacy not found</h1><p><a href="/">Return to Skedisy</a></p>`);
+  }
 });
 app.get("/cookies/", (req, res) => {
-  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "cookies", "index.html"));
+  const filePath = path.join(salonportalPath, "cookies", "index.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(filePath);
+  } else {
+    res.status(404).send(`<h1>404 - Cookies not found</h1><p><a href="/">Return to Skedisy</a></p>`);
+  }
 });
 app.get("/documentation.html", (req, res) => res.redirect(301, "/docs/"));
 app.get("/terms.html", (req, res) => res.redirect(301, "/terms/"));
@@ -722,10 +747,10 @@ app.get("/admin/*", function (req, res) {
 });
 
 // Serve static files for salonportal at /salonportal/ path (backward compatibility)
-app.use("/salonportal", express.static(path.join(__dirname, "..", "salonportal")));
+app.use("/salonportal", express.static(salonportalPath));
 // Direct route for salonportal index.html (backward compatibility)
 app.get("/salonportal/*", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "index.html"));
+  res.status(200).sendFile(path.join(salonportalPath, "index.html"));
 });
 
 // Serve static files for salon panel at /salonpanel/ path
@@ -793,10 +818,10 @@ cp -r build/* ${salonPath}/</pre>
 
 
 // Serve static files for salonportal at root path (main page) - MUST BE LAST
-app.use("/", express.static(path.join(__dirname, "..", "salonportal")));
+app.use("/", express.static(salonportalPath));
 // Direct route for salonportal as main page - MUST BE LAST
 app.get("/", function (req, res) {
-  res.status(200).sendFile(path.join(__dirname, "..", "salonportal", "index.html"));
+  res.status(200).sendFile(path.join(salonportalPath, "index.html"));
 });
 
 app.listen(port, () => {
