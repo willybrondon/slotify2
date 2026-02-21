@@ -174,7 +174,7 @@ JWT_SECRET = ${shared_jwt_secret}
 
 #Sendgrid credentials for send email
 SENDGRID_API_KEY = $SENDGRID_API_KEY
-EMAIL = $EMAIL
+EMAIL=$EMAIL
 # no need to use password for sendgrid
 PASSWORD = $PASSWORD
 
