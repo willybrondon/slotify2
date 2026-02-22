@@ -343,33 +343,40 @@ class SignUpScreen extends StatelessWidget {
                     GetBuilder<SignUpController>(
                       id: Constant.idBookingAndLogin,
                       builder: (logic) {
-                        return AppButton(
-                          onTap: () async {
-                            FocusScopeNode currentFocus = FocusScope.of(context);
-                            if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
-                              currentFocus.focusedChild?.unfocus();
-                            }
+                        return AbsorbPointer(
+                          absorbing: logic.isLoading.value,
+                          child: Opacity(
+                            opacity: logic.isLoading.value ? 0.6 : 1,
+                            child: AppButton(
+                              onTap: () async {
+                                if (logic.isLoading.value) return;
+                                FocusScopeNode currentFocus = FocusScope.of(context);
+                                if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+                                  currentFocus.focusedChild?.unfocus();
+                                }
 
-                            await logic.onCheckSignUpUserApiCall(
-                              email: logic.emailController.text,
-                              loginType: "1",
-                              password: logic.confirmPasswordController.text,
-                            );
+                                await logic.onCheckSignUpUserApiCall(
+                                  email: logic.emailController.text,
+                                  loginType: "1",
+                                  password: logic.confirmPasswordController.text,
+                                );
 
-                            if (logic.checkSignUpCategory?.status == true) {
-                              logic.onClickSignup();
-                            } else {
-                              Utils.showToast(Get.context!, logic.checkSignUpCategory?.message ?? "");
-                            }
-                          },
-                          height: 55,
-                          width: Get.width,
-                          buttonColor: AppColors.primaryAppColor,
-                          buttonText: "txtSignUp".tr,
-                          fontFamily: FontFamily.sfProDisplay,
-                          color: AppColors.whiteColor,
-                          fontSize: 20,
-                        ).paddingAll(13);
+                                if (logic.checkSignUpCategory?.status == true) {
+                                  logic.onClickSignup();
+                                } else {
+                                  Utils.showToast(Get.context!, logic.checkSignUpCategory?.message ?? "");
+                                }
+                              },
+                              height: 55,
+                              width: Get.width,
+                              buttonColor: AppColors.primaryAppColor,
+                              buttonText: "txtSignUp".tr,
+                              fontFamily: FontFamily.sfProDisplay,
+                              color: AppColors.whiteColor,
+                              fontSize: 20,
+                            ).paddingAll(13),
+                          ),
+                        );
                       },
                     ),
                     Center(

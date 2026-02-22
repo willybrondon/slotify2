@@ -402,16 +402,21 @@ class SignUpScreen extends StatelessWidget {
                     GetBuilder<SignUpController>(
                       id: Constant.idBookingAndLogin,
                       builder: (logic) {
-                        return AppButton(
-                          onTap: () async {
-                            FocusScopeNode currentFocus =
-                                FocusScope.of(context);
-                            if (!currentFocus.hasPrimaryFocus &&
-                                currentFocus.focusedChild != null) {
-                              currentFocus.focusedChild?.unfocus();
-                            }
+                        return AbsorbPointer(
+                          absorbing: logic.isLoading.value,
+                          child: Opacity(
+                            opacity: logic.isLoading.value ? 0.6 : 1,
+                            child: AppButton(
+                              onTap: () async {
+                                if (logic.isLoading.value) return;
+                                FocusScopeNode currentFocus =
+                                    FocusScope.of(context);
+                                if (!currentFocus.hasPrimaryFocus &&
+                                    currentFocus.focusedChild != null) {
+                                  currentFocus.focusedChild?.unfocus();
+                                }
 
-                            await logic.onCheckSignUpUserApiCall(
+                                await logic.onCheckSignUpUserApiCall(
                               email: logic.emailController.text,
                               loginType: "1",
                               password: logic.confirmPasswordController.text,
@@ -443,7 +448,9 @@ class SignUpScreen extends StatelessWidget {
                           fontFamily: AppFontFamily.sfProDisplay,
                           color: AppColors.whiteColor,
                           fontSize: 20,
-                        ).paddingAll(13);
+                        ).paddingAll(13),
+                          ),
+                        );
                       },
                     ),
                     Center(

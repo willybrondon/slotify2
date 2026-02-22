@@ -286,21 +286,7 @@ exports.sendClaimInvitation = async (req, res) => {
         results.sms = { success: false, error: "Salon mobile number not found" };
       } else {
         console.log(`[Claim Invitation] Attempting to send SMS to: ${salon.mobile} for salon: ${salon.name}`);
-        const smsMessage = `🎉 Félicitations! Votre salon ${salon.name} est maintenant sur Skedisy!
-
-Skesdisy, la plateforme de réservation de services de beauté à pour but de vous ramener des clients.
-Réclamez votre profil GRATUITEMENT (2 min) pour:
-✅ Gérer vos réservations 24/7
-✅ Recevoir de nouveaux clients
-✅ Augmenter vos revenus
-✅ Suivre vos statistiques en temps réel
-
-🚀 Réclamez maintenant: ${claimLink}
-
-Questions? support@skedisy.com ou +33 7 66 16 03 94
-Site: https://skedisy.com
-
-L'équipe Skedisy`;
+        const smsMessage = `Salon ${salon.name} sur Skedisy! Reclamez gratuit: ${claimLink}`;
         const smsResult = await sendSMS(salon.mobile, smsMessage);
         results.sms = smsResult;
         

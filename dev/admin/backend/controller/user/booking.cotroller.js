@@ -47,11 +47,16 @@ const getLocalizedMessages = (language = 'en') => {
       en: "You cannot book because you don't have enough money in your wallet for booking. Please recharge your wallet to continue.",
       fr: "Vous ne pouvez pas réserver car vous n'avez pas assez d'argent dans votre portefeuille pour la réservation. Veuillez recharger votre portefeuille pour continuer."
     },
+    // Customer SMS - ultra-short for 1 segment (GSM-7: 153 chars max)
+    customerInsufficientWalletSMS: {
+      en: "Wallet low. Recharge to book. skedisy.com Skedisy",
+      fr: "Portefeuille bas. Rechargez pour reserver. skedisy.com Skedisy"
+    },
     
-    // Salon owner SMS - Insufficient wallet
+    // Salon owner SMS - Ultra-short for 1 segment (GSM-7: 153 chars max)
     salonOwnerSMSAlert: {
-      en: "⚠️ ALERT: Insufficient Wallet Balance!\n\nSomeone tried to book a service at your salon \"{salonName}\" but your salon cannot accept new bookings because your wallet balance is insufficient.\n\nCurrent Balance: {currencySymbol}{currentBalance}\nRequired Balance: {currencySymbol}{requiredBalance}\n\nPlease recharge your wallet from your salon dashboard to continue accepting bookings.\n\nThank you,\nSkedisy Team",
-      fr: "⚠️ ALERTE: Solde de portefeuille insuffisant!\n\nQuelqu'un a essayé de réserver un service dans votre salon \"{salonName}\" mais votre salon ne peut pas accepter de nouvelles réservations car votre solde de portefeuille est insuffisant.\n\nSolde actuel: {currencySymbol}{currentBalance}\nSolde requis: {currencySymbol}{requiredBalance}\n\nVeuillez recharger votre portefeuille depuis votre tableau de bord salon pour continuer à accepter des réservations.\n\nMerci,\nL'équipe Skedisy"
+      en: "Wallet low {salonName}. {currencySymbol}{currentBalance}/{currencySymbol}{requiredBalance}. Recharge: skedisy.com Skedisy",
+      fr: "Portefeuille bas {salonName}. {currencySymbol}{currentBalance}/{currencySymbol}{requiredBalance}. Rechargez: skedisy.com Skedisy"
     },
     
     // Salon owner Email - Subject
@@ -487,7 +492,7 @@ exports.newBooking = async (req, res, next) => {
           // SMS Notification
           if (user.mobile && user.mobile.trim() !== "") {
             try {
-              const smsMessage = getMessage('customerInsufficientWallet', userLanguage);
+              const smsMessage = getMessage('customerInsufficientWalletSMS', userLanguage);
 
               const smsResult = await sendSMS(user.mobile, smsMessage);
               if (smsResult.success) {

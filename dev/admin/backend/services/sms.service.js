@@ -10,6 +10,43 @@ if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
 }
 
 /**
+ * Normalize SMS message for GSM-7 encoding to reduce segment count and cost.
+ * - Removes emojis (Unicode triggers 67 chars/segment vs 153 for GSM-7)
+ * - Replaces accented chars with ASCII equivalents (e.g. e, a, c)
+ * - Replaces smart quotes with straight quotes
+ * @param {string} message - Raw message
+ * @returns {string} - GSM-7 compatible message
+ */
+function normalizeForGSM7(message) {
+  if (!message || typeof message !== "string") return message;
+  let normalized = message;
+
+  // Remove emojis and Unicode symbols (triggers UCS-2 = 67 chars/segment vs GSM-7 = 153)
+  normalized = normalized.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{203C}\u{2049}\u{2139}\u{274C}\u{274E}\u{2705}\u{2B50}]/gu, "");
+
+  // Replace accented chars and Unicode symbols with ASCII (avoids UCS-2, keeps GSM-7 = 153 chars/segment)
+  // Euro (€) and Pound (£) trigger Unicode - replace to stay in GSM-7
+  const accentMap = {
+    "\u00E0": "a", "\u00E1": "a", "\u00E2": "a", "\u00E3": "a", "\u00E4": "a", "\u00E5": "a",
+    "\u00E8": "e", "\u00E9": "e", "\u00EA": "e", "\u00EB": "e",
+    "\u00EC": "i", "\u00ED": "i", "\u00EE": "i", "\u00EF": "i",
+    "\u00F2": "o", "\u00F3": "o", "\u00F4": "o", "\u00F5": "o", "\u00F6": "o",
+    "\u00F9": "u", "\u00FA": "u", "\u00FB": "u", "\u00FC": "u",
+    "\u00E7": "c", "\u00F1": "n", "\u00DF": "s",
+    "\u00C0": "A", "\u00C1": "A", "\u00C2": "A", "\u00C8": "E", "\u00C9": "E", "\u00CA": "E",
+    "\u00CC": "I", "\u00CD": "I", "\u00CE": "I", "\u00D2": "O", "\u00D3": "O", "\u00D4": "O",
+    "\u00D9": "U", "\u00DA": "U", "\u00DB": "U", "\u00C7": "C", "\u00D1": "N",
+    "\u2018": "'", "\u2019": "'", "\u201C": '"', "\u201D": '"', "\u2013": "-", "\u2014": "-",
+    "\u20AC": "EUR ", "\u00A3": "GBP ",  // Euro and Pound trigger UCS-2
+  };
+  for (const [accent, ascii] of Object.entries(accentMap)) {
+    normalized = normalized.split(accent).join(ascii);
+  }
+
+  return normalized.trim();
+}
+
+/**
  * Send SMS using Twilio
  * @param {string} to - Phone number to send SMS to (E.164 format)
  * @param {string} message - Message body
@@ -80,9 +117,12 @@ async function sendSMS(to, message) {
       console.log(`[SMS Service] Added + prefix: ${to} -> ${formattedPhone}`);
     }
 
+    // Normalize for GSM-7 to reduce segments and cost (no emojis, ASCII accents)
+    const normalizedMessage = normalizeForGSM7(message);
+
     // Send SMS
     const messageResponse = await client.messages.create({
-      body: message,
+      body: normalizedMessage,
       from: process.env.TWILIO_PHONE_NUMBER,
       to: formattedPhone,
     });
@@ -167,14 +207,14 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
     const salonName = salon.name || "Salon";
     const bookingId = booking.bookingId || "";
 
-    // Create message based on reminder type
+    // Create message (short for GSM-7, <153 chars/segment to reduce cost)
     let message = "";
     if (reminderType === "24h") {
-      message = `Hi ${customerName}! Reminder: You have an appointment at ${salonName} tomorrow (${appointmentDate}) at ${appointmentTime}. Booking ID: ${bookingId}. We look forward to seeing you!`;
+      message = `Hi ${customerName}! Appt at ${salonName} tomorrow ${appointmentDate} ${appointmentTime}. ID: ${bookingId}. Skedisy`;
     } else if (reminderType === "2h") {
-      message = `Hi ${customerName}! Reminder: Your appointment at ${salonName} is in 2 hours (${appointmentDate} at ${appointmentTime}). Booking ID: ${bookingId}. See you soon!`;
+      message = `Hi ${customerName}! Appt at ${salonName} in 2h - ${appointmentDate} ${appointmentTime}. ID: ${bookingId}. Skedisy`;
     } else {
-      message = `Hi ${customerName}! Reminder: You have an appointment at ${salonName} on ${appointmentDate} at ${appointmentTime}. Booking ID: ${bookingId}.`;
+      message = `Hi ${customerName}! Appt at ${salonName} ${appointmentDate} ${appointmentTime}. ID: ${bookingId}. Skedisy`;
     }
 
     // Send SMS

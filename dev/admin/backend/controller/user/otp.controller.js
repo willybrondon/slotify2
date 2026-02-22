@@ -8,14 +8,15 @@ const User = require("../../models/user.model");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+// Rate limit: 60 seconds between OTP emails per email address
+const OTP_RATE_LIMIT_MS = 60 * 1000;
+
 //create OTP and send the email for password security
 exports.store = async (req, res) => {
   try {
     if (!req.query.email) {
       return res.status(200).json({ status: false, message: "Email must be required!!" });
     }
-
-    var newOtp = Math.floor(Math.random() * 8999) + 1000;
 
     const [userEmail, existOTP] = await Promise.all([
       User.findOne({ email: req.query.email }),
@@ -25,6 +26,16 @@ exports.store = async (req, res) => {
     if (!userEmail) {
       return res.status(200).json({ status: false, message: "User does not found with that email." });
     }
+
+    // Rate limit: if OTP was sent recently, return success without sending again
+    if (existOTP && existOTP.updatedAt) {
+      const elapsed = Date.now() - new Date(existOTP.updatedAt).getTime();
+      if (elapsed < OTP_RATE_LIMIT_MS) {
+        return res.status(200).json({ status: true, message: "Email Send Successfully for Password Security." });
+      }
+    }
+
+    var newOtp = Math.floor(Math.random() * 8999) + 1000;
 
     if (existOTP) {
       existOTP.otp = newOtp;
@@ -80,9 +91,16 @@ exports.otplogin = async (req, res) => {
       return res.status(200).json({ status: false, message: "Email must be required." });
     }
 
-    var newOtp = Math.floor(Math.random() * 8999) + 1000;
-
     const existOTP = await OTP.findOne({ email: req.query.email });
+    // Rate limit: if OTP was sent recently, return success without sending again
+    if (existOTP && existOTP.updatedAt) {
+      const elapsed = Date.now() - new Date(existOTP.updatedAt).getTime();
+      if (elapsed < OTP_RATE_LIMIT_MS) {
+        return res.status(200).json({ status: true, message: "Email Send Successfully to User!" });
+      }
+    }
+
+    var newOtp = Math.floor(Math.random() * 8999) + 1000;
     if (existOTP) {
       existOTP.otp = newOtp;
       await existOTP.save();

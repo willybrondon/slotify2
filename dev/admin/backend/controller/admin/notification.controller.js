@@ -360,7 +360,7 @@ exports.particularSalonNotification = async (req, res) => {
     // Send SMS notification to salon's mobile number
     if (salon && salon.mobile && salon.mobile.trim() !== "") {
       try {
-        const smsMessage = `${req.body.title}\n\n${req.body.message}\n\nPour plus d'informations:\nSite: ${websiteLink}\nEmail: ${supportEmail}\nTel: ${contactNumber}`;
+        const smsMessage = `${req.body.title}\n\n${req.body.message}\n\nInfo: skedisy.com`;
         const smsResult = await sendSMS(salon.mobile, smsMessage);
         
         if (smsResult.success) {

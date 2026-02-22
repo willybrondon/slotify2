@@ -66,25 +66,37 @@ class ForgotPasswordScreen extends StatelessWidget {
           ).paddingOnly(bottom: 13),
         ),
       ),
-      bottomNavigationBar: AppButton(
-        height: 55,
-        width: Get.width,
-        buttonColor: AppColors.primaryAppColor,
-        buttonText: "txtContinue".tr,
-        fontFamily: AppFontFamily.sfProDisplay,
-        color: AppColors.whiteColor,
-        fontSize: 19,
-        onTap: () async {
-          await forgotPasswordController.onCreateOtpApiCall(email: forgotPasswordController.emailEditingController.text);
+      bottomNavigationBar: GetBuilder<ForgotPasswordController>(
+        id: Constant.idProgressView,
+        builder: (logic) {
+          return AbsorbPointer(
+            absorbing: logic.isLoading.value,
+            child: Opacity(
+              opacity: logic.isLoading.value ? 0.6 : 1,
+              child: AppButton(
+                height: 55,
+                width: Get.width,
+                buttonColor: AppColors.primaryAppColor,
+                buttonText: "txtContinue".tr,
+                fontFamily: AppFontFamily.sfProDisplay,
+                color: AppColors.whiteColor,
+                fontSize: 19,
+                onTap: () async {
+                  if (logic.isLoading.value) return;
+                  await forgotPasswordController.onCreateOtpApiCall(email: forgotPasswordController.emailEditingController.text);
 
-          if (forgotPasswordController.otpCreateCategory?.status == true) {
-            Utils.showToast(Get.context!, "txtCheckMail".tr);
-            Get.toNamed(AppRoutes.verifyOtp, arguments: [forgotPasswordController.emailEditingController.text]);
-          } else {
-            Utils.showToast(Get.context!, forgotPasswordController.otpCreateCategory?.message ?? "");
-          }
+                  if (forgotPasswordController.otpCreateCategory?.status == true) {
+                    Utils.showToast(Get.context!, "txtCheckMail".tr);
+                    Get.toNamed(AppRoutes.verifyOtp, arguments: [forgotPasswordController.emailEditingController.text]);
+                  } else {
+                    Utils.showToast(Get.context!, forgotPasswordController.otpCreateCategory?.message ?? "");
+                  }
+                },
+              ),
+            ),
+          ).paddingOnly(left: 13, right: 13, bottom: 15);
         },
-      ).paddingOnly(left: 13, right: 13, bottom: 15),
+      ),
       body: GetBuilder<ForgotPasswordController>(
         id: Constant.idProgressView,
         builder: (logic) {

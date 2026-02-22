@@ -2210,6 +2210,7 @@ exports.serveSalonWebPage = async (req, res) => {
         </button>
     </div>
     
+    <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
     <script>
         // Truncate hero-subtitle to 46 characters on mobile only

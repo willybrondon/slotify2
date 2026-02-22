@@ -147,7 +147,7 @@ exports.verifyMobileForSignup = async (req, res) => {
     }
 
     // Send welcome SMS to verify the number is valid
-    const welcomeMessage = `Welcome to ${process.env.projectName || "our platform"}! Your mobile number has been verified. This number will be used for appointment reminders and notifications. Thank you for joining us!`;
+    const welcomeMessage = `Welcome to ${process.env.projectName || "Skedisy"}! Mobile verified. Skedisy`;
 
     console.log(`[Mobile Verification] Attempting to send SMS to ${formattedMobile} for signup verification`);
 

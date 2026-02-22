@@ -32,7 +32,7 @@ async function testTwilio() {
   console.log("");
 
   // Test message
-  const testMessage = "Test SMS from Salon Booking System - If you receive this, Twilio is working correctly! 🎉";
+  const testMessage = "Test SMS from Salon Booking System - If you receive this, Twilio is working correctly!";
 
   try {
     console.log("3. Sending test SMS...");
