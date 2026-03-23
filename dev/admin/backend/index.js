@@ -71,27 +71,27 @@ global.updateSettingFile = (settingData) => {
   console.log("Settings file updated.");
 };
 
-const indexRoute = require("./route/index");
-app.use(indexRoute);
-
-// Resolve salonportal path (works for both dev: ../salonportal and prod: backend/salonportal)
+// Resolve salonportal path first (works for both dev: ../salonportal and prod: backend/salonportal)
 const salonportalPath = fs.existsSync(path.join(__dirname, "salonportal", "index.html"))
   ? path.join(__dirname, "salonportal")
   : path.join(__dirname, "..", "salonportal");
 
+const indexRoute = require("./route/index");
+app.use(indexRoute);
+
 // Docs, terms, privacy, cookies - explicit routes (must be early to avoid conflicts)
 app.get("/docs", (req, res) => res.redirect(301, "/docs/"));
-app.get("/terms", (req, res) => res.redirect(301, "/terms/"));
-app.get("/privacy", (req, res) => res.redirect(301, "/privacy/"));
-app.get("/cookies", (req, res) => res.redirect(301, "/cookies/"));
 app.get("/docs/", (req, res) => {
   const filePath = path.join(salonportalPath, "docs", "index.html");
   if (fs.existsSync(filePath)) {
-    res.status(200).sendFile(filePath);
+    res.status(200).sendFile(path.resolve(filePath));
   } else {
     res.status(404).send(`<h1>404 - Documentation not found</h1><p>Expected at: ${filePath}</p><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
+app.get("/terms", (req, res) => res.redirect(301, "/terms/"));
+app.get("/privacy", (req, res) => res.redirect(301, "/privacy/"));
+app.get("/cookies", (req, res) => res.redirect(301, "/cookies/"));
 app.get("/terms/", (req, res) => {
   const filePath = path.join(salonportalPath, "terms", "index.html");
   if (fs.existsSync(filePath)) {
