@@ -62,6 +62,11 @@ const bookingSchema = new mongoose.Schema(
     smsReminder24hSent: { type: Boolean, default: false }, // 24 hours before appointment
     smsReminder2hSent: { type: Boolean, default: false }, // 2 hours before appointment
 
+    // Admin email: accept/reject reservation from email (token links)
+    adminEmailActionToken: { type: String, default: "" },
+    adminEmailActionTokenExpires: { type: Date },
+    adminEmailApprovedAt: { type: Date },
+
     cancel: {
       reason: String,
       person: {

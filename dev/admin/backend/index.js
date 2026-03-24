@@ -77,15 +77,19 @@ const salonportalPath = fs.existsSync(path.join(__dirname, "salonportal", "index
   : path.join(__dirname, "..", "salonportal");
 
 const indexRoute = require("./route/index");
+const bookingAdminEmailController = require("./controller/user/bookingAdminEmail.controller");
+
+// Public booking action from admin email (no secret key) — register before /user router
+app.get("/user/booking/public/email-action", bookingAdminEmailController.handleEmailAction);
+
 app.use(indexRoute);
 
-// Docs - serve documentation.html (was working at /documentation.html); support both /docs/ and /documentation.html
+// Docs — /docs/ and /docs must serve the same content as /docs/index.html (cucumber-style docs folder)
 app.get("/docs", (req, res) => res.redirect(301, "/docs/"));
 app.get("/docs/", (req, res) => {
-  // Prefer documentation.html (was working before), fallback to docs/index.html
-  const docHtml = path.join(salonportalPath, "documentation.html");
   const docsIndex = path.join(salonportalPath, "docs", "index.html");
-  const filePath = fs.existsSync(docHtml) ? docHtml : docsIndex;
+  const docHtml = path.join(salonportalPath, "documentation.html");
+  const filePath = fs.existsSync(docsIndex) ? docsIndex : docHtml;
   if (fs.existsSync(filePath)) {
     res.status(200).sendFile(path.resolve(filePath));
   } else {

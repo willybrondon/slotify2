@@ -329,6 +329,25 @@ class SignInScreen extends StatelessWidget {
                           ),
                         ).paddingOnly(top: 5, bottom: 20),
                       ),
+                      InkWell(
+                        overlayColor:
+                            WidgetStatePropertyAll(AppColors.transparent),
+                        onTap: () {
+                          Get.toNamed(AppRoutes.guestLogin,
+                              arguments: [logic.isDataSelected]);
+                        },
+                        child: Text(
+                          'txtGuestBookingLink'.tr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
+                            fontSize: 15,
+                            color: AppColors.categoryService,
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppColors.categoryService,
+                          ),
+                        ),
+                      ).paddingOnly(bottom: 20),
                       // TEMPORARILY DISABLED - Google, Apple, and OTP login not working
                       /* 
                       Row(

@@ -21,6 +21,7 @@ const mongoose = require("mongoose");
 const admin = require("../../firebase");
 const moment = require("moment");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
+const { sendAdminNewBookingEmail } = require("../../services/bookingAdminEmail.service");
 
 // Initialize SendGrid if API key is available
 if (process.env.SENDGRID_API_KEY) {
@@ -1032,6 +1033,12 @@ exports.newBooking = async (req, res, next) => {
           console.log("Error sending message: ", error);
         });
     }
+
+    setImmediate(() => {
+      sendAdminNewBookingEmail(booking._id).catch((err) =>
+        console.error("[Admin Booking Email] send failed:", err.message)
+      );
+    });
   } catch (error) {
     console.log(error);
     

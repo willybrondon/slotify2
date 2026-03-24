@@ -91,6 +91,7 @@ exports.bookingForExpert = async (req, res) => {
           createdAt: 1,
           updatedAt: 1,
           status: 1,
+          adminEmailApprovedAt: 1,
           user: { _id: 1, fname: 1, lname: 1, image: 1 },
           expert: { _id: 1, fname: 1, lname: 1, image: 1 },
           service: 1,

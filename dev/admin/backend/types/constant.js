@@ -47,6 +47,8 @@ exports.LOGIN_TYPE = {
   EMAIL_PASSWORD: 1,
   GOOGLE: 2,
   MOBILE: 3, // OTP LOGIN
+  APPLE: 4,
+  GUEST_EMAIL_OTP: 5, // book without full account: email + phone + email OTP
 };
 
 exports.COUPON_TYPE = {

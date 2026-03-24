@@ -22,6 +22,7 @@ class AppRoutes {
   static const String bookingAppointment = '/bookingAppointment';
   static const String login = '/login';
   static const String signIn = '/signIn';
+  static const String guestLogin = '/guestLogin';
   static const String signUp = '/signUp';
   static const String forgotPassword = '/forgotPassword';
   static const String verifyOtp = '/verifyOtp';

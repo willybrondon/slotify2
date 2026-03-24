@@ -53,6 +53,8 @@ import 'package:salon_2/ui/login_screen/reset_password_screen/binding/reset_pass
 import 'package:salon_2/ui/login_screen/reset_password_screen/view/reset_password_screen.dart';
 import 'package:salon_2/ui/login_screen/sign_in_screen/binding/sign_in_binding.dart';
 import 'package:salon_2/ui/login_screen/sign_in_screen/view/sign_in_screen.dart';
+import 'package:salon_2/ui/login_screen/guest_login_screen/binding/guest_login_binding.dart';
+import 'package:salon_2/ui/login_screen/guest_login_screen/view/guest_login_screen.dart';
 import 'package:salon_2/ui/login_screen/sign_up_otp_verify_screen/binding/sign_up_otp_verify_binding.dart';
 import 'package:salon_2/ui/login_screen/sign_up_otp_verify_screen/view/sign_up_otp_verify_screen.dart';
 import 'package:salon_2/ui/login_screen/sign_up_screen/binding/sign_up_binding.dart';
@@ -211,6 +213,11 @@ class AppPages {
       name: AppRoutes.signIn,
       page: () => SignInScreen(),
       binding: SignInBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.guestLogin,
+      page: () => GuestLoginScreen(),
+      binding: GuestLoginBinding(),
     ),
     GetPage(
       name: AppRoutes.signUp,

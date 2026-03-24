@@ -6,6 +6,8 @@ class ApiConstant {
 
   /// ---------- user ---------- ///
   static const loginUser = "user/loginSignup";
+  static const guestSendOtp = "user/guest/sendOtp";
+  static const guestVerifyOtp = "user/guest/verify";
   static const getUser = "user/profile?";
   static const deleteUser = "user/delete";
   static const updateUser = "user/update?";
