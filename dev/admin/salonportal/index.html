@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skedisy - Manage Your Salon Like Never Before</title>
+    <title>Skedisy - Get More Clients for Your Afro Salon in Île-de-France</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
@@ -99,165 +99,97 @@
       <a href="#" class="mobile-download-btn customer" onclick="openPhoneSelection('customer'); return false;" data-translate="qr.customerApp">Download Customer App</a>
       <a href="#" class="mobile-download-btn expert" onclick="openPhoneSelection('expert'); return false;" data-translate="qr.expertApp">Download Expert App</a>
     </div>
-    <!-- Hero Section -->
-    <section class="hero">
+    <!-- 🟣 HERO SECTION -->
+    <section class="hero afro-hero">
         <div class="hero-container">
             <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Salon Management">
+                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Afro hair salon in Île-de-France">
             </div>
             <div class="hero-content">
-                <h1 data-translate="hero.title">Salon Management Platform</h1>
-                <p class="hero-subtitle" data-translate-html="hero.subtitle">
-                    <strong>50,000+ salons</strong> trust our beauty industry reference, used by <strong>10M+ users</strong> every month.
+                <h1 data-translate="hero.afroHeadline">💇 Get more clients for your Afro salon in Île-de-France</h1>
+                <p class="hero-subtitle" data-translate="hero.afroSubheadline">
+                    Join the first platform dedicated to Afro hair salons.<br>We bring you new customers — you pay nothing to start.
                 </p>
                 <div class="hero-buttons">
-                    <a href="#demo" class="btn-primary" data-translate-html="hero.addSalon">Add My Salon</a>
-                    <a href="ai-concierge.html" class="btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <i class="fas fa-robot"></i> <span data-translate="hero.tryAI">Try AI</span>
-                    </a>
-                    <div class="trust-badge">
-                        <i class="fas fa-star"></i>
-                        <span data-translate="hero.trustBadge">4.8/5 on Trustpilot</span>
-                    </div>
-                </div>
-                <div class="hero-features">
-                    <div class="feature-item">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span data-translate="hero.bookingManagement">Booking management</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-credit-card"></i>
-                        <span data-translate="hero.simplifiedPayments">Simplified payments</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <span data-translate="hero.noCommitment">No commitment</span>
-                    </div>
+                    <a href="/request-adding-salon.html" class="btn-primary btn-join-free" data-translate="hero.joinFree">👉 Join for free</a>
+                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="btn-secondary" data-translate="request.customerButton">Book here</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Request Buttons Section -->
+    <!-- 🟢 PROBLEM SECTION -->
+    <section class="problem-section">
+        <div class="container">
+            <h2 data-translate="problem.title">Most Afro salons rely on Instagram and WhatsApp:</h2>
+            <ul class="problem-list">
+                <li><i class="fas fa-times-circle"></i> <span data-translate="problem.missed">Missed appointments</span></li>
+                <li><i class="fas fa-times-circle"></i> <span data-translate="problem.noShows">No-shows</span></li>
+                <li><i class="fas fa-times-circle"></i> <span data-translate="problem.timeWasted">Time wasted managing messages</span></li>
+                <li><i class="fas fa-times-circle"></i> <span data-translate="problem.hardToAttract">Hard to attract new clients</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 🔵 SOLUTION SECTION -->
+    <section class="solution-section">
+        <div class="container">
+            <h2 data-translate="solution.title">Skedisy helps you:</h2>
+            <div class="solution-grid">
+                <div class="solution-item">
+                    <span class="solution-icon">📅</span>
+                    <span data-translate="solution.bookings">Accept bookings 24/7</span>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-icon">📍</span>
+                    <span data-translate="solution.discovered">Get discovered by new clients nearby</span>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-icon">⭐</span>
+                    <span data-translate="solution.reputation">Build your reputation with reviews</span>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-icon">💰</span>
+                    <span data-translate="solution.revenue">Increase your monthly revenue</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🟡 TRUST SECTION -->
+    <section class="trust-section">
+        <div class="container">
+            <h2 data-translate="trust.title">Designed specifically for:</h2>
+            <div class="trust-badges">
+                <span class="trust-badge-item" data-translate="trust.braids">Braids</span>
+                <span class="trust-badge-item" data-translate="trust.wigs">Wigs</span>
+                <span class="trust-badge-item" data-translate="trust.locks">Locks</span>
+                <span class="trust-badge-item" data-translate="trust.naturalHair">Natural hair</span>
+            </div>
+            <p class="trust-niche" data-translate="trust.niche">👉 Not generic beauty. Afro beauty only.</p>
+        </div>
+    </section>
+
+    <!-- 🟠 CTA AGAIN -->
+    <section class="cta-again-section">
+        <div class="container">
+            <h2 data-translate="ctaAgain.title">Start getting new clients today</h2>
+            <a href="/request-adding-salon.html" class="btn-primary btn-join-free" data-translate="ctaAgain.button">👉 Join Skedisy for free</a>
+        </div>
+    </section>
+
+    <!-- Request Buttons (Salon + Customer) -->
     <section class="request-buttons-section">
         <div class="container">
             <div class="request-buttons-container">
-                <!-- Salon Owner Button -->
                 <div class="request-button-card">
                     <h3 data-translate="request.salonTitle">Would you like to integrate your salon on Skedisy platform?</h3>
                     <a href="/request-adding-salon.html" class="btn-request" data-translate="request.salonButton">Make your Request</a>
                 </div>
-                <!-- Customer Button -->
                 <div class="request-button-card">
                     <h3 data-translate="request.customerTitle">Would you like to book services from a salon?</h3>
                     <a href="#" class="btn-request" onclick="openPhoneSelection('customer'); return false;" data-translate="request.customerButton">Book here</a>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="stats-container">
-            <div class="stat-item">
-                <h3>50,000+</h3>
-                <p data-translate="stats.professionals">Professionals</p>
-            </div>
-            <div class="stat-item">
-                <h3>12M+</h3>
-                <p data-translate="stats.appointments">Appointments managed monthly</p>
-            </div>
-            <div class="stat-item">
-                <h3>50%</h3>
-                <p data-translate="stats.onlineBookings">Online bookings outside business hours</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- New Features Inspired by Planity -->
-    <section class="planity-features">
-        <div class="container planity-features-flex">
-            <div class="planity-feature-block">
-                <h2 data-translate="features.bookTitle">Book Your Appointment Online</h2>
-                <p data-translate="features.bookDesc">Find your favorite salon and book your beauty appointment 24/7, instantly and easily. No more waiting on the phone—just a few clicks and your spot is reserved!</p>
-            </div>
-            <div class="planity-feature-block">
-                <h2 data-translate="features.manageTitle">Manage Your Salon Effortlessly</h2>
-                <p data-translate="features.manageDesc">Salon owners can manage bookings, staff, and schedules from anywhere. Simplify your daily operations and focus on what matters most: your clients.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- New Clients Section -->
-    <section class="new-clients">
-        <div class="container">
-            <div class="clients-content">
-                <h2 data-translate-html="clients.title">New Clients.<br>Continuously.</h2>
-                <p data-translate="clients.desc">Some are looking for exactly your specialty. Some are new to the neighborhood. Some have decided to take care of themselves. Let them find their rare pearl: you.</p>
-                <ul>
-                    <li data-translate="clients.showcase">Showcase page for your establishment</li>
-                    <li data-translate="clients.reviews">Certified client reviews</li>
-                    <li data-translate="clients.ranking">Optimized Google ranking</li>
-                </ul>
-                <a href="#demo" class="btn-secondary" data-translate="clients.discover">Discover for Free</a>
-            </div>
-            <div class="clients-image">
-                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Professional Stylist">
-            </div>
-        </div>
-    </section>
-
-    <!-- Professional Stats Section -->
-    <section class="pro-stats-section">
-        <div class="container pro-stats-flex no-img">
-            <div class="pro-stats-content">
-                <h2 class="pro-stats-title" data-translate-html="proStats.title">Are you a beauty professional?<br>Discover online appointment booking!</h2>
-                <div class="pro-stats-grid">
-                    <div class="pro-stats-cell"><span class="pro-stats-main">+ 50%</span><br><span class="pro-stats-desc" data-translate="proStats.increase">increase in frequency for online bookings</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">4x</span><br><span class="pro-stats-desc" data-translate="proStats.noShows">fewer no-shows with SMS appointment reminders</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">50%</span><br><span class="pro-stats-desc" data-translate="proStats.outsideHours">of online bookings made outside business hours</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">+50 000</span><br><span class="pro-stats-desc" data-translate="proStats.salons">Salons & institutes</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">5 RDV</span><br><span class="pro-stats-desc" data-translate="proStats.booked">Booked every second</span></div>
-                    <div class="pro-stats-cell"><span class="pro-stats-main">&gt; 5 billion €</span><br><span class="pro-stats-desc" data-translate="proStats.sold">in appointments sold</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- All-in-One Platform Features Section -->
-    <section class="platform-features-section">
-        <div class="container platform-features-flex">
-            <div class="platform-feature-card">
-                <div class="platform-feature-icon">📅</div>
-                <h3 data-translate="platform.manage">Manage</h3>
-                <p data-translate="platform.manageDesc">Control every aspect of your business: bookings, sales, clients, locations, and team members. Analyze your business with detailed reports and statistics.</p>
-            </div>
-            <div class="platform-feature-card">
-                <div class="platform-feature-icon">🚀</div>
-                <h3 data-translate="platform.grow">Grow</h3>
-                <p data-translate="platform.growDesc">Attract new clients on the world's largest beauty & wellness marketplace and keep them coming back with built-in marketing tools.</p>
-                    </div>
-            <div class="platform-feature-card">
-                <div class="platform-feature-icon">💳</div>
-                <h3 data-translate="platform.getPaid">Get Paid</h3>
-                <p data-translate="platform.getPaidDesc">Get paid quickly and securely with integrated payments, reduce no-shows with deposits, and simplify your checkout process.</p>
-            </div>
-            <div class="platform-feature-card">
-                <div class="platform-feature-icon">🤖</div>
-                <h3 data-translate="platform.aiTitle">AI Beauty Concierge</h3>
-                <p data-translate="platform.aiDesc">Get personalized beauty recommendations powered by AI. Upload your selfie and discover the perfect services for you.</p>
-                <a href="ai-concierge.html" class="btn-ai-try" data-translate="platform.tryNow">Try Now →</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Call to Action Section -->
-    <section class="cta-section">
-        <div class="container cta-flex">
-            <div class="cta-content">
-                <h2 data-translate="cta.ready">Ready to grow your business?</h2>
-                <p data-translate="cta.join">Join thousands of professionals who trust SalonPortal to manage and grow their business. Start for free today!</p>
-                <a href="#" class="btn-primary cta-btn" data-translate="cta.getStarted">Get Started</a>
             </div>
         </div>
     </section>
@@ -483,22 +415,11 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta">
-        <div class="container">
-            <div class="cta-content">
-                <h2 data-translate="cta.million">10,000,000</h2>
-                <p data-translate="cta.millionDesc">10 million people book a beauty appointment every month on SalonPortal. Take care of them.</p>
-                <a href="#demo" class="btn-primary" data-translate="clients.discover">Discover for Free</a>
-            </div>
-        </div>
-    </section>
-
     <!-- Final CTA -->
     <section class="final-cta">
         <div class="container">
-            <h2 data-translate="cta.final">More than 50,000 professionals have transformed their days with SalonPortal. Join them.</h2>
-            <a href="#demo" class="btn-primary" data-translate="clients.discover">Discover for Free</a>
+            <h2 data-translate="ctaAgain.title">Start getting new clients today</h2>
+            <a href="/request-adding-salon.html" class="btn-primary btn-join-free" data-translate="ctaAgain.button">👉 Join Skedisy for free</a>
         </div>
     </section>
 

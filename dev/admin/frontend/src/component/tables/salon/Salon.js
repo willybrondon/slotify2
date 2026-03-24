@@ -297,6 +297,14 @@ export const Salon = () => {
             </button>
             {/* TEMPORARY: Always show button for testing - will fix condition after confirming it works */}
             <button
+              className="py-1"
+              style={{ backgroundColor: "#FFCDD2", borderRadius: "8px", minWidth: "40px", height: "32px" }}
+              onClick={() => handleDelete(row?._id)}
+              title="Delete salon"
+            >
+              <Delete />
+            </button>
+            <button
               className="py-1 px-2"
               style={{ 
                 backgroundColor: "#FF6B00", 

@@ -36,7 +36,7 @@ route.post("/addMoneyToWallet", checkAccessWithSecretKey(), admin, salonControll
 
 route.get("/getShareLink", checkAccessWithSecretKey(), admin, salonController.getSalonShareLink);
 
-route.patch("/delete", checkAccessWithSecretKey(), admin, salonController.delete);
+route.delete("/delete", checkAccessWithSecretKey(), admin, salonController.delete);
 
 // Claim invitation routes
 route.post("/send-claim-invitation", checkAccessWithSecretKey(), admin, claimController.sendClaimInvitation);

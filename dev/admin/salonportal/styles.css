@@ -3067,4 +3067,131 @@ html {
     }
 }
 
+/* Afro Salon Homepage - Conversion Sections */
+.afro-hero .hero-content h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+}
+@media (max-width: 768px) {
+    .afro-hero .hero-content h1 {
+        font-size: 1.75rem;
+    }
+}
+.btn-join-free {
+    font-size: 1.1rem;
+    padding: 14px 28px;
+}
+
+/* Problem Section (green) */
+.problem-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+.problem-section h2 {
+    font-size: 1.5rem;
+    color: #111;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.problem-list {
+    list-style: none;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0;
+}
+.problem-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+.problem-list li i {
+    color: #c62828;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* Solution Section (blue) */
+.solution-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+.solution-section h2 {
+    font-size: 1.5rem;
+    color: #111;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.solution-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.solution-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    font-size: 1rem;
+    font-weight: 500;
+}
+.solution-icon {
+    font-size: 1.5rem;
+}
+
+/* Trust Section (yellow) */
+.trust-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+}
+.trust-section h2 {
+    font-size: 1.5rem;
+    color: #111;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.trust-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.trust-badge-item {
+    background: #111;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+.trust-niche {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111;
+    margin: 0;
+}
+
+/* CTA Again Section (orange accent) */
+.cta-again-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+}
+.cta-again-section .container {
+    text-align: center;
+}
+.cta-again-section h2 {
+    font-size: 1.75rem;
+    color: #111;
+    margin-bottom: 1.5rem;
+}
+
  

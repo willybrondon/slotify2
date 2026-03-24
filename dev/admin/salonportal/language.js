@@ -10,6 +10,9 @@ const translations = {
         // Hero Section
         'hero.title': 'The #1 Platform to Manage Your Salon.',
         'hero.subtitle': '<strong>50,000+ salons</strong> trust our beauty industry reference, used by <strong>10M+ users</strong> every month.',
+        'hero.afroHeadline': '💇 Get more clients for your Afro salon in Île-de-France',
+        'hero.afroSubheadline': 'Join the first platform dedicated to Afro hair salons. We bring you new customers — you pay nothing to start.',
+        'hero.joinFree': '👉 Join for free',
         'hero.addSalon': 'Add My Salon',
         'hero.tryAI': 'Try AI Concierge',
         'hero.trustBadge': '4.8/5 on Trustpilot',
@@ -22,6 +25,32 @@ const translations = {
         'request.salonButton': 'Make your Request',
         'request.customerTitle': 'Would you like to book services from a salon?',
         'request.customerButton': 'Book here',
+        
+        // Problem Section
+        'problem.title': 'Most Afro salons rely on Instagram and WhatsApp:',
+        'problem.missed': 'Missed appointments',
+        'problem.noShows': 'No-shows',
+        'problem.timeWasted': 'Time wasted managing messages',
+        'problem.hardToAttract': 'Hard to attract new clients',
+        
+        // Solution Section
+        'solution.title': 'Skedisy helps you:',
+        'solution.bookings': 'Accept bookings 24/7',
+        'solution.discovered': 'Get discovered by new clients nearby',
+        'solution.reputation': 'Build your reputation with reviews',
+        'solution.revenue': 'Increase your monthly revenue',
+        
+        // Trust Section
+        'trust.title': 'Designed specifically for:',
+        'trust.braids': 'Braids',
+        'trust.wigs': 'Wigs',
+        'trust.locks': 'Locks',
+        'trust.naturalHair': 'Natural hair',
+        'trust.niche': '👉 Not generic beauty. Afro beauty only.',
+        
+        // CTA Again
+        'ctaAgain.title': 'Start getting new clients today',
+        'ctaAgain.button': '👉 Join Skedisy for free',
         
         // Stats
         'stats.professionals': 'Professionals',
@@ -568,6 +597,9 @@ const translations = {
         // Hero Section
         'hero.title': 'La Plateforme #1 pour Gérer Votre Salon.',
         'hero.subtitle': '<strong>50 000+ salons</strong> nous font confiance. <strong>10M+ d\'utilisateurs</strong> chaque mois.',
+        'hero.afroHeadline': '💇 Attirez plus de clients pour votre salon afro en Île-de-France',
+        'hero.afroSubheadline': 'Rejoignez la première plateforme dédiée aux salons coiffure afro. Nous vous amenons de nouveaux clients — vous ne payez rien pour commencer.',
+        'hero.joinFree': '👉 Rejoindre gratuitement',
         'hero.addSalon': 'Ajouter mon<br>salon',
         'hero.tryAI': 'Essayer l\'IA',
         'hero.trustBadge': '4,8/5 sur Trustpilot',
@@ -580,6 +612,32 @@ const translations = {
         'request.salonButton': 'Faire ma demande',
         'request.customerTitle': 'Souhaitez-vous réserver des services en salon ?',
         'request.customerButton': 'Réserver ici',
+        
+        // Problem Section
+        'problem.title': 'La plupart des salons afro dépendent d\'Instagram et WhatsApp :',
+        'problem.missed': 'Rendez-vous manqués',
+        'problem.noShows': 'Clients absents',
+        'problem.timeWasted': 'Temps perdu à gérer les messages',
+        'problem.hardToAttract': 'Difficile d\'attirer de nouveaux clients',
+        
+        // Solution Section
+        'solution.title': 'Skedisy vous aide à :',
+        'solution.bookings': 'Accepter les réservations 24h/24 et 7j/7',
+        'solution.discovered': 'Être découvert par de nouveaux clients à proximité',
+        'solution.reputation': 'Construire votre réputation avec les avis',
+        'solution.revenue': 'Augmenter vos revenus mensuels',
+        
+        // Trust Section
+        'trust.title': 'Conçu spécifiquement pour :',
+        'trust.braids': 'Tresses',
+        'trust.wigs': 'Perruques',
+        'trust.locks': 'Dreadlocks',
+        'trust.naturalHair': 'Cheveux naturels',
+        'trust.niche': '👉 Pas la beauté générique. Beauté afro uniquement.',
+        
+        // CTA Again
+        'ctaAgain.title': 'Commencez à attirer de nouveaux clients aujourd\'hui',
+        'ctaAgain.button': '👉 Rejoindre Skedisy gratuitement',
         
         // Stats
         'stats.professionals': 'Professionnels',
