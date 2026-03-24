@@ -79,14 +79,17 @@ const salonportalPath = fs.existsSync(path.join(__dirname, "salonportal", "index
 const indexRoute = require("./route/index");
 app.use(indexRoute);
 
-// Docs, terms, privacy, cookies - explicit routes (must be early to avoid conflicts)
+// Docs - serve documentation.html (was working at /documentation.html); support both /docs/ and /documentation.html
 app.get("/docs", (req, res) => res.redirect(301, "/docs/"));
 app.get("/docs/", (req, res) => {
-  const filePath = path.join(salonportalPath, "docs", "index.html");
+  // Prefer documentation.html (was working before), fallback to docs/index.html
+  const docHtml = path.join(salonportalPath, "documentation.html");
+  const docsIndex = path.join(salonportalPath, "docs", "index.html");
+  const filePath = fs.existsSync(docHtml) ? docHtml : docsIndex;
   if (fs.existsSync(filePath)) {
     res.status(200).sendFile(path.resolve(filePath));
   } else {
-    res.status(404).send(`<h1>404 - Documentation not found</h1><p>Expected at: ${filePath}</p><p><a href="/">Return to Skedisy</a></p>`);
+    res.status(404).send(`<h1>404 - Documentation not found</h1><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
 app.get("/terms", (req, res) => res.redirect(301, "/terms/"));
@@ -116,7 +119,15 @@ app.get("/cookies/", (req, res) => {
     res.status(404).send(`<h1>404 - Cookies not found</h1><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
-app.get("/documentation.html", (req, res) => res.redirect(301, "/docs/"));
+// Serve documentation.html directly (no redirect) - was working before
+app.get("/documentation.html", (req, res) => {
+  const filePath = path.join(salonportalPath, "documentation.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(path.resolve(filePath));
+  } else {
+    res.status(404).send(`<h1>404 - Documentation not found</h1><p><a href="/">Return to Skedisy</a></p>`);
+  }
+});
 app.get("/terms.html", (req, res) => res.redirect(301, "/terms/"));
 app.get("/privacy.html", (req, res) => res.redirect(301, "/privacy/"));
 app.get("/cookies.html", (req, res) => res.redirect(301, "/cookies/"));
