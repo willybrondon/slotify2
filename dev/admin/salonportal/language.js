@@ -3,7 +3,7 @@ const translations = {
     en: {
         // Navigation
         'nav.aiConcierge': 'AI Concierge',
-        'nav.documentation': 'Documentation',
+        'nav.documentation': 'Docs',
         'nav.menu': 'Menu',
         'nav.login': 'Login',
         
@@ -590,7 +590,7 @@ const translations = {
     fr: {
         // Navigation
         'nav.aiConcierge': 'Concierge IA',
-        'nav.documentation': 'Documentation',
+        'nav.documentation': 'Docs',
         'nav.menu': 'Menu',
         'nav.login': 'Connexion',
         

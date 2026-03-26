@@ -394,7 +394,7 @@ function renderCategories(categories) {
     
     if (!desktopMenu || !mobileMenu) return;
     
-    // Desktop menu - add Documentation and Language Switcher at the end
+    // Desktop menu - add Docs link and Language Switcher at the end
     const categoriesHtml = categories.map(category => {
         const slug = generateCategorySlug(category.name);
         const shortId = category._id.toString().substring(0, 6);
@@ -408,7 +408,7 @@ function renderCategories(categories) {
     const switchToShort = switchToLang.toUpperCase(); // EN or FR
     
     desktopMenu.innerHTML = categoriesHtml + 
-        '<a href="/docs/" class="nav-link documentation-link" data-translate="nav.documentation">Documentation</a>' +
+        '<a href="https://skedisy.com/docs/index.html" class="nav-link documentation-link" data-translate="nav.documentation">Docs</a>' +
         `<button class="lang-switcher desktop-only" data-lang="${switchToLang}" title="Switch to ${switchToShort}">
             <i class="fas fa-globe"></i> <span>${switchToShort}</span>
         </button>`;
