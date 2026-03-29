@@ -12,6 +12,7 @@
         android:label="Skedisy">
         <activity
             android:name=".MainActivity"
+            android:alwaysRetainTaskState="true"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
             android:hardwareAccelerated="true"

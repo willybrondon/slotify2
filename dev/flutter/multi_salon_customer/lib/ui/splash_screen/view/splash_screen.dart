@@ -11,6 +11,7 @@ import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/login_screen/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
 import 'package:salon_2/ui/search_screen/controller/search_screen_controller.dart';
+import 'package:salon_2/ui/login_screen/guest_login_screen/controller/guest_login_controller.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
@@ -80,6 +81,12 @@ class _SplashScreenState extends State<SplashScreen> {
           } else {
             log("is LogIn Splash :: ${Constant.storage.read<bool>('isLogIn')}");
             log("is Update Splash :: ${Constant.storage.read<bool>('isUpdate')}");
+
+            // Resume guest email/OTP flow after app was killed while user checked mail, etc.
+            if (GuestLoginController.hasPendingDraft()) {
+              Get.offAllNamed(AppRoutes.guestLogin, arguments: [false]);
+              return;
+            }
 
             // Skip onboarding - go directly to menu after splash
             if (loginScreenController.isLogIn == true &&

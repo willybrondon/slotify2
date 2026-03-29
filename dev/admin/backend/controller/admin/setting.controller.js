@@ -63,6 +63,10 @@ exports.update = async (req, res) => {
 
     setting.firebaseKey = req.body.firebaseKey ? JSON.parse(req.body.firebaseKey.trim()) : setting.firebaseKey;
 
+    if (req.body.reservationNotificationEmails !== undefined) {
+      setting.reservationNotificationEmails = String(req.body.reservationNotificationEmails).trim();
+    }
+
     await setting.save();
     updateSettingFile(setting);
     return res.status(200).send({ status: true, message: "success!!", setting });

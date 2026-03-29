@@ -35,6 +35,10 @@ final Map<String, String> ptPT = {
   "txtContinue": "Continuar",
   "txtTax": "Imposto",
   "txtTotalAmount": "Montante total",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "Editar Perfil",
   "txtCategory": "Categoria",
   "txtViewAll": "Ver tudo",
@@ -179,6 +183,7 @@ final Map<String, String> ptPT = {
   "txtEnterYourComplain": "Insira sua reclamação",
   "txtPleaseAddReview": "Adicione uma avaliação primeiro",
   "txtPleaseMakeYour": "Por favor faça o seu",
+  "txtProfile!": "perfil",
   "txtGetReview": "Enviar revisão",
   "txtNotAvailableCancel": "Reserva cancelada não disponível...!",
   "txtNotAvailableComplete": "Reserva concluída não disponível...!",

@@ -50,6 +50,9 @@ const settingSchema = new mongoose.Schema(
 
     isAddProductRequest: { type: Boolean, default: false }, //false then directly product add by seller, true then product add through request
     isUpdateProductRequest: { type: Boolean, default: false }, //false then directly product update by seller, true then product update through request
+
+    /** Comma-separated emails: receive new-booking approve/decline links + customer cancellation notices */
+    reservationNotificationEmails: { type: String, default: "" },
   },
   {
     timestamps: true,

@@ -35,6 +35,10 @@ final Map<String, String> urPK = {
   "txtContinue": "جاری رہے",
   "txtTax": "ٹیکس",
   "txtTotalAmount": "کل رقم",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "پروفائل میں ترمیم کریں",
   "txtCategory": "قسم",
   "txtViewAll": "سب دیکھیں",
@@ -179,6 +183,7 @@ final Map<String, String> urPK = {
   "txtEnterYourComplain": "اپنی شکایت درج کریں۔",
   "txtPleaseAddReview": "براہ کرم پہلے جائزہ شامل کریں۔",
   "txtPleaseMakeYour": "براہ کرم اپنا بنائیں",
+  "txtProfile!": "پروفائل",
   "txtGetReview": "جائزہ جمع کروائیں۔",
   "txtNotAvailableCancel": "منسوخ شدہ بکنگ دستیاب نہیں...!",
   "txtNotAvailableComplete": "مکمل بکنگ دستیاب نہیں...!",

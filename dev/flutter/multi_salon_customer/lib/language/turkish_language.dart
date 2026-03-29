@@ -35,6 +35,10 @@ final Map<String, String> trTR = {
   "txtContinue": "Devam etmek",
   "txtTax": "Vergi",
   "txtTotalAmount": "Toplam tutar",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "Profili Düzenle",
   "txtCategory": "Kategori",
   "txtViewAll": "Hepsini gör",
@@ -179,6 +183,7 @@ final Map<String, String> trTR = {
   "txtEnterYourComplain": "Şikayetinizi Girin",
   "txtPleaseAddReview": "Lütfen Önce İncelemeyi Ekleyin",
   "txtPleaseMakeYour": "Lütfen",
+  "txtProfile!": "profil",
   "txtGetReview": "İncelemeyi Gönder",
   "txtNotAvailableCancel": "İptal edilen rezervasyon mevcut değil...!",
   "txtNotAvailableComplete": "Tamamlanmış rezervasyon mevcut değil...!",

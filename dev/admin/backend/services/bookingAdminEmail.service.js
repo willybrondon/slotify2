@@ -25,8 +25,51 @@ function getAdminRecipientEmail() {
   ).trim();
 }
 
+/** Split comma-separated list from settings; basic email validation */
+function parseReservationEmailList(str) {
+  if (!str || typeof str !== "string") return [];
+  return str
+    .split(",")
+    .map((e) => e.trim())
+    .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+}
+
+/**
+ * Recipients for reservation emails (new booking + customer cancel).
+ * Priority: Settings (comma-separated) → env fallback (single address).
+ */
+function getAdminRecipientEmails() {
+  const fromSettings = parseReservationEmailList(global.settingJSON?.reservationNotificationEmails || "");
+  if (fromSettings.length) return fromSettings;
+  const single = getAdminRecipientEmail();
+  return single ? [single] : [];
+}
+
 function getBaseUrl() {
   return (process.env.baseURL || process.env.WEBSITE_URL || "https://skedisy.com").replace(/\/+$/, "");
+}
+
+function escapeHtml(s) {
+  if (s == null || s === undefined || s === "") return "—";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function formatSalonAddress(addressDetails) {
+  if (!addressDetails || typeof addressDetails !== "object") return "—";
+  const parts = [
+    addressDetails.addressLine1,
+    addressDetails.landMark,
+    addressDetails.city,
+    addressDetails.state,
+    addressDetails.country,
+  ]
+    .map((p) => (p != null ? String(p).trim() : ""))
+    .filter(Boolean);
+  return parts.length ? parts.join(", ") : "—";
 }
 
 /**
@@ -37,9 +80,11 @@ async function sendAdminNewBookingEmail(bookingId) {
     console.warn("[Admin Booking Email] SENDGRID_API_KEY not set; skipping admin email.");
     return;
   }
-  const to = getAdminRecipientEmail();
-  if (!to) {
-    console.warn("[Admin Booking Email] No ADMIN_BOOKING_EMAIL, SUPPORT_EMAIL, or EMAIL; skipping.");
+  const to = getAdminRecipientEmails();
+  if (!to.length) {
+    console.warn(
+      "[Admin Booking Email] No recipients: set reservation notification emails in Admin Settings or ADMIN_BOOKING_EMAIL / SUPPORT_EMAIL / EMAIL in .env"
+    );
     return;
   }
 
@@ -66,12 +111,18 @@ async function sendAdminNewBookingEmail(bookingId) {
   const expert = booking.expertId;
   const user = booking.userId;
 
-  const salonName = salon?.name || "—";
-  const expertName = expert ? `${expert.fname || ""} ${expert.lname || ""}`.trim() : "—";
-  const customerName = user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "—";
+  const salonNameSubject = salon?.name || "—";
+  const salonName = escapeHtml(salonNameSubject);
+  const expertName = escapeHtml(expert ? `${expert.fname || ""} ${expert.lname || ""}`.trim() : "—");
+  const customerName = escapeHtml(user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "—");
+  const customerEmail = escapeHtml(user?.email);
+  const customerPhone = escapeHtml(user?.mobile);
+  const salonEmail = escapeHtml(salon?.email);
+  const salonPhone = escapeHtml(salon?.mobile);
+  const salonAddress = escapeHtml(formatSalonAddress(salon?.addressDetails));
   const services =
     booking.serviceId && booking.serviceId.length
-      ? booking.serviceId.map((s) => s.name || "").filter(Boolean).join(", ")
+      ? escapeHtml(booking.serviceId.map((s) => s.name || "").filter(Boolean).join(", "))
       : "—";
 
   const html = `
@@ -81,8 +132,13 @@ async function sendAdminNewBookingEmail(bookingId) {
   <h2>New reservation — action required</h2>
   <p><strong>Booking ID:</strong> ${booking.bookingId}</p>
   <p><strong>Salon:</strong> ${salonName}</p>
+  <p><strong>Salon email:</strong> ${salonEmail}</p>
+  <p><strong>Salon phone:</strong> ${salonPhone}</p>
+  <p><strong>Salon address:</strong> ${salonAddress}</p>
   <p><strong>Expert:</strong> ${expertName}</p>
   <p><strong>Customer:</strong> ${customerName}</p>
+  <p><strong>Customer email:</strong> ${customerEmail}</p>
+  <p><strong>Customer phone:</strong> ${customerPhone}</p>
   <p><strong>Date:</strong> ${booking.date} &nbsp; <strong>Time:</strong> ${booking.startTime || (booking.time && booking.time[0]) || "—"}</p>
   <p><strong>Services:</strong> ${services}</p>
   <p><strong>Amount:</strong> ${booking.amount ?? "—"}</p>
@@ -99,10 +155,86 @@ async function sendAdminNewBookingEmail(bookingId) {
   await sgMail.send({
     to,
     from,
-    subject: `[Skedisy] New booking #${booking.bookingId} — ${salonName}`,
+    subject: `[Skedisy] New booking #${booking.bookingId} — ${salonNameSubject}`,
     html,
   });
-  console.log(`[Admin Booking Email] Sent to ${to} for booking ${booking.bookingId}`);
+  console.log(`[Admin Booking Email] Sent to ${to.join(", ")} for booking ${booking.bookingId}`);
+}
+
+/**
+ * Customer cancelled / declined their own reservation — notify same admin list as new-booking emails.
+ */
+async function sendAdminCustomerCancelledBookingEmail(bookingId) {
+  if (!process.env.SENDGRID_API_KEY) {
+    console.warn("[Admin Booking Email] SENDGRID_API_KEY not set; skipping customer-cancel email.");
+    return;
+  }
+  const to = getAdminRecipientEmails();
+  if (!to.length) {
+    console.warn("[Admin Booking Email] No recipients for customer-cancel email; skipping.");
+    return;
+  }
+
+  const booking = await Booking.findById(bookingId)
+    .populate("userId", "fname lname email mobile")
+    .populate("expertId", "fname lname email mobile")
+    .populate("salonId", "name email mobile addressDetails")
+    .populate("serviceId", "name duration");
+
+  if (!booking || booking.isDelete) return;
+
+  const salon = booking.salonId;
+  const expert = booking.expertId;
+  const user = booking.userId;
+  const salonNameSubject = salon?.name || "—";
+  const salonName = escapeHtml(salonNameSubject);
+  const expertName = escapeHtml(expert ? `${expert.fname || ""} ${expert.lname || ""}`.trim() : "—");
+  const customerName = escapeHtml(user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "—");
+  const customerEmail = escapeHtml(user?.email);
+  const customerPhone = escapeHtml(user?.mobile);
+  const salonEmail = escapeHtml(salon?.email);
+  const salonPhone = escapeHtml(salon?.mobile);
+  const salonAddress = escapeHtml(formatSalonAddress(salon?.addressDetails));
+  const services =
+    booking.serviceId && booking.serviceId.length
+      ? escapeHtml(booking.serviceId.map((s) => s.name || "").filter(Boolean).join(", "))
+      : "—";
+  const reasonRaw = (booking.cancel && booking.cancel.reason) || "—";
+  const reason = String(reasonRaw)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  const html = `
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; line-height: 1.5; color: #222;">
+  <h2>Customer cancelled a reservation</h2>
+  <p><strong>Booking ID:</strong> ${booking.bookingId}</p>
+  <p><strong>Salon:</strong> ${salonName}</p>
+  <p><strong>Salon email:</strong> ${salonEmail}</p>
+  <p><strong>Salon phone:</strong> ${salonPhone}</p>
+  <p><strong>Salon address:</strong> ${salonAddress}</p>
+  <p><strong>Expert:</strong> ${expertName}</p>
+  <p><strong>Customer:</strong> ${customerName}</p>
+  <p><strong>Customer email:</strong> ${customerEmail}</p>
+  <p><strong>Customer phone:</strong> ${customerPhone}</p>
+  <p><strong>Date:</strong> ${booking.date} &nbsp; <strong>Time:</strong> ${booking.startTime || (booking.time && booking.time[0]) || "—"}</p>
+  <p><strong>Services:</strong> ${services}</p>
+  <p><strong>Amount:</strong> ${booking.amount ?? "—"}</p>
+  <p><strong>Reason (customer):</strong> ${reason}</p>
+  <p style="font-size: 12px; color: #666; margin-top: 24px;">This mirrors what the expert receives via app notification (booking cancelled by customer).</p>
+</body></html>`;
+
+  const from = process.env.EMAIL || "noreply@skedisy.com";
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  await sgMail.send({
+    to,
+    from,
+    subject: `[Skedisy] Customer cancelled booking #${booking.bookingId} — ${salonNameSubject}`,
+    html,
+  });
+  console.log(`[Admin Booking Email] Customer-cancel sent to ${to.join(", ")} for booking ${booking.bookingId}`);
 }
 
 /**
@@ -263,6 +395,8 @@ async function processEmailAction(token, action) {
 
 module.exports = {
   sendAdminNewBookingEmail,
+  sendAdminCustomerCancelledBookingEmail,
   processEmailAction,
   getAdminRecipientEmail,
+  getAdminRecipientEmails,
 };

@@ -21,7 +21,7 @@ const mongoose = require("mongoose");
 const admin = require("../../firebase");
 const moment = require("moment");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
-const { sendAdminNewBookingEmail } = require("../../services/bookingAdminEmail.service");
+const { sendAdminNewBookingEmail, sendAdminCustomerCancelledBookingEmail } = require("../../services/bookingAdminEmail.service");
 
 // Initialize SendGrid if API key is available
 if (process.env.SENDGRID_API_KEY) {
@@ -1386,6 +1386,12 @@ exports.cancelBookingByUser = async (req, res) => {
     booking.cancel.date = moment().format("YYYY-MM-DD");
     booking.cancel.person = "user";
     await booking.save();
+
+    setImmediate(() => {
+      sendAdminCustomerCancelledBookingEmail(booking._id).catch((err) =>
+        console.error("[Admin Booking Email] customer cancel notify failed:", err.message)
+      );
+    });
 
     res.status(200).send({
       status: true,

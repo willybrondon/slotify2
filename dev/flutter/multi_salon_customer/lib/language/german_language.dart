@@ -32,6 +32,10 @@ final Map<String, String> deat = {
   "txtSubtotal": "Zwischensumme",
   "txtTax": "Steuer",
   "txtTotalAmount": "Gesamtmenge",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtConfirmExit": "Bestätigen Sie das Beenden",
   "txtExit": "Ausfahrt",
   "txtContinue": "Weitermachen",
@@ -183,6 +187,7 @@ final Map<String, String> deat = {
   "txtEnterYourComplain": "Geben Sie Ihre Beschwerde ein",
   "txtPleaseAddReview": "Bitte fügen Sie zuerst die Bewertung hinzu",
   "txtPleaseMakeYour": "Bitte machen Sie Ihre",
+  "txtProfile!": "Profil",
   "txtGetReview": "Bewertung abschicken",
   "txtNotAvailableCancel": "Stornierte Buchung nicht verfügbar...!",
   "txtNotAvailableComplete": "Abgeschlossene Buchung nicht verfügbar...!",

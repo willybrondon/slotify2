@@ -1,0 +1,14 @@
+{
+  "women": [
+    { "id": "REPLACE_WITH_MONGODB_OBJECTID", "price": 45 },
+    { "id": "REPLACE_WITH_MONGODB_OBJECTID_2", "price": 55 }
+  ],
+  "men": [
+    { "id": "REPLACE_WITH_MONGODB_OBJECTID", "price": 35 },
+    { "id": "REPLACE_WITH_MONGODB_OBJECTID_2", "price": 40 }
+  ],
+  "mixed": [
+    { "id": "REPLACE_WITH_MONGODB_OBJECTID", "price": 40 },
+    { "id": "REPLACE_WITH_MONGODB_OBJECTID_2", "price": 50 }
+  ]
+}

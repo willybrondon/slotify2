@@ -35,6 +35,10 @@ final Map<String, String> koKR = {
   "txtContinue": "계속하다",
   "txtTax": "세",
   "txtTotalAmount": "총액",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "프로필 수정",
   "txtCategory": "범주",
   "txtViewAll": "모두보기",
@@ -179,6 +183,7 @@ final Map<String, String> koKR = {
   "txtEnterYourComplain": "불만사항을 입력하세요",
   "txtPleaseAddReview": "먼저 리뷰를 추가해 주세요",
   "txtPleaseMakeYour": "당신의",
+  "txtProfile!": "프로필",
   "txtGetReview": "리뷰 제출",
   "txtNotAvailableCancel": "취소된 예약은 불가능합니다...!",
   "txtNotAvailableComplete": "예약 완료 불가..!",

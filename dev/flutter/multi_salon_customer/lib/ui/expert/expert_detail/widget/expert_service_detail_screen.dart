@@ -96,10 +96,13 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                   ),
                                 ),
                               ).paddingOnly(left: 5, bottom: 7),
-                              Row(
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                 children: [
                                   Text(
-                                    "$currency ${logic.withOutTaxRupeeExpert.toStringAsFixed(2)}",
+                                    "${"txtPriceFrom".tr} $currency ${logic.withOutTaxRupeeExpert.toStringAsFixed(2)}",
                                     style: TextStyle(
                                         fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 15,
@@ -114,12 +117,27 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: Get.width * 0.02),
                                   Text(
-                                    "= $currency ${logic.totalPriceExpert.toStringAsFixed(2)}",
+                                    "= ${"txtPriceFrom".tr} $currency ${logic.totalPriceExpert.toStringAsFixed(2)}",
                                     style: TextStyle(
                                         fontFamily: AppFontFamily.sfProDisplayBold, fontSize: 17, color: AppColors.currency),
                                   ),
                                 ],
                               ).paddingOnly(left: 5),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 8, top: 6),
+                                    child: Text(
+                                      "txtPriceIndicativeHint".tr,
+                                      style: TextStyle(
+                                        fontFamily: AppFontFamily.sfProDisplay,
+                                        fontSize: 11.5,
+                                        color: AppColors.currencyGrey,
+                                        height: 1.35,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),

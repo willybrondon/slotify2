@@ -819,6 +819,7 @@ exports.serveSalonWebPage = async (req, res) => {
           const serviceName = (service.id?.name || 'Service').replace(/"/g, '&quot;');
           const servicePrice = service.price || 0;
           const serviceDuration = service.id?.duration || 0;
+          const serviceMongoId = service.id && service.id._id ? String(service.id._id) : "";
           const durationText = serviceDuration > 0 ? `<div class="service-duration">⏱️ ${serviceDuration} min</div>` : '';
           return `
             <div class="service-item">
@@ -827,7 +828,7 @@ exports.serveSalonWebPage = async (req, res) => {
                 <div class="service-price">${currency}${servicePrice}</div>
               </div>
               ${durationText}
-              <button onclick="openApp()" class="service-book-btn">
+              <button onclick="openApp('${serviceMongoId.replace(/'/g, "\\'")}')" class="service-book-btn">
                 <i class="fas fa-calendar-plus"></i> Book Now
               </button>
             </div>`;
@@ -1045,8 +1046,13 @@ exports.serveSalonWebPage = async (req, res) => {
     <!-- Fallback redirect to app store or app -->
     <script>
         // Try to open app, fallback to app store or download page
-        function openApp() {
-            const deepLink = "${deepLink}";
+        function openApp(serviceId) {
+            const serviceIdParam = (serviceId !== undefined && serviceId !== null && String(serviceId).trim() !== "")
+                ? String(serviceId).trim() : "";
+            let deepLink = "${deepLinkScheme}://salon/${salon._id}";
+            if (serviceIdParam) {
+                deepLink += "?serviceId=" + encodeURIComponent(serviceIdParam);
+            }
             const androidPackage = "${androidPackage}";
             const iosAppStoreIdRaw = "${iosAppStoreId}";
             const iosAppStoreId = (iosAppStoreIdRaw && iosAppStoreIdRaw !== "undefined" && iosAppStoreIdRaw !== "null" && iosAppStoreIdRaw.trim() !== "") 
@@ -1062,9 +1068,10 @@ exports.serveSalonWebPage = async (req, res) => {
             const isAndroid = /Android/.test(navigator.userAgent);
             const isMobile = isIOS || isAndroid;
             
-            // For desktop/computer: redirect to download page
+            // For desktop/computer: redirect to marketing home (get-app anchors; same as salonportal script.js)
             if (!isMobile) {
-                window.location.href = downloadPageUrl;
+                const base = (downloadPageUrl || "https://skedisy.com").replace(/\/+$/, "");
+                window.location.href = base + "/#download-customer";
                 return;
             }
             

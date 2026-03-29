@@ -449,9 +449,10 @@ exports.serveCategoryPage = async (req, res) => {
 
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
     
-    // Detect language from URL or default to French for French URLs
-    // If URL contains French characters or French slug pattern, use French
-    const language = 'fr'; // Default to French for skedisy.com
+    const langParam = (req.query.lang || req.query.language || "fr")
+      .toString()
+      .toLowerCase();
+    const language = langParam.startsWith("en") ? "en" : "fr";
     const categoryDisplayName = getTranslatedName(category, language) || category.name;
     
     // Generate the new slug format for category URL
@@ -460,6 +461,11 @@ exports.serveCategoryPage = async (req, res) => {
     const categorySlugWithId = `${categorySlug}-${categoryShortId}`;
     const categoryUrl = `${baseURL}/category/${categorySlugWithId}`;
     const currency = global.settingJSON?.currencySymbol || "$";
+    const priceFromLabel = language === "fr" ? "À partir de" : "From";
+    const priceDisclaimer =
+      language === "fr"
+        ? "Prix indicatif — le montant définitif sera confirmé par le salon."
+        : "Indicative price — the final amount will be confirmed with the salon.";
 
     // Generate HTML page
     const salonsHtml = formattedSalons.length > 0 
@@ -468,7 +474,7 @@ exports.serveCategoryPage = async (req, res) => {
             ? `<div class="salon-rating"><span class="rating-stars">⭐</span><span>${salon.review.toFixed(1)} (${salon.reviewCount})</span></div>`
             : '';
           const priceHtml = salon.minPrice !== null 
-            ? `<div class="salon-price">From ${currency}${salon.minPrice}</div>`
+            ? `<div class="salon-price">${priceFromLabel} ${currency}${salon.minPrice}</div>`
             : '';
           const distanceHtml = salon.distance !== null
             ? `<div class="salon-distance">📍 ${salon.distance.toFixed(1)} km away</div>`
@@ -777,6 +783,13 @@ exports.serveCategoryPage = async (req, res) => {
             color: #ffa500;
             font-size: 1.1rem;
         }
+        .price-disclaimer {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0 0 16px;
+            line-height: 1.45;
+            max-width: 720px;
+        }
         .salon-price {
             font-size: 1.2rem;
             font-weight: 700;
@@ -1002,6 +1015,7 @@ exports.serveCategoryPage = async (req, res) => {
     </div>
     
     <div class="salons-section">
+        <p class="price-disclaimer">${priceDisclaimer}</p>
         <div class="salons-grid" id="salonsGrid">
             ${salonsHtml}
         </div>
@@ -1052,6 +1066,7 @@ exports.serveCategoryPage = async (req, res) => {
         function updateSalonsGrid(salons) {
             const grid = document.getElementById('salonsGrid');
             const currency = "${currency}";
+            const priceFromLabel = ${JSON.stringify(priceFromLabel)};
             
             if (salons.length === 0) {
                 grid.innerHTML = '<div class="no-results"><p>No salons found. Try a different search.</p></div>';
@@ -1063,7 +1078,7 @@ exports.serveCategoryPage = async (req, res) => {
                     ? \`<div class="salon-rating"><span class="rating-stars">⭐</span><span>\${salon.review.toFixed(1)} (\${salon.reviewCount})</span></div>\`
                     : '';
                 const priceHtml = salon.minPrice !== null 
-                    ? \`<div class="salon-price">From \${currency}\${salon.minPrice}</div>\`
+                    ? \`<div class="salon-price">\${priceFromLabel} \${currency}\${salon.minPrice}</div>\`
                     : '';
                 const distanceHtml = salon.distance !== null
                     ? \`<div class="salon-distance">📍 \${salon.distance.toFixed(1)} km away</div>\`

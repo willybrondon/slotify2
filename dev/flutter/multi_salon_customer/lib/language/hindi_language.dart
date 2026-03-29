@@ -35,6 +35,10 @@ final Map<String, String> hiIN = {
   "txtTax": "कर",
   "txtContinue": "जारी रखना",
   "txtTotalAmount": "कुल राशि",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtConfirmExit": "बाहर निकलने की पुष्टि करें",
   "txtExit": "बाहर निकलना",
   "txtCategory": "वर्ग",
@@ -181,6 +185,7 @@ final Map<String, String> hiIN = {
   "txtEnterYourComplain": "अपनी शिकायत दर्ज करें",
   "txtPleaseAddReview": "कृपया पहले समीक्षा जोड़ें",
   "txtPleaseMakeYour": "कृपया अपना बनाएं",
+  "txtProfile!": "प्रोफ़ाइल",
   "txtGetReview": "समीक्षा जमा करें",
   "txtNotAvailableCancel": "रद्द की गई बुकिंग उपलब्ध नहीं है...!",
   "txtNotAvailableComplete": "पूरी बुकिंग उपलब्ध नहीं है...!",

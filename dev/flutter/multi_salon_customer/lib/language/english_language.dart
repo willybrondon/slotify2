@@ -35,6 +35,10 @@ final Map<String, String> enUS = {
   "txtContinue": "Continue",
   "txtTax": "Tax",
   "txtTotalAmount": "Total Amount",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "Edit Profile",
   "txtCategory": "Category",
   "txtViewAll": "View All",

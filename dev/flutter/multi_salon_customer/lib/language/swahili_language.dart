@@ -35,6 +35,10 @@ final Map<String, String> swKE = {
   "txtContinue": "Endelea",
   "txtTax": "Kodi",
   "txtTotalAmount": "Jumla",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "Badilisha Wasifu",
   "txtCategory": "Kategoria",
   "txtViewAll": "Tazama zote",
@@ -180,6 +184,7 @@ final Map<String, String> swKE = {
   "txtEnterYourComplain": "Weka Malalamiko Yako",
   "txtPleaseAddReview": "Tafadhali Ongeza Maoni Kwanza",
   "txtPleaseMakeYour": "Tafadhali fanya yako",
+  "txtProfile!": "wasifu",
   "txtGetReview": "Wasilisha Ukaguzi",
   "txtNotAvailableCancel": "Uhifadhi ulioghairiwa haupatikani...!",
   "txtNotAvailableComplete": "Uhifadhi uliokamilika haupatikani...!",

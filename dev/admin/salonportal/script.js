@@ -448,14 +448,78 @@ const APP_DOWNLOAD_LINKS = {
 // Global variable to store current app type
 let currentAppType = 'customer';
 
+// Match desktop vs mobile behavior with salon web page (salon.controller.js openApp)
+function isSkedisyMobileBrowser() {
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isAndroid = /Android/.test(ua);
+    return isIOS || isAndroid;
+}
+
+function getSkedisyMarketingBaseUrl() {
+    const o = typeof window !== 'undefined' && window.location && window.location.origin;
+    if (o && /^https?:/i.test(o)) {
+        return o.replace(/\/+$/, '');
+    }
+    return 'https://skedisy.com';
+}
+
+function scrollToAppDownloadHash() {
+    const h = window.location.hash;
+    if (h !== '#download-customer' && h !== '#download-expert') return;
+    const id = h.slice(1);
+    const el = document.getElementById(id);
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+window.addEventListener('hashchange', scrollToAppDownloadHash);
+document.addEventListener('DOMContentLoaded', scrollToAppDownloadHash);
+
+/**
+ * Desktop: send users to the marketing site get-app section (QR + labels), same idea as salon page redirect.
+ */
+function goDesktopAppLanding(hash) {
+    const targetHash = hash || '#download-customer';
+    const base = getSkedisyMarketingBaseUrl();
+    let path = (window.location.pathname || '').replace(/\/+$/, '');
+    if (!path) path = '/';
+    const onHome = path === '/' || /index\.html$/i.test(path);
+    const sameOrigin = window.location.origin.replace(/\/+$/, '') === base;
+    if (onHome && sameOrigin) {
+        if (window.location.hash !== targetHash) {
+            window.location.hash = targetHash;
+        }
+        requestAnimationFrame(function() {
+            scrollToAppDownloadHash();
+        });
+        return;
+    }
+    window.location.href = base.replace(/\/+$/, '') + targetHash;
+}
+
 // Phone Selection Modal Functions
 function openPhoneSelection(appType) {
     currentAppType = appType;
+    const hash = appType === 'expert' ? '#download-expert' : '#download-customer';
+
+    if (!isSkedisyMobileBrowser()) {
+        goDesktopAppLanding(hash);
+        return;
+    }
+
     const modal = document.getElementById('phone-selection-modal');
+    if (!modal) {
+        const links = APP_DOWNLOAD_LINKS[appType];
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        window.open(isIOS ? links.ios : links.android, '_blank');
+        return;
+    }
+
     const modalTitle = document.getElementById('modal-title');
     const modalDescription = document.getElementById('modal-description');
-    
-    // Update modal content based on app type
+
     if (appType === 'customer') {
         modalTitle.textContent = 'Download Customer App';
         modalDescription.textContent = 'Choose your device to download the Skedisy Customer App';
@@ -463,11 +527,9 @@ function openPhoneSelection(appType) {
         modalTitle.textContent = 'Download Expert App';
         modalDescription.textContent = 'Choose your device to download the Skedisy Expert App';
     }
-    
-    // Update download links
+
     updateDownloadLinks(appType);
-    
-    // Show modal
+
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
@@ -490,23 +552,23 @@ function updateDownloadLinks(appType) {
 // Phone Selection Modal Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
     const phoneModal = document.getElementById('phone-selection-modal');
+    if (!phoneModal) return;
+
     const phoneModalClose = phoneModal.querySelector('.close');
-    
-    // Close phone selection modal
-    phoneModalClose.addEventListener('click', function() {
-        phoneModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    });
-    
-    // Close modal when clicking outside
+    if (phoneModalClose) {
+        phoneModalClose.addEventListener('click', function() {
+            phoneModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+    }
+
     window.addEventListener('click', function(e) {
         if (e.target === phoneModal) {
             phoneModal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
     });
-    
-    // Handle phone option clicks
+
     const phoneOptions = document.querySelectorAll('.phone-option');
     phoneOptions.forEach(option => {
         option.addEventListener('click', function() {

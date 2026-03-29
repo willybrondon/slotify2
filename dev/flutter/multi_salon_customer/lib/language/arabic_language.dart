@@ -30,6 +30,10 @@ final Map<String, String> ardz = {
   "txtSubtotal": "المجموع الفرعي",
   "txtTax": "ضريبة",
   "txtTotalAmount": "المبلغ الإجمالي",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtPasswordCharacters": "الرقم السري يجب الا يقل عن 6 احرف على الاقل",
   "txtRememberMe": "تذكرنى",
   "txtNearbyBranches": "الصالونات القريبة",
@@ -181,6 +185,7 @@ final Map<String, String> ardz = {
   "txtEnterYourComplain": "أدخل الشكوى الخاصة بك",
   "txtPleaseAddReview": "الرجاء إضافة المراجعة أولا",
   "txtPleaseMakeYour": "الرجاء جعل الخاص بك",
+  "txtProfile!": "الملف الشخصي",
   // "txtProfile": " حساب تعريفي!",
   "txtGetReview": "إرسال المراجعة",
   "txtNotAvailableCancel": "الحجز الملغى غير متوفر...!",

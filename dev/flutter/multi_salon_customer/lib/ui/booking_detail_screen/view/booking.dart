@@ -46,7 +46,12 @@ class Booking extends StatelessWidget {
             log("is Update :: ${Constant.storage.read<bool>('isUpdate')}");
             log("is LogIn Variable :: ${logic.isLogIn}");
             log("is Update Variable :: ${logic.isUpdate}");
-            return logic.isLogIn == true && logic.isUpdate == false
+            final isGuestQuickLogin =
+                Constant.storage.read<bool>('isGuestBookingLogin') ?? false;
+            // Guest (email + phone) users: same access as full accounts — show booking list
+            return logic.isLogIn == true &&
+                    logic.isUpdate == false &&
+                    !isGuestQuickLogin
                 ? Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

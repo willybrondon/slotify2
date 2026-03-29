@@ -35,6 +35,10 @@ final Map<String, String> taIN = {
   "txtContinue": "தொடரவும்",
   "txtTax": "வரி",
   "txtTotalAmount": "மொத்த தொகை",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "சுயவிவரத்தைத் திருத்து",
   "txtCategory": "வகை",
   "txtViewAll": "அனைத்தையும் காட்டு",
@@ -181,6 +185,7 @@ final Map<String, String> taIN = {
   "txtEnterYourComplain": "உங்கள் புகாரை உள்ளிடவும்",
   "txtPleaseAddReview": "முதலில் மதிப்பாய்வைச் சேர்க்கவும்",
   "txtPleaseMakeYour": "தயவுசெய்து உங்களுடையது",
+  "txtProfile!": "சுயவிவரம்",
   "txtGetReview": "விமர்சனத்தை சமர்ப்பிக்கவும்",
   "txtNotAvailableCancel": "ரத்து செய்யப்பட்ட முன்பதிவு கிடைக்கவில்லை...!",
   "txtNotAvailableComplete": "முடிந்த முன்பதிவு கிடைக்கவில்லை...!",

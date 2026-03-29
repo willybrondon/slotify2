@@ -8,7 +8,7 @@ import requests
 import json
 import time
 import csv
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 import os
 from dotenv import load_dotenv
@@ -21,7 +21,182 @@ import math
 load_dotenv()
 
 # Configuration
-GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY", "")
+GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY", "AIzaSyBRPBAMyYhXs12DKij8ew7c8NowhrGzjNQ")
+
+# Target volume & "not too popular" salons (lower Google review counts first)
+TARGET_SALON_COUNT = 1000
+# Start by keeping salons with at most this many Google ratings; relax if we cannot reach TARGET_SALON_COUNT
+INITIAL_MAX_USER_RATINGS_TOTAL = 80
+MAX_RELAXED_USER_RATINGS_TOTAL = 400
+
+# Optional: copy scraping_services_config.example.json to scraping_services_config.json and set MongoDB ObjectIds
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SERVICES_CONFIG_PATH = os.path.join(SCRIPT_DIR, "scraping_services_config.json")
+
+
+def _print_google_places_api_error(result: Optional[Dict], where: str = "") -> None:
+    """Log status + error_message from Legacy Places JSON; hints for REQUEST_DENIED."""
+    if not result:
+        return
+    status = result.get("status") or ""
+    if status == "OK":
+        return
+    err = (result.get("error_message") or "").strip()
+    loc = f" ({where})" if where else ""
+    print(f"      ⚠️  Google Places API{loc}: {status}")
+    if err:
+        print(f"      📋 {err}")
+    if status == "REQUEST_DENIED":
+        print("      💡 Fix: (1) Enable **Places API** (Maps Platform → Places API, legacy endpoint maps.googleapis.com)")
+        print("      💡 (2) Turn on **billing** for the GCP project (required for Places).")
+        print("      💡 (3) API key restrictions: for a local script use **None** or **IP**, not HTTP referrer / mobile-only.")
+        print("      💡 Console: https://console.cloud.google.com/google/maps-apis/api-list")
+
+
+def load_services_config() -> Dict:
+    """Load default Service ObjectIds from backend (women/men/mixed pools)."""
+    if not os.path.isfile(SERVICES_CONFIG_PATH):
+        return {"women": [], "men": [], "mixed": []}
+    try:
+        with open(SERVICES_CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return {
+            "women": data.get("women") or [],
+            "men": data.get("men") or [],
+            "mixed": data.get("mixed") or [],
+        }
+    except Exception:
+        return {"women": [], "men": [], "mixed": []}
+
+
+def _stable_hash_int(seed: str) -> int:
+    return int(hashlib.sha256(seed.encode("utf-8")).hexdigest()[:12], 16)
+
+
+def _word_in_name(name: str, *words: str) -> bool:
+    t = (name or "").lower()
+    for w in words:
+        if re.search(rf"\b{re.escape(w.lower())}\b", t, re.I):
+            return True
+    return False
+
+
+def classify_salon_gender_target(name: str, types: Optional[List[str]] = None) -> str:
+    """
+    Return 'men', 'women', or 'mixed' for service & expert defaults.
+    Uses Google types + French/English keywords in the business name.
+    """
+    types = types or []
+    types_l = [x.lower() for x in types]
+
+    if "barber_shop" in types_l and "beauty_salon" not in types_l:
+        return "men"
+
+    if _word_in_name(name, "homme", "hommes", "barber", "barbier", "barbershop", "masculin", "garçon", "garcon"):
+        if not _word_in_name(name, "femme", "femmes", "féminin", "feminin", "women", "ladies"):
+            return "men"
+
+    if _word_in_name(name, "femme", "femmes", "féminin", "feminin", "women", "woman", "ladies", "dames"):
+        return "women"
+
+    return "mixed"
+
+
+def pick_default_services(services_config: Dict, gender_target: str) -> List[Dict]:
+    """Pick up to 2 default service entries {id, price} from config for the salon."""
+    pool_key = gender_target if gender_target in ("men", "women") else "mixed"
+    pool = services_config.get(pool_key) or []
+    if not pool:
+        pool = services_config.get("mixed") or services_config.get("women") or services_config.get("men") or []
+    out = []
+    for item in pool[:2]:
+        if isinstance(item, dict) and item.get("id"):
+            out.append({"id": str(item["id"]), "price": item.get("price", 0)})
+    return out
+
+
+def build_experts_for_salon(
+    place_id: str,
+    gender_target: str,
+    service_ids_hex: List[str],
+) -> List[Dict]:
+    """1–2 experts per salon; deterministic names from place_id; serviceId aligned to salon services."""
+    n = 1 + (_stable_hash_int(place_id + ":expert_count") % 2)
+    first_m = [
+        "Amadou", "Ibrahim", "Kofi", "Mamadou", "Youssef", "Jean-Baptiste", "Hakim", "Samuel",
+    ]
+    last_m = [
+        "Diallo", "Koné", "Traoré", "N'Diaye", "Benali", "Mensah", "Ouedraogo", "Sow",
+    ]
+    first_f = [
+        "Aïcha", "Fatou", "Aminata", "Mariam", "Sophie", "Nadia", "Élodie", "Christelle",
+    ]
+    last_f = [
+        "Diop", "Sarr", "Fall", "Camara", "Koné", "Touré", "Bâ", "Sylla",
+    ]
+    first_x = first_m + first_f
+    last_x = last_m + last_f
+
+    experts = []
+    for i in range(n):
+        seed = f"{place_id}:ex:{i}"
+        h = _stable_hash_int(seed)
+        if gender_target == "men":
+            fn = first_m[h % len(first_m)]
+            ln = last_m[(h // 7) % len(last_m)]
+            g = "Male"
+        elif gender_target == "women":
+            fn = first_f[h % len(first_f)]
+            ln = last_f[(h // 7) % len(last_f)]
+            g = "Female"
+        else:
+            fn = first_x[h % len(first_x)]
+            ln = last_x[(h // 11) % len(last_x)]
+            g = "Female" if h % 2 == 0 else "Male"
+
+        sid = service_ids_hex[i % len(service_ids_hex)] if service_ids_hex else ""
+        experts.append({
+            "fname": fn,
+            "lname": ln,
+            "gender": g,
+            "serviceId": [sid] if sid else [],
+        })
+    return experts
+
+
+def select_salons_by_popularity(
+    salons: List[Dict],
+    target: int,
+    initial_max_reviews: int,
+    max_relaxed_reviews: int,
+) -> Tuple[List[Dict], int]:
+    """
+    Prefer salons that are 'not too popular' (fewer Google ratings).
+    Relax the review ceiling until we have enough rows or cap out.
+    Returns (selected_salons, effective_max_reviews_used).
+    """
+    max_r = initial_max_reviews
+    while max_r <= max_relaxed_reviews:
+        filtered = []
+        for s in salons:
+            total = s.get("user_ratings_total")
+            if total is None:
+                total = 0
+            if total <= max_r:
+                filtered.append(s)
+        ranked = sorted(
+            filtered,
+            key=lambda x: (x.get("user_ratings_total") is None, x.get("user_ratings_total") or 0),
+        )
+        if len(ranked) >= target:
+            return ranked[:target], max_r
+        max_r += 40
+
+    ranked = sorted(
+        salons,
+        key=lambda x: (x.get("user_ratings_total") is None, x.get("user_ratings_total") or 0),
+    )
+    return ranked[:target], max_relaxed_reviews
 
 # Île-de-France departments with multiple search points for better coverage
 ILE_DE_FRANCE_DEPARTMENTS = {
@@ -361,17 +536,52 @@ class GooglePlacesScraper:
             response.raise_for_status()
             result = response.json()
             
-            # Debug: Print API response status
             status = result.get("status")
             if status != "OK":
-                if status == "REQUEST_DENIED":
-                    print(f"      ⚠️  API Error: {status}")
-                    print(f"      💡 Tip: Enable 'Places API' (not 'Places API (New)') in Google Cloud Console")
+                _print_google_places_api_error(result, "nearbysearch")
                 return None
             
             return result
         except requests.exceptions.RequestException as e:
             return None
+
+    def search_nearby_all_pages(
+        self, lat: float, lng: float, radius: int = 5000, keyword: str = "coiffure afro"
+    ) -> List[Dict]:
+        """Nearby search with pagination (up to 3 pages / 60 results per keyword-location)."""
+        all_results: List[Dict] = []
+        page_token: Optional[str] = None
+        for _ in range(3):
+            url = f"{self.BASE_URL}/nearbysearch/json"
+            params = {
+                "location": f"{lat},{lng}",
+                "radius": radius,
+                "keyword": keyword,
+                "key": self.api_key,
+                "language": "fr",
+            }
+            if page_token:
+                params["pagetoken"] = page_token
+            try:
+                response = self.session.get(url, params=params, timeout=15)
+                response.raise_for_status()
+                result = response.json()
+            except requests.exceptions.RequestException:
+                break
+
+            status = result.get("status")
+            if status != "OK":
+                _print_google_places_api_error(result, "nearbysearch paginated")
+                break
+
+            batch = result.get("results", [])
+            all_results.extend(batch)
+            page_token = result.get("next_page_token")
+            if not page_token:
+                break
+            time.sleep(2)
+
+        return all_results
     
     def get_place_details(self, place_id: str) -> Optional[Dict]:
         """Get detailed information about a place using Legacy Places API (Free)"""
@@ -381,7 +591,7 @@ class GooglePlacesScraper:
                 "place_id": place_id,
                 "key": self.api_key,
                 "language": "fr",
-                "fields": "name,formatted_address,formatted_phone_number,website,geometry,photos,reviews,opening_hours,types"
+                "fields": "place_id,name,formatted_address,formatted_phone_number,website,geometry,photos,reviews,opening_hours,types,business_status,rating,user_ratings_total"
             }
             
             response = self.session.get(url, params=params, timeout=10)
@@ -404,14 +614,13 @@ class GooglePlacesScraper:
         
         for keyword in keywords:
             print(f"    🔍 Keyword: '{keyword}'", end=" ... ")
-            data = self.search_nearby(lat, lng, radius=5000, keyword=keyword)
+            results = self.search_nearby_all_pages(lat, lng, radius=5000, keyword=keyword)
             
-            if not data:
+            if not results:
                 print("❌ No results")
                 time.sleep(0.2)  # Rate limiting
                 continue
             
-            results = data.get("results", [])
             new_results = 0
             
             for result in results:
@@ -425,8 +634,16 @@ class GooglePlacesScraper:
                 # Get detailed information
                 details = self.get_place_details(place_id)
                 if details and details.get("status") == "OK":
-                    salon_data = self._format_google_data(details.get("result", {}), department_code)
+                    detail_result = details.get("result", {})
+                    if detail_result.get("business_status") == "CLOSED_PERMANENTLY":
+                        continue
+                    salon_data = self._format_google_data(detail_result, department_code)
                     if salon_data:
+                        # Prefer listing signal for popularity when details omit it
+                        if salon_data.get("user_ratings_total") in (None, 0) and result.get("user_ratings_total") is not None:
+                            salon_data["user_ratings_total"] = result.get("user_ratings_total")
+                        if salon_data.get("rating") is None and result.get("rating") is not None:
+                            salon_data["rating"] = result.get("rating")
                         all_salons.append(salon_data)
                         new_results += 1
                 
@@ -435,6 +652,63 @@ class GooglePlacesScraper:
             print(f"✅ Found {new_results} new salons")
             time.sleep(0.3)  # Rate limiting between keywords
         
+        return all_salons
+
+    def scrape_department_centre(
+        self,
+        department_code: str,
+        department_name: str,
+        centre_lat: float,
+        centre_lng: float,
+        keywords: List[str],
+        radius_m: int = 50000,
+    ) -> List[Dict]:
+        """
+        Same flow as scrape_ile_de_france.py: one centre per department, large radius (default 50 km).
+        Uses pagination + place details + afro-specific fields (rating, types, etc.).
+        """
+        all_salons: List[Dict] = []
+        print(f"Scraping Google Places (centre + {radius_m}m) for {department_name} ({department_code})...")
+
+        for keyword in keywords:
+            print(f"  Searching for '{keyword}'...")
+            results = self.search_nearby_all_pages(centre_lat, centre_lng, radius=radius_m, keyword=keyword)
+
+            if not results:
+                print(f"    ⚠️  No data returned for '{keyword}'")
+                time.sleep(0.2)
+                continue
+
+            print(f"    ✅ Found {len(results)} raw results for '{keyword}'")
+            new_results = 0
+
+            for result in results:
+                place_id = result.get("place_id")
+                if not place_id or place_id in self.seen_place_ids:
+                    continue
+
+                self.seen_place_ids.add(place_id)
+
+                details = self.get_place_details(place_id)
+                if details and details.get("status") == "OK":
+                    detail_result = details.get("result", {})
+                    if detail_result.get("business_status") == "CLOSED_PERMANENTLY":
+                        continue
+                    salon_data = self._format_google_data(detail_result, department_code)
+                    if salon_data:
+                        if salon_data.get("user_ratings_total") in (None, 0) and result.get("user_ratings_total") is not None:
+                            salon_data["user_ratings_total"] = result.get("user_ratings_total")
+                        if salon_data.get("rating") is None and result.get("rating") is not None:
+                            salon_data["rating"] = result.get("rating")
+                        all_salons.append(salon_data)
+                        new_results += 1
+
+                time.sleep(0.2)
+
+            print(f"    → {new_results} new salons after details for '{keyword}'")
+            time.sleep(0.3)
+
+        print(f"Found {len(all_salons)} salons from Google Places in {department_name} (centre search)")
         return all_salons
     
     def scrape_department(self, department_code: str, keywords: List[str]) -> List[Dict]:
@@ -537,6 +811,10 @@ class GooglePlacesScraper:
                 "department": department_code,
                 "website": data.get("website", ""),
                 "opening_hours": opening_hours,
+                "rating": data.get("rating"),
+                "user_ratings_total": data.get("user_ratings_total"),
+                "types": data.get("types") or [],
+                "business_status": data.get("business_status"),
                 "raw_data": data
             }
         except Exception as e:
@@ -547,15 +825,22 @@ class SkedisySalonFormatter:
     """Format scraped data for Skedisy platform"""
     
     @staticmethod
-    def format_for_skedisy(salon_data: Dict) -> Dict:
-        """Format salon data to match Skedisy salon model"""
-        # Generate default password (salon will change when claiming)
+    def format_for_skedisy(salon_data: Dict, services_config: Dict) -> Dict:
+        """Format salon data to match Skedisy salon model + experts (import script strips experts onto Expert collection)."""
         import secrets
         default_password = secrets.token_urlsafe(12)
         
-        # Generate unique ID
         import random
         unique_id = random.randint(1000000, 9999999)
+
+        gender_target = classify_salon_gender_target(
+            salon_data.get("name", ""),
+            salon_data.get("types"),
+        )
+        service_entries = pick_default_services(services_config, gender_target)
+        service_ids_hex = [s["id"] for s in service_entries if s.get("id")]
+        place_id = salon_data.get("source_id") or salon_data.get("name", "unknown")
+        experts = build_experts_for_salon(place_id, gender_target, service_ids_hex)
         
         return {
             "name": salon_data.get("name", ""),
@@ -576,13 +861,17 @@ class SkedisySalonFormatter:
             "source": salon_data.get("source", ""),
             "source_id": salon_data.get("source_id", ""),
             "salonTime": SkedisySalonFormatter._generate_default_hours(),
-            "serviceIds": [],  # Will be added manually or via service mapping
+            "serviceIds": service_entries,
+            "experts": experts,
             "createdAt": datetime.now().isoformat(),
             "metadata": {
                 "scraped_at": datetime.now().isoformat(),
                 "department": salon_data.get("department", ""),
                 "website": salon_data.get("website", ""),
-                "salon_type": "afro_black"  # Mark as afro/black salon
+                "salon_type": "afro_black",
+                "google_rating": salon_data.get("rating"),
+                "user_ratings_total": salon_data.get("user_ratings_total"),
+                "gender_target": gender_target,
             }
         }
     
@@ -618,6 +907,12 @@ def main():
         return
     
     gp_scraper = GooglePlacesScraper(GOOGLE_PLACES_API_KEY)
+    services_config = load_services_config()
+    if not any(services_config.get(k) for k in ("women", "men", "mixed")):
+        print(
+            "⚠️  No scraping_services_config.json (or empty pools). "
+            "Copy scraping_services_config.example.json → scraping_services_config.json with your Service ObjectIds."
+        )
     print("✅ Google Places scraper initialized")
     print(f"📋 Using {len(AFRO_SALON_KEYWORDS)} focused keywords for afro/black salons")
     
@@ -628,9 +923,9 @@ def main():
         
         print(f"\n📊 Total salons found so far: {len(all_salons)}")
         
-        # If we've reached 1000, we can stop early
-        if len(all_salons) >= 1000:
-            print(f"\n🎯 Target reached! Found {len(all_salons)} salons")
+        # If we've reached enough raw candidates, stop early (popularity filter happens later)
+        if len(all_salons) >= TARGET_SALON_COUNT * 5:
+            print(f"\n🎯 Enough raw candidates for filtering ({len(all_salons)}). Stopping department loop early.")
             break
         
         # Rate limiting between departments
@@ -653,20 +948,29 @@ def main():
     
     print(f"Total salons found: {len(all_salons)}")
     print(f"Unique salons: {len(unique_salons)}")
-    
-    if len(unique_salons) < 1000:
-        print(f"\n⚠️  Found {len(unique_salons)} salons, target is 1000")
-        print("💡 Consider:")
-        print("   - Running the script again (may find different results)")
-        print("   - Adding more search points in departments")
-        print("   - Expanding keyword list")
+
+    ranked, effective_max = select_salons_by_popularity(
+        unique_salons,
+        TARGET_SALON_COUNT,
+        INITIAL_MAX_USER_RATINGS_TOTAL,
+        MAX_RELAXED_USER_RATINGS_TOTAL,
+    )
+    print(
+        f"\n📉 Popularity filter: prioritizing lower Google review counts "
+        f"(effective max user_ratings_total: {effective_max})"
+    )
+    print(f"   → Selected {len(ranked)} salons for export (target {TARGET_SALON_COUNT})")
+
+    if len(ranked) < TARGET_SALON_COUNT:
+        print(f"\n⚠️  Only {len(ranked)} salons after filtering; target was {TARGET_SALON_COUNT}")
+        print("💡 Consider: more search points, more keywords, or running again another day.")
     else:
-        print(f"\n✅ Successfully found {len(unique_salons)} unique afro/black salons!")
+        print(f"\n✅ Ready to export {len(ranked)} salons (capped at target).")
     
     # Format for Skedisy
     print("\nFormatting data for Skedisy...")
     formatter = SkedisySalonFormatter()
-    skedisy_salons = [formatter.format_for_skedisy(salon) for salon in unique_salons]
+    skedisy_salons = [formatter.format_for_skedisy(salon, services_config) for salon in ranked]
     
     # Save to files
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -706,9 +1010,10 @@ def main():
     print("Scraping complete!")
     print(f"{'='*60}")
     print(f"\n📊 Summary:")
-    print(f"   - Total unique salons: {len(unique_salons)}")
-    print(f"   - Target: 1000 salons")
-    print(f"   - Coverage: {'✅ Target reached!' if len(unique_salons) >= 1000 else '⚠️  Below target'}")
+    print(f"   - Unique candidates: {len(unique_salons)}")
+    print(f"   - Exported after popularity filter: {len(ranked)}")
+    print(f"   - Target: {TARGET_SALON_COUNT} salons")
+    print(f"   - Coverage: {'✅ Target reached!' if len(ranked) >= TARGET_SALON_COUNT else '⚠️  Below target'}")
     print(f"\nNext steps:")
     print(f"1. Review {csv_file}")
     print(f"2. Images saved to 'images/' directory (relative paths in JSON)")

@@ -56,6 +56,7 @@ const Setting = (props) => {
   const [mtnMomoSecondaryKey, setMtnMomoSecondaryKey] = useState("");
   const [minWithdrawalRequestedAmount, setMinWithdrawalRequestedAmount] = useState("");
   const [minSalonWalletBalance, setMinSalonWalletBalance] = useState("");
+  const [reservationNotificationEmails, setReservationNotificationEmails] = useState("");
   const [currencyName, setCurrencyName] = useState();
   const [currencySymbol, setCurrencySymbol] = useState();
   const [flutterWaveKey, setFlutterWaveKey] = useState();
@@ -138,6 +139,7 @@ const Setting = (props) => {
       setIsUpdateProduct(setting?.isUpdateProductRequest);
       setMinWithdrawalRequestedAmount(setting?.minWithdrawalRequestedAmount);
       setMinSalonWalletBalance(setting?.minSalonWalletBalance || "");
+      setReservationNotificationEmails(setting?.reservationNotificationEmails || "");
       setAdminCommissionCharges(setting?.adminCommissionCharges);
       setCustomerCommissionCharges(setting?.customerCommissionCharges || "");
       setSalonCommissionCharges(setting?.salonCommissionCharges || "");
@@ -211,6 +213,7 @@ const Setting = (props) => {
         firebaseKey,
         minWithdrawalRequestedAmount,
         minSalonWalletBalance,
+        reservationNotificationEmails,
         cancelOrderCharges,
         adminCommissionCharges,
         customerCommissionCharges,
@@ -1190,6 +1193,26 @@ const Setting = (props) => {
                         )}
                         <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
                           Salon owners must maintain this minimum wallet balance plus expected commission to accept bookings
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="col-12">
+                      <div className="inputData text flex-row justify-content-start text-start">
+                        <label htmlFor="reservationNotificationEmails" className="ms-2 order-1">
+                          Reservation notification emails
+                        </label>
+                        <textarea
+                          className="rounded-2"
+                          style={{ width: "100%", minHeight: "72px" }}
+                          id="reservationNotificationEmails"
+                          value={reservationNotificationEmails}
+                          placeholder="test@gmail.com, toto@gmail.com, admin@skedisy.com"
+                          onChange={(e) => setReservationNotificationEmails(e.target.value)}
+                        />
+                        <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                          Comma-separated addresses. They receive new booking emails (with Accept/Decline links) and emails when a customer cancels a reservation, including the same booking details as the expert notification plus the customer&apos;s reason.
+                          If empty, new booking emails fall back to ADMIN_BOOKING_EMAIL, SUPPORT_EMAIL, or EMAIL in server .env.
                         </label>
                       </div>
                     </div>

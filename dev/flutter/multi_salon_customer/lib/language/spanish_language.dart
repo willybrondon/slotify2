@@ -35,6 +35,10 @@ final Map<String, String> esES = {
   "txtContinue": "Continuar",
   "txtTax": "Impuesto",
   "txtTotalAmount": "Cantidad total",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "Editar perfil",
   "txtCategory": "Categoría",
   "txtViewAll": "Ver todo",
@@ -182,6 +186,7 @@ final Map<String, String> esES = {
   "txtEnterYourComplain": "Ingrese su queja",
   "txtPleaseAddReview": "Por favor agregue reseña primero",
   "txtPleaseMakeYour": "Por favor haz tu",
+  "txtProfile!": "perfil",
   "txtGetReview": "Enviar opinión",
   "txtNotAvailableCancel": "Reserva cancelada no disponible...!",
   "txtNotAvailableComplete": "Reserva completada no disponible...!",

@@ -35,6 +35,10 @@ final Map<String, String> idID = {
   "txtContinue": "Melanjutkan",
   "txtTax": "Pajak",
   "txtTotalAmount": "Jumlah total",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "Sunting profil",
   "txtCategory": "Kategori",
   "txtViewAll": "Lihat semua",
@@ -179,6 +183,7 @@ final Map<String, String> idID = {
   "txtEnterYourComplain": "Masukkan Keluhan Anda",
   "txtPleaseAddReview": "Silakan Tambahkan Ulasan Terlebih Dahulu",
   "txtPleaseMakeYour": "Silakan buat milik Anda",
+  "txtProfile!": "Profil",
   "txtGetReview": "Kirim Ulasan",
   "txtNotAvailableCancel": "Pemesanan yang dibatalkan tidak tersedia...!",
   "txtNotAvailableComplete": "Pemesanan yang telah selesai tidak tersedia...!",

@@ -35,6 +35,10 @@ final Map<String, String> zhCN = {
   "txtContinue": "继续",
   "txtTax": "税",
   "txtTotalAmount": "总金额",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "编辑个人资料",
   "txtCategory": "类别",
   "txtViewAll": "查看全部",
@@ -179,6 +183,7 @@ final Map<String, String> zhCN = {
   "txtEnterYourComplain": "输入您的投诉",
   "txtPleaseAddReview": "请先添加评论",
   "txtPleaseMakeYour": "请让您的",
+  "txtProfile!": "个人资料",
   "txtGetReview": "提交评论",
   "txtNotAvailableCancel": "无法取消预订...！",
   "txtNotAvailableComplete": "已完成的预订无法使用...！",

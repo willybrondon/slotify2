@@ -36,7 +36,7 @@ class ServicePriceDialog extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      "Services Price",
+                      "txtServicesPriceTitle".tr,
                       style: TextStyle(
                         fontFamily: AppFontFamily.sfProDisplay,
                         color: AppColors.whiteColor,
@@ -100,7 +100,7 @@ class ServicePriceDialog extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis),
                                 ).paddingOnly(right: 8)
                               : Text(
-                                  "$currency ${logic.getExpertServiceBaseSalonCategory?.matchedServices?[index].price?.toStringAsFixed(2)}",
+                                  "${"txtPriceFrom".tr} $currency ${logic.getExpertServiceBaseSalonCategory?.matchedServices?[index].price?.toStringAsFixed(2)}",
                                   style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplayBold,
                                       color: AppColors.currency,
@@ -111,7 +111,21 @@ class ServicePriceDialog extends StatelessWidget {
                       ).paddingOnly(bottom: 8);
                     },
                   ),
-                ).paddingOnly(top: 13, left: 10)
+                ).paddingOnly(top: 13, left: 10),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 14, right: 14, bottom: 12),
+                  child: Text(
+                    "txtPriceIndicativeHint".tr,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplay,
+                      fontSize: 11.5,
+                      color: AppColors.currencyGrey,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
               ],
             ));
       },

@@ -777,7 +777,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  "$currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
+                                  "${"txtPriceFrom".tr} $currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
                                   style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 15,
@@ -794,7 +794,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                 ),
                                 SizedBox(width: Get.width * 0.02),
                                 Text(
-                                  "= $currency ${logic.totalPrice.toStringAsFixed(2)}",
+                                  "= ${"txtPriceFrom".tr} $currency ${logic.totalPrice.toStringAsFixed(2)}",
                                   style: TextStyle(
                                       fontFamily:
                                           AppFontFamily.sfProDisplayBold,
@@ -803,6 +803,19 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                 ),
                               ],
                             ).paddingOnly(left: 5),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 5, right: 8, top: 6),
+                              child: Text(
+                                "txtPriceIndicativeHint".tr,
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.sfProDisplay,
+                                  fontSize: 11.5,
+                                  color: AppColors.currencyGrey,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -869,7 +882,10 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                   : GetBuilder<BranchDetailController>(
                       id: Constant.idServiceList,
                       builder: (logic) {
-                        return GridView.builder(
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            GridView.builder(
                           itemCount: logic.getSalonDetailCategory?.salon
                                   ?.serviceIds?.length ??
                               0,
@@ -996,7 +1012,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "$currency ${logic.getSalonDetailCategory?.salon?.serviceIds?[index].price?.toStringAsFixed(2)}",
+                                                "${"txtPriceFrom".tr} $currency ${logic.getSalonDetailCategory?.salon?.serviceIds?[index].price?.toStringAsFixed(2)}",
                                                 style: TextStyle(
                                                   fontFamily:
                                                       AppFontFamily.heeBo800,
@@ -1036,7 +1052,23 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                               ),
                             );
                           },
-                        ).paddingOnly(left: 12, right: 12, bottom: 12);
+                        ).paddingOnly(left: 12, right: 12, bottom: 4),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 16, right: 16, bottom: 12),
+                              child: Text(
+                                "txtPriceIndicativeHint".tr,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.sfProDisplay,
+                                  fontSize: 11.5,
+                                  color: AppColors.currencyGrey,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
                       },
                     );
         },
@@ -1181,7 +1213,7 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 5, horizontal: 9),
                                       child: Text(
-                                        "$currency ${logic.getSalonDetailCategory?.product?[index].price ?? ""}",
+                                        "${"txtPriceFrom".tr} $currency ${logic.getSalonDetailCategory?.product?[index].price ?? ""}",
                                         style: TextStyle(
                                           fontFamily: AppFontFamily.heeBo800,
                                           fontSize: 14,

@@ -371,19 +371,37 @@ void _initializeDeepLinks() {
 // Getter to check if deep link navigation occurred
 bool get deepLinkNavigated => _deepLinkNavigated;
 
+/// Map web/app query ?venue=salon|home|at_salon|at_home → booking screen labels
+String? _mapVenueQuery(String? v) {
+  if (v == null || v.isEmpty) return null;
+  final s = v.toLowerCase().trim();
+  if (s == 'salon' || s == 'at_salon' || s == 'atsalon') return 'At Salon';
+  if (s == 'home' || s == 'at_home' || s == 'athome') return 'At Home';
+  return null;
+}
+
 void _handleIncomingLink(Uri uri) {
   try {
     log("Handling incoming link: $uri");
 
-    // Handle custom scheme: slotify://salon/{salonId}
+    // Handle custom scheme: slotify://salon/{salonId}?serviceId=...&venue=salon|home
     if (uri.scheme == 'slotify' && uri.host == 'salon') {
       final salonId = uri.pathSegments.isNotEmpty ? uri.pathSegments[0] : null;
       if (salonId != null && salonId.isNotEmpty) {
-        log("Navigating to salon detail: $salonId");
+        final serviceId = uri.queryParameters['serviceId'];
+        final venuePref = _mapVenueQuery(uri.queryParameters['venue']);
+        log("Navigating to salon detail: $salonId serviceId=$serviceId venue=$venuePref");
         _deepLinkNavigated = true; // Mark that deep link navigation occurred
         // Wait for app to be ready, then navigate
         Future.delayed(const Duration(milliseconds: 1000), () {
-          Get.toNamed(AppRoutes.branchDetail, arguments: [salonId]);
+          Get.toNamed(AppRoutes.branchDetail, arguments: [
+            salonId,
+            null,
+            null,
+            null,
+            serviceId,
+            venuePref,
+          ]);
         });
         return;
       }
@@ -404,13 +422,22 @@ void _handleIncomingLink(Uri uri) {
             // Short ID should be 6 hex characters
             if (shortId.length == 6 &&
                 RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(shortId)) {
-              log("Navigating to salon detail from App Link: $slugWithId (shortId: $shortId)");
+              final serviceId = uri.queryParameters['serviceId'];
+              final venuePref = _mapVenueQuery(uri.queryParameters['venue']);
+              log("Navigating to salon detail from App Link: $slugWithId (shortId: $shortId) serviceId=$serviceId venue=$venuePref");
               _deepLinkNavigated =
                   true; // Mark that deep link navigation occurred
               // Pass the slug to the backend, which will resolve it to full salon ID
               // The backend will handle the lookup by short ID
               Future.delayed(const Duration(milliseconds: 1000), () {
-                Get.toNamed(AppRoutes.branchDetail, arguments: [slugWithId]);
+                Get.toNamed(AppRoutes.branchDetail, arguments: [
+                  slugWithId,
+                  null,
+                  null,
+                  null,
+                  serviceId,
+                  venuePref,
+                ]);
               });
               return;
             }

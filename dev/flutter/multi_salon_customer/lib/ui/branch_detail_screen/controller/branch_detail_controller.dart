@@ -32,6 +32,10 @@ class BranchDetailController extends GetxController
   String? localCity;
   double? localLatitude;
   double? localLongitude;
+  /// From web deep link: pre-select this MongoDB service id on the venue / services step
+  String? deepLinkServiceId;
+  /// Optional: "At Salon" | "At Home" — applied on booking screen when user taps Book Now
+  String? deepLinkVenuePreference;
   dynamic args = Get.arguments;
   late List<bool> isBranchSelected = List.generate(
       (getSalonDetailCategory?.salon?.serviceIds?.length ?? 0),
@@ -65,6 +69,7 @@ class BranchDetailController extends GetxController
         salonId: salonId ?? "",
         latitude: localLatitude ?? 0.0,
         longitude: localLongitude ?? 0.0);
+    _applyDeepLinkServicePreselection();
 
     super.onInit();
   }
@@ -83,6 +88,15 @@ class BranchDetailController extends GetxController
       if (args.length > 3 && args[3] != null) {
         localLongitude = args[3];
       }
+      if (args.length > 4 && args[4] != null) {
+        final s = args[4].toString().trim();
+        deepLinkServiceId = s.isEmpty ? null : s;
+      }
+      if (args.length > 5 && args[5] != null) {
+        final v = args[5].toString().trim();
+        deepLinkVenuePreference =
+            (v == 'At Salon' || v == 'At Home') ? v : null;
+      }
     }
 
     // Fallback to global values if not provided in arguments
@@ -94,6 +108,29 @@ class BranchDetailController extends GetxController
     log("Branch Detail - City: $localCity");
     log("Branch Detail - Latitude: $localLatitude");
     log("Branch Detail - Longitude: $localLongitude");
+    log("Branch Detail - deepLink serviceId: $deepLinkServiceId venue: $deepLinkVenuePreference");
+  }
+
+  /// After salon services load: select the service from web → app deep link (price bar + Book Now match website).
+  void _applyDeepLinkServicePreselection() {
+    final want = deepLinkServiceId;
+    if (want == null || want.isEmpty) return;
+    final services = getSalonDetailCategory?.salon?.serviceIds;
+    if (services == null || services.isEmpty) return;
+    final n = services.length;
+    if (isBranchSelected.length != n) {
+      isBranchSelected = List<bool>.generate(n, (_) => false);
+    }
+    for (int i = 0; i < n; i++) {
+      final sid = services[i].serviceIdId?.id;
+      if (sid != null &&
+          sid.toString().toLowerCase() == want.toLowerCase()) {
+        if (!isBranchSelected[i]) {
+          onCheckBoxClick(true, i);
+        }
+        break;
+      }
+    }
   }
 
   makingPhoneCall() async {
@@ -211,6 +248,11 @@ class BranchDetailController extends GetxController
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         getSalonDetailCategory = GetSalonDetailModel.fromJson(jsonResponse);
+
+        final n = getSalonDetailCategory?.salon?.serviceIds?.length ?? 0;
+        if (isBranchSelected.length != n) {
+          isBranchSelected = List<bool>.generate(n, (_) => false);
+        }
 
         // Log the response data to see what services are returned
         if (getSalonDetailCategory?.salon?.serviceIds != null) {

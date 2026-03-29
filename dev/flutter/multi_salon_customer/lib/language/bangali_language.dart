@@ -35,6 +35,10 @@ final Map<String, String> bnIN = {
   "txtContinue": "চালিয়ে যান",
   "txtTax": "ট্যাক্স",
   "txtTotalAmount": "সর্বমোট পরিমাণ",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "জীবন বৃত্তান্ত সম্পাদনা",
   "txtCategory": "শ্রেণী",
   "txtViewAll": "সব দেখ",
@@ -180,6 +184,7 @@ final Map<String, String> bnIN = {
   "txtEnterYourComplain": "আপনার অভিযোগ লিখুন",
   "txtPleaseAddReview": "প্রথমে পর্যালোচনা যোগ করুন",
   "txtPleaseMakeYour": "আপনার করুন",
+  "txtProfile!": "প্রোফাইল",
   "txtGetReview": "পর্যালোচনা জমা দিন",
   "txtNotAvailableCancel": "বাতিল বুকিং পাওয়া যাচ্ছে না...!",
   "txtNotAvailableComplete": "সম্পূর্ণ বুকিং পাওয়া যাচ্ছে না...!",

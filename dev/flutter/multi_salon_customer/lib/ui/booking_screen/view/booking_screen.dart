@@ -197,10 +197,13 @@ class BookingScreen extends StatelessWidget {
                                   logic.totalPrice == 0.0 &&
                                   logic.finalTaxRupee == 0.0
                               ? const SizedBox()
-                              : Row(
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
                                   children: [
                                     Text(
-                                      "$currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
+                                      "${"txtPriceFrom".tr} $currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
                                       style: TextStyle(
                                         fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 15.5,
@@ -228,7 +231,7 @@ class BookingScreen extends StatelessWidget {
                                             if (logic.couponDiscountAmount >
                                                 0) ...[
                                               Text(
-                                                "$currency ${(logic.withOutTaxRupee + logic.finalTaxRupee).toStringAsFixed(2)}",
+                                                "${"txtPriceFrom".tr} $currency ${(logic.withOutTaxRupee + logic.finalTaxRupee).toStringAsFixed(2)}",
                                                 style: TextStyle(
                                                   fontFamily: AppFontFamily
                                                       .sfProDisplay,
@@ -250,7 +253,7 @@ class BookingScreen extends StatelessWidget {
                                               ),
                                             ],
                                             Text(
-                                              "= $currency ${logic.totalPrice.toStringAsFixed(2)}",
+                                              "= ${"txtPriceFrom".tr} $currency ${logic.totalPrice.toStringAsFixed(2)}",
                                               style: TextStyle(
                                                 fontFamily: AppFontFamily
                                                     .sfProDisplayBold,
@@ -263,7 +266,23 @@ class BookingScreen extends StatelessWidget {
                                       },
                                     ),
                                   ],
-                                ).paddingOnly(left: 5)
+                                ).paddingOnly(left: 5),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 5, right: 8, top: 6),
+                                      child: Text(
+                                        "txtPriceIndicativeHint".tr,
+                                        style: TextStyle(
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplay,
+                                          fontSize: 11.5,
+                                          color: AppColors.currencyGrey,
+                                          height: 1.35,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                         ],
                       ),
                     ),

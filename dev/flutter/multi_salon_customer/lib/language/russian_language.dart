@@ -35,6 +35,10 @@ final Map<String, String> ruRU = {
   "txtContinue": "Продолжать",
   "txtTax": "Налог",
   "txtTotalAmount": "Общая сумма",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "Редактировать профиль",
   "txtCategory": "Категория",
   "txtViewAll": "Посмотреть все",
@@ -180,6 +184,7 @@ final Map<String, String> ruRU = {
   "txtEnterYourComplain": "Введите свою жалобу",
   "txtPleaseAddReview": "Пожалуйста, сначала добавьте отзыв",
   "txtPleaseMakeYour": "Пожалуйста, сделайте свой",
+  "txtProfile!": "профиль",
   "txtGetReview": "добавить отзыв",
   "txtNotAvailableCancel": "Отмененное бронирование недоступно...!",
   "txtNotAvailableComplete": "Завершенное бронирование недоступно...!",

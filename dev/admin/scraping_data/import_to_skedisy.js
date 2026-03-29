@@ -3,9 +3,14 @@
  * Usage: node import_to_skedisy.js salons_ile_de_france_TIMESTAMP.json
  */
 
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+
+function generateClaimToken() {
+  return crypto.randomBytes(24).toString('base64url');
+}
 
 // Load .env from backend directory (where the actual .env file is)
 const backendEnvPath = path.join(__dirname, '../backend/.env');
@@ -132,6 +137,76 @@ function processImages(salonData) {
   return processedImages;
 }
 
+/**
+ * Map scraped serviceIds [{ id: hex string, price }] to MongoDB subdocuments.
+ */
+function normalizeServiceIds(serviceIds) {
+  if (!serviceIds || !Array.isArray(serviceIds)) return [];
+  return serviceIds
+    .filter((s) => s && s.id && typeof s.id === 'string' && /^[a-fA-F0-9]{24}$/.test(s.id))
+    .map((s) => ({
+      id: new ObjectId(s.id),
+      price: s.price != null ? Number(s.price) : null,
+      allowCities: Array.isArray(s.allowCities) ? s.allowCities : [],
+    }));
+}
+
+async function reserveUniqueExpertId(expertsCollection) {
+  let uid = Math.floor(Math.random() * 9000000) + 1000000;
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const clash = await expertsCollection.findOne({ uniqueId: uid }, { maxTimeMS: 5000 });
+    if (!clash) return uid;
+    uid = Math.floor(Math.random() * 9000000) + 1000000;
+  }
+  return Math.floor(Date.now() % 9000000) + 1000000;
+}
+
+async function insertExpertsForSalon(db, salonMongoId, salonUniqueId, expertsPayload, emailFallbackPrefix) {
+  if (!expertsPayload || !expertsPayload.length) return;
+  const expertsCollection = db.collection('experts');
+  let idx = 0;
+  for (const ex of expertsPayload) {
+    idx += 1;
+    const serviceIds = (ex.serviceId || [])
+      .filter((id) => typeof id === 'string' && /^[a-fA-F0-9]{24}$/.test(id))
+      .map((id) => new ObjectId(id));
+    const uniqueId = await reserveUniqueExpertId(expertsCollection);
+    const expertEmail =
+      ex.email && String(ex.email).trim()
+        ? ex.email
+        : `${emailFallbackPrefix}-expert-${idx}@skedisy-temp.com`;
+    await expertsCollection.insertOne(
+      {
+        fname: ex.fname != null ? String(ex.fname) : '',
+        lname: ex.lname != null ? String(ex.lname) : '',
+        email: expertEmail,
+        age: ex.age,
+        image: ex.image || '',
+        mobile: ex.mobile || '',
+        gender: ex.gender || '',
+        fcmToken: '',
+        isBlock: false,
+        password: ex.password || '123456',
+        isDelete: false,
+        isAttend: false,
+        showDialog: false,
+        uniqueId,
+        salonId: salonMongoId,
+        serviceId: serviceIds,
+        commission: ex.commission,
+        earning: 0,
+        bookingCount: 0,
+        totalBookingCount: 0,
+        review: 0,
+        reviewCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      { maxTimeMS: 30000 }
+    );
+  }
+}
+
 async function importSalons(jsonFile) {
   let client;
   try {
@@ -174,8 +249,9 @@ async function importSalons(jsonFile) {
     let skipped = 0;
     let errors = 0;
 
-    for (const salonData of salonsData) {
+    for (const rawSalon of salonsData) {
       try {
+        const { experts: expertsPayload = [], metadata: _metadata, ...salonData } = rawSalon;
         // Validate required fields before any database queries
         if (!salonData.name || !salonData.password) {
           console.log(`⚠️  Skipping incomplete salon: ${salonData.name || 'Unknown'} (missing name or password)`);
@@ -208,7 +284,7 @@ async function importSalons(jsonFile) {
         // Check if salon already exists using native MongoDB driver
         // Build query conditions - only check source_id if it's not empty
         const duplicateConditions = [
-          { email: salonData.email },
+          { email: email },
           { uniqueId: uniqueId }
         ];
         
@@ -259,6 +335,11 @@ async function importSalons(jsonFile) {
               updatedAt: new Date(),
             }
           };
+
+          const normalizedServices = normalizeServiceIds(salonData.serviceIds);
+          if (normalizedServices.length > 0) {
+            updateData.$set.serviceIds = normalizedServices;
+          }
           
           // Update the salon
           await salonsCollection.updateOne(
@@ -298,13 +379,16 @@ async function importSalons(jsonFile) {
         }
         const processedImages = processImages(salonData);
 
-        // Prepare salon data with proper structure
+        const { createdAt: _scrapedCreatedAt, ...salonForInsert } = salonData;
+
+        // Prepare salon data with proper structure (experts/metadata stripped; createdAt from scrape ignored)
         const salonDataWithId = {
-          ...salonData,
+          ...salonForInsert,
           email: email,  // Use the email (real or temporary)
           uniqueId: uniqueId,
           mainImage: processedImages.mainImage,
           image: processedImages.image,
+          serviceIds: normalizeServiceIds(salonData.serviceIds),
           // Ensure addressDetails structure matches schema
           addressDetails: {
             addressLine1: salonData.addressDetails.addressLine1 || '',
@@ -327,6 +411,18 @@ async function importSalons(jsonFile) {
         const result = await salonsCollection.insertOne(salonDataWithId, {
           maxTimeMS: 30000 // 30 second timeout for insert
         });
+
+        try {
+          await insertExpertsForSalon(
+            db,
+            result.insertedId,
+            uniqueId,
+            expertsPayload,
+            `temp-${uniqueId}`
+          );
+        } catch (exErr) {
+          console.error(`⚠️  Experts not inserted for ${salonData.name}: ${exErr.message}`);
+        }
         
         console.log(`✅ Imported: ${salonData.name} (${salonData.addressDetails?.city || 'Unknown'}) - ID: ${uniqueId}, MongoDB ID: ${result.insertedId}`);
         imported++;

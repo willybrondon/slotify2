@@ -35,6 +35,10 @@ final Map<String, String> itIT = {
   "txtContinue": "Continua",
   "txtTax": "Imposta",
   "txtTotalAmount": "Importo totale",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "Modifica Profilo",
   "txtCategory": "Categoria",
   "txtViewAll": "Mostra tutto",
@@ -180,6 +184,7 @@ final Map<String, String> itIT = {
   "txtEnterYourComplain": "Inserisci il tuo reclamo",
   "txtPleaseAddReview": "Aggiungi prima la recensione",
   "txtPleaseMakeYour": "Per favore, crea il tuo",
+  "txtProfile!": "profilo",
   "txtGetReview": "invia recensione",
   "txtNotAvailableCancel": "Prenotazione annullata non disponibile...!",
   "txtNotAvailableComplete": "Prenotazione completata non disponibile...!",

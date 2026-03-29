@@ -22,6 +22,21 @@ import 'package:salon_2/utils/utils.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  /// First + last name from storage; if empty, use part before @ from email (guest / minimal profile).
+  static String _profileDisplayName(ProfileScreenController logicProfile) {
+    final fn = (Constant.storage.read<String>('fName') ?? '').trim();
+    final ln = (Constant.storage.read<String>('lName') ?? '').trim();
+    final combined = '$fn $ln'.trim();
+    if (combined.isNotEmpty) return combined;
+    final email = logicProfile.getUserCategory?.user?.email ??
+        Constant.storage.read<String>('UserEmail') ??
+        '';
+    if (email.contains('@')) {
+      return email.split('@').first.trim();
+    }
+    return email.trim().isNotEmpty ? email.trim() : '—';
+  }
+
   @override
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
@@ -175,7 +190,7 @@ class ProfileScreen extends StatelessWidget {
                                             ),
                                             SizedBox(height: Get.height * 0.01),
                                             Text(
-                                              "${Constant.storage.read<String>("fName")} ${Constant.storage.read<String>("lName")}",
+                                              _profileDisplayName(logicProfile),
                                               style: TextStyle(
                                                 fontFamily:
                                                     AppFontFamily.heeBo800,

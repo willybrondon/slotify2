@@ -40,6 +40,14 @@ class LoginScreenController extends GetxController {
   void onInit() async {
     dev.log("Enter in Login Screen Controller");
     await getDataFromArgs();
+    // Existing sessions: guest quick-login users should not stay on "complete profile" wall
+    if (Constant.storage.read<bool>('isGuestBookingLogin') == true &&
+        Constant.storage.read<bool>('isLogIn') == true) {
+      Constant.storage.write('isUpdate', true);
+    }
+    isUpdate = Constant.storage.read<bool>('isUpdate') ?? false;
+    isLogIn = Constant.storage.read<bool>('isLogIn') ?? false;
+    update([Constant.idBookingAndLogin]);
     super.onInit();
   }
 

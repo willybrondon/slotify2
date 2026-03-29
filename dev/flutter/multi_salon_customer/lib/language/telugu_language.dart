@@ -35,6 +35,10 @@ final Map<String, String> teIN = {
   "txtContinue": "కొనసాగించు",
   "txtTax": "పన్ను",
   "txtTotalAmount": "మొత్తం మొత్తం",
+  "txtPriceFrom": "From",
+  "txtPriceIndicativeHint":
+      "Indicative price — the final amount will be confirmed with the salon.",
+  "txtServicesPriceTitle": "Services & prices",
   "txtEditProfile": "ప్రొఫైల్‌ని సవరించండి",
   "txtCategory": "వర్గం",
   "txtViewAll": "అన్నీ వీక్షించండి",
@@ -180,6 +184,7 @@ final Map<String, String> teIN = {
   "txtEnterYourComplain": "మీ ఫిర్యాదును నమోదు చేయండి",
   "txtPleaseAddReview": "దయచేసి ముందుగా సమీక్షను జోడించండి",
   "txtPleaseMakeYour": "దయచేసి మీ చేయండి",
+  "txtProfile!": "ప్రొఫైల్",
   "txtGetReview": "సమీక్షను సమర్పించండి",
   "txtNotAvailableCancel": "రద్దు చేసిన బుకింగ్ అందుబాటులో లేదు...!",
   "txtNotAvailableComplete": "పూర్తయిన బుకింగ్ అందుబాటులో లేదు...!",
