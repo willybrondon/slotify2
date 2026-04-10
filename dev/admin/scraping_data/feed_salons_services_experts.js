@@ -6,6 +6,9 @@
  * Usage:
  *   node feed_salons_services_experts.js
  *   node feed_salons_services_experts.js --dry-run
+ *   node feed_salons_services_experts.js --prices-only   (only refresh serviceIds + prices, no experts)
+ *
+ * Default price for each salon service when missing, null, or 0: 50 (override with DEFAULT_SERVICE_PRICE or --default-price=75).
  *
  * Requires backend/.env with MONGODB_CONNECTION_STRING or MONGODB_URI (same as import_to_skedisy.js).
  */
@@ -23,6 +26,17 @@ if (fs.existsSync(backendEnvPath)) {
 
 const MONGODB_URI = process.env.MONGODB_CONNECTION_STRING || process.env.MONGODB_URI || '';
 const DRY_RUN = process.argv.includes('--dry-run');
+const PRICES_ONLY = process.argv.includes('--prices-only');
+
+let DEFAULT_SERVICE_PRICE = Number(process.env.DEFAULT_SERVICE_PRICE);
+if (Number.isNaN(DEFAULT_SERVICE_PRICE) || DEFAULT_SERVICE_PRICE <= 0) {
+  DEFAULT_SERVICE_PRICE = 50;
+}
+const priceArg = process.argv.find((a) => a.startsWith('--default-price='));
+if (priceArg) {
+  const v = Number(priceArg.split('=')[1]);
+  if (!Number.isNaN(v) && v > 0) DEFAULT_SERVICE_PRICE = v;
+}
 
 /** @param {string} salonName */
 function expertImageUrl(salonName, mainImage) {
@@ -33,11 +47,24 @@ function expertImageUrl(salonName, mainImage) {
 }
 
 /**
- * Merge catalog into salon.serviceIds: keep existing price/allowCities per service id.
+ * If price is missing, null, NaN, or 0, use defaultPrice (non-zero existing prices are kept).
+ * @param {unknown} price
+ * @param {number} defaultPrice
+ */
+function normalizeSalonServicePrice(price, defaultPrice) {
+  if (price === null || price === undefined || price === '') return defaultPrice;
+  const n = Number(price);
+  if (Number.isNaN(n) || n === 0) return defaultPrice;
+  return n;
+}
+
+/**
+ * Merge catalog into salon.serviceIds: keep allowCities; normalize prices (0/null → default).
  * @param {any[]} existing
  * @param {{ _id: ObjectId }[]} catalogServices
+ * @param {number} defaultPrice
  */
-function mergeServiceIds(existing, catalogServices) {
+function mergeServiceIds(existing, catalogServices, defaultPrice) {
   const existingById = new Map();
   for (const entry of existing || []) {
     if (!entry || !entry.id) continue;
@@ -51,11 +78,11 @@ function mergeServiceIds(existing, catalogServices) {
     if (prev) {
       merged.push({
         id: svc._id,
-        price: prev.price != null ? prev.price : null,
+        price: normalizeSalonServicePrice(prev.price, defaultPrice),
         allowCities: Array.isArray(prev.allowCities) ? prev.allowCities : [],
       });
     } else {
-      merged.push({ id: svc._id, price: null, allowCities: [] });
+      merged.push({ id: svc._id, price: defaultPrice, allowCities: [] });
     }
   }
   return merged;
@@ -101,7 +128,8 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`Catalog: ${catalog.length} services.`);
+  console.log(`Catalog: ${catalog.length} services. Default service price: ${DEFAULT_SERVICE_PRICE}.`);
+  if (PRICES_ONLY) console.log('Mode: --prices-only (services/prices only, no expert creation).');
   if (DRY_RUN) console.log('DRY RUN — no writes.\n');
 
   const serviceObjectIds = catalog.map((s) => s._id);
@@ -115,7 +143,7 @@ async function main() {
     const salonId = salon._id;
     const name = salon.name || 'Salon';
 
-    const merged = mergeServiceIds(salon.serviceIds, catalog);
+    const merged = mergeServiceIds(salon.serviceIds, catalog, DEFAULT_SERVICE_PRICE);
 
     if (!DRY_RUN) {
       await salonsCol.updateOne(
@@ -130,7 +158,7 @@ async function main() {
       isDelete: { $ne: true },
     });
 
-    if (expertCount > 0) continue;
+    if (PRICES_ONLY || expertCount > 0) continue;
 
     const salonEmail = salon.email && String(salon.email).trim();
     const salonPassword = salon.password;
