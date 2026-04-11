@@ -132,6 +132,8 @@ final Map<String, String> frCH = {
   "txtWalletRechargedSuccessfully": "Votre portefeuille a été rechargé avec succès !",
   "txtContinueBookingQuestion": "Souhaitez-vous continuer avec votre réservation ?",
   "txtBookingSuccessful": "Réserver réussi!",
+  "desFirstBookingCashback":
+      "Vos 5 € de cashback seront crédités sur votre portefeuille dans les 24 à 48 h suivant votre rendez-vous.",
   "txtBookAppointment": "Voulez-vous confirmer cette réservation?",
   "txtGotoBookings": "Réservations",
   "txtExpertsDetails": "Détails des experts",

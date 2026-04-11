@@ -1782,7 +1782,10 @@ class BookingScreenController extends GetxController {
             barrierColor: AppColors.blackColor.withOpacity(0.8),
             Dialog(
               backgroundColor: AppColors.transparent,
-              child: SuccessDialog(),
+              child: SuccessDialog(
+                showFirstBookingCashback:
+                    createBookingCategory?.firstBookingCashback == true,
+              ),
             ),
           );
         } else {

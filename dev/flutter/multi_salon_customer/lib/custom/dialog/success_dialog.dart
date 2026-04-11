@@ -11,14 +11,17 @@ import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 
 class SuccessDialog extends StatelessWidget {
-  SuccessDialog({super.key});
+  SuccessDialog({super.key, this.showFirstBookingCashback = false});
+
+  /// When true, shows marketing cashback copy (first non-cancelled booking only; set from API).
+  final bool showFirstBookingCashback;
 
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 365,
+      constraints: const BoxConstraints(maxWidth: 300, maxHeight: 520),
       width: 300,
       padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
       decoration: BoxDecoration(
@@ -26,6 +29,7 @@ class SuccessDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(45),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
             AppAsset.inSuccessfully,
@@ -52,7 +56,32 @@ class SuccessDialog extends StatelessWidget {
               ),
             ),
           ),
-          const Spacer(),
+          if (showFirstBookingCashback) ...[
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryAppColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  "desFirstBookingCashback".tr,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    color: AppColors.categoryService,
+                    fontSize: 14,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
           GetBuilder<BottomBarController>(
             id: Constant.idBottomBar,
             builder: (logic) {
@@ -87,7 +116,8 @@ class SuccessDialog extends StatelessWidget {
             onTap: () {
               Get.back();
             },
-          )
+          ),
+          const SizedBox(height: 8),
         ],
       ),
     );

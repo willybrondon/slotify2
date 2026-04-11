@@ -326,6 +326,10 @@ class StripeService {
                         true) {
                       Utils.showToast(
                           Get.context!, "Payment successful! Booking created.");
+                      final showFirstBookingCashback =
+                          bookingScreenController.createBookingCategory
+                                  ?.firstBookingCashback ==
+                              true;
 
                       // Navigate back to home screen
                       Get.offAndToNamed(AppRoutes.bottom);
@@ -336,7 +340,9 @@ class StripeService {
                             AppColors.blackColor.withValues(alpha: 0.8),
                         Dialog(
                           backgroundColor: AppColors.transparent,
-                          child: SuccessDialog(),
+                          child: SuccessDialog(
+                            showFirstBookingCashback: showFirstBookingCashback,
+                          ),
                         ),
                       );
                     } else {

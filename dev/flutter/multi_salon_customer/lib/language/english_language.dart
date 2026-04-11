@@ -228,6 +228,8 @@ final Map<String, String> enUS = {
   "desDisclaimerAgree":
       "I have read the disclaimer and agree upon the terms and conditions.",
   "desSuccessfullyBooked": "Your booking has been successfully booked",
+  "desFirstBookingCashback":
+      "Your €5 cashback will be credited to your wallet within 24–48 hours after your appointment.",
   "desCancelBooking": "Do you want to cancel this Booking Appointment?",
   "desDeletedPermanently":
       "Your account will be deleted permanently. Your Data wil not be restored again.",

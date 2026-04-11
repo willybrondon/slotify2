@@ -931,6 +931,9 @@ class PaymentScreenController extends GetxController {
 
           if (bookingScreenController!.createBookingCategory?.status == true) {
             log("Cash Payment - ✅ Booking created successfully!");
+            final showFirstBookingCashback =
+                bookingScreenController!.createBookingCategory?.firstBookingCashback ==
+                    true;
 
             // Clear prices only (data from navigation arguments will be set when user navigates to booking screen again)
             bookingScreenController!.finalTaxRupee = 0.0;
@@ -1083,7 +1086,8 @@ class PaymentScreenController extends GetxController {
               barrierColor: AppColors.blackColor.withOpacity(0.8),
               Dialog(
                 backgroundColor: AppColors.transparent,
-                child: SuccessDialog(),
+                child: SuccessDialog(
+                    showFirstBookingCashback: showFirstBookingCashback),
               ),
             );
 
@@ -1300,6 +1304,9 @@ class PaymentScreenController extends GetxController {
 
           if (bookingScreenController!.createBookingCategory?.status == true) {
             log("Wallet Payment - ✅ Booking created successfully!");
+            final showFirstBookingCashback =
+                bookingScreenController!.createBookingCategory?.firstBookingCashback ==
+                    true;
 
             // Clear prices only (data from navigation arguments will be set when user navigates to booking screen again)
             bookingScreenController!.finalTaxRupee = 0.0;
@@ -1452,7 +1459,8 @@ class PaymentScreenController extends GetxController {
               barrierColor: AppColors.blackColor.withOpacity(0.8),
               Dialog(
                 backgroundColor: AppColors.transparent,
-                child: SuccessDialog(),
+                child: SuccessDialog(
+                    showFirstBookingCashback: showFirstBookingCashback),
               ),
             );
 

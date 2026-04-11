@@ -8,33 +8,40 @@ class CreateBookingModel {
     bool? status,
     String? message,
     Data? data,
+    bool? firstBookingCashback,
   }) {
     _status = status;
     _message = message;
     _data = data;
+    _firstBookingCashback = firstBookingCashback;
   }
 
   CreateBookingModel.fromJson(dynamic json) {
     _status = json['status'];
     _message = json['message'];
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    _firstBookingCashback = json['firstBookingCashback'] == true;
   }
   bool? _status;
   String? _message;
   Data? _data;
+  bool? _firstBookingCashback;
   CreateBookingModel copyWith({
     bool? status,
     String? message,
     Data? data,
+    bool? firstBookingCashback,
   }) =>
       CreateBookingModel(
         status: status ?? _status,
         message: message ?? _message,
         data: data ?? _data,
+        firstBookingCashback: firstBookingCashback ?? _firstBookingCashback,
       );
   bool? get status => _status;
   String? get message => _message;
   Data? get data => _data;
+  bool? get firstBookingCashback => _firstBookingCashback;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -43,6 +50,7 @@ class CreateBookingModel {
     if (_data != null) {
       map['data'] = _data?.toJson();
     }
+    map['firstBookingCashback'] = _firstBookingCashback;
     return map;
   }
 }

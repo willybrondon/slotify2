@@ -120,6 +120,9 @@ class FlutterWaveService {
       );
 
       if (bookingScreenController.createBookingCategory?.status == true) {
+        final showFirstBookingCashback =
+            bookingScreenController.createBookingCategory?.firstBookingCashback ==
+                true;
         bookingScreenController.finalTaxRupee = 0.0;
         bookingScreenController.withOutTaxRupee = 0.0;
         bookingScreenController.totalPrice = 0.0;
@@ -215,7 +218,9 @@ class FlutterWaveService {
           barrierColor: AppColors.blackColor.withOpacity(0.8),
           Dialog(
             backgroundColor: AppColors.transparent,
-            child: SuccessDialog(),
+            child: SuccessDialog(
+              showFirstBookingCashback: showFirstBookingCashback,
+            ),
           ),
         );
       } else {

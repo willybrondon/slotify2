@@ -356,6 +356,9 @@ class ZitopayService {
         );
 
         if (bookingScreenController!.createBookingCategory?.status == true) {
+          final showFirstBookingCashback =
+              bookingScreenController!.createBookingCategory?.firstBookingCashback ==
+                  true;
           bookingScreenController!.isLoading(false);
           bookingScreenController!.update([Constant.idProgressView]);
 
@@ -369,7 +372,9 @@ class ZitopayService {
             barrierColor: AppColors.blackColor.withValues(alpha: 0.8),
             Dialog(
               backgroundColor: AppColors.transparent,
-              child: SuccessDialog(),
+              child: SuccessDialog(
+                showFirstBookingCashback: showFirstBookingCashback,
+              ),
             ),
           );
         } else {

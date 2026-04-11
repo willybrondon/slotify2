@@ -312,6 +312,13 @@ exports.newBooking = async (req, res, next) => {
       return res.status(200).send({ status: false, message: "User is blocked. Please contact admin" });
     }
 
+    const priorBookingsCount = await Booking.countDocuments({
+      userId: user._id,
+      isDelete: { $ne: true },
+      status: { $nin: ["cancel"] },
+    });
+    const isFirstBookingCashback = priorBookingsCount === 0;
+
     if (!expert || expert.isBlock) {
       return res.status(200).send({ status: false, message: "Expert not found" });
     }
@@ -922,6 +929,7 @@ exports.newBooking = async (req, res, next) => {
       status: true,
       message: "Booking Created!",
       data: booking,
+      firstBookingCashback: isFirstBookingCashback,
     });
 
     if (coupon) {
