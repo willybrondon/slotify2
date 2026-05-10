@@ -6,7 +6,7 @@
    - Changed from small icon-only button to larger button with text
    - Orange background (#FF6B00) with white text "Invite"
    - More prominent and easier to see
-
+-- need to test if the change can work
 2. **Better Condition Handling**
    - Now handles `undefined`, `false`, and `null` values for `isClaimed`
    - Button shows for any salon that is NOT explicitly `true` for `isClaimed`
