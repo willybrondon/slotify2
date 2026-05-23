@@ -135,6 +135,16 @@ app.get("/documentation.html", (req, res) => {
 app.get("/terms.html", (req, res) => res.redirect(301, "/terms/"));
 app.get("/privacy.html", (req, res) => res.redirect(301, "/privacy/"));
 app.get("/cookies.html", (req, res) => res.redirect(301, "/cookies/"));
+app.get("/blog", (req, res) => res.redirect(301, "/blog/"));
+app.get("/blog.html", (req, res) => res.redirect(301, "/blog/"));
+app.get("/blog/", (req, res) => {
+  const filePath = path.join(salonportalPath, "blog", "index.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(path.resolve(filePath));
+  } else {
+    res.status(404).send(`<h1>404 - Blog not found</h1><p><a href="/">Return to Skedisy</a></p>`);
+  }
+});
 
 // Public web route for salon claim page
 app.get("/salon/claim", (req, res) => {

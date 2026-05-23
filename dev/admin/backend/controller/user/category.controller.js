@@ -3,6 +3,12 @@ const Salon = require("../../models/salon.model");
 const Service = require("../../models/service.model");
 const mongoose = require("mongoose");
 const geolib = require("geolib");
+const {
+  getWebCopy,
+  resolveLang,
+  idfBannerHtml,
+  skedisyFooterHtml,
+} = require("../../lib/webPageCopy");
 
 // Generate slug from name
 const generateSlug = (name) => {
@@ -449,10 +455,8 @@ exports.serveCategoryPage = async (req, res) => {
 
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
     
-    const langParam = (req.query.lang || req.query.language || "fr")
-      .toString()
-      .toLowerCase();
-    const language = langParam.startsWith("en") ? "en" : "fr";
+    const language = resolveLang(req.query.lang || req.query.language);
+    const copy = getWebCopy(language);
     const categoryDisplayName = getTranslatedName(category, language) || category.name;
     
     // Generate the new slug format for category URL
@@ -477,11 +481,11 @@ exports.serveCategoryPage = async (req, res) => {
             ? `<div class="salon-price">${priceFromLabel} ${currency}${salon.minPrice}</div>`
             : '';
           const distanceHtml = salon.distance !== null
-            ? `<div class="salon-distance">📍 ${salon.distance.toFixed(1)} km away</div>`
+            ? `<div class="salon-distance">📍 ${copy.kmAway(salon.distance.toFixed(1))}</div>`
             : '';
           const imageHtml = salon.mainImage 
             ? `<img src="${salon.mainImage}" alt="${salon.name}" class="salon-card-image" onerror="this.style.display='none'">`
-            : '<div class="salon-card-image-placeholder">No Image</div>';
+            : `<div class="salon-card-image-placeholder">${copy.noImage}</div>`;
 
           return `
             <a href="${salon.shareUrl}" class="salon-card">
@@ -494,26 +498,28 @@ exports.serveCategoryPage = async (req, res) => {
                 ${distanceHtml}
                 <div class="salon-card-cta">
                   <span class="salon-card-cta-btn">
-                    <i class="fas fa-calendar-check"></i> View & Book
+                    <i class="fas fa-calendar-check"></i> ${copy.viewBook}
                   </span>
                 </div>
               </div>
             </a>
           `;
         }).join('')
-      : '<div class="no-results"><p>No salons found for this category.</p></div>';
+      : `<div class="no-results"><p>${copy.noSalonsCategory}</p></div>`;
 
-    const categoryDescription = category.description || `Find the best ${categoryDisplayName} services at top-rated salons near you. Book your appointment today!`;
+    const categoryDescription = category.description || copy.categoryMetaDesc(categoryDisplayName);
+    const idfBanner = idfBannerHtml(copy);
+    const footerHtml = skedisyFooterHtml(baseURL, copy);
     const categoryImage = category.image || `${baseURL}/logo.png`;
 
     const html = `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${language}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${categoryDisplayName} - Skedisy | Book ${categoryDisplayName} Services Online</title>
+    <title>${copy.categoryMetaTitle(categoryDisplayName).replace(/"/g, '&quot;')}</title>
     <meta name="description" content="${categoryDescription.replace(/"/g, '&quot;')}">
-    <meta name="keywords" content="${categoryDisplayName}, salon services, beauty services, book appointment, ${categoryDisplayName.toLowerCase()}">
+    <meta name="keywords" content="${copy.categoryMetaKeywords(categoryDisplayName)}">
     <link rel="canonical" href="${categoryUrl}">
     
     <!-- Open Graph / Facebook -->
@@ -554,399 +560,31 @@ exports.serveCategoryPage = async (req, res) => {
     }
     </script>
     
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${baseURL}/styles.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #fff;
-            color: #111;
-            line-height: 1.6;
-            padding-top: 80px; /* Account for fixed navbar */
-        }
-        /* Category Hero Section */
-        .category-hero-section {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            overflow: hidden;
-            margin-top: 0;
-        }
-        .category-hero-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background-image: url('${baseURL}/logo.png');
-            background-color: #667eea; /* Fallback color */
-        }
-        .category-hero-image-overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 180px;
-            height: 180px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            z-index: 3;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .category-hero-image-overlay img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-        .category-hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
-            z-index: 1;
-        }
-        .category-hero-content {
-            position: relative;
-            z-index: 2;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            color: white;
-            padding: 40px 0;
-            padding-left: 240px; /* Make room for category image on left */
-        }
-        .category-hero-title {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .category-hero-description {
-            font-size: 1.2rem;
-            margin-bottom: 24px;
-            max-width: 700px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            line-height: 1.6;
-        }
-        .category-hero-stats {
-            display: flex;
-            gap: 32px;
-            font-size: 1.1rem;
-        }
-        .category-hero-stats span {
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            padding: 12px 24px;
-            border-radius: 8px;
-        }
-        .category-hero-stats strong {
-            font-size: 1.3rem;
-            display: block;
-        }
-        
-        .category-header {
-            background: #fff;
-            padding: 40px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .category-header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        .category-subtitle {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 12px;
-        }
-        .category-description {
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 32px;
-        }
-        .search-section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 32px 20px;
-        }
-        .search-container {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .search-input {
-            width: 100%;
-            padding: 16px 50px 16px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-        .search-input:focus {
-            outline: none;
-            border-color: #111;
-        }
-        .search-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-            font-size: 1.2rem;
-        }
-        .salons-section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-        .salons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 24px;
-            margin-top: 32px;
-        }
-        .salon-card {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 16px;
-            overflow: hidden;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s;
-            display: block;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .salon-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
-            border-color: #111;
-        }
-        .salon-card-image {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-        .salon-card:hover .salon-card-image {
-            transform: scale(1.05);
-        }
-        .salon-card-image-placeholder {
-            width: 100%;
-            height: 220px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-        .salon-card-content {
-            padding: 24px;
-        }
-        .salon-card-name {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 12px;
-            line-height: 1.3;
-        }
-        .salon-rating {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 1rem;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-        .rating-stars {
-            color: #ffa500;
-            font-size: 1.1rem;
-        }
-        .price-disclaimer {
-            font-size: 0.9rem;
-            color: #666;
-            margin: 0 0 16px;
-            line-height: 1.45;
-            max-width: 720px;
-        }
-        .salon-price {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 12px;
-            padding: 8px 0;
-            border-top: 1px solid #f0f0f0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .salon-address {
-            font-size: 0.95rem;
-            color: #666;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        .salon-distance {
-            font-size: 0.9rem;
-            color: #999;
-            font-weight: 500;
-        }
-        .salon-card-cta {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #f0f0f0;
-            text-align: center;
-        }
-        .salon-card-cta-btn {
-            background: #111;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            display: inline-block;
-            width: 100%;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .salon-card:hover .salon-card-cta-btn {
-            background: #333;
-            transform: translateY(-1px);
-        }
-        .no-results {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-        .no-results p {
-            font-size: 1.1rem;
-        }
-        @media (max-width: 768px) {
-            body {
-                padding-top: 80px;
-            }
-            .category-hero-section {
-                height: auto;
-                min-height: auto;
-                padding-top: 30px;
-                padding-bottom: 20px;
-                display: flex;
-                flex-direction: row;
-                align-items: flex-start;
-                gap: 15px;
-                position: relative;
-            }
-            .category-hero-image-overlay {
-                position: relative;
-                width: 100px;
-                height: 100px;
-                top: auto;
-                left: auto;
-                padding: 8px;
-                margin: 0;
-                flex-shrink: 0;
-                z-index: 3;
-            }
-            .category-hero-content {
-                padding-left: 0;
-                padding-right: 20px;
-                padding-top: 0;
-                padding-bottom: 0;
-                align-items: flex-start;
-                flex: 1;
-                min-width: 0;
-                height: auto;
-            }
-            .category-hero-content .category-header-content {
-                padding: 0;
-                max-width: none;
-            }
-            .category-hero-title {
-                font-size: 1.4rem;
-                margin-bottom: 8px;
-                margin-top: 0;
-                line-height: 1.3;
-            }
-            .category-hero-description {
-                font-size: 0.85rem;
-                margin-bottom: 10px;
-                line-height: 1.4;
-                max-width: 100%;
-            }
-            .category-hero-stats {
-                flex-direction: row;
-                gap: 6px;
-                font-size: 0.75rem;
-                flex-wrap: wrap;
-            }
-            .category-hero-stats span {
-                padding: 4px 10px;
-                font-size: 0.75rem;
-            }
-            .category-hero-stats strong {
-                font-size: 0.9rem;
-                display: inline;
-            }
-            .category-subtitle {
-                font-size: 1.75rem;
-            }
-            .salons-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="${baseURL}/public-pages.css">
 </head>
-<body>
+<body class="sk-public-page sq-page">
     <!-- Login Button Above QR Code -->
     <div class="login-above-qr">
         <a href="${baseURL}/salonpanel/" class="btn-login-above">Login</a>
     </div>
     
-    <!-- QR Code Top Right Floating -->
-    <div class="qr-topright">
+    <div class="qr-topright qr-topright--client">
         <div class="qr-top-flex">
             <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
                 <div class="qr-code-wrapper">
                     <div id="qr-customer-top"></div>
                     <img class="qr-logo-overlay" src="${baseURL}/images/logo.png" alt="Skedisy">
                 </div>
-                <div class="qr-label">Download Customer App</div>
-            </div>
-            <div class="qr-top-block" data-app-type="expert" onclick="openPhoneSelection('expert')">
-                <div class="qr-code-wrapper">
-                    <div id="qr-expert-top"></div>
-                    <img class="qr-logo-overlay" src="${baseURL}/images/logo.png" alt="Skedisy">
-                </div>
-                <div class="qr-label">Download the Expert App</div>
+                <div class="qr-label">${copy.qrCustomer}</div>
             </div>
         </div>
     </div>
     
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar sq-navbar">
         <div class="nav-container">
             <div class="nav-logo">
                 <a href="${baseURL}" style="text-decoration: none; color: inherit;">
@@ -993,23 +631,25 @@ exports.serveCategoryPage = async (req, res) => {
                 <h1 class="category-hero-title">${categoryDisplayName}</h1>
                 <p class="category-hero-description">${categoryDescription}</p>
                 <div class="category-hero-stats">
-                    <span><strong>${formattedSalons.length}</strong> Salons</span>
-                    <span><strong>${formattedSalons.filter(s => s.review > 0).length}</strong> Rated</span>
+                    <span><strong>${formattedSalons.length}</strong> ${copy.categorySalons}</span>
+                    <span><strong>${formattedSalons.filter(s => s.review > 0).length}</strong> ${copy.categoryRated}</span>
                 </div>
             </div>
         </div>
     </div>
+
+    ${idfBanner}
     
     <div class="category-header">
         <div class="category-header-content">
-            <h2 class="category-subtitle">Discover Top ${categoryDisplayName} Salons</h2>
+            <h2 class="category-subtitle">${copy.discoverSalons(categoryDisplayName)}</h2>
             <p class="category-description">${categoryDescription}</p>
         </div>
     </div>
     
     <div class="search-section">
         <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Search by address or service name..." value="${search.replace(/"/g, '&quot;')}">
+            <input type="text" id="searchInput" class="search-input" placeholder="${copy.searchPlaceholder.replace(/"/g, '&quot;')}" value="${search.replace(/"/g, '&quot;')}">
             <i class="fas fa-search search-icon"></i>
         </div>
     </div>
@@ -1020,6 +660,14 @@ exports.serveCategoryPage = async (req, res) => {
             ${salonsHtml}
         </div>
     </div>
+
+    <div class="sked-app-banner">
+        <h3>${copy.appBannerTitle}</h3>
+        <p>${copy.appBannerDesc}</p>
+        <a href="${baseURL}/#download-customer">${copy.bookOnApp}</a>
+    </div>
+
+    ${footerHtml}
 
     <script>
         const categoryId = "${category._id}";
@@ -1067,9 +715,13 @@ exports.serveCategoryPage = async (req, res) => {
             const grid = document.getElementById('salonsGrid');
             const currency = "${currency}";
             const priceFromLabel = ${JSON.stringify(priceFromLabel)};
+            const viewBookLabel = ${JSON.stringify(copy.viewBook)};
+            const noImageLabel = ${JSON.stringify(copy.noImage)};
+            const kmAwayTpl = ${JSON.stringify(copy.kmAway("__KM__"))};
+            const noSalonsSearch = ${JSON.stringify(copy.noSalonsSearch)};
             
             if (salons.length === 0) {
-                grid.innerHTML = '<div class="no-results"><p>No salons found. Try a different search.</p></div>';
+                grid.innerHTML = '<div class="no-results"><p>' + noSalonsSearch + '</p></div>';
                 return;
             }
 
@@ -1081,11 +733,11 @@ exports.serveCategoryPage = async (req, res) => {
                     ? \`<div class="salon-price">\${priceFromLabel} \${currency}\${salon.minPrice}</div>\`
                     : '';
                 const distanceHtml = salon.distance !== null
-                    ? \`<div class="salon-distance">📍 \${salon.distance.toFixed(1)} km away</div>\`
+                    ? \`<div class="salon-distance">📍 \${kmAwayTpl.replace('__KM__', salon.distance.toFixed(1))}</div>\`
                     : '';
                 const imageHtml = salon.mainImage 
                     ? \`<img src="\${salon.mainImage}" alt="\${salon.name}" class="salon-card-image" onerror="this.style.display='none'">\`
-                    : '<div class="salon-card-image-placeholder">No Image</div>';
+                    : '<div class="salon-card-image-placeholder">' + noImageLabel + '</div>';
 
                 return \`
                     <a href="\${salon.shareUrl}" class="salon-card">
@@ -1094,8 +746,11 @@ exports.serveCategoryPage = async (req, res) => {
                             <h3 class="salon-card-name">\${salon.name}</h3>
                             \${ratingHtml}
                             \${priceHtml}
-                            \${salon.address ? \`<div class="salon-address">📍 \${salon.address}</div>\` : ''}
+                            \${salon.address ? \`<div class="salon-address"><i class="fas fa-map-marker-alt"></i> \${salon.address}</div>\` : ''}
                             \${distanceHtml}
+                            <div class="salon-card-cta">
+                              <span class="salon-card-cta-btn"><i class="fas fa-calendar-check"></i> \${viewBookLabel}</span>
+                            </div>
                         </div>
                     </a>
                 \`;

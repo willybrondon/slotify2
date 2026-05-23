@@ -7,6 +7,12 @@ const User = require("../../models/user.model");
 const Favorite = require("../../models/favourite.model");
 
 const { deleteFile } = require("../../middleware/deleteFile");
+const {
+  getWebCopy,
+  resolveLang,
+  idfBannerHtml,
+  skedisyFooterHtml,
+} = require("../../lib/webPageCopy");
 
 const geolib = require("geolib");
 
@@ -718,6 +724,9 @@ exports.serveSalonWebPage = async (req, res) => {
       return res.status(404).send("Salon not found");
     }
 
+    const pageLang = resolveLang(req.query.lang || req.query.language);
+    const copy = getWebCopy(pageLang);
+
     // Fetch additional data: products, experts, reviews with expert info
     const [products, experts, reviews] = await Promise.all([
       Product.find({
@@ -753,10 +762,10 @@ exports.serveSalonWebPage = async (req, res) => {
     // Use heroImage if available, otherwise fallback to mainImage or first image
     const salonImage = salon.heroImage || salon.mainImage || (salon.image && salon.image.length > 0 ? salon.image[0] : "");
     const salonName = salon.name || "Salon";
-    const salonDescription = salon.about || `Book your appointment at ${salonName}`;
+    const salonDescription = salon.about || copy.defaultSalonDesc(salonName);
     // Get value proposition data
     const valueProposition = salon.valueProposition || {};
-    const valuePropTitle = valueProposition.title || `${salonName} — Premier Hair & Beauty Experience`;
+    const valuePropTitle = valueProposition.title || copy.defaultHeroTitle(salonName);
     const valuePropDescription = valueProposition.description || "";
     const valuePropFeatures = valueProposition.features || [];
     const salonAddress = salon.addressDetails 
@@ -780,10 +789,10 @@ exports.serveSalonWebPage = async (req, res) => {
     if (salon.salonTime && salon.salonTime.length > 0) {
       openingHoursHtml = salon.salonTime.map(time => {
         const isClosed = !time.isActive || (time.openTime === "" && time.closedTime === "");
-        const timeDisplay = isClosed ? '<span class="hours-closed">Closed</span>' : `${time.openTime || 'N/A'} - ${time.closedTime || 'N/A'}`;
+        const timeDisplay = isClosed ? `<span class="hours-closed">${copy.closed}</span>` : `${time.openTime || 'N/A'} - ${time.closedTime || 'N/A'}`;
         return `<div class="hours-item"><span class="hours-day">${time.day || 'N/A'}</span><span class="hours-time">${timeDisplay}</span></div>`;
       }).join('');
-      openingHoursHtml = `<div class="section"><h3 class="section-title">⏰ Opening Hours</h3><div class="hours-grid">${openingHoursHtml}</div></div>`;
+      openingHoursHtml = `<div class="section"><h3 class="section-title">⏰ ${copy.openingHours}</h3><div class="hours-grid">${openingHoursHtml}</div></div>`;
     }
 
     // Services Section - Group by Category
@@ -794,7 +803,7 @@ exports.serveSalonWebPage = async (req, res) => {
       salon.serviceIds.forEach(service => {
         if (service.id && service.id.categoryId) {
           const categoryId = service.id.categoryId._id?.toString() || service.id.categoryId?.toString() || 'other';
-          const categoryName = getTranslatedCategoryName(service.id.categoryId, 'fr') || 'Other Services';
+          const categoryName = getTranslatedCategoryName(service.id.categoryId, pageLang) || copy.otherServices;
           if (!servicesByCategory[categoryId]) {
             servicesByCategory[categoryId] = {
               name: categoryName,
@@ -805,7 +814,7 @@ exports.serveSalonWebPage = async (req, res) => {
         } else {
           if (!servicesByCategory['other']) {
             servicesByCategory['other'] = {
-              name: 'Other Services',
+              name: copy.otherServices,
               services: []
             };
           }
@@ -829,11 +838,11 @@ exports.serveSalonWebPage = async (req, res) => {
               </div>
               ${durationText}
               <button onclick="openApp('${serviceMongoId.replace(/'/g, "\\'")}')" class="service-book-btn">
-                <i class="fas fa-calendar-plus"></i> Book Now
+                <i class="fas fa-calendar-plus"></i> ${copy.bookOnApp}
               </button>
             </div>`;
         }).join('');
-        const moreInCategory = category.services.length > 8 ? `<p class="service-more">+ ${category.services.length - 8} more in this category</p>` : '';
+        const moreInCategory = category.services.length > 8 ? `<p class="service-more">${copy.moreInCategory(category.services.length - 8)}</p>` : '';
         return `
           <div class="service-category-group">
             <h4 class="service-category-title">${category.name}</h4>
@@ -844,11 +853,11 @@ exports.serveSalonWebPage = async (req, res) => {
 
       const totalServices = salon.serviceIds.length;
       const displayedServices = Object.values(servicesByCategory).reduce((sum, cat) => sum + Math.min(cat.services.length, 8), 0);
-      const moreServices = totalServices > displayedServices ? `<p class="services-total-more">+ ${totalServices - displayedServices} more services available in the app</p>` : '';
+      const moreServices = totalServices > displayedServices ? `<p class="services-total-more">${copy.moreServicesApp(totalServices - displayedServices)}</p>` : '';
       
-      servicesHtml = `<div class="section"><h3 class="section-title">💇 Services</h3>${categorySections}${moreServices}</div>`;
+      servicesHtml = `<div class="section"><h3 class="section-title">💇 ${copy.services}</h3>${categorySections}${moreServices}</div>`;
     } else {
-      servicesHtml = '<div class="section"><h3 class="section-title">💇 Services</h3><p class="empty-state">No services available</p></div>';
+      servicesHtml = `<div class="section"><h3 class="section-title">💇 ${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
     }
 
     // Products Section
@@ -862,9 +871,9 @@ exports.serveSalonWebPage = async (req, res) => {
         const imageHtml = productImage ? `<img src="${productImage}" alt="${productName}" onerror="this.style.display='none'">` : '';
         return `<div class="product-item">${imageHtml}<div class="product-info"><div class="product-name">${productName}</div>${productDesc ? `<div class="product-desc">${productDesc}</div>` : ''}<div class="product-price">${currency}${productPrice}</div></div></div>`;
       }).join('');
-      productsHtml = `<div class="section"><h3 class="section-title">🛍️ Products</h3><div class="services-grid">${productsHtml}</div></div>`;
+      productsHtml = `<div class="section"><h3 class="section-title">🛍️ ${copy.products}</h3><div class="services-grid">${productsHtml}</div></div>`;
     } else {
-      productsHtml = '<div class="section"><h3 class="section-title">🛍️ Products</h3><p class="empty-state">No products available</p></div>';
+      productsHtml = `<div class="section"><h3 class="section-title">🛍️ ${copy.products}</h3><p class="empty-state">${copy.noProducts}</p></div>`;
     }
 
     // Staff Section
@@ -880,9 +889,9 @@ exports.serveSalonWebPage = async (req, res) => {
         const ratingHtml = expertRating > 0 ? `<div class="staff-rating">⭐ ${expertRating.toFixed(1)}</div>` : '';
         return `<div class="staff-item">${imageHtml}<div class="staff-info"><div class="staff-name">${expertName}</div>${ratingHtml}</div></div>`;
       }).join('');
-      staffHtml = `<div class="section"><h3 class="section-title">👤 Staff</h3><div class="services-grid">${staffHtml}</div></div>`;
+      staffHtml = `<div class="section"><h3 class="section-title">👤 ${copy.staff}</h3><div class="services-grid">${staffHtml}</div></div>`;
     } else {
-      staffHtml = '<div class="section"><h3 class="section-title">👤 Staff</h3><p class="empty-state">No staff information available</p></div>';
+      staffHtml = `<div class="section"><h3 class="section-title">👤 ${copy.staff}</h3><p class="empty-state">${copy.noStaff}</p></div>`;
     }
 
     // Reviews Section - Show expert/staff info
@@ -891,7 +900,7 @@ exports.serveSalonWebPage = async (req, res) => {
       reviewsHtml = reviews.map(review => {
         const userFname = (review.userId?.fname || '').replace(/"/g, '&quot;');
         const userLname = (review.userId?.lname || '').replace(/"/g, '&quot;');
-        const userName = `${userFname} ${userLname}`.trim() || 'Anonymous';
+        const userName = `${userFname} ${userLname}`.trim() || copy.anonymous;
         const userImage = review.userId?.image || '';
         const reviewRating = review.rating || 0;
         const reviewComment = ((review.review || review.comment || review.message || '').replace(/"/g, '&quot;').replace(/\n/g, '<br>'));
@@ -900,82 +909,33 @@ exports.serveSalonWebPage = async (req, res) => {
         const expertFname = (review.expertId?.fname || '').replace(/"/g, '&quot;');
         const expertLname = (review.expertId?.lname || '').replace(/"/g, '&quot;');
         const expertName = `${expertFname} ${expertLname}`.trim();
-        const expertInfo = expertName ? `<div class="review-expert">👤 With ${expertName}</div>` : '';
+        const expertInfo = expertName ? `<div class="review-expert">👤 ${copy.withExpert} ${expertName}</div>` : '';
         
         const imageHtml = userImage ? `<img src="${userImage}" alt="${userName}" class="review-avatar" onerror="this.style.display='none'">` : `<div class="review-avatar">${userName.charAt(0).toUpperCase()}</div>`;
         const ratingHtml = reviewRating > 0 ? `<div class="review-rating">${'⭐'.repeat(Math.round(reviewRating))} ${reviewRating.toFixed(1)}</div>` : '';
         const commentHtml = reviewComment ? `<div class="review-text">${reviewComment}</div>` : '';
         return `<div class="review-item"><div class="review-header">${imageHtml}<div class="review-info"><div class="review-name">${userName}</div>${ratingHtml}${expertInfo}</div></div>${commentHtml}</div>`;
       }).join('');
-      reviewsHtml = `<div class="section"><h3 class="section-title">💬 Reviews</h3><div class="reviews-container">${reviewsHtml}</div></div>`;
+      reviewsHtml = `<div class="section"><h3 class="section-title">💬 ${copy.reviews}</h3><div class="reviews-container">${reviewsHtml}</div></div>`;
     } else {
-      reviewsHtml = '<div class="section"><h3 class="section-title">💬 Reviews</h3><p class="empty-state">No reviews yet</p></div>';
+      reviewsHtml = `<div class="section"><h3 class="section-title">💬 ${copy.reviews}</h3><p class="empty-state">${copy.noReviews}</p></div>`;
     }
 
     // Rating badge HTML
-    const ratingBadgeHtml = salonRating > 0 ? `<div class="rating-badge"><span class="rating-stars">⭐</span><span>${salonRating.toFixed(1)} (${salonReviewCount} reviews)</span></div>` : '';
+    const ratingBadgeHtml = salonRating > 0 ? `<div class="rating-badge"><span class="rating-stars">⭐</span><span>${salonRating.toFixed(1)} (${salonReviewCount} ${copy.reviewsCount})</span></div>` : '';
 
-    // Footer HTML (matching skedisy.com)
-    const footerHtml = `
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Skedisy</h3>
-                    <p>Transform your salon management with our all-in-one solution.</p>
-                    <div class="contact-info">
-                        <p><i class="fas fa-envelope"></i> support@skedisy.com</p>
-                        <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>About</h4>
-                    <ul>
-                        <li><a href="${baseURL}">Home</a></li>
-                        <li><a href="${baseURL}/salonpanel">Sign Up</a></li>
-                        <li><a href="${baseURL}">Pricing</a></li>
-                        <li><a href="${baseURL}">Help Center</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Our Solutions</h4>
-                    <ul>
-                        <li><a href="${baseURL}">24/7 Online Booking</a></li>
-                        <li><a href="${baseURL}">Calendar Management</a></li>
-                        <li><a href="${baseURL}">Certified POS</a></li>
-                        <li><a href="${baseURL}">Payment Terminal</a></li>
-                        <li><a href="${baseURL}">Work Time Management</a></li>
-                        <li><a href="${baseURL}">Marketing Solutions</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="${baseURL}/terms/">Terms of Service</a></li>
-                        <li><a href="${baseURL}/privacy/">Privacy Policy</a></li>
-                        <li><a href="${baseURL}/cookies/">Cookie Management</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; ${new Date().getFullYear()} Skedisy. All rights reserved.</p>
-                <p style="margin-top: 10px; font-size: 0.9rem;">
-                    <a href="${baseURL}/sitemap.xml" style="color: #999; text-decoration: none;">Sitemap</a> | 
-                    <a href="${baseURL}/robots.txt" style="color: #999; text-decoration: none;">Robots.txt</a>
-                </p>
-            </div>
-        </div>
-    </footer>`;
+    const footerHtml = skedisyFooterHtml(baseURL, copy);
+    const idfBanner = idfBannerHtml(copy);
 
     // Generate HTML with Open Graph and App Links meta tags
     const html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="${pageLang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${salonName} - Skedisy | Book Appointment Online</title>
-    <meta name="description" content="${salonDescription.replace(/"/g, '&quot;')}">
-    <meta name="keywords" content="${salonName}, salon, beauty services, book appointment, ${salonAddress ? salonAddress.split(',').join(', ') : ''}">
+    <title>${copy.metaSalonTitle(salonName).replace(/"/g, '&quot;')}</title>
+    <meta name="description" content="${(salon.about ? salonDescription : copy.metaSalonDesc(salonName)).replace(/"/g, '&quot;')}">
+    <meta name="keywords" content="${salonName}, ${copy.metaKeywords}${salonAddress ? ', ' + salonAddress.split(',').join(', ') : ''}">
     <link rel="canonical" href="${shareUrl}">
     
     <!-- Open Graph / Facebook -->
@@ -1117,907 +1077,31 @@ exports.serveSalonWebPage = async (req, res) => {
     </script>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${baseURL}/styles.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #fff;
-            color: #111;
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-top: 80px; /* Account for fixed navbar */
-        }
-        .main-wrapper {
-            flex: 1;
-            width: 100%;
-            margin-top: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            width: 100%;
-        }
-        /* Hero Section */
-        .hero-section {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            overflow: hidden;
-            margin-top: 0;
-            margin-left: 0;
-            margin-right: 0;
-        }
-        .hero-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            min-width: 100%;
-            min-height: 100%;
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: scroll;
-        }
-        .hero-placeholder {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            min-width: 100%;
-            min-height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7));
-            z-index: 1;
-        }
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            color: #ffffff !important;
-            padding: 40px 0;
-        }
-        .hero-content * {
-            color: #ffffff !important;
-        }
-        .hero-content h1,
-        .hero-content p {
-            color: #ffffff !important;
-        }
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: #ffffff !important;
-            text-shadow: 
-                0 2px 4px rgba(0,0,0,0.8),
-                0 4px 8px rgba(0,0,0,0.6),
-                2px 2px 8px rgba(0,0,0,0.9),
-                -1px -1px 0 rgba(0,0,0,0.5),
-                1px 1px 0 rgba(0,0,0,0.5);
-            line-height: 1.2;
-        }
-        .hero-title * {
-            color: #ffffff !important;
-        }
-        .hero-subtitle {
-            font-size: 1.3rem;
-            margin-bottom: 24px;
-            max-width: 700px;
-            color: #ffffff !important;
-            font-weight: 400;
-            text-shadow: 
-                0 2px 4px rgba(0,0,0,0.8),
-                0 4px 8px rgba(0,0,0,0.6),
-                2px 2px 6px rgba(0,0,0,0.9),
-                -1px -1px 0 rgba(0,0,0,0.5),
-                1px 1px 0 rgba(0,0,0,0.5);
-            line-height: 1.6;
-        }
-        .hero-subtitle,
-        .hero-subtitle *,
-        .hero-content .hero-subtitle,
-        .hero-content .hero-subtitle *,
-        p.hero-subtitle {
-            color: #ffffff !important;
-        }
-        .hero-rating {
-            margin-bottom: 32px;
-        }
-        .hero-rating .rating-badge {
-            background: rgba(255,255,255,0.25);
-            backdrop-filter: blur(10px);
-            color: #ffffff !important;
-            text-shadow: 
-                0 1px 3px rgba(0,0,0,0.8),
-                0 2px 6px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        }
-        .hero-cta-btn {
-            background: #fff;
-            color: #000000 !important;
-            border: none;
-            padding: 18px 40px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .hero-cta-btn * {
-            color: #000000 !important;
-        }
-        .hero-cta-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(0,0,0,0.3);
-            background: #f8f8f8;
-        }
-        .hero-cta-btn i {
-            font-size: 1.1rem;
-        }
-        
-        /* Value Proposition Section */
-        .value-proposition-section {
-            background: #f8f8f8;
-            padding: 60px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .value-prop-description {
-            text-align: center;
-            margin-bottom: 40px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .value-prop-description p {
-            font-size: 1.1rem;
-            color: #555;
-            line-height: 1.6;
-        }
-        .value-props-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 32px;
-        }
-        .value-prop-item {
-            text-align: center;
-            padding: 24px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        .value-prop-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        }
-        .value-prop-icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
-        }
-        .value-prop-item h4 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 12px;
-        }
-        .value-prop-item p {
-            color: #666;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        
-        .salon-header {
-            background: #fff;
-            padding: 40px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .salon-header-content {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-        .salon-info-header {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .salon-info-header h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #111;
-            margin: 0;
-            background: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            display: inline-block;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .salon-info-header .rating-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #f8f8f8;
-            padding: 8px 16px;
-            border-radius: 20px;
-            width: fit-content;
-            font-size: 1rem;
-            margin-top: 12px;
-            margin-bottom: 12px;
-            scroll-margin-bottom: 100px; /* Prevent hiding behind sticky button on mobile */
-        }
-        .rating-stars {
-            color: #ffa500;
-        }
-        .salon-description {
-            color: #444;
-            font-size: 1.1rem;
-            line-height: 1.7;
-            margin: 16px 0;
-        }
-        .salon-contact {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 16px;
-        }
-        .salon-contact p {
-            color: #666;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .content-wrapper {
-            padding: 40px 0;
-        }
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
-        }
-        .sidebar-content {
-            position: sticky;
-            top: 20px;
-        }
-        .booking-card {
-            background: #f8f8f8;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .booking-card h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #000000 !important;
-            margin-bottom: 20px;
-        }
-        .open-app-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 18px 32px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 16px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .open-app-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        }
-        .open-app-btn i {
-            font-size: 1rem;
-        }
-        #download-section {
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid #e0e0e0;
-            display: none; /* Hidden by default, shown when app not installed */
-        }
-        .download-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .btn {
-            padding: 14px 24px;
-            border-radius: 12px;
-            text-decoration: none;
-            text-align: center;
-            font-weight: 600;
-            transition: all 0.2s;
-            display: block;
-            font-size: 1rem;
-        }
-        .btn-primary {
-            background: #111;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #333;
-            transform: translateY(-2px);
-        }
-        .section {
-            background: #fff;
-            padding: 32px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .section:last-child {
-            border-bottom: none;
-        }
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 24px;
-            padding-top: 20px; /* Add top padding for mobile */
-            scroll-margin-top: 100px; /* Prevent hiding behind navbar on mobile */
-        }
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-        }
-        /* Service Category Grouping */
-        .service-category-group {
-            margin-bottom: 40px;
-        }
-        .service-category-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            padding-top: 20px; /* Add top padding for mobile */
-            border-bottom: 2px solid #eee;
-            scroll-margin-top: 100px; /* Prevent hiding behind navbar on mobile */
-        }
-        .service-item, .product-item, .staff-item {
-            background: #fff;
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.2s;
-        }
-        .service-item:hover, .product-item:hover, .staff-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-color: #111;
-        }
-        .service-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-        .service-name, .product-name, .staff-name {
-            font-weight: 600;
-            color: #111;
-            font-size: 1.1rem;
-            flex: 1;
-        }
-        .service-price, .product-price {
-            color: #111;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-left: 16px;
-        }
-        .service-duration {
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 8px;
-        }
-        .service-book-btn {
-            margin-top: 16px;
-            width: 100%;
-            background: #111;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .service-book-btn:hover {
-            background: #333;
-            transform: translateY(-1px);
-        }
-        .service-book-btn i {
-            font-size: 0.9rem;
-        }
-        .service-more, .services-total-more {
-            text-align: center;
-            color: #666;
-            margin-top: 16px;
-            font-size: 0.95rem;
-            font-style: italic;
-        }
-        .product-item {
-            display: flex;
-            gap: 16px;
-            align-items: start;
-        }
-        .product-item img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-            flex-shrink: 0;
-        }
-        .product-info {
-            flex: 1;
-        }
-        .product-desc {
-            color: #666;
-            font-size: 0.9rem;
-            margin: 8px 0;
-        }
-        .staff-item {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            padding: 20px;
-        }
-        .staff-item img,
-        .staff-item-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            object-position: center center;
-            flex-shrink: 0;
-            border: 3px solid #f0f0f0;
-            display: block;
-        }
-        .staff-info {
-            flex: 1;
-        }
-        .staff-name {
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-        }
-        .staff-rating {
-            color: #ffa500;
-            font-size: 1rem;
-            margin-top: 4px;
-            font-weight: 600;
-        }
-        .reviews-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .review-item {
-            background: #fff;
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.2s;
-        }
-        .review-item:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-color: #111;
-        }
-        .review-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .review-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-        .review-info {
-            flex: 1;
-        }
-        .review-name {
-            font-weight: 600;
-            color: #111;
-            font-size: 1.1rem;
-            margin-bottom: 6px;
-        }
-        .review-rating {
-            color: #ffa500;
-            font-size: 1rem;
-            margin-bottom: 8px;
-        }
-        .review-expert {
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 4px;
-            font-style: italic;
-        }
-        .review-text {
-            color: #444;
-            line-height: 1.7;
-            font-size: 1rem;
-            margin-top: 12px;
-        }
-        .hours-grid {
-            display: grid;
-            gap: 0;
-        }
-        .hours-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .hours-item:last-child {
-            border-bottom: none;
-        }
-        .hours-day {
-            font-weight: 600;
-            color: #111;
-            font-size: 1rem;
-        }
-        .hours-time {
-            color: #666;
-            font-size: 1rem;
-        }
-        .hours-closed {
-            color: #999;
-            font-style: italic;
-        }
-        .empty-state {
-            color: #999;
-            font-style: italic;
-            text-align: center;
-            padding: 40px 20px;
-            background: #f8f8f8;
-            border-radius: 12px;
-        }
-        /* Footer Styles */
-        .footer {
-            background: #000;
-            color: white;
-            padding: 60px 0 30px;
-            margin-top: 60px;
-        }
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        .footer-section h3, .footer-section h4 {
-            margin-bottom: 20px;
-            color: #fff;
-            font-weight: 700;
-        }
-        .footer-section h3 {
-            font-size: 1.5rem;
-        }
-        .footer-section h4 {
-            font-size: 1.1rem;
-        }
-        .footer-section p {
-            color: #bdc3c7;
-            margin-bottom: 16px;
-            line-height: 1.6;
-        }
-        .footer-section ul {
-            list-style: none;
-        }
-        .footer-section li {
-            margin-bottom: 12px;
-        }
-        .footer-section a {
-            color: #bdc3c7;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        .footer-section a:hover {
-            color: #fff;
-        }
-        .contact-info p {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .contact-info i {
-            width: 20px;
-        }
-        .footer-bottom {
-            border-top: 1px solid #34495e;
-            padding-top: 30px;
-            text-align: center;
-            color: #bdc3c7;
-        }
-        /* Sticky Booking Button on Mobile */
-        .sticky-booking-btn {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #111;
-            color: white;
-            padding: 16px;
-            z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-        }
-        .sticky-booking-btn button {
-            width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 968px) {
-            .hero-section {
-                height: 400px;
-            }
-            .hero-title {
-                font-size: 2.5rem;
-                color: #ffffff !important;
-            }
-            .hero-subtitle {
-                font-size: 1.1rem;
-                color: #ffffff !important;
-            }
-            .hero-overlay {
-                background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.75));
-            }
-            .value-props-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            .salon-header-content {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-            .content-grid {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-            .sidebar-content {
-                position: static;
-            }
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        @media (max-width: 768px) {
-            body {
-                padding-top: 0;
-                padding-bottom: 100px; /* Space for sticky button */
-                overflow-x: hidden;
-            }
-            .main-wrapper {
-                margin-top: 0;
-                padding-top: 0;
-            }
-            .hero-section {
-                position: relative;
-                height: 400px;
-                width: 100%;
-                max-width: 100vw;
-                margin: 0;
-                padding: 0;
-                left: 0;
-                right: 0;
-                overflow: hidden;
-            }
-            .hero-image {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                min-width: 100%;
-                min-height: 100%;
-                background-size: cover;
-                background-position: center center;
-                background-repeat: no-repeat;
-                object-fit: cover;
-            }
-            .hero-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                min-width: 100%;
-                min-height: 100%;
-                background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
-                z-index: 1;
-            }
-            .hero-title,
-            .hero-subtitle {
-                color: #ffffff !important;
-            }
-            .hero-title {
-                font-size: 2rem;
-            }
-            .hero-subtitle {
-                font-size: 1rem;
-            }
-            .hero-cta-btn {
-                padding: 14px 28px;
-                font-size: 1rem;
-            }
-            .value-props-grid {
-                grid-template-columns: 1fr;
-            }
-            .salon-info-header h2 {
-                font-size: 1.75rem;
-                padding: 10px 16px;
-            }
-            .section-title {
-                font-size: 1.5rem;
-                padding-top: 30px; /* Extra padding on mobile */
-            }
-            .service-category-title {
-                padding-top: 30px; /* Extra padding on mobile */
-            }
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-            .sticky-booking-btn {
-                display: block;
-            }
-            .salon-info-header .rating-badge {
-                margin-bottom: 20px; /* Extra margin on mobile */
-            }
-            .content-wrapper {
-                padding-bottom: 120px; /* Extra padding to prevent content hiding behind sticky button */
-            }
-            .hero-content {
-                position: relative;
-                height: 100%;
-                padding: 20px;
-                z-index: 2;
-            }
-            .hero-content .container {
-                padding: 0 20px;
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-        @media (max-width: 480px) {
-            .hero-section {
-                position: relative;
-                height: 400px;
-                width: 100%;
-                max-width: 100vw;
-                margin: 0;
-                padding: 0;
-                left: 0;
-                right: 0;
-                overflow: hidden;
-            }
-            .hero-image {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                min-width: 100%;
-                min-height: 100%;
-                background-size: cover;
-                background-position: center center;
-                background-repeat: no-repeat;
-                object-fit: cover;
-            }
-            .hero-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                min-width: 100%;
-                min-height: 100%;
-                z-index: 1;
-            }
-            .hero-content {
-                position: relative;
-                height: 100%;
-                padding: 15px;
-                z-index: 2;
-            }
-            .hero-content .container {
-                padding: 0 15px;
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="${baseURL}/public-pages.css">
 </head>
-<body>
+<body class="sk-public-page sq-page">
     <!-- Login Button Above QR Code -->
     <div class="login-above-qr">
         <a href="${baseURL}/salonpanel/" class="btn-login-above">Login</a>
     </div>
     
-    <!-- QR Code Top Right Floating -->
-    <div class="qr-topright">
+    <!-- QR Code — app cliente uniquement -->
+    <div class="qr-topright qr-topright--client">
         <div class="qr-top-flex">
             <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
                 <div class="qr-code-wrapper">
                     <div id="qr-customer-top"></div>
                     <img class="qr-logo-overlay" src="${baseURL}/images/logo.png" alt="Skedisy">
                 </div>
-                <div class="qr-label">Download Customer App</div>
-            </div>
-            <div class="qr-top-block" data-app-type="expert" onclick="openPhoneSelection('expert')">
-                <div class="qr-code-wrapper">
-                    <div id="qr-expert-top"></div>
-                    <img class="qr-logo-overlay" src="${baseURL}/images/logo.png" alt="Skedisy">
-                </div>
-                <div class="qr-label">Download the Expert App</div>
+                <div class="qr-label">${copy.qrCustomer}</div>
             </div>
         </div>
     </div>
     
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar sq-navbar">
         <div class="nav-container">
             <div class="nav-logo">
                 <a href="${baseURL}" style="text-decoration: none; color: inherit;">
@@ -2065,11 +1149,13 @@ exports.serveSalonWebPage = async (req, res) => {
                     ${valuePropDescription ? `<p class="hero-subtitle" data-original-subtitle="${valuePropDescription.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${valuePropDescription.length > 150 ? valuePropDescription.substring(0, 150) + '...' : valuePropDescription}</p>` : `<p class="hero-subtitle" data-original-subtitle="${salonDescription.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${salonDescription.length > 150 ? salonDescription.substring(0, 150) + '...' : salonDescription}</p>`}
                     ${ratingBadgeHtml ? `<div class="hero-rating">${ratingBadgeHtml}</div>` : ''}
                     <button onclick="openApp()" class="hero-cta-btn">
-                        <i class="fas fa-calendar-check"></i> Book Now
+                        <i class="fas fa-calendar-check"></i> ${copy.bookOnApp}
                     </button>
                 </div>
             </div>
         </div>
+
+        ${idfBanner}
         
         <!-- Value Proposition Section -->
         ${valuePropFeatures.length > 0 || valuePropDescription ? `
@@ -2091,8 +1177,8 @@ exports.serveSalonWebPage = async (req, res) => {
                     ${salonReviewCount > 0 ? `
                     <div class="value-prop-item">
                         <div class="value-prop-icon">⭐</div>
-                        <h4>Top Rated</h4>
-                        <p>Rated ${salonRating.toFixed(1)} by ${salonReviewCount} clients</p>
+                        <h4>${copy.topRated}</h4>
+                        <p>${copy.topRatedDesc(salonRating.toFixed(1), salonReviewCount)}</p>
                     </div>
                     ` : ''}
                 </div>
@@ -2100,24 +1186,24 @@ exports.serveSalonWebPage = async (req, res) => {
                 <div class="value-props-grid">
                     <div class="value-prop-item">
                         <div class="value-prop-icon">✨</div>
-                        <h4>Elegant Atmosphere</h4>
-                        <p>Experience luxury in a sophisticated and welcoming environment</p>
+                        <h4>${copy.valuePropAfro1Title}</h4>
+                        <p>${copy.valuePropAfro1Desc}</p>
                     </div>
                     <div class="value-prop-item">
                         <div class="value-prop-icon">👨‍🎨</div>
-                        <h4>Expert Stylists</h4>
-                        <p>Our team of experienced professionals is dedicated to your satisfaction</p>
+                        <h4>${copy.valuePropAfro2Title}</h4>
+                        <p>${copy.valuePropAfro2Desc}</p>
                     </div>
                     <div class="value-prop-item">
-                        <div class="value-prop-icon">💆</div>
-                        <h4>Personalized Service</h4>
-                        <p>Every appointment includes a personalized consultation</p>
+                        <div class="value-prop-icon">📱</div>
+                        <h4>${copy.valuePropAfro3Title}</h4>
+                        <p>${copy.valuePropAfro3Desc}</p>
                     </div>
                     ${salonReviewCount > 0 ? `
                     <div class="value-prop-item">
                         <div class="value-prop-icon">⭐</div>
-                        <h4>Top Rated</h4>
-                        <p>Rated ${salonRating.toFixed(1)} by ${salonReviewCount} clients</p>
+                        <h4>${copy.topRated}</h4>
+                        <p>${copy.topRatedDesc(salonRating.toFixed(1), salonReviewCount)}</p>
                     </div>
                     ` : ''}
                 </div>
@@ -2130,24 +1216,24 @@ exports.serveSalonWebPage = async (req, res) => {
                 <div class="value-props-grid">
                     <div class="value-prop-item">
                         <div class="value-prop-icon">✨</div>
-                        <h4>Elegant Atmosphere</h4>
-                        <p>Experience luxury in a sophisticated and welcoming environment</p>
+                        <h4>${copy.valuePropAfro1Title}</h4>
+                        <p>${copy.valuePropAfro1Desc}</p>
                     </div>
                     <div class="value-prop-item">
                         <div class="value-prop-icon">👨‍🎨</div>
-                        <h4>Expert Stylists</h4>
-                        <p>Our team of experienced professionals is dedicated to your satisfaction</p>
+                        <h4>${copy.valuePropAfro2Title}</h4>
+                        <p>${copy.valuePropAfro2Desc}</p>
                     </div>
                     <div class="value-prop-item">
-                        <div class="value-prop-icon">💆</div>
-                        <h4>Personalized Service</h4>
-                        <p>Every appointment includes a personalized consultation</p>
+                        <div class="value-prop-icon">📱</div>
+                        <h4>${copy.valuePropAfro3Title}</h4>
+                        <p>${copy.valuePropAfro3Desc}</p>
                     </div>
                     ${salonReviewCount > 0 ? `
                     <div class="value-prop-item">
                         <div class="value-prop-icon">⭐</div>
-                        <h4>Top Rated</h4>
-                        <p>Rated ${salonRating.toFixed(1)} by ${salonReviewCount} clients</p>
+                        <h4>${copy.topRated}</h4>
+                        <p>${copy.topRatedDesc(salonRating.toFixed(1), salonReviewCount)}</p>
                     </div>
                     ` : ''}
                 </div>
@@ -2160,7 +1246,7 @@ exports.serveSalonWebPage = async (req, res) => {
             <div class="container">
                 <div class="salon-header-content">
                     <div class="salon-info-header">
-                        <h2>About ${salonName}</h2>
+                        <h2>${copy.aboutSalon(salonName)}</h2>
                         <p class="salon-description">${salonDescription}</p>
                         <div class="salon-contact">
                             ${salonAddress ? `<p><i class="fas fa-map-marker-alt"></i> ${salonAddress}</p>` : ''}
@@ -2184,21 +1270,21 @@ exports.serveSalonWebPage = async (req, res) => {
                     
                     <div class="sidebar-content">
                         <div class="booking-card">
-                            <h3>Book Your Appointment</h3>
+                            <h3>${copy.bookingCardTitle}</h3>
                             <button onclick="openApp()" class="open-app-btn">
-                                <i class="fas fa-calendar-check"></i> Book Now
+                                <i class="fas fa-calendar-check"></i> ${copy.bookOnApp}
                             </button>
                             <div id="download-section">
                                 <p style="text-align: center; margin-bottom: 16px; color: #666; font-size: 0.95rem;">
-                                    Don't have the app? Download it now:
+                                    ${copy.noAppDesc}
                                 </p>
                                 <div class="download-buttons">
-                                    <a href="https://play.google.com/store/apps/details?id=${androidPackage}" class="btn btn-primary" target="_blank">
-                                        <i class="fab fa-google-play"></i> Download for Android
+                                    <a href="https://play.google.com/store/apps/details?id=${androidPackage}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                                        <i class="fab fa-google-play"></i> ${copy.downloadAndroid}
                                     </a>
-                                    ${iosAppStoreId ? `<a href="https://apps.apple.com/app/id${iosAppStoreId}" class="btn btn-primary" target="_blank">
-                                        <i class="fab fa-apple"></i> Download for iOS
-                                    </a>` : '<a href="https://apps.apple.com/search?term=skedisy" class="btn btn-primary" target="_blank"><i class="fab fa-apple"></i> Download for iOS</a>'}
+                                    ${iosAppStoreId ? `<a href="https://apps.apple.com/app/id${iosAppStoreId}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                                        <i class="fab fa-apple"></i> ${copy.downloadIos}
+                                    </a>` : `<a href="https://apps.apple.com/search?term=skedisy" class="btn btn-primary" target="_blank" rel="noopener noreferrer"><i class="fab fa-apple"></i> ${copy.downloadIos}</a>`}
                                 </div>
                             </div>
                         </div>
@@ -2213,7 +1299,7 @@ exports.serveSalonWebPage = async (req, res) => {
     <!-- Sticky Booking Button (Mobile Only) -->
     <div class="sticky-booking-btn">
         <button onclick="openApp()">
-            <i class="fas fa-calendar-check"></i> Book Your Appointment
+            <i class="fas fa-calendar-check"></i> ${copy.stickyBook}
         </button>
     </div>
     

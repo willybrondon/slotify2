@@ -1,0 +1,729 @@
+/**
+ * Fiches salon + pages catégorie (SSR backend).
+ * Utilise les variables :root de styles.css — même palette que skedisy.com (sq-page).
+ */
+
+body.sk-public-page {
+    background: var(--sk-bg);
+    color: var(--sk-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 80px;
+}
+
+body.sk-public-page .main-wrapper {
+    flex: 1;
+    width: 100%;
+}
+
+/* Bandeau IDF */
+.skedisy-idf-banner {
+    background: var(--sk-primary);
+    color: var(--sk-inverse);
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.skedisy-idf-banner p {
+    margin: 0 auto;
+    max-width: 900px;
+}
+
+/* Bannière app (catégories) */
+.sked-app-banner {
+    background: var(--sk-bg-alt);
+    border-top: 1px solid var(--sk-border);
+    border-bottom: 1px solid var(--sk-border);
+    padding: 28px 20px;
+    text-align: center;
+}
+
+.sked-app-banner h3 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+    color: var(--sk-text);
+}
+
+.sked-app-banner p {
+    color: var(--sk-text-muted);
+    margin-bottom: 16px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sked-app-banner a {
+    display: inline-block;
+    background: var(--sk-primary);
+    color: var(--sk-inverse);
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.sked-app-banner a:hover {
+    background: var(--sk-primary-hover);
+}
+
+/* ——— Hero salon ——— */
+.sk-public-page .hero-section {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.sk-public-page .hero-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.sk-public-page .hero-placeholder {
+    background: linear-gradient(135deg, var(--sk-primary) 0%, var(--sk-primary-hover) 100%);
+}
+
+.sk-public-page .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        var(--sk-hero-overlay-top),
+        var(--sk-hero-overlay-bottom)
+    );
+    z-index: 1;
+}
+
+.sk-public-page .hero-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: var(--sk-inverse) !important;
+    padding: 40px 0;
+}
+
+.sk-public-page .hero-content *,
+.sk-public-page .hero-title,
+.sk-public-page .hero-subtitle {
+    color: var(--sk-inverse) !important;
+}
+
+.sk-public-page .hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.sk-public-page .hero-subtitle {
+    font-size: 1.15rem;
+    margin-bottom: 24px;
+    max-width: 700px;
+    line-height: 1.6;
+}
+
+.sk-public-page .hero-rating .rating-badge {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 8px 16px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sk-public-page .hero-cta-btn {
+    background: var(--sk-inverse);
+    color: var(--sk-primary) !important;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.sk-public-page .hero-cta-btn * {
+    color: var(--sk-primary) !important;
+}
+
+.sk-public-page .hero-cta-btn:hover {
+    transform: translateY(-2px);
+    background: var(--sk-bg-alt);
+}
+
+/* Value props */
+.sk-public-page .value-proposition-section {
+    background: var(--sk-bg-alt);
+    padding: 60px 0;
+    border-bottom: 1px solid var(--sk-border-light);
+}
+
+.sk-public-page .value-props-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 32px;
+}
+
+.sk-public-page .value-prop-item {
+    text-align: center;
+    padding: 24px;
+    background: var(--sk-bg);
+    border-radius: 16px;
+    border: 1px solid var(--sk-border-light);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sk-public-page .value-prop-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--sk-shadow);
+}
+
+.sk-public-page .value-prop-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.sk-public-page .value-prop-item h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--sk-text);
+    margin-bottom: 8px;
+}
+
+.sk-public-page .value-prop-item p {
+    color: var(--sk-text-muted);
+    font-size: 1rem;
+    line-height: 1.55;
+}
+
+/* En-tête salon */
+.sk-public-page .salon-header {
+    background: var(--sk-bg);
+    padding: 40px 0;
+    border-bottom: 1px solid var(--sk-border-light);
+}
+
+.sk-public-page .salon-info-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--sk-text);
+}
+
+.sk-public-page .salon-description {
+    color: #444;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+.sk-public-page .salon-contact p {
+    color: var(--sk-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sk-public-page .rating-stars,
+.sk-public-page .review-rating,
+.sk-public-page .staff-rating {
+    color: var(--sk-star);
+}
+
+/* Grille contenu */
+.sk-public-page .content-wrapper {
+    padding: 40px 0;
+}
+
+.sk-public-page .content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.sk-public-page .sidebar-content {
+    position: sticky;
+    top: 100px;
+}
+
+.sk-public-page .booking-card {
+    background: var(--sk-bg-alt);
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid var(--sk-border-light);
+}
+
+.sk-public-page .booking-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--sk-text);
+    margin-bottom: 20px;
+}
+
+.sk-public-page .open-app-btn {
+    background: var(--sk-primary);
+    color: var(--sk-inverse);
+    border: none;
+    padding: 16px 28px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.sk-public-page .open-app-btn:hover {
+    background: var(--sk-primary-hover);
+    transform: translateY(-1px);
+}
+
+.sk-public-page .btn-primary {
+    background: var(--sk-primary);
+    color: var(--sk-inverse);
+}
+
+.sk-public-page .btn-primary:hover {
+    background: var(--sk-primary-hover);
+}
+
+/* Sections */
+.sk-public-page .section {
+    padding: 32px 0;
+    border-bottom: 1px solid var(--sk-border-light);
+}
+
+.sk-public-page .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--sk-text);
+    margin-bottom: 24px;
+    scroll-margin-top: 100px;
+}
+
+.sk-public-page .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.sk-public-page .service-category-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--sk-text);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--sk-border-light);
+}
+
+.sk-public-page .service-item,
+.sk-public-page .product-item,
+.sk-public-page .staff-item,
+.sk-public-page .review-item {
+    background: var(--sk-bg);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--sk-border);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.sk-public-page .service-item:hover,
+.sk-public-page .product-item:hover,
+.sk-public-page .staff-item:hover,
+.sk-public-page .review-item:hover {
+    border-color: var(--sk-primary);
+    box-shadow: 0 4px 12px var(--sk-shadow);
+}
+
+.sk-public-page .service-book-btn {
+    margin-top: 16px;
+    width: 100%;
+    background: var(--sk-primary);
+    color: var(--sk-inverse);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.sk-public-page .service-book-btn:hover {
+    background: var(--sk-primary-hover);
+}
+
+.sk-public-page .service-price,
+.sk-public-page .product-price {
+    color: var(--sk-text);
+    font-weight: 700;
+}
+
+.sk-public-page .service-more,
+.sk-public-page .services-total-more {
+    color: var(--sk-text-muted);
+    text-align: center;
+    margin-top: 16px;
+    font-style: italic;
+}
+
+.sk-public-page .review-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--sk-primary);
+    color: var(--sk-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.sk-public-page .hours-closed {
+    color: var(--sk-text-soft);
+    font-style: italic;
+}
+
+.sk-public-page .empty-state {
+    color: var(--sk-text-soft);
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--sk-bg-muted);
+    border-radius: 12px;
+}
+
+/* Sticky mobile */
+.sk-public-page .sticky-booking-btn {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--sk-primary);
+    padding: 12px 16px;
+    z-index: 1000;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.sk-public-page .sticky-booking-btn button {
+    width: 100%;
+    background: var(--sk-inverse);
+    color: var(--sk-primary);
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ——— Pages catégorie ——— */
+.sk-public-page .category-hero-section {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+}
+
+.sk-public-page .category-hero-background {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--sk-primary) 0%, var(--sk-primary-hover) 100%);
+    background-size: cover;
+    background-position: center;
+}
+
+.sk-public-page .category-hero-image-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 160px;
+    height: 160px;
+    background: var(--sk-bg);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 3;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sk-public-page .category-hero-image-overlay img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.sk-public-page .category-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.25),
+        rgba(0, 0, 0, 0.55)
+    );
+    z-index: 1;
+}
+
+.sk-public-page .category-hero-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: var(--sk-inverse);
+    padding: 40px 0 40px 220px;
+}
+
+.sk-public-page .category-hero-title {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.sk-public-page .category-hero-description {
+    font-size: 1.1rem;
+    max-width: 700px;
+    line-height: 1.55;
+    opacity: 0.95;
+}
+
+.sk-public-page .category-hero-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.sk-public-page .category-hero-stats span {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.sk-public-page .category-header {
+    background: var(--sk-bg);
+    padding: 40px 0;
+    border-bottom: 1px solid var(--sk-border-light);
+}
+
+.sk-public-page .category-subtitle {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--sk-text);
+    margin-bottom: 12px;
+}
+
+.sk-public-page .category-description {
+    color: var(--sk-text-muted);
+    font-size: 1.05rem;
+}
+
+.sk-public-page .search-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 20px;
+}
+
+.sk-public-page .search-input {
+    width: 100%;
+    padding: 16px 50px 16px 20px;
+    border: 2px solid var(--sk-border);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.sk-public-page .search-input:focus {
+    outline: none;
+    border-color: var(--sk-primary);
+}
+
+.sk-public-page .salons-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 48px;
+}
+
+.sk-public-page .salons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.sk-public-page .salon-card {
+    background: var(--sk-bg);
+    border: 1px solid var(--sk-border);
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: block;
+}
+
+.sk-public-page .salon-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px var(--sk-shadow);
+    border-color: var(--sk-primary);
+}
+
+.sk-public-page .salon-card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.sk-public-page .salon-card-image-placeholder {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, var(--sk-primary) 0%, var(--sk-primary-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sk-inverse);
+    font-weight: 600;
+}
+
+.sk-public-page .salon-card-content {
+    padding: 20px;
+}
+
+.sk-public-page .salon-card-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--sk-text);
+    margin-bottom: 8px;
+}
+
+.sk-public-page .salon-card-cta-btn {
+    background: var(--sk-primary);
+    color: var(--sk-inverse);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.sk-public-page .salon-card:hover .salon-card-cta-btn {
+    background: var(--sk-primary-hover);
+}
+
+.sk-public-page .price-disclaimer {
+    color: var(--sk-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.sk-public-page .no-results {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--sk-text-soft);
+}
+
+/* Nav / catégories sur pages publiques */
+.sk-public-page .nav-menu-center a,
+.sk-public-page .category-link {
+    color: var(--sk-text);
+}
+
+.sk-public-page .nav-menu-center a:hover,
+.sk-public-page .category-link:hover {
+    color: var(--sk-primary-hover);
+}
+
+/* Footer : hérite de .sq-page .footer dans styles.css */
+.sk-public-page .footer:not(.sq-footer) {
+    background: var(--sk-footer-bg);
+    margin-top: 48px;
+}
+
+@media (max-width: 968px) {
+    .sk-public-page .content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sk-public-page .sidebar-content {
+        position: static;
+    }
+
+    .sk-public-page .hero-section {
+        height: 400px;
+    }
+
+    .sk-public-page .category-hero-content {
+        padding-left: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    body.sk-public-page {
+        padding-top: 0;
+        padding-bottom: 88px;
+    }
+
+    .sk-public-page .sticky-booking-btn {
+        display: block;
+    }
+
+    .sk-public-page .category-hero-section {
+        height: auto;
+        min-height: 280px;
+        padding: 24px 0;
+    }
+
+    .sk-public-page .category-hero-image-overlay {
+        position: relative;
+        width: 88px;
+        height: 88px;
+        top: auto;
+        left: auto;
+        flex-shrink: 0;
+    }
+
+    .sk-public-page .category-hero-section {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .sk-public-page .category-hero-content {
+        padding: 0;
+        height: auto;
+        flex: 1;
+    }
+
+    .sk-public-page .salons-grid {
+        grid-template-columns: 1fr;
+    }
+}

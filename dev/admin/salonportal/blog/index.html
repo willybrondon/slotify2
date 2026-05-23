@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="blog.pageTitle">Blog Skedisy — Beauté afro en Île-de-France</title>
+    <meta name="description" content="Conseils et ressources Skedisy : salons afro en Île-de-France, réservation sur l'app, tresses, locks, perruques.">
+    <link rel="canonical" href="https://skedisy.com/blog/">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../cookie-consent.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <script src="../language.js" defer></script>
+</head>
+<body class="client-page sq-page sq-blog-page" data-page="client">
+    <div class="login-above-qr header-actions-above-qr">
+        <a href="/professionnel/" class="btn-nav-above btn-pro-above" data-translate="nav.pro">Pro</a>
+        <a href="https://skedisy.com/salonpanel/" class="btn-login-above" data-translate="nav.login">Login</a>
+    </div>
+
+    <nav class="navbar sq-navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/" style="text-decoration: none; color: inherit;"><h2>Skedisy</h2></a>
+            </div>
+            <div class="nav-menu-center desktop-only" id="categoriesMenu"></div>
+            <div class="mobile-menu-wrapper">
+                <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3 data-translate="nav.menu">Menu</h3>
+                <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English"><i class="fas fa-globe"></i> <span>EN</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+                </div>
+            </div>
+            <div class="mobile-menu-content">
+                <a href="/professionnel/" class="btn-login-mobile-menu btn-pro-mobile-menu" data-translate="nav.pro">Pro</a>
+                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Login</a>
+                <a href="/blog/" class="category-link nav-link--active" data-translate="nav.blog">Blog</a>
+                <a href="../ai-concierge.html" class="btn-ai-concierge-mobile"><i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span></a>
+                <div class="mobile-categories" id="mobileCategories"></div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="sq-blog-main">
+        <header class="sq-blog-hero">
+            <div class="container">
+                <p class="sq-kicker" data-translate="blog.eyebrow">Île-de-France · Beauté afro</p>
+                <h1 class="sq-display" data-translate="blog.heroTitle">Le blog Skedisy</h1>
+                <p class="sq-lead" data-translate="blog.heroLead">
+                    Ressources pour la communauté : trouver un salon afro, réserver sur l'app, comprendre nos prestations.
+                    Découvre sur le site, réserve sur l'app Skedisy (gratuite).
+                </p>
+            </div>
+        </header>
+
+        <section class="sq-blog-grid-section">
+            <div class="container">
+                <h2 class="sq-section-title" data-translate="blog.guidesTitle">Guides &amp; parcours</h2>
+                <div class="sq-blog-grid">
+                    <a href="/#categories-browse" class="sq-blog-card">
+                        <span class="sq-blog-card-label" data-translate="blog.card1Label">Salons</span>
+                        <h3 data-translate="blog.card1Title">Parcourir les prestations en IDF</h3>
+                        <p data-translate="blog.card1Desc">Tresses, locks, perruques, homme, esthétique — salons afro par catégorie.</p>
+                        <span class="sq-link" data-translate="blog.readMore">Voir les catégories →</span>
+                    </a>
+                    <div class="sq-blog-card sq-blog-card--stores">
+                        <span class="sq-blog-card-label" data-translate="blog.card2Label">App</span>
+                        <h3 data-translate="blog.card2Title">Réserver sur l'app</h3>
+                        <p data-translate="blog.card2Desc">Créneaux, expertes, rappels : la réservation se fait sur l'app cliente Skedisy.</p>
+                        <div class="sq-store-badges-mount" data-app="customer"></div>
+                    </div>
+                    <a href="../ai-concierge.html" class="sq-blog-card">
+                        <span class="sq-blog-card-label" data-translate="blog.card3Label">IA</span>
+                        <h3 data-translate="blog.card3Title">Concierge IA</h3>
+                        <p data-translate="blog.card3Desc">Selfie et recommandation adaptée aux cheveux texturés — complément à la recherche salon.</p>
+                        <span class="sq-link" data-translate="hero.tryAI">Essayer le Concierge IA →</span>
+                    </a>
+                    <a href="/professionnel/" class="sq-blog-card">
+                        <span class="sq-blog-card-label" data-translate="blog.card4Label">Pro</span>
+                        <h3 data-translate="blog.card4Title">Vous gérez un salon afro ?</h3>
+                        <p data-translate="blog.card4Desc">Agenda, réservations, visibilité auprès des clientes en Île-de-France. Gratuit pour commencer.</p>
+                        <span class="sq-link" data-translate="nav.pro">Espace professionnel →</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="sq-blog-soon">
+            <div class="container sq-blog-soon-inner">
+                <h2 data-translate="blog.soonTitle">Articles à venir</h2>
+                <p data-translate="blog.soonDesc">Nous préparons des contenus sur l'entretien des tresses et locks, choisir son salon en IDF, et le parcours réservation Skedisy.</p>
+                <div class="sq-pills" aria-label="Thèmes à venir">
+                    <span data-translate="trust.tresses">Tresses</span>
+                    <span data-translate="trust.locks">Locks</span>
+                    <span data-translate="trust.wigs">Perruques</span>
+                    <span data-translate="trust.homme">Homme</span>
+                    <span data-translate="trust.esthetique">Esthétique</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="sq-final-cta">
+            <div class="container sq-final-cta-inner">
+                <h2 data-translate="client.finalCtaTitle">Prête pour ton prochain rendez-vous ?</h2>
+                <p data-translate="client.finalCtaDesc">Télécharge l'app et rejoins la communauté Skedisy en Île-de-France.</p>
+                <div class="sq-cta-row sq-cta-row--center">
+                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                    <a href="/" class="sq-btn sq-btn-ghost sq-btn-ghost--on-dark" data-translate="blog.backHome">Retour à l'accueil</a>
+                </div>
+                <div class="sq-store-badges-mount" data-app="customer" data-variant="on-dark" data-center="true"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer sq-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Skedisy</h3>
+                    <p data-translate="footer.clientTagline">La réservation pour la communauté afro en Île-de-France.</p>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> support@skedisy.com</p>
+                        <p>
+                            <a href="https://wa.me/33766160394" class="btn-whatsapp-inline" target="_blank" rel="noopener noreferrer" data-translate="footer.whatsapp">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </p>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.about">About</h4>
+                    <ul>
+                        <li><a href="/" data-translate="blog.backHome">Accueil</a></li>
+                        <li><a href="#" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a></li>
+                        <li><a href="/professionnel/" data-translate="nav.pro">Pro</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.legal">Legal</h4>
+                    <ul>
+                        <li><a href="/terms/" data-translate="footer.terms">Terms of Service</a></li>
+                        <li><a href="/privacy/" data-translate="footer.privacy">Privacy Policy</a></li>
+                        <li><a href="/cookies/" data-translate="footer.cookies">Cookie Management</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-translate="footer.rights">&copy; 2024 Skedisy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="phone-selection-modal" class="modal">
+        <div class="modal-content phone-selection">
+            <span class="close">&times;</span>
+            <h2 id="modal-title" data-translate="modal.choosePlatform">Choose Your Platform</h2>
+            <p id="modal-description" data-translate="modal.selectDevice">Select your device to download the app</p>
+            <div class="phone-options">
+                <div class="phone-option" data-platform="android">
+                    <div class="store-logo"><i class="fab fa-google-play"></i></div>
+                    <h3 data-translate="modal.android">Android</h3>
+                    <p data-translate="modal.downloadAndroid">Download from Google Play Store</p>
+                    <div class="download-link" id="android-link"><i class="fas fa-download"></i> <span data-translate="modal.download">Download</span></div>
+                </div>
+                <div class="phone-option" data-platform="ios">
+                    <div class="store-logo"><i class="fab fa-apple"></i></div>
+                    <h3 data-translate="modal.iphone">iPhone</h3>
+                    <p data-translate="modal.downloadIOS">Download from App Store</p>
+                    <div class="download-link" id="ios-link"><i class="fas fa-download"></i> <span data-translate="modal.download">Download</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../cookie-consent.js"></script>
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 // Navigation functionality
 document.addEventListener('DOMContentLoaded', function() {
+    mountStoreBadges();
+
     // Initialize language system (if language.js is loaded)
     if (typeof setLanguage === 'function') {
         const savedLang = localStorage.getItem('skedisy-language') || 'fr';
@@ -12,6 +14,13 @@ document.addEventListener('DOMContentLoaded', function() {
         initProNavigation();
     } else {
         loadCategories();
+    }
+
+    const pathNorm = window.location.pathname.replace(/\/$/, '') || '/';
+    if (pathNorm === '/blog') {
+        document.querySelectorAll('a[href="/blog/"]').forEach(function (el) {
+            el.classList.add('nav-btn--active');
+        });
     }
     
     // Mobile menu toggle
@@ -336,7 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
         left: 0;
         width: 0%;
         height: 3px;
-        background: linear-gradient(90deg, #3498db, #e74c3c);
+        background: linear-gradient(90deg, var(--sk-primary), var(--sk-primary-hover));
         z-index: 9999;
         transition: width 0.3s ease;
     `;
@@ -471,10 +480,41 @@ const APP_DOWNLOAD_LINKS = {
         ios: 'https://apps.apple.com/fr/app/skedisy/id6752954525'
     },
     expert: {
-        android: 'https://play.google.com/store/apps/details?id=com.skedisy.expert',
+        android: 'https://play.google.com/store/apps/details?id=com.skedisy.expert&hl=fr',
         ios: 'https://apps.apple.com/fr/app/skedisy-xp/id6752965522'
     }
 };
+
+function buildStoreBadgesHtml(appType) {
+    const links = APP_DOWNLOAD_LINKS[appType] || APP_DOWNLOAD_LINKS.customer;
+    return (
+        '<a class="sq-store-badge sq-store-badge--play" href="' + links.android + '" target="_blank" rel="noopener noreferrer" aria-label="Google Play">' +
+        '<span class="sq-store-badge-icon" aria-hidden="true"><i class="fab fa-google-play"></i></span>' +
+        '<span class="sq-store-badge-text">' +
+        '<small data-translate="store.availableOn">Disponible sur</small>' +
+        '<strong data-translate="store.googlePlay">Google Play</strong>' +
+        '</span></a>' +
+        '<a class="sq-store-badge sq-store-badge--apple" href="' + links.ios + '" target="_blank" rel="noopener noreferrer" aria-label="App Store">' +
+        '<span class="sq-store-badge-icon" aria-hidden="true"><i class="fab fa-apple"></i></span>' +
+        '<span class="sq-store-badge-text">' +
+        '<small data-translate="store.availableOnAppStore">Disponible sur l\'</small>' +
+        '<strong data-translate="store.appStore">App Store</strong>' +
+        '</span></a>'
+    );
+}
+
+function mountStoreBadges() {
+    document.querySelectorAll('.sq-store-badges-mount').forEach(function (mount) {
+        const appType = mount.getAttribute('data-app') || 'customer';
+        const onDark = mount.getAttribute('data-variant') === 'on-dark';
+        mount.className = 'sq-store-badges' + (onDark ? ' sq-store-badges--on-dark' : '');
+        if (mount.getAttribute('data-center') === 'true') {
+            mount.classList.add('sq-store-badges--center');
+        }
+        mount.setAttribute('data-app', appType);
+        mount.innerHTML = buildStoreBadgesHtml(appType);
+    });
+}
 
 // Global variable to store current app type
 let currentAppType = 'customer';

@@ -14,7 +14,7 @@
 .ai-icon {
     font-size: 80px;
     margin-bottom: 20px;
-    color: #667eea;
+    color: #111;
     animation: float 3s ease-in-out infinite;
 }
 
@@ -62,14 +62,14 @@
 .upload-area {
     position: relative;
     min-height: 400px;
-    border: 3px dashed #667eea;
+    border: 3px dashed #111;
     border-radius: 15px;
     background: #f8f9fa;
     transition: all 0.3s ease;
 }
 
 .upload-area.dragover {
-    border-color: #764ba2;
+    border-color: #333;
     background: #e9ecef;
     transform: scale(1.02);
 }
@@ -86,7 +86,7 @@
 
 .upload-placeholder i {
     font-size: 80px;
-    color: #667eea;
+    color: #111;
     margin-bottom: 20px;
 }
 
@@ -110,7 +110,7 @@
 .btn-upload {
     margin-top: 30px;
     padding: 15px 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #111 0%, #333 100%);
     color: white;
     border: none;
     border-radius: 50px;
@@ -167,7 +167,7 @@
 
 .btn-analyze {
     padding: 18px 50px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #111 0%, #333 100%);
     color: white;
     border: none;
     border-radius: 50px;
@@ -224,7 +224,7 @@
 
 .analysis-card h2 i,
 .recommendations-card h2 i {
-    color: #667eea;
+    color: #111;
 }
 
 .analysis-content {
@@ -237,12 +237,12 @@
     background: #f8f9fa;
     padding: 25px;
     border-radius: 15px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #111;
 }
 
 .analysis-item h3 {
     font-size: 20px;
-    color: #667eea;
+    color: #111;
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -276,7 +276,7 @@
 }
 
 .service-card:hover {
-    border-color: #667eea;
+    border-color: #111;
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
 }
@@ -314,7 +314,7 @@
 }
 
 .salon-item:hover {
-    border-color: #667eea;
+    border-color: #111;
     transform: translateX(5px);
 }
 
@@ -390,8 +390,8 @@
 .btn-secondary {
     padding: 15px 40px;
     background: white;
-    color: #667eea;
-    border: 2px solid #667eea;
+    color: #111;
+    border: 2px solid #111;
     border-radius: 50px;
     font-size: 16px;
     font-weight: 600;
@@ -404,14 +404,14 @@
 }
 
 .btn-secondary:hover {
-    background: #667eea;
+    background: #111;
     color: white;
     transform: translateY(-2px);
 }
 
 .btn-primary {
     padding: 15px 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #111 0%, #333 100%);
     color: white;
     border: none;
     border-radius: 50px;

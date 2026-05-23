@@ -202,6 +202,8 @@ Si non → reformuler ou ne pas publier.
 **Liens bio :**
 - App cliente Android : `https://play.google.com/store/apps/details?id=com.skedisy.customer`
 - App cliente iOS : `https://apps.apple.com/fr/app/skedisy/id6752954525`
+- App expert Android : `https://play.google.com/store/apps/details?id=com.skedisy.expert&hl=fr`
+- App expert iOS (Skedisy XP) : `https://apps.apple.com/fr/app/skedisy-xp/id6752965522`
 - Portail pro : `https://skedisy.com/salonpanel`
 - Claim salon : `https://skedisy.com/salon/claim`
 
