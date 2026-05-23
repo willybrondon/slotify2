@@ -1341,7 +1341,7 @@ html {
 
 /* Footer — noir & blanc */
 .footer {
-    background: #000;
+    background: #111;
     color: #fff;
     padding: 4rem 0 2rem;
 }
@@ -1399,6 +1399,45 @@ html {
 
 .contact-info a:not(.btn-whatsapp-inline):hover {
     color: #fff;
+}
+
+.footer-social {
+    margin-top: 1.5rem;
+}
+
+.footer-social h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 0.75rem;
+}
+
+.footer-social-links {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.footer-social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 1.1rem;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.footer-social-link:hover {
+    background: #fff;
+    border-color: #fff;
+    color: #111 !important;
 }
 
 .footer-bottom {
@@ -4122,15 +4161,17 @@ html {
 }
 
 .sq-footer {
-    background: #000;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    background: #111;
+    border-top: 2px solid rgba(255, 255, 255, 0.28);
+    margin-top: 0;
 }
 
-/* Pied de page pages Squire (client + pro) */
+/* Pied de page : même fond que .sq-final-cta (#111), séparé par la bordure */
 .sq-page .footer,
 .sq-page .sq-footer {
-    background: #000 !important;
+    background: #111 !important;
     color: #fff !important;
+    border-top: 2px solid rgba(255, 255, 255, 0.28);
 }
 
 .sq-page .footer-section h3,
@@ -4162,6 +4203,21 @@ html {
 }
 
 .sq-page .footer .btn-whatsapp-inline:hover {
+    background: #fff;
+    color: #111 !important;
+    border-color: #fff;
+}
+
+.sq-page .footer-social h4 {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.sq-page .footer-social-link {
+    color: #fff !important;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.sq-page .footer-social-link:hover {
     background: #fff;
     color: #111 !important;
     border-color: #fff;

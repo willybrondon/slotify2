@@ -76,6 +76,7 @@ const translations = {
         'client.finalCtaDesc': 'Download the app and join the Skedisy community in Île-de-France.',
         'footer.clientTagline': 'Booking for the Afro community in Île-de-France.',
         'footer.whatsapp': 'WhatsApp',
+        'footer.followUs': 'Follow us',
         
         // Pro page
         'pro.heroEyebrow': 'For professionals',
@@ -769,7 +770,8 @@ const translations = {
         'client.finalCtaDesc': 'Télécharge l\'app et rejoins la communauté Skedisy en Île-de-France.',
         'footer.clientTagline': 'La réservation pour la communauté afro en Île-de-France.',
         'footer.whatsapp': 'WhatsApp',
-        
+        'footer.followUs': 'Suivez-nous',
+
         // Pro page
         'pro.heroEyebrow': 'Espace professionnel',
         'pro.claimSalon': 'Réclamer mon salon',
