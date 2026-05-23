@@ -354,13 +354,14 @@ function initProNavigation() {
     const currentLang = localStorage.getItem('skedisy-language') || 'fr';
     const switchToLang = currentLang === 'fr' ? 'en' : 'fr';
     const switchToShort = switchToLang.toUpperCase();
-    const docsHref = 'https://skedisy.com/docs/index.html';
+    const blogHref = '/blog/';
     const navBits =
-        '<a href="' + docsHref + '" class="nav-link documentation-link" data-translate="nav.documentation">Docs</a>' +
-        '<a href="/professionnel/" class="nav-link nav-link-pro-active" data-translate="nav.pro">Pro</a>' +
-        /* Do not add ai-concierge.html here */
-        '<button class="lang-switcher desktop-only" data-lang="' + switchToLang + '" title="Switch to ' + switchToShort + '">' +
-        '<i class="fas fa-globe"></i> <span>' + switchToShort + '</span></button>';
+        '<span class="nav-menu-actions">' +
+        '<a href="' + blogHref + '" class="nav-btn" data-translate="nav.blog">Blog</a>' +
+        '<a href="/professionnel/" class="nav-btn nav-btn--active" data-translate="nav.pro">Pro</a>' +
+        '<button type="button" class="nav-btn lang-switcher desktop-only" data-lang="' + switchToLang + '" title="Switch to ' + switchToShort + '">' +
+        '<i class="fas fa-globe"></i> <span>' + switchToShort + '</span></button>' +
+        '</span>';
     if (desktopMenu) {
         desktopMenu.innerHTML = navBits;
     }
@@ -436,11 +437,12 @@ function renderCategories(categories) {
     const switchToLang = currentLang === 'fr' ? 'en' : 'fr';
     const switchToShort = switchToLang.toUpperCase(); // EN or FR
     
-    desktopMenu.innerHTML = categoriesHtml + 
-        '<a href="https://skedisy.com/docs/index.html" class="nav-link documentation-link" data-translate="nav.documentation">Docs</a>' +
-        `<button class="lang-switcher desktop-only" data-lang="${switchToLang}" title="Switch to ${switchToShort}">
-            <i class="fas fa-globe"></i> <span>${switchToShort}</span>
-        </button>`;
+    desktopMenu.innerHTML = categoriesHtml +
+        '<span class="nav-menu-actions">' +
+        '<a href="/blog/" class="nav-btn" data-translate="nav.blog">Blog</a>' +
+        `<button type="button" class="nav-btn lang-switcher desktop-only" data-lang="${switchToLang}" title="Switch to ${switchToShort}">` +
+        `<i class="fas fa-globe"></i> <span>${switchToShort}</span></button>` +
+        '</span>';
     
     // Mobile menu
     mobileMenu.innerHTML = categories.map(category => {

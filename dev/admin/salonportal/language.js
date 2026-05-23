@@ -4,6 +4,7 @@ const translations = {
         // Navigation
         'nav.aiConcierge': 'AI Concierge',
         'nav.documentation': 'Docs',
+        'nav.blog': 'Blog',
         'nav.menu': 'Menu',
         'nav.login': 'Login',
         'nav.pro': 'Pro',
@@ -696,6 +697,7 @@ const translations = {
         // Navigation
         'nav.aiConcierge': 'Concierge IA',
         'nav.documentation': 'Docs',
+        'nav.blog': 'Blog',
         'nav.menu': 'Menu',
         'nav.login': 'Connexion',
         'nav.pro': 'Pro',
