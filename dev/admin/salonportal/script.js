@@ -6,8 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
         setLanguage(savedLang);
     }
     
-    // Load categories
-    loadCategories();
+    // Load categories (client homepage only — not on /professionnel)
+    const isProPage = document.body.dataset.page === 'pro';
+    if (isProPage) {
+        initProNavigation();
+    } else {
+        loadCategories();
+    }
     
     // Mobile menu toggle
     const hamburger = document.getElementById('mobileMenuToggle');
@@ -342,6 +347,29 @@ document.addEventListener('DOMContentLoaded', function() {
         progressBar.style.width = scrolled + '%';
     });
 });
+
+// Pro page nav (no category browse)
+function initProNavigation() {
+    const desktopMenu = document.getElementById('proNavMenu');
+    const currentLang = localStorage.getItem('skedisy-language') || 'fr';
+    const switchToLang = currentLang === 'fr' ? 'en' : 'fr';
+    const switchToShort = switchToLang.toUpperCase();
+    const docsHref = 'https://skedisy.com/docs/index.html';
+    const navBits =
+        '<a href="' + docsHref + '" class="nav-link documentation-link" data-translate="nav.documentation">Docs</a>' +
+        '<a href="/professionnel/" class="nav-link nav-link-pro-active" data-translate="nav.pro">Pro</a>' +
+        '<button class="lang-switcher desktop-only" data-lang="' + switchToLang + '" title="Switch to ' + switchToShort + '">' +
+        '<i class="fas fa-globe"></i> <span>' + switchToShort + '</span></button>';
+    if (desktopMenu) {
+        desktopMenu.innerHTML = navBits;
+    }
+    if (typeof updateLanguageSwitcher === 'function') {
+        updateLanguageSwitcher();
+    }
+    if (typeof translatePage === 'function') {
+        translatePage();
+    }
+}
 
 // Load categories from API
 function loadCategories() {
