@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skedisy — Réserve ta beauté afro en Île-de-France</title>
-    <meta name="description" content="Trouve et réserve dans les salons de beauté afro en Île-de-France. Tresses, locks, tissages, cheveux naturels. Réservation sur l'app Skedisy.">
+    <meta name="description" content="Trouve et réserve dans les salons de beauté afro en Île-de-France. Tresses, locks, perruques. Réservation sur l'app Skedisy.">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <script src="language.js" defer></script>
 </head>
-<body class="client-page" data-page="client">
+<body class="client-page sq-page" data-page="client">
     <div class="login-above-qr header-actions-above-qr">
         <a href="/professionnel/" class="btn-nav-above btn-pro-above" data-translate="nav.pro">Pro</a>
         <a href="https://skedisy.com/salonpanel/" class="btn-login-above" data-translate="nav.login">Login</a>
@@ -21,32 +21,24 @@
     <div class="qr-topright">
         <div class="qr-top-flex">
             <div class="qr-top-block" id="download-customer" data-app-type="customer" onclick="openPhoneSelection('customer')">
-                <div class="qr-code-wrapper">
-                    <div id="qr-customer-top"></div>
-                </div>
+                <div class="qr-code-wrapper"><div id="qr-customer-top"></div></div>
                 <div class="qr-label" data-translate="qr.customerApp">Download Customer App</div>
             </div>
             <div class="qr-top-block" id="download-expert" data-app-type="expert" onclick="openPhoneSelection('expert')">
-                <div class="qr-code-wrapper">
-                    <div id="qr-expert-top"></div>
-                </div>
+                <div class="qr-code-wrapper"><div id="qr-expert-top"></div></div>
                 <div class="qr-label" data-translate="qr.expertApp">Download the Expert App</div>
             </div>
         </div>
     </div>
 
-    <nav class="navbar">
+    <nav class="navbar sq-navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <a href="https://skedisy.com" style="text-decoration: none; color: inherit;">
-                    <h2>Skedisy</h2>
-                </a>
+                <a href="https://skedisy.com" style="text-decoration: none; color: inherit;"><h2>Skedisy</h2></a>
             </div>
             <div class="nav-menu-center desktop-only" id="categoriesMenu"></div>
             <div class="mobile-menu-wrapper">
-                <div class="hamburger mobile-only" id="mobileMenuToggle">
-                    <span></span><span></span><span></span>
-                </div>
+                <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
             </div>
         </div>
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
@@ -54,9 +46,7 @@
             <div class="mobile-menu-header">
                 <h3 data-translate="nav.menu">Menu</h3>
                 <div class="mobile-menu-header-right">
-                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
-                        <i class="fas fa-globe"></i> <span>EN</span>
-                    </button>
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English"><i class="fas fa-globe"></i> <span>EN</span></button>
                     <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
                 </div>
             </div>
@@ -64,9 +54,7 @@
                 <a href="/professionnel/" class="btn-login-mobile-menu btn-pro-mobile-menu" data-translate="nav.pro">Pro</a>
                 <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Login</a>
                 <a href="https://skedisy.com/docs/index.html" class="mobile-documentation-link" data-translate="nav.documentation">Docs</a>
-                <a href="ai-concierge.html" class="btn-ai-concierge-mobile">
-                    <i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span>
-                </a>
+                <a href="ai-concierge.html" class="btn-ai-concierge-mobile"><i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span></a>
                 <div class="mobile-categories" id="mobileCategories"></div>
             </div>
         </div>
@@ -82,113 +70,185 @@
         <a href="#" class="mobile-download-btn customer" onclick="openPhoneSelection('customer'); return false;" data-translate="qr.customerApp">Download Customer App</a>
     </div>
 
-    <!-- Hero cliente — inspiré Squire (Find / Book) -->
-    <section class="hero client-hero">
-        <div class="hero-container">
-            <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Beauté afro en Île-de-France">
-            </div>
-            <div class="hero-content">
-                <p class="hero-eyebrow" data-translate="client.heroEyebrow">Île-de-France · Beauté afro</p>
-                <h1 data-translate="client.heroHeadline">Réserve ta beauté afro en Île-de-France</h1>
-                <p class="hero-subtitle" data-translate="client.heroSubheadline">
-                    Les salons de la communauté — tresses, locks, tissages, cheveux naturels.<br>
-                    Découvre sur le site, réserve sur l'app Skedisy.
+    <!-- Hero — structure Squire, ton Skedisy -->
+    <section class="sq-hero">
+        <div class="sq-hero-grid">
+            <div class="sq-hero-copy">
+                <p class="sq-kicker" data-translate="client.heroEyebrow">Île-de-France · Beauté afro</p>
+                <h1 class="sq-display" data-translate="client.heroHeadline">L'app pour réserver ta beauté afro</h1>
+                <p class="sq-lead" data-translate="client.heroSubheadline">
+                    Salons de la communauté — tresses, locks, perruques, homme, esthétique.<br>
+                    Découvre sur le site, réserve sur l'app.
                 </p>
-                <div class="hero-buttons">
-                    <a href="#categories-browse" class="btn-primary" data-translate="client.browseSalons">Parcourir les prestations</a>
-                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="btn-secondary" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                <div class="sq-cta-row">
+                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                    <a href="#categories-browse" class="sq-btn sq-btn-ghost" data-translate="client.browseSalons">Parcourir les prestations</a>
                 </div>
-                <p class="hero-app-note" data-translate="client.heroAppNote">
-                    <i class="fas fa-info-circle"></i> La réservation des créneaux se fait sur l'app (gratuite).
-                </p>
+                <p class="sq-note" data-translate="client.heroAppNote">La réservation des créneaux se fait sur l'app Skedisy (gratuite).</p>
             </div>
-        </div>
-    </section>
-
-    <section class="trust-section trust-section-client">
-        <div class="container">
-            <h2 data-translate="client.trustTitle">Pensé pour nos cheveux, nos salons, nos quartiers</h2>
-            <div class="trust-badges">
-                <span class="trust-badge-item" data-translate="trust.braids">Braids</span>
-                <span class="trust-badge-item" data-translate="trust.wigs">Wigs</span>
-                <span class="trust-badge-item" data-translate="trust.locks">Locks</span>
-                <span class="trust-badge-item" data-translate="trust.naturalHair">Natural hair</span>
-            </div>
-            <p class="trust-niche" data-translate="trust.niche">👉 Not generic beauty. Afro beauty only.</p>
-        </div>
-    </section>
-
-    <!-- Parcours 3 étapes -->
-    <section class="how-it-works-section" id="how-it-works">
-        <div class="container">
-            <h2 data-translate="client.howItWorksTitle">Comment ça marche</h2>
-            <div class="how-it-works-grid">
-                <div class="how-step">
-                    <span class="how-step-num">1</span>
-                    <h3 data-translate="client.step1Title">Découvre</h3>
-                    <p data-translate="client.step1Desc">Parcours les catégories ou une fiche salon sur skedisy.com — services, équipe, avis.</p>
+            <div class="sq-hero-visual">
+                <div class="sq-photo-frame">
+                    <img src="https://images.unsplash.com/photo-1610392133048-f459a6a2d337?auto=format&fit=crop&w=1200&q=85" alt="Coiffeuse et cliente en salon afro" width="600" height="750" loading="eager">
                 </div>
-                <div class="how-step">
-                    <span class="how-step-num">2</span>
-                    <h3 data-translate="client.step2Title">Télécharge l'app</h3>
-                    <p data-translate="client.step2Desc">Installe Skedisy sur iPhone ou Android (gratuit).</p>
-                </div>
-                <div class="how-step">
-                    <span class="how-step-num">3</span>
-                    <h3 data-translate="client.step3Title">Réserve</h3>
-                    <p data-translate="client.step3Desc">Choisis ta prestation, ton experte et ton créneau — confirmation et rappels SMS.</p>
+                <div class="sq-device-frame" aria-hidden="true">
+                    <img src="images/cus_tab_1_menu.png" alt="" width="280" height="560" loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1580618672591-eb180b1a4964?auto=format&fit=crop&w=400&q=80'; this.alt='Prestations beauté afro';">
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Blocs type Squire -->
-    <section class="client-benefits-section">
-        <div class="container">
-            <div class="client-benefit-row">
-                <div class="client-benefit-text">
-                    <h2 data-translate="client.benefit1Title">Trouve ton salon</h2>
-                    <p data-translate="client.benefit1Desc">Salons afro en Île-de-France : parcoure les prestations via le menu ou l'app.</p>
-                    <a href="#categories-browse" class="btn-text-link" data-translate="client.browseSalons">Parcourir les prestations →</a>
-                </div>
-                <div class="client-benefit-visual" aria-hidden="true">
-                    <i class="fas fa-map-marker-alt"></i>
-                </div>
-            </div>
-            <div class="client-benefit-row client-benefit-row-reverse">
-                <div class="client-benefit-text">
-                    <h2 data-translate="client.benefit2Title">Réserve sur l'app</h2>
-                    <p data-translate="client.benefit2Desc">Créneaux en temps réel, paiement sécurisé, rappels avant ton rendez-vous.</p>
-                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="btn-primary btn-sm" data-translate="client.downloadAppCta">Télécharger l'app</a>
-                </div>
-                <div class="client-benefit-visual" aria-hidden="true">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
-            </div>
-            <div class="client-benefit-row">
-                <div class="client-benefit-text">
-                    <h2 data-translate="platform.aiTitle">AI Beauty Concierge</h2>
-                    <p data-translate="client.aiDesc">Envoie un selfie : l'IA te recommande la prestation adaptée à tes cheveux texturés.</p>
-                    <a href="ai-concierge.html" class="btn-text-link" data-translate="platform.tryNow">Try Now →</a>
-                </div>
-                <div class="client-benefit-visual client-benefit-visual-ai" aria-hidden="true">
-                    <i class="fas fa-robot"></i>
-                </div>
+    <section class="sq-trust-bar">
+        <div class="container sq-trust-bar-inner">
+            <p data-translate="client.trustBar">Beauté afro uniquement — pas de beauté générique.</p>
+            <div class="sq-pills" aria-label="Catégories">
+                <span data-translate="trust.tresses">Tresses</span>
+                <span data-translate="trust.locks">Locks</span>
+                <span data-translate="trust.wigs">Perruques</span>
+                <span data-translate="trust.homme">Homme</span>
+                <span data-translate="trust.esthetique">Esthétique</span>
             </div>
         </div>
     </section>
 
-    <section class="categories-hint-section" id="categories-browse">
+    <!-- Blocs alternés type Squire -->
+    <section class="sq-feature">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media">
+                <img src="https://images.unsplash.com/photo-1580618672591-eb180b1a4964?auto=format&fit=crop&w=900&q=85" alt="Tresses et braids en salon" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <h2 data-translate="client.feature1Title">Trouve ton salon</h2>
+                <p data-translate="client.feature1Desc">Salons afro en Île-de-France : par quartier, par prestation, par avis. Visible sur le web, réservable sur l'app.</p>
+                <a href="#categories-browse" class="sq-link" data-translate="client.feature1Link">Parcourir les prestations</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--alt">
+        <div class="container sq-feature-inner sq-feature-inner--reverse">
+            <div class="sq-feature-media sq-feature-media--app">
+                <img src="images/book_select_creneaux.png" alt="Choix du créneau sur l'app Skedisy" width="320" height="640" loading="lazy"
+                     onerror="this.src='images/cus_tab_1_menu.png';">
+            </div>
+            <div class="sq-feature-copy">
+                <h2 data-translate="client.feature2Title">Réserve en quelques clics</h2>
+                <p data-translate="client.feature2Desc">Créneaux en temps réel, choix de l'experte, paiement sécurisé et rappels SMS avant ton rendez-vous.</p>
+                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill sq-btn-sm" data-translate="client.downloadAppCta">Télécharger l'app</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media">
+                <img src="https://images.unsplash.com/photo-1633683804491-8e185ee7662d?auto=format&fit=crop&w=900&q=85" alt="Experte en salon de coiffure afro" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <h2 data-translate="client.feature3Title">Des expertes qui connaissent nos cheveux</h2>
+                <p data-translate="client.feature3Desc">Tresses, locks, lace, soins : des professionnelles formées aux cheveux texturés, là où la communauté se retrouve.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--dark">
+        <div class="container sq-feature-inner sq-feature-inner--reverse">
+            <div class="sq-feature-media sq-feature-media--app">
+                <img src="images/cus_tab2_booking.png" alt="Mes réservations sur Skedisy" width="320" height="640" loading="lazy"
+                     onerror="this.parentElement.classList.add('sq-feature-media--fallback');">
+            </div>
+            <div class="sq-feature-copy">
+                <h2 data-translate="platform.aiTitle">Concierge beauté IA</h2>
+                <p data-translate="client.aiDesc">Envoie un selfie : une recommandation adaptée à ta texture et à ce que tu veux faire au salon.</p>
+                <a href="ai-concierge.html" class="sq-link sq-link--light" data-translate="platform.tryNow">Essayer</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pour qui — inspiré FOR BARBERS / CLIENTS / BUSINESS -->
+    <section class="sq-audience" id="how-it-works">
         <div class="container">
-            <h2 data-translate="client.categoriesTitle">Que cherchez-vous ?</h2>
+            <p class="sq-kicker sq-kicker--center" data-translate="client.audienceKicker">Pour qui</p>
+            <h2 class="sq-section-title" data-translate="client.audienceTitle">Une plateforme, trois usages</h2>
+            <div class="sq-audience-grid">
+                <article class="sq-audience-card">
+                    <h3 data-translate="client.audienceClient">Clientes</h3>
+                    <p data-translate="client.audienceClientDesc">Découvre les salons, compare les prestations, réserve et reçois tes rappels sur l'app.</p>
+                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-link" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                </article>
+                <article class="sq-audience-card">
+                    <h3 data-translate="client.audienceSalon">Salons</h3>
+                    <p data-translate="client.audienceSalonDesc">Agenda en ligne, nouveaux clients en IDF, avis et visibilité sans dépendre du DM Instagram.</p>
+                    <a href="/professionnel/" class="sq-link" data-translate="nav.pro">Espace Pro</a>
+                </article>
+                <article class="sq-audience-card">
+                    <h3 data-translate="client.audienceExpert">Expertes</h3>
+                    <p data-translate="client.audienceExpertDesc">Gère tes créneaux et réservations depuis l'app Expert, au salon ou en déplacement.</p>
+                    <a href="#" onclick="openPhoneSelection('expert'); return false;" class="sq-link" data-translate="qr.expertApp">App Expert</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-steps">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="client.howItWorksTitle">Comment ça marche</h2>
+            <ol class="sq-steps-list">
+                <li>
+                    <span class="sq-step-num">1</span>
+                    <div>
+                        <h3 data-translate="client.step1Title">Découvre</h3>
+                        <p data-translate="client.step1Desc">Parcours les catégories ou une fiche salon sur skedisy.com — services, équipe, avis.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="sq-step-num">2</span>
+                    <div>
+                        <h3 data-translate="client.step2Title">Télécharge l'app</h3>
+                        <p data-translate="client.step2Desc">Installe Skedisy sur iPhone ou Android (gratuit).</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="sq-step-num">3</span>
+                    <div>
+                        <h3 data-translate="client.step3Title">Réserve</h3>
+                        <p data-translate="client.step3Desc">Choisis ta prestation, ton experte et ton créneau — confirmation et rappels SMS.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <section class="sq-quotes">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="client.quotesTitle">Elles en parlent</h2>
+            <div class="sq-quotes-grid">
+                <blockquote>
+                    <p data-translate="client.quote1">« Enfin une app où je trouve des salons qui font vraiment du knotless, pas juste « coiffure ». »</p>
+                    <footer data-translate="client.quote1Author">Cliente · Seine-Saint-Denis</footer>
+                </blockquote>
+                <blockquote>
+                    <p data-translate="client.quote2">« Je book mes tresses sans envoyer dix messages sur WhatsApp. Le créneau est confirmé tout de suite. »</p>
+                    <footer data-translate="client.quote2Author">Cliente · Paris 18e</footer>
+                </blockquote>
+                <blockquote>
+                    <p data-translate="client.quote3">« Mes clientes réservent seules le soir. Moins de trous dans l'agenda. »</p>
+                    <footer data-translate="client.quote3Author">Gérante de salon · Val-de-Marne</footer>
+                </blockquote>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories-hint-section sq-categories" id="categories-browse">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="client.categoriesTitle">Que cherchez-vous ?</h2>
             <p class="categories-hint" data-translate="client.categoriesHint">Utilisez le menu en haut pour explorer les catégories et trouver un salon près de chez vous.</p>
         </div>
     </section>
 
-    <section class="faq faq-client">
+    <section class="faq faq-client sq-faq">
         <div class="container">
-            <h2 data-translate="faq.title">Frequently Asked Questions</h2>
+            <h2 class="sq-section-title" data-translate="faq.title">Questions fréquentes</h2>
             <div class="faq-grid">
                 <div class="faq-item collapsible">
                     <h3 data-translate="client.faqWhyApp">Pourquoi télécharger l'app pour réserver ?</h3>
@@ -197,7 +257,7 @@
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3 data-translate="faq.customerAccount">How to create a customer account on Skedisy?</h3>
+                    <h3 data-translate="faq.customerAccount">Comment créer un compte cliente ?</h3>
                     <div class="faq-content">
                         <ol>
                             <li data-translate="client.faqAccountStep1">Scannez le QR code ou téléchargez l'app Skedisy.</li>
@@ -207,7 +267,7 @@
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3 data-translate="faq.downloadApp">How to download the app?</h3>
+                    <h3 data-translate="faq.downloadApp">Comment télécharger l'app ?</h3>
                     <div class="faq-content">
                         <p data-translate="client.faqDownloadDesc">Scannez le QR code en haut à droite ou cliquez sur « Télécharger l'app » pour iPhone ou Android.</p>
                     </div>
@@ -228,18 +288,18 @@
         </div>
     </section>
 
-    <section class="final-cta final-cta-client">
-        <div class="container">
+    <section class="sq-final-cta">
+        <div class="container sq-final-cta-inner">
             <h2 data-translate="client.finalCtaTitle">Prête pour ton prochain rendez-vous ?</h2>
             <p data-translate="client.finalCtaDesc">Télécharge l'app et rejoins la communauté Skedisy en Île-de-France.</p>
-            <div class="hero-buttons hero-buttons-center">
-                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="btn-primary" data-translate="client.downloadAppCta">Télécharger l'app</a>
-                <a href="ai-concierge.html" class="btn-secondary" data-translate="hero.tryAI">Try AI Concierge</a>
+            <div class="sq-cta-row sq-cta-row--center">
+                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                <a href="ai-concierge.html" class="sq-btn sq-btn-ghost sq-btn-ghost--on-dark" data-translate="hero.tryAI">Essayer le Concierge IA</a>
             </div>
         </div>
     </section>
 
-    <footer class="footer">
+    <footer class="footer sq-footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">

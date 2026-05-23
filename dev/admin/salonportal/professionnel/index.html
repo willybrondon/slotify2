@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../cookie-consent.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <script src="../language.js" defer></script>
 </head>
-<body class="pro-page" data-page="pro">
+<body class="pro-page sq-page" data-page="pro">
     <div class="login-above-qr header-actions-above-qr">
         <a href="/" class="btn-nav-above btn-clients-above" data-translate="nav.forClients">Clients</a>
         <a href="https://skedisy.com/salonpanel/" class="btn-login-above" data-translate="nav.login">Login</a>
@@ -21,26 +21,20 @@
     <div class="qr-topright qr-topright-pro">
         <div class="qr-top-flex">
             <div class="qr-top-block" id="download-expert" data-app-type="expert" onclick="openPhoneSelection('expert')">
-                <div class="qr-code-wrapper">
-                    <div id="qr-expert-top"></div>
-                </div>
+                <div class="qr-code-wrapper"><div id="qr-expert-top"></div></div>
                 <div class="qr-label" data-translate="qr.expertApp">Download the Expert App</div>
             </div>
         </div>
     </div>
 
-    <nav class="navbar">
+    <nav class="navbar sq-navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <a href="/" style="text-decoration: none; color: inherit;">
-                    <h2>Skedisy</h2>
-                </a>
+                <a href="/" style="text-decoration: none; color: inherit;"><h2>Skedisy</h2></a>
             </div>
             <div class="nav-menu-center desktop-only" id="proNavMenu"></div>
             <div class="mobile-menu-wrapper">
-                <div class="hamburger mobile-only" id="mobileMenuToggle">
-                    <span></span><span></span><span></span>
-                </div>
+                <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
             </div>
         </div>
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
@@ -48,9 +42,7 @@
             <div class="mobile-menu-header">
                 <h3 data-translate="nav.menu">Menu</h3>
                 <div class="mobile-menu-header-right">
-                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English">
-                        <i class="fas fa-globe"></i> <span>EN</span>
-                    </button>
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English"><i class="fas fa-globe"></i> <span>EN</span></button>
                     <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
                 </div>
             </div>
@@ -63,151 +55,188 @@
         </div>
     </nav>
 
-    <section class="hero afro-hero pro-landing-hero">
-        <div class="hero-container">
-            <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Salon de coiffure afro en Île-de-France">
-            </div>
-            <div class="hero-content">
-                <p class="hero-eyebrow" data-translate="pro.heroEyebrow">Espace professionnel</p>
-                <h1 data-translate="hero.afroHeadline">💇 Get more clients for your Afro salon in Île-de-France</h1>
-                <p class="hero-subtitle" data-translate="hero.afroSubheadline">
-                    Join the first platform dedicated to Afro hair salons.<br>We bring you new customers — you pay nothing to start.
+    <section class="sq-hero sq-hero--pro">
+        <div class="sq-hero-grid">
+            <div class="sq-hero-copy">
+                <p class="sq-kicker" data-translate="pro.heroEyebrow">Espace professionnel</p>
+                <h1 class="sq-display" data-translate="hero.afroHeadline">Attirez plus de clientes pour votre salon afro en Île-de-France</h1>
+                <p class="sq-lead" data-translate="hero.afroSubheadline">
+                    La plateforme dédiée aux salons coiffure afro.<br>
+                    Nouveaux clients — gratuit pour commencer.
                 </p>
-                <div class="hero-buttons">
-                    <a href="../request-adding-salon.html" class="btn-primary btn-join-free" data-translate="hero.joinFree">👉 Join for free</a>
-                    <a href="https://skedisy.com/salon/claim" class="btn-secondary" data-translate="pro.claimSalon">Réclamer mon salon</a>
+                <div class="sq-cta-row">
+                    <a href="../request-adding-salon.html" class="sq-btn sq-btn-fill" data-translate="hero.joinFree">Rejoindre gratuitement</a>
+                    <a href="https://skedisy.com/salon/claim" class="sq-btn sq-btn-ghost" data-translate="pro.claimSalon">Réclamer mon salon</a>
+                </div>
+            </div>
+            <div class="sq-hero-visual">
+                <div class="sq-photo-frame">
+                    <img src="https://images.unsplash.com/photo-1605497788044-5b76906a2dad?auto=format&fit=crop&w=1200&q=85" alt="Professionnelle en salon de coiffure afro" width="600" height="750" loading="eager">
+                </div>
+                <div class="sq-device-frame" aria-hidden="true">
+                    <img src="../images/exp_tab2_booking.png" alt="" width="280" height="560" loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1522335787792-6a55c27e44a0?auto=format&fit=crop&w=400&q=80'; this.alt='Salon afro';">
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="problem-section">
-        <div class="container">
-            <h2 data-translate="problem.title">Most Afro salons rely on Instagram and WhatsApp:</h2>
-            <ul class="problem-list">
-                <li><i class="fas fa-times-circle"></i> <span data-translate="problem.missed">Missed appointments</span></li>
-                <li><i class="fas fa-times-circle"></i> <span data-translate="problem.noShows">No-shows</span></li>
-                <li><i class="fas fa-times-circle"></i> <span data-translate="problem.timeWasted">Time wasted managing messages</span></li>
-                <li><i class="fas fa-times-circle"></i> <span data-translate="problem.hardToAttract">Hard to attract new clients</span></li>
+    <section class="sq-trust-bar">
+        <div class="container sq-trust-bar-inner">
+            <p data-translate="trust.niche">Beauté afro uniquement — pas de beauté générique.</p>
+            <div class="sq-pills" aria-label="Catégories">
+                <span data-translate="trust.tresses">Tresses</span>
+                <span data-translate="trust.locks">Locks</span>
+                <span data-translate="trust.wigs">Perruques</span>
+                <span data-translate="trust.homme">Homme</span>
+                <span data-translate="trust.esthetique">Esthétique</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-problem">
+        <div class="container sq-problem-inner">
+            <h2 data-translate="problem.title">La plupart des salons afro dépendent d'Instagram et WhatsApp :</h2>
+            <ul class="sq-problem-list">
+                <li data-translate="problem.missed">Rendez-vous manqués</li>
+                <li data-translate="problem.noShows">Clientes absentes</li>
+                <li data-translate="problem.timeWasted">Temps perdu à gérer les messages</li>
+                <li data-translate="problem.hardToAttract">Difficile d'attirer de nouvelles clientes</li>
             </ul>
         </div>
     </section>
 
-    <section class="solution-section">
-        <div class="container">
-            <h2 data-translate="solution.title">Skedisy helps you:</h2>
-            <div class="solution-grid">
-                <div class="solution-item">
-                    <span class="solution-icon">📅</span>
-                    <span data-translate="solution.bookings">Accept bookings 24/7</span>
-                </div>
-                <div class="solution-item">
-                    <span class="solution-icon">📍</span>
-                    <span data-translate="solution.discovered">Get discovered by new clients nearby</span>
-                </div>
-                <div class="solution-item">
-                    <span class="solution-icon">⭐</span>
-                    <span data-translate="solution.reputation">Build your reputation with reviews</span>
-                </div>
-                <div class="solution-item">
-                    <span class="solution-icon">💰</span>
-                    <span data-translate="solution.revenue">Increase your monthly revenue</span>
-                </div>
+    <section class="sq-feature">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media">
+                <img src="https://images.unsplash.com/photo-1522335787792-6a55c27e44a0?auto=format&fit=crop&w=900&q=85" alt="Salon de coiffure afro en activité" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <h2 data-translate="pro.feature1Title">Soyez trouvées</h2>
+                <p data-translate="pro.feature1Desc">Des clientes en IDF cherchent knotless, tissage, locks ou lace — votre salon apparaît là où elles réservent.</p>
             </div>
         </div>
     </section>
 
-    <section class="trust-section">
-        <div class="container">
-            <h2 data-translate="trust.title">Designed specifically for:</h2>
-            <div class="trust-badges">
-                <span class="trust-badge-item" data-translate="trust.braids">Braids</span>
-                <span class="trust-badge-item" data-translate="trust.wigs">Wigs</span>
-                <span class="trust-badge-item" data-translate="trust.locks">Locks</span>
-                <span class="trust-badge-item" data-translate="trust.naturalHair">Natural hair</span>
+    <section class="sq-feature sq-feature--alt">
+        <div class="container sq-feature-inner sq-feature-inner--reverse">
+            <div class="sq-feature-media sq-feature-media--app">
+                <img src="../images/salon-dashboard.png" alt="Tableau de bord salon Skedisy" width="640" height="400" loading="lazy"
+                     onerror="this.src='../images/exp_tab1_revenue.png';">
             </div>
-            <p class="trust-niche" data-translate="trust.niche">👉 Not generic beauty. Afro beauty only.</p>
-        </div>
-    </section>
-
-    <section class="cta-again-section">
-        <div class="container">
-            <h2 data-translate="ctaAgain.title">Start getting new clients today</h2>
-            <a href="../request-adding-salon.html" class="btn-primary btn-join-free" data-translate="ctaAgain.button">👉 Join Skedisy for free</a>
-        </div>
-    </section>
-
-    <section class="request-buttons-section">
-        <div class="container">
-            <div class="request-buttons-container request-buttons-single">
-                <div class="request-button-card">
-                    <h3 data-translate="request.salonTitle">Would you like to integrate your salon on Skedisy platform?</h3>
-                    <a href="../request-adding-salon.html" class="btn-request" data-translate="request.salonButton">Make your Request</a>
-                </div>
+            <div class="sq-feature-copy">
+                <h2 data-translate="pro.feature2Title">Réservations 24h/24</h2>
+                <p data-translate="pro.feature2Desc">Agenda en ligne, rappels SMS, moins de no-shows. Vos clientes réservent même quand vous êtes en prestation.</p>
             </div>
         </div>
     </section>
 
-    <section class="faq faq-pro">
+    <section class="sq-feature">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media">
+                <img src="https://images.unsplash.com/photo-1633683804491-8e185ee7662d?auto=format&fit=crop&w=900&q=85" alt="Coiffeuse afro au travail" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <h2 data-translate="pro.feature3Title">Réputation et avis</h2>
+                <p data-translate="pro.feature3Desc">Collectez des avis vérifiés, mettez en avant vos expertes et vos prestations phares.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-solutions">
         <div class="container">
-            <h2 data-translate="faq.title">Frequently Asked Questions</h2>
+            <h2 class="sq-section-title" data-translate="solution.title">Skedisy vous aide à</h2>
+            <ul class="sq-solutions-grid">
+                <li><span class="sq-solutions-num">01</span><span data-translate="solution.bookings">Accepter des réservations 24h/24</span></li>
+                <li><span class="sq-solutions-num">02</span><span data-translate="solution.discovered">Être découvertes par de nouvelles clientes</span></li>
+                <li><span class="sq-solutions-num">03</span><span data-translate="solution.reputation">Construire votre réputation</span></li>
+                <li><span class="sq-solutions-num">04</span><span data-translate="solution.revenue">Développer votre chiffre d'affaires</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="sq-quotes">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="pro.quotesTitle">Salons partenaires</h2>
+            <div class="sq-quotes-grid">
+                <blockquote>
+                    <p data-translate="pro.quote1">« Moins de messages WhatsApp à minuit. Les créneaux se remplissent dans l'app. »</p>
+                    <footer data-translate="pro.quote1Author">Salon · Seine-Saint-Denis</footer>
+                </blockquote>
+                <blockquote>
+                    <p data-translate="pro.quote2">« On est référencées sur les prestations qu'on fait vraiment : braids, tissage, locks. »</p>
+                    <footer data-translate="pro.quote2Author">Salon · Paris</footer>
+                </blockquote>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-request">
+        <div class="container sq-request-inner">
+            <h2 data-translate="request.salonTitle">Intégrer votre salon sur Skedisy ?</h2>
+            <a href="../request-adding-salon.html" class="sq-btn sq-btn-fill" data-translate="request.salonButton">Faire ma demande</a>
+        </div>
+    </section>
+
+    <section class="faq faq-pro sq-faq">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="faq.title">Questions fréquentes</h2>
             <div class="faq-grid">
                 <div class="faq-item collapsible">
-                    <h3 data-translate="faq.salonAccount">How to create a salon owner account?</h3>
+                    <h3 data-translate="faq.salonAccount">Comment créer un compte gérant ?</h3>
                     <div class="faq-content">
                         <ol>
-                            <li>Download the Skedisy Customer App and sign up as a customer first.</li>
-                            <li>Go to the Profile section and select <b>Register your salon</b>.</li>
-                            <li>Fill in your salon details and specify the number of experts (staff) you want to add.</li>
-                            <li>Once approved, you will receive credentials for your expert(s).</li>
+                            <li data-translate="pro.faqStep1">Téléchargez l'app Skedisy Client et créez un compte.</li>
+                            <li data-translate="pro.faqStep2">Profil → <strong>Enregistrer votre salon</strong>.</li>
+                            <li data-translate="pro.faqStep3">Renseignez votre salon et le nombre d'expertes.</li>
+                            <li data-translate="pro.faqStep4">Après validation, vous recevez les accès Expert.</li>
                         </ol>
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3 data-translate="faq.expertCredentials">How does an expert get their credentials?</h3>
+                    <h3 data-translate="faq.expertCredentials">Comment l'experte reçoit ses accès ?</h3>
                     <div class="faq-content">
-                        <p>The salon owner creates expert accounts during salon registration. Each expert receives their login credentials from the salon owner.</p>
+                        <p data-translate="pro.faqExpertDesc">La gérante crée les comptes expertes à l'inscription. Chaque experte reçoit ses identifiants.</p>
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3 data-translate="faq.appDifference">What is the difference between the Customer and Expert app?</h3>
+                    <h3 data-translate="faq.appDifference">App Client vs App Expert ?</h3>
                     <div class="faq-content">
                         <ul>
-                            <li><b>Customer App:</b> For clients booking at your salon.</li>
-                            <li><b>Expert App:</b> For your team to manage bookings and schedules.</li>
+                            <li data-translate="pro.faqAppClient"><strong>App Client :</strong> réservation pour vos clientes.</li>
+                            <li data-translate="pro.faqAppExpert"><strong>App Expert :</strong> agenda et réservations pour votre équipe.</li>
                         </ul>
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3 data-translate="faq.manageBusiness">How can a salon owner add a new expert, add services, and manage their business on the business owner platform?</h3>
+                    <h3 data-translate="faq.manageBusiness">Gérer experts, services et réservations ?</h3>
                     <div class="faq-content">
-                        <p>Log in to <a href="https://skedisy.com/salonpanel/">Skedisy Salon Panel</a> to manage experts, services, bookings, and your salon profile.</p>
+                        <p data-translate="pro.faqPanelDesc">Connectez-vous au <a href="https://skedisy.com/salonpanel/">Salon Panel</a> pour gérer experts, prestations, réservations et fiche salon.</p>
                     </div>
                 </div>
                 <div class="faq-item collapsible">
-                    <h3 data-translate="pro.faqClaim">My salon is already listed — how do I claim it?</h3>
+                    <h3 data-translate="pro.faqClaim">Mon salon est déjà en ligne — comment le réclamer ?</h3>
                     <div class="faq-content">
-                        <p data-translate="pro.faqClaimDesc">Use the claim link sent by email or visit <a href="https://skedisy.com/salon/claim">skedisy.com/salon/claim</a> to take ownership of your profile.</p>
+                        <p data-translate="pro.faqClaimDesc">Utilisez le lien reçu par e-mail ou rendez-vous sur <a href="https://skedisy.com/salon/claim">skedisy.com/salon/claim</a>.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="final-cta">
-        <div class="container">
-            <h2 data-translate="ctaAgain.title">Start getting new clients today</h2>
-            <a href="../request-adding-salon.html" class="btn-primary btn-join-free" data-translate="ctaAgain.button">👉 Join Skedisy for free</a>
+    <section class="sq-final-cta">
+        <div class="container sq-final-cta-inner">
+            <h2 data-translate="ctaAgain.title">Commencez à recevoir de nouvelles clientes</h2>
+            <a href="../request-adding-salon.html" class="sq-btn sq-btn-fill" data-translate="ctaAgain.button">Rejoindre Skedisy gratuitement</a>
         </div>
     </section>
 
-    <footer class="footer">
+    <footer class="footer sq-footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Skedisy</h3>
-                    <p data-translate="footer.proTagline">The booking platform for Afro salons in Île-de-France.</p>
+                    <p data-translate="footer.proTagline">La plateforme de réservation des salons afro en Île-de-France.</p>
                     <div class="contact-info">
                         <p><i class="fas fa-envelope"></i> support@skedisy.com</p>
                         <p>

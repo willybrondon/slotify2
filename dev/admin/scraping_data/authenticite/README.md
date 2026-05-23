@@ -8,6 +8,8 @@ Dossier de référence pour le **marketing**, les **réseaux sociaux** et la **c
 
 → **[PARCOURS_SITE_AVANT_RESEAUX.md](./PARCOURS_SITE_AVANT_RESEAUX.md)** — à faire sur skedisy.com / fiches salon **avant** les posts IG/FB/TikTok (réservation app-only, copy, parcours)
 
+→ **[CATEGORIES_SERVICES_AFRO_IDF.md](./CATEGORIES_SERVICES_AFRO_IDF.md)** — **5 catégories** : Tresses · Locks · Perruques · Homme · **Esthétique** (ongles, maquillage, soins, épilation)
+
 ### AUTHENTICITE_SKEDISY.md contient :
 
 - Essence de marque et 4 piliers (appartenance, compréhension, territoire IDF, visibilité salon)

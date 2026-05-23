@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Pro page nav (no category browse)
+// Pro page nav (no category browse, no AI Concierge — client-only feature)
 function initProNavigation() {
     const desktopMenu = document.getElementById('proNavMenu');
     const currentLang = localStorage.getItem('skedisy-language') || 'fr';
@@ -358,6 +358,7 @@ function initProNavigation() {
     const navBits =
         '<a href="' + docsHref + '" class="nav-link documentation-link" data-translate="nav.documentation">Docs</a>' +
         '<a href="/professionnel/" class="nav-link nav-link-pro-active" data-translate="nav.pro">Pro</a>' +
+        /* Do not add ai-concierge.html here */
         '<button class="lang-switcher desktop-only" data-lang="' + switchToLang + '" title="Switch to ' + switchToShort + '">' +
         '<i class="fas fa-globe"></i> <span>' + switchToShort + '</span></button>';
     if (desktopMenu) {

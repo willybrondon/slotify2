@@ -195,7 +195,9 @@ Si non → reformuler ou ne pas publier.
 | Compte | Public | Bio type |
 |--------|--------|----------|
 | **@skedisy** | Clientes IDF | Beauté afro en Île-de-France · Tresses · Locks · Naturel · Les salons de la communauté 👇 Réserver |
-| **@skedisy.pro** | Salons | L’outil des salons afro en IDF · Visibilité · Agenda · Gratuit pour commencer 👇 Rejoindre / réclamer |
+| **@skedisy.pro** | Salons | L’outil des salons afro en IDF · Visibilité · Agenda · Gratuit pour commencer 👇 Rejoindre / réclamer · **pas** de Concierge IA |
+
+**Site web :** `skedisy.com` = clientes (catégories, Concierge IA) · `skedisy.com/professionnel/` = pros (**sans** Concierge IA).
 
 **Liens bio :**
 - App cliente Android : `https://play.google.com/store/apps/details?id=com.skedisy.customer`
@@ -286,7 +288,7 @@ Si non → reformuler ou ne pas publier.
 |---------|-------|----------|--------------|
 | **S1** | Appartenance | 3× « Chez nous en IDF » | 1× Pourquoi un outil afro (pas agenda générique) |
 | **S2** | Territoire | 4× Salon afro du [dép.] | 2× Claim / réclame ta fiche |
-| **S3** | Compréhension | 3× Éducation prestation + 1× IA Concierge | 1× Agenda & prestations afro |
+| **S3** | Compréhension | 3× Éducation prestation + 1× IA Concierge (**@skedisy** / site cliente) | 1× Agenda & prestations afro (pas d’IA) |
 | **S4** | Visibilité salon | 2× Portrait salon + avis | Témoignage gérant + chiffre RDV **réel** |
 
 ---

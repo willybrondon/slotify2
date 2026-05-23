@@ -155,9 +155,11 @@ C’est un argument **authentique et unique** (scraping + claim).
 
 ---
 
-### Priorité D — AI Concierge (`ai-concierge.html`)
+### Priorité D — AI Concierge (`ai-concierge.html`) — **clientes uniquement**
 
-Atout différenciant pour le pilier **Compréhension**.
+**Ne pas afficher ni promouvoir sur `/professionnel/`** : l’outil selfie → recommandation est destiné aux clientes, pas aux gérants de salon.
+
+Atout différenciant pour le pilier **Compréhension** (parcours cliente).
 
 #### D1. Positionner en français autour des cheveux texturés
 
@@ -217,7 +219,8 @@ Réseau social (Reel, story, post)
 | URL | Public |
 |-----|--------|
 | `skedisy.com/` | **Clientes** — catégories, QR app, parcours découvrir → app |
-| `skedisy.com/professionnel/` | **Pros** — acquisition salon, sans menu catégories |
+| `skedisy.com/professionnel/` | **Pros** — acquisition salon, sans menu catégories, **sans Concierge IA** |
+| `skedisy.com/ai-concierge.html` | **Clientes uniquement** — ne pas lier depuis `/professionnel/` |
 | Bouton **Pro** (avant Login) en haut à droite | → `/professionnel/` |
 
 ## 5b. Homepage cliente : blocs (message)
@@ -228,9 +231,9 @@ Réseau social (Reel, story, post)
 4. **Comment ça marche (3 étapes)** — Découvrir → App → Réserver  
 5. **Salons mis en avant** — 6–12 fiches IDF réelles (nom + ville + photo)  
 6. **Problème WhatsApp** (déjà présent) — garder, c’est authentique  
-7. **IA Concierge** — lien secondaire « Pas sûre de la prestation ? »  
+7. **IA Concierge** — lien secondaire « Pas sûre de la prestation ? » (**home cliente seulement**, jamais sur `/professionnel/`)  
 8. **FAQ courte cliente** — « Pourquoi l’app ? » « C’est gratuit ? » « Quelles zones ? »  
-9. **CTA pro** — claim / demande d’ajout salon  
+9. **CTA pro** — via `/professionnel/` (claim / demande d’ajout), pas sur la home cliente en hero principal  
 
 Réduire ou supprimer : stats Planity, sections « institut / spa » génériques si encore présentes ailleurs sur le site.
 
@@ -257,7 +260,7 @@ Tresses, tissages, locks, perruques, soins cheveux naturels — salons spéciali
 | État du site | OK en post | À éviter |
 |--------------|------------|----------|
 | **Actuel** (app only, stats Planity, home pro) | Teasing communauté, « bientôt », DM vers support | « Réserve sur le lien » sans mention app ; chiffres nationaux |
-| **Après Priorité A+B** | « Voir le salon → app » ; salons par ville ; série « Chez nous en IDF » | « Comme Planity sur le web » |
+| **Après Priorité A+B** | « Voir le salon → app » ; salons par ville ; Concierge IA depuis **home cliente** | « Comme Planity sur le web » ; Concierge IA sur `/professionnel/` |
 | **Après stores alignés** | Campagne téléchargement app ; UGC avec QR salon | « Meilleure app beauté » générique |
 | **Si un jour réservation web** | « Réserve en 2 clics » sans friction | — |
 
