@@ -96,33 +96,28 @@ app.get("/docs/", (req, res) => {
     res.status(404).send(`<h1>404 - Documentation not found</h1><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
-app.get("/terms", (req, res) => res.redirect(301, "/terms/"));
-app.get("/privacy", (req, res) => res.redirect(301, "/privacy/"));
-app.get("/cookies", (req, res) => res.redirect(301, "/cookies/"));
-app.get("/terms/", (req, res) => {
-  const filePath = path.join(salonportalPath, "terms", "index.html");
-  if (fs.existsSync(filePath)) {
-    res.status(200).sendFile(filePath);
-  } else {
-    res.status(404).send(`<h1>404 - Terms not found</h1><p><a href="/">Return to Skedisy</a></p>`);
+// Pages légales — servir le fichier directement (évite boucle /cookies/ ↔ /cookies.html avec nginx/static)
+const serveSalonportalLegalPage = (indexRelPath, flatRelPath) => (req, res) => {
+  const indexPath = path.join(salonportalPath, indexRelPath);
+  const flatPath = path.join(salonportalPath, flatRelPath);
+  const filePath = fs.existsSync(indexPath)
+    ? indexPath
+    : fs.existsSync(flatPath)
+      ? flatPath
+      : null;
+  if (!filePath) {
+    return res.status(404).send(`<h1>404 - Page not found</h1><p><a href="/">Retour à Skedisy</a></p>`);
   }
-});
-app.get("/privacy/", (req, res) => {
-  const filePath = path.join(salonportalPath, "privacy", "index.html");
-  if (fs.existsSync(filePath)) {
-    res.status(200).sendFile(filePath);
-  } else {
-    res.status(404).send(`<h1>404 - Privacy not found</h1><p><a href="/">Return to Skedisy</a></p>`);
-  }
-});
-app.get("/cookies/", (req, res) => {
-  const filePath = path.join(salonportalPath, "cookies", "index.html");
-  if (fs.existsSync(filePath)) {
-    res.status(200).sendFile(filePath);
-  } else {
-    res.status(404).send(`<h1>404 - Cookies not found</h1><p><a href="/">Return to Skedisy</a></p>`);
-  }
-});
+  res.status(200).sendFile(path.resolve(filePath));
+};
+
+const serveTermsPage = serveSalonportalLegalPage("terms/index.html", "terms.html");
+const servePrivacyPage = serveSalonportalLegalPage("privacy/index.html", "privacy.html");
+const serveCookiesPage = serveSalonportalLegalPage("cookies/index.html", "cookies.html");
+
+app.get(["/terms", "/terms/", "/terms.html"], serveTermsPage);
+app.get(["/privacy", "/privacy/", "/privacy.html"], servePrivacyPage);
+app.get(["/cookies", "/cookies/", "/cookies.html"], serveCookiesPage);
 // Serve documentation.html directly (no redirect) - was working before
 app.get("/documentation.html", (req, res) => {
   const filePath = path.join(salonportalPath, "documentation.html");
@@ -132,12 +127,7 @@ app.get("/documentation.html", (req, res) => {
     res.status(404).send(`<h1>404 - Documentation not found</h1><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
-app.get("/terms.html", (req, res) => res.redirect(301, "/terms/"));
-app.get("/privacy.html", (req, res) => res.redirect(301, "/privacy/"));
-app.get("/cookies.html", (req, res) => res.redirect(301, "/cookies/"));
-app.get("/blog", (req, res) => res.redirect(301, "/blog/"));
-app.get("/blog.html", (req, res) => res.redirect(301, "/blog/"));
-app.get("/blog/", (req, res) => {
+app.get(["/blog", "/blog/", "/blog.html"], (req, res) => {
   const filePath = path.join(salonportalPath, "blog", "index.html");
   if (fs.existsSync(filePath)) {
     res.status(200).sendFile(path.resolve(filePath));

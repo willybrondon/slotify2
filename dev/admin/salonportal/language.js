@@ -251,7 +251,7 @@ const translations = {
         'faq.newClientsDesc': 'Your salon will be visible to our 10 million monthly users and listed on search networks like Google to easily find your establishment. Verified reviews from your previous appointments will encourage visitors to book simply, without fees.',
         
         // Footer
-        'footer.tagline': 'Transform your salon management with our all-in-one solution.',
+        'footer.tagline': 'Booking for the Afro community in Île-de-France.',
         'footer.about': 'About',
         'footer.myAccount': 'My Skedisy Account',
         'footer.signUp': 'Sign Up',
@@ -976,7 +976,7 @@ const translations = {
         'faq.newClientsDesc': 'Visible par 10M d\'utilisateurs et sur Google.',
         
         // Footer
-        'footer.tagline': 'Gérez votre salon avec notre solution tout-en-un.',
+        'footer.tagline': 'La réservation pour la communauté afro en Île-de-France.',
         'footer.about': 'À Propos',
         'footer.myAccount': 'Mon Compte Skedisy',
         'footer.signUp': 'S\'inscrire',
