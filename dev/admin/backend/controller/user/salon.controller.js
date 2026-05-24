@@ -737,7 +737,10 @@ exports.serveSalonWebPage = async (req, res) => {
         salonId: salon._id,
         isBlock: false,
         isDelete: false,
-      }).select("fname lname image review reviewCount").limit(20),
+      })
+        .select("fname lname image review reviewCount serviceId")
+        .limit(24)
+        .lean(),
       Review.find({ salonId: salon._id })
         .populate({
           path: "userId",
@@ -795,69 +798,47 @@ exports.serveSalonWebPage = async (req, res) => {
       openingHoursHtml = `<div class="section"><h3 class="section-title">⏰ ${copy.openingHours}</h3><div class="hours-grid">${openingHoursHtml}</div></div>`;
     }
 
-    // Services Section - Group by Category
-    let servicesHtml = '';
+    const bookingServices = [];
+    const categoryMap = new Map();
     if (salon.serviceIds && salon.serviceIds.length > 0) {
-      // Group services by category
-      const servicesByCategory = {};
-      salon.serviceIds.forEach(service => {
-        if (service.id && service.id.categoryId) {
-          const categoryId = service.id.categoryId._id?.toString() || service.id.categoryId?.toString() || 'other';
-          const categoryName = getTranslatedCategoryName(service.id.categoryId, pageLang) || copy.otherServices;
-          if (!servicesByCategory[categoryId]) {
-            servicesByCategory[categoryId] = {
-              name: categoryName,
-              services: []
-            };
-          }
-          servicesByCategory[categoryId].services.push(service);
-        } else {
-          if (!servicesByCategory['other']) {
-            servicesByCategory['other'] = {
-              name: copy.otherServices,
-              services: []
-            };
-          }
-          servicesByCategory['other'].services.push(service);
+      salon.serviceIds.forEach((service) => {
+        if (!service.id || !service.id._id) return;
+        const cat = service.id.categoryId;
+        const categoryId = cat?._id?.toString() || "other";
+        const categoryName =
+          getTranslatedCategoryName(cat, pageLang) || copy.otherServices;
+        if (!categoryMap.has(categoryId)) {
+          categoryMap.set(categoryId, { id: categoryId, name: categoryName });
         }
+        bookingServices.push({
+          id: String(service.id._id),
+          name: service.id.name || "Service",
+          price: service.price || 0,
+          duration: service.id.duration || 0,
+          categoryId,
+          categoryName,
+        });
       });
+    }
+    const bookingCategories = Array.from(categoryMap.values());
+    const bookingExperts = (experts || []).map((expert) => ({
+      id: String(expert._id),
+      name: `${expert.fname || ""} ${expert.lname || ""}`.trim(),
+      image: expert.image || "",
+      review: expert.review || 0,
+      reviewCount: expert.reviewCount || 0,
+      serviceIds: (expert.serviceId || []).map((id) => String(id)),
+    }));
 
-      // Build HTML for each category
-      const categorySections = Object.values(servicesByCategory).map(category => {
-        const serviceItems = category.services.slice(0, 8).map(service => {
-          const serviceName = (service.id?.name || 'Service').replace(/"/g, '&quot;');
-          const servicePrice = service.price || 0;
-          const serviceDuration = service.id?.duration || 0;
-          const serviceMongoId = service.id && service.id._id ? String(service.id._id) : "";
-          const durationText = serviceDuration > 0 ? `<div class="service-duration">⏱️ ${serviceDuration} min</div>` : '';
-          return `
-            <div class="service-item">
-              <div class="service-header">
-                <div class="service-name">${serviceName}</div>
-                <div class="service-price">${currency}${servicePrice}</div>
-              </div>
-              ${durationText}
-              <button onclick="openApp('${serviceMongoId.replace(/'/g, "\\'")}')" class="service-book-btn">
-                <i class="fas fa-calendar-plus"></i> ${copy.bookOnApp}
-              </button>
-            </div>`;
-        }).join('');
-        const moreInCategory = category.services.length > 8 ? `<p class="service-more">${copy.moreInCategory(category.services.length - 8)}</p>` : '';
-        return `
-          <div class="service-category-group">
-            <h4 class="service-category-title">${category.name}</h4>
-            <div class="services-grid">${serviceItems}</div>
-            ${moreInCategory}
-          </div>`;
-      }).join('');
-
-      const totalServices = salon.serviceIds.length;
-      const displayedServices = Object.values(servicesByCategory).reduce((sum, cat) => sum + Math.min(cat.services.length, 8), 0);
-      const moreServices = totalServices > displayedServices ? `<p class="services-total-more">${copy.moreServicesApp(totalServices - displayedServices)}</p>` : '';
-      
-      servicesHtml = `<div class="section"><h3 class="section-title">💇 ${copy.services}</h3>${categorySections}${moreServices}</div>`;
+    let servicesHtml = "";
+    if (bookingServices.length > 0) {
+      servicesHtml = `<div class="section sq-salon-services-block">
+        <h3 class="section-title">${copy.services}</h3>
+        <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
+        <div class="sq-services-grid-4" id="salonServicesGrid"></div>
+      </div>`;
     } else {
-      servicesHtml = `<div class="section"><h3 class="section-title">💇 ${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
+      servicesHtml = `<div class="section"><h3 class="section-title">${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
     }
 
     // Products Section
@@ -876,22 +857,14 @@ exports.serveSalonWebPage = async (req, res) => {
       productsHtml = `<div class="section"><h3 class="section-title">🛍️ ${copy.products}</h3><p class="empty-state">${copy.noProducts}</p></div>`;
     }
 
-    // Staff Section
-    let staffHtml = '';
-    if (experts && experts.length > 0) {
-      staffHtml = experts.map(expert => {
-        const expertFname = (expert.fname || '').replace(/"/g, '&quot;');
-        const expertLname = (expert.lname || '').replace(/"/g, '&quot;');
-        const expertName = `${expertFname} ${expertLname}`.trim() || 'Staff Member';
-        const expertImage = expert.image || '';
-        const expertRating = expert.review || 0;
-        const imageHtml = expertImage ? `<img src="${expertImage}" alt="${expertName}" class="staff-item-img" onerror="this.style.display='none'">` : `<div class="review-avatar" style="width: 60px; height: 60px;">${expertName.charAt(0).toUpperCase()}</div>`;
-        const ratingHtml = expertRating > 0 ? `<div class="staff-rating">⭐ ${expertRating.toFixed(1)}</div>` : '';
-        return `<div class="staff-item">${imageHtml}<div class="staff-info"><div class="staff-name">${expertName}</div>${ratingHtml}</div></div>`;
-      }).join('');
-      staffHtml = `<div class="section"><h3 class="section-title">👤 ${copy.staff}</h3><div class="services-grid">${staffHtml}</div></div>`;
+    let staffHtml = "";
+    if (bookingExperts.length > 0) {
+      staffHtml = `<div class="section sq-salon-experts-block">
+        <h3 class="section-title">${copy.salonExpertsTitle}</h3>
+        <div class="sq-experts-row" id="salonExpertsRow"></div>
+      </div>`;
     } else {
-      staffHtml = `<div class="section"><h3 class="section-title">👤 ${copy.staff}</h3><p class="empty-state">${copy.noStaff}</p></div>`;
+      staffHtml = `<div class="section"><h3 class="section-title">${copy.salonExpertsTitle}</h3><p class="empty-state">${copy.noStaff}</p></div>`;
     }
 
     // Reviews Section - Show expert/staff info
@@ -975,7 +948,6 @@ exports.serveSalonWebPage = async (req, res) => {
       "description": "${salonDescription.replace(/"/g, '\\"')}",
       "url": "${shareUrl}",
       "image": "${salonImage || ''}",
-      "telephone": "${salonMobile || ''}",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "${(salon.addressDetails?.addressLine1 || '').replace(/"/g, '\\"')}",
@@ -1148,98 +1120,14 @@ exports.serveSalonWebPage = async (req, res) => {
                     <h1 class="hero-title">${valuePropTitle}</h1>
                     ${valuePropDescription ? `<p class="hero-subtitle" data-original-subtitle="${valuePropDescription.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${valuePropDescription.length > 150 ? valuePropDescription.substring(0, 150) + '...' : valuePropDescription}</p>` : `<p class="hero-subtitle" data-original-subtitle="${salonDescription.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${salonDescription.length > 150 ? salonDescription.substring(0, 150) + '...' : salonDescription}</p>`}
                     ${ratingBadgeHtml ? `<div class="hero-rating">${ratingBadgeHtml}</div>` : ''}
-                    <button onclick="openApp()" class="hero-cta-btn">
-                        <i class="fas fa-calendar-check"></i> ${copy.bookOnApp}
+                    <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="hero-cta-btn">
+                        <i class="fas fa-calendar-check"></i> ${copy.bookNow}
                     </button>
                 </div>
             </div>
         </div>
 
         ${idfBanner}
-        
-        <!-- Value Proposition Section -->
-        ${valuePropFeatures.length > 0 || valuePropDescription ? `
-        <div class="value-proposition-section">
-            <div class="container">
-                ${valuePropDescription ? `<div class="value-prop-description"><p>${valuePropDescription}</p></div>` : ''}
-                ${valuePropFeatures.length > 0 ? `
-                <div class="value-props-grid">
-                    ${valuePropFeatures.map((feature, index) => {
-                        const icons = ['✨', '👨‍🎨', '💆', '⭐', '🌟', '💅', '🎨', '💇'];
-                        const icon = icons[index % icons.length];
-                        return `
-                        <div class="value-prop-item">
-                            <div class="value-prop-icon">${icon}</div>
-                            <h4>${feature}</h4>
-                        </div>
-                        `;
-                    }).join('')}
-                    ${salonReviewCount > 0 ? `
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">⭐</div>
-                        <h4>${copy.topRated}</h4>
-                        <p>${copy.topRatedDesc(salonRating.toFixed(1), salonReviewCount)}</p>
-                    </div>
-                    ` : ''}
-                </div>
-                ` : `
-                <div class="value-props-grid">
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">✨</div>
-                        <h4>${copy.valuePropAfro1Title}</h4>
-                        <p>${copy.valuePropAfro1Desc}</p>
-                    </div>
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">👨‍🎨</div>
-                        <h4>${copy.valuePropAfro2Title}</h4>
-                        <p>${copy.valuePropAfro2Desc}</p>
-                    </div>
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">📱</div>
-                        <h4>${copy.valuePropAfro3Title}</h4>
-                        <p>${copy.valuePropAfro3Desc}</p>
-                    </div>
-                    ${salonReviewCount > 0 ? `
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">⭐</div>
-                        <h4>${copy.topRated}</h4>
-                        <p>${copy.topRatedDesc(salonRating.toFixed(1), salonReviewCount)}</p>
-                    </div>
-                    ` : ''}
-                </div>
-                `}
-            </div>
-        </div>
-        ` : `
-        <div class="value-proposition-section">
-            <div class="container">
-                <div class="value-props-grid">
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">✨</div>
-                        <h4>${copy.valuePropAfro1Title}</h4>
-                        <p>${copy.valuePropAfro1Desc}</p>
-                    </div>
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">👨‍🎨</div>
-                        <h4>${copy.valuePropAfro2Title}</h4>
-                        <p>${copy.valuePropAfro2Desc}</p>
-                    </div>
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">📱</div>
-                        <h4>${copy.valuePropAfro3Title}</h4>
-                        <p>${copy.valuePropAfro3Desc}</p>
-                    </div>
-                    ${salonReviewCount > 0 ? `
-                    <div class="value-prop-item">
-                        <div class="value-prop-icon">⭐</div>
-                        <h4>${copy.topRated}</h4>
-                        <p>${copy.topRatedDesc(salonRating.toFixed(1), salonReviewCount)}</p>
-                    </div>
-                    ` : ''}
-                </div>
-            </div>
-        </div>
-        `}
         
         <!-- Salon Info Section -->
         <div class="salon-header">
@@ -1250,7 +1138,6 @@ exports.serveSalonWebPage = async (req, res) => {
                         <p class="salon-description">${salonDescription}</p>
                         <div class="salon-contact">
                             ${salonAddress ? `<p><i class="fas fa-map-marker-alt"></i> ${salonAddress}</p>` : ''}
-                            ${salonMobile ? `<p><i class="fas fa-phone"></i> ${salonMobile}</p>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1262,17 +1149,17 @@ exports.serveSalonWebPage = async (req, res) => {
                 <div class="content-grid">
                     <div class="main-content">
                         ${openingHoursHtml}
+                        ${staffHtml}
                         ${servicesHtml}
                         ${productsHtml}
-                        ${staffHtml}
                         ${reviewsHtml}
                     </div>
                     
                     <div class="sidebar-content">
                         <div class="booking-card">
                             <h3>${copy.bookingCardTitle}</h3>
-                            <button onclick="openApp()" class="open-app-btn">
-                                <i class="fas fa-calendar-check"></i> ${copy.bookOnApp}
+                            <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
+                                <i class="fas fa-calendar-check"></i> ${copy.bookNow}
                             </button>
                             <div id="download-section">
                                 <p style="text-align: center; margin-bottom: 16px; color: #666; font-size: 0.95rem;">
@@ -1298,11 +1185,46 @@ exports.serveSalonWebPage = async (req, res) => {
     
     <!-- Sticky Booking Button (Mobile Only) -->
     <div class="sticky-booking-btn">
-        <button onclick="openApp()">
-            <i class="fas fa-calendar-check"></i> ${copy.stickyBook}
+        <button type="button" onclick="window.SalonBooking && SalonBooking.open()">
+            <i class="fas fa-calendar-check"></i> ${copy.bookNow}
         </button>
     </div>
-    
+
+    <div id="salonBookingModal" class="sq-booking-modal" aria-hidden="true">
+        <div class="sq-booking-modal__backdrop" data-close-booking></div>
+        <div class="sq-booking-modal__panel" role="dialog" aria-labelledby="bookingModalTitle">
+            <button type="button" class="sq-booking-modal__close" data-close-booking aria-label="Fermer">&times;</button>
+            <h2 id="bookingModalTitle" class="sq-booking-modal__title">${copy.bookNow}</h2>
+            <div id="salonBookingSteps" class="sq-booking-steps"></div>
+        </div>
+    </div>
+
+    <script>
+        window.SKEDISY_SALON_BOOKING = {
+            salonId: "${salon._id}",
+            salonName: ${JSON.stringify(salonName)},
+            slug: ${JSON.stringify(salonSlugWithId)},
+            language: ${JSON.stringify(pageLang)},
+            currency: ${JSON.stringify(currency)},
+            tax: ${global.settingJSON?.tax || 0},
+            services: ${JSON.stringify(bookingServices)},
+            categories: ${JSON.stringify(bookingCategories)},
+            experts: ${JSON.stringify(bookingExperts)},
+            copy: {
+                allCategoriesTab: ${JSON.stringify(copy.allCategoriesTab)},
+                selectServices: ${JSON.stringify(copy.selectServices)},
+                selectExpert: ${JSON.stringify(copy.selectExpert)},
+                selectDateTime: ${JSON.stringify(copy.selectDateTime)},
+                yourDetails: ${JSON.stringify(copy.yourDetails)},
+                confirmBooking: ${JSON.stringify(copy.confirmBooking)},
+                payAtSalon: ${JSON.stringify(copy.payAtSalon)},
+                bookingSuccess: ${JSON.stringify(copy.bookingSuccess)},
+                min: ${JSON.stringify(copy.min)},
+                bookNow: ${JSON.stringify(copy.bookNow)}
+            }
+        };
+    </script>
+    <script src="${baseURL}/salon-booking.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
     <script>

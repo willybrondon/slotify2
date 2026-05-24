@@ -727,3 +727,590 @@ body.sk-public-page .main-wrapper {
         grid-template-columns: 1fr;
     }
 }
+
+/* ——— Page catégorie (style discover / Squire) ——— */
+.sq-category-discover {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 20px 48px;
+}
+
+.sq-category-discover__head {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 28px;
+    padding-top: 8px;
+}
+
+.sq-category-discover__title {
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+    font-weight: 700;
+    color: var(--sk-text);
+    margin-bottom: 12px;
+    line-height: 1.2;
+}
+
+.sq-category-discover__lead {
+    font-size: 1.05rem;
+    color: var(--sk-text-muted);
+    line-height: 1.55;
+    margin: 0;
+}
+
+.sq-category-discover__search {
+    max-width: 640px;
+    margin: 0 auto 24px;
+    padding: 0 !important;
+}
+
+.sq-category-discover__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.sq-category-discover__stats {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--sk-text);
+    margin: 0 0 4px;
+}
+
+.sq-category-discover__city-msg {
+    font-size: 0.95rem;
+    color: var(--sk-primary);
+    font-weight: 500;
+    margin: 0;
+}
+
+.sq-category-discover__view-toggle {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.sq-view-btn {
+    padding: 10px 16px;
+    border: 1px solid var(--sk-border);
+    background: var(--sk-bg);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--sk-text);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.sq-view-btn:hover {
+    border-color: var(--sk-primary);
+}
+
+.sq-view-btn--active {
+    background: var(--sk-primary);
+    border-color: var(--sk-primary);
+    color: var(--sk-inverse);
+}
+
+.sq-category-discover__main {
+    display: block;
+    margin-bottom: 48px;
+}
+
+.sq-category-discover__main--map {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.sq-category-discover__map {
+    display: none;
+    height: 520px;
+    border-radius: 12px;
+    border: 1px solid var(--sk-border);
+    overflow: hidden;
+    z-index: 1;
+}
+
+.sq-category-discover__main--map .sq-category-discover__map {
+    display: block;
+}
+
+.sq-category-discover__list-wrap {
+    min-width: 0;
+}
+
+.sk-public-page .sq-salons-grid--3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 12px;
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-content {
+    padding: 14px 16px 16px;
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    font-size: 0.875rem;
+    color: var(--sk-text-muted);
+    margin-bottom: 6px;
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-price {
+    font-weight: 600;
+    color: var(--sk-text);
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-rating .rating-stars {
+    color: #f5a623;
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-address {
+    font-size: 0.8rem;
+    color: var(--sk-text-soft);
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sk-public-page .sq-salon-card-v2.sq-salon-card-v2--highlight {
+    outline: 2px solid var(--sk-primary);
+    outline-offset: 2px;
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-image {
+    height: 160px;
+}
+
+.sk-public-page .sq-salon-card-v2 .salon-card-image-placeholder {
+    height: 160px;
+}
+
+.sq-category-discover__experts {
+    border-top: 1px solid var(--sk-border-light);
+    padding-top: 36px;
+}
+
+.sq-category-discover__experts-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 20px;
+    color: var(--sk-text);
+}
+
+.sq-experts-scroll {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.sq-expert-card {
+    flex: 0 0 200px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px 12px;
+    background: var(--sk-bg);
+    border: 1px solid var(--sk-border);
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.sq-expert-card:hover {
+    border-color: var(--sk-primary);
+    box-shadow: 0 8px 24px var(--sk-shadow);
+}
+
+.sq-expert-card__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 2px solid var(--sk-border-light);
+}
+
+.sq-expert-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sq-expert-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sk-primary);
+    color: var(--sk-inverse);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.sq-expert-card__name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--sk-text);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.sq-expert-card__rating {
+    font-size: 0.8rem;
+    color: var(--sk-text-muted);
+    display: block;
+}
+
+.sq-expert-card__salon {
+    font-size: 0.75rem;
+    color: var(--sk-text-soft);
+    display: block;
+    margin-top: 6px;
+    line-height: 1.3;
+}
+
+.sq-category-discover__empty {
+    color: var(--sk-text-soft);
+    font-size: 0.95rem;
+}
+
+@media (max-width: 1024px) {
+    .sk-public-page .sq-salons-grid--3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sq-category-discover__main--map {
+        grid-template-columns: 1fr;
+    }
+
+    .sq-category-discover__map {
+        height: 320px;
+    }
+}
+
+/* ——— Fiche salon : onglets prestations, experts chips, réservation ——— */
+.sk-public-page .sq-service-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.sk-public-page .sq-service-tab {
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    border: 1px solid var(--sk-border);
+    border-radius: 999px;
+    background: var(--sk-bg);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.sk-public-page .sq-service-tab--active {
+    background: var(--sk-text);
+    border-color: var(--sk-text);
+    color: var(--sk-inverse);
+}
+
+.sk-public-page .sq-services-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.sk-public-page .sq-service-card {
+    text-align: left;
+    padding: 12px;
+    border: 1px solid var(--sk-border);
+    border-radius: 10px;
+    background: var(--sk-bg);
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+}
+
+.sk-public-page .sq-service-card:hover,
+.sk-public-page .sq-service-card--selected {
+    border-color: var(--sk-primary);
+    box-shadow: 0 4px 12px var(--sk-shadow);
+}
+
+.sk-public-page .sq-service-card__name {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--sk-text);
+    margin-bottom: 6px;
+    line-height: 1.25;
+}
+
+.sk-public-page .sq-service-card__meta {
+    font-size: 0.75rem;
+    color: var(--sk-text-muted);
+}
+
+.sk-public-page .sq-experts-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.sk-public-page .sq-salon-expert-chip {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 72px;
+    padding: 8px 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.sk-public-page .sq-salon-expert-chip__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--sk-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sk-bg-soft, #f5f5f5);
+}
+
+.sk-public-page .sq-salon-expert-chip__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sk-public-page .sq-salon-expert-chip__letter {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--sk-primary);
+}
+
+.sk-public-page .sq-salon-expert-chip__name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: 6px;
+    text-align: center;
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sk-public-page .sq-salon-expert-chip__rating {
+    font-size: 0.65rem;
+    color: var(--sk-text-muted);
+}
+
+.sq-booking-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.sq-booking-modal--open {
+    display: flex;
+}
+
+.sq-booking-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.sq-booking-modal__panel {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    max-height: 92vh;
+    overflow-y: auto;
+    background: var(--sk-bg);
+    border-radius: 16px 16px 0 0;
+    padding: 20px;
+    z-index: 1;
+}
+
+@media (min-width: 640px) {
+    .sq-booking-modal {
+        align-items: center;
+    }
+    .sq-booking-modal__panel {
+        border-radius: 16px;
+        margin: 20px;
+    }
+}
+
+.sq-booking-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.sq-booking-modal__title {
+    font-size: 1.25rem;
+    margin: 0 0 16px;
+    padding-right: 32px;
+}
+
+.sq-booking-field {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.sq-booking-field input {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--sk-border);
+    border-radius: 8px;
+    font-family: inherit;
+}
+
+.sq-booking-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--sk-text);
+    color: var(--sk-inverse);
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.sq-booking-btn--ghost {
+    background: transparent;
+    color: var(--sk-text);
+    border: 1px solid var(--sk-border);
+}
+
+.sq-booking-summary {
+    background: var(--sk-bg-soft, #f8f8f8);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+.sq-slot-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.sq-slot-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--sk-border);
+    border-radius: 8px;
+    background: var(--sk-bg);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+
+.sq-slot-btn--busy {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.sq-slot-btn--picked {
+    background: var(--sk-text);
+    color: var(--sk-inverse);
+    border-color: var(--sk-text);
+}
+
+.sq-booking-success {
+    color: var(--sk-primary);
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+    .sk-public-page .sq-services-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .sk-public-page .sq-salons-grid--3 {
+        grid-template-columns: 1fr;
+    }
+
+    .sk-public-page .sq-services-grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .sq-category-discover__toolbar {
+        flex-direction: column;
+    }
+
+    .sq-category-discover__view-toggle {
+        width: 100%;
+    }
+
+    .sq-view-btn {
+        flex: 1;
+    }
+}

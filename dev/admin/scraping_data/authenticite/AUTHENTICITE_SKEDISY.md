@@ -293,6 +293,8 @@ Si non → reformuler ou ne pas publier.
 | **S3** | Compréhension | 3× Éducation prestation + 1× IA Concierge (**@skedisy** / site cliente) | 1× Agenda & prestations afro (pas d’IA) |
 | **S4** | Visibilité salon | 2× Portrait salon + avis | Témoignage gérant + chiffre RDV **réel** |
 
+**→ Plan opérationnel mois 1 (posts détaillés + stories) :** [CALENDRIER_RESEAUX_MOIS_1.md](./CALENDRIER_RESEAUX_MOIS_1.md)
+
 ---
 
 ## 14. Matrice messages : dire / ne pas dire
@@ -369,6 +371,7 @@ Skedisy  = « La réservation pour la communauté afro en Île-de-France —
 | `../IMPLEMENTATION_GUIDE.md` | Scraping, onboarding salons IDF |
 | `../../salonportal/language.js` | Copy site FR/EN afro |
 | `../../salonportal/index.html` | Homepage conversion salons |
+| `CALENDRIER_RESEAUX_MOIS_1.md` | Mois 1 : 12 posts clientes, 6 posts pro, 28 stories |
 
 ---
 

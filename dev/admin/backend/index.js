@@ -379,6 +379,15 @@ app.get("/api/public/categories", async (req, res) => {
 
 // Public API endpoint for salons by category (for category page)
 app.get("/api/public/salons-by-category", categoryController.getSalonsByCategory);
+app.get("/api/public/experts-by-category", categoryController.getExpertsByCategory);
+
+const publicWebBooking = require("./controller/user/publicWebBooking.controller");
+app.get("/api/public/booking/slots", publicWebBooking.publicCheckSlots);
+app.get("/api/public/booking/experts", publicWebBooking.publicExpertsForService);
+app.post("/api/public/guest/send-otp", publicWebBooking.publicGuestSendOtp);
+app.post("/api/public/guest/verify-otp", publicWebBooking.publicGuestVerifyOtp);
+app.post("/api/public/booking/create", publicWebBooking.publicCreateBooking);
+app.get("/api/public/booking/cancel", publicWebBooking.publicCancelBooking);
 
 // SEO: Sitemap and Robots.txt
 const sitemapController = require("./controller/user/sitemap.controller");

@@ -1,6 +1,7 @@
 const Category = require("../../models/category.model");
 const Salon = require("../../models/salon.model");
 const Service = require("../../models/service.model");
+const Expert = require("../../models/expert.model");
 const mongoose = require("mongoose");
 const geolib = require("geolib");
 const {
@@ -68,6 +69,210 @@ const getTranslatedServiceName = (service, language = 'en') => {
   
   // Default to English if language not found
   return translationMap[language] || service.name || '';
+};
+
+const getCategoryServiceIds = async (categoryId) => {
+  const services = await Service.find({
+    categoryId,
+    isDelete: false,
+    status: true,
+  }).select("_id");
+  return services.map((s) => s._id);
+};
+
+const appendSalonSearchFilter = (searchQuery, search) => {
+  if (!search || !String(search).trim()) return searchQuery;
+  const searchTerm = String(search).trim();
+  return {
+    ...searchQuery,
+    $or: [
+      { name: { $regex: searchTerm, $options: "i" } },
+      { "addressDetails.addressLine1": { $regex: searchTerm, $options: "i" } },
+      { "addressDetails.city": { $regex: searchTerm, $options: "i" } },
+      { "addressDetails.country": { $regex: searchTerm, $options: "i" } },
+      { about: { $regex: searchTerm, $options: "i" } },
+    ],
+  };
+};
+
+const formatSalonAddress = (addressDetails) => {
+  if (!addressDetails) return "";
+  const line = [
+    addressDetails.addressLine1,
+    addressDetails.city,
+    addressDetails.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  return line.replace(/,\s*,/g, ",").replace(/^,|,$/g, "");
+};
+
+const buildSalonShareUrl = (salon, baseURL) => {
+  const slug = generateSlug(salon.name);
+  const shortId = salon._id.toString().substring(0, 6);
+  return `${baseURL}/salon/${slug}-${shortId}`;
+};
+
+const formatSalonForCategory = (salon, { baseURL, language, copy }) => {
+  const categoryServices = (salon.serviceIds || [])
+    .filter((s) => s.id && s.price !== null && s.price !== undefined)
+    .map((s) => s.price);
+  const minPrice =
+    categoryServices.length > 0 ? Math.min(...categoryServices) : null;
+  const addr = salon.addressDetails || {};
+  const city = addr.city || "";
+
+  return {
+    _id: salon._id,
+    name: salon.name,
+    mainImage:
+      salon.mainImage ||
+      (salon.image && salon.image.length > 0 ? salon.image[0] : ""),
+    review: salon.review || 0,
+    reviewCount: salon.reviewCount || 0,
+    address: formatSalonAddress(addr),
+    city,
+    minPrice,
+    distance: salon.distance ?? null,
+    latitude: salon.locationCoordinates?.latitude
+      ? parseFloat(salon.locationCoordinates.latitude)
+      : null,
+    longitude: salon.locationCoordinates?.longitude
+      ? parseFloat(salon.locationCoordinates.longitude)
+      : null,
+    shareUrl: buildSalonShareUrl(salon, baseURL),
+  };
+};
+
+const inferSearchCity = (search, salons) => {
+  const term = (search || "").trim();
+  if (!term) return null;
+  const lower = term.toLowerCase();
+  for (const salon of salons) {
+    if (salon.city && salon.city.toLowerCase().includes(lower)) {
+      return salon.city;
+    }
+  }
+  return term;
+};
+
+const sumReviewCount = (salons) =>
+  salons.reduce((acc, s) => acc + (s.reviewCount || 0), 0);
+
+const fetchExpertsForCategory = async ({
+  categoryId,
+  search,
+  limit = 16,
+  salonIdsFilter = null,
+}) => {
+  const serviceObjectIds = await getCategoryServiceIds(categoryId);
+  if (!serviceObjectIds.length) return [];
+
+  let salonQuery = {
+    isDelete: false,
+    isActive: true,
+    "serviceIds.id": { $in: serviceObjectIds },
+  };
+  salonQuery = appendSalonSearchFilter(salonQuery, search);
+
+  let salonIds = salonIdsFilter;
+  if (!salonIds) {
+    const salons = await Salon.find(salonQuery).select("_id").lean();
+    salonIds = salons.map((s) => s._id);
+  }
+  if (!salonIds.length) return [];
+
+  const experts = await Expert.find({
+    isDelete: false,
+    isBlock: false,
+    salonId: { $in: salonIds },
+    serviceId: { $in: serviceObjectIds },
+  })
+    .populate({
+      path: "salonId",
+      select: "name addressDetails isActive isDelete",
+    })
+    .select("fname lname image review reviewCount salonId")
+    .sort({ review: -1, reviewCount: -1 })
+    .limit(limit)
+    .lean();
+
+  return experts
+    .filter((e) => e.salonId && e.salonId.isActive && !e.salonId.isDelete)
+    .map((e) => {
+      const salon = e.salonId;
+      const baseURL = (process.env.baseURL || "https://skedisy.com").replace(
+        /\/+$/,
+        ""
+      );
+      return {
+        _id: e._id,
+        name: `${e.fname || ""} ${e.lname || ""}`.trim(),
+        image: e.image || "",
+        review: e.review || 0,
+        reviewCount: e.reviewCount || 0,
+        salonName: salon.name || "",
+        city: salon.addressDetails?.city || "",
+        shareUrl: buildSalonShareUrl(salon, baseURL),
+      };
+    });
+};
+
+const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) => {
+  const imageHtml = salon.mainImage
+    ? `<img src="${salon.mainImage}" alt="${salon.name.replace(/"/g, "&quot;")}" class="salon-card-image" loading="lazy" onerror="this.style.display='none'">`
+    : `<div class="salon-card-image-placeholder">${noImageLabel}</div>`;
+
+  const pricePart =
+    salon.minPrice !== null
+      ? `<span class="salon-card-price">${priceFromLabel} ${currency}${salon.minPrice}</span>`
+      : "";
+  const ratingPart =
+    salon.review > 0
+      ? `<span class="salon-card-rating"><span class="rating-stars" aria-hidden="true">★</span> ${salon.review.toFixed(1)} (${salon.reviewCount})</span>`
+      : "";
+  const metaRow =
+    pricePart || ratingPart
+      ? `<div class="salon-card-meta">${pricePart}${ratingPart}</div>`
+      : "";
+  const addressHtml = salon.address
+    ? `<p class="salon-card-address">${salon.address}</p>`
+    : "";
+
+  return `
+    <a href="${salon.shareUrl}" class="salon-card sq-salon-card-v2" data-salon-id="${salon._id}">
+      ${imageHtml}
+      <div class="salon-card-content">
+        <h3 class="salon-card-name">${salon.name}</h3>
+        ${metaRow}
+        ${addressHtml}
+      </div>
+    </a>
+  `;
+};
+
+const renderExpertCardHtml = (expert, { expertAtSalonLabel }) => {
+  const imageHtml = expert.image
+    ? `<img src="${expert.image}" alt="${expert.name.replace(/"/g, "&quot;")}" class="sq-expert-card__img" loading="lazy" onerror="this.classList.add('sq-expert-card__img--error')">`
+    : `<div class="sq-expert-card__placeholder" aria-hidden="true">${(expert.name || "?").charAt(0)}</div>`;
+  const ratingHtml =
+    expert.review > 0
+      ? `<span class="sq-expert-card__rating">★ ${expert.review.toFixed(1)} (${expert.reviewCount})</span>`
+      : "";
+  const salonLine = expert.salonName
+    ? `<span class="sq-expert-card__salon">${expertAtSalonLabel(expert.salonName)}</span>`
+    : "";
+
+  return `
+    <a href="${expert.shareUrl}" class="sq-expert-card">
+      <div class="sq-expert-card__avatar">${imageHtml}</div>
+      <div class="sq-expert-card__body">
+        <span class="sq-expert-card__name">${expert.name}</span>
+        ${ratingHtml}
+        ${salonLine}
+      </div>
+    </a>
+  `;
 };
 
 //get all category
@@ -221,65 +426,13 @@ exports.getSalonsByCategory = async (req, res) => {
     // Get total count for pagination
     const total = await Salon.countDocuments(searchQuery);
 
-    // Format salon data for response
-    const formattedSalons = salons.map(salon => {
-      // Translate service names in salon.serviceIds
-      if (salon.serviceIds && Array.isArray(salon.serviceIds)) {
-        salon.serviceIds = salon.serviceIds.map(serviceItem => {
-          if (serviceItem.id) {
-            return {
-              ...serviceItem,
-              id: {
-                ...serviceItem.id,
-                name: getTranslatedServiceName(serviceItem.id, language),
-              }
-            };
-          }
-          return serviceItem;
-        });
-      }
-      
-      // Get minimum price from services in this category
-      const categoryServices = salon.serviceIds
-        .filter(s => s.id && s.price !== null && s.price !== undefined)
-        .map(s => s.price);
-      const minPrice = categoryServices.length > 0 ? Math.min(...categoryServices) : null;
-
-      // Generate slug for share link
-      const generateSlug = (name) => {
-        if (!name) return "";
-        return name
-          .toLowerCase()
-          .trim()
-          .replace(/[^\w\s-]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/-+/g, "-")
-          .replace(/^-+|-+$/g, "");
-      };
-      const slug = generateSlug(salon.name);
-      const shortId = salon._id.toString().substring(0, 6);
-      const slugWithId = `${slug}-${shortId}`;
-      const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
-      const shareUrl = `${baseURL}/salon/${slugWithId}`;
-
-      return {
-        _id: salon._id,
-        name: salon.name,
-        mainImage: salon.mainImage || (salon.image && salon.image.length > 0 ? salon.image[0] : ""),
-        review: salon.review || 0,
-        reviewCount: salon.reviewCount || 0,
-        address: salon.addressDetails 
-          ? `${salon.addressDetails.addressLine1 || ""}, ${salon.addressDetails.city || ""}, ${salon.addressDetails.country || ""}`.replace(/,\s*,/g, ',').replace(/^,|,$/g, '')
-          : "",
-        minPrice: minPrice,
-        distance: salon.distance || null,
-        shareUrl: shareUrl,
-      };
-    });
-
-    // Get translated category name
+    const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
+    const formattedSalons = salons.map((salon) =>
+      formatSalonForCategory(salon, { baseURL, language })
+    );
     const translatedCategoryName = getTranslatedName(category, language);
-    
+    const searchCity = inferSearchCity(search, formattedSalons);
+
     return res.status(200).json({
       status: true,
       message: "Salons retrieved successfully",
@@ -287,13 +440,64 @@ exports.getSalonsByCategory = async (req, res) => {
         _id: category._id,
         name: translatedCategoryName,
         image: category.image,
-        description: category.description || `${translatedCategoryName} services available at top-rated salons`,
+        description:
+          category.description ||
+          `${translatedCategoryName} services available at top-rated salons`,
       },
       salons: formattedSalons,
-      total: total,
+      total,
+      totalReviews: sumReviewCount(formattedSalons),
+      searchCity,
     });
   } catch (error) {
     console.error("[Get Salons By Category] Error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+exports.getExpertsByCategory = async (req, res) => {
+  try {
+    const categoryId = req.query.categoryId;
+    const search = req.query.search || "";
+    const limit = parseInt(req.query.limit, 10) || 16;
+    const language = req.query.language || "fr";
+
+    if (!categoryId) {
+      return res.status(200).json({
+        status: false,
+        message: "Category ID is required",
+      });
+    }
+
+    const category = await Category.findById(categoryId);
+    if (!category || category.isDelete || !category.status) {
+      return res.status(200).json({
+        status: false,
+        message: "Category not found",
+      });
+    }
+
+    const experts = await fetchExpertsForCategory({
+      categoryId,
+      search,
+      limit,
+    });
+
+    return res.status(200).json({
+      status: true,
+      message: "Experts retrieved successfully",
+      category: {
+        _id: category._id,
+        name: getTranslatedName(category, language),
+      },
+      experts,
+      total: experts.length,
+    });
+  } catch (error) {
+    console.error("[Get Experts By Category] Error:", error);
     return res.status(500).json({
       status: false,
       error: error.message || "Internal Server Error",
@@ -372,16 +576,7 @@ exports.serveCategoryPage = async (req, res) => {
       "serviceIds.id": { $in: serviceObjectIds },
     };
 
-    if (search && search.trim() !== "") {
-      const searchTerm = search.trim();
-      searchQuery.$or = [
-        { name: { $regex: searchTerm, $options: "i" } },
-        { "addressDetails.addressLine1": { $regex: searchTerm, $options: "i" } },
-        { "addressDetails.city": { $regex: searchTerm, $options: "i" } },
-        { "addressDetails.country": { $regex: searchTerm, $options: "i" } },
-        { about: { $regex: searchTerm, $options: "i" } },
-      ];
-    }
+    searchQuery = appendSalonSearchFilter(searchQuery, search);
 
     let salons = await Salon.find(searchQuery)
       .populate({
@@ -425,89 +620,58 @@ exports.serveCategoryPage = async (req, res) => {
       });
     }
 
-    // Format salons for display
-    const formattedSalons = salons.map(salon => {
-      const categoryServices = salon.serviceIds
-        .filter(s => s.id && s.price !== null && s.price !== undefined)
-        .map(s => s.price);
-      const minPrice = categoryServices.length > 0 ? Math.min(...categoryServices) : null;
-
-      const slug = generateSlug(salon.name);
-      const shortId = salon._id.toString().substring(0, 6);
-      const slugWithId = `${slug}-${shortId}`;
-      const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
-      const shareUrl = `${baseURL}/salon/${slugWithId}`;
-
-      return {
-        _id: salon._id,
-        name: salon.name,
-        mainImage: salon.mainImage || (salon.image && salon.image.length > 0 ? salon.image[0] : ""),
-        review: salon.review || 0,
-        reviewCount: salon.reviewCount || 0,
-        address: salon.addressDetails 
-          ? `${salon.addressDetails.addressLine1 || ""}, ${salon.addressDetails.city || ""}, ${salon.addressDetails.country || ""}`.replace(/,\s*,/g, ',').replace(/^,|,$/g, '')
-          : "",
-        minPrice: minPrice,
-        distance: salon.distance || null,
-        shareUrl: shareUrl,
-      };
-    });
-
-    const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
-    
+    const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
     const language = resolveLang(req.query.lang || req.query.language);
+    const formattedSalons = salons.map((salon) =>
+      formatSalonForCategory(salon, { baseURL, language })
+    );
     const copy = getWebCopy(language);
     const categoryDisplayName = getTranslatedName(category, language) || category.name;
-    
-    // Generate the new slug format for category URL
     const categorySlug = generateSlug(categoryDisplayName);
     const categoryShortId = category._id.toString().substring(0, 6);
     const categorySlugWithId = `${categorySlug}-${categoryShortId}`;
     const categoryUrl = `${baseURL}/category/${categorySlugWithId}`;
-    const currency = global.settingJSON?.currencySymbol || "$";
+    const currency = global.settingJSON?.currencySymbol || "€";
     const priceFromLabel = language === "fr" ? "À partir de" : "From";
     const priceDisclaimer =
       language === "fr"
         ? "Prix indicatif — le montant définitif sera confirmé par le salon."
         : "Indicative price — the final amount will be confirmed with the salon.";
+    const totalReviews = sumReviewCount(formattedSalons);
+    const searchCity = inferSearchCity(search, formattedSalons);
+    const experts = await fetchExpertsForCategory({
+      categoryId: fullCategoryId,
+      search,
+      limit: 16,
+      salonIdsFilter: formattedSalons.map((s) => s._id),
+    });
 
-    // Generate HTML page
-    const salonsHtml = formattedSalons.length > 0 
-      ? formattedSalons.map(salon => {
-          const ratingHtml = salon.review > 0 
-            ? `<div class="salon-rating"><span class="rating-stars">⭐</span><span>${salon.review.toFixed(1)} (${salon.reviewCount})</span></div>`
-            : '';
-          const priceHtml = salon.minPrice !== null 
-            ? `<div class="salon-price">${priceFromLabel} ${currency}${salon.minPrice}</div>`
-            : '';
-          const distanceHtml = salon.distance !== null
-            ? `<div class="salon-distance">📍 ${copy.kmAway(salon.distance.toFixed(1))}</div>`
-            : '';
-          const imageHtml = salon.mainImage 
-            ? `<img src="${salon.mainImage}" alt="${salon.name}" class="salon-card-image" onerror="this.style.display='none'">`
-            : `<div class="salon-card-image-placeholder">${copy.noImage}</div>`;
+    const cardOpts = { currency, priceFromLabel, noImageLabel: copy.noImage };
+    const salonsHtml =
+      formattedSalons.length > 0
+        ? formattedSalons
+            .map((salon) => renderSalonCardHtml(salon, cardOpts))
+            .join("")
+        : `<div class="no-results"><p>${copy.noSalonsCategory}</p></div>`;
 
-          return `
-            <a href="${salon.shareUrl}" class="salon-card">
-              ${imageHtml}
-              <div class="salon-card-content">
-                <h3 class="salon-card-name">${salon.name}</h3>
-                ${ratingHtml}
-                ${priceHtml}
-                ${salon.address ? `<div class="salon-address"><i class="fas fa-map-marker-alt"></i> ${salon.address}</div>` : ''}
-                ${distanceHtml}
-                <div class="salon-card-cta">
-                  <span class="salon-card-cta-btn">
-                    <i class="fas fa-calendar-check"></i> ${copy.viewBook}
-                  </span>
-                </div>
-              </div>
-            </a>
-          `;
-        }).join('')
-      : `<div class="no-results"><p>${copy.noSalonsCategory}</p></div>`;
+    const expertsHtml =
+      experts.length > 0
+        ? experts
+            .map((expert) =>
+              renderExpertCardHtml(expert, {
+                expertAtSalonLabel: copy.expertAtSalon,
+              })
+            )
+            .join("")
+        : `<p class="sq-category-discover__empty">${copy.noExpertsCategory}</p>`;
 
+    const searchMessageHtml = searchCity
+      ? `<p class="sq-category-discover__city-msg">${copy.resultsInCity(searchCity)}</p>`
+      : "";
+    const statsLabel = copy.resultsCount(formattedSalons.length, totalReviews);
     const categoryDescription = category.description || copy.categoryMetaDesc(categoryDisplayName);
+    const pageTitle = copy.discoverSalons(categoryDisplayName);
+    const pageLead = copy.categoryPageLead(categoryDisplayName);
     const idfBanner = idfBannerHtml(copy);
     const footerHtml = skedisyFooterHtml(baseURL, copy);
     const categoryImage = category.image || `${baseURL}/logo.png`;
@@ -562,6 +726,7 @@ exports.serveCategoryPage = async (req, res) => {
     
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/public-pages.css">
 </head>
@@ -621,45 +786,49 @@ exports.serveCategoryPage = async (req, res) => {
         </div>
     </nav>
     
-    <!-- Hero Section -->
-    <div class="category-hero-section">
-        <div class="category-hero-background"></div>
-        ${categoryImage ? `<div class="category-hero-image-overlay"><img src="${categoryImage}" alt="${categoryDisplayName}" onerror="this.style.display='none'"></div>` : ''}
-        <div class="category-hero-overlay"></div>
-        <div class="category-hero-content">
-            <div class="category-header-content">
-                <h1 class="category-hero-title">${categoryDisplayName}</h1>
-                <p class="category-hero-description">${categoryDescription}</p>
-                <div class="category-hero-stats">
-                    <span><strong>${formattedSalons.length}</strong> ${copy.categorySalons}</span>
-                    <span><strong>${formattedSalons.filter(s => s.review > 0).length}</strong> ${copy.categoryRated}</span>
+    ${idfBanner}
+
+    <main class="sq-category-discover">
+        <header class="sq-category-discover__head">
+            <h1 class="sq-category-discover__title">${pageTitle}</h1>
+            <p class="sq-category-discover__lead">${pageLead}</p>
+        </header>
+
+        <div class="sq-category-discover__search search-section">
+            <div class="search-container">
+                <input type="search" id="searchInput" class="search-input" placeholder="${copy.searchPlaceholder.replace(/"/g, "&quot;")}" value="${search.replace(/"/g, "&quot;")}" autocomplete="off">
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+            </div>
+        </div>
+
+        <div class="sq-category-discover__toolbar">
+            <div class="sq-category-discover__stats-wrap">
+                <p class="sq-category-discover__stats" id="categoryStats">${statsLabel}</p>
+                <div id="categorySearchMessage">${searchMessageHtml}</div>
+            </div>
+            <div class="sq-category-discover__view-toggle" role="group" aria-label="Affichage">
+                <button type="button" class="sq-view-btn sq-view-btn--active" id="btnListView" data-view="list">${copy.listView}</button>
+                <button type="button" class="sq-view-btn" id="btnMapView" data-view="map">${copy.mapView}</button>
+            </div>
+        </div>
+
+        <div class="sq-category-discover__main sq-category-discover__main--list" id="categoryMain">
+            <div id="categoryMap" class="sq-category-discover__map" aria-hidden="true"></div>
+            <div class="sq-category-discover__list-wrap">
+                <p class="price-disclaimer">${priceDisclaimer}</p>
+                <div class="salons-grid sq-salons-grid--3" id="salonsGrid">
+                    ${salonsHtml}
                 </div>
             </div>
         </div>
-    </div>
 
-    ${idfBanner}
-    
-    <div class="category-header">
-        <div class="category-header-content">
-            <h2 class="category-subtitle">${copy.discoverSalons(categoryDisplayName)}</h2>
-            <p class="category-description">${categoryDescription}</p>
-        </div>
-    </div>
-    
-    <div class="search-section">
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="${copy.searchPlaceholder.replace(/"/g, '&quot;')}" value="${search.replace(/"/g, '&quot;')}">
-            <i class="fas fa-search search-icon"></i>
-        </div>
-    </div>
-    
-    <div class="salons-section">
-        <p class="price-disclaimer">${priceDisclaimer}</p>
-        <div class="salons-grid" id="salonsGrid">
-            ${salonsHtml}
-        </div>
-    </div>
+        <section class="sq-category-discover__experts" aria-labelledby="expertsHeading">
+            <h2 id="expertsHeading" class="sq-category-discover__experts-title">${copy.categoryExpertsTitle}</h2>
+            <div class="sq-experts-scroll" id="expertsRow">
+                ${expertsHtml}
+            </div>
+        </section>
+    </main>
 
     <div class="sked-app-banner">
         <h3>${copy.appBannerTitle}</h3>
@@ -670,93 +839,30 @@ exports.serveCategoryPage = async (req, res) => {
     ${footerHtml}
 
     <script>
-        const categoryId = "${category._id}";
-        const categorySlugWithId = "${categorySlugWithId}";
-        const searchInput = document.getElementById('searchInput');
-        let searchTimeout;
-
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            const searchTerm = this.value.trim();
-            
-            searchTimeout = setTimeout(() => {
-                if (searchTerm.length >= 2 || searchTerm.length === 0) {
-                    loadSalons(searchTerm);
-                }
-            }, 500);
-        });
-
-        function loadSalons(search = '') {
-            // Use the same endpoint but with search parameter in URL
-            const url = new URL(window.location.href);
-            if (search) {
-                url.searchParams.set('search', search);
-            } else {
-                url.searchParams.delete('search');
+        window.SKEDISY_CATEGORY_PAGE = {
+            categoryId: "${category._id}",
+            language: "${language}",
+            initialSalons: ${JSON.stringify(formattedSalons)},
+            initialExperts: ${JSON.stringify(experts)},
+            initialSearchCity: ${JSON.stringify(searchCity)},
+            initialTotalReviews: ${totalReviews},
+            copy: {
+                resultsInCityTpl: ${JSON.stringify(copy.resultsInCityTpl)},
+                expertAtSalonTpl: ${JSON.stringify(copy.expertAtSalonTpl)},
+                mapView: ${JSON.stringify(copy.mapView)},
+                listView: ${JSON.stringify(copy.listView)},
+                noSalonsSearch: ${JSON.stringify(copy.noSalonsSearch)},
+                noExpertsCategory: ${JSON.stringify(copy.noExpertsCategory)}
+            },
+            render: {
+                currency: ${JSON.stringify(currency)},
+                priceFromLabel: ${JSON.stringify(priceFromLabel)},
+                noImageLabel: ${JSON.stringify(copy.noImage)}
             }
-            // Reload page with search parameter for server-side rendering
-            window.location.href = url.toString();
-        }
-
-        function fetchSalons(url) {
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status && data.salons) {
-                        updateSalonsGrid(data.salons);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading salons:', error);
-                });
-        }
-
-        function updateSalonsGrid(salons) {
-            const grid = document.getElementById('salonsGrid');
-            const currency = "${currency}";
-            const priceFromLabel = ${JSON.stringify(priceFromLabel)};
-            const viewBookLabel = ${JSON.stringify(copy.viewBook)};
-            const noImageLabel = ${JSON.stringify(copy.noImage)};
-            const kmAwayTpl = ${JSON.stringify(copy.kmAway("__KM__"))};
-            const noSalonsSearch = ${JSON.stringify(copy.noSalonsSearch)};
-            
-            if (salons.length === 0) {
-                grid.innerHTML = '<div class="no-results"><p>' + noSalonsSearch + '</p></div>';
-                return;
-            }
-
-            grid.innerHTML = salons.map(salon => {
-                const ratingHtml = salon.review > 0 
-                    ? \`<div class="salon-rating"><span class="rating-stars">⭐</span><span>\${salon.review.toFixed(1)} (\${salon.reviewCount})</span></div>\`
-                    : '';
-                const priceHtml = salon.minPrice !== null 
-                    ? \`<div class="salon-price">\${priceFromLabel} \${currency}\${salon.minPrice}</div>\`
-                    : '';
-                const distanceHtml = salon.distance !== null
-                    ? \`<div class="salon-distance">📍 \${kmAwayTpl.replace('__KM__', salon.distance.toFixed(1))}</div>\`
-                    : '';
-                const imageHtml = salon.mainImage 
-                    ? \`<img src="\${salon.mainImage}" alt="\${salon.name}" class="salon-card-image" onerror="this.style.display='none'">\`
-                    : '<div class="salon-card-image-placeholder">' + noImageLabel + '</div>';
-
-                return \`
-                    <a href="\${salon.shareUrl}" class="salon-card">
-                        \${imageHtml}
-                        <div class="salon-card-content">
-                            <h3 class="salon-card-name">\${salon.name}</h3>
-                            \${ratingHtml}
-                            \${priceHtml}
-                            \${salon.address ? \`<div class="salon-address"><i class="fas fa-map-marker-alt"></i> \${salon.address}</div>\` : ''}
-                            \${distanceHtml}
-                            <div class="salon-card-cta">
-                              <span class="salon-card-cta-btn"><i class="fas fa-calendar-check"></i> \${viewBookLabel}</span>
-                            </div>
-                        </div>
-                    </a>
-                \`;
-            }).join('');
-        }
+        };
     </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="${baseURL}/category-page.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
 </body>

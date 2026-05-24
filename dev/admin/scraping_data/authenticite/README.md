@@ -11,6 +11,7 @@ Dossier de référence pour le **marketing**, les **réseaux sociaux** et la **c
 → **[CATEGORIES_SERVICES_AFRO_IDF.md](./CATEGORIES_SERVICES_AFRO_IDF.md)** — **5 catégories** : Tresses · Locks · Perruques · Homme · **Esthétique** (ongles, maquillage, soins, épilation)
 
 → **[AUDIT_ALIGNEMENT_AVANT_RESEAUX.md](./AUDIT_ALIGNEMENT_AVANT_RESEAUX.md)** — **checklist page par page** (site, stores, fiches salon, app, légal) avant push réseaux  
+→ **[CALENDRIER_RESEAUX_MOIS_1.md](./CALENDRIER_RESEAUX_MOIS_1.md)** — **mois 1 réseaux** : 12 posts @skedisy + 6 posts @skedisy.pro + 28 scripts stories  
 → Blog : **`salonportal/blog/index.html`** — hub minimal (Lot C)
 
 ### AUTHENTICITE_SKEDISY.md contient :
