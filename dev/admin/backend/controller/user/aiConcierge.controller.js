@@ -40,7 +40,8 @@ exports.analyzeSelfie = async (req, res) => {
       data: {
         analysis: result.analysis,
         recommendations: result.recommendations,
-        provider: result.provider
+        provider: result.provider,
+        locationUsed: !!(result.recommendations && result.recommendations.locationUsed),
       }
     });
   } catch (error) {

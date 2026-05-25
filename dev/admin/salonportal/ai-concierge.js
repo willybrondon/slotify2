@@ -22,10 +22,76 @@ const errorMessage = document.getElementById('errorMessage');
 const analyzeAnotherBtn = document.getElementById('analyzeAnotherBtn');
 
 let selectedFile = null;
+let clientLocation = { lat: null, lng: null, active: false };
+
+function isMobileConcierge() {
+    return window.matchMedia('(max-width: 768px)').matches;
+}
+
+function sortSalonsByDistance(salons) {
+    if (!salons || !salons.length) return salons;
+    return [...salons].sort((a, b) => {
+        const da = a.distance != null ? a.distance : 9999;
+        const db = b.distance != null ? b.distance : 9999;
+        if (da !== db) return da - db;
+        return (b.review || 0) - (a.review || 0);
+    });
+}
+
+function updateLocationStatusUI() {
+    const el = document.getElementById('locationStatus');
+    if (!el) return;
+    if (clientLocation.active) {
+        el.textContent = 'Localisation activée — salons proches de vous en priorité.';
+        el.classList.add('sq-location-status--ok');
+    } else if (isMobileConcierge()) {
+        el.textContent = 'Autorisez la localisation pour des salons afro près de chez vous (recommandé).';
+        el.classList.remove('sq-location-status--ok');
+    } else {
+        el.textContent = '';
+    }
+}
+
+function requestClientLocation(onDone) {
+    if (!navigator.geolocation) {
+        updateLocationStatusUI();
+        if (onDone) onDone();
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            if (!isNaN(lat) && !isNaN(lng)) {
+                clientLocation = { lat, lng, active: true };
+            }
+            updateLocationStatusUI();
+            if (onDone) onDone();
+        },
+        () => {
+            clientLocation = { lat: null, lng: null, active: false };
+            updateLocationStatusUI();
+            if (onDone) onDone();
+        },
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    );
+}
+
+function appendLocationToFormData(formData) {
+    if (clientLocation.active && clientLocation.lat != null && clientLocation.lng != null) {
+        formData.append('latitude', clientLocation.lat);
+        formData.append('longitude', clientLocation.lng);
+    }
+}
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
+    if (isMobileConcierge()) {
+        requestClientLocation();
+    } else {
+        updateLocationStatusUI();
+    }
 });
 
 function setupEventListeners() {
@@ -138,48 +204,27 @@ function analyzeImage() {
     const formData = new FormData();
     formData.append('image', selectedFile);
     
-    // Get user location if available
-    // Use timeout to prevent hanging if geolocation is slow or blocked
-    if (navigator.geolocation) {
-        const locationTimeout = setTimeout(() => {
-            // If location takes too long, proceed without it
-            console.warn('Location request timed out, proceeding without location');
-            sendAnalysisRequest(formData);
-        }, 5000); // 5 second timeout
-        
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                clearTimeout(locationTimeout);
-                // Validate coordinates (check for valid numbers and reasonable ranges)
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-                
-                // Check if coordinates are valid (not NaN and within valid ranges)
-                if (!isNaN(lat) && !isNaN(lng) && 
-                    lat >= -90 && lat <= 90 && 
-                    lng >= -180 && lng <= 180) {
-                    formData.append('latitude', lat);
-                    formData.append('longitude', lng);
-                    console.log('Location obtained:', lat, lng);
-                } else {
-                    console.warn('Invalid location coordinates, proceeding without location');
-                }
-                sendAnalysisRequest(formData);
-            },
-            (error) => {
-                clearTimeout(locationTimeout);
-                // Location permission denied or error, continue without location
-                console.warn('Location error:', error.message);
-                sendAnalysisRequest(formData);
-            },
-            {
-                enableHighAccuracy: false, // Don't require high accuracy (faster)
-                timeout: 4000, // 4 second timeout
-                maximumAge: 300000 // Accept cached location up to 5 minutes old
+    const runAnalyze = () => {
+        appendLocationToFormData(formData);
+        if (isMobileConcierge() && !clientLocation.active) {
+            const ok = window.confirm(
+                'Sans localisation, les salons ne seront pas triés par distance.\n\nAutoriser la position maintenant ?'
+            );
+            if (ok) {
+                requestClientLocation(() => {
+                    appendLocationToFormData(formData);
+                    sendAnalysisRequest(formData);
+                });
+                return;
             }
-        );
-    } else {
+        }
         sendAnalysisRequest(formData);
+    };
+
+    if (!clientLocation.active && navigator.geolocation) {
+        requestClientLocation(runAnalyze);
+    } else {
+        runAnalyze();
     }
 }
 
@@ -229,6 +274,8 @@ function displayResults(data) {
     // Hide main content, show results
     mainContent.style.display = 'none';
     resultsSection.style.display = 'block';
+
+    const locationUsed = data.locationUsed || data.recommendations?.locationUsed;
     
     // Display analysis
     if (data.analysis) {
@@ -237,7 +284,7 @@ function displayResults(data) {
     
     // Display recommendations
     if (data.recommendations) {
-        displayRecommendations(data.recommendations);
+        displayRecommendations(data.recommendations, locationUsed);
     }
     
     // Scroll to results
@@ -305,8 +352,75 @@ function displayAnalysis(analysis) {
     analysisContent.innerHTML = html;
 }
 
-function displayRecommendations(recommendations) {
+function renderSalonCard(salon) {
+    const salonId = salon._id || salon.id;
+    let webUrl = salon.shareUrl;
+    if (!webUrl && salonId) {
+        const salonSlug =
+            salon.slug ||
+            (salon.name
+                ? salon.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+                : 'salon');
+        const shortId = salon.shortId || String(salonId).substring(0, 6);
+        webUrl = `${API_BASE_URL.replace(/\/+$/, '')}/salon/${salonSlug}-${shortId}`;
+    }
+    const matchHint = formatSalonMatchHint(salon);
+    const name = escapeHtml(salon.name || 'Salon');
+    const addr = escapeHtml(
+        salon.address || (salon.addressDetails && salon.addressDetails.addressLine1) || ''
+    );
+    const img = salon.image || salon.mainImage;
+    const mobile = isMobileConcierge();
+
+    if (mobile) {
+        return `
+            <a class="salon-item salon-item--link salon-item--mobile" href="${escapeHtml(webUrl || '#')}">
+                <div class="salon-item__media">
+                    ${
+                        img
+                            ? `<img src="${escapeHtml(img)}" alt="${name}" loading="lazy" onerror="this.parentElement.classList.add('salon-item__media--fallback')">`
+                            : '<div class="salon-item__placeholder"><i class="fas fa-store" aria-hidden="true"></i></div>'
+                    }
+                </div>
+                <div class="salon-item__body">
+                    ${addr ? `<p class="salon-address salon-address--primary"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${addr}</p>` : ''}
+                    <h4 class="salon-item__name">${name}</h4>
+                    ${salon.distance != null ? `<p class="salon-distance">${salon.distance.toFixed(1)} km · près de vous</p>` : ''}
+                    ${salon.review ? `<p class="rating"><i class="fas fa-star" aria-hidden="true"></i> ${salon.review.toFixed(1)}</p>` : ''}
+                    ${matchHint ? `<p class="salon-match-hint">${matchHint}</p>` : ''}
+                    <span class="salon-cta">Voir le salon et réserver</span>
+                </div>
+            </a>
+        `;
+    }
+
+    return `
+        <a class="salon-item salon-item--link" href="${escapeHtml(webUrl || '#')}" data-salon-id="${escapeHtml(String(salonId || ''))}">
+            ${
+                img
+                    ? `<img src="${escapeHtml(img)}" alt="${name}" onerror="this.style.display='none'">`
+                    : '<div class="salon-item__placeholder"><i class="fas fa-store" aria-hidden="true"></i></div>'
+            }
+            <div class="salon-info">
+                <h4>${name}</h4>
+                ${salon.review ? `<p class="rating"><i class="fas fa-star" aria-hidden="true"></i> ${salon.review.toFixed(1)}</p>` : ''}
+                ${matchHint ? `<p class="salon-match-hint">${matchHint}</p>` : ''}
+                ${addr ? `<p class="salon-address">${addr}</p>` : ''}
+                ${salon.distance != null ? `<p class="salon-distance"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${salon.distance.toFixed(1)} km</p>` : ''}
+                <p class="salon-cta">Voir le salon et réserver</p>
+            </div>
+            <i class="fas fa-chevron-right salon-item__chevron" aria-hidden="true"></i>
+        </a>
+    `;
+}
+
+function displayRecommendations(recommendations, locationUsed) {
     let html = '';
+    const mobile = isMobileConcierge();
+    let salons = recommendations.salons || [];
+    if (locationUsed || clientLocation.active) {
+        salons = sortSalonsByDistance(salons);
+    }
     
     // Services
     if (recommendations.services && recommendations.services.length > 0) {
@@ -333,44 +447,21 @@ function displayRecommendations(recommendations) {
     }
     
     // Salons - Always show salon recommendations section
+    const leadText = locationUsed || clientLocation.active
+        ? 'Salons afro en Île-de-France, classés selon votre position et votre profil.'
+        : 'Salons afro en Île-de-France classés selon vos besoins (prestations, catégories).';
+
     html += `
-        <div class="recommendations-section">
+        <div class="recommendations-section${mobile ? ' recommendations-section--mobile' : ''}">
             <h3><i class="fas fa-store" aria-hidden="true"></i> Salons afro en Île-de-France</h3>
+            <p class="recommendations-lead">${escapeHtml(leadText)}</p>
     `;
-    
-    if (recommendations.salons && recommendations.salons.length > 0) {
-        html += `<div class="salon-list">`;
-        
-        recommendations.salons.forEach((salon) => {
-            const salonId = salon._id || salon.id;
-            let webUrl = salon.shareUrl;
-            if (!webUrl && salonId) {
-                const salonSlug = salon.slug || (salon.name ? salon.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : 'salon');
-                const shortId = salon.shortId || String(salonId).substring(0, 6);
-                webUrl = `${API_BASE_URL.replace(/\/+$/, "")}/salon/${salonSlug}-${shortId}`;
-            }
-            const matchHint = formatSalonMatchHint(salon);
-            const name = escapeHtml(salon.name || 'Salon');
-            const addr = escapeHtml(salon.address || (salon.addressDetails && salon.addressDetails.addressLine1) || '');
-            const img = salon.image || salon.mainImage;
-            html += `
-                <a class="salon-item salon-item--link" href="${escapeHtml(webUrl || '#')}" data-salon-id="${escapeHtml(String(salonId || ''))}">
-                    ${img
-                        ? `<img src="${escapeHtml(img)}" alt="${name}" onerror="this.style.display='none'">`
-                        : '<div class="salon-item__placeholder"><i class="fas fa-store" aria-hidden="true"></i></div>'}
-                    <div class="salon-info">
-                        <h4>${name}</h4>
-                        ${salon.review ? `<p class="rating"><i class="fas fa-star" aria-hidden="true"></i> ${salon.review.toFixed(1)}</p>` : ''}
-                        ${matchHint ? `<p class="salon-match-hint">${matchHint}</p>` : ''}
-                        ${addr ? `<p class="salon-address">${addr}</p>` : ''}
-                        ${salon.distance != null ? `<p class="salon-distance"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${salon.distance.toFixed(1)} km</p>` : ''}
-                        <p class="salon-cta">Voir le salon et réserver</p>
-                    </div>
-                    <i class="fas fa-chevron-right salon-item__chevron" aria-hidden="true"></i>
-                </a>
-            `;
+
+    if (salons.length > 0) {
+        html += `<div class="salon-list${mobile ? ' salon-list--mobile' : ''}">`;
+        salons.forEach((salon) => {
+            html += renderSalonCard(salon);
         });
-        
         html += `</div>`;
     } else {
         // Show message if no salons found

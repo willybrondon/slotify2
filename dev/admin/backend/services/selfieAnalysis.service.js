@@ -544,13 +544,14 @@ Return ONLY valid JSON (no markdown):
 
       return {
         services: servicesWithUrl,
-        salons: salonMatches.salons, // Already formatted in getSalonMatches
+        salons: salonMatches.salons,
         experts: salonMatches.experts,
-        beautyTips: beautyTips
+        beautyTips: beautyTips,
+        locationUsed: salonMatches.locationUsed,
       };
     } catch (error) {
       console.error('[Selfie Analysis] Recommendation error:', error);
-      return { services: [], salons: [], experts: [], beautyTips: [] };
+      return { services: [], salons: [], experts: [], beautyTips: [], locationUsed: false };
     }
   }
 
@@ -559,6 +560,8 @@ Return ONLY valid JSON (no markdown):
    * Prioritize salons based on their service types matching user's needs
    */
   async getSalonMatches(services, context, analysis = null) {
+    const IDF_RADIUS_KM = 55;
+    let locationUsed = false;
     try {
       // Always try to get salon recommendations, even if no services found
       // This ensures users always see salon recommendations
@@ -618,6 +621,7 @@ Return ONLY valid JSON (no markdown):
         const isValidLocation = !isNaN(userLocation.latitude) && !isNaN(userLocation.longitude);
         
         if (isValidLocation) {
+          locationUsed = true;
           salons = salons.map(salon => {
             if (salon.locationCoordinates && salon.locationCoordinates.latitude && salon.locationCoordinates.longitude) {
               const salonLat = parseFloat(salon.locationCoordinates.latitude);
@@ -649,39 +653,32 @@ Return ONLY valid JSON (no markdown):
           const salonsWithDistance = salons.filter(salon => salon.distance !== null);
           const salonsWithoutDistance = salons.filter(salon => salon.distance === null);
           
-          // Filter nearby salons (within 100km for better coverage, especially for Cameroon)
-          // If no salons within 100km, include all salons with distance
-          const nearbySalons = salonsWithDistance.filter(salon => salon.distance <= 100);
+          // Île-de-France : prioriser les salons proches du client
+          let nearbySalons = salonsWithDistance.filter((s) => s.distance <= IDF_RADIUS_KM);
+          if (!nearbySalons.length) {
+            nearbySalons = salonsWithDistance.filter((s) => s.distance <= 100);
+          }
           const salonsToShow = nearbySalons.length > 0 ? nearbySalons : salonsWithDistance;
-          
-          // Sort by service match score first, then distance, then rating
-          salonsToShow.sort((a, b) => {
-            // Sort by service match score first (if available), then distance, then rating
-            if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
-              if (b.serviceMatchScore !== a.serviceMatchScore) {
-                return b.serviceMatchScore - a.serviceMatchScore;
-              }
+
+          const sortByDistanceThenMatch = (a, b) => {
+            if (a.distance != null && b.distance != null && a.distance !== b.distance) {
+              return a.distance - b.distance;
             }
-            if (a.distance !== null && b.distance !== null) {
-              if (a.distance !== b.distance) {
-                return a.distance - b.distance;
-              }
+            if (b.serviceMatchScore !== a.serviceMatchScore) {
+              return b.serviceMatchScore - a.serviceMatchScore;
             }
             return (b.review || 0) - (a.review || 0);
-          });
-          
-          // Add salons without distance at the end (sorted by score and rating)
+          };
+
+          salonsToShow.sort(sortByDistanceThenMatch);
           salonsWithoutDistance.sort((a, b) => {
-            if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
-              if (b.serviceMatchScore !== a.serviceMatchScore) {
-                return b.serviceMatchScore - a.serviceMatchScore;
-              }
+            if (b.serviceMatchScore !== a.serviceMatchScore) {
+              return b.serviceMatchScore - a.serviceMatchScore;
             }
             return (b.review || 0) - (a.review || 0);
           });
-          
-          // Combine: nearby salons first, then salons without distance
-          salons = [...salonsToShow, ...salonsWithoutDistance];
+
+          salons = [...salonsToShow, ...salonsWithoutDistance.slice(0, 2)];
         } else {
           console.warn('[Selfie Analysis] Invalid location coordinates provided');
           // If location is invalid, treat as no location
@@ -767,12 +764,13 @@ Return ONLY valid JSON (no markdown):
         .limit(3);
 
       return {
-        salons: formattedSalons, // Use formatted salons
-        experts: experts
+        salons: formattedSalons,
+        experts: experts,
+        locationUsed,
       };
     } catch (error) {
       console.error('[Selfie Analysis] Salon matching error:', error);
-      return { salons: [], experts: [] };
+      return { salons: [], experts: [], locationUsed: false };
     }
   }
   

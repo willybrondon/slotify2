@@ -35,11 +35,14 @@
                 <div class="upload-section" id="uploadSection">
                     <div class="upload-area" id="uploadArea">
                         <div class="upload-placeholder" id="uploadPlaceholder">
+                            <p class="sq-upload-kicker">Île-de-France · Cheveux texturés · afro</p>
                             <i class="fas fa-camera" aria-hidden="true"></i>
-                            <h3>Votre selfie</h3>
-                            <p>Cliquez ou glissez une photo (JPG, PNG — max. 10 Mo)</p>
+                            <h3>Ta photo, ton profil beauté</h3>
+                            <p class="sq-upload-lead">Une selfie bien éclairée : on analyse tes cheveux et ta peau pour te proposer des <strong>salons afro près de chez toi</strong>.</p>
+                            <p class="upload-hint">JPG ou PNG · max. 10 Mo · visage et cheveux visibles</p>
+                            <p class="sq-location-status" id="locationStatus" aria-live="polite"></p>
                             <button type="button" class="btn-upload" id="uploadBtn">
-                                <i class="fas fa-image" aria-hidden="true"></i> Choisir une photo
+                                <i class="fas fa-image" aria-hidden="true"></i> Prendre ou choisir une photo
                             </button>
                         </div>
                         <div class="image-preview" id="imagePreview" style="display: none;">
@@ -71,7 +74,6 @@
 
                 <div class="recommendations-card" id="recommendationsCard">
                     <h2><i class="fas fa-store" aria-hidden="true"></i> Salons recommandés</h2>
-                    <p class="recommendations-lead">Salons afro en Île-de-France classés selon vos besoins (prestations, catégories, description).</p>
                     <div class="recommendations-content" id="recommendationsContent"></div>
                 </div>
 
