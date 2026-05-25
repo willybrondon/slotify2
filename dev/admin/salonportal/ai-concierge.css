@@ -301,7 +301,8 @@
     gap: 15px;
 }
 
-.salon-item {
+.salon-item,
+.salon-item--link {
     background: #f8f9fa;
     padding: 20px;
     border-radius: 15px;
@@ -311,11 +312,54 @@
     transition: all 0.3s ease;
     cursor: pointer;
     border: 2px solid transparent;
+    text-decoration: none;
+    color: inherit;
 }
 
-.salon-item:hover {
+.salon-item:hover,
+.salon-item--link:hover {
     border-color: #111;
     transform: translateX(5px);
+}
+
+.salon-item__placeholder {
+    width: 80px;
+    height: 80px;
+    background: #e8e8e8;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.salon-match-hint {
+    color: var(--sk-primary, #e96e14);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.salon-cta {
+    color: #111;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.recommendations-lead {
+    color: #555;
+    font-size: 0.95rem;
+    margin: -8px 0 20px;
+    line-height: 1.5;
+}
+
+.analysis-item--summary {
+    border-left: 3px solid var(--sk-primary, #e96e14);
+    padding-left: 16px;
+}
+
+body.sq-ai-concierge-page .ai-concierge-section {
+    padding-top: 100px;
 }
 
 .salon-item img {

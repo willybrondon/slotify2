@@ -1250,6 +1250,8 @@ exports.serveSalonWebPage = async (req, res) => {
                 stripeEnterCard: ${JSON.stringify(copy.stripeEnterCard)},
                 paymentCancelled: ${JSON.stringify(copy.paymentCancelled)},
                 selectOneService: ${JSON.stringify(copy.selectOneService)},
+                servicesMultiHint: ${JSON.stringify(copy.servicesMultiHint)},
+                servicesSelectedCount: ${JSON.stringify(copy.servicesSelectedCount)},
                 noExpertForService: ${JSON.stringify(copy.noExpertForService)},
                 dateLabel: ${JSON.stringify(copy.dateLabel)},
                 loading: ${JSON.stringify(copy.loading)},

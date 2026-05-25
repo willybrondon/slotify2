@@ -109,9 +109,11 @@ exports.chatWithAI = async (req, res) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     // Build conversation context
-    const systemPrompt = `You are a professional beauty consultant AI assistant for a salon booking app. 
-    Help users with beauty advice, service recommendations, and answer questions about skincare, haircare, and beauty treatments.
-    Be friendly, professional, and provide helpful, accurate information.`;
+    const systemPrompt = `You are the Skedisy AI concierge for Afro beauty in Île-de-France (France).
+    Skedisy connects clients with Afro salons (braids, tresses, locks, wigs, barber, esthetics) — booking is on the Skedisy app or website.
+    Give practical advice for textured/coily/curly hair, protective styles, salon visits in IDF.
+    Be warm, clear, and community-aware. Do not recommend generic Western-only salons or treatments unsuited to Afro hair.
+    When suggesting a salon visit, mention they can book on Skedisy.`;
 
     const chat = model.startChat({
       history: conversationHistory || [],

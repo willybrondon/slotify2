@@ -131,7 +131,7 @@ function analyzeImage() {
     // Show loading state
     analyzeBtn.disabled = true;
     spinner.style.display = 'inline-block';
-    analyzeBtn.querySelector('span').textContent = 'Analyzing...';
+    analyzeBtn.querySelector('span').textContent = 'Analyse en cours…';
     hideError();
     
     // Create FormData
@@ -222,7 +222,7 @@ function sendAnalysisRequest(formData) {
 function resetAnalyzeButton() {
     analyzeBtn.disabled = false;
     spinner.style.display = 'none';
-    analyzeBtn.querySelector('span').textContent = 'Analyze My Beauty';
+    analyzeBtn.querySelector('span').textContent = 'Analyser et trouver mon salon';
 }
 
 function displayResults(data) {
@@ -246,12 +246,24 @@ function displayResults(data) {
 
 function displayAnalysis(analysis) {
     let html = '';
+
+    if (analysis.recommendedNeeds?.summary) {
+        html += `
+            <div class="analysis-item analysis-item--summary">
+                <h3><i class="fas fa-star" aria-hidden="true"></i> Recommandation Skedisy</h3>
+                <p>${escapeHtml(analysis.recommendedNeeds.summary)}</p>
+                ${analysis.recommendedNeeds.primaryCategories?.length
+                    ? `<p><strong>Catégories :</strong> ${escapeHtml(analysis.recommendedNeeds.primaryCategories.join(', '))}</p>`
+                    : ''}
+            </div>
+        `;
+    }
     
     // Skin Analysis
     if (analysis.skin) {
         html += `
             <div class="analysis-item">
-                <h3><i class="fas fa-face-smile"></i> Skin Analysis</h3>
+                <h3><i class="fas fa-face-smile" aria-hidden="true"></i> Peau</h3>
                 <p><strong>Type:</strong> ${analysis.skin.type || 'N/A'}</p>
                 <p><strong>Tone:</strong> ${analysis.skin.tone || 'N/A'}</p>
                 <p><strong>Undertone:</strong> ${analysis.skin.undertone || 'N/A'}</p>
@@ -267,7 +279,7 @@ function displayAnalysis(analysis) {
     if (analysis.hair) {
         html += `
             <div class="analysis-item">
-                <h3><i class="fas fa-cut"></i> Hair Analysis</h3>
+                <h3><i class="fas fa-cut" aria-hidden="true"></i> Cheveux</h3>
                 <p><strong>Type:</strong> ${analysis.hair.type || 'N/A'}</p>
                 <p><strong>Texture:</strong> ${analysis.hair.texture || 'N/A'}</p>
                 <p><strong>Color:</strong> ${analysis.hair.color || 'N/A'}</p>
@@ -281,7 +293,7 @@ function displayAnalysis(analysis) {
     if (analysis.face) {
         html += `
             <div class="analysis-item">
-                <h3><i class="fas fa-user"></i> Facial Features</h3>
+                <h3><i class="fas fa-user" aria-hidden="true"></i> Visage</h3>
                 <p><strong>Face Shape:</strong> ${analysis.face.shape || 'N/A'}</p>
                 <p><strong>Eye Shape:</strong> ${analysis.face.eyeShape || 'N/A'}</p>
                 <p><strong>Lip Shape:</strong> ${analysis.face.lipShape || 'N/A'}</p>
@@ -300,7 +312,7 @@ function displayRecommendations(recommendations) {
     if (recommendations.services && recommendations.services.length > 0) {
         html += `
             <div class="recommendations-section">
-                <h3><i class="fas fa-spa"></i> Recommended Services</h3>
+                <h3><i class="fas fa-spa" aria-hidden="true"></i> Prestations suggérées</h3>
                 <div class="services-grid">
         `;
         
@@ -323,38 +335,39 @@ function displayRecommendations(recommendations) {
     // Salons - Always show salon recommendations section
     html += `
         <div class="recommendations-section">
-            <h3><i class="fas fa-store"></i> Recommended Salons</h3>
+            <h3><i class="fas fa-store" aria-hidden="true"></i> Salons afro en Île-de-France</h3>
     `;
     
     if (recommendations.salons && recommendations.salons.length > 0) {
         html += `<div class="salon-list">`;
         
-        recommendations.salons.forEach((salon, index) => {
+        recommendations.salons.forEach((salon) => {
             const salonId = salon._id || salon.id;
-            // Use shareUrl if available, otherwise construct it
             let webUrl = salon.shareUrl;
             if (!webUrl && salonId) {
                 const salonSlug = salon.slug || (salon.name ? salon.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : 'salon');
-                const shortId = salon.shortId || (salonId.toString().substring(0, 6));
-                const slugWithId = `${salonSlug}-${shortId}`;
-                webUrl = `${API_BASE_URL}salon/${slugWithId}`;
+                const shortId = salon.shortId || String(salonId).substring(0, 6);
+                webUrl = `${API_BASE_URL.replace(/\/+$/, "")}/salon/${salonSlug}-${shortId}`;
             }
-            
+            const matchHint = formatSalonMatchHint(salon);
+            const name = escapeHtml(salon.name || 'Salon');
+            const addr = escapeHtml(salon.address || (salon.addressDetails && salon.addressDetails.addressLine1) || '');
+            const img = salon.image || salon.mainImage;
             html += `
-                <div class="salon-item" style="cursor: pointer;" onclick="handleSalonClick('${salonId}', '${webUrl || ''}')">
-                    ${salon.image || salon.mainImage 
-                        ? `<img src="${salon.image || salon.mainImage}" alt="${salon.name || 'Salon'}" onerror="this.style.display='none'">` 
-                        : '<div style="width: 80px; height: 80px; background: #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-store" style="font-size: 30px; color: #999;"></i></div>'}
+                <a class="salon-item salon-item--link" href="${escapeHtml(webUrl || '#')}" data-salon-id="${escapeHtml(String(salonId || ''))}">
+                    ${img
+                        ? `<img src="${escapeHtml(img)}" alt="${name}" onerror="this.style.display='none'">`
+                        : '<div class="salon-item__placeholder"><i class="fas fa-store" aria-hidden="true"></i></div>'}
                     <div class="salon-info">
-                        <h4>${salon.name || 'Salon'}</h4>
-                        ${salon.review ? `<p class="rating"><i class="fas fa-star"></i> ${salon.review.toFixed(1)}</p>` : ''}
-                        ${salon.address || (salon.addressDetails && salon.addressDetails.addressLine1) 
-                            ? `<p>${salon.address || salon.addressDetails.addressLine1}</p>` 
-                            : ''}
-                        ${salon.distance ? `<p style="color: #666; font-size: 12px;"><i class="fas fa-map-marker-alt"></i> ${salon.distance.toFixed(1)} km away</p>` : ''}
+                        <h4>${name}</h4>
+                        ${salon.review ? `<p class="rating"><i class="fas fa-star" aria-hidden="true"></i> ${salon.review.toFixed(1)}</p>` : ''}
+                        ${matchHint ? `<p class="salon-match-hint">${matchHint}</p>` : ''}
+                        ${addr ? `<p class="salon-address">${addr}</p>` : ''}
+                        ${salon.distance != null ? `<p class="salon-distance"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${salon.distance.toFixed(1)} km</p>` : ''}
+                        <p class="salon-cta">Voir le salon et réserver</p>
                     </div>
-                    <i class="fas fa-chevron-right" style="color: #999;"></i>
-                </div>
+                    <i class="fas fa-chevron-right salon-item__chevron" aria-hidden="true"></i>
+                </a>
             `;
         });
         
@@ -364,7 +377,7 @@ function displayRecommendations(recommendations) {
         html += `
             <div style="padding: 20px; text-align: center; color: #666;">
                 <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px; color: #999;"></i>
-                <p>No salons found at the moment. Please check back later or try again.</p>
+                <p>Aucun salon trouvé pour le moment. Essayez une autre photo ou parcourez les prestations sur l'accueil.</p>
             </div>
         `;
     }
@@ -375,7 +388,7 @@ function displayRecommendations(recommendations) {
     if (recommendations.beautyTips && recommendations.beautyTips.length > 0) {
         html += `
             <div class="beauty-tips">
-                <h3><i class="fas fa-lightbulb"></i> Beauty Tips</h3>
+                <h3><i class="fas fa-lightbulb" aria-hidden="true"></i> Conseils</h3>
                 <ul>
         `;
         
@@ -419,62 +432,37 @@ function hideError() {
     errorMessage.style.display = 'none';
 }
 
-// Handle salon click - try app deep link first, fallback to web
+function escapeHtml(s) {
+    return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function formatSalonMatchHint(salon) {
+    const types = salon.matchingServiceTypes || [];
+    const count = salon.matchingServiceCount || 0;
+    if (types.length) {
+        const labels = { tresses: 'Tresses', locks: 'Locks', perruques: 'Perruques', homme: 'Homme', esthetique: 'Esthétique', hair: 'Coiffure', skin: 'Soins peau' };
+        const shown = types.slice(0, 2).map((t) => labels[t] || t).join(', ');
+        return escapeHtml(`Adapté pour vous · ${shown}${count > 1 ? ` (${count} prestations)` : ''}`);
+    }
+    if (count > 0) {
+        return escapeHtml(`${count} prestation(s) correspondante(s)`);
+    }
+    return '';
+}
+
+/** Ouvre la fiche salon web (réservation web activée). */
 function handleSalonClick(salonId, webUrl) {
-    if (!salonId) {
-        console.error('Salon ID is missing');
+    if (!webUrl && salonId) {
+        webUrl = `${API_BASE_URL.replace(/\/+$/, "")}/salon/${salonId}`;
+    }
+    if (!webUrl) {
+        console.error("Salon URL manquante");
         return;
     }
-    
-    // Ensure webUrl is valid
-    if (!webUrl) {
-        // Fallback: construct web URL if not provided
-        webUrl = `${API_BASE_URL}salon/${salonId}`;
-    }
-    
-    // Try to open app using deep link
-    const deepLink = `slotify://salon/${salonId}`;
-    
-    // Method 1: Try custom scheme deep link (slotify://)
-    // Create a hidden iframe to attempt deep linking
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = deepLink;
-    document.body.appendChild(iframe);
-    
-    // Set a timeout to check if app opened
-    let appOpened = false;
-    const timeout = setTimeout(() => {
-        if (!appOpened) {
-            // App didn't open, redirect to web page
-            window.location.href = webUrl;
-        }
-        if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-        }
-    }, 1500);
-    
-    // Try to detect if app opened (blur event indicates app focus)
-    const blurHandler = function() {
-        appOpened = true;
-        clearTimeout(timeout);
-        window.removeEventListener('blur', blurHandler);
-        if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-        }
-    };
-    window.addEventListener('blur', blurHandler);
-    
-    // Method 2: Also try universal link (https://skedisy.com/salon/...)
-    // Universal links work automatically if app is installed (iOS/Android)
-    // If app is not installed, browser will open the web page
-    // This is the preferred method for modern apps
-    setTimeout(() => {
-        if (!appOpened) {
-            // Try universal link - if app is installed, it will open
-            // If not, browser will navigate to web page
-            window.location.href = webUrl;
-        }
-    }, 300);
+    window.location.href = webUrl;
 }
 

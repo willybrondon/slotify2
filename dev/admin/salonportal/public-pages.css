@@ -1971,6 +1971,46 @@ body.sk-public-page .main-wrapper {
     border: 1px solid var(--sk-border-light);
 }
 
+.sq-booking-step__hint {
+    font-size: 0.9rem;
+    color: var(--sk-text-muted, #6b7280);
+    margin: -4px 0 14px;
+    line-height: 1.45;
+}
+
+.sq-booking-services-summary {
+    margin: 16px 0 12px;
+    padding: 14px 16px;
+    background: var(--sk-bg-alt, #f8f8f8);
+    border: 1px solid var(--sk-border-light, #e8e8e8);
+    border-radius: 10px;
+}
+
+.sq-booking-services-summary--hidden {
+    display: none;
+}
+
+.sq-booking-services-summary__count {
+    margin: 0 0 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--sk-text, #111);
+}
+
+.sq-booking-services-summary__names {
+    margin: 0 0 6px;
+    font-size: 0.88rem;
+    color: var(--sk-text-soft, #484e60);
+    line-height: 1.4;
+}
+
+.sq-booking-services-summary__meta {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--sk-primary, #e96e14);
+}
+
 .sq-booking-step__label {
     font-size: 0.9rem;
     font-weight: 600;

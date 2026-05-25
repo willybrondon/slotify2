@@ -328,11 +328,54 @@
       .replace(/>/g, "&gt;");
   }
 
+  function normalizeServiceId(id) {
+    return String(id);
+  }
+
+  function isServiceSelected(id) {
+    const sid = normalizeServiceId(id);
+    return state.selectedServiceIds.some((x) => normalizeServiceId(x) === sid);
+  }
+
+  /** Sélection multiple comme l'app : clic = ajouter/retirer une prestation. */
+  function toggleServiceSelection(id) {
+    const sid = normalizeServiceId(id);
+    if (isServiceSelected(sid)) {
+      state.selectedServiceIds = state.selectedServiceIds.filter(
+        (x) => normalizeServiceId(x) !== sid
+      );
+    } else {
+      state.selectedServiceIds = [...state.selectedServiceIds, sid];
+    }
+  }
+
   function expertsForServices(serviceIds) {
     if (!serviceIds.length) return cfg.experts;
-    return cfg.experts.filter((e) =>
-      serviceIds.every((sid) => e.serviceIds.includes(sid))
-    );
+    const wanted = serviceIds.map(normalizeServiceId);
+    return cfg.experts.filter((e) => {
+      const expertServices = (e.serviceIds || []).map(normalizeServiceId);
+      return wanted.every((sid) => expertServices.includes(sid));
+    });
+  }
+
+  function renderServicesSelectionSummary(hostEl) {
+    if (!hostEl) return;
+    const selected = getSelectedServices();
+    if (!selected.length) {
+      hostEl.innerHTML = "";
+      hostEl.classList.add("sq-booking-services-summary--hidden");
+      return;
+    }
+    const totals = calcTotals(selected);
+    const names = selected.map((s) => s.name).join(", ");
+    hostEl.classList.remove("sq-booking-services-summary--hidden");
+    hostEl.innerHTML = `
+      <p class="sq-booking-services-summary__count">${escapeHtml(
+        tFmt("servicesSelectedCount", "{n}", String(selected.length))
+      )}</p>
+      <p class="sq-booking-services-summary__names">${escapeHtml(names)}</p>
+      <p class="sq-booking-services-summary__meta">${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)} · ${totals.dur} ${escapeHtml(t("min"))}</p>
+    `;
   }
 
   function servicesForExpert(expertId) {
@@ -395,7 +438,7 @@
         : cfg.services.filter((s) => s.categoryId === activeCategory);
     gridEl.innerHTML = list
       .map((s) => {
-        const selected = state.selectedServiceIds.includes(s.id);
+        const selected = isServiceSelected(s.id);
         return `<button type="button" class="sq-service-card${selected ? " sq-service-card--selected" : ""}" data-service-id="${escapeHtml(s.id)}">
         <span class="sq-service-card__name">${escapeHtml(s.name)}</span>
         <span class="sq-service-card__meta">${escapeHtml(cfg.currency)}${s.price} · ${s.duration} ${cfg.copy.min}</span>
@@ -672,12 +715,15 @@
         : cfg.services;
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectServices)}</p>
+      <p class="sq-booking-step__hint">${escapeHtml(t("servicesMultiHint"))}</p>
       <div class="sq-service-tabs sq-service-tabs--modal" id="bookingServiceTabs"></div>
       <div class="sq-services-grid-4" id="bookingServicesGrid"></div>
+      <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="bookingServicesSummary" aria-live="polite"></div>
       <button type="button" class="sq-booking-btn" id="btnServicesNext">${escapeHtml(t("continue"))}</button>
     `;
     const bTabs = document.getElementById("bookingServiceTabs");
     const bGrid = document.getElementById("bookingServicesGrid");
+    const bSummary = document.getElementById("bookingServicesSummary");
     const cats = [{ id: "all", name: cfg.copy.allCategoriesTab }, ...cfg.categories];
     let cat = "all";
     function paint() {
@@ -697,22 +743,20 @@
         cat === "all" ? list : list.filter((s) => s.categoryId === cat);
       bGrid.innerHTML = filtered
         .map((s) => {
-          const sel = state.selectedServiceIds.includes(s.id);
-          return `<button type="button" class="sq-service-card${sel ? " sq-service-card--selected" : ""}" data-sid="${s.id}">
+          const sel = isServiceSelected(s.id);
+          return `<button type="button" class="sq-service-card${sel ? " sq-service-card--selected" : ""}" data-sid="${escapeHtml(s.id)}" aria-pressed="${sel ? "true" : "false"}">
             <span class="sq-service-card__name">${escapeHtml(s.name)}</span>
-            <span class="sq-service-card__meta">${escapeHtml(cfg.currency)}${s.price} · ${s.duration} ${cfg.copy.min}</span>
+            <span class="sq-service-card__meta">${escapeHtml(cfg.currency)}${s.price} · ${s.duration} ${escapeHtml(cfg.copy.min)}</span>
           </button>`;
         })
         .join("");
       bGrid.querySelectorAll("[data-sid]").forEach((btn) => {
         btn.onclick = () => {
-          const id = btn.getAttribute("data-sid");
-          state.selectedServiceIds = state.selectedServiceIds.includes(id)
-            ? []
-            : [id];
+          toggleServiceSelection(btn.getAttribute("data-sid"));
           paint();
         };
       });
+      renderServicesSelectionSummary(bSummary);
     }
     paint();
     document.getElementById("btnServicesNext").onclick = () => {

@@ -17,7 +17,128 @@ if (process.env.GEMINI_API_KEY) {
   }
 }
 
+/** Mots-clés Skedisy — 5 catégories beauté afro IDF */
+const AFRO_CATEGORY_KEYWORDS = {
+  tresses: [
+    'tresse', 'tresses', 'braid', 'braids', 'box braid', 'knotless', 'vanille', 'vanilles',
+    'tissage', 'crochet', 'ghana', 'fulani', 'lemonade', 'natte', 'nattes', 'cornrow',
+    'dépose', 'protective'
+  ],
+  locks: ['lock', 'locks', 'dread', 'retwist', 'starter loc', 'faux lock', 'entretien lock', 'dépose lock'],
+  perruques: ['perruque', 'wig', 'lace', 'closure', 'couture', 'extension', 'frontal'],
+  homme: ['fade', 'barbe', 'beard', 'coupe homme', 'skin fade', 'barber', 'rasage', 'contour', 'nattes homme'],
+  esthetique: [
+    'ongle', 'manucure', 'pédicure', 'maquillage', 'makeup', 'cil', 'sourcil', 'épilation',
+    'soin visage', 'nettoyage', 'gel', 'nail', 'microblading'
+  ],
+};
+
+const IDF_LOCATION_HINTS = [
+  'paris', 'île-de-france', 'ile-de-france', 'idf', 'seine', 'val-de-marne', 'val de marne',
+  'hauts-de-seine', 'bobigny', 'montreuil', 'créteil', 'creteil', 'versailles', 'nanterre',
+  'saint-denis', 'argenteuil', 'cergy', 'melun', 'évry', 'evry', 'france'
+];
+
 class SelfieAnalysisService {
+  normalizeText(value) {
+    return String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  /**
+   * Termes de recherche dérivés de l'analyse photo (cheveux texturés / afro).
+   */
+  extractSearchTermsFromAnalysis(analysis) {
+    const terms = new Set();
+    const add = (v) => {
+      if (!v) return;
+      if (Array.isArray(v)) v.forEach((x) => terms.add(this.normalizeText(x)));
+      else terms.add(this.normalizeText(v));
+    };
+
+    const needs = analysis.recommendedNeeds || analysis.beautyProfile?.recommendedNeeds || {};
+    (needs.serviceKeywords || []).forEach((k) => terms.add(this.normalizeText(k)));
+    (needs.primaryCategories || []).forEach((c) => terms.add(this.normalizeText(c)));
+
+    if (analysis.hair) {
+      const hairType = this.normalizeText(analysis.hair.type);
+      const texture = this.normalizeText(analysis.hair.texture);
+      const condition = this.normalizeText(analysis.hair.condition);
+
+      if (hairType === 'coily' || hairType === 'curly' || texture === 'thick') {
+        ['tresses', 'knotless', 'box braids', 'locks', 'retwist', 'coiffure afro', 'textured'].forEach((t) => terms.add(t));
+      }
+      if (hairType === 'wavy') {
+        terms.add('tissage');
+        terms.add('coiffure');
+      }
+      if (hairType === 'straight') {
+        terms.add('lissage');
+        terms.add('tissage');
+      }
+      if (condition === 'damaged' || condition === 'dry') {
+        terms.add('soin');
+        terms.add('traitement');
+        terms.add('masque');
+      }
+      if (analysis.hair.color) {
+        terms.add('coloration');
+        terms.add('couleur');
+      }
+    }
+
+    if (analysis.skin?.concerns?.length) {
+      analysis.skin.concerns.forEach((c) => {
+        const x = this.normalizeText(c);
+        if (x.includes('acne') || x.includes('bouton')) terms.add('soin visage');
+        if (x.includes('spot') || x.includes('tache') || x.includes('pigment')) terms.add('soin visage');
+      });
+    }
+
+    if (analysis.beautyProfile?.areasToImprove?.length) {
+      analysis.beautyProfile.areasToImprove.forEach((area) => {
+        const a = this.normalizeText(area);
+        if (a.includes('hair') || a.includes('cheveu')) terms.add('coiffure');
+        if (a.includes('eyebrow') || a.includes('sourcil')) terms.add('sourcil');
+        if (a.includes('skin') || a.includes('peau')) terms.add('soin visage');
+      });
+    }
+
+    Object.entries(AFRO_CATEGORY_KEYWORDS).forEach(([cat, words]) => {
+      words.forEach((w) => {
+        if ([...terms].some((t) => t.includes(w) || w.includes(t))) terms.add(cat);
+      });
+    });
+
+    if (terms.size === 0) {
+      ['coiffure afro', 'tresses', 'salon'].forEach((t) => terms.add(t));
+    }
+
+    return [...terms];
+  }
+
+  detectAfroCategoriesInText(text) {
+    const norm = this.normalizeText(text);
+    const found = new Set();
+    Object.entries(AFRO_CATEGORY_KEYWORDS).forEach(([cat, words]) => {
+      if (words.some((w) => norm.includes(w))) found.add(cat);
+    });
+    return found;
+  }
+
+  textMatchScore(haystack, searchTerms) {
+    const norm = this.normalizeText(haystack);
+    if (!norm) return 0;
+    let score = 0;
+    searchTerms.forEach((term) => {
+      if (term.length < 3) return;
+      if (norm.includes(term)) score += 4;
+    });
+    return score;
+  }
+
   /**
    * Analyze selfie image and extract beauty features using Google Gemini
    */
@@ -36,65 +157,31 @@ class SelfieAnalysisService {
       const mimeType = this.getImageMimeType(imagePath);
 
       // Create detailed analysis prompt
-      const analysisPrompt = `You are a professional beauty consultant analyzing a selfie photo. Provide a detailed beauty analysis in JSON format only. Focus on:
+      const analysisPrompt = `You are the Skedisy AI beauty concierge for Afro beauty salons in Île-de-France (France).
+Analyze this selfie for a client from the Afro community. Focus on textured/coily/curly hair and realistic salon services (not generic Western spa menus).
 
-1. Skin Analysis:
-   - Skin type (oily, dry, combination, sensitive, normal)
-   - Skin tone (fair, light, medium, tan, dark)
-   - Undertone (warm, cool, neutral)
-   - Visible skin concerns (acne, wrinkles, dark spots, pigmentation, fine lines, pores, etc.)
-   - Overall skin condition (excellent, good, fair, needs attention)
-   - Skin texture assessment
+Categories on Skedisy: Tresses, Locks, Perruques, Homme (barber), Esthétique (nails, makeup, skin, waxing).
 
-2. Hair Analysis:
-   - Hair type (straight, wavy, curly, coily)
-   - Hair texture (fine, medium, thick)
-   - Hair color (black, brown, blonde, red, gray, etc.)
-   - Hair condition (healthy, damaged, dry, oily, normal)
-   - Scalp visibility/health indicators
-   - Hair length (short, medium, long)
+1. Skin: type, tone, undertone, concerns (hyperpigmentation, dryness…), condition
+2. Hair (priority): type (straight, wavy, curly, coily), texture, color, condition, length, protective-style needs
+3. Face: shape, eyes, lips, brows
+4. recommendedNeeds: what to book at an Afro salon in IDF (categories + service keywords in French/English, e.g. knotless, box braids, retwist, lace front, fade, soin visage)
 
-3. Facial Features:
-   - Face shape (oval, round, square, heart, diamond, oblong, triangle)
-   - Eye shape (almond, round, hooded, monolid, etc.)
-   - Lip shape (thin, medium, full)
-   - Eyebrow shape (straight, arched, rounded)
-   - Overall facial structure
-
-4. Beauty Profile:
-   - Age estimation (approximate range)
-   - Overall beauty assessment
-   - Areas that could benefit from professional services
-   - Natural features to enhance
-
-Return ONLY valid JSON in this exact format (no markdown, no code blocks, just JSON):
+Return ONLY valid JSON (no markdown):
 {
-  "skin": {
-    "type": "combination",
-    "tone": "medium",
-    "undertone": "warm",
-    "concerns": ["acne", "dark spots"],
-    "condition": "good",
-    "texture": "smooth"
-  },
-  "hair": {
-    "type": "wavy",
-    "texture": "medium",
-    "color": "brown",
-    "condition": "healthy",
-    "length": "medium"
-  },
-  "face": {
-    "shape": "oval",
-    "eyeShape": "almond",
-    "lipShape": "full",
-    "eyebrowShape": "arched"
-  },
+  "skin": { "type": "", "tone": "", "undertone": "", "concerns": [], "condition": "", "texture": "" },
+  "hair": { "type": "", "texture": "", "color": "", "condition": "", "length": "" },
+  "face": { "shape": "", "eyeShape": "", "lipShape": "", "eyebrowShape": "" },
   "beautyProfile": {
-    "ageEstimate": "25-30",
-    "assessment": "Good overall condition",
-    "areasToImprove": ["skin clarity", "hair styling"],
-    "featuresToEnhance": ["natural lip color", "eyebrow definition"]
+    "ageEstimate": "",
+    "assessment": "",
+    "areasToImprove": [],
+    "featuresToEnhance": []
+  },
+  "recommendedNeeds": {
+    "primaryCategories": ["Tresses"],
+    "serviceKeywords": ["knotless", "box braids"],
+    "summary": "One sentence in French for the client"
   }
 }`;
 
@@ -365,6 +452,13 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
     if (!analysis.beautyProfile) {
       analysis.beautyProfile = { ageEstimate: 'unknown', assessment: '', areasToImprove: [], featuresToEnhance: [] };
     }
+    if (!analysis.recommendedNeeds) {
+      analysis.recommendedNeeds = {
+        primaryCategories: [],
+        serviceKeywords: [],
+        summary: analysis.beautyProfile.assessment || '',
+      };
+    }
     return analysis;
   }
 
@@ -373,76 +467,32 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
    */
   async getServiceRecommendations(analysis, userId, context) {
     try {
-      const serviceQueries = [];
-      const serviceKeywords = [];
+      const searchTerms = this.extractSearchTermsFromAnalysis(analysis);
+      const serviceKeywords = [...searchTerms];
 
-      // Skin-based recommendations
-      if (analysis.skin) {
-        if (analysis.skin.concerns && analysis.skin.concerns.length > 0) {
-          const concernServiceMap = {
-            'acne': ['facial', 'acne treatment', 'deep cleansing', 'skin care'],
-            'wrinkles': ['anti-aging', 'facial', 'botox', 'facial massage'],
-            'dark spots': ['brightening', 'facial', 'chemical peel', 'laser'],
-            'pigmentation': ['pigmentation', 'facial', 'skin whitening', 'brightening'],
-            'dry': ['hydrating', 'moisturizing', 'facial'],
-            'oily': ['oil control', 'deep cleansing', 'facial', 'pore treatment'],
-            'fine lines': ['anti-aging', 'facial', 'wrinkle treatment'],
-            'pores': ['pore treatment', 'facial', 'deep cleansing']
-          };
+      (analysis.recommendedNeeds?.serviceKeywords || []).forEach((k) =>
+        serviceKeywords.push(this.normalizeText(k))
+      );
+      (analysis.recommendedNeeds?.primaryCategories || []).forEach((cat) => {
+        const key = this.normalizeText(cat);
+        const words = AFRO_CATEGORY_KEYWORDS[key] || AFRO_CATEGORY_KEYWORDS[cat?.toLowerCase?.()] || [];
+        serviceKeywords.push(key, ...words);
+      });
 
-          analysis.skin.concerns.forEach(concern => {
-            const services = concernServiceMap[concern.toLowerCase()] || ['facial'];
-            serviceKeywords.push(...services);
-          });
-        }
+      const uniqueKeywords = [...new Set(serviceKeywords.filter((k) => k && k.length > 1))].slice(0, 24);
 
-        // Add general facial services
-        serviceKeywords.push('facial', 'skin care', 'beauty treatment');
+      let services = [];
+      if (uniqueKeywords.length > 0) {
+        services = await Service.find({
+          $or: uniqueKeywords.map((keyword) => ({
+            name: { $regex: keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' },
+          })),
+          isDelete: false,
+          status: true,
+        })
+          .populate('categoryId')
+          .limit(15);
       }
-
-      // Hair-based recommendations
-      if (analysis.hair) {
-        serviceKeywords.push('hair cut', 'hair styling', 'hair');
-
-        if (analysis.hair.condition === 'damaged' || analysis.hair.condition === 'dry') {
-          serviceKeywords.push('hair treatment', 'hair spa', 'hair repair', 'hair care');
-        }
-
-        if (analysis.hair.color) {
-          serviceKeywords.push('hair color', 'hair highlights', 'hair coloring');
-        }
-      }
-
-      // Face shape-based recommendations
-      if (analysis.face && analysis.face.shape) {
-        serviceKeywords.push('hair cut', 'hair styling', 'makeup');
-      }
-
-      // Beauty profile recommendations
-      if (analysis.beautyProfile && analysis.beautyProfile.areasToImprove) {
-        analysis.beautyProfile.areasToImprove.forEach(area => {
-          if (area.toLowerCase().includes('eyebrow')) {
-            serviceKeywords.push('eyebrow', 'threading', 'waxing');
-          }
-          if (area.toLowerCase().includes('lip')) {
-            serviceKeywords.push('lip', 'makeup');
-          }
-          if (area.toLowerCase().includes('hair')) {
-            serviceKeywords.push('hair cut', 'hair styling');
-          }
-        });
-      }
-
-      // Query database for matching services (case-insensitive search)
-      const services = await Service.find({
-        $or: serviceKeywords.map(keyword => ({
-          name: { $regex: keyword, $options: 'i' }
-        })),
-        isDelete: false,
-        status: true
-      })
-        .populate('categoryId')
-        .limit(15);
 
       // Add service URL/slug to each service for web linking
       // Services should link to their category page, not a service-specific page
@@ -554,13 +604,8 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
           .lean();
       }
       
-      // Score and rank salons based on service type matching
-      salons = this.scoreSalonsByServiceTypes(salons, services, analysis);
-      
-      // Filter salons based on hair type/color if analysis is provided
-      if (analysis && analysis.hair) {
-        salons = this.filterSalonsByHairType(salons, analysis.hair);
-      }
+      const searchTerms = this.extractSearchTermsFromAnalysis(analysis);
+      salons = this.scoreSalonsByServiceTypes(salons, services, analysis, searchTerms);
       
       // Calculate distance and filter by location if provided
       if (context.latitude && context.longitude) {
@@ -704,8 +749,10 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
           locationCoordinates: salon.locationCoordinates || {},
           distance: salon.distance || null, // Include distance if calculated
           shareUrl: shareUrl, // Add share URL for web linking
-          matchingServiceCount: salon.matchingServiceCount || 0, // Number of matching services
-          matchingServiceTypes: salon.matchingServiceTypes || [] // Types of matching services
+          matchingServiceCount: salon.matchingServiceCount || 0,
+          matchingServiceTypes: salon.matchingServiceTypes || [],
+          matchSummary: salon.matchSummary || null,
+          about: salon.about || '',
         };
       });
 
@@ -730,130 +777,116 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
   }
   
   /**
-   * Score salons based on how well their service types match the recommended services
-   * and user's analysis needs
+   * Score salons : prestations recommandées + catégories + description + texte des services vs analyse photo.
    */
-  scoreSalonsByServiceTypes(salons, recommendedServices, analysis = null) {
+  scoreSalonsByServiceTypes(salons, recommendedServices, analysis = null, searchTerms = []) {
     if (!salons || salons.length === 0) return salons;
-    
-    // Create a map of recommended service IDs for quick lookup
-    const recommendedServiceIds = new Set(recommendedServices.map(s => s._id.toString()));
-    
-    // Create service type categories based on analysis
-    const serviceTypeCategories = {
-      skin: [],
-      hair: [],
-      facial: [],
-      beauty: []
-    };
-    
-    if (analysis) {
-      // Categorize services based on analysis
-      recommendedServices.forEach(service => {
-        const serviceName = (service.name || '').toLowerCase();
-        const categoryName = service.categoryId?.name?.toLowerCase() || '';
-        
-        if (analysis.skin && (serviceName.includes('facial') || serviceName.includes('skin') || 
-            serviceName.includes('acne') || serviceName.includes('treatment') ||
-            categoryName.includes('skin') || categoryName.includes('facial'))) {
-          serviceTypeCategories.skin.push(service._id.toString());
-        }
-        
-        if (analysis.hair && (serviceName.includes('hair') || serviceName.includes('cut') || 
-            serviceName.includes('color') || serviceName.includes('styling') ||
-            categoryName.includes('hair'))) {
-          serviceTypeCategories.hair.push(service._id.toString());
-        }
-        
-        if (analysis.face && (serviceName.includes('makeup') || serviceName.includes('eyebrow') ||
-            serviceName.includes('threading') || categoryName.includes('makeup'))) {
-          serviceTypeCategories.facial.push(service._id.toString());
-        }
-        
-        // General beauty services
-        if (serviceName.includes('beauty') || serviceName.includes('spa') ||
-            categoryName.includes('beauty') || categoryName.includes('spa')) {
-          serviceTypeCategories.beauty.push(service._id.toString());
-        }
-      });
-    }
-    
-    // Score each salon based on service type matching
-    const scoredSalons = salons.map(salon => {
+
+    const terms =
+      searchTerms && searchTerms.length
+        ? searchTerms
+        : analysis
+          ? this.extractSearchTermsFromAnalysis(analysis)
+          : [];
+
+    const recommendedServiceIds = new Set(
+      (recommendedServices || []).map((s) => String(s._id))
+    );
+
+    const primaryCats = (analysis?.recommendedNeeds?.primaryCategories || []).map((c) =>
+      this.normalizeText(c)
+    );
+
+    const scoredSalons = salons.map((salon) => {
       let serviceMatchScore = 0;
       let matchingServiceCount = 0;
-      let matchingServiceTypes = new Set();
-      
-      if (salon.serviceIds && salon.serviceIds.length > 0) {
-        salon.serviceIds.forEach(serviceItem => {
-          if (serviceItem.id && serviceItem.id._id) {
-            const serviceId = serviceItem.id._id.toString();
-            
-            // Check if this service is in recommended services
-            if (recommendedServiceIds.has(serviceId)) {
-              matchingServiceCount++;
-              serviceMatchScore += 10; // Base score for matching service
-              
-              // Check service category/type
-              const serviceName = (serviceItem.id.name || '').toLowerCase();
-              const categoryName = (serviceItem.id.categoryId?.name || '').toLowerCase();
-              
-              // Add bonus points for service type matching
-              if (analysis) {
-                // Skin services
-                if (analysis.skin && (serviceName.includes('facial') || serviceName.includes('skin') ||
-                    serviceName.includes('acne') || serviceName.includes('treatment') ||
-                    categoryName.includes('skin') || categoryName.includes('facial'))) {
-                  serviceMatchScore += 5;
-                  matchingServiceTypes.add('skin');
-                }
-                
-                // Hair services
-                if (analysis.hair && (serviceName.includes('hair') || serviceName.includes('cut') ||
-                    serviceName.includes('color') || serviceName.includes('styling') ||
-                    categoryName.includes('hair'))) {
-                  serviceMatchScore += 5;
-                  matchingServiceTypes.add('hair');
-                }
-                
-                // Facial/beauty services
-                if (analysis.face && (serviceName.includes('makeup') || serviceName.includes('eyebrow') ||
-                    categoryName.includes('makeup'))) {
-                  serviceMatchScore += 5;
-                  matchingServiceTypes.add('facial');
-                }
-              }
-              
-              // Bonus for salon having multiple matching services
-              if (matchingServiceCount > 1) {
-                serviceMatchScore += (matchingServiceCount - 1) * 2;
-              }
+      const matchingServiceTypes = new Set();
+
+      const aboutText = salon.about || '';
+      serviceMatchScore += this.textMatchScore(aboutText, terms) * 2;
+
+      const addrBlob = [
+        salon.addressDetails?.addressLine1,
+        salon.addressDetails?.city,
+        salon.addressDetails?.country,
+      ]
+        .filter(Boolean)
+        .join(' ');
+      if (IDF_LOCATION_HINTS.some((h) => this.normalizeText(addrBlob).includes(h))) {
+        serviceMatchScore += 6;
+      }
+
+      if (salon.serviceIds?.length) {
+        salon.serviceIds.forEach((serviceItem) => {
+          const svc = serviceItem.id;
+          if (!svc?._id) return;
+
+          const serviceId = svc._id.toString();
+          const serviceName = svc.name || '';
+          const categoryName = svc.categoryId?.name || '';
+          const blob = `${serviceName} ${categoryName}`;
+
+          const termHits = this.textMatchScore(blob, terms);
+          const catHits = this.detectAfroCategoriesInText(blob);
+
+          if (recommendedServiceIds.has(serviceId)) {
+            matchingServiceCount++;
+            serviceMatchScore += 12;
+          } else if (termHits > 0) {
+            matchingServiceCount++;
+            serviceMatchScore += 6 + termHits;
+          }
+
+          catHits.forEach((c) => matchingServiceTypes.add(c));
+
+          primaryCats.forEach((pc) => {
+            if (this.normalizeText(categoryName).includes(pc) || catHits.has(pc)) {
+              serviceMatchScore += 8;
+              matchingServiceTypes.add(pc);
+            }
+          });
+
+          if (analysis?.hair) {
+            const hairType = this.normalizeText(analysis.hair.type);
+            const normName = this.normalizeText(serviceName);
+            if (
+              (hairType === 'coily' || hairType === 'curly') &&
+              (normName.includes('tresse') ||
+                normName.includes('braid') ||
+                normName.includes('knotless') ||
+                normName.includes('lock') ||
+                normName.includes('afro'))
+            ) {
+              serviceMatchScore += 6;
+              matchingServiceTypes.add('tresses');
             }
           }
         });
       }
-      
-      // Store the score and matching info
+
+      if (matchingServiceCount > 1) {
+        serviceMatchScore += (matchingServiceCount - 1) * 3;
+      }
+
+      const catLabels = [...matchingServiceTypes];
       salon.serviceMatchScore = serviceMatchScore;
       salon.matchingServiceCount = matchingServiceCount;
-      salon.matchingServiceTypes = Array.from(matchingServiceTypes);
-      
+      salon.matchingServiceTypes = catLabels.length ? catLabels : primaryCats.slice(0, 2);
+      salon.matchSummary = analysis?.recommendedNeeds?.summary || null;
+
       return salon;
     });
-    
-    // Sort by service match score (highest first)
+
     scoredSalons.sort((a, b) => {
       if (b.serviceMatchScore !== a.serviceMatchScore) {
         return b.serviceMatchScore - a.serviceMatchScore;
       }
-      // If scores are equal, prefer salons with more matching services
       if (b.matchingServiceCount !== a.matchingServiceCount) {
         return b.matchingServiceCount - a.matchingServiceCount;
       }
-      // Then by rating
       return (b.review || 0) - (a.review || 0);
     });
-    
+
     return scoredSalons;
   }
   
@@ -931,46 +964,28 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just J
   generateBeautyTips(analysis) {
     const tips = [];
 
-    // Skin tips
-    if (analysis.skin) {
-      if (analysis.skin.type === 'oily') {
-        tips.push('Use oil-free moisturizer and non-comedogenic products');
-        tips.push('Consider regular deep cleansing facials to control oil production');
-      } else if (analysis.skin.type === 'dry') {
-        tips.push('Use hydrating serums and rich moisturizers');
-        tips.push('Consider hydrating facial treatments to restore moisture');
-      }
-
-      if (analysis.skin.concerns && analysis.skin.concerns.includes('acne')) {
-        tips.push('Avoid touching your face and use gentle, non-comedogenic products');
-        tips.push('Consider professional acne treatment for best results');
-      }
-
-      if (analysis.skin.concerns && analysis.skin.concerns.includes('dark spots')) {
-        tips.push('Use sunscreen daily to prevent further darkening');
-        tips.push('Consider brightening treatments to even out skin tone');
-      }
+    if (analysis.recommendedNeeds?.summary) {
+      tips.push(analysis.recommendedNeeds.summary);
     }
 
-    // Hair tips
     if (analysis.hair) {
-      if (analysis.hair.condition === 'damaged') {
-        tips.push('Use deep conditioning treatments regularly');
-        tips.push('Consider professional hair spa treatments to restore health');
+      const ht = this.normalizeText(analysis.hair.type);
+      if (ht === 'coily' || ht === 'curly') {
+        tips.push('Privilégiez un salon afro qui maîtrise les tresses, locks ou styles protecteurs adaptés à vos cheveux texturés.');
+        tips.push('Hydratez le cuir chevelu régulièrement entre deux rendez-vous en salon.');
       }
-
-      if (analysis.hair.type === 'curly' || analysis.hair.type === 'coily') {
-        tips.push('Use products specifically designed for curly hair');
-        tips.push('Avoid over-washing to maintain natural oils');
+      if (analysis.hair.condition === 'damaged' || analysis.hair.condition === 'dry') {
+        tips.push('Un soin en salon (masque, traitement) avant une pose longue durée peut renforcer vos cheveux.');
       }
     }
 
-    // Face shape tips
-    if (analysis.face && analysis.face.shape) {
-      tips.push(`Your ${analysis.face.shape} face shape can be enhanced with the right haircut and styling`);
+    if (analysis.skin?.concerns?.length) {
+      tips.push('Pour la peau, les salons partenaires Skedisy proposent des soins visage et épilation en Île-de-France.');
     }
 
-    return tips.length > 0 ? tips : ['Maintain a regular beauty routine for best results'];
+    tips.push('Réservez votre créneau sur l\'app Skedisy ou sur la fiche salon du site — sans échanges WhatsApp interminables.');
+
+    return tips.length > 0 ? tips.slice(0, 5) : ['Trouvez un salon afro en Île-de-France sur Skedisy et réservez en quelques clics.'];
   }
 }
 
