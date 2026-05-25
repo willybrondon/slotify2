@@ -1,0 +1,183 @@
+/* Pages légales — alignées sur skedisy.com (sq-page) */
+body.sq-legal-page {
+    padding-top: 56px;
+}
+
+body.sq-legal-page .sq-legal-main {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+}
+
+body.sq-legal-page .sq-legal-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    color: var(--sk-text, #111);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+body.sq-legal-page .sq-legal-back:hover {
+    text-decoration: underline;
+}
+
+body.sq-legal-page .sq-legal-kicker {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--sk-primary, #e96e14);
+    margin: 0 0 8px;
+}
+
+body.sq-legal-page .sq-legal-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--sk-border-light, #e8e8e8);
+}
+
+body.sq-legal-page .sq-legal-header h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 700;
+    color: var(--sk-text, #111);
+    margin: 0 0 10px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+body.sq-legal-page .sq-legal-version {
+    color: var(--sk-text-muted, #6b7280);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+body.sq-legal-page .sq-legal-body {
+    color: var(--sk-text-soft, #484e60);
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+body.sq-legal-page .sq-legal-body h2 {
+    color: var(--sk-text, #111);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 32px 0 14px;
+    padding-top: 24px;
+    border-top: 1px solid var(--sk-border-light, #e8e8e8);
+}
+
+body.sq-legal-page .sq-legal-body h2:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+body.sq-legal-page .sq-legal-body h3 {
+    color: var(--sk-text, #111);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 20px 0 10px;
+}
+
+body.sq-legal-page .sq-legal-body p {
+    margin: 0 0 14px;
+}
+
+body.sq-legal-page .sq-legal-body ul,
+body.sq-legal-page .sq-legal-body ol {
+    margin: 0 0 16px;
+    padding-left: 1.35rem;
+}
+
+body.sq-legal-page .sq-legal-body li {
+    margin-bottom: 8px;
+}
+
+body.sq-legal-page .sq-legal-body a {
+    color: var(--sk-text, #111);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+body.sq-legal-page .sq-legal-contact {
+    background: var(--sk-bg-alt, #f8f8f8);
+    border-left: 3px solid var(--sk-primary, #111);
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 24px;
+}
+
+body.sq-legal-page .sq-legal-contact h3 {
+    margin-top: 0;
+}
+
+body.sq-legal-page .sq-cookie-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 0.9rem;
+}
+
+body.sq-legal-page .sq-cookie-table th,
+body.sq-legal-page .sq-cookie-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--sk-border-light, #e8e8e8);
+}
+
+body.sq-legal-page .sq-cookie-table th {
+    background: var(--sk-bg-alt, #f8f8f8);
+    font-weight: 600;
+    color: var(--sk-text, #111);
+}
+
+body.sq-legal-page .sq-cookie-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+body.sq-legal-page .sq-cookie-badge--essential {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+body.sq-legal-page .sq-cookie-badge--optional {
+    background: #f2f6ff;
+    color: #1565c0;
+}
+
+body.sq-legal-page .sq-btn-manage-cookies {
+    display: inline-block;
+    margin: 12px 0 8px;
+    padding: 12px 22px;
+    background: var(--sk-text, #111);
+    color: var(--sk-inverse, #fff);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+body.sq-legal-page .sq-btn-manage-cookies:hover {
+    background: var(--sk-primary-hover, #333);
+}
+
+@media (max-width: 768px) {
+    body.sq-legal-page .sq-legal-main {
+        padding: 20px 16px 40px;
+    }
+
+    body.sq-legal-page .sq-cookie-table {
+        font-size: 0.82rem;
+    }
+}
