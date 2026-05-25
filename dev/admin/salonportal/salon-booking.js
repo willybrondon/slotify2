@@ -24,6 +24,10 @@
     stripeInstance: null,
     stripeElements: null,
     stripePaymentElement: null,
+    salonSlotMinutes: 15,
+    breakStartTime: "",
+    breakEndTime: "",
+    slotPickHint: "",
   };
 
   const payCfg = cfg.payment || {};
@@ -37,6 +41,74 @@
 
   function tFmt(key, token, value) {
     return String(t(key)).split(token).join(value);
+  }
+
+  function parseTime12h(str) {
+    const m = String(str || "")
+      .trim()
+      .match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (!m) return null;
+    let h = parseInt(m[1], 10);
+    const min = parseInt(m[2], 10);
+    const ap = m[3].toUpperCase();
+    if (ap === "PM" && h !== 12) h += 12;
+    if (ap === "AM" && h === 12) h = 0;
+    return h * 60 + min;
+  }
+
+  function formatTime12h(totalMinutes) {
+    const dayMin = ((totalMinutes % 1440) + 1440) % 1440;
+    let h24 = Math.floor(dayMin / 60);
+    const min = dayMin % 60;
+    const ap = h24 >= 12 ? "PM" : "AM";
+    let h12 = h24 % 12;
+    if (h12 === 0) h12 = 12;
+    return `${String(h12).padStart(2, "0")}:${String(min).padStart(2, "0")} ${ap}`;
+  }
+
+  function isBreakTime(slot, breakStart, breakEnd) {
+    if (!breakStart || !breakEnd) return false;
+    const t = parseTime12h(slot);
+    const bs = parseTime12h(breakStart);
+    const be = parseTime12h(breakEnd);
+    if (t == null || bs == null || be == null) return false;
+    return t > bs && t < be;
+  }
+
+  /** Même logique que l'app : start + créneaux tous les salonSlotMinutes jusqu'à la durée prestation. */
+  function buildSelectedSlotsForDuration(startSlot, serviceDurationMin, salonSlotMinutes) {
+    const startMin = parseTime12h(startSlot);
+    if (startMin == null || serviceDurationMin <= 0) return [startSlot];
+
+    const interval = Math.max(1, Number(salonSlotMinutes) || 15);
+    const targetMin = startMin + serviceDurationMin;
+    const slots = [startSlot];
+    const iterations = Math.floor((targetMin - startMin) / interval);
+
+    let currentMin = startMin;
+    for (let i = 0; i < iterations; i++) {
+      currentMin += interval;
+      const label = formatTime12h(currentMin);
+      if (isBreakTime(label, state.breakStartTime, state.breakEndTime)) {
+        continue;
+      }
+      if (currentMin >= targetMin) break;
+      slots.push(label);
+    }
+    return slots;
+  }
+
+  function getServiceDurationMinutes() {
+    return calcTotals(getSelectedServices()).dur || 0;
+  }
+
+  function markPickedSlots(container) {
+    if (!container) return;
+    const picked = new Set(state.timeSlots);
+    container.querySelectorAll(".sq-slot-btn").forEach((btn) => {
+      const time = btn.getAttribute("data-time");
+      btn.classList.toggle("sq-slot-btn--picked", picked.has(time));
+    });
   }
 
   const modal = document.getElementById("salonBookingModal");
@@ -483,31 +555,90 @@
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectDateTime)}</p>
       <label class="sq-booking-field">${escapeHtml(t("dateLabel"))} <input type="date" id="bookingDate" value="${state.date}" min="${new Date().toISOString().slice(0, 10)}"></label>
       <div id="slotGroups" class="sq-slot-groups"></div>
+      <p id="slotPickHint" class="sq-slot-pick-hint${state.slotPickHint ? "" : " sq-slot-pick-hint--hidden"}">${escapeHtml(state.slotPickHint)}</p>
       <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>${escapeHtml(t("continue"))}</button>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackExp">${escapeHtml(t("back"))}</button>
     `;
 
     const dateInput = document.getElementById("bookingDate");
     const slotGroups = document.getElementById("slotGroups");
+    const slotPickHint = document.getElementById("slotPickHint");
     const btnNext = document.getElementById("btnDateNext");
+    let busySlots = new Set();
+
+    function updateSlotHint() {
+      if (!slotPickHint) return;
+      if (!state.slotPickHint) {
+        slotPickHint.classList.add("sq-slot-pick-hint--hidden");
+        slotPickHint.textContent = "";
+        return;
+      }
+      slotPickHint.textContent = state.slotPickHint;
+      slotPickHint.classList.remove("sq-slot-pick-hint--hidden");
+    }
+
+    function selectStartSlot(startSlot) {
+      const durationMin = getServiceDurationMinutes();
+      const built = buildSelectedSlotsForDuration(
+        startSlot,
+        durationMin,
+        state.salonSlotMinutes
+      );
+      const blocked = built.find((s) => busySlots.has(s));
+      if (blocked) {
+        alert(t("slotBusy"));
+        state.timeSlots = [];
+        state.slotPickHint = "";
+        btnNext.disabled = true;
+        markPickedSlots(slotGroups);
+        updateSlotHint();
+        return;
+      }
+      const expectedLen = Math.max(1, Math.ceil(durationMin / 15));
+      if (built.length !== expectedLen) {
+        alert(t("slotInvalid"));
+        state.timeSlots = [];
+        state.slotPickHint = "";
+        btnNext.disabled = true;
+        markPickedSlots(slotGroups);
+        updateSlotHint();
+        return;
+      }
+      state.timeSlots = built;
+      const endSlot = built[built.length - 1];
+      state.slotPickHint =
+        built.length > 1
+          ? `${t("slotSelectedRange")} : ${built[0]} → ${endSlot} (${durationMin} ${t("min")})`
+          : `${t("slotSelectedRange")} : ${built[0]} (${durationMin} ${t("min")})`;
+      markPickedSlots(slotGroups);
+      updateSlotHint();
+      btnNext.disabled = false;
+    }
 
     async function loadSlots() {
       state.date = dateInput.value;
       state.timeSlots = [];
+      state.slotPickHint = "";
       btnNext.disabled = true;
+      updateSlotHint();
       slotGroups.innerHTML = escapeHtml(t("loading"));
       const data = await fetchSlots();
       if (!data.status || !data.isOpen) {
         slotGroups.innerHTML = `<p>${escapeHtml(t("slotsClosed"))}</p>`;
         return;
       }
-      const busy = new Set(data.timeSlots || []);
+      busySlots = new Set(data.timeSlots || []);
+      const st = data.salonTime || {};
+      state.salonSlotMinutes = Math.max(1, parseInt(st.time, 10) || 15);
+      state.breakStartTime = (st.breakStartTime || "").trim();
+      state.breakEndTime = (st.breakEndTime || "").trim();
+
       const renderGroup = (label, slots) => {
         if (!slots?.length) return "";
         return `<div class="sq-slot-group"><h4>${label}</h4><div class="sq-slot-list">${slots
-          .map((t) => {
-            const taken = busy.has(t);
-            return `<button type="button" class="sq-slot-btn${taken ? " sq-slot-btn--busy" : ""}" data-time="${escapeHtml(t)}" ${taken ? "disabled" : ""}>${escapeHtml(t)}</button>`;
+          .map((slotTime) => {
+            const taken = busySlots.has(slotTime);
+            return `<button type="button" class="sq-slot-btn${taken ? " sq-slot-btn--busy" : ""}" data-time="${escapeHtml(slotTime)}" ${taken ? "disabled" : ""}>${escapeHtml(slotTime)}</button>`;
           })
           .join("")}</div></div>`;
       };
@@ -515,12 +646,7 @@
         renderGroup(t("slotMorning"), data.allSlots?.morning) +
         renderGroup(t("slotAfternoon"), data.allSlots?.evening);
       slotGroups.querySelectorAll(".sq-slot-btn:not([disabled])").forEach((btn) => {
-        btn.onclick = () => {
-          state.timeSlots = [btn.getAttribute("data-time")];
-          slotGroups.querySelectorAll(".sq-slot-btn").forEach((b) => b.classList.remove("sq-slot-btn--picked"));
-          btn.classList.add("sq-slot-btn--picked");
-          btnNext.disabled = false;
-        };
+        btn.onclick = () => selectStartSlot(btn.getAttribute("data-time"));
       });
     }
 
@@ -625,8 +751,8 @@
       <div class="sq-coupon-block">
         <label class="sq-booking-field">${escapeHtml(cfg.copy.couponCode)}
           <div class="sq-coupon-row">
-            <input type="text" id="bkCouponCode" value="${escapeHtml(state.couponCode)}" placeholder="${escapeHtml(t("couponPlaceholder"))}">
-            <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnApplyCoupon">${escapeHtml(cfg.copy.applyCoupon)}</button>
+            <input type="text" id="bkCouponCode" class="sq-coupon-row__input" value="${escapeHtml(state.couponCode)}" placeholder="${escapeHtml(t("couponPlaceholder"))}" autocomplete="off" spellcheck="false">
+            <button type="button" class="sq-booking-btn sq-booking-btn--ghost sq-coupon-row__btn" id="btnApplyCoupon">${escapeHtml(cfg.copy.applyCoupon)}</button>
           </div>
         </label>
         ${couponList}
@@ -716,6 +842,7 @@
       state.expertId = opts.expertId || null;
       state.date = "";
       state.timeSlots = [];
+      state.slotPickHint = "";
       state.userId = null;
       state.couponId = null;
       state.couponCode = "";

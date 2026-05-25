@@ -1150,6 +1150,8 @@ exports.serveSalonWebPage = async (req, res) => {
 
         <div class="content-wrapper sq-salon-detail__page">
             <div class="container">
+                ${salonCoverHtml}
+
                 <div class="sq-salon-detail__head">
                     <div class="sq-salon-detail__meta">
                         <h1 class="sq-salon-detail__title">${salonName.replace(/"/g, "&quot;").replace(/</g, "&lt;")}</h1>
@@ -1161,8 +1163,6 @@ exports.serveSalonWebPage = async (req, res) => {
                         ${bookingCardHtml}
                     </aside>
                 </div>
-
-                ${salonCoverHtml}
 
                 <div class="sq-salon-detail__body content-grid">
                     <div class="main-content">
@@ -1267,7 +1267,10 @@ exports.serveSalonWebPage = async (req, res) => {
                 missingFieldSlot: ${JSON.stringify(copy.missingFieldSlot)},
                 missingFieldAmount: ${JSON.stringify(copy.missingFieldAmount)},
                 missingFieldAmountTtc: ${JSON.stringify(copy.missingFieldAmountTtc)},
-                missingFieldPlace: ${JSON.stringify(copy.missingFieldPlace)}
+                missingFieldPlace: ${JSON.stringify(copy.missingFieldPlace)},
+                slotBusy: ${JSON.stringify(copy.slotBusy)},
+                slotInvalid: ${JSON.stringify(copy.slotInvalid)},
+                slotSelectedRange: ${JSON.stringify(copy.slotSelectedRange)}
             },
             payment: {
                 isStripePay: ${!!global.settingJSON?.isStripePay},

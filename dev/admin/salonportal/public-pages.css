@@ -137,8 +137,8 @@ body.sk-public-page .main-wrapper {
 
 .sk-public-page .sq-salon-detail__cover {
     width: 100%;
-    height: 200px;
-    margin: 20px 0 28px;
+    height: 220px;
+    margin: 0 0 24px;
     border-radius: 12px;
     overflow: hidden;
     background: var(--sk-border-light, #eee);
@@ -635,6 +635,13 @@ body.sk-public-page .main-wrapper {
     border-color: var(--sk-primary);
 }
 
+@media (hover: none) {
+    .sk-public-page .salon-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
 .sk-public-page .salon-card:not(.sq-salon-card-v2) .salon-card-image {
     width: 100%;
     height: 200px;
@@ -724,8 +731,8 @@ body.sk-public-page .main-wrapper {
     }
 
     .sk-public-page .sq-salon-detail__cover {
-        height: 180px;
-        margin: 16px 0 24px;
+        height: 200px;
+        margin: 0 0 20px;
     }
 
     .sk-public-page .sq-salon-detail__rail {
@@ -960,25 +967,51 @@ body.sk-public-page .main-wrapper {
 
 .sq-category-discover__list-wrap {
     min-width: 0;
+    overflow: visible;
+    width: 100%;
+}
+
+.sq-category-discover {
+    overflow: visible;
 }
 
 .sk-public-page .sq-salons-grid--3 {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
     margin-top: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+    .sk-public-page .sq-salons-grid--3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (min-width: 1025px) {
+    .sk-public-page .sq-salons-grid--3 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+    }
 }
 
 .sk-public-page .sq-salons-grid--3 > .salon-card,
 .sk-public-page .sq-salons-grid--3 > .no-results {
     min-width: 0;
+    max-width: 100%;
 }
 
 .sk-public-page .sq-salon-card-v2 {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    max-width: 100%;
+    height: auto;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .sk-public-page .sq-salon-card-v2__media {
@@ -1512,6 +1545,18 @@ body.sk-public-page .main-wrapper {
     border-color: var(--sk-text);
 }
 
+.sq-slot-pick-hint {
+    font-size: 0.875rem;
+    color: var(--sk-primary, #c45c26);
+    font-weight: 600;
+    margin: 0 0 12px;
+    line-height: 1.4;
+}
+
+.sq-slot-pick-hint--hidden {
+    display: none;
+}
+
 .sq-booking-success {
     color: var(--sk-primary);
     font-weight: 600;
@@ -1537,13 +1582,37 @@ body.sk-public-page .main-wrapper {
 
 .sq-coupon-row {
     display: flex;
+    align-items: stretch;
     gap: 8px;
     margin-top: 6px;
+    width: 100%;
 }
 
+.sq-booking-field .sq-coupon-row input,
 .sq-coupon-row input {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    width: auto;
+    display: block;
+    margin-top: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--sk-border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.sq-coupon-row .sq-booking-btn,
+.sq-coupon-row .sq-booking-btn--ghost {
+    width: auto;
+    flex: 0 0 auto;
+    margin-top: 0;
+    padding: 10px 12px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    line-height: 1.2;
 }
 
 .sq-coupon-list {
@@ -1637,6 +1706,11 @@ body.sk-public-page .main-wrapper {
 }
 
 @media (max-width: 640px) {
+    .sq-category-discover {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
     .sk-public-page .sq-salons-grid--3 {
         gap: 10px;
     }
@@ -1647,16 +1721,55 @@ body.sk-public-page .main-wrapper {
 
     .sk-public-page .sq-salon-card-v2 .salon-card-name {
         font-size: 0.8rem;
+        -webkit-line-clamp: 2;
     }
 
-    .sk-public-page .sq-salon-card-v2 .salon-card-meta,
-    .sk-public-page .sq-salon-card-v2 .salon-card-address {
+    .sk-public-page .sq-salon-card-v2 .salon-card-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
         font-size: 0.7rem;
     }
 
+    .sk-public-page .sq-salon-card-v2 .salon-card-address {
+        font-size: 0.7rem;
+        -webkit-line-clamp: 3;
+    }
+
+    .sk-public-page .sq-salon-card-v2__media {
+        aspect-ratio: 1 / 1;
+    }
+
+    .sq-category-discover__head--with-img {
+        max-width: 100%;
+        width: 100%;
+        padding: 0;
+        gap: 14px;
+    }
+
     .sq-category-discover__head-img {
-        width: 72px;
-        height: 72px;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        padding: 0;
+        border-radius: 12px;
+    }
+
+    .sq-category-discover__head-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+
+    .sq-category-discover__head-text {
+        width: 100%;
+        text-align: left;
+    }
+
+    .sq-category-discover__title {
+        font-size: 1.35rem;
     }
 
     .sk-public-page .sq-services-grid-4 {

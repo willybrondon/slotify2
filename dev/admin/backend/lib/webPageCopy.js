@@ -147,6 +147,9 @@ const COPY = {
     missingFieldAmount: "montant",
     missingFieldAmountTtc: "montant TTC",
     missingFieldPlace: "lieu",
+    slotBusy: "Un ou plusieurs créneaux de cette plage ne sont plus disponibles.",
+    slotInvalid: "Impossible de réserver ce créneau pour la durée de la prestation.",
+    slotSelectedRange: "Créneau",
   },
   en: {
     bookOnApp: "Book on the app",
@@ -290,6 +293,9 @@ const COPY = {
     missingFieldAmount: "amount",
     missingFieldAmountTtc: "total amount",
     missingFieldPlace: "location",
+    slotBusy: "One or more time slots in this range are no longer available.",
+    slotInvalid: "This time cannot be booked for the selected service duration.",
+    slotSelectedRange: "Time slot",
   },
 };
 
