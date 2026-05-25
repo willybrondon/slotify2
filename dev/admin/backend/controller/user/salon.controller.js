@@ -1163,6 +1163,7 @@ exports.serveSalonWebPage = async (req, res) => {
                         ${salonRatingBlock}
                         <p class="sq-salon-detail__desc">${salonDescription}</p>
                         ${salonAddressBlock}
+                        ${openingHoursHtml}
                     </div>
                     <aside class="sq-salon-detail__aside sidebar-content">
                         ${bookingCardHtml}
@@ -1171,7 +1172,6 @@ exports.serveSalonWebPage = async (req, res) => {
 
                 <div class="sq-salon-detail__body content-grid">
                     <div class="main-content">
-                        ${openingHoursHtml}
                         ${staffHtml}
                         ${servicesHtml}
                         ${productsHtml}

@@ -130,6 +130,30 @@ body.sk-public-page .main-wrapper {
     color: var(--sk-text-muted);
 }
 
+/* Horaires sous l'adresse : même rythme vertical que les autres sections (.section) */
+.sk-public-page .sq-salon-detail__meta > .section {
+    padding-top: 24px;
+    padding-bottom: 32px;
+    margin-top: 0;
+    border-bottom: 1px solid var(--sk-border-light);
+}
+
+.sk-public-page .sq-salon-detail__meta > .section .section-title {
+    margin-bottom: 20px;
+}
+
+.sk-public-page .sq-salon-detail__head {
+    margin-bottom: 0;
+}
+
+.sk-public-page .sq-salon-detail__body.content-grid {
+    margin-top: 0;
+}
+
+.sk-public-page .sq-salon-detail__body .main-content > .section:first-child {
+    padding-top: 32px;
+}
+
 .sk-public-page .sq-salon-detail__aside {
     position: sticky;
     top: 100px;
