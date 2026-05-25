@@ -47,7 +47,7 @@
             <div class="mobile-menu-content">
                 <a href="/professionnel/" class="btn-login-mobile-menu btn-pro-mobile-menu" data-translate="nav.pro">Pro</a>
                 <a href="/compte/connexion" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
-                <a href="/blog/" class="category-link" data-translate="nav.blog">Blog</a>
+                <a href="/blog/" class="btn-login-mobile-menu" data-translate="nav.blog">Blog</a>
                 <a href="${asset("ai-concierge.html")}" class="btn-ai-concierge-mobile"><i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">Concierge IA</span></a>
                 <div class="mobile-categories" id="mobileCategories"></div>
             </div>
