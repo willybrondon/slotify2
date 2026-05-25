@@ -11,6 +11,7 @@ const COPY = {
     stickyBook: "Réserver sur l'app",
     downloadAndroid: "Télécharger sur Android",
     downloadIos: "Télécharger sur iPhone",
+    downloadAppCta: "Télécharger l'app",
     noAppTitle: "Pas encore l'app ?",
     noAppDesc: "Téléchargez Skedisy gratuitement pour choisir votre créneau.",
     idfBanner:
@@ -48,6 +49,7 @@ const COPY = {
     footerTerms: "CGU",
     footerPrivacy: "Confidentialité",
     footerCookies: "Cookies",
+    footerFollowUs: "Suivez-nous",
     qrCustomer: "App cliente",
     valuePropAfro1Title: "Salon afro en IDF",
     valuePropAfro1Desc: "Prestations pensées pour les cheveux texturés et la communauté.",
@@ -93,8 +95,58 @@ const COPY = {
     yourDetails: "Vos coordonnées",
     confirmBooking: "Confirmer la réservation",
     payAtSalon: "Paiement au salon",
+    payWithStripe: "Payer par carte (Stripe)",
+    paymentTitle: "Paiement",
+    couponCode: "Code promo",
+    applyCoupon: "Appliquer",
+    removeCoupon: "Retirer",
+    couponApplied: "Code appliqué",
+    subtotal: "Sous-total",
+    taxLabel: "TVA",
+    discount: "Réduction",
+    totalLabel: "Total",
+    selectPayment: "Mode de paiement",
+    stripeSecure: "Paiement sécurisé par Stripe",
     bookingSuccess: "Réservation enregistrée. Un email de confirmation vous a été envoyé.",
     min: "min",
+    continue: "Continuer",
+    back: "Retour",
+    enterCouponCode: "Saisissez un code promo.",
+    couponInvalid: "Code invalide",
+    couponPlaceholder: "Ex. SKEDISY10",
+    missingFields: "Informations manquantes : __LIST__.",
+    stripeUnavailable: "Paiement Stripe indisponible",
+    stripeNotLoaded: "Stripe non disponible.",
+    stripeEnterCard: "Saisissez vos informations de carte, puis confirmez à nouveau.",
+    paymentCancelled: "Paiement annulé",
+    selectOneService: "Choisissez une prestation.",
+    noExpertForService: "Aucun expert pour cette prestation.",
+    dateLabel: "Date",
+    loading: "Chargement…",
+    slotsClosed: "Fermé ou indisponible ce jour.",
+    slotMorning: "Matin",
+    slotAfternoon: "Après-midi",
+    emailLabel: "Email",
+    phoneLabel: "Téléphone",
+    otpLabel: "Code reçu par email",
+    otpPlaceholder: "6 chiffres",
+    sendOtp: "Envoyer le code",
+    otpSent: "Code envoyé",
+    genericError: "Erreur",
+    emailPhoneRequired: "Email et téléphone sont requis.",
+    enterOtp: "Saisissez le code reçu par email.",
+    verifyFailed: "Vérification échouée",
+    sessionExpired: "Session expirée. Recommencez la vérification email.",
+    bookingFailed: "Réservation impossible",
+    missingFieldAccount: "compte",
+    missingFieldExpert: "experte",
+    missingFieldSalon: "salon",
+    missingFieldService: "prestation",
+    missingFieldDate: "date",
+    missingFieldSlot: "créneau",
+    missingFieldAmount: "montant",
+    missingFieldAmountTtc: "montant TTC",
+    missingFieldPlace: "lieu",
   },
   en: {
     bookOnApp: "Book on the app",
@@ -102,6 +154,7 @@ const COPY = {
     stickyBook: "Book on the app",
     downloadAndroid: "Download on Android",
     downloadIos: "Download on iPhone",
+    downloadAppCta: "Download the app",
     noAppTitle: "Don't have the app yet?",
     noAppDesc: "Download Skedisy for free to pick your time slot.",
     idfBanner:
@@ -139,6 +192,7 @@ const COPY = {
     footerTerms: "Terms",
     footerPrivacy: "Privacy",
     footerCookies: "Cookies",
+    footerFollowUs: "Follow us",
     qrCustomer: "Customer app",
     valuePropAfro1Title: "Afro salon in IDF",
     valuePropAfro1Desc: "Services for textured hair and our community.",
@@ -184,8 +238,58 @@ const COPY = {
     yourDetails: "Your details",
     confirmBooking: "Confirm booking",
     payAtSalon: "Pay at the salon",
+    payWithStripe: "Pay by card (Stripe)",
+    paymentTitle: "Payment",
+    couponCode: "Promo code",
+    applyCoupon: "Apply",
+    removeCoupon: "Remove",
+    couponApplied: "Code applied",
+    subtotal: "Subtotal",
+    taxLabel: "Tax",
+    discount: "Discount",
+    totalLabel: "Total",
+    selectPayment: "Payment method",
+    stripeSecure: "Secure payment by Stripe",
     bookingSuccess: "Booking saved. A confirmation email has been sent.",
     min: "min",
+    continue: "Continue",
+    back: "Back",
+    enterCouponCode: "Enter a promo code.",
+    couponInvalid: "Invalid code",
+    couponPlaceholder: "e.g. SKEDISY10",
+    missingFields: "Missing information: __LIST__.",
+    stripeUnavailable: "Stripe payment unavailable",
+    stripeNotLoaded: "Stripe is not available.",
+    stripeEnterCard: "Enter your card details, then confirm again.",
+    paymentCancelled: "Payment cancelled",
+    selectOneService: "Please choose a service.",
+    noExpertForService: "No stylist available for this service.",
+    dateLabel: "Date",
+    loading: "Loading…",
+    slotsClosed: "Closed or unavailable on this day.",
+    slotMorning: "Morning",
+    slotAfternoon: "Afternoon",
+    emailLabel: "Email",
+    phoneLabel: "Phone",
+    otpLabel: "Code from email",
+    otpPlaceholder: "6 digits",
+    sendOtp: "Send code",
+    otpSent: "Code sent",
+    genericError: "Error",
+    emailPhoneRequired: "Email and phone are required.",
+    enterOtp: "Enter the code from your email.",
+    verifyFailed: "Verification failed",
+    sessionExpired: "Session expired. Please verify your email again.",
+    bookingFailed: "Unable to complete booking",
+    missingFieldAccount: "account",
+    missingFieldExpert: "stylist",
+    missingFieldSalon: "salon",
+    missingFieldService: "service",
+    missingFieldDate: "date",
+    missingFieldSlot: "time slot",
+    missingFieldAmount: "amount",
+    missingFieldAmountTtc: "total amount",
+    missingFieldPlace: "location",
   },
 };
 
@@ -199,6 +303,66 @@ function getWebCopy(lang) {
   return COPY[code];
 }
 
+const WEEKDAY_FR = {
+  Monday: "Lundi",
+  Tuesday: "Mardi",
+  Wednesday: "Mercredi",
+  Thursday: "Jeudi",
+  Friday: "Vendredi",
+  Saturday: "Samedi",
+  Sunday: "Dimanche",
+};
+
+function parseSalonTimeString(timeStr) {
+  const s = (timeStr || "").trim();
+  if (!s) return null;
+  const m24 = s.match(/^(\d{1,2}):(\d{2})$/);
+  if (m24) {
+    return { h: parseInt(m24[1], 10), m: parseInt(m24[2], 10) };
+  }
+  const m12 = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (m12) {
+    let h = parseInt(m12[1], 10);
+    const m = parseInt(m12[2], 10);
+    const ampm = m12[3].toUpperCase();
+    if (ampm === "PM" && h !== 12) h += 12;
+    if (ampm === "AM" && h === 12) h = 0;
+    return { h, m };
+  }
+  return null;
+}
+
+function formatSalonTimeForDisplay(timeStr, lang) {
+  const parsed = parseSalonTimeString(timeStr);
+  if (!parsed) return (timeStr || "").trim() || "—";
+  if (lang === "fr") {
+    return `${String(parsed.h).padStart(2, "0")}h${String(parsed.m).padStart(2, "0")}`;
+  }
+  const ampm = parsed.h >= 12 ? "PM" : "AM";
+  let h12 = parsed.h % 12;
+  if (h12 === 0) h12 = 12;
+  return `${String(h12).padStart(2, "0")}:${String(parsed.m).padStart(2, "0")} ${ampm}`;
+}
+
+function formatSalonDayName(day, lang) {
+  if (!day) return "—";
+  if (lang === "fr") return WEEKDAY_FR[day] || day;
+  return day;
+}
+
+function formatSalonHoursItemHtml(time, lang, copy) {
+  const dayLabel = formatSalonDayName(time.day, lang);
+  const isClosed =
+    !time.isActive || (time.openTime === "" && time.closedTime === "");
+  if (isClosed) {
+    return `<div class="hours-item"><span class="hours-day">${dayLabel}</span><span class="hours-time hours-closed">${copy.closed}</span></div>`;
+  }
+  const open = formatSalonTimeForDisplay(time.openTime, lang);
+  const close = formatSalonTimeForDisplay(time.closedTime, lang);
+  const range = `${open} - ${close}`;
+  return `<div class="hours-item"><span class="hours-day">${dayLabel}</span><span class="hours-time">${range}</span></div>`;
+}
+
 function idfBannerHtml(copy) {
   return `<div class="skedisy-idf-banner" role="note"><p>${copy.idfBanner}</p></div>`;
 }
@@ -206,7 +370,7 @@ function idfBannerHtml(copy) {
 function skedisyFooterHtml(baseURL, copy) {
   return `
     <footer class="footer sq-footer">
-        <div class="footer-container">
+        <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Skedisy</h3>
@@ -214,6 +378,14 @@ function skedisyFooterHtml(baseURL, copy) {
                     <div class="contact-info">
                         <p><i class="fas fa-envelope"></i> support@skedisy.com</p>
                         <p><a href="${WEB_WHATSAPP_URL}" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i> WhatsApp · ${WEB_WHATSAPP_DISPLAY}</a></p>
+                    </div>
+                    <div class="footer-social">
+                        <h4>${copy.footerFollowUs}</h4>
+                        <div class="footer-social-links">
+                            <a href="https://www.facebook.com/profile.php?id=61586655939283" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                            <a href="https://www.instagram.com/skedisy/" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                            <a href="https://www.tiktok.com/@skedisy" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
+                        </div>
                     </div>
                 </div>
                 <div class="footer-section">
@@ -246,4 +418,5 @@ module.exports = {
   resolveLang,
   idfBannerHtml,
   skedisyFooterHtml,
+  formatSalonHoursItemHtml,
 };

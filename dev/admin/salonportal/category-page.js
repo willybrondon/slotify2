@@ -56,8 +56,8 @@
 
     function renderSalonCard(salon) {
         const imageHtml = salon.mainImage
-            ? `<img src="${escapeHtml(salon.mainImage)}" alt="${escapeHtml(salon.name)}" class="salon-card-image" loading="lazy" onerror="this.style.display='none'">`
-            : `<div class="salon-card-image-placeholder">${escapeHtml(noImageLabel)}</div>`;
+            ? `<div class="sq-salon-card-v2__media"><img src="${escapeHtml(salon.mainImage)}" alt="${escapeHtml(salon.name)}" class="salon-card-image" loading="lazy" onerror="this.closest('.sq-salon-card-v2__media')?.classList.add('sq-salon-card-v2__media--fallback')"></div>`
+            : `<div class="sq-salon-card-v2__media sq-salon-card-v2__media--fallback"><div class="salon-card-image-placeholder">${escapeHtml(noImageLabel)}</div></div>`;
 
         const pricePart =
             salon.minPrice !== null && salon.minPrice !== undefined
@@ -197,12 +197,17 @@
 
     function inferCity(searchTerm, salonList) {
         const term = (searchTerm || "").trim();
-        if (!term) return null;
+        if (!term || !salonList.length) return null;
         const lower = term.toLowerCase();
-        for (const s of salonList) {
-            if (s.city && s.city.toLowerCase().includes(lower)) return s.city;
+        const cities = [...new Set(salonList.map((s) => (s.city || "").trim()).filter(Boolean))];
+        const cityMatch = cities.find((c) => c.toLowerCase().includes(lower));
+        if (cityMatch) return cityMatch;
+        if (cities.length === 1) return cities[0];
+        if (cities.length > 1) {
+            const uniqueLower = new Set(cities.map((c) => c.toLowerCase()));
+            if (uniqueLower.size === 1) return cities[0];
         }
-        return term;
+        return salonList[0]?.city?.trim() || null;
     }
 
     async function fetchResults(searchTerm) {

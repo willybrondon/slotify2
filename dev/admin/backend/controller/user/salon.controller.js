@@ -12,6 +12,7 @@ const {
   resolveLang,
   idfBannerHtml,
   skedisyFooterHtml,
+  formatSalonHoursItemHtml,
 } = require("../../lib/webPageCopy");
 
 const geolib = require("geolib");
@@ -790,12 +791,10 @@ exports.serveSalonWebPage = async (req, res) => {
     // Opening Hours Section
     let openingHoursHtml = '';
     if (salon.salonTime && salon.salonTime.length > 0) {
-      openingHoursHtml = salon.salonTime.map(time => {
-        const isClosed = !time.isActive || (time.openTime === "" && time.closedTime === "");
-        const timeDisplay = isClosed ? `<span class="hours-closed">${copy.closed}</span>` : `${time.openTime || 'N/A'} - ${time.closedTime || 'N/A'}`;
-        return `<div class="hours-item"><span class="hours-day">${time.day || 'N/A'}</span><span class="hours-time">${timeDisplay}</span></div>`;
-      }).join('');
-      openingHoursHtml = `<div class="section"><h3 class="section-title">⏰ ${copy.openingHours}</h3><div class="hours-grid">${openingHoursHtml}</div></div>`;
+      openingHoursHtml = salon.salonTime
+        .map((time) => formatSalonHoursItemHtml(time, pageLang, copy))
+        .join("");
+      openingHoursHtml = `<div class="section"><h3 class="section-title">${copy.openingHours}</h3><div class="hours-grid">${openingHoursHtml}</div></div>`;
     }
 
     const bookingServices = [];
@@ -844,17 +843,29 @@ exports.serveSalonWebPage = async (req, res) => {
     // Products Section
     let productsHtml = '';
     if (products && products.length > 0) {
-      productsHtml = products.map(product => {
-        const productName = (product.productName || 'Product').replace(/"/g, '&quot;');
-        const productDesc = (product.description || '').replace(/"/g, '&quot;').substring(0, 120);
-        const productImage = product.mainImage || '';
-        const productPrice = product.price || 0;
-        const imageHtml = productImage ? `<img src="${productImage}" alt="${productName}" onerror="this.style.display='none'">` : '';
-        return `<div class="product-item">${imageHtml}<div class="product-info"><div class="product-name">${productName}</div>${productDesc ? `<div class="product-desc">${productDesc}</div>` : ''}<div class="product-price">${currency}${productPrice}</div></div></div>`;
-      }).join('');
-      productsHtml = `<div class="section"><h3 class="section-title">🛍️ ${copy.products}</h3><div class="services-grid">${productsHtml}</div></div>`;
+      productsHtml = products
+        .map((product) => {
+          const productName = (product.productName || "Product").replace(
+            /"/g,
+            "&quot;"
+          );
+          const productImage = product.mainImage || "";
+          const productPrice = product.price || 0;
+          const imageHtml = productImage
+            ? `<img src="${productImage}" alt="${productName}" class="sq-product-card__img" loading="lazy" onerror="this.style.display='none'">`
+            : `<div class="sq-product-card__placeholder">${productName.charAt(0).toUpperCase()}</div>`;
+          return `<article class="sq-product-card">
+        <div class="sq-product-card__thumb">${imageHtml}</div>
+        <div class="sq-product-card__body">
+          <span class="sq-product-card__name">${productName}</span>
+          <span class="sq-product-card__price">${currency}${productPrice}</span>
+        </div>
+      </article>`;
+        })
+        .join("");
+      productsHtml = `<div class="section sq-salon-products-block"><h3 class="section-title">${copy.products}</h3><div class="sq-products-row">${productsHtml}</div></div>`;
     } else {
-      productsHtml = `<div class="section"><h3 class="section-title">🛍️ ${copy.products}</h3><p class="empty-state">${copy.noProducts}</p></div>`;
+      productsHtml = `<div class="section"><h3 class="section-title">${copy.products}</h3><p class="empty-state">${copy.noProducts}</p></div>`;
     }
 
     let staffHtml = "";
@@ -889,13 +900,36 @@ exports.serveSalonWebPage = async (req, res) => {
         const commentHtml = reviewComment ? `<div class="review-text">${reviewComment}</div>` : '';
         return `<div class="review-item"><div class="review-header">${imageHtml}<div class="review-info"><div class="review-name">${userName}</div>${ratingHtml}${expertInfo}</div></div>${commentHtml}</div>`;
       }).join('');
-      reviewsHtml = `<div class="section"><h3 class="section-title">💬 ${copy.reviews}</h3><div class="reviews-container">${reviewsHtml}</div></div>`;
+      reviewsHtml = `<div class="section"><h3 class="section-title">${copy.reviews}</h3><div class="reviews-container">${reviewsHtml}</div></div>`;
     } else {
-      reviewsHtml = `<div class="section"><h3 class="section-title">💬 ${copy.reviews}</h3><p class="empty-state">${copy.noReviews}</p></div>`;
+      reviewsHtml = `<div class="section"><h3 class="section-title">${copy.reviews}</h3><p class="empty-state">${copy.noReviews}</p></div>`;
     }
 
     // Rating badge HTML
     const ratingBadgeHtml = salonRating > 0 ? `<div class="rating-badge"><span class="rating-stars">⭐</span><span>${salonRating.toFixed(1)} (${salonReviewCount} ${copy.reviewsCount})</span></div>` : '';
+
+    const salonCoverHtml = salonImage
+      ? `<div class="sq-salon-detail__cover"><img src="${salonImage}" alt="" class="sq-salon-detail__cover-img" loading="eager" onerror="this.parentElement.classList.add('sq-salon-detail__cover--placeholder')"></div>`
+      : `<div class="sq-salon-detail__cover sq-salon-detail__cover--placeholder" aria-hidden="true"></div>`;
+
+    const salonRatingBlock = ratingBadgeHtml
+      ? `<div class="sq-salon-detail__rating">${ratingBadgeHtml}</div>`
+      : "";
+    const salonAddressBlock = salonAddress
+      ? `<p class="sq-salon-detail__address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${salonAddress}</p>`
+      : "";
+
+    const bookingCardHtml = `<div class="booking-card">
+                            <h3>${copy.bookingCardTitle}</h3>
+                            <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
+                                <i class="fas fa-calendar-check"></i> ${copy.bookNow}
+                            </button>
+                            <div id="download-section" class="sq-salon-download">
+                                <p class="sq-salon-download__lead">${copy.noAppDesc}</p>
+                                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill sq-salon-download__cta">${copy.downloadAppCta}</a>
+                                <div class="sq-store-badges-mount" data-app="customer" data-center="true"></div>
+                            </div>
+                        </div>`;
 
     const footerHtml = skedisyFooterHtml(baseURL, copy);
     const idfBanner = idfBannerHtml(copy);
@@ -1052,6 +1086,7 @@ exports.serveSalonWebPage = async (req, res) => {
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/public-pages.css">
+    ${global.settingJSON?.isStripePay && global.settingJSON?.stripePublishableKey ? `<script src="https://js.stripe.com/v3/"></script>` : ""}
 </head>
 <body class="sk-public-page sq-page">
     <!-- Login Button Above QR Code -->
@@ -1110,43 +1145,26 @@ exports.serveSalonWebPage = async (req, res) => {
         </div>
     </nav>
     
-    <div class="main-wrapper">
-        <!-- Hero Section -->
-        <div class="hero-section">
-            ${salonImage ? `<div class="hero-image" style="background-image: url('${salonImage}');"></div>` : '<div class="hero-image hero-placeholder"></div>'}
-            <div class="hero-overlay"></div>
-            <div class="hero-content">
-                <div class="container">
-                    <h1 class="hero-title">${valuePropTitle}</h1>
-                    ${valuePropDescription ? `<p class="hero-subtitle" data-original-subtitle="${valuePropDescription.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${valuePropDescription.length > 150 ? valuePropDescription.substring(0, 150) + '...' : valuePropDescription}</p>` : `<p class="hero-subtitle" data-original-subtitle="${salonDescription.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}">${salonDescription.length > 150 ? salonDescription.substring(0, 150) + '...' : salonDescription}</p>`}
-                    ${ratingBadgeHtml ? `<div class="hero-rating">${ratingBadgeHtml}</div>` : ''}
-                    <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="hero-cta-btn">
-                        <i class="fas fa-calendar-check"></i> ${copy.bookNow}
-                    </button>
-                </div>
-            </div>
-        </div>
-
+    <div class="main-wrapper sq-salon-detail">
         ${idfBanner}
-        
-        <!-- Salon Info Section -->
-        <div class="salon-header">
+
+        <div class="content-wrapper sq-salon-detail__page">
             <div class="container">
-                <div class="salon-header-content">
-                    <div class="salon-info-header">
-                        <h2>${copy.aboutSalon(salonName)}</h2>
-                        <p class="salon-description">${salonDescription}</p>
-                        <div class="salon-contact">
-                            ${salonAddress ? `<p><i class="fas fa-map-marker-alt"></i> ${salonAddress}</p>` : ''}
-                        </div>
+                <div class="sq-salon-detail__head">
+                    <div class="sq-salon-detail__meta">
+                        <h1 class="sq-salon-detail__title">${salonName.replace(/"/g, "&quot;").replace(/</g, "&lt;")}</h1>
+                        ${salonRatingBlock}
+                        <p class="sq-salon-detail__desc">${salonDescription}</p>
+                        ${salonAddressBlock}
                     </div>
+                    <aside class="sq-salon-detail__aside sidebar-content">
+                        ${bookingCardHtml}
+                    </aside>
                 </div>
-            </div>
-        </div>
-        
-        <div class="content-wrapper">
-            <div class="container">
-                <div class="content-grid">
+
+                ${salonCoverHtml}
+
+                <div class="sq-salon-detail__body content-grid">
                     <div class="main-content">
                         ${openingHoursHtml}
                         ${staffHtml}
@@ -1154,28 +1172,7 @@ exports.serveSalonWebPage = async (req, res) => {
                         ${productsHtml}
                         ${reviewsHtml}
                     </div>
-                    
-                    <div class="sidebar-content">
-                        <div class="booking-card">
-                            <h3>${copy.bookingCardTitle}</h3>
-                            <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
-                                <i class="fas fa-calendar-check"></i> ${copy.bookNow}
-                            </button>
-                            <div id="download-section">
-                                <p style="text-align: center; margin-bottom: 16px; color: #666; font-size: 0.95rem;">
-                                    ${copy.noAppDesc}
-                                </p>
-                                <div class="download-buttons">
-                                    <a href="https://play.google.com/store/apps/details?id=${androidPackage}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                                        <i class="fab fa-google-play"></i> ${copy.downloadAndroid}
-                                    </a>
-                                    ${iosAppStoreId ? `<a href="https://apps.apple.com/app/id${iosAppStoreId}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                                        <i class="fab fa-apple"></i> ${copy.downloadIos}
-                                    </a>` : `<a href="https://apps.apple.com/search?term=skedisy" class="btn btn-primary" target="_blank" rel="noopener noreferrer"><i class="fab fa-apple"></i> ${copy.downloadIos}</a>`}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="sq-salon-detail__rail" aria-hidden="true"></div>
                 </div>
             </div>
         </div>
@@ -1216,62 +1213,73 @@ exports.serveSalonWebPage = async (req, res) => {
                 selectExpert: ${JSON.stringify(copy.selectExpert)},
                 selectDateTime: ${JSON.stringify(copy.selectDateTime)},
                 yourDetails: ${JSON.stringify(copy.yourDetails)},
+                paymentTitle: ${JSON.stringify(copy.paymentTitle)},
                 confirmBooking: ${JSON.stringify(copy.confirmBooking)},
                 payAtSalon: ${JSON.stringify(copy.payAtSalon)},
+                payWithStripe: ${JSON.stringify(copy.payWithStripe)},
+                couponCode: ${JSON.stringify(copy.couponCode)},
+                applyCoupon: ${JSON.stringify(copy.applyCoupon)},
+                removeCoupon: ${JSON.stringify(copy.removeCoupon)},
+                couponApplied: ${JSON.stringify(copy.couponApplied)},
+                subtotal: ${JSON.stringify(copy.subtotal)},
+                taxLabel: ${JSON.stringify(copy.taxLabel)},
+                discount: ${JSON.stringify(copy.discount)},
+                totalLabel: ${JSON.stringify(copy.totalLabel)},
+                selectPayment: ${JSON.stringify(copy.selectPayment)},
+                stripeSecure: ${JSON.stringify(copy.stripeSecure)},
                 bookingSuccess: ${JSON.stringify(copy.bookingSuccess)},
                 min: ${JSON.stringify(copy.min)},
-                bookNow: ${JSON.stringify(copy.bookNow)}
+                bookNow: ${JSON.stringify(copy.bookNow)},
+                continue: ${JSON.stringify(copy.continue)},
+                back: ${JSON.stringify(copy.back)},
+                enterCouponCode: ${JSON.stringify(copy.enterCouponCode)},
+                couponInvalid: ${JSON.stringify(copy.couponInvalid)},
+                couponPlaceholder: ${JSON.stringify(copy.couponPlaceholder)},
+                missingFields: ${JSON.stringify(copy.missingFields)},
+                stripeUnavailable: ${JSON.stringify(copy.stripeUnavailable)},
+                stripeNotLoaded: ${JSON.stringify(copy.stripeNotLoaded)},
+                stripeEnterCard: ${JSON.stringify(copy.stripeEnterCard)},
+                paymentCancelled: ${JSON.stringify(copy.paymentCancelled)},
+                selectOneService: ${JSON.stringify(copy.selectOneService)},
+                noExpertForService: ${JSON.stringify(copy.noExpertForService)},
+                dateLabel: ${JSON.stringify(copy.dateLabel)},
+                loading: ${JSON.stringify(copy.loading)},
+                slotsClosed: ${JSON.stringify(copy.slotsClosed)},
+                slotMorning: ${JSON.stringify(copy.slotMorning)},
+                slotAfternoon: ${JSON.stringify(copy.slotAfternoon)},
+                emailLabel: ${JSON.stringify(copy.emailLabel)},
+                phoneLabel: ${JSON.stringify(copy.phoneLabel)},
+                otpLabel: ${JSON.stringify(copy.otpLabel)},
+                otpPlaceholder: ${JSON.stringify(copy.otpPlaceholder)},
+                sendOtp: ${JSON.stringify(copy.sendOtp)},
+                otpSent: ${JSON.stringify(copy.otpSent)},
+                genericError: ${JSON.stringify(copy.genericError)},
+                emailPhoneRequired: ${JSON.stringify(copy.emailPhoneRequired)},
+                enterOtp: ${JSON.stringify(copy.enterOtp)},
+                verifyFailed: ${JSON.stringify(copy.verifyFailed)},
+                sessionExpired: ${JSON.stringify(copy.sessionExpired)},
+                bookingFailed: ${JSON.stringify(copy.bookingFailed)},
+                missingFieldAccount: ${JSON.stringify(copy.missingFieldAccount)},
+                missingFieldExpert: ${JSON.stringify(copy.missingFieldExpert)},
+                missingFieldSalon: ${JSON.stringify(copy.missingFieldSalon)},
+                missingFieldService: ${JSON.stringify(copy.missingFieldService)},
+                missingFieldDate: ${JSON.stringify(copy.missingFieldDate)},
+                missingFieldSlot: ${JSON.stringify(copy.missingFieldSlot)},
+                missingFieldAmount: ${JSON.stringify(copy.missingFieldAmount)},
+                missingFieldAmountTtc: ${JSON.stringify(copy.missingFieldAmountTtc)},
+                missingFieldPlace: ${JSON.stringify(copy.missingFieldPlace)}
+            },
+            payment: {
+                isStripePay: ${!!global.settingJSON?.isStripePay},
+                cashAfterService: ${global.settingJSON?.cashAfterService !== false},
+                stripePublishableKey: ${JSON.stringify((global.settingJSON?.stripePublishableKey || "").trim())},
+                currencyName: ${JSON.stringify((global.settingJSON?.currencyName || "eur").toLowerCase())}
             }
         };
     </script>
     <script src="${baseURL}/salon-booking.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
-    <script>
-        // Truncate hero-subtitle to 46 characters on mobile only
-        (function() {
-            const heroSubtitle = document.querySelector('.hero-subtitle');
-            if (!heroSubtitle) return;
-            
-            // Get original text from data attribute (most reliable)
-            let originalText = heroSubtitle.getAttribute('data-original-subtitle');
-            
-            // Decode HTML entities if present
-            if (originalText) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = originalText;
-                originalText = tempDiv.textContent || tempDiv.innerText || originalText;
-            } else {
-                // Fallback to current text content
-                originalText = heroSubtitle.textContent || heroSubtitle.innerText || '';
-            }
-            
-            // Check if screen is mobile (max-width: 768px)
-            function isMobile() {
-                return window.innerWidth <= 768;
-            }
-            
-            function applyTruncation() {
-                if (!originalText) return;
-                
-                if (isMobile() && originalText.length > 46) {
-                    heroSubtitle.textContent = originalText.substring(0, 46) + '...';
-                } else {
-                    heroSubtitle.textContent = originalText;
-                }
-            }
-            
-            // Apply on load
-            applyTruncation();
-            
-            // Re-apply on window resize (debounced)
-            let resizeTimer;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(applyTruncation, 100);
-            });
-        })();
-    </script>
 </body>
 </html>`;
 

@@ -386,6 +386,10 @@ app.get("/api/public/booking/slots", publicWebBooking.publicCheckSlots);
 app.get("/api/public/booking/experts", publicWebBooking.publicExpertsForService);
 app.post("/api/public/guest/send-otp", publicWebBooking.publicGuestSendOtp);
 app.post("/api/public/guest/verify-otp", publicWebBooking.publicGuestVerifyOtp);
+app.get("/api/public/booking/payment-settings", publicWebBooking.publicPaymentSettings);
+app.get("/api/public/booking/coupons", publicWebBooking.publicListCoupons);
+app.post("/api/public/booking/validate-coupon", publicWebBooking.publicValidateCoupon);
+app.post("/api/public/booking/stripe-intent", publicWebBooking.publicCreateStripePaymentIntent);
 app.post("/api/public/booking/create", publicWebBooking.publicCreateBooking);
 app.get("/api/public/booking/cancel", publicWebBooking.publicCancelBooking);
 

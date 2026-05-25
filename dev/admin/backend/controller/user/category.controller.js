@@ -146,14 +146,28 @@ const formatSalonForCategory = (salon, { baseURL, language, copy }) => {
 
 const inferSearchCity = (search, salons) => {
   const term = (search || "").trim();
-  if (!term) return null;
+  if (!term || !salons.length) return null;
+
   const lower = term.toLowerCase();
-  for (const salon of salons) {
-    if (salon.city && salon.city.toLowerCase().includes(lower)) {
-      return salon.city;
-    }
+  const citiesFromResults = [
+    ...new Set(
+      salons.map((s) => (s.city || "").trim()).filter(Boolean)
+    ),
+  ];
+
+  const cityMatch = citiesFromResults.find((city) =>
+    city.toLowerCase().includes(lower)
+  );
+  if (cityMatch) return cityMatch;
+
+  // Recherche par nom de salon : afficher la ville du (des) résultat(s), pas le texte saisi
+  if (citiesFromResults.length === 1) return citiesFromResults[0];
+  if (citiesFromResults.length > 1) {
+    const uniqueLower = new Set(citiesFromResults.map((c) => c.toLowerCase()));
+    if (uniqueLower.size === 1) return citiesFromResults[0];
   }
-  return term;
+
+  return salons[0]?.city?.trim() || null;
 };
 
 const sumReviewCount = (salons) =>
@@ -220,8 +234,8 @@ const fetchExpertsForCategory = async ({
 
 const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) => {
   const imageHtml = salon.mainImage
-    ? `<img src="${salon.mainImage}" alt="${salon.name.replace(/"/g, "&quot;")}" class="salon-card-image" loading="lazy" onerror="this.style.display='none'">`
-    : `<div class="salon-card-image-placeholder">${noImageLabel}</div>`;
+    ? `<div class="sq-salon-card-v2__media"><img src="${salon.mainImage}" alt="${salon.name.replace(/"/g, "&quot;")}" class="salon-card-image" loading="lazy" onerror="this.closest('.sq-salon-card-v2__media')?.classList.add('sq-salon-card-v2__media--fallback')"></div>`
+    : `<div class="sq-salon-card-v2__media sq-salon-card-v2__media--fallback"><div class="salon-card-image-placeholder">${noImageLabel}</div></div>`;
 
   const pricePart =
     salon.minPrice !== null
@@ -789,15 +803,20 @@ exports.serveCategoryPage = async (req, res) => {
     ${idfBanner}
 
     <main class="sq-category-discover">
-        <header class="sq-category-discover__head">
-            <h1 class="sq-category-discover__title">${pageTitle}</h1>
-            <p class="sq-category-discover__lead">${pageLead}</p>
+        <header class="sq-category-discover__head sq-category-discover__head--with-img">
+            <div class="sq-category-discover__head-img">
+                <img src="${categoryImage}" alt="${categoryDisplayName.replace(/"/g, "&quot;")}" loading="lazy" onerror="this.style.display='none'">
+            </div>
+            <div class="sq-category-discover__head-text">
+                <h1 class="sq-category-discover__title">${pageTitle}</h1>
+                <p class="sq-category-discover__lead">${pageLead}</p>
+            </div>
         </header>
 
         <div class="sq-category-discover__search search-section">
-            <div class="search-container">
-                <input type="search" id="searchInput" class="search-input" placeholder="${copy.searchPlaceholder.replace(/"/g, "&quot;")}" value="${search.replace(/"/g, "&quot;")}" autocomplete="off">
-                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+            <div class="search-container sq-search-wrap">
+                <i class="fas fa-search sq-search-wrap__icon" aria-hidden="true"></i>
+                <input type="search" id="searchInput" class="search-input sq-search-wrap__input" placeholder="${copy.searchPlaceholder.replace(/"/g, "&quot;")}" value="${search.replace(/"/g, "&quot;")}" autocomplete="off">
             </div>
         </div>
 

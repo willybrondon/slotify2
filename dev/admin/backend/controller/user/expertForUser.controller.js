@@ -35,11 +35,19 @@ exports.getExpertServiceWise = async (req, res) => {
       select: "name",
     });
 
+    const serviceIdStrings = serviceIds.map((id) => id.toString());
     let matchedServices = [];
     if (expert.length > 0) {
-      matchedServices = salon.serviceIds.filter((service) => {
-        return serviceIds.toString().includes(service.id?._id);
-      });
+      matchedServices = salon.serviceIds
+        .filter((service) => {
+          const sid = service.id?._id?.toString();
+          return sid && serviceIdStrings.includes(sid);
+        })
+        .map((service) => ({
+          _id: service.id?._id,
+          price: service.price,
+          duration: service.id?.duration || 0,
+        }));
     }
 
     return res.status(200).json({

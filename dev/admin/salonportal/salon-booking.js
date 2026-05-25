@@ -16,7 +16,28 @@
     matchedServices: [],
     total: 0,
     withoutTax: 0,
+    paymentMethod: "cashAfterService",
+    couponId: null,
+    couponCode: "",
+    couponDiscount: 0,
+    availableCoupons: [],
+    stripeInstance: null,
+    stripeElements: null,
+    stripePaymentElement: null,
   };
+
+  const payCfg = cfg.payment || {};
+  if (payCfg.cashAfterService === false && payCfg.isStripePay) {
+    state.paymentMethod = "Stripe";
+  }
+
+  function t(key) {
+    return cfg.copy[key] || key;
+  }
+
+  function tFmt(key, token, value) {
+    return String(t(key)).split(token).join(value);
+  }
 
   const modal = document.getElementById("salonBookingModal");
   const stepsEl = document.getElementById("salonBookingSteps");
@@ -154,19 +175,206 @@
     return res.json();
   }
 
-  function calcTotals(matched) {
+  function getSelectedServices() {
+    const ids = new Set(state.selectedServiceIds.map(String));
+    return cfg.services.filter((s) => ids.has(String(s.id)));
+  }
+
+  function calcTotals(serviceList) {
     let sub = 0;
     let dur = 0;
-    matched.forEach((m) => {
-      sub += Number(m.price) || 0;
-      dur += Number(m.duration) || 0;
+    serviceList.forEach((s) => {
+      sub += Number(s.price) || 0;
+      dur += Number(s.duration) || 0;
     });
     const taxPct = Number(cfg.tax) || 0;
-    const tax = (sub * taxPct) / 100;
-    state.withoutTax = sub;
-    state.total = sub + tax;
+    const taxAmount = (sub * taxPct) / 100;
+    const withTaxNum = parseFloat((taxAmount + sub).toFixed(2));
+    const discount = Number(state.couponDiscount) || 0;
+    const totalAfter = Math.max(0, withTaxNum - discount);
+    state.withoutTax = Number(sub.toFixed(2));
+    state.total = Number(totalAfter.toFixed(2));
     state.duration = dur;
-    return { sub, tax, total: state.total, dur };
+    return {
+      sub: state.withoutTax,
+      tax: Number(taxAmount.toFixed(2)),
+      withTax: withTaxNum,
+      total: state.total,
+      discount,
+      dur,
+    };
+  }
+
+  function buildBookingPayload(userId, totals) {
+    const timeStr = state.timeSlots.filter(Boolean).join(",");
+    const body = {
+      userId: String(userId),
+      expertId: String(state.expertId),
+      salonId: String(cfg.salonId),
+      serviceId: state.selectedServiceIds.map(String).join(","),
+      date: state.date,
+      time: timeStr,
+      amount: totals.total,
+      withoutTax: totals.sub,
+      duration: totals.dur,
+      atPlace: 1,
+      paymentType: state.paymentMethod,
+    };
+    if (state.couponId && state.couponDiscount > 0) {
+      body.couponId = String(state.couponId);
+    }
+    return body;
+  }
+
+  function destroyStripeElement() {
+    if (state.stripePaymentElement) {
+      try {
+        state.stripePaymentElement.unmount();
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    state.stripePaymentElement = null;
+    state.stripeElements = null;
+  }
+
+  async function loadCouponsForUser(userId) {
+    const services = getSelectedServices();
+    const sub = services.reduce((a, s) => a + (Number(s.price) || 0), 0);
+    if (!userId || sub <= 0) return;
+    const params = new URLSearchParams({
+      userId: String(userId),
+      amount: String(Math.floor(sub)),
+      type: "2",
+    });
+    const res = await fetch(`/api/public/booking/coupons?${params}`);
+    const data = await res.json();
+    state.availableCoupons = data.status && data.data ? data.data : [];
+  }
+
+  async function applyCouponCode(userId) {
+    const codeInput = document.getElementById("bkCouponCode");
+    const code = (codeInput?.value || state.couponCode || "").trim();
+    if (!code) return alert(t("enterCouponCode"));
+    const totals = calcTotals(getSelectedServices());
+    const res = await fetch("/api/public/booking/validate-coupon", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        code,
+        amount: totals.sub,
+      }),
+    });
+    const data = await res.json();
+    if (!data.status) {
+      alert(data.message || t("couponInvalid"));
+      return;
+    }
+    state.couponId = data.coupon?._id;
+    state.couponCode = data.coupon?.code || code;
+    state.couponDiscount = Number(data.data) || 0;
+    destroyStripeElement();
+    renderStepPayment();
+  }
+
+  function clearCoupon() {
+    state.couponId = null;
+    state.couponCode = "";
+    state.couponDiscount = 0;
+    destroyStripeElement();
+    renderStepPayment();
+  }
+
+  async function createBooking(userId) {
+    const totals = calcTotals(getSelectedServices());
+    const body = buildBookingPayload(userId, totals);
+    const missing = validateBookingPayload(body);
+    if (missing.length) {
+      alert(tFmt("missingFields", "__LIST__", missing.join(", ")));
+      return { ok: false };
+    }
+    const cr = await fetch("/api/public/booking/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return cr.json();
+  }
+
+  async function mountStripePaymentElement(userId) {
+    if (typeof Stripe === "undefined") {
+      alert(t("stripeNotLoaded"));
+      return false;
+    }
+    const totals = calcTotals(getSelectedServices());
+    const intentRes = await fetch("/api/public/booking/stripe-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: totals.total,
+        userId,
+        email: state.email,
+      }),
+    });
+    const intentData = await intentRes.json();
+    if (!intentData.status || !intentData.clientSecret) {
+      alert(intentData.message || t("stripeUnavailable"));
+      return false;
+    }
+    const pk = intentData.publishableKey || payCfg.stripePublishableKey;
+    if (!state.stripeInstance) {
+      state.stripeInstance = Stripe(pk);
+    }
+    destroyStripeElement();
+    state.stripeElements = state.stripeInstance.elements({
+      clientSecret: intentData.clientSecret,
+      appearance: { theme: "stripe" },
+    });
+    state.stripePaymentElement = state.stripeElements.create("payment");
+    const mountEl = document.getElementById("sq-stripe-element");
+    if (mountEl) {
+      mountEl.innerHTML = "";
+      state.stripePaymentElement.mount(mountEl);
+    }
+    return true;
+  }
+
+  async function confirmStripePayment(userId) {
+    if (!state.stripeInstance || !state.stripeElements) {
+      const mounted = await mountStripePaymentElement(userId);
+      if (!mounted) return { ok: false };
+      alert(t("stripeEnterCard"));
+      return { ok: false };
+    }
+    const { error } = await state.stripeInstance.confirmPayment({
+      elements: state.stripeElements,
+      confirmParams: {
+        receipt_email: state.email || undefined,
+      },
+      redirect: "if_required",
+    });
+    if (error) {
+      alert(error.message || t("paymentCancelled"));
+      return { ok: false };
+    }
+    return createBooking(userId);
+  }
+
+  function validateBookingPayload(payload) {
+    const missing = [];
+    if (!payload.userId) missing.push(t("missingFieldAccount"));
+    if (!payload.expertId) missing.push(t("missingFieldExpert"));
+    if (!payload.salonId) missing.push(t("missingFieldSalon"));
+    if (!payload.serviceId) missing.push(t("missingFieldService"));
+    if (!payload.date) missing.push(t("missingFieldDate"));
+    if (!payload.time) missing.push(t("missingFieldSlot"));
+    if (!payload.withoutTax || payload.withoutTax <= 0) missing.push(t("missingFieldAmount"));
+    if (!payload.amount || payload.amount <= 0) missing.push(t("missingFieldAmountTtc"));
+    if (payload.atPlace === undefined || payload.atPlace === null || payload.atPlace === "") {
+      missing.push(t("missingFieldPlace"));
+    }
+    return missing;
   }
 
   function renderStepServices() {
@@ -178,7 +386,7 @@
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectServices)}</p>
       <div class="sq-service-tabs sq-service-tabs--modal" id="bookingServiceTabs"></div>
       <div class="sq-services-grid-4" id="bookingServicesGrid"></div>
-      <button type="button" class="sq-booking-btn" id="btnServicesNext">Continuer</button>
+      <button type="button" class="sq-booking-btn" id="btnServicesNext">${escapeHtml(t("continue"))}</button>
     `;
     const bTabs = document.getElementById("bookingServiceTabs");
     const bGrid = document.getElementById("bookingServicesGrid");
@@ -220,7 +428,7 @@
     }
     paint();
     document.getElementById("btnServicesNext").onclick = () => {
-      if (!state.selectedServiceIds.length) return alert("Choisissez une prestation.");
+      if (!state.selectedServiceIds.length) return alert(t("selectOneService"));
       renderStepExperts();
     };
   }
@@ -229,15 +437,19 @@
     stepsEl.innerHTML = `<p>${escapeHtml(cfg.copy.selectExpert)}</p><div class="sq-booking-loading">…</div>`;
     const data = await fetchExpertsForService();
     if (!data.status || !data.data?.length) {
-      stepsEl.innerHTML = `<p>Aucun expert pour cette prestation.</p><button type="button" class="sq-booking-btn" id="btnBackSvc">Retour</button>`;
+      stepsEl.innerHTML = `<p>${escapeHtml(t("noExpertForService"))}</p><button type="button" class="sq-booking-btn" id="btnBackSvc">${escapeHtml(t("back"))}</button>`;
       document.getElementById("btnBackSvc").onclick = renderStepServices;
       return;
     }
     state.matchedServices = data.matchedServices || [];
+    if (!state.selectedServiceIds.length && data.matchedServices?.length === 1) {
+      const mid = data.matchedServices[0].id?._id || data.matchedServices[0].id;
+      if (mid) state.selectedServiceIds = [String(mid)];
+    }
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectExpert)}</p>
       <div class="sq-experts-row sq-experts-row--modal" id="bookingExpertsPick"></div>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackSvc">Retour</button>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackSvc">${escapeHtml(t("back"))}</button>
     `;
     const row = document.getElementById("bookingExpertsPick");
     row.innerHTML = data.data
@@ -269,10 +481,10 @@
 
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectDateTime)}</p>
-      <label class="sq-booking-field">Date <input type="date" id="bookingDate" value="${state.date}" min="${new Date().toISOString().slice(0, 10)}"></label>
+      <label class="sq-booking-field">${escapeHtml(t("dateLabel"))} <input type="date" id="bookingDate" value="${state.date}" min="${new Date().toISOString().slice(0, 10)}"></label>
       <div id="slotGroups" class="sq-slot-groups"></div>
-      <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>Continuer</button>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackExp">Retour</button>
+      <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>${escapeHtml(t("continue"))}</button>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackExp">${escapeHtml(t("back"))}</button>
     `;
 
     const dateInput = document.getElementById("bookingDate");
@@ -283,10 +495,10 @@
       state.date = dateInput.value;
       state.timeSlots = [];
       btnNext.disabled = true;
-      slotGroups.innerHTML = "Chargement…";
+      slotGroups.innerHTML = escapeHtml(t("loading"));
       const data = await fetchSlots();
       if (!data.status || !data.isOpen) {
-        slotGroups.innerHTML = "<p>Fermé ou indisponible ce jour.</p>";
+        slotGroups.innerHTML = `<p>${escapeHtml(t("slotsClosed"))}</p>`;
         return;
       }
       const busy = new Set(data.timeSlots || []);
@@ -300,8 +512,8 @@
           .join("")}</div></div>`;
       };
       slotGroups.innerHTML =
-        renderGroup("Matin", data.allSlots?.morning) +
-        renderGroup("Après-midi", data.allSlots?.evening);
+        renderGroup(t("slotMorning"), data.allSlots?.morning) +
+        renderGroup(t("slotAfternoon"), data.allSlots?.evening);
       slotGroups.querySelectorAll(".sq-slot-btn:not([disabled])").forEach((btn) => {
         btn.onclick = () => {
           state.timeSlots = [btn.getAttribute("data-time")];
@@ -318,20 +530,33 @@
     loadSlots();
   }
 
+  function renderPriceBreakdown(totals) {
+    let html = `<p>${escapeHtml(cfg.copy.subtotal)} : ${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)}</p>`;
+    if (totals.tax > 0) {
+      html += `<p>${escapeHtml(cfg.copy.taxLabel)} : ${escapeHtml(cfg.currency)}${totals.tax.toFixed(2)}</p>`;
+    }
+    if (totals.discount > 0) {
+      html += `<p class="sq-booking-summary__discount">${escapeHtml(cfg.copy.discount)} : −${escapeHtml(cfg.currency)}${totals.discount.toFixed(2)}</p>`;
+    }
+    html += `<p class="sq-booking-summary__total"><strong>${escapeHtml(cfg.copy.totalLabel)} : ${escapeHtml(cfg.currency)}${totals.total.toFixed(2)}</strong></p>`;
+    return html;
+  }
+
   function renderStepContact() {
-    const totals = calcTotals(state.matchedServices.length ? state.matchedServices : cfg.services.filter((s) => state.selectedServiceIds.includes(s.id)));
+    const totals = calcTotals(getSelectedServices());
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.yourDetails)}</p>
       <div class="sq-booking-summary">
         <p><strong>${escapeHtml(cfg.salonName)}</strong></p>
         <p>${escapeHtml(state.date)} · ${escapeHtml(state.timeSlots.join(", "))}</p>
-        <p>${escapeHtml(cfg.currency)}${totals.total.toFixed(2)} — ${escapeHtml(cfg.copy.payAtSalon)}</p>
+        ${renderPriceBreakdown(totals)}
       </div>
-      <label class="sq-booking-field">Email <input type="email" id="bkEmail" value="${escapeHtml(state.email)}" required></label>
-      <label class="sq-booking-field">Téléphone <input type="tel" id="bkMobile" value="${escapeHtml(state.mobile)}" required></label>
-      <label class="sq-booking-field">Code reçu par email <input type="text" id="bkOtp" inputmode="numeric" maxlength="6" placeholder="6 chiffres"></label>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnSendOtp">Envoyer le code</button>
-      <button type="button" class="sq-booking-btn" id="btnConfirm">${escapeHtml(cfg.copy.confirmBooking)}</button>
+      <label class="sq-booking-field">${escapeHtml(t("emailLabel"))} <input type="email" id="bkEmail" value="${escapeHtml(state.email)}" required></label>
+      <label class="sq-booking-field">${escapeHtml(t("phoneLabel"))} <input type="tel" id="bkMobile" value="${escapeHtml(state.mobile)}" required></label>
+      <label class="sq-booking-field">${escapeHtml(t("otpLabel"))} <input type="text" id="bkOtp" inputmode="numeric" maxlength="6" placeholder="${escapeHtml(t("otpPlaceholder"))}"></label>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnSendOtp">${escapeHtml(t("sendOtp"))}</button>
+      <button type="button" class="sq-booking-btn" id="btnToPayment">${escapeHtml(t("continue"))}</button>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackDate">${escapeHtml(t("back"))}</button>
     `;
     document.getElementById("btnSendOtp").onclick = async () => {
       state.email = document.getElementById("bkEmail").value.trim();
@@ -342,53 +567,147 @@
         body: JSON.stringify({ email: state.email, mobile: state.mobile }),
       });
       const data = await res.json();
-      alert(data.message || (data.status ? "Code envoyé" : "Erreur"));
+      alert(data.message || (data.status ? t("otpSent") : t("genericError")));
     };
-    document.getElementById("btnConfirm").onclick = async () => {
+    document.getElementById("btnBackDate").onclick = renderStepDateTime;
+    document.getElementById("btnToPayment").onclick = async () => {
       state.email = document.getElementById("bkEmail").value.trim();
       state.mobile = document.getElementById("bkMobile").value.trim();
       const otp = document.getElementById("bkOtp").value.trim();
+      if (!state.email || !state.mobile) {
+        alert(t("emailPhoneRequired"));
+        return;
+      }
+      if (!otp) {
+        alert(t("enterOtp"));
+        return;
+      }
       const v = await fetch("/api/public/guest/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: state.email, mobile: state.mobile, otp }),
       });
       const vd = await v.json();
-      if (!vd.status || !vd.user?._id) {
-        alert(vd.message || "Vérification échouée");
+      const userId = vd.user?._id || vd.user?.id;
+      if (!vd.status || !userId) {
+        alert(vd.message || t("verifyFailed"));
         return;
       }
-      state.userId = vd.user._id;
-      const totals2 = calcTotals(
-        state.matchedServices.length
-          ? state.matchedServices
-          : cfg.services.filter((s) => state.selectedServiceIds.includes(s.id))
-      );
-      const body = {
-        userId: state.userId,
-        expertId: state.expertId,
-        salonId: cfg.salonId,
-        serviceId: state.selectedServiceIds.join(","),
-        date: state.date,
-        time: state.timeSlots.join(","),
-        amount: totals2.total,
-        withoutTax: totals2.withoutTax,
-        atPlace: 1,
-        paymentType: "cashAfterService",
-        duration: totals2.dur,
+      state.userId = userId;
+      await loadCouponsForUser(userId);
+      renderStepPayment();
+    };
+  }
+
+  function renderStepPayment() {
+    const totals = calcTotals(getSelectedServices());
+    const showCash = payCfg.cashAfterService !== false;
+    const showStripe = payCfg.isStripePay && payCfg.stripePublishableKey;
+
+    const couponList =
+      state.availableCoupons.length > 0
+        ? `<div class="sq-coupon-list">${state.availableCoupons
+            .map(
+              (c) =>
+                `<button type="button" class="sq-coupon-pick" data-code="${escapeHtml(c.code)}">${escapeHtml(c.code)}${c.title ? ` — ${escapeHtml(c.title)}` : ""}</button>`
+            )
+            .join("")}</div>`
+        : "";
+
+    const appliedCoupon =
+      state.couponDiscount > 0
+        ? `<p class="sq-coupon-applied">${escapeHtml(cfg.copy.couponApplied)} : <strong>${escapeHtml(state.couponCode)}</strong> (−${escapeHtml(cfg.currency)}${state.couponDiscount.toFixed(2)}) <button type="button" class="sq-coupon-remove" id="btnRemoveCoupon">${escapeHtml(cfg.copy.removeCoupon)}</button></p>`
+        : "";
+
+    stepsEl.innerHTML = `
+      <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.paymentTitle)}</p>
+      <div class="sq-booking-summary">${renderPriceBreakdown(totals)}</div>
+      <div class="sq-coupon-block">
+        <label class="sq-booking-field">${escapeHtml(cfg.copy.couponCode)}
+          <div class="sq-coupon-row">
+            <input type="text" id="bkCouponCode" value="${escapeHtml(state.couponCode)}" placeholder="${escapeHtml(t("couponPlaceholder"))}">
+            <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnApplyCoupon">${escapeHtml(cfg.copy.applyCoupon)}</button>
+          </div>
+        </label>
+        ${couponList}
+        ${appliedCoupon}
+      </div>
+      <p class="sq-booking-step__label">${escapeHtml(cfg.copy.selectPayment)}</p>
+      <div class="sq-payment-methods">
+        ${showCash ? `<label class="sq-payment-option"><input type="radio" name="payMethod" value="cashAfterService" ${state.paymentMethod === "cashAfterService" ? "checked" : ""}> <span>${escapeHtml(cfg.copy.payAtSalon)}</span></label>` : ""}
+        ${showStripe ? `<label class="sq-payment-option"><input type="radio" name="payMethod" value="Stripe" ${state.paymentMethod === "Stripe" ? "checked" : ""}> <span>${escapeHtml(cfg.copy.payWithStripe)}</span></label>` : ""}
+      </div>
+      <div id="sq-stripe-wrap" class="sq-stripe-wrap${state.paymentMethod === "Stripe" ? "" : " sq-stripe-wrap--hidden"}">
+        <p class="sq-stripe-hint">${escapeHtml(cfg.copy.stripeSecure)}</p>
+        <div id="sq-stripe-element"></div>
+      </div>
+      <button type="button" class="sq-booking-btn" id="btnConfirm">${escapeHtml(cfg.copy.confirmBooking)}</button>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackContact">${escapeHtml(t("back"))}</button>
+    `;
+
+    stepsEl.querySelectorAll('input[name="payMethod"]').forEach((radio) => {
+      radio.onchange = async () => {
+        state.paymentMethod = radio.value;
+        destroyStripeElement();
+        const wrap = document.getElementById("sq-stripe-wrap");
+        if (wrap) {
+          wrap.classList.toggle("sq-stripe-wrap--hidden", state.paymentMethod !== "Stripe");
+        }
+        if (state.paymentMethod === "Stripe" && state.userId) {
+          await mountStripePaymentElement(state.userId);
+        }
       };
-      const cr = await fetch("/api/public/booking/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const cd = await cr.json();
-      if (cd.status) {
-        stepsEl.innerHTML = `<p class="sq-booking-success">${escapeHtml(cfg.copy.bookingSuccess)}</p>`;
+    });
+
+    stepsEl.querySelectorAll(".sq-coupon-pick").forEach((btn) => {
+      btn.onclick = () => {
+        const inp = document.getElementById("bkCouponCode");
+        if (inp) inp.value = btn.getAttribute("data-code");
+        applyCouponCode(state.userId);
+      };
+    });
+
+    document.getElementById("btnApplyCoupon")?.addEventListener("click", () =>
+      applyCouponCode(state.userId)
+    );
+    document.getElementById("btnRemoveCoupon")?.addEventListener("click", clearCoupon);
+    document.getElementById("btnBackContact").onclick = renderStepContact;
+
+    document.getElementById("btnConfirm").onclick = async () => {
+      const userId = state.userId;
+      if (!userId) {
+        alert(t("sessionExpired"));
+        renderStepContact();
+        return;
+      }
+
+      const btn = document.getElementById("btnConfirm");
+      btn.disabled = true;
+      btn.textContent = "…";
+
+      let result;
+      if (state.paymentMethod === "Stripe") {
+        result = await confirmStripePayment(userId);
       } else {
-        alert(cd.message || "Réservation impossible");
+        result = await createBooking(userId);
+      }
+
+      btn.disabled = false;
+      btn.textContent = cfg.copy.confirmBooking;
+
+      if (result?.status) {
+        destroyStripeElement();
+        stepsEl.innerHTML = `<p class="sq-booking-success">${escapeHtml(cfg.copy.bookingSuccess)}</p>`;
+      } else if (result) {
+        alert(result.message || t("bookingFailed"));
       }
     };
+
+    if (state.paymentMethod === "Stripe" && showStripe && state.userId) {
+      const wrap = document.getElementById("sq-stripe-wrap");
+      if (wrap) wrap.classList.remove("sq-stripe-wrap--hidden");
+      mountStripePaymentElement(state.userId);
+    }
   }
 
   window.SalonBooking = {
@@ -398,6 +717,10 @@
       state.date = "";
       state.timeSlots = [];
       state.userId = null;
+      state.couponId = null;
+      state.couponCode = "";
+      state.couponDiscount = 0;
+      destroyStripeElement();
       openModal();
       if (state.expertId && !state.selectedServiceIds.length) {
         renderStepServices();

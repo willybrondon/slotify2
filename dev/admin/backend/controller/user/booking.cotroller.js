@@ -288,9 +288,27 @@ exports.newBooking = async (req, res, next) => {
   try {
     console.log("req.body++++++++", req.body);
 
-    if (!req.body.serviceId || !req.body.userId || !req.body.expertId || !req.body.date || !req.body.time || !req.body.amount || !req.body.withoutTax || !req.body.salonId || !req.body.atPlace) {
+    const atPlaceMissing =
+      req.body.atPlace === undefined || req.body.atPlace === null || req.body.atPlace === "";
+    const amountNum = parseFloat(req.body.amount);
+    const withoutTaxNum = parseFloat(req.body.withoutTax);
+    if (
+      !req.body.serviceId ||
+      !req.body.userId ||
+      !req.body.expertId ||
+      !req.body.date ||
+      !req.body.time ||
+      !req.body.salonId ||
+      atPlaceMissing ||
+      Number.isNaN(amountNum) ||
+      amountNum <= 0 ||
+      Number.isNaN(withoutTaxNum) ||
+      withoutTaxNum <= 0
+    ) {
       return res.status(200).send({ status: false, message: "Invalid Details!!" });
     }
+    req.body.amount = amountNum;
+    req.body.withoutTax = withoutTaxNum;
 
     const today = moment().format("YYYY-MM-DD");
     let timeSlots = Array.isArray(req.body.time) ? req.body.time : [req.body.time];
@@ -628,15 +646,20 @@ exports.newBooking = async (req, res, next) => {
     const breakEndTime = moment(salonTime.breakEndTime, "hh:mm A");
 
     const isWithinSalonHours = timeArray.every((time) => {
-      const bookingStartTime = moment(time, "hh:mm:ss A");
-      return bookingStartTime.isSameOrAfter(salonOpenTime) && bookingStartTime.isSameOrBefore(salonCloseTime);
+      const bookingStartTime = moment(String(time).trim(), "hh:mm A");
+      return (
+        bookingStartTime.isValid() &&
+        bookingStartTime.isSameOrAfter(salonOpenTime) &&
+        bookingStartTime.isSameOrBefore(salonCloseTime)
+      );
     });
 
     if (
       !isWithinSalonHours ||
       timeArray.some((time) => {
-        const bookingStartTime = moment(time, "hh:mm A");
+        const bookingStartTime = moment(String(time).trim(), "hh:mm A");
         return (
+          !bookingStartTime.isValid() ||
           bookingStartTime.isSameOrBefore(salonOpenTime) ||
           bookingStartTime.isSameOrAfter(salonCloseTime) ||
           (bookingStartTime.isSameOrAfter(breakStartTime) && bookingStartTime.isSameOrBefore(breakEndTime))
