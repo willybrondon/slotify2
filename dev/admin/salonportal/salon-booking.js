@@ -28,6 +28,8 @@
     breakStartTime: "",
     breakEndTime: "",
     slotPickHint: "",
+    calendarYear: null,
+    calendarMonth: null,
   };
 
   const payCfg = cfg.payment || {};
@@ -41,6 +43,72 @@
 
   function tFmt(key, token, value) {
     return String(t(key)).split(token).join(value);
+  }
+
+  /**
+   * Affiche un message dans la modale (succès / erreur / info), comme la confirmation finale.
+   * @param {"success"|"error"|"info"} type
+   * @param {string} message
+   * @param {(() => void)|null} [onContinue] — si fourni, bouton pour reprendre le parcours
+   */
+  function getWebUser() {
+    try {
+      const raw = sessionStorage.getItem("skedisy_web_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function clearWebUser() {
+    sessionStorage.removeItem("skedisy_web_user");
+  }
+
+  function saveBookingDraft() {
+    sessionStorage.setItem(
+      "skedisy_booking_draft",
+      JSON.stringify({
+        salonId: cfg.salonId,
+        selectedServiceIds: state.selectedServiceIds,
+        expertId: state.expertId,
+        date: state.date,
+        timeSlots: state.timeSlots,
+        slotPickHint: state.slotPickHint,
+        couponId: state.couponId,
+        couponCode: state.couponCode,
+        couponDiscount: state.couponDiscount,
+      })
+    );
+  }
+
+  function bindAuthNavLinks(root) {
+    if (!root) return;
+    root.querySelectorAll("[data-auth-nav]").forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        saveBookingDraft();
+        window.location.href = a.getAttribute("href");
+      });
+    });
+  }
+
+  function showBookingNotice(type, message, onContinue) {
+    if (!stepsEl) return;
+    const typeClass =
+      type === "success" ? "success" : type === "error" ? "error" : "info";
+    const btnHtml = onContinue
+      ? `<button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBookingNotice">${escapeHtml(t("noticeContinue"))}</button>`
+      : "";
+    stepsEl.innerHTML = `
+      <div class="sq-booking-notice sq-booking-notice--${typeClass}">
+        <p class="sq-booking-notice__message">${escapeHtml(message)}</p>
+        ${btnHtml}
+      </div>
+    `;
+    const btn = document.getElementById("btnBookingNotice");
+    if (btn && onContinue) {
+      btn.onclick = () => onContinue();
+    }
   }
 
   function parseTime12h(str) {
@@ -107,8 +175,139 @@
     const picked = new Set(state.timeSlots);
     container.querySelectorAll(".sq-slot-btn").forEach((btn) => {
       const time = btn.getAttribute("data-time");
-      btn.classList.toggle("sq-slot-btn--picked", picked.has(time));
+      const isPicked = picked.has(time);
+      btn.classList.toggle("sq-slot-btn--picked", isPicked);
+      btn.classList.toggle(
+        "sq-slot-btn--unavailable",
+        btn.classList.contains("sq-slot-btn--past") ||
+          btn.classList.contains("sq-slot-btn--booked")
+      );
     });
+  }
+
+  const localeTag = cfg.language === "en" ? "en-GB" : "fr-FR";
+
+  function parseDateYmd(str) {
+    const [y, m, d] = String(str || "").split("-").map(Number);
+    if (!y || !m || !d) return null;
+    return new Date(y, m - 1, d);
+  }
+
+  function formatDateYmd(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatMonthYear(year, monthIndex) {
+    const d = new Date(year, monthIndex, 1);
+    return d.toLocaleDateString(localeTag, { month: "long", year: "numeric" });
+  }
+
+  function formatWeekdayShort(date) {
+    return date.toLocaleDateString(localeTag, { weekday: "short" }).replace(/\.$/, "");
+  }
+
+  function todayYmd() {
+    return formatDateYmd(new Date());
+  }
+
+  function isDateBeforeToday(ymd) {
+    return ymd < todayYmd();
+  }
+
+  function slotDateTime(ymd, slotTime) {
+    const base = parseDateYmd(ymd);
+    const mins = parseTime12h(slotTime);
+    if (!base || mins == null) return null;
+    return new Date(base.getFullYear(), base.getMonth(), base.getDate(), Math.floor(mins / 60), mins % 60);
+  }
+
+  function isSlotPassed(ymd, slotTime) {
+    const slotDt = slotDateTime(ymd, slotTime);
+    if (!slotDt) return false;
+    const now = new Date();
+    const dayStart = parseDateYmd(ymd);
+    if (!dayStart) return false;
+    const todayStart = parseDateYmd(todayYmd());
+    if (dayStart < todayStart) return true;
+    if (formatDateYmd(dayStart) === todayYmd()) {
+      return slotDt.getTime() <= now.getTime();
+    }
+    return false;
+  }
+
+  function getSlotStatus(slotTime) {
+    if (busySlotsRef.has(slotTime)) return "booked";
+    if (isSlotPassed(state.date, slotTime)) return "past";
+    return "available";
+  }
+
+  let busySlotsRef = new Set();
+
+  function initCalendarFromStateDate() {
+    const base = parseDateYmd(state.date) || new Date();
+    state.calendarYear = base.getFullYear();
+    state.calendarMonth = base.getMonth();
+  }
+
+  function renderCalendarDays(container, onDayChange) {
+    if (!container) return;
+    const year = state.calendarYear;
+    const month = state.calendarMonth;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = todayYmd();
+    let html = "";
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(year, month, day);
+      const ymd = formatDateYmd(d);
+      const disabled = isDateBeforeToday(ymd);
+      const isSelected = state.date === ymd;
+      const isToday = ymd === today;
+      html += `<button type="button" class="sq-cal-day${isSelected ? " sq-cal-day--active" : ""}${isToday ? " sq-cal-day--today" : ""}${disabled ? " sq-cal-day--disabled" : ""}" data-ymd="${ymd}" ${disabled ? "disabled" : ""}>
+        <span class="sq-cal-day__wd">${escapeHtml(formatWeekdayShort(d))}</span>
+        <span class="sq-cal-day__num">${day}</span>
+      </button>`;
+    }
+    container.innerHTML = html;
+    container.querySelectorAll(".sq-cal-day:not([disabled])").forEach((btn) => {
+      btn.onclick = () => {
+        state.date = btn.getAttribute("data-ymd");
+        renderCalendarDays(container, onDayChange);
+        if (onDayChange) onDayChange();
+      };
+    });
+  }
+
+  function renderSlotGrid(slots, groupEl, onPick) {
+    if (!slots?.length) {
+      groupEl.innerHTML = "";
+      return;
+    }
+    groupEl.innerHTML = `<div class="sq-slot-grid">${slots
+      .map((slotTime) => {
+        const status = getSlotStatus(slotTime);
+        const picked = state.timeSlots.includes(slotTime);
+        const cls = [
+          "sq-slot-btn",
+          status === "past" ? "sq-slot-btn--past" : "",
+          status === "booked" ? "sq-slot-btn--booked" : "",
+          status === "available" ? "sq-slot-btn--available" : "",
+          picked ? "sq-slot-btn--picked" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+        const disabled = status !== "available";
+        return `<button type="button" class="${cls}" data-time="${escapeHtml(slotTime)}" ${disabled ? "disabled" : ""}><span class="sq-slot-btn__label">${escapeHtml(slotTime)}</span></button>`;
+      })
+      .join("")}</div>`;
+
+    if (onPick) {
+      groupEl.querySelectorAll(".sq-slot-btn:not([disabled])").forEach((btn) => {
+        btn.onclick = () => onPick(btn.getAttribute("data-time"));
+      });
+    }
   }
 
   const modal = document.getElementById("salonBookingModal");
@@ -327,7 +526,10 @@
   async function applyCouponCode(userId) {
     const codeInput = document.getElementById("bkCouponCode");
     const code = (codeInput?.value || state.couponCode || "").trim();
-    if (!code) return alert(t("enterCouponCode"));
+    if (!code) {
+      showBookingNotice("error", t("enterCouponCode"), () => renderStepPayment());
+      return;
+    }
     const totals = calcTotals(getSelectedServices());
     const res = await fetch("/api/public/booking/validate-coupon", {
       method: "POST",
@@ -340,7 +542,9 @@
     });
     const data = await res.json();
     if (!data.status) {
-      alert(data.message || t("couponInvalid"));
+      showBookingNotice("error", data.message || t("couponInvalid"), () =>
+        renderStepPayment()
+      );
       return;
     }
     state.couponId = data.coupon?._id;
@@ -363,7 +567,11 @@
     const body = buildBookingPayload(userId, totals);
     const missing = validateBookingPayload(body);
     if (missing.length) {
-      alert(tFmt("missingFields", "__LIST__", missing.join(", ")));
+      showBookingNotice(
+        "error",
+        tFmt("missingFields", "__LIST__", missing.join(", ")),
+        () => renderStepPayment()
+      );
       return { ok: false };
     }
     const cr = await fetch("/api/public/booking/create", {
@@ -376,7 +584,7 @@
 
   async function mountStripePaymentElement(userId) {
     if (typeof Stripe === "undefined") {
-      alert(t("stripeNotLoaded"));
+      showBookingNotice("error", t("stripeNotLoaded"), () => renderStepPayment());
       return false;
     }
     const totals = calcTotals(getSelectedServices());
@@ -391,7 +599,11 @@
     });
     const intentData = await intentRes.json();
     if (!intentData.status || !intentData.clientSecret) {
-      alert(intentData.message || t("stripeUnavailable"));
+      showBookingNotice(
+        "error",
+        intentData.message || t("stripeUnavailable"),
+        () => renderStepPayment()
+      );
       return false;
     }
     const pk = intentData.publishableKey || payCfg.stripePublishableKey;
@@ -416,7 +628,7 @@
     if (!state.stripeInstance || !state.stripeElements) {
       const mounted = await mountStripePaymentElement(userId);
       if (!mounted) return { ok: false };
-      alert(t("stripeEnterCard"));
+      showBookingNotice("info", t("stripeEnterCard"), () => renderStepPayment());
       return { ok: false };
     }
     const { error } = await state.stripeInstance.confirmPayment({
@@ -427,7 +639,11 @@
       redirect: "if_required",
     });
     if (error) {
-      alert(error.message || t("paymentCancelled"));
+      showBookingNotice(
+        "error",
+        error.message || t("paymentCancelled"),
+        () => renderStepPayment()
+      );
       return { ok: false };
     }
     return createBooking(userId);
@@ -500,7 +716,10 @@
     }
     paint();
     document.getElementById("btnServicesNext").onclick = () => {
-      if (!state.selectedServiceIds.length) return alert(t("selectOneService"));
+      if (!state.selectedServiceIds.length) {
+        showBookingNotice("error", t("selectOneService"), () => renderStepServices());
+        return;
+      }
       renderStepExperts();
     };
   }
@@ -546,25 +765,35 @@
   }
 
   async function renderStepDateTime() {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const defaultDate = tomorrow.toISOString().slice(0, 10);
-    state.date = state.date || defaultDate;
+    if (!state.date || isDateBeforeToday(state.date)) {
+      state.date = todayYmd();
+    }
+    initCalendarFromStateDate();
 
+    const monthLabel = formatMonthYear(state.calendarYear, state.calendarMonth);
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectDateTime)}</p>
-      <label class="sq-booking-field">${escapeHtml(t("dateLabel"))} <input type="date" id="bookingDate" value="${state.date}" min="${new Date().toISOString().slice(0, 10)}"></label>
+      <section class="sq-booking-calendar" aria-label="${escapeHtml(t("selectDate"))}">
+        <p class="sq-booking-calendar__label">${escapeHtml(t("selectDate"))}</p>
+        <div class="sq-booking-calendar__header">
+          <button type="button" class="sq-cal-nav" id="calPrevMonth" aria-label="${escapeHtml(t("monthPrev"))}">‹</button>
+          <span class="sq-booking-calendar__month" id="calMonthLabel">${escapeHtml(monthLabel)}</span>
+          <button type="button" class="sq-cal-nav" id="calNextMonth" aria-label="${escapeHtml(t("monthNext"))}">›</button>
+        </div>
+        <div class="sq-booking-calendar__days" id="bookingCalendarDays"></div>
+      </section>
+      <h3 class="sq-booking-slots-title">${escapeHtml(t("availableSlots"))}</h3>
       <div id="slotGroups" class="sq-slot-groups"></div>
       <p id="slotPickHint" class="sq-slot-pick-hint${state.slotPickHint ? "" : " sq-slot-pick-hint--hidden"}">${escapeHtml(state.slotPickHint)}</p>
       <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>${escapeHtml(t("continue"))}</button>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackExp">${escapeHtml(t("back"))}</button>
     `;
 
-    const dateInput = document.getElementById("bookingDate");
+    const daysEl = document.getElementById("bookingCalendarDays");
+    const monthLabelEl = document.getElementById("calMonthLabel");
     const slotGroups = document.getElementById("slotGroups");
     const slotPickHint = document.getElementById("slotPickHint");
     const btnNext = document.getElementById("btnDateNext");
-    let busySlots = new Set();
 
     function updateSlotHint() {
       if (!slotPickHint) return;
@@ -577,6 +806,13 @@
       slotPickHint.classList.remove("sq-slot-pick-hint--hidden");
     }
 
+    function refreshMonthUi() {
+      if (monthLabelEl) {
+        monthLabelEl.textContent = formatMonthYear(state.calendarYear, state.calendarMonth);
+      }
+      renderCalendarDays(daysEl, loadSlots);
+    }
+
     function selectStartSlot(startSlot) {
       const durationMin = getServiceDurationMinutes();
       const built = buildSelectedSlotsForDuration(
@@ -584,24 +820,16 @@
         durationMin,
         state.salonSlotMinutes
       );
-      const blocked = built.find((s) => busySlots.has(s));
+      const blocked = built.find(
+        (s) => busySlotsRef.has(s) || isSlotPassed(state.date, s)
+      );
       if (blocked) {
-        alert(t("slotBusy"));
-        state.timeSlots = [];
-        state.slotPickHint = "";
-        btnNext.disabled = true;
-        markPickedSlots(slotGroups);
-        updateSlotHint();
+        showBookingNotice("error", t("slotBusy"), () => renderStepDateTime());
         return;
       }
       const expectedLen = Math.max(1, Math.ceil(durationMin / 15));
       if (built.length !== expectedLen) {
-        alert(t("slotInvalid"));
-        state.timeSlots = [];
-        state.slotPickHint = "";
-        btnNext.disabled = true;
-        markPickedSlots(slotGroups);
-        updateSlotHint();
+        showBookingNotice("error", t("slotInvalid"), () => renderStepDateTime());
         return;
       }
       state.timeSlots = built;
@@ -616,43 +844,105 @@
     }
 
     async function loadSlots() {
-      state.date = dateInput.value;
+      if (!state.date || isDateBeforeToday(state.date)) {
+        state.date = todayYmd();
+        refreshMonthUi();
+      }
       state.timeSlots = [];
       state.slotPickHint = "";
       btnNext.disabled = true;
       updateSlotHint();
-      slotGroups.innerHTML = escapeHtml(t("loading"));
+      slotGroups.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("loading"))}</p>`;
       const data = await fetchSlots();
       if (!data.status || !data.isOpen) {
         slotGroups.innerHTML = `<p>${escapeHtml(t("slotsClosed"))}</p>`;
         return;
       }
-      busySlots = new Set(data.timeSlots || []);
+      busySlotsRef = new Set(data.timeSlots || []);
       const st = data.salonTime || {};
       state.salonSlotMinutes = Math.max(1, parseInt(st.time, 10) || 15);
       state.breakStartTime = (st.breakStartTime || "").trim();
       state.breakEndTime = (st.breakEndTime || "").trim();
 
-      const renderGroup = (label, slots) => {
-        if (!slots?.length) return "";
-        return `<div class="sq-slot-group"><h4>${label}</h4><div class="sq-slot-list">${slots
-          .map((slotTime) => {
-            const taken = busySlots.has(slotTime);
-            return `<button type="button" class="sq-slot-btn${taken ? " sq-slot-btn--busy" : ""}" data-time="${escapeHtml(slotTime)}" ${taken ? "disabled" : ""}>${escapeHtml(slotTime)}</button>`;
-          })
-          .join("")}</div></div>`;
-      };
-      slotGroups.innerHTML =
-        renderGroup(t("slotMorning"), data.allSlots?.morning) +
-        renderGroup(t("slotAfternoon"), data.allSlots?.evening);
-      slotGroups.querySelectorAll(".sq-slot-btn:not([disabled])").forEach((btn) => {
-        btn.onclick = () => selectStartSlot(btn.getAttribute("data-time"));
-      });
+      let morning = data.allSlots?.morning || [];
+      let evening = data.allSlots?.evening || [];
+      if (evening.length > 1) evening = evening.slice(1);
+
+      slotGroups.innerHTML = "";
+      if (morning.length) {
+        const wrap = document.createElement("div");
+        wrap.className = "sq-slot-group";
+        wrap.innerHTML = `<h4 class="sq-slot-group__title">${escapeHtml(t("slotMorning"))}</h4>`;
+        const gridHost = document.createElement("div");
+        wrap.appendChild(gridHost);
+        slotGroups.appendChild(wrap);
+        renderSlotGrid(morning, gridHost, selectStartSlot);
+      }
+      if (evening.length) {
+        const wrap = document.createElement("div");
+        wrap.className = "sq-slot-group";
+        wrap.innerHTML = `<h4 class="sq-slot-group__title">${escapeHtml(t("slotAfternoon"))}</h4>`;
+        const gridHost = document.createElement("div");
+        wrap.appendChild(gridHost);
+        slotGroups.appendChild(wrap);
+        renderSlotGrid(evening, gridHost, selectStartSlot);
+      }
+      if (!morning.length && !evening.length) {
+        slotGroups.innerHTML = `<p>${escapeHtml(t("slotsClosed"))}</p>`;
+      } else {
+        markPickedSlots(slotGroups);
+      }
     }
 
-    dateInput.onchange = loadSlots;
+    const prevBtn = document.getElementById("calPrevMonth");
+    const nextBtn = document.getElementById("calNextMonth");
+    if (prevBtn) {
+      prevBtn.onclick = () => {
+        if (state.calendarMonth === 0) {
+          state.calendarMonth = 11;
+          state.calendarYear -= 1;
+        } else {
+          state.calendarMonth -= 1;
+        }
+        const lastOfMonth = formatDateYmd(
+          new Date(state.calendarYear, state.calendarMonth + 1, 0)
+        );
+        if (lastOfMonth < todayYmd()) return;
+        const firstOfMonth = formatDateYmd(
+          new Date(state.calendarYear, state.calendarMonth, 1)
+        );
+        if (state.date < firstOfMonth || state.date > lastOfMonth) {
+          state.date = firstOfMonth >= todayYmd() ? firstOfMonth : todayYmd();
+        }
+        refreshMonthUi();
+        loadSlots();
+      };
+    }
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        if (state.calendarMonth === 11) {
+          state.calendarMonth = 0;
+          state.calendarYear += 1;
+        } else {
+          state.calendarMonth += 1;
+        }
+        const firstOfMonth = formatDateYmd(
+          new Date(state.calendarYear, state.calendarMonth, 1)
+        );
+        const lastOfMonth = formatDateYmd(
+          new Date(state.calendarYear, state.calendarMonth + 1, 0)
+        );
+        if (state.date < firstOfMonth || state.date > lastOfMonth) {
+          state.date = firstOfMonth;
+        }
+        refreshMonthUi();
+        loadSlots();
+      };
+    }
+
     document.getElementById("btnBackExp").onclick = renderStepExperts;
     btnNext.onclick = renderStepContact;
+    refreshMonthUi();
     loadSlots();
   }
 
@@ -670,8 +960,51 @@
 
   function renderStepContact() {
     const totals = calcTotals(getSelectedServices());
+    const webUser = getWebUser();
+    const auth = cfg.authUrls || {};
+    const loginHref = auth.login || "/compte/connexion";
+    const signupHref = auth.signup || "/compte/inscription";
+
+    if (webUser) {
+      state.userId = String(webUser.id);
+      state.email = webUser.email || "";
+      state.mobile = webUser.mobile || "";
+      const displayName =
+        [webUser.fname, webUser.lname].filter(Boolean).join(" ").trim() ||
+        webUser.email;
+      stepsEl.innerHTML = `
+      <p class="sq-booking-step__lead">${escapeHtml(t("bookAsGuest"))}</p>
+      <div class="sq-booking-summary">
+        <p><strong>${escapeHtml(cfg.salonName)}</strong></p>
+        <p>${escapeHtml(state.date)} · ${escapeHtml(state.timeSlots.join(", "))}</p>
+        ${renderPriceBreakdown(totals)}
+      </div>
+      <p class="sq-booking-connected">${escapeHtml(t("connectedAs"))} <strong>${escapeHtml(displayName)}</strong></p>
+      <button type="button" class="sq-booking-btn" id="btnToPayment">${escapeHtml(t("continue"))}</button>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnAuthSwitch">${escapeHtml(t("authUseOtherAccount"))}</button>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackDate">${escapeHtml(t("back"))}</button>
+    `;
+      document.getElementById("btnToPayment").onclick = async () => {
+        await loadCouponsForUser(state.userId);
+        renderStepPayment();
+      };
+      document.getElementById("btnAuthSwitch").onclick = () => {
+        clearWebUser();
+        state.userId = null;
+        renderStepContact();
+      };
+      document.getElementById("btnBackDate").onclick = renderStepDateTime;
+      return;
+    }
+
     stepsEl.innerHTML = `
-      <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.yourDetails)}</p>
+      <p class="sq-booking-step__lead">${escapeHtml(t("bookAsGuest"))}</p>
+      <p class="sq-booking-auth-prompt">
+        ${escapeHtml(t("alreadyHaveAccount"))}
+        <a href="${escapeHtml(loginHref)}" class="sq-booking-auth-link" data-auth-nav="login">${escapeHtml(t("authSignInLink"))}</a>
+        ${escapeHtml(t("authOr"))}
+        <a href="${escapeHtml(signupHref)}" class="sq-booking-auth-link" data-auth-nav="signup">${escapeHtml(t("authSignUpLink"))}</a>
+      </p>
       <div class="sq-booking-summary">
         <p><strong>${escapeHtml(cfg.salonName)}</strong></p>
         <p>${escapeHtml(state.date)} · ${escapeHtml(state.timeSlots.join(", "))}</p>
@@ -684,6 +1017,7 @@
       <button type="button" class="sq-booking-btn" id="btnToPayment">${escapeHtml(t("continue"))}</button>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackDate">${escapeHtml(t("back"))}</button>
     `;
+    bindAuthNavLinks(stepsEl);
     document.getElementById("btnSendOtp").onclick = async () => {
       state.email = document.getElementById("bkEmail").value.trim();
       state.mobile = document.getElementById("bkMobile").value.trim();
@@ -693,7 +1027,10 @@
         body: JSON.stringify({ email: state.email, mobile: state.mobile }),
       });
       const data = await res.json();
-      alert(data.message || (data.status ? t("otpSent") : t("genericError")));
+      const otpMsg = data.message || (data.status ? t("otpSent") : t("genericError"));
+      showBookingNotice(data.status ? "info" : "error", otpMsg, () =>
+        renderStepContact()
+      );
     };
     document.getElementById("btnBackDate").onclick = renderStepDateTime;
     document.getElementById("btnToPayment").onclick = async () => {
@@ -701,11 +1038,13 @@
       state.mobile = document.getElementById("bkMobile").value.trim();
       const otp = document.getElementById("bkOtp").value.trim();
       if (!state.email || !state.mobile) {
-        alert(t("emailPhoneRequired"));
+        showBookingNotice("error", t("emailPhoneRequired"), () =>
+          renderStepContact()
+        );
         return;
       }
       if (!otp) {
-        alert(t("enterOtp"));
+        showBookingNotice("error", t("enterOtp"), () => renderStepContact());
         return;
       }
       const v = await fetch("/api/public/guest/verify-otp", {
@@ -716,7 +1055,9 @@
       const vd = await v.json();
       const userId = vd.user?._id || vd.user?.id;
       if (!vd.status || !userId) {
-        alert(vd.message || t("verifyFailed"));
+        showBookingNotice("error", vd.message || t("verifyFailed"), () =>
+          renderStepContact()
+        );
         return;
       }
       state.userId = userId;
@@ -802,8 +1143,7 @@
     document.getElementById("btnConfirm").onclick = async () => {
       const userId = state.userId;
       if (!userId) {
-        alert(t("sessionExpired"));
-        renderStepContact();
+        showBookingNotice("error", t("sessionExpired"), () => renderStepContact());
         return;
       }
 
@@ -823,9 +1163,13 @@
 
       if (result?.status) {
         destroyStripeElement();
-        stepsEl.innerHTML = `<p class="sq-booking-success">${escapeHtml(cfg.copy.bookingSuccess)}</p>`;
+        showBookingNotice("success", cfg.copy.bookingSuccess);
       } else if (result) {
-        alert(result.message || t("bookingFailed"));
+        showBookingNotice(
+          "error",
+          result.message || t("bookingFailed"),
+          () => renderStepPayment()
+        );
       }
     };
 
@@ -833,6 +1177,53 @@
       const wrap = document.getElementById("sq-stripe-wrap");
       if (wrap) wrap.classList.remove("sq-stripe-wrap--hidden");
       mountStripePaymentElement(state.userId);
+    }
+  }
+
+  function tryResumeBooking() {
+    if (sessionStorage.getItem("skedisy_resume_booking") !== "1") return;
+    sessionStorage.removeItem("skedisy_resume_booking");
+    const raw = sessionStorage.getItem("skedisy_booking_draft");
+    if (!raw) return;
+    let draft;
+    try {
+      draft = JSON.parse(raw);
+    } catch (e) {
+      return;
+    }
+    if (String(draft.salonId) !== String(cfg.salonId)) return;
+
+    state.selectedServiceIds = draft.selectedServiceIds || [];
+    state.expertId = draft.expertId || null;
+    state.date = draft.date || "";
+    state.timeSlots = draft.timeSlots || [];
+    state.slotPickHint = draft.slotPickHint || "";
+    state.couponId = draft.couponId || null;
+    state.couponCode = draft.couponCode || "";
+    state.couponDiscount = draft.couponDiscount || 0;
+
+    const webUser = getWebUser();
+    if (webUser) {
+      state.userId = String(webUser.id);
+      state.email = webUser.email || "";
+      state.mobile = webUser.mobile || "";
+    } else {
+      state.userId = null;
+    }
+
+    destroyStripeElement();
+    openModal();
+
+    if (state.userId) {
+      loadCouponsForUser(state.userId).then(() => renderStepPayment());
+    } else if (state.expertId && state.date && state.timeSlots.length) {
+      renderStepContact();
+    } else if (state.expertId && state.selectedServiceIds.length) {
+      renderStepDateTime();
+    } else if (state.selectedServiceIds.length) {
+      renderStepExperts();
+    } else {
+      renderStepServices();
     }
   }
 
@@ -858,9 +1249,11 @@
       }
     },
     close: closeModal,
+    saveDraft: saveBookingDraft,
   };
 
   renderExpertsRow();
   renderServiceTabs();
   renderServicesGrid();
+  tryResumeBooking();
 })();

@@ -10,6 +10,7 @@ const {
   idfBannerHtml,
   skedisyFooterHtml,
 } = require("../../lib/webPageCopy");
+const { authUrls } = require("../../lib/publicAuthPage");
 
 // Generate slug from name
 const generateSlug = (name) => {
@@ -687,6 +688,9 @@ exports.serveCategoryPage = async (req, res) => {
     const pageTitle = copy.discoverSalons(categoryDisplayName);
     const pageLead = copy.categoryPageLead(categoryDisplayName);
     const idfBanner = idfBannerHtml(copy);
+    const returnPath =
+      `/category/${categorySlugWithId}` + (language !== "fr" ? `?lang=${language}` : "");
+    const clientAuth = authUrls(baseURL, returnPath, language);
     const footerHtml = skedisyFooterHtml(baseURL, copy);
     const categoryImage = category.image || `${baseURL}/logo.png`;
 
@@ -747,7 +751,7 @@ exports.serveCategoryPage = async (req, res) => {
 <body class="sk-public-page sq-page">
     <!-- Login Button Above QR Code -->
     <div class="login-above-qr">
-        <a href="${baseURL}/salonpanel/" class="btn-login-above">Login</a>
+        <a href="${clientAuth.login}" class="btn-login-above">${copy.headerLogin}</a>
     </div>
     
     <div class="qr-topright qr-topright--client">
@@ -792,7 +796,7 @@ exports.serveCategoryPage = async (req, res) => {
             </div>
             <div class="mobile-menu-content">
                 <!-- Mobile Login Button -->
-                <a href="${baseURL}/salonpanel/" class="btn-login-mobile-menu">Login</a>
+                <a href="${clientAuth.login}" class="btn-login-mobile-menu">${copy.headerLogin}</a>
                 <div class="mobile-categories" id="mobileCategories">
                     <!-- Categories will be loaded dynamically -->
                 </div>

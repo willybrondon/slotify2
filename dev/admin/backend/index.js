@@ -393,6 +393,12 @@ app.post("/api/public/booking/stripe-intent", publicWebBooking.publicCreateStrip
 app.post("/api/public/booking/create", publicWebBooking.publicCreateBooking);
 app.get("/api/public/booking/cancel", publicWebBooking.publicCancelBooking);
 
+const publicClientAuth = require("./controller/user/publicClientAuth.controller");
+app.get("/compte/connexion", publicClientAuth.serveLoginPage);
+app.get("/compte/inscription", publicClientAuth.serveSignupPage);
+app.post("/api/public/auth/login", publicClientAuth.publicLogin);
+app.post("/api/public/auth/register", publicClientAuth.publicRegister);
+
 // SEO: Sitemap and Robots.txt
 const sitemapController = require("./controller/user/sitemap.controller");
 app.get("/sitemap.xml", sitemapController.generateSitemap);

@@ -14,6 +14,7 @@ const {
   skedisyFooterHtml,
   formatSalonHoursItemHtml,
 } = require("../../lib/webPageCopy");
+const { authUrls } = require("../../lib/publicAuthPage");
 
 const geolib = require("geolib");
 
@@ -931,6 +932,10 @@ exports.serveSalonWebPage = async (req, res) => {
                             </div>
                         </div>`;
 
+    const returnPath =
+      `/salon/${salonSlugWithId}` + (pageLang !== "fr" ? `?lang=${pageLang}` : "");
+    const clientAuth = authUrls(baseURL, returnPath, pageLang);
+
     const footerHtml = skedisyFooterHtml(baseURL, copy);
     const idfBanner = idfBannerHtml(copy);
 
@@ -1091,7 +1096,7 @@ exports.serveSalonWebPage = async (req, res) => {
 <body class="sk-public-page sq-page">
     <!-- Login Button Above QR Code -->
     <div class="login-above-qr">
-        <a href="${baseURL}/salonpanel/" class="btn-login-above">Login</a>
+        <a href="${clientAuth.login}" class="btn-login-above">${copy.headerLogin}</a>
     </div>
     
     <!-- QR Code — app cliente uniquement -->
@@ -1137,7 +1142,7 @@ exports.serveSalonWebPage = async (req, res) => {
             </div>
             <div class="mobile-menu-content">
                 <!-- Mobile Login Button -->
-                <a href="${baseURL}/salonpanel/" class="btn-login-mobile-menu">Login</a>
+                <a href="${clientAuth.login}" class="btn-login-mobile-menu">${copy.headerLogin}</a>
                 <div class="mobile-categories" id="mobileCategories">
                     <!-- Categories will be loaded dynamically -->
                 </div>
@@ -1212,6 +1217,10 @@ exports.serveSalonWebPage = async (req, res) => {
                 selectServices: ${JSON.stringify(copy.selectServices)},
                 selectExpert: ${JSON.stringify(copy.selectExpert)},
                 selectDateTime: ${JSON.stringify(copy.selectDateTime)},
+                selectDate: ${JSON.stringify(copy.selectDate)},
+                availableSlots: ${JSON.stringify(copy.availableSlots)},
+                monthPrev: ${JSON.stringify(copy.monthPrev)},
+                monthNext: ${JSON.stringify(copy.monthNext)},
                 yourDetails: ${JSON.stringify(copy.yourDetails)},
                 paymentTitle: ${JSON.stringify(copy.paymentTitle)},
                 confirmBooking: ${JSON.stringify(copy.confirmBooking)},
@@ -1270,7 +1279,19 @@ exports.serveSalonWebPage = async (req, res) => {
                 missingFieldPlace: ${JSON.stringify(copy.missingFieldPlace)},
                 slotBusy: ${JSON.stringify(copy.slotBusy)},
                 slotInvalid: ${JSON.stringify(copy.slotInvalid)},
-                slotSelectedRange: ${JSON.stringify(copy.slotSelectedRange)}
+                slotSelectedRange: ${JSON.stringify(copy.slotSelectedRange)},
+                noticeContinue: ${JSON.stringify(copy.noticeContinue)},
+                bookAsGuest: ${JSON.stringify(copy.bookAsGuest)},
+                alreadyHaveAccount: ${JSON.stringify(copy.alreadyHaveAccount)},
+                authSignInLink: ${JSON.stringify(copy.authSignInLink)},
+                authOr: ${JSON.stringify(copy.authOr)},
+                authSignUpLink: ${JSON.stringify(copy.authSignUpLink)},
+                connectedAs: ${JSON.stringify(copy.connectedAs)},
+                authUseOtherAccount: ${JSON.stringify(copy.authUseOtherAccount)}
+            },
+            authUrls: {
+                login: ${JSON.stringify(clientAuth.login)},
+                signup: ${JSON.stringify(clientAuth.signup)}
             },
             payment: {
                 isStripePay: ${!!global.settingJSON?.isStripePay},
