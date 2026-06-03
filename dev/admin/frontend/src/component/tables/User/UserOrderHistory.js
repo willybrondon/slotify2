@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useEffect, useState } from "react"
 import Button from "../../extras/Button"
 import Pagination from "../../extras/Pagination"
@@ -87,7 +89,7 @@ const UserOrderHistory = () => {
     });
     const orderTable = [
         {
-            Header: "SR NO",
+            Header: col.srNo,
             Cell: ({ row, index }) => {
                 if (row?.isGrouped && row?.srNo) {
                     return <span>{page * rowsPerPage + parseInt(index) + 1}</span>; // Use the srNo generated above
@@ -96,7 +98,7 @@ const UserOrderHistory = () => {
             }
         },
         {
-            Header: "Order ID",
+            Header: col.orderId,
             Cell: ({ row }) => (
                 row?.isGrouped ? (
                     <span style={{ color: "blue", cursor: "pointer" }} onClick={() => handleOrderView(row?.orderMainId)}>
@@ -106,12 +108,12 @@ const UserOrderHistory = () => {
             )
         },
         {
-            Header: "User Info",
+            Header: col.userInfo,
             Cell: ({ row }) =>
                 row?.isGrouped ? <div>{row?.firstName + " " + row?.lastName ? row?.firstName + " " + row?.lastName : "-"}</div> : null
         },
         {
-            Header: "Items",
+            Header: col.items,
             Cell: ({ row }) => (
                 <>
                     <div className="d-flex justify-content-start">
@@ -129,7 +131,7 @@ const UserOrderHistory = () => {
             )
         },
         {
-            Header: "Total Price",
+            Header: col.totalPrice,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.purchasedTimeProductPrice * row?.productQuantity ? row?.purchasedTimeProductPrice * row?.productQuantity : "-"}</div>
@@ -137,7 +139,7 @@ const UserOrderHistory = () => {
             )
         },
         {
-            Header: "Shipping Charge",
+            Header: col.shipping,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.purchasedTimeShippingCharges ? row?.purchasedTimeShippingCharges : "-"}</div>
@@ -145,7 +147,7 @@ const UserOrderHistory = () => {
             )
         },
         {
-            Header: "Status",
+            Header: col.status,
             Cell: ({ row }) => {
                 return (
                     <div className="mb-2"> {/* Add margin for spacing */}
@@ -182,7 +184,7 @@ const UserOrderHistory = () => {
 
     return (
         <div className="mainCategory">
-            <Title name="Product" />
+            <Title name={ui.pages.product} />
             <div className="row ">
                 <div className="mt-2 col-4">
                     <div className="inputData">

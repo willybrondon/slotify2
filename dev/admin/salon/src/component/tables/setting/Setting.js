@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 // /* eslint-disable react-hooks/exhaustive-deps */
 // /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
@@ -132,24 +134,24 @@ const Setting = (props) => {
     ) {
       let error = {};
       if (!privacyPolicyLink)
-        error.privacyPolicyLink = "Privacy Policy Link is required";
-      if (!tnc) error.tnc = "T&C is required";
+        error.privacyPolicyLink = ui.settings.privacyPolicyRequired;
+      if (!tnc) error.tnc = ui.settings.tncRequired;
       if (!stripePublishableKey)
-        error.stripePublishableKey = "Stripe Publishable Key is required";
+        error.stripePublishableKey = ui.settings.stripePublishableRequired;
       if (!stripeSecretKey)
-        error.stripeSecretKey = "Stripe Secret Key is required";
-      if (!razorPayId) error.razorPayId = "Razor Pay Id is required";
+        error.stripeSecretKey = ui.settings.stripeSecretRequired;
+      if (!razorPayId) error.razorPayId = ui.settings.razorIdRequired;
       if (!razorSecretKey)
-        error.razorSecretKey = "Razor Secret Key is required";
-      if (!tax) error.tax = "Tax is required";
-      if (!currencyName) error.currencyName = "Currency Name is required";
-      if (!currencySymbol) error.currencySymbol = "Currency Symbol is required";
+        error.razorSecretKey = ui.settings.razorSecretRequired;
+      if (!tax) error.tax = ui.settings.taxRequired;
+      if (!currencyName) error.currencyName = ui.settings.currencyNameRequired;
+      if (!currencySymbol) error.currencySymbol = ui.settings.currencySymbolRequired;
       if (!flutterWaveKey)
-        error.flutterWaveKey = "Flutter Wave Key is required";
-      if (!firebaseKey) error.firebaseKey = "Firebase Key is required";
-      if (!adminCommissionCharges) error.commissionPerProductQuantity = "commissionPerProductQuantity Key is required";
-      if (!cancelOrderCharges) error.cancelOrderCharges = "cancelOrderCharges Key is required";
-      if (!minWithdrawalRequestedAmount) error.minWithdrawalRequestedAmount = "withDrawReq is required";
+        error.flutterWaveKey = ui.settings.flutterWaveRequired;
+      if (!firebaseKey) error.firebaseKey = ui.settings.firebaseRequired;
+      if (!adminCommissionCharges) error.commissionPerProductQuantity = ui.settings.adminCommissionRequired;
+      if (!cancelOrderCharges) error.cancelOrderCharges = ui.settings.cancelOrderRequired;
+      if (!minWithdrawalRequestedAmount) error.minWithdrawalRequestedAmount = ui.settings.minWithdrawRequired;
       return setError({ ...error });
     } else {
       const data = {
@@ -214,26 +216,26 @@ const Setting = (props) => {
 
   const withDrawTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
 
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <img src={row?.image} alt={"image"} width="50px" height="50px" />
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.name}</span>
       ),
     },
     {
-      Header: "Details",
+      Header: col.details,
       Cell: ({ row }) => {
         const details = row?.
           details
@@ -249,13 +251,13 @@ const Setting = (props) => {
       },
     },
     {
-      Header: "Created At",
+      Header: col.createdAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.createdAt?.split("T")[0]}</span>
       ),
     },
     {
-      Header: "Is Active",
+      Header: col.isActive,
       Cell: ({ row }) => (
         <ToggleSwitch
           value={row?.isEnabled}
@@ -272,7 +274,7 @@ const Setting = (props) => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <>
           <span>
@@ -346,7 +348,7 @@ const Setting = (props) => {
                   <Button
                     type={`submit`}
                     className={`text-light m10-left fw-bold`}
-                    text={`Submit`}
+                    text="Enregistrer"
                     style={{ backgroundColor: "#1ebc1e" }}
                     onClick={onsubmit}
                   />
@@ -371,13 +373,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="stripePublishableKey"
                           value={stripePublishableKey}
-                          placeholder="Enter Stripe Publishable Key"
+                          placeholder={ui.settings.stripePublishablePh}
                           onChange={(e) => {
                             setStripePublishableKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                stripePublishableKey: ` stripePublishableKey Is Required`,
+                                stripePublishableKey: ui.settings.stripePublishableRequired,
                               });
                             } else {
                               return setError({
@@ -397,20 +399,20 @@ const Setting = (props) => {
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label htmlFor="stripeSecretKey" className="ms-2 order-1">
-                          Stripe secret key
+                          {ui.settings.stripeSecretLabel}
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="stripeSecretKey"
                           value={stripeSecretKey}
-                          placeholder="Enter Stripe Secret Key"
+                          placeholder={ui.settings.stripeSecretPh}
                           onChange={(e) => {
                             setStripeSecretKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                stripeSecretKey: ` Stripe Secret Key Is Required`,
+                                stripeSecretKey: ui.settings.stripeSecretRequired,
                               });
                             } else {
                               return setError({
@@ -429,7 +431,7 @@ const Setting = (props) => {
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">Stripe pay active (enable/disable stripe pay)</label>
+                        <label className="my-3">{ui.settings.stripeActive}</label>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 2)}
@@ -446,19 +448,19 @@ const Setting = (props) => {
                     </div>
                     <div className="col-12 ">
                       <div className="inputData text  flex-row justify-content-start text-start">
-                        <label className="my-3">Razor pay active (enable/disable razor pay)</label>
+                        <label className="my-3">{ui.settings.razorActive}</label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="razorSecretKey"
                           value={razorSecretKey}
-                          placeholder="Enter Razorpay Secret Key"
+                          placeholder={ui.settings.razorSecretPh}
                           onChange={(e) => {
                             setRazorSecretKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                razorSecretKey: ` Razorpay Secret Key Is Required`,
+                                razorSecretKey: ui.settings.razorSecretRequired,
                               });
                             } else {
                               return setError({
@@ -485,13 +487,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="razorPayId"
                           value={razorPayId}
-                          placeholder="Enter razorPay Id"
+                          placeholder={ui.settings.razorIdPh}
                           onChange={(e) => {
                             setRazorPayId(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                razorPayId: ` razorPay Id Is Required`,
+                                razorPayId: ui.settings.razorIdRequired,
                               });
                             } else {
                               return setError({
@@ -510,7 +512,7 @@ const Setting = (props) => {
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">Razor pay active</label>
+                        <label className="my-3">{ui.settings.razorActive}</label>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 1)}
@@ -535,13 +537,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="flutterWaveKey"
                           value={flutterWaveKey}
-                          placeholder="EnterFlutterWave Key"
+                          placeholder={ui.settings.flutterWavePh}
                           onChange={(e) => {
                             setFlutterWaveKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                flutterWaveKey: `FlutterWave Key Is Required`,
+                                flutterWaveKey: ui.settings.flutterWaveRequired,
                               });
                             } else {
                               return setError({
@@ -560,7 +562,7 @@ const Setting = (props) => {
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">flutterwave payment (enable/disable)</label>
+                        <label className="my-3">{ui.settings.flutterActive}</label>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 4)}
@@ -585,7 +587,7 @@ const Setting = (props) => {
                   <Button
                     type={`submit`}
                     className={`text-light m10-left fw-bold`}
-                    text={`Submit`}
+                    text="Enregistrer"
                     style={{ backgroundColor: "#1ebc1e" }}
                     onClick={onsubmit}
                   />
@@ -598,7 +600,7 @@ const Setting = (props) => {
                     <div className="settingBoxHeader d-flex justify-content-between">
                       <h4>APP SETTING</h4>
                       <div className="inputData">
-                        <label className="me-2">Maintenance Mode</label>
+                        <label className="me-2">{ui.settings.maintenanceMode}</label>
                         <ToggleSwitch
                           onClick={() => handleAppActive(setting?._id)}
                           value={setting?.maintenanceMode}
@@ -615,13 +617,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="privacyPolicyLink"
                           value={privacyPolicyLink}
-                          placeholder="Enter privacyPolicyLink"
+                          placeholder={ui.settings.privacyPolicyPh}
                           onChange={(e) => {
                             setPrivacyPolicyLink(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                privacyPolicyLink: ` privacyPolicyLink Is Required`,
+                                privacyPolicyLink: ui.settings.privacyPolicyRequired,
                               });
                             } else {
                               return setError({
@@ -648,13 +650,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="tnc"
                           value={tnc}
-                          placeholder="Enter tnc"
+                          placeholder={ui.settings.tncPh}
                           onChange={(e) => {
                             setTnc(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                tnc: ` Terms And Condition Is Required`,
+                                tnc: ui.settings.tncRequired,
                               });
                             } else {
                               return setError({
@@ -681,13 +683,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="tax"
                           value={tax}
-                          placeholder="Enter tax"
+                          placeholder={ui.settings.taxPh}
                           onChange={(e) => {
                             setTax(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                tax: ` tax Is Required`,
+                                tax: ui.settings.taxRequired,
                               });
                             } else {
                               return setError({
@@ -723,7 +725,7 @@ const Setting = (props) => {
 
                     <div className="inputData">
                       <div>
-                        <label className="my-3" style={{ fontSize: "20px" }}>New product request enable/disable for seller</label>
+                        <label className="my-3" style={{ fontSize: "20px" }}>{ui.settings.productRequestNew}</label>
                       </div>
                     </div>
                   </div>
@@ -740,7 +742,7 @@ const Setting = (props) => {
 
                     <div className="inputData">
                       <div>
-                        <label className="my-3" style={{ fontSize: "20px" }}>Enable/disable product request update for seller</label>
+                        <label className="my-3" style={{ fontSize: "20px" }}>{ui.settings.productRequestUpdate}</label>
                       </div>
                     </div>
                   </div>
@@ -759,7 +761,7 @@ const Setting = (props) => {
 
                     <div className="inputData">
                       <div>
-                        <label className="my-3" style={{ fontSize: "20px" }}>Enable/disable product request update for seller</label>
+                        <label className="my-3" style={{ fontSize: "20px" }}>{ui.settings.productRequestUpdate}</label>
                       </div>
                     </div>
                   </div>
@@ -778,20 +780,20 @@ const Setting = (props) => {
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label htmlFor="cancelOrderCharges" className="ms-2 order-1">
-                          Cancel Order Charges (%)
+                          {ui.labels.cancelOrderChargesPct}
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="cancelOrderCharges"
                           value={cancelOrderCharges}
-                          placeholder="Enter Cancel Order Charges"
+                          placeholder={ui.settings.cancelOrderPh}
                           onChange={(e) => {
                             setCancelOrderCharges(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                cancelOrderCharges: ` Cancel Order Charges Is Required`,
+                                cancelOrderCharges: ui.settings.cancelOrderRequired,
                               });
                             } else {
                               return setError({
@@ -810,21 +812,21 @@ const Setting = (props) => {
                     </div>
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="Admin Commission Charges (%)" className="ms-2 order-1">
-                          Admin Commission Charges (%)
+                        <label htmlFor="{ui.settings.adminCommissionLabel}" className="ms-2 order-1">
+                          {ui.settings.adminCommissionLabel}
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="adminCommissionCharges"
                           value={adminCommissionCharges}
-                          placeholder="Enter Admin Commission"
+                          placeholder={ui.settings.adminCommissionPh}
                           onChange={(e) => {
                             setAdminCommissionCharges(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                adminCommissionCharges: ` Admin Commission Is Required`,
+                                adminCommissionCharges: ui.settings.adminCommissionRequired,
                               });
                             } else {
                               return setError({
@@ -861,13 +863,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="currencyName"
                           value={currencyName}
-                          placeholder="Enter currency Name"
+                          placeholder={ui.settings.currencyNamePh}
                           onChange={(e) => {
                             setCurrencyName(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                currencyName: ` currency Name Is Required`,
+                                currencyName: ui.settings.currencyNameRequired,
                               });
                             } else {
                               return setError({
@@ -894,13 +896,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="currencySymbol"
                           value={currencySymbol}
-                          placeholder="Enter Currency Symbol"
+                          placeholder={ui.settings.currencySymbolPh}
                           onChange={(e) => {
                             setCurrencySymbol(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                currencySymbol: ` Currency Symbol Is Required`,
+                                currencySymbol: ui.settings.currencySymbolRequired,
                               });
                             } else {
                               return setError({
@@ -978,12 +980,12 @@ const Setting = (props) => {
                   <div className="settingBoxOuter">
                     <div className=" d-flex justify-content-between">
                       <div>
-                        <label style={{fontWeight:"bold"}}>Minimum Withdrawal request amount</label>
+                        <label style={{fontWeight:"bold"}}>{ui.labels.minWithdrawLabel}</label>
                       </div>
                       <Button
                         type={`submit`}
                         className={`text-light d-flex justify-end fw-bold`}
-                        text={`Submit`}
+                        text="Enregistrer"
                         style={{ backgroundColor: "#1ebc1e" }}
                         onClick={onsubmit}
                       />
@@ -996,13 +998,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="minWithdrawalRequestedAmount"
                           value={minWithdrawalRequestedAmount}
-                          placeholder="Enter minWithdrawalRequestedAmount"
+                          placeholder={ui.settings.minWithdrawPh}
                           onChange={(e) => {
                             setMinWithdrawalRequestedAmount(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                razorSecretKey: `WithdrawalRequestedAmount Key Is Required`,
+                                minWithdrawalRequestedAmount: ui.settings.minWithdrawRequired,
                               });
                             } else {
                               return setError({
@@ -1023,7 +1025,7 @@ const Setting = (props) => {
               <div className="d-flex justify-content-end">
                 <Button
                   className={`bg-button p-10 text-black m20-bottom`}
-                  text={`Add New`}
+                  text={ui.labels.addNew}
                   bIcon={`fa-solid fa-user-plus`}
                   onClick={() => {
                     dispatch(openDialog({ type: "withdraw" }));

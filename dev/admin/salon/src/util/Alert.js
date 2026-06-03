@@ -1,10 +1,10 @@
 import Swal from "sweetalert2";
-import { DangerRight } from "../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../constants/skedisyUiCopy";
 
 export const warning = (confirm) => {
   return Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
+    title: ui.alert.title,
+    text: ui.alert.text,
     iconHtml: '<i className="ri-alert-line"></i>',
     showCancelButton: true,
     confirmButtonText: confirm,

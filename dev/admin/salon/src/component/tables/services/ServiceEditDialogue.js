@@ -208,7 +208,7 @@ const ServiceEditDialogue = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className="bg-gray text-light"
-                      text="Cancel"
+                      text="Annuler"
                       type="button"
                       onClick={() => dispatch(closeDialog())}
                     />

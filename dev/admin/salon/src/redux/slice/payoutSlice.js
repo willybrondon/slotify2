@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   payout: [],
@@ -92,7 +93,7 @@ const payoutSlice = createSlice({
         }
       }
       state.isLoading = false;
-      Success("Bonus-Penalty Update Successfully");
+      Success(ui.toast.bonusUpdated);
     });
 
     builder.addCase(bonusPenalty.rejected, (state, action) => {
@@ -117,7 +118,7 @@ const payoutSlice = createSlice({
         }
       }
       state.isLoading = false;
-      Success("Expert Paid  Successfully");
+      Success(ui.toast.expertPaid);
     });
 
     builder.addCase(payment.rejected, (state, action) => {

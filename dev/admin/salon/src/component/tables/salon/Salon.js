@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -81,13 +83,13 @@ export const Salon = () => {
 
   const salonTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -102,7 +104,7 @@ export const Salon = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -113,11 +115,11 @@ export const Salon = () => {
       ),
     },
     {
-      Header: "Mobile No",
+      Header: col.mobile,
       Cell: ({ row }) => <span>{row?.mobile ? row?.mobile : "-"}</span>,
     },
     {
-      Header: "Platform Fee (%)",
+      Header: col.platformFee,
       body: "platformFee",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -125,11 +127,11 @@ export const Salon = () => {
       ),
     },
     {
-      Header: "Country",
+      Header: col.country,
       Cell: ({ row }) => <span>{row?.addressDetails?.country}</span>,
     },
     {
-      Header: "Active",
+      Header: col.active,
       body: "isActive",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -142,7 +144,7 @@ export const Salon = () => {
       ),
     },
     {
-      Header: "Best Seller",
+      Header: col.bestSeller,
       body: "isBestSeller",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -169,7 +171,7 @@ export const Salon = () => {
     },
    
     {
-      Header: "Schedule",
+      Header: col.schedule,
       Cell: ({ row }) => (
         <span>
           <button
@@ -200,7 +202,7 @@ export const Salon = () => {
       ),
     },
     {
-      Header: "Booking",
+      Header: col.booking,
       body: "booking",
       Cell: ({ row }) => (
         <button
@@ -213,7 +215,7 @@ export const Salon = () => {
       ),
     },
     {
-      Header: "Order",
+      Header: col.order,
       body: "order",
       Cell: ({ row }) => (
         <button
@@ -226,7 +228,7 @@ export const Salon = () => {
       ),
     },
     {
-      Header: "Info",
+      Header: col.info,
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
           <button
@@ -247,7 +249,7 @@ export const Salon = () => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
           <button
@@ -315,7 +317,7 @@ export const Salon = () => {
 
   return (
     <div className="userTable">
-      <Title name="Salons" />
+      <Title name={ui.pages.salons} />
 
       <div className="betBox">
         <Button

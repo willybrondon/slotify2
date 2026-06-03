@@ -2,6 +2,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   time: [],
@@ -89,7 +90,7 @@ const timeSlice = createSlice({
             ...action.payload.salonTime,
           };
         }
-        Success("Updated Successfully");
+        Success(ui.toast.updated);
       }
       state.isLoading = false;
     });
@@ -116,7 +117,7 @@ const timeSlice = createSlice({
             ...action.payload.salonTime,
           };
         }
-        Success("Updated Successfully");
+        Success(ui.toast.updated);
       }
       state.isLoading = false;
     });

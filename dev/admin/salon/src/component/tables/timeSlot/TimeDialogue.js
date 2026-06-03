@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { ExInput } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -63,8 +64,8 @@ const TimeDialogue = () => {
     e.preventDefault();
     if (!openTime || !closeTime) {
       let error = {};
-      if (!openTime) error.openTime = "Open Time is required";
-      if (!closeTime) error.closeTime = "Close TIme is required";
+      if (!openTime) error.openTime = ui.dialog.openTimeRequired;
+      if (!closeTime) error.closeTime = ui.dialog.closeTimeRequired;
       return setError({ ...error });
     } else {
       let addTax = {
@@ -253,7 +254,7 @@ const TimeDialogue = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -261,7 +262,7 @@ const TimeDialogue = () => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                     />
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   service: [],
@@ -105,7 +106,7 @@ const serviceSlice = createSlice({
           ...action.payload.services,
         };
         state.particularService.unshift(dataObject);
-        Success("Service Add Successfully");
+        Success(ui.toast.serviceAdded);
       }
       state.isLoading = false;
     });
@@ -130,7 +131,7 @@ const serviceSlice = createSlice({
 
         
         state.particularService = action.payload.services
-        Success("Service Add Successfully");
+        Success(ui.toast.serviceAdded);
       }
       state.isLoading = false;
     });
@@ -147,7 +148,7 @@ const serviceSlice = createSlice({
       if (action.payload.status) {
         
         state.particularService = action.payload.salon;
-        Success("Service Delete Successfully");
+        Success(ui.toast.serviceDeleted);
       }
       state.isLoading = false;
     });
@@ -164,7 +165,7 @@ const serviceSlice = createSlice({
       state.isLoading = false;
       console.log('action', action)
       if (action.payload.status) {
-        Success("City added Successfully");
+        Success(ui.toast.cityAdded);
       }
     }); 
 
@@ -180,7 +181,7 @@ const serviceSlice = createSlice({
     builder.addCase(blockCity.fulfilled, (state, action) => {
       state.isLoading = false;
       if (action.payload.status) {
-        Success("City blocked Successfully");
+        Success(ui.toast.cityBlocked);
       }
     });
 

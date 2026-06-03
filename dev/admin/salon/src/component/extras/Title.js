@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const Title = (props) => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Title = (props) => {
       </div>
       <div className="titlePath" style={{ display: display }}>
         <span onClick={handleDashboardClick}>
-          Dashboard <i className="ri-arrow-right-s-line"></i>
+          {ui.breadcrumbHome} <i className="ri-arrow-right-s-line"></i>
         </span>
         <span className="text-second"> {name}</span>
       </div>

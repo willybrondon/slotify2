@@ -1,3 +1,5 @@
+import { col } from "../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -59,34 +61,34 @@ const StaffEarning = () => {
 
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{page * rowsPerPage + parseInt(index) + 1}</span>
     },
 
     {
-      Header: "UniqueId",
+      Header: col.uniqueId,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.uniqueId || "-"}</span>
       ),
     },
     {
-      Header: "Expert Info",
+      Header: col.expertInfo,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.expert?.name || "-"}</span>
       ),
     },
     {
-      Header: `Amount (${setting?.currencySymbol})`,
+      Header: `${col.amount} (${setting?.currencySymbol})`,
       Cell: ({ row }) => <span className="text-capitalize">{row?.amount || "-"}</span>,
     },
     {
-      Header: `Date`,
+      Header: col.date,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.date || "-"}</span>
       ),
     },
     {
-      Header: "Time",
+      Header: col.time,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.time ? row?.time : "-"}
@@ -95,7 +97,7 @@ const StaffEarning = () => {
     },
 
     {
-      Header: 'Transaction Type',
+      Header: col.transactionType,
       Cell: ({ row }) => {
         const isCredit = row?.type === 1;
         const isDebit = row?.type === 2 && row?.payoutStatus === 2;
@@ -116,7 +118,7 @@ const StaffEarning = () => {
       },
     },
     {
-      Header: 'Transaction Completed',
+      Header: col.transactionCompleted,
       Cell: ({ row }) => {
         const isCredit = row?.type === 1;
         const isDebit = row?.type === 2;
@@ -126,7 +128,7 @@ const StaffEarning = () => {
           <button className="d-flex align-items-center justify-content-center"
             style={{ background: "#C0E9C0", color: "#14AF14", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
             <img src={Sign} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px" }} />
-            <span style={{ whiteSpace: "nowrap" }}>Booking Complete</span>
+            <span style={{ whiteSpace: "nowrap" }}>{ui.labels.bookingComplete}</span>
           </button>
         ) : isDebit ? (
           <>
@@ -135,7 +137,7 @@ const StaffEarning = () => {
                 style={{ background: "#D8F0F9", color: "#17A7DB", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
                 <Refund />
                 <span style={{ whiteSpace: "nowrap" }} className="ms-2">{
-                  row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+                  row?.payoutStatus === 1 && ui.labels.withdrawPending || row?.payoutStatus === 2 && ui.labels.withdrawApproved || row?.payoutStatus === 3 && ui.labels.withdrawDeclined
                 }</span>
               </button>
             ) : (
@@ -143,7 +145,7 @@ const StaffEarning = () => {
                 style={{ background: "#F5DDC3", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
                 <img src={With} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px", border: "none", borderRadius: "5px" }} />
                 <span style={{ whiteSpace: "nowrap" }}>{
-                  row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+                  row?.payoutStatus === 1 && ui.labels.withdrawPending || row?.payoutStatus === 2 && ui.labels.withdrawApproved || row?.payoutStatus === 3 && ui.labels.withdrawDeclined
                 }</span>
               </button>
             )
@@ -158,7 +160,7 @@ const StaffEarning = () => {
 
   return (
     <div className="mainCategory">
-      <Title name="Expert earnings" />
+      <Title name={ui.pages.expertEarnings} />
       <div className="betBox">
         <div className="inputData pb-2">
           <label className="styleForTitle" htmlFor="transactionType">
@@ -199,7 +201,7 @@ const StaffEarning = () => {
           <Analytics
             analyticsStartDate={startDate}
             analyticsStartEnd={endDate}
-            placeholder="Wallet"
+            placeholder={ui.form.wallet}
             analyticsStartDateSet={setStartDate}
             analyticsStartEndSet={setEndDate}
           />

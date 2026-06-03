@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -54,18 +56,18 @@ const ProductCategory = () => {
   };
   const productCategoryTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
             src={row?.image ? row?.image : noImage}
-            alt="Product Category"
+            alt={ui.labels.productCategory}
             className="cursor-pointer"
             style={{ height: "70px", width: "70px", objectFit: "cover" }}
             onClick={() => openImage(row?.image)}
@@ -74,19 +76,19 @@ const ProductCategory = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.name}</span>
       ),
     },
     {
-      Header: "Created At",
+      Header: col.createdAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.createdAt.split("T")[0]}</span>
       ),
     },
     {
-      Header: "Status",
+      Header: col.status,
       Cell: ({ row }) => (
         <ToggleSwitch
           value={row?.isActive}
@@ -95,7 +97,7 @@ const ProductCategory = () => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span>
           <button
@@ -113,10 +115,10 @@ const ProductCategory = () => {
   ];
   return (
     <div className="mainCategory">
-      <Title name="Product Category" />
+      <Title name={ui.labels.productCategory} />
       <Button
         className={`bg-button p-10 text-black m20-bottom`}
-        text={`Add Product Category`}
+        text={ui.labels.addProductCategory}
         bIcon={`fa-solid fa-user-plus`}
         onClick={() => {
           dispatch(openDialog({ type: "productCategory" }));

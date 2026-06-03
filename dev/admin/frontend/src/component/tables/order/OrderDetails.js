@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -20,13 +21,13 @@ const OrderDetails = () => {
     }, [orderDetails]);
     const mapData = [
         {
-            Header: "No",
+            Header: col.no,
             width: "20px",
             Cell: ({ index }) => <span>{parseInt(index) + 1}</span>,
         },
 
         {
-            Header: "Item Detail",
+            Header: col.itemDetail,
             body: "",
             Cell: ({ row }) => {
                 return (
@@ -72,7 +73,7 @@ const OrderDetails = () => {
 
 
         {
-            Header: "Price",
+            Header: col.price,
             body: "price",
             Cell: ({ row }) => {
                 return (
@@ -86,7 +87,7 @@ const OrderDetails = () => {
         },
 
         {
-            Header: "Quantity",
+            Header: col.quantity,
             body: "Quantity",
             Cell: ({ row }) => {
                 return (
@@ -102,7 +103,7 @@ const OrderDetails = () => {
 
 
         {
-            Header: "Shipping Charge",
+            Header: col.shipping,
             body: "purchasedTimeShippingCharges",
             Cell: ({ row }) => {
                 return (
@@ -113,7 +114,7 @@ const OrderDetails = () => {
             },
         },
         {
-            Header: "Delivered Service",
+            Header: col.deliveredService,
             body: "deliveredServiceName",
             Cell: ({ row }) => {
                 return (
@@ -127,7 +128,7 @@ const OrderDetails = () => {
         },
 
         {
-            Header: "Status",
+            Header: col.status,
             body: "status",
             Cell: ({ row }) => {
                 return (
@@ -167,7 +168,7 @@ const OrderDetails = () => {
         },
 
         {
-            Header: "Total",
+            Header: col.total,
             body: "purchTotal AmountasedTimeShippingCharges",
             Cell: ({ row }) => {
                 return (

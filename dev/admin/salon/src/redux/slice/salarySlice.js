@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import {  Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   salary: [],
@@ -155,7 +156,7 @@ const salarySlice = createSlice({
         }
       }
       state.isLoading = false;
-      Success("Salary Paid Successfully");
+      Success(ui.toast.salaryPaid);
     });
 
     builder.addCase(Salonpayment.rejected, (state, action) => {

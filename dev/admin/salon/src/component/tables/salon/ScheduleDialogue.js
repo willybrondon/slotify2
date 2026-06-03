@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useDispatch, useSelector } from "react-redux";
 
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
@@ -57,8 +58,8 @@ const ScheduleDialogue = () => {
     e.preventDefault();
     if (!openTime || !closeTime) {
       let error = {};
-      if (!openTime) error.openTime = "Open time is required";
-      if (!closeTime) error.closeTime = "Close time is required";
+      if (!openTime) error.openTime = ui.settings.openTimeRequired;
+      if (!closeTime) error.closeTime = ui.settings.closeTimeRequired;
       return setError({ ...error });
     } else {
     
@@ -269,7 +270,7 @@ const ScheduleDialogue = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -277,7 +278,7 @@ const ScheduleDialogue = () => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                     />
                   </div>
                 </div>

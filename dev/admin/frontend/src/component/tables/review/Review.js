@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import Table from "../../extras/Table";
@@ -87,13 +89,13 @@ export const Review = () => {
 
   const reviewTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "User",
+      Header: col.user,
       Cell: ({ row }) => (
         <div
           className=""
@@ -110,7 +112,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "User Name",
+      Header: col.userName,
       Cell: ({ row }) => (
         <span
           className="text-capitalize cursor fw-bold"
@@ -121,7 +123,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "Review",
+      Header: col.review,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.review ? row?.review : "-"}
@@ -129,7 +131,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "Rating",
+      Header: col.rating,
       Cell: ({ row }) => (
         <>
           <Rating
@@ -143,7 +145,7 @@ export const Review = () => {
     },
 
     {
-      Header: "BookingId",
+      Header: col.bookingId,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.bookingId ? row?.bookingId : "-"}
@@ -151,7 +153,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "Expert",
+      Header: col.expert,
       Cell: ({ row }) => (
         <span
           className="text-capitalize cursor fw-bold"
@@ -162,14 +164,14 @@ export const Review = () => {
       ),
     },
     {
-      Header: "Created At",
+      Header: col.createdAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.createdAt?.split("T")[0]}</span>
       ),
     },
 
     {
-      Header: "Delete",
+      Header: col.delete,
       Cell: ({ row }) => (
         <span>
           <button
@@ -199,7 +201,7 @@ export const Review = () => {
 
   return (
     <div className="mainExpert">
-      <Title name="Reviews" />
+      <Title name={ui.pages.reviews} />
       <div className="col-md-8 col-lg-5  ms-auto">
         <Searching
           type={`server`}

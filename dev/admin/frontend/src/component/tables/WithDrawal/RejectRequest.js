@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import { useEffect, useState } from "react";
 import Table from "../../extras/Table";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,13 +34,13 @@ const RejectRequest = ({ status, startDate, endDate }) => {
     }
     const acceptTable = [
         {
-            Header: "SR NO",
+            Header: col.srNo,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             )
         },
         {
-            Header: "Expert Image",
+            Header: col.expertImage,
             Cell: ({ row }) => (
                 <>
                     <img src={row?.salon?.mainImage} alt="expert" width="80" height="80" style={{ objectFit: "contain", cursor: "pointer" }} onClick={(e) => {
@@ -49,7 +50,7 @@ const RejectRequest = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: "Expert Name",
+            Header: col.expertName,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.expert?.fname + " " + row?.expert?.lname || "-"}</div>
@@ -57,7 +58,7 @@ const RejectRequest = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: `Amount (${setting?.currencySymbol})`,
+            Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.amount ? row?.amount : "-"}</div>
@@ -65,7 +66,7 @@ const RejectRequest = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: "Date",
+            Header: col.date,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.paymentDate ? row?.paymentDate : "-"}</div>

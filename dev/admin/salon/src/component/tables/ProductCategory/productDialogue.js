@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
 import ReactDropzone from "react-dropzone";
 import { useNavigate } from "react-router-dom";
@@ -162,23 +163,23 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
         let error = {};
         let isValid = true;
         if (!productCode) {
-            error.productCode = "Product code is required";
+            error.productCode = ui.dialog.productCodeRequired;
             isValid = false;
         }
         if (!productName) {
-            error.productName = "Product name is required";
+            error.productName = ui.dialog.productNameRequired;
             isValid = false;
         }
         if (!description) {
-            error.description = "Description is required";
+            error.description = ui.dialog.descriptionRequired;
             isValid = false;
         }
         if (!brand) {
-            error.brand = "Brand is required";
+            error.brand = ui.dialog.brandRequired;
             isValid = false;
         }
         if (!category) {
-            error.category = "Category is required";
+            error.category = ui.dialog.categoryRequired;
             isValid = false;
         }
         const hasAtLeastOneAttributeValue = personNames?.some(
@@ -186,27 +187,27 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
         );
 
         if (!hasAtLeastOneAttributeValue) {
-            error.personNames = "At least one attribute is required!";
+            error.personNames = ui.dialog.attributeRequired;
             isValid = false;
         }
         if (!price) {
-            error.price = "Price is required";
+            error.price = ui.dialog.priceRequired;
             isValid = false;
         }
         if (!mrp) {
-            error.mrp = "MRP is required";
+            error.mrp = ui.dialog.mrpRequired;
             isValid = false;
         }
         if (!shippingCharges) {
-            error.shippingCharges = "Shipping Charges is required";
+            error.shippingCharges = ui.dialog.shippingRequired;
             isValid = false;
         }
         if (!mainImage) {
-            error.mainImage = "Main Image is required";
+            error.mainImage = ui.dialog.mainImageRequired;
             isValid = false;
         }
         if (!image) {
-            error.images = "Image is required";
+            error.images = ui.dialog.imagesRequired;
             isValid = false;
         }
         setError(error)
@@ -282,7 +283,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                         <div className="row d-flex">
                                             <div className={`${mongoId ? "col-12" : "col-md-9"}`}>
                                                 <ExInput
-                                                    label={`Product Code (6 digit)`}
+                                                    label={ui.form.productCode}
                                                     id={`productCode`}
                                                     name="productCode"
                                                     type="number"
@@ -292,7 +293,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                                     onChange={(e) => {
                                                         setProductcode(e.target.value)
                                                         if (!e.target.value) {
-                                                            return setError({ ...error, productCode: "Product code is required" });
+                                                            return setError({ ...error, productCode: ui.dialog.productCodeRequired });
                                                         } else {
                                                             return setError({ ...error, productCode: "" });
                                                         }
@@ -331,8 +332,8 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                             id={`productName`}
                                             name={`productName`}
                                             value={productName}
-                                            label={`Product Name`}
-                                            placeholder={`Product name`}
+                                            label={ui.form.productName}
+                                            placeholder={ui.form.productName}
                                             onChange={(e) => {
                                                 setProductName(e.target.value)
                                                 setError({ ...error, productName: "" });
@@ -352,8 +353,8 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                             value={description}
                                             id={`description`}
                                             name={`description`}
-                                            label={`Description`}
-                                            placeholder={`Description`}
+                                            label={ui.form.description}
+                                            placeholder={ui.form.description}
                                             onChange={(e) => {
                                                 setDescription(e.target.value)
                                                 setError({ ...error, description: "" })
@@ -372,8 +373,8 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                             value={brand}
                                             id={`brand`}
                                             name={`brand`}
-                                            label={`Brand`}
-                                            placeholder={`brand`}
+                                            label={ui.form.brand}
+                                            placeholder={ui.form.brand}
                                             onChange={(e) => {
                                                 setBrand(e.target.value)
                                                 setError({ ...error, brand: "" })
@@ -390,9 +391,9 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                             type={`number`}
                                             id={`price`}
                                             name={`price`}
-                                            label={`Price`}
+                                            label={ui.form.price}
                                             value={price}
-                                            placeholder={`Price`}
+                                            placeholder={ui.form.price}
                                             onChange={(e) => {
                                                 setPrice(e.target.value)
 
@@ -413,8 +414,8 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                             value={mrp}
                                             id={`mrp`}
                                             name={`mrp`}
-                                            label={`Mrp`}
-                                            placeholder={`MRP`}
+                                            label={ui.form.mrp}
+                                            placeholder={ui.form.mrp}
                                             onChange={(e) => {
                                                 setMrp(e.target.value)
                                                 setError({ ...error, mrp: "" })
@@ -432,8 +433,8 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                             id={`shippingCharges`}
                                             name={`shippingCharges`}
                                             value={shippingCharges}
-                                            label={`Shipping Charges`}
-                                            placeholder={`Shipping Charges`}
+                                            label={ui.form.shippingCharges}
+                                            placeholder={ui.form.shippingCharges}
                                             onChange={(e) => {
                                                 setShippingCharges(e.target.value)
 
@@ -450,7 +451,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                     <div className="col-12">
                                         <div className="inputData text  flex-row justify-content-start text-start">
                                             <label htmlFor="categorySelect" className="false">
-                                                Select Category
+                                                {ui.dialog.selectCategory}
                                             </label>
                                         </div>
                                         <FormGroup>
@@ -462,7 +463,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                                 }}
                                                 value={category}>
                                                 <option value="" disabled>
-                                                    Select a category
+                                                    {ui.dialog.selectCategoryHint}
                                                 </option>
                                                 {productCategory?.map((list) => (
                                                     <option key={list?._id} value={list?._id}>
@@ -477,7 +478,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
 
                                     </div>
                                     <div className="col-12">
-                                        <label style={{ color: "#7E7E7E" }}>Select Attribute</label>
+                                        <label style={{ color: "#7E7E7E" }}>{ui.dialog.selectAttribute}</label>
                                     </div>
                                     {attributes?.map((data, index) => {
                                         console.log("datdtatdta", data)
@@ -576,7 +577,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
 
                                     <div className="col-12">
                                         <ExInput
-                                            label={`Main Image`}
+                                            label={ui.form.mainImage}
                                             id={`mainImage`}
                                             type={`file`}
                                             name="mainImage"
@@ -608,7 +609,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
 
                                     <div className="col-12">
                                         <label className="float-left dialog__input__title" style={{ color: "#7E7E7E" }}>
-                                            Select (Multiple) Image
+                                            {ui.dialog.selectImages}
                                         </label>
 
                                         <ReactDropzone
@@ -732,7 +733,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                 <div className="col-12 text-end m0">
                                     <Button
                                         className={`bg-gray text-light`}
-                                        text={`Cancel`}
+                                        text="Annuler"
                                         type={`button`}
                                         onClick={() => {
                                             dispatch(closeDialog())
@@ -742,7 +743,7 @@ const ProductDialogue = ({ page, rowsPerPage, statusType }) => {
                                         type={`submit`}
                                         className={` text-white m10-left`}
                                         style={{ backgroundColor: "#1ebc1e" }}
-                                        text={`Submit`}
+                                        text="Enregistrer"
                                         onClick={(e) => {
                                             handleSubmit(e)
                                         }}

@@ -10,7 +10,7 @@ import { adminProfile } from "../../redux/api";
 import { useQuery } from "@tanstack/react-query";
 import Male from "../../../src/assets/images/male.png"
 import male from "../../assets/images/male.png";
-
+import { SKEDISY_ADMIN_PORTAL_COPY as portalCopy } from "../../constants/skedisyPortalCopy";
 
 export const AdminProfile = () => {
   const dispatch = useDispatch();
@@ -68,13 +68,12 @@ export const AdminProfile = () => {
       !oldPassword
     ) {
       let error = {};
-      if (!newPassword) error.newPassword = "New password is required !";
+      if (!newPassword) error.newPassword = portalCopy.newPasswordRequired;
       if (!confirmPassword)
-        error.confirmPassword = "Confirm password Is required !";
+        error.confirmPassword = portalCopy.confirmPasswordRequired;
       if (newPassword !== confirmPassword)
-        error.confirmPassword =
-          "New password and confirm password doesn't match";
-      if (!oldPassword) error.oldPassword = "Old password is required !";
+        error.confirmPassword = portalCopy.passwordMismatch;
+      if (!oldPassword) error.oldPassword = portalCopy.oldPasswordRequired;
       return setError({ ...error });
     } else {
       let data = {
@@ -90,9 +89,9 @@ export const AdminProfile = () => {
     if ( !imagePath || ! name || !email) {
       
       let error= {}
-      if(!email) error.email = "Email is required"
-      if(!name) error.name = "Name is required"
-      if(!image || imagePath?.length < 0) error.image = "Image is required"
+      if(!email) error.email = portalCopy.emailRequired
+      if(!name) error.name = portalCopy.nameRequired
+      if(!image || imagePath?.length < 0) error.image = portalCopy.imageRequired
     } else {
       const formData = new FormData();
       formData.append("image", image);
@@ -108,7 +107,7 @@ export const AdminProfile = () => {
 
   return (
     <div className="mainAdminProfile">
-      <Title name="Admin Profile" />
+      <Title name={portalCopy.profileTitle} />
       <div className="d-lg-flex d-md-block">
         <div className="col-12 col-sm-12 col-md-12 col-lg-3 mt-4 me-4">
           <div className="card" style={{minHeight:"500px"}}>
@@ -169,7 +168,7 @@ export const AdminProfile = () => {
                   <Button
                     onClick={handleEditName}
                     className={`text-end btn bg-theme text-white ml-2`}
-                    text={`Upload Image`}
+                    text={portalCopy.uploadImage}
                   />
                 </div>
               </div>
@@ -182,7 +181,7 @@ export const AdminProfile = () => {
                     <span className="ps-2">
                       <i className="fa fa-edit p-3" style={{borderRadius : "50%" , backgroundColor : "#F3F9FA",fontSize : "18px"}} />
                     </span>
-                    <span className="ps-2 fs-18">Edit Profile</span>
+                    <span className="ps-2 fs-18">{portalCopy.editProfile}</span>
                   </li>
                   <li
                     className="mt-2 user cursor-pointer"
@@ -191,7 +190,7 @@ export const AdminProfile = () => {
                     <span className="ps-2">
                       <i className="fa fa-key p-3" style={{borderRadius : "50%" , backgroundColor : "#F3F9FA",fontSize : "18px"}} />
                     </span>
-                    <span className="ps-2 fs-18">Change Password</span>
+                    <span className="ps-2 fs-18">{portalCopy.changePassword}</span>
                   </li>
                 </ul>
               </div>
@@ -205,25 +204,25 @@ export const AdminProfile = () => {
                 {toggle ? (
                   <div className="card-body">
                     <h4 className="profile_box pb-2 my-3 text-center head-bg">
-                      Password Settings
+                      {portalCopy.passwordSettings}
                     </h4>
                     <div className="col-sm-12 col-md-12 col-lg-7 col-xl-7 col-xxl-7 mx-auto">
                       <div className="form-group mt-4 ">
                         <div className="mb-2 my-4">
                           <label className="mb-2 text-gray ml-3 font-weight-bold">
-                            Old Password
+                            {portalCopy.oldPassword}
                           </label>
                           <input
                             type="password"
                             className="form-control p-2"
-                            placeholder="Old Password"
+                            placeholder={portalCopy.oldPassword}
                             value={oldPassword}
                             onChange={(e) => {
                               setOldPassword(e.target.value);
                               if (!e.target.value) {
                                 return setError({
                                   ...error,
-                                  oldPassword: "Old password is required !",
+                                  oldPassword: portalCopy.oldPasswordRequired,
                                 });
                               } else {
                                 return setError({
@@ -243,19 +242,19 @@ export const AdminProfile = () => {
                       <div className="form-group">
                         <div className="mb-2 my-4">
                           <label className="mb-2 text-gray ml-3 font-weight-bold">
-                            New Password
+                            {portalCopy.newPassword}
                           </label>
                           <input
                             type="password"
                             className="form-control p-2"
-                            placeholder="New Password"
+                            placeholder={portalCopy.newPassword}
                             value={newPassword}
                             onChange={(e) => {
                               setNewPassword(e.target.value);
                               if (!e.target.value) {
                                 return setError({
                                   ...error,
-                                  newPassword: "New password is required !",
+                                  newPassword: portalCopy.newPasswordRequired,
                                 });
                               } else {
                                 return setError({
@@ -275,12 +274,12 @@ export const AdminProfile = () => {
                       <div className="form-group ">
                         <div className="mb-2 ">
                           <label className="mb-2 text-gray ml-3 font-weight-bold">
-                            Confirm Password
+                            {portalCopy.confirmPasswordField}
                           </label>
                           <input
                             type="password"
                             className="form-control p-2"
-                            placeholder="Confirm Password"
+                            placeholder={portalCopy.confirmPasswordField}
                             value={confirmPassword}
                             onChange={(e) => {
                               setConfirmPassword(e.target.value);
@@ -288,7 +287,7 @@ export const AdminProfile = () => {
                                 return setError({
                                   ...error,
                                   confirmPassword:
-                                    "Confirm password is required !",
+                                    portalCopy.confirmPasswordRequired,
                                 });
                               } else {
                                 return setError({
@@ -309,7 +308,7 @@ export const AdminProfile = () => {
                       <div className="d-flex justify-content-end pt-4">
                         <Button
                           onClick={handleChangePassword}
-                          text={`Submit`}
+                          text="Enregistrer"
                           className={` text-white`}
                           style={{ backgroundColor: "#1ebc1e" }}
                         />
@@ -340,7 +339,7 @@ export const AdminProfile = () => {
                               if (!e.target.value) {
                                 return setError({
                                   ...error,
-                                  name: "Name is required !",
+                                  name: portalCopy.nameRequired,
                                 });
                               } else {
                                 return setError({
@@ -373,7 +372,7 @@ export const AdminProfile = () => {
                               if (!e.target.value) {
                                 return setError({
                                   ...error,
-                                  email: "Email is required !",
+                                  email: portalCopy.emailRequired,
                                 });
                               } else {
                                 return setError({
@@ -391,7 +390,7 @@ export const AdminProfile = () => {
                       <div className="d-flex justify-content-end pt-4">
                         <Button
                           onClick={handleEditName}
-                          text={`Submit`}
+                          text="Enregistrer"
                           className={` text-white`}
                           style={{ backgroundColor: "#1ebc1e" }}
                         />

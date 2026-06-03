@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success, DangerRight } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
     tax: [],
@@ -60,7 +61,7 @@ const taxSlice = createSlice({
             
             state.tax.unshift(action.payload.tax);
             state.isLoading = false;
-            Success("Tax Added Successfully");
+            Success(ui.toast.taxAdded);
         });
 
         builder.addCase(taxAdd.rejected, (state, action) => {
@@ -81,7 +82,7 @@ const taxSlice = createSlice({
                   state.tax[taxInx] = { ...state.tax[taxInx], ...action.payload.tax };
                 }
               }
-              Success("Tax Updated Successfully");
+              Success(ui.toast.taxUpdated);
             }
             state.isLoading = false;
 
@@ -108,7 +109,7 @@ const taxSlice = createSlice({
               state.tax[taxIndex].status = updatedTax.status;
             }
             state.isLoading = false;
-            Success("Tax Status Updated Successfully");
+            Success(ui.toast.taxStatus);
 
           })
           builder.addCase(taxStatus.rejected, (state, action) => {
@@ -122,7 +123,7 @@ const taxSlice = createSlice({
           builder.addCase(taxDelete.fulfilled, (state, action) => {
               state.tax = state.tax.filter((tax) => tax._id !== action.meta.arg);
               state.isLoading = false;
-              Success("Tax  Successfully");
+              Success(ui.toast.taxGeneric);
           })
           builder.addCase(taxDelete.rejected, (state, action) => {
             

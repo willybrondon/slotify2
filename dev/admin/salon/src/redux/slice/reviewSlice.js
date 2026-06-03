@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
     review: [],
@@ -47,7 +48,7 @@ const reviewSlice = createSlice({
             if (action.payload.status) {
                 
                 state.review = state.review.filter((review) => review._id !== action.meta.arg);
-                Success("Review Deleted Successfully")
+                Success(ui.toast.reviewDeleted)
             }
             state.isLoading = false;
         })

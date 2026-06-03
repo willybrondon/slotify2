@@ -4,7 +4,7 @@ import { ExInput } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
 import { cancelBooking } from "../../../redux/slice/bookingSlice";
-
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 
 const CancelBookingDialog = () => {
   const { dialogueData } = useSelector((state) => state.dialogue);
@@ -25,7 +25,7 @@ const CancelBookingDialog = () => {
 
     e.preventDefault();
     if (!reason) {
-      setError("Reason is Required");
+      setError(ui.dialog.reasonRequired);
     } else {
       if (dialogueData) {
         const payload = {
@@ -48,7 +48,7 @@ const CancelBookingDialog = () => {
             <div className="mainDiaogBox">
               <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
-                  <h4 className="text-theme m0">Cancel Booking</h4>
+                  <h4 className="text-theme m0">{ui.dialog.cancelBooking}</h4>
                 </div>
                 <div className="col-4">
                   <div
@@ -68,13 +68,13 @@ const CancelBookingDialog = () => {
                       type={`text`}
                       id={`reason`}
                       name={`reason`}
-                      label={`Reason`}
-                      placeholder={`Reason`}
+                      label={ui.dialog.reason}
+                      placeholder={ui.dialog.reason}
                       value={reason}
                       onChange={(e) => {
                         setReason(e.target.value);
                         if (!e.target.value) {
-                          return setError("Reason is Required !");
+                          return setError(ui.dialog.reasonRequired);
                         } else {
                           setError("");
                         }
@@ -91,7 +91,7 @@ const CancelBookingDialog = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -99,7 +99,7 @@ const CancelBookingDialog = () => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                     />
                   </div>
                 </div>

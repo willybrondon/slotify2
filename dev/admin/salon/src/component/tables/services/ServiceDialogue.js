@@ -4,6 +4,7 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
@@ -47,7 +48,7 @@ const ServiceDialogue = (props) => {
       if (!price) {
         let error = {};
 
-        if (!price) error.price = "Price is Required";
+        if (!price) error.price = ui.dialog.priceRequired;
 
         return setError({ ...error });
       } else {
@@ -106,13 +107,13 @@ const ServiceDialogue = (props) => {
                       className="rounded-2"
                       id="price"
                       value={price}
-                      placeholder="Enter Price"
+                      placeholder={ui.dialog.enterPrice}
                       onChange={(e) => {
                         setPrice(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            price: ` Price is required`,
+                            price: ui.dialog.priceRequired,
                           });
                         } else {
                           return setError({
@@ -134,7 +135,7 @@ const ServiceDialogue = (props) => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -142,7 +143,7 @@ const ServiceDialogue = (props) => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                       onClick={(e) => handleSubmit(e)}
                     />
                   </div>

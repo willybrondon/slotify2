@@ -2,6 +2,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   time: [],
@@ -82,7 +83,7 @@ const timeSlice = createSlice({
     builder.addCase(updateSalonTime.fulfilled, (state, action) => {
       if (action.payload.status) {
         state.time = action.payload.salonTime;
-        Success("Updated Successfully");
+        Success(ui.toast.updated);
       }
       state.isLoading = false;
     });
@@ -109,7 +110,7 @@ const timeSlice = createSlice({
             ...action.payload.salonTime,
           };
         }
-        Success("Updated Successfully");
+        Success(ui.toast.updated);
       }
       state.isLoading = false;
     });
@@ -130,7 +131,7 @@ const timeSlice = createSlice({
         if (salonIndx !== -1) {
           state.time[salonIndx].isBreak = activeSalonIndx.isBreak;
         }
-        Success("Salon Break Time Updated Successfully");
+        Success(ui.toast.breakUpdated);
       }
       state.isLoading = false;
     });

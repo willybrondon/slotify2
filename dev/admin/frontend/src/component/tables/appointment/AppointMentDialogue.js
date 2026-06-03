@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { getAllSalons } from "../../../redux/slice/salonSlice";
 import { getAllExpert } from "../../../redux/slice/expertSlice";
 import { allUsers, getUser } from "../../../redux/slice/userSlice";
@@ -88,13 +89,13 @@ const AppointMentDialogue = () => {
       >
         <div className="offcanvas-header">
           <h5 className="offcanvas-title" id="offcanvasRightLabel">
-            New Appointment
+            {ui.appointment.title}
           </h5>
           <button
             type="button"
             className="btn-close"
             data-bs-dismiss="offcanvas"
-            aria-label="Close"
+            aria-label={ui.appointment.close}
             onClick={() => {
               dispatch(closeDialog());
             }}
@@ -107,20 +108,20 @@ const AppointMentDialogue = () => {
               className="col-6 mb-0 text-center"
               style={{ borderRight: "1px solid gray", padding: "15px 0px" }}
             >
-              <span className=" fw-bold">On {new Date().toDateString()}</span>
+              <span className=" fw-bold">{ui.appointment.onDatePrefix} {new Date().toLocaleDateString("fr-FR")}</span>
             </div>
             <div
               className="col-6 mb-0 text-center fw-bold"
               style={{ padding: "15px 0px" }}
             >
-              <span className="">At --:--</span>
+              <span className="">{ui.appointment.atTime} --:--</span>
             </div>
           </div>
           <div className="row">
             <div className="col-12">
               <div className="inputData">
                 <label className="  " htmlFor="category">
-                  Salon
+                  {ui.appointment.salon}
                 </label>
                 <select
                   name="salon"
@@ -139,7 +140,7 @@ const AppointMentDialogue = () => {
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        salon: "salon is Required !",
+                        salon: ui.appointment.salonRequired,
                       });
                     } else {
                       setError({
@@ -157,7 +158,7 @@ const AppointMentDialogue = () => {
                   }}
                 >
                   <option value="" disabled selected>
-                    --select Salon--
+                    {ui.appointment.selectSalon}
                   </option>
                   {salon.map((data) => {
                     return <option value={data._id}>{data.name}</option>;
@@ -173,7 +174,7 @@ const AppointMentDialogue = () => {
             <div className="col-12">
               <div className="inputData">
                 <label className="  " htmlFor="category">
-                  Expert
+                  {ui.appointment.expert}
                 </label>
                 <select
                   name="expert"
@@ -186,7 +187,7 @@ const AppointMentDialogue = () => {
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        expert: "expert is Required !",
+                        expert: ui.appointment.expertRequired,
                       });
                     } else {
                       setError({
@@ -204,7 +205,7 @@ const AppointMentDialogue = () => {
                   }}
                 >
                   <option value="" disabled selected>
-                    --select Expert--
+                    {ui.appointment.selectExpert}
                   </option>
                   {expert.map((data) => {
                     return (
@@ -227,7 +228,7 @@ const AppointMentDialogue = () => {
               <div className="row mt-2">
                 <div className="col-6">
                   <div className="inputData">
-                    <label className="me-4">Choose Start Date</label>
+                    <label className="me-4">{ui.appointment.chooseDate}</label>
                   </div>
                   <ReactDatePicker
                     selected={date}
@@ -243,7 +244,7 @@ const AppointMentDialogue = () => {
                 </div>
                 <div className="col-6">
                   <div className="inputData">
-                    <label className="me-4">Choose Start Time</label>
+                    <label className="me-4">{ui.appointment.chooseTime}</label>
                   </div>
                   <ReactDatePicker
                     selected={startTime}
@@ -266,7 +267,7 @@ const AppointMentDialogue = () => {
                 >
                   <div className="inputData">
                     <label className="  " htmlFor="user">
-                      Customer
+                      {ui.appointment.customer}
                     </label>
                     <select
                       name="user"
@@ -280,7 +281,7 @@ const AppointMentDialogue = () => {
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            user: "user is Required !",
+                            user: ui.appointment.customerRequired,
                           });
                         } else {
                           setError({
@@ -291,7 +292,7 @@ const AppointMentDialogue = () => {
                       }}
                     >
                       <option value="" disabled selected>
-                        --select User--
+                        {ui.appointment.selectCustomer}
                       </option>
                       {user?.map((data) => {
                         return (
@@ -327,7 +328,7 @@ const AppointMentDialogue = () => {
                             {userProfile?.fname + " " + userProfile?.lname}
                           </p>
                           <div style={{ fontSize: "13px" }}>
-                            Client since{" "}
+                            {ui.appointment.clientSince}{" "}
                             {dayjs(userProfile?.createdAt).format(
                               "DD MMM YYYY"
                             )}
@@ -360,13 +361,13 @@ const AppointMentDialogue = () => {
                     <div className="mt-3">
                       <ul>
                         <li style={{ fontSize: "15px" }}>
-                          <span>Email </span> :-{" "}
+                          <span>{ui.appointment.email} </span> :-{" "}
                           <span className="fw-bold">
                             {userProfile?.email ? userProfile?.email : "-"}
                           </span>
                         </li>
                         <li style={{ fontSize: "15px" }}>
-                          <span> UniqueId</span> :-{" "}
+                          <span> {ui.appointment.uniqueId}</span> :-{" "}
                           <span className="fw-bold">
                             {" "}
                             {userProfile?.uniqueId

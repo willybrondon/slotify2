@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import Analytics from "../extras/Analytics";
-import moment from "moment";
 import withDrawBanner from "../../../src/assets/images/withDraw.png";
 import Button from "../extras/Button";
 import Title from "../extras/Title";
@@ -9,7 +7,14 @@ import { addWithDrawMethod, getWithDrawMethod } from "../../redux/slice/withDraw
 import { toast } from "react-toastify";
 import { getCurrency } from "../../redux/slice/settingSlice";
 import { useNavigate } from "react-router-dom";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
+import {
+  translateApiMessage,
+  translatePaymentDetail,
+  translatePaymentMethod,
+} from "../../constants/skedisyApiMessage";
 
+const w = ui.withdraw;
 
 const WithDrawMoney = () => {
     const { withDraw } = useSelector((state) => state.withDraw);
@@ -74,7 +79,7 @@ const WithDrawMoney = () => {
         }
 
         if (paymentDetails.length === 0) {
-            toast.error("Please select at least one payment detail.");
+            toast.error(w.selectPaymentDetail);
             return;
         }
 
@@ -95,10 +100,10 @@ const WithDrawMoney = () => {
             .then((res) => {
                 if (res?.payload?.status) {
                     dispatch(getWithDrawMethod());
-                    toast.success(res?.payload?.message);
+                    toast.success(translateApiMessage(res?.payload?.message));
                     navigate("/salonpanel/salonDashboard")
                 } else {
-                    toast.error(res?.payload?.message);
+                    toast.error(translateApiMessage(res?.payload?.message));
                 }
             });
     };
@@ -107,22 +112,20 @@ const WithDrawMoney = () => {
     return (
         <>
             <div className="mainExpert">
-                <Title name="Withdraw Money" />
+                <Title name={w.title} />
 
                 <div className="row">
                     <div className="col-md-6" style={{ position: "relative" }}>
-                        {/* Text positioned on top of the image */}
                         <div style={{ position: "absolute", top: "5%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "17px", zIndex: 2, fontWeight: "bold" }}>
-                            My Available Balance
+                            {w.balanceLabel}
                         </div>
                         <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>{currency?.currencySymbol} {admin?.earning}</div>
 
-                        {/* Image */}
-                        <img src={withDrawBanner} alt="Withdraw Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
+                        <img src={withDrawBanner} alt={w.bannerAlt} height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
 
                         <div className="inputData">
                             <label className="styleForTitle mt-2" htmlFor="withdrawAmount">
-                                Enter Withdraw Amount
+                                {w.amountLabel}
                             </label>
                             <div className="input-group mt-2" style={{ position: "relative", display: "flex", alignItems: "center" }}>
                                 <span className="input-group-text fw-bold" style={{ position: "relative", display: "flex", alignItems: "center", background: "#1C2B20", color: "white" }}>{currency?.currencySymbol} </span>
@@ -136,7 +139,7 @@ const WithDrawMoney = () => {
                                         borderTopLeftRadius: "0",
                                         borderBottomLeftRadius: "0",
                                     }}
-                                    placeholder="Enter amount"
+                                    placeholder={w.amountPlaceholder}
                                     onChange={(e) => {
                                         const value = parseFloat(e.target.value);
                                         if (value < currency?.minWithdrawalRequestedAmount) {
@@ -151,11 +154,11 @@ const WithDrawMoney = () => {
                         </div>
                         {amountError && (
                             <label className="d-flex justify-content-end mt-1" style={{ color: "red", fontSize: "15px" }}>
-                                *Amount should be greater than or equal to ${currency?.minWithdrawalRequestedAmount}
+                                *{w.amountMinError} {currency?.currencySymbol}{currency?.minWithdrawalRequestedAmount}
                             </label>
                         )}
                         <label className="d-flex justify-content-end mt-1" style={{ color: "red", fontSize: "15px" }}>
-                            *Maximum Withdraw amount is {currency?.currencySymbol}{currency?.minWithdrawalRequestedAmount}
+                            *{w.amountMaxNote} {currency?.currencySymbol}{currency?.minWithdrawalRequestedAmount}
                         </label>
 
 
@@ -163,11 +166,10 @@ const WithDrawMoney = () => {
                         <div className="row mt-4">
                             <div className="inputData mt-4 col-md-11">
                                 <label className="styleForTitle fw-bold" style={{ color: "#1C2B20", fontSize: "24px" }}>
-                                    Withdraw Instruction :
+                                    {w.instructionsTitle}
                                 </label>
                                 <div style={{ fontSize: "14px", lineHeight: "25px", color: "#A5A5A5" }}>
-                                    <div>To initiate a withdrawal, please enter the desired amount in the withdrawal field. Ensure that the amount meets or exceeds the minimum withdrawal limit of $[Insert Minimum Amount]. Once the request is submitted, it will be processed within [Insert Time Frame], and funds will be transferred to your registered account. Please verify that your account details are up-to-date to avoid any delays. If you encounter any issues during the process, feel free to contact our support team for assistance.</div>
-                                    <div style={{ wordWrap: "break-word" }}>To withdraw funds, enter the amount you wish to withdraw, ensuring it meets the minimum withdrawal limit of $[Insert Minimum Amount]. Verify that your account details are correct to avoid delays. Once submitted, your request will be processed within [Insert Time Frame], and any applicable fees may be deducted. If you encounter any issues or delays, please contact our support team for assistance.</div>
+                                    <div>{w.instructions}</div>
                                 </div>
                             </div>
                         </div>
@@ -179,7 +181,7 @@ const WithDrawMoney = () => {
 
                         <div className="inputData mt-2">
                             <label className="styleForTitle" htmlFor="paymentType">
-                                Select Payment Option
+                                {w.paymentOption}
                             </label>
                             <select
                                 name="paymentType"
@@ -190,19 +192,18 @@ const WithDrawMoney = () => {
                             >
                                 {withDraw?.map((data) => (
                                     <option key={data._id} value={data.name}>
-                                        {data.name}
+                                        {translatePaymentMethod(data.name)}
                                     </option>
                                 ))}
                             </select>
 
-                            {/* Display dynamic input fields based on selected payment details */}
                             {selectedDetails?.map((detail, index) => (
                                 <div className="inputData mt-4" key={index}>
-                                    <label className="styleForTitle">Enter Your {detail}</label>
+                                    <label className="styleForTitle">{w.paymentField} {translatePaymentDetail(detail)}</label>
                                     <input
                                         type="text"
                                         className="rounded-2 fw-bold p-4"
-                                        placeholder={`Enter your ${detail.toLowerCase()}`}
+                                        placeholder={`${w.paymentFieldPlaceholder} ${translatePaymentDetail(detail).toLowerCase()}`}
                                         onChange={(e) => handleDetailChange(detail, e.target.value)}
                                     />
                                 </div>
@@ -214,7 +215,7 @@ const WithDrawMoney = () => {
                                     type={`submit`}
                                     className={`text-white m10-left`}
                                     style={{ backgroundColor: "#1ebc1e" }}
-                                    text={`Submit`}
+                                    text={w.submit}
                                     onClick={handleSubmit}
                                 />
                             </div>

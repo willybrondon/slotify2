@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import Table from "../../extras/Table";
@@ -66,13 +67,13 @@ export const Review = () => {
 
   const reviewTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "User",
+      Header: col.user,
       Cell: ({ row }) => (
         <div>
           <img
@@ -85,7 +86,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "Review",
+      Header: col.review,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.review ? row?.review : "-"}
@@ -93,7 +94,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "Rating",
+      Header: col.rating,
       Cell: ({ row }) => (
         <>
           <Rating
@@ -106,7 +107,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "User",
+      Header: col.user,
       Cell: ({ row }) => (
         <span className="text-capitalize cursor fw-bold">
           {row?.userFname + " " + row?.userLname}
@@ -114,7 +115,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "BookingId",
+      Header: col.bookingId,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.bookingIds ? row?.bookingIds : "-"}
@@ -122,7 +123,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "Expert",
+      Header: col.expert,
       Cell: ({ row }) => (
         <span className="text-capitalize cursor fw-bold">
           {row?.expertFname + " " + row?.expertLname}
@@ -130,7 +131,7 @@ export const Review = () => {
       ),
     },
     {
-      Header: "Created At",
+      Header: col.createdAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.createdAt?.split("T")[0]}</span>
       ),
@@ -139,7 +140,7 @@ export const Review = () => {
 
   return (
     <div className="mainExpert">
-      <Title name="Reviews" />
+      <Title name="Avis" />
       <div>
         <Table
           data={data}

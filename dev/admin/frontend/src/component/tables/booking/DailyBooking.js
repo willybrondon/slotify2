@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-undef */
@@ -80,29 +82,29 @@ const DailyBooking = () => {
   });
   const bookingTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       Cell: ({ row }) => <span className="text-capitalize">{row?.date}</span>,
     },
     {
-      Header: "No. Booking",
+      Header: col.noBooking,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.totalBookings}</span>
       ),
     },
     {
-      Header: "No. Experts",
+      Header: col.noExperts,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.experts}</span>
       ),
     },
     {
-      Header: "Services Amount +",
+      Header: col.servicesAmountPlus,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.totalWithoutTax ? row?.totalWithoutTax?.toFixed(2) + " " + setting?.currencySymbol : "-"}
@@ -110,7 +112,7 @@ const DailyBooking = () => {
       ),
     },
     {
-      Header: "Admin Earning +",
+      Header: col.adminEarningPlus,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.platFormFee ? row?.platFormFee?.toFixed(2) + " " + setting?.currencySymbol : "-"}
@@ -118,7 +120,7 @@ const DailyBooking = () => {
       ),
     },
     {
-      Header: "Expert Earning +",
+      Header: col.expertEarningPlus,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.expertEarning ? row?.expertEarning?.toFixed(2) + " " + setting?.currencySymbol : "-"}
@@ -126,7 +128,7 @@ const DailyBooking = () => {
       ),
     },
     {
-      Header: "Salon Earning +",
+      Header: col.salonEarningPlus,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.salonCommission ? row?.salonCommission?.toFixed(2) + " " + setting?.currencySymbol : "-"}
@@ -134,7 +136,7 @@ const DailyBooking = () => {
       ),
     },
     {
-      Header: "Tax =",
+      Header: col.taxEquals,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.totalTax ? row?.totalTax?.toFixed(2) + " " + setting?.currencySymbol : "-"}
@@ -143,7 +145,7 @@ const DailyBooking = () => {
     },
 
     {
-      Header: "Total revenue",
+      Header: col.totalRevenue,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.totalAmount ? row?.totalAmount?.toFixed(2) + " " + setting?.currencySymbol : "-"}
@@ -158,7 +160,7 @@ const DailyBooking = () => {
       <div className="row ">
         <div className="mt-2 col-md-9">
           <div className=" inputData col-lg-2 col-md-4 me-3">
-            <label>Select date</label>
+            <label>{ui.labels.selectDate}</label>
           </div>
           <Analytics
             analyticsStartDate={startDate}

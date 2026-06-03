@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -71,13 +73,13 @@ const Service = () => {
 
   const serviceTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -92,24 +94,24 @@ const Service = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.name}</span>
       ),
     },
     {
-      Header: "Category",
+      Header: col.category,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.categoryname}</span>
       ),
     },
 
     {
-      Header: "Duration",
+      Header: col.duration,
       Cell: ({ row }) => <span>{row?.duration + " min"}</span>,
     },
     {
-      Header: "Status",
+      Header: col.status,
       Cell: ({ row }) => (
         <ToggleSwitch
           value={row?.status}
@@ -118,7 +120,7 @@ const Service = () => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span>
           <button
@@ -160,7 +162,7 @@ const Service = () => {
 
   return (
     <div className="mainCategory">
-      <Title name="Services" />
+      <Title name={ui.pages.services} />
       <div className="row">
         <div className="col-3">
           <Button

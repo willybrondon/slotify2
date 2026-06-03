@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { ExInput } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,10 +40,10 @@ const BannerDialog = () => {
 
     if (!date || !salonId || !endDate || !reason) {
       let error = {};
-      if (!date) error.date = "Date is required";
-      if (!salonId) error.salonId = "Salon is required";
-      if (!endDate) error.endDate = "End date is required";
-      if (!reason) error.reason = "Reason is required";
+      if (!date) error.date = ui.dialog.dateRequired;
+      if (!salonId) error.salonId = ui.dialog.salonRequired;
+      if (!endDate) error.endDate = ui.dialog.endDateRequired;
+      if (!reason) error.reason = ui.dialog.reasonRequired;
       return setError({ ...error });
     } else {
       const hDate = moment(date, "YYYY-MM-DD").format("YYYY-MM-DD");
@@ -92,7 +93,7 @@ const BannerDialog = () => {
                 <div className="col-12">
                   <div className="inputData text  flex-row justify-content-start text-start">
                     <label for="fname" className="false text-capitalize">
-                      Select Salon
+                      {ui.dialog.selectSalon}
                     </label>
                     <select
                       name="bookingType"
@@ -105,7 +106,7 @@ const BannerDialog = () => {
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            salonId: `Salon is required`,
+                            salonId: ui.dialog.salonRequired,
                           });
                         } else {
                           return setError({
@@ -116,7 +117,7 @@ const BannerDialog = () => {
                       }}
                     >
                       <option selected disabled>
-                        Select Salon
+                        {ui.dialog.selectSalon}
                       </option>
                       {salon.map((data) => (
                         <option key={data?._id} value={data?._id}>
@@ -165,7 +166,7 @@ const BannerDialog = () => {
                 </div>
                 <div className="col-12">
                   <ExInput
-                    label={`Reason`}
+                    label={ui.dialog.reason}
                     id={`reason`}
                     type={`text`}
                     errorMessage={error.reason && error.reason}
@@ -174,7 +175,7 @@ const BannerDialog = () => {
                       if (!e.target.value) {
                         return setError({
                           ...error,
-                          reason: `Reason is required`,
+                          reason: ui.dialog.reasonRequired,
                         });
                       } else {
                         return setError({
@@ -190,7 +191,7 @@ const BannerDialog = () => {
                 <div className="col-12 text-end m0">
                   <Button
                     className={`bg-gray text-light`}
-                    text={`Cancel`}
+                    text="Annuler"
                     type={`button`}
                     onClick={() => dispatch(closeDialog())}
                   />
@@ -198,7 +199,7 @@ const BannerDialog = () => {
                     type={`submit`}
                     className={` text-white m10-left`}
                     style={{ backgroundColor: "#1ebc1e" }}
-                    text={`Submit`}
+                    text="Enregistrer"
                     onClick={(e) => handleSubmit(e)}
                   />
                 </div>

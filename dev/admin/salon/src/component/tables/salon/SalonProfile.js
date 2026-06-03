@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import React, { useEffect, useState } from "react";
 import { ExInput, Textarea } from "../../extras/Input";
 import Title from "../../extras/Title";
@@ -87,11 +89,11 @@ const SalonProfile = () => {
 
   const reviewTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{index + 1}</span>,
     },
     {
-      Header: "Rating",
+      Header: col.rating,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold cursor">
           <Rating
@@ -105,11 +107,11 @@ const SalonProfile = () => {
       ),
     },
     {
-      Header: "Review",
+      Header: col.review,
       Cell: ({ row }) => <span>{row?.review ? row?.review : "-"}</span>,
     },
     {
-      Header: "CreatedAt",
+      Header: col.createdAt,
       body: "createdAt",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -120,7 +122,7 @@ const SalonProfile = () => {
     },
 
     {
-      Header: "Delete",
+      Header: col.delete,
       Cell: ({ row }) => (
         <span>
           <button
@@ -136,11 +138,11 @@ const SalonProfile = () => {
   ];
   const serviceTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{index + 1}</span>,
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -154,18 +156,18 @@ const SalonProfile = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.id?.name}</span>
       ),
     },
     {
-      Header: `Price ( ${setting?.currencySymbol} )`,
+      Header: `${col.price} (${setting?.currencySymbol})`,
       Cell: ({ row }) => <span className="text-capitalize">{row?.price}</span>,
     },
 
     {
-      Header: "Duration",
+      Header: col.duration,
       Cell: ({ row }) => <span>{row?.id?.duration + " min"}</span>,
     },
   ];
@@ -198,14 +200,14 @@ const SalonProfile = () => {
 
   const productTableData = [
     {
-      Header: "No",
+      Header: col.no,
       width: "20px",
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       )
     },
     {
-      Header: "Product",
+      Header: col.product,
       body: "image",
       Cell: ({ row }) => (
         <div className="d-flex ">
@@ -223,30 +225,30 @@ const SalonProfile = () => {
       ),
     },
 
-    { Header: "Product Code", body: "productCode" },
+    { Header: col.productCode, body: "productCode" },
 
     {
-      Header: "Price",
+      Header: col.price,
       body: "price",
       Cell: ({ row }) => (
         <span className="fw-bold text-dark">${row.price}</span>
       ),
     },
     {
-      Header: "Shipping Charges",
+      Header: col.shipping,
       body: "shippingCharges",
       Cell: ({ row }) => <span>${row.shippingCharges}</span>,
     },
 
     {
-      Header: "CreatedDate",
+      Header: col.createdAt,
       body: "createdAt",
       Cell: ({ row }) => (
         <span>{dayjs(row.createdAt).format("DD MMM YYYY")}</span>
       ),
     },
     {
-      Header: "Create Status",
+      Header: col.createStatus,
       body: "status",
       Cell: ({ row }) => (
         <div className="boxCenter">
@@ -332,8 +334,8 @@ const SalonProfile = () => {
                       id={`salonName`}
                       name={`salonName`}
                       value={salonDetail?.name}
-                      label={`Salon name`}
-                      placeholder={`salonName`}
+                      label={ui.form.salonName}
+                      placeholder={ui.form.salonName}
                       readOnly
                     />
                   )}
@@ -361,8 +363,8 @@ const SalonProfile = () => {
                       id={`email`}
                       name={`email`}
                       value={salonDetail?.email}
-                      label={`Email`}
-                      placeholder={`email`}
+                      label={ui.form.email}
+                      placeholder={ui.form.email}
                       readOnly
                     />
                   )}
@@ -392,8 +394,8 @@ const SalonProfile = () => {
                       value={
                         salonDetail?.platformFee ? salonDetail?.platformFee : ""
                       }
-                      label={`Plateform fee (%)`}
-                      placeholder={`Plat form Fee`}
+                      label={ui.form.platformFeePct}
+                      placeholder={ui.form.platformFeeTypo}
                       readOnly
                     />
                   )}
@@ -422,8 +424,8 @@ const SalonProfile = () => {
                       id={`mobileNumber`}
                       name={`mobileNumber`}
                       value={salonDetail?.mobile}
-                      label={`Mobile number`}
-                      placeholder={`mobileNumber`}
+                      label={ui.form.mobileNumber}
+                      placeholder={ui.form.mobileNumber}
                       readOnly
                     />
                   )}
@@ -451,8 +453,8 @@ const SalonProfile = () => {
                       id={`city`}
                       name={`city`}
                       value={salonDetail?.password}
-                      label={`Password`}
-                      placeholder={`city`}
+                      label={ui.form.password}
+                      placeholder={ui.form.city}
                       readOnly
                     />
                   )}
@@ -575,8 +577,8 @@ const SalonProfile = () => {
                       id={`latitude`}
                       name={`latitude`}
                       value={salonDetail?.locationCoordinates?.latitude}
-                      label={`Latitude`}
-                      placeholder={`latitude`}
+                      label={ui.form.latitude}
+                      placeholder={ui.form.latitude}
                       readOnly
                     />
                   )}
@@ -604,8 +606,8 @@ const SalonProfile = () => {
                       id={`latitude`}
                       name={`latitude`}
                       value={salonDetail?.locationCoordinates?.longitude}
-                      label={`Longitude`}
-                      placeholder={`latitude`}
+                      label={ui.form.longitude}
+                      placeholder={ui.form.latitude}
                       readOnly
                     />
                   )}
@@ -640,8 +642,8 @@ const SalonProfile = () => {
                     id={`address`}
                     name={`address`}
                     value={salonDetail?.addressDetails?.addressLine1}
-                    label={`Address`}
-                    placeholder={`address`}
+                    label={ui.form.address}
+                    placeholder={ui.form.address}
                     readOnly
                   />
                 )}
@@ -669,8 +671,8 @@ const SalonProfile = () => {
                     id={`landmark`}
                     name={`landmark`}
                     value={salonDetail?.addressDetails?.landMark}
-                    label={`LandMark`}
-                    placeholder={`landmark`}
+                    label={ui.form.landMark}
+                    placeholder={ui.form.landmark}
                     readOnly
                   />
                 )}
@@ -698,8 +700,8 @@ const SalonProfile = () => {
                     id={`city`}
                     name={`city`}
                     value={salonDetail?.addressDetails?.city}
-                    label={`City`}
-                    placeholder={`city`}
+                    label={ui.form.city}
+                    placeholder={ui.form.city}
                     readOnly
                   />
                 )}
@@ -727,8 +729,8 @@ const SalonProfile = () => {
                     id={`state`}
                     name={`state`}
                     value={salonDetail?.addressDetails?.state}
-                    label={`State`}
-                    placeholder={`state`}
+                    label={ui.form.state}
+                    placeholder={ui.form.state}
                     readOnly
                   />
                 )}
@@ -756,8 +758,8 @@ const SalonProfile = () => {
                     id={`country`}
                     name={`country`}
                     value={salonDetail?.addressDetails?.country}
-                    label={`Country`}
-                    placeholder={`country`}
+                    label={ui.form.country}
+                    placeholder={ui.form.country}
                     readOnly
                   />
                 )}

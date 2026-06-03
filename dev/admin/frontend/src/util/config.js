@@ -1,3 +1,3 @@
 export const baseURL = "";
 export const secretKey = "";
-export const projectName = "";
+export const projectName = "Skedisy";

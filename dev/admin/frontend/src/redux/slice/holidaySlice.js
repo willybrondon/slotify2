@@ -2,6 +2,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   isLoading: false,
@@ -69,7 +70,7 @@ const holidaySlice = createSlice({
         
         state.holiday.unshift(...action.payload.data);
         state.total += 1;
-        Success("Holiday Added Successfully")
+        Success(ui.toast.holidayAdded)
       }else{
         
         DangerRight(action?.payload?.message)
@@ -89,7 +90,7 @@ const holidaySlice = createSlice({
         if (action?.payload?.status) {
           state.holiday = state.holiday.filter((holiday) => holiday?._id !== action.meta.arg);
           state.total -= 1;
-          Success("Holiday Delete Successfully")
+          Success(ui.toast.holidayDeleted)
         }
         state.isLoading = false;
 

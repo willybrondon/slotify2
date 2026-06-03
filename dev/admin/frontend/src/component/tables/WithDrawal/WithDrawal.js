@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import Analytics from "../../extras/Analytics"
 import Title from "../../extras/Title";
 import PendingSalonReq from "./PendingSalonReq";
@@ -30,7 +31,7 @@ const WithDrawal = () => {
     return (
         <div className="mainSetting">
             <div className="row">
-                <Title name="Salon Withdrawal Request" className="mt-4" />
+                <Title name={ui.labels.salonWithdrawRequest} className="mt-4" />
             </div>
             <div className="d-flex justify-content-between">
                 <div
@@ -80,7 +81,7 @@ const WithDrawal = () => {
                 <Analytics
                     analyticsStartDate={startDate}
                     analyticsStartEnd={endDate}
-                    placeholder="Wallet"
+                    placeholder={ui.form.wallet}
                     analyticsStartDateSet={setStartDate}
                     analyticsStartEndSet={setEndDate}
                 />

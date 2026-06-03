@@ -57,11 +57,11 @@ const handleErrors = async (response) => {
   if (!response.ok) {
     const data = await response.json();
     if (data.message instanceof Array) {
-      data.message.forEach((msg) => DangerRight("error", msg));
+      data.message.forEach((msg) => DangerRight(msg));
     } else if (data.message) {
-      DangerRight("error", data.message);
+      DangerRight(data.message);
     } else {
-      DangerRight("error", "Unexpected error occurred.");
+      DangerRight("Unexpected error occurred.");
     }
 
     return Promise.reject(data);

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useDispatch, useSelector } from "react-redux";
 import { ExInput } from "../../extras/Input";
 import Button from "../../extras/Button";
@@ -43,8 +44,8 @@ const CancleDetails = () => {
                       type={`text`}
                       id={`reason`}
                       name={`reason`}
-                      label={`Reason`}
-                      placeholder={`Reason`}
+                      label={ui.dialog.reason}
+                      placeholder={ui.dialog.reason}
                       value={mongoId?.cancel?.reason}
                       disabled={true}
                     />
@@ -54,8 +55,8 @@ const CancleDetails = () => {
                       type={`text`}
                       id={`Date`}
                       name={`Date`}
-                      label={`Date`}
-                      placeholder={`Date`}
+                      label={ui.form.date}
+                      placeholder={ui.form.date}
                       value={mongoId?.cancel?.date}
                       disabled={true}
                     />
@@ -65,8 +66,8 @@ const CancleDetails = () => {
                       type={`text`}
                       id={`Time`}
                       name={`Time`}
-                      label={`Time`}
-                      placeholder={`Time`}
+                      label={ui.form.time}
+                      placeholder={ui.form.time}
                       value={mongoId?.cancel?.time}
                       disabled={true}
                     />
@@ -76,7 +77,7 @@ const CancleDetails = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />

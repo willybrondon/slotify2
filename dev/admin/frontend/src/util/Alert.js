@@ -1,10 +1,10 @@
 import Swal from "sweetalert2";
-import { DangerRight } from "../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../constants/skedisyUiCopy";
 
 export const warning = (confirm) => {
   return Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
+    title: ui.alert.title,
+    text: ui.alert.text,
     iconHtml: '<i className="ri-alert-line"></i>',
     showCancelButton: true,
     confirmButtonText: confirm,
@@ -17,8 +17,7 @@ export const warning = (confirm) => {
 };
 export const AcceptWarning = (confirm) => {
   return Swal.fire({
-    // title: "Are you sure?",
-    text: "Would you like to approve the withdrawal request?",
+    text: ui.alert.approveWithdraw,
     iconHtml: '<i className="ri-alert-line"></i>',
     showCancelButton: true,
     confirmButtonText: confirm,
@@ -31,8 +30,7 @@ export const AcceptWarning = (confirm) => {
 };
 export const AcceptProductWarning = (confirm) => {
   return Swal.fire({
-    // title: "Are you sure?",
-    text: "Would you like to approve the product request?",
+    text: ui.alert.approveProduct,
     iconHtml: '<i className="ri-alert-line"></i>',
     showCancelButton: true,
     confirmButtonText: confirm,
@@ -45,8 +43,7 @@ export const AcceptProductWarning = (confirm) => {
 };
 export const RejectWarning = (confirm) => {
   return Swal.fire({
-    // title: "Are you sure?",
-    text: "Would you like to reject the withdrawal request?",
+    text: ui.alert.rejectRequest,
     iconHtml: '<i className="ri-alert-line"></i>',
     showCancelButton: true,
     confirmButtonText: confirm,
@@ -59,8 +56,7 @@ export const RejectWarning = (confirm) => {
 };
 export const RejectProductWarning = (confirm) => {
   return Swal.fire({
-    // title: "Are you sure?",
-    text: "Would you like to reject the withdrawal request?",
+    text: ui.alert.rejectRequest,
     iconHtml: '<i className="ri-alert-line"></i>',
     showCancelButton: true,
     confirmButtonText: confirm,
@@ -71,4 +67,3 @@ export const RejectProductWarning = (confirm) => {
     buttonsStyling: false,
   });
 };
-

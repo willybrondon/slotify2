@@ -4,6 +4,7 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
@@ -41,9 +42,9 @@ const ProductCategoryDialogue = () => {
 
     if (!name || !image || !imagePath) {
       let error = {};
-      if (!name) error.name = "Name is Required";
-      if (!image?.length === 0 || !imagePath) error.image = "Image is Required";
-      if (!imagePath) error.imagePath = "Image Path is Required";
+      if (!name) error.name = ui.dialog.nameRequiredBang;
+      if (!image?.length === 0 || !imagePath) error.image = ui.dialog.imageRequiredCategory;
+      if (!imagePath) error.imagePath = ui.dialog.imagePathRequired;
       return setError({ ...error });
     }
     const formData = new FormData();
@@ -82,7 +83,7 @@ const ProductCategoryDialogue = () => {
     if (!e.target.files) {
       setError((prevErrors) => ({
         ...prevErrors,
-        image: "Image is Required",
+        image: ui.dialog.imageRequiredCategory,
       }));
     }
     setImage(e.target.files[0]);
@@ -101,7 +102,7 @@ const ProductCategoryDialogue = () => {
             <div className="mainDiaogBox">
               <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
-                  <h2 className="text-theme m0">Product Category dialog</h2>
+                  <h2 className="text-theme m0">{ui.labels.productCategoryDialog}</h2>
                 </div>
                 <div className="col-4">
                   <div
@@ -128,13 +129,13 @@ const ProductCategoryDialogue = () => {
                     className="rounded-2"
                     id="name"
                     value={name}
-                    placeholder="Enter Name"
+                    placeholder={ui.dialog.enterName}
                     onChange={(e) => {
                       setName(e.target.value);
                       if (!e.target.value) {
                         return setError({
                           ...error,
-                          name: ` Name is required`,
+                          name: ui.dialog.nameRequiredBang,
                         });
                       } else {
                         return setError({
@@ -191,7 +192,7 @@ const ProductCategoryDialogue = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -199,7 +200,7 @@ const ProductCategoryDialogue = () => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                       onClick={(e) => handleSubmit(e)}
                     />
                   </div>

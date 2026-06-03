@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 import Button from "../extras/Button";
 import Input from "../extras/Input";
 import { useEffect, useState } from "react";
@@ -73,11 +74,11 @@ const WithDrawDialogue = ({ page, rowsPerPage }) => {
         let isValid = true;
 
         if (!name) {
-            errors.name = "Name is required!";
+            errors.name = ui.dialog.nameRequiredBang;
             isValid = false;
         }
         if (!image || image?.length === 0) {
-            errors.image = "Image is required!";
+            errors.image = ui.dialog.imageRequired;
             isValid = false;
         }
         if (!addDetail || addDetail.length === 0) {
@@ -168,7 +169,7 @@ const WithDrawDialogue = ({ page, rowsPerPage }) => {
                                             className="rounded-2"
                                             name="name"
                                             value={name}
-                                            placeholder="Enter name"
+                                            placeholder={ui.dialog.enterName}
                                             onChange={(e) => {
                                                 setName(e.target.value);
                                                 setError({ ...error, name: "" });
@@ -192,7 +193,7 @@ const WithDrawDialogue = ({ page, rowsPerPage }) => {
                                                     className="rounded-2"
                                                     name="detail"
                                                     value={detail}
-                                                    placeholder="Enter detail"
+                                                    placeholder={ui.dialog.enterDetail}
                                                     onChange={(e) => {
                                                         setDetail(e.target.value);
                                                         setError({ ...error, detail: "" });
@@ -288,7 +289,7 @@ const WithDrawDialogue = ({ page, rowsPerPage }) => {
                                     <div className="col-12 text-end m0">
                                         <Button
                                             className={`bg-gray text-light`}
-                                            text={`Cancel`}
+                                            text="Annuler"
                                             type={`button`}
                                             onClick={() => dispatch(closeDialog())}
                                         />
@@ -296,7 +297,7 @@ const WithDrawDialogue = ({ page, rowsPerPage }) => {
                                             type={`submit`}
                                             className={` text-white m10-left`}
                                             style={{ backgroundColor: "#1ebc1e" }}
-                                            text={`Submit`}
+                                            text="Enregistrer"
                                         />
                                     </div>
                                 </div>

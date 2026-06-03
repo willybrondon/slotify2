@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ToggleSwitch from "../../extras/ToggleSwitch";
@@ -43,31 +45,31 @@ const Coupon = () => {
 
   const couponTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Title",
+      Header: col.title,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.title}</span>
       ),
     },
     {
-      Header: "Code",
+      Header: col.code,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.code}</span>
       ),
     },
     {
-      Header: "Description",
+      Header: col.description,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.description}</span>
       ),
     },
     {
-      Header: "Discount (%)",
+      Header: col.discountPct,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.discountPercent ? row?.discountPercent : "Not Applicable"}
@@ -75,19 +77,19 @@ const Coupon = () => {
       ),
     },
     {
-      Header: `Minimum Amount To Apply (${setting?.currencySymbol})`,
+      Header: `${ui.labels.minAmountApply} (${setting?.currencySymbol})`,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.minAmountToApply}</span>
       ),
     },
     {
-      Header: "Maximum Discount",
+      Header: col.maxDiscount,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.maxDiscount}</span>
       ),
     },
     {
-      Header: "isActive",
+      Header: col.isActive,
       Cell: ({ row }) => (
         <ToggleSwitch
           value={row?.isActive}
@@ -96,7 +98,7 @@ const Coupon = () => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span className="d-flex">
           <button
@@ -141,7 +143,7 @@ const Coupon = () => {
     <>
       {dialogueType === "coupon" && <CouponDialogue />}
       <div className="mainCategory">
-        <Title name="Coupons" />
+        <Title name={ui.pages.coupons} />
         <div className="row">
           <div className="col-3">
             <Button

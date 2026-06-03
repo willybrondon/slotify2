@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -61,13 +63,13 @@ const Category = () => {
 
   const categoryTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -82,19 +84,19 @@ const Category = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.name}</span>
       ),
     },
     {
-      Header: "Created At",
+      Header: col.createdAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.createdAt.split("T")[0]}</span>
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span>
           <button
@@ -132,10 +134,10 @@ const Category = () => {
   };
   return (
     <div className="mainCategory">
-      <Title name="Category" />
+      <Title name={ui.nav.category} />
       <Button
         className={`bg-button p-10 text-black m20-bottom`}
-        text={`Add category`}
+        text={ui.labels.addCategory}
         bIcon={`fa-solid fa-user-plus`}
         onClick={() => {
           dispatch(openDialog({ type: "category" }));

@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { ExInput } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -101,23 +102,23 @@ const ProductDialogue = () => {
         let error = {};
         let isValid = true;
         if (!productCode) {
-            error.productCode = "Product code is required";
+            error.productCode = ui.dialog.productCodeRequired;
             isValid = false;
         }
         if (!productName) {
-            error.productName = "Product name is required";
+            error.productName = ui.dialog.productNameRequired;
             isValid = false;
         }
         if (!description) {
-            error.description = "Description is required";
+            error.description = ui.dialog.descriptionRequired;
             isValid = false;
         }
         if (!brand) {
-            error.brand = "Brand is required";
+            error.brand = ui.dialog.brandRequired;
             isValid = false;
         }
         if (!category) {
-            error.category = "Category is required";
+            error.category = ui.dialog.categoryRequired;
             isValid = false;
         }
         const hasAtLeastOneAttributeValue = personNames?.some(
@@ -125,27 +126,27 @@ const ProductDialogue = () => {
         );
 
         if (!hasAtLeastOneAttributeValue) {
-            error.personNames = "At least one attribute is required!";
+            error.personNames = ui.dialog.attributeRequired;
             isValid = false;
         }
         if (!price) {
-            error.price = "Price is required";
+            error.price = ui.dialog.priceRequired;
             isValid = false;
         }
         if (!mrp) {
-            error.mrp = "MRP is required";
+            error.mrp = ui.dialog.mrpRequired;
             isValid = false;
         }
         if (!shippingCharges) {
-            error.shippingCharges = "Shipping Charges is required";
+            error.shippingCharges = ui.dialog.shippingRequired;
             isValid = false;
         }
         if (!mainImage) {
-            error.mainImage = "Main Image is required";
+            error.mainImage = ui.dialog.mainImageRequired;
             isValid = false;
         }
         if (!image) {
-            error.images = "Image is required";
+            error.images = ui.dialog.imagesRequired;
             isValid = false;
         }
         setError(error)
@@ -295,7 +296,7 @@ const ProductDialogue = () => {
 
     return (
         <div className="p-3">
-            <Title name={`Add product`} />
+            <Title name={ui.pages.addProduct} />
             <div className="card">
                 <div className="card-body">
                     <div className="">
@@ -311,7 +312,7 @@ const ProductDialogue = () => {
                                 <div className="row d-flex">
                                     <div className={`${mongoId ? "col-12" : "col-md-10"}`}>
                                         <Input
-                                            label={`Product Code (6 digit)`}
+                                            label={ui.form.productCode}
                                             id={`productCode`}
                                             name="productCode"
                                             type="number"
@@ -321,7 +322,7 @@ const ProductDialogue = () => {
                                             onChange={(e) => {
                                                 setProductcode(e.target.value)
                                                 if (!e.target.value) {
-                                                    return setError({ ...error, productCode: "Product code is required" });
+                                                    return setError({ ...error, productCode: ui.dialog.productCodeRequired });
                                                 } else {
                                                     return setError({ ...error, productCode: "" });
                                                 }
@@ -364,8 +365,8 @@ const ProductDialogue = () => {
                                     id={`productName`}
                                     name={`productName`}
                                     value={productName}
-                                    label={`Product Name`}
-                                    placeholder={`Product name`}
+                                    label={ui.form.productName}
+                                    placeholder={ui.form.productName}
                                     onChange={(e) => {
                                         setProductName(e.target.value)
                                         setError({ ...error, productName: "" });
@@ -385,8 +386,8 @@ const ProductDialogue = () => {
                                     value={description}
                                     id={`description`}
                                     name={`description`}
-                                    label={`Description`}
-                                    placeholder={`Description`}
+                                    label={ui.form.description}
+                                    placeholder={ui.form.description}
                                     onChange={(e) => {
                                         setDescription(e.target.value)
                                         setError({ ...error, description: "" })
@@ -407,8 +408,8 @@ const ProductDialogue = () => {
                                     value={brand}
                                     id={`brand`}
                                     name={`brand`}
-                                    label={`Brand`}
-                                    placeholder={`brand`}
+                                    label={ui.form.brand}
+                                    placeholder={ui.form.brand}
                                     onChange={(e) => {
                                         setBrand(e.target.value)
                                         setError({ ...error, brand: "" })
@@ -425,9 +426,9 @@ const ProductDialogue = () => {
                                     type={`number`}
                                     id={`price`}
                                     name={`price`}
-                                    label={`Price`}
+                                    label={ui.form.price}
                                     value={price}
-                                    placeholder={`Price`}
+                                    placeholder={ui.form.price}
                                     onChange={(e) => {
                                         setPrice(e.target.value)
 
@@ -449,15 +450,15 @@ const ProductDialogue = () => {
                                     value={mrp}
                                     id={`mrp`}
                                     name={`mrp`}
-                                    label={`MRP`}
-                                    placeholder={`MRP`}
+                                    label={ui.form.mrp}
+                                    placeholder={ui.form.mrp}
                                     onChange={(e) => {
                                         const newMrp = e.target.value;
                                         if (newMrp > price) {
                                             setMrp(newMrp);
                                             setError({ ...error, mrp: "" }); // Clear error when valid
                                         } else {
-                                            setError({ ...error, mrp: "Price cannot be greater than MRP" }); // Show error when invalid
+                                            setError({ ...error, mrp: ui.dialog.priceAboveMrp }); // Show error when invalid
                                         }
                                     }}
                                 />
@@ -473,8 +474,8 @@ const ProductDialogue = () => {
                                     id={`shippingCharges`}
                                     name={`shippingCharges`}
                                     value={shippingCharges}
-                                    label={`Shipping Charges`}
-                                    placeholder={`Shipping Charges`}
+                                    label={ui.form.shippingCharges}
+                                    placeholder={ui.form.shippingCharges}
                                     onChange={(e) => {
                                         setShippingCharges(e.target.value)
                                         setError({ ...error, shippingCharges: "" })
@@ -489,7 +490,7 @@ const ProductDialogue = () => {
                             <div className="col-12">
                                 <div className="inputData text  flex-row justify-content-start text-start">
                                     <label htmlFor="categorySelect" className="false">
-                                        Select Category
+                                        {ui.dialog.selectCategory}
                                     </label>
                                 </div>
                                 <FormGroup>
@@ -501,7 +502,7 @@ const ProductDialogue = () => {
                                         }}
                                         value={category}>
                                         <option value="" disabled>
-                                            Select a category
+                                            {ui.dialog.selectCategoryHint}
                                         </option>
                                         {productCategory?.map((list) => (
                                             <option key={list?._id} value={list?._id}>
@@ -516,7 +517,7 @@ const ProductDialogue = () => {
 
                             </div>
                             <div className="col-12">
-                                <label style={{ color: "#7E7E7E" }}>Select Attribute</label>
+                                <label style={{ color: "#7E7E7E" }}>{ui.dialog.selectAttribute}</label>
                             </div>
                             {attribute?.map((data, index) => {
                                 return (
@@ -614,7 +615,7 @@ const ProductDialogue = () => {
 
                             <div className="col-12">
                                 <ExInput
-                                    label={`Main Image`}
+                                    label={ui.form.mainImage}
                                     id={`mainImage`}
                                     type={`file`}
                                     name="mainImage"
@@ -646,7 +647,7 @@ const ProductDialogue = () => {
 
                             <div className="col-12">
                                 <label className="float-left dialog__input__title">
-                                    Select (Multiple) Image
+                                    {ui.dialog.selectImages}
                                 </label>
 
                                 <ReactDropzone
@@ -768,7 +769,7 @@ const ProductDialogue = () => {
                             <div className="col-12 text-end m0">
                                 <Button
                                     className={`bg-gray text-light`}
-                                    text={`Cancel`}
+                                    text="Annuler"
                                     type={`button`}
                                     onClick={() => navigate(-1)}
                                 />
@@ -776,7 +777,7 @@ const ProductDialogue = () => {
                                     type={`submit`}
                                     className={` text-white m10-left`}
                                     style={{ backgroundColor: "#1ebc1e" }}
-                                    text={`Submit`}
+                                    text="Enregistrer"
                                     onClick={(e) => {
 
                                         handleSubmit(e)

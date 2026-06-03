@@ -1,3 +1,5 @@
+import { col } from "../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 import Analytics from "../extras/Analytics";
 import Title from "../extras/Title";
@@ -47,13 +49,13 @@ const Recharge = () => {
 
     const walletTable = [
         {
-            Header: "No",
+            Header: col.no,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             ),
         },
         {
-            Header: "User Info",
+            Header: col.userInfo,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -64,7 +66,7 @@ const Recharge = () => {
             ),
         },
         {
-            Header: "UniqueId",
+            Header: col.uniqueId,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -75,7 +77,7 @@ const Recharge = () => {
             ),
         },
         {
-            Header: `Amount (${setting?.currencySymbol})`,
+            Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -86,7 +88,7 @@ const Recharge = () => {
             ),
         },
         {
-            Header: "Date",
+            Header: col.date,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -99,7 +101,7 @@ const Recharge = () => {
             ),
         },
         {
-            Header: "Time",
+            Header: col.time,
             Cell: ({ row }) => (
                 <div>
                     {row?.time ? row?.time : "-"}
@@ -107,7 +109,7 @@ const Recharge = () => {
             ),
         },
         {
-            Header: "Transaction Type",
+            Header: col.transactionType,
             Cell: ({ row }) =>
                 row?.type === 1 ? (
                     <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{
@@ -139,7 +141,7 @@ const Recharge = () => {
                 ),
         },
         {
-            Header: "Transaction Completed",
+            Header: col.transactionCompleted,
             Cell: ({ row }) =>
                 row?.type === 1 ? (
                     <button className="d-flex align-items-center justify-content-center"
@@ -153,7 +155,7 @@ const Recharge = () => {
                             style={{ backgroundColor: "#FFE7CF", borderRadius: "8px", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}
                     >
                         <WithDraw />
-                            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Booking Fee Deduction</span>
+                            <span style={{ whiteSpace: "nowrap" }} className="ms-2">{ui.labels.bookingFeeDeduction}</span>
                     </button>
                 ) : row?.type === 3 ? (
 
@@ -184,7 +186,7 @@ const Recharge = () => {
         <>
             <div className="orderDetails mt-2">
                 <div className="row">
-                    <Title name="Wallet History" className="mt-4" />
+                    <Title name={ui.labels.walletHistory} className="mt-4" />
                 </div>
                 <div className="betBox">
                     <div className="inputData pb-2">
@@ -227,7 +229,7 @@ const Recharge = () => {
                         <Analytics
                             analyticsStartDate={startDate}
                             analyticsStartEnd={endDate}
-                            placeholder="Wallet"
+                            placeholder={ui.form.wallet}
                             analyticsStartDateSet={setStartDate}
                             analyticsStartEndSet={setEndDate}
                         />

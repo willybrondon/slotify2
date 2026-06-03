@@ -19,7 +19,11 @@ import ReactApexChart from "react-apexcharts";
 import dayjs from "dayjs";
 import { upcomingBookings } from "../../../redux/slice/bookingSlice";
 import Analytics from "../../extras/Analytics";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
+
 const DashBoard = () => {
+  const d = ui.dashboard;
+  const t = ui.table;
   const { salon, dashData } = useSelector((state) => state.dash);
   const { futureBooking } = useSelector((state) => state.booking);
   const { setting } = useSelector((state) => state.setting);
@@ -63,11 +67,11 @@ const DashBoard = () => {
 
   const mapData = [
     {
-      Header: "No",
+      Header: t.no,
       Cell: ({ index }) => <span>{index + 1}</span>,
     },
     {
-      Header: "Image",
+      Header: t.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -86,12 +90,12 @@ const DashBoard = () => {
     },
 
     {
-      Header: "Name",
+      Header: t.name,
       Cell: ({ row }) => <span>{row?.salonName}</span>,
     },
 
     {
-      Header: `Salon Commission `,
+      Header: t.salonCommission,
       Cell: ({ row }) => (
         <span className="fw-bold">
           {numberWithCommas(row?.salonCommission) + " " + setting?.currencySymbol}
@@ -99,14 +103,14 @@ const DashBoard = () => {
       ),
     },
     {
-      Header: "Bookings",
+      Header: t.bookings,
       Cell: ({ row }) => <span className="fw-bold">{row?.bookings}</span>,
     },
   ];
 
   const appointMentData = [
     {
-      Header: "User",
+      Header: t.user,
       thClass: "text-nowrap",
       Cell: ({ row }) => (
         <div className="d-flex text-nowrap">
@@ -121,7 +125,7 @@ const DashBoard = () => {
           <span className="ms-3 fw-bold fs-15 p8-top text-start">
             {row?.userId?.fname
               ? row?.userId?.fname + "  " + row?.userId?.lname
-              : "Salon User"}
+              : d.fallbackUser}
             <div
               className="fs-12 fw-500 text-start"
               style={{ opacity: "0.65" }}
@@ -133,17 +137,17 @@ const DashBoard = () => {
       ),
     },
     {
-      Header: "Salon",
+      Header: t.salon,
       thClass : "text-nowrap",
       Cell: ({ row }) => <span className="text-nowrap">{row?.salonId?.name}</span>,
     },
     {
-      Header: "Time",
+      Header: t.time,
       thClass : "text-nowrap",
       Cell: ({ row }) => <span className="text-nowrap">{row?.time[0]}</span>,
     },
     {
-      Header: "Show More",
+      Header: t.showMore,
       thClass: "text-decoration-underline special cursor",
       thClick: () => navigate("/admin/futureBooking"),
       Cell: ({ row }) => <></>,
@@ -158,10 +162,10 @@ const DashBoard = () => {
   return (
     <div className="mainDashboard">
       <div className="dashBoardHead">
-        <h3 className="m3-bottom text-start">Welcome back, Admin! 👋</h3>
+        <h3 className="m3-bottom text-start">{d.welcome} 👋</h3>
         <div className="row mb-0">
           <div className="col-3 mb-0 d-flex align-items-center">
-            <Title name={"Dashboard Overview"} display={"none"} bottom={"0"} />
+            <Title name={d.title} display={"none"} bottom={"0"} />
           </div>
 
           <div className="col-9 mb-0 d-flex justify-content-end">
@@ -180,7 +184,7 @@ const DashBoard = () => {
         <div className="row">
           <div className="col-lg-3 col-md-4 col-sm-6 col-12 mt-3">
             <DashBox
-              title={`TOTAL CUSTOMERS`}
+              title={d.totalCustomers}
               dashSVG={
                 <svg
                   width="60"
@@ -231,7 +235,7 @@ const DashBoard = () => {
           </div>
           <div className="col-lg-3 col-md-4 col-sm-6 col-12 mt-3">
             <DashBox
-              title={`COMPLETED BOOKING`}
+              title={d.completedBooking}
               dashSVG={
                 <svg
                   width="60"
@@ -295,7 +299,7 @@ const DashBoard = () => {
           </div>
           <div className="col-lg-3 col-md-4 col-sm-6 col-12 mt-3">
             <DashBox
-              title={`TOTAL SALONS`}
+              title={d.totalSalons}
               dashSVG={
                 <svg
                   width="60"
@@ -340,7 +344,7 @@ const DashBoard = () => {
           </div>
           <div className="col-lg-3 col-md-4 col-sm-6 col-12 mt-3">
             <DashBox
-              title={`TOTAL EXPERTS`}
+              title={d.totalExperts}
               dashSVG={
                 <svg
                   width="60"
@@ -365,7 +369,7 @@ const DashBoard = () => {
           </div>
           <div className="col-lg-3 col-md-4 col-sm-6 col-12 mt-3">
             <DashBox
-              title={`SALES COMMISIONS`}
+              title={d.salesCommission}
               dashSVG={
                 <svg
                   width="60"
@@ -391,7 +395,7 @@ const DashBoard = () => {
           </div>
           <div className="col-lg-3 col-md-4 col-sm-6 col-12 mt-3">
             <DashBox
-              title={`TOTAL REVENUE`}
+              title={d.totalRevenue}
               dashSVG={
                 <svg
                   width="60"
@@ -488,8 +492,8 @@ const DashBoard = () => {
         <div className="col-12">
           <div className="table-container">
             <div className="table-title">
-              <h5>Data Analysis</h5>
-              <span>Revenue and Booking Data</span>
+              <h5>{d.dataAnalysis}</h5>
+              <span>{d.revenueBookingChart}</span>
             </div>
             <ApexChart />
           </div>
@@ -500,12 +504,12 @@ const DashBoard = () => {
         <div className="col-lg-6 col-md-12">
           <div className="table-container">
             <div className="table-title">
-              <h5>Top Salons</h5>
+              <h5>{d.topSalons}</h5>
               <button 
                 className="show-more-btn"
                 onClick={() => navigate("/admin/allSalon")}
               >
-                View All
+                {d.viewAll}
               </button>
             </div>
             <Table data={data} mapData={mapData} className="border-0" />
@@ -514,12 +518,12 @@ const DashBoard = () => {
         <div className="col-lg-6 col-md-12">
           <div className="table-container">
             <div className="table-title">
-              <h5>Today's Upcoming Bookings</h5>
+              <h5>{d.todayBookings}</h5>
               <button 
                 className="show-more-btn"
                 onClick={() => navigate("/admin/futureBooking")}
               >
-                Show More
+                {d.showMore}
               </button>
             </div>
             <Table

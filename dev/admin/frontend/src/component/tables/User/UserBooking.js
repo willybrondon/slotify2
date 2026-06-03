@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import React, { useEffect, useState } from "react";
 import Pagination from "../../extras/Pagination";
 import Table from "../../extras/Table";
@@ -82,13 +84,13 @@ const UserBooking = () => {
 
   const bookingTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "User",
+      Header: col.user,
       Cell: ({ row }) => (
         <div
           className="userProfile cursor"
@@ -104,7 +106,7 @@ const UserBooking = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -117,7 +119,7 @@ const UserBooking = () => {
       ),
     },
     {
-      Header: "Expert",
+      Header: col.expert,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -128,7 +130,7 @@ const UserBooking = () => {
       ),
     },
     {
-      Header: "Service",
+      Header: col.service,
       Cell: ({ row }) => (
         <div>
           {row?.services?.map((dur, index) => (
@@ -141,12 +143,12 @@ const UserBooking = () => {
       ),
     },
     {
-      Header: "Booking Id",
+      Header: col.bookingId,
       body: "bookingId",
       sorting: { type: "client" },
     },
     {
-      Header: `Price `,
+      Header: col.price,
       body: "rupee",
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.amount?.toFixed(2) + " " + setting?.currencySymbol}</span>
@@ -154,7 +156,7 @@ const UserBooking = () => {
       sorting: { type: "client" },
     },
     {
-      Header: `Admin Commission`,
+      Header: col.adminCommission,
       body: "commission",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -164,7 +166,7 @@ const UserBooking = () => {
       ),
     },
     {
-      Header: "Duration",
+      Header: col.duration,
       body: "duration",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -172,7 +174,7 @@ const UserBooking = () => {
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       body: "date",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -180,7 +182,7 @@ const UserBooking = () => {
       ),
     },
     {
-      Header: "Status",
+      Header: col.status,
       Cell: ({ row }) =>
         row?.status === "completed" ? (
           <div className="d-flex">
@@ -215,7 +217,7 @@ const UserBooking = () => {
         ),
     },
     {
-      Header: "First Slot",
+      Header: col.firstSlot,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.time ? row?.time[0] : "-"}
@@ -245,7 +247,7 @@ const UserBooking = () => {
       <Title
         name={`${
           state ? state?.state?.data?.fname + state?.state?.data?.lname : ""
-        }'s Bookings`}
+        }${state?.state?.row ? " — " : ""}${ui.labels.bookingsTitle}`}
       />
       {dialogue && dialogueType === "cancelBooking" && (
         <CancelBookingDialog setData={setData} data={data} />
@@ -258,7 +260,7 @@ const UserBooking = () => {
         <div className="col-2">
           <div className="inputData">
             <label className="styleForTitle" htmlFor="bookingType">
-              Booking type
+              {ui.labels.bookingType}
             </label>
             <select
               name="bookingType"

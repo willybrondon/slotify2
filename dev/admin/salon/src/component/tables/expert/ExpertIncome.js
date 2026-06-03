@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-unused-vars */
@@ -71,28 +73,28 @@ const ExpertIncome = () => {
 
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{page * rowsPerPage + parseInt(index) + 1}</span>
     },
 
     {
-      Header: "UniqueId",
+      Header: col.uniqueId,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.uniqueId || "-"}</span>
       ),
     },
     {
-      Header: `Amount (${setting?.currencySymbol})`,
+      Header: `${col.amount} (${setting?.currencySymbol})`,
       Cell: ({ row }) => <span className="text-capitalize">{row?.amount || "-"}</span>,
     },
     {
-      Header: `Date`,
+      Header: col.date,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.date || "-"}</span>
       ),
     },
     {
-      Header: "Time",
+      Header: col.time,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.time ? row?.time : "-"}
@@ -101,7 +103,7 @@ const ExpertIncome = () => {
     },
 
     {
-      Header: 'Transaction Type',
+      Header: col.transactionType,
       Cell: ({ row }) => {
         const isCredit = row?.type === 1;
         const isDebit = row?.type === 2 && row?.payoutStatus === 2;
@@ -122,7 +124,7 @@ const ExpertIncome = () => {
       },
     },
     {
-      Header: 'Transaction Completed',
+      Header: col.transactionCompleted,
       Cell: ({ row }) => {
         const isCredit = row?.type === 1;
         const isDebit = row?.type === 2 ;
@@ -132,7 +134,7 @@ const ExpertIncome = () => {
           <button className="d-flex align-items-center justify-content-center"
             style={{ background: "#D9F2E7", color: "#0EC070", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
             <Complete />
-            <span style={{ whiteSpace: "nowrap" }} className="ms-2">Booking Complete</span>
+            <span style={{ whiteSpace: "nowrap" }} className="ms-2">{ui.labels.bookingComplete}</span>
           </button>
         ) : isDebit ? (
 
@@ -142,7 +144,7 @@ const ExpertIncome = () => {
                   style={{ background: "#D8F0F9", color: "#17A7DB", border: "none", borderRadius: "5px", padding: "8px 12px" , marginLeft: "70px"}}>
                   <Refund />
                   <span style={{ whiteSpace: "nowrap" }} className="ms-2">{
-                      row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+                      row?.payoutStatus === 1 && ui.labels.withdrawPending || row?.payoutStatus === 2 && ui.labels.withdrawApproved || row?.payoutStatus === 3 && ui.labels.withdrawDeclined
                   }</span>
               </button>
           ) : (
@@ -150,7 +152,7 @@ const ExpertIncome = () => {
                   style={{ background: "#F5DDC3", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
                   <WithDraw />
                   <span style={{ whiteSpace: "nowrap" }} className="ms-2">{
-                      row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+                      row?.payoutStatus === 1 && ui.labels.withdrawPending || row?.payoutStatus === 2 && ui.labels.withdrawApproved || row?.payoutStatus === 3 && ui.labels.withdrawDeclined
                   }</span>
               </button>
           )
@@ -218,7 +220,7 @@ const ExpertIncome = () => {
             <Analytics
               analyticsStartDate={startDate}
               analyticsStartEnd={endDate}
-              placeholder="Wallet"
+              placeholder={ui.form.wallet}
               analyticsStartDateSet={setStartDate}
               analyticsStartEndSet={setEndDate}
             />

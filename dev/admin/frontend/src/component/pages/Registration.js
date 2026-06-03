@@ -4,12 +4,11 @@ import { ExInput } from "../extras/Input";
 import Button from "../extras/Button";
 import { useDispatch } from "react-redux";
 import { DangerRight } from "../api/toastServices";
-import { useNavigate } from "react-router-dom";
 import { signUp } from "../../redux/slice/authSlice";
+import { SKEDISY_ADMIN_PORTAL_COPY as copy } from "../../constants/skedisyPortalCopy";
 
 const Registration = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,8 +21,6 @@ const Registration = () => {
     code: "",
   });
 
-
-
   const submit = async () => {
     if (
       !email ||
@@ -32,148 +29,119 @@ const Registration = () => {
       !newPassword ||
       newPassword !== password
     ) {
-      let error = {};
-      if (!email) error.email = "Email is required";
-      if (!password) error.password = "password is required !";
-      if (!newPassword) error.newPassword = "new password is required !";
-
+      const nextError = {};
+      if (!email) nextError.email = copy.errEmail;
+      if (!password) nextError.password = copy.errPassword;
+      if (!newPassword) nextError.newPassword = copy.errConfirmPassword;
       if (newPassword !== password)
-        error.newPassword = "New Password and Confirm Password doesn't match !";
-      if (!code) error.code = "code is required !";
-      return setError({ ...error });
-    } else {
-      const loginData = {
-        email,
-        newPassword,
-        password,
-        code,
-      };
-
-      let response = await dispatch(signUp(loginData)).unwrap();
-      response?.status ? window.location.reload() : DangerRight(response?.message);
+        nextError.newPassword = copy.errPasswordMismatch;
+      if (!code) nextError.code = copy.errCode;
+      return setError(nextError);
     }
+    const loginData = { email, newPassword, password, code };
+    const response = await dispatch(signUp(loginData)).unwrap();
+    response?.status ? window.location.reload() : DangerRight(response?.message);
   };
+
   return (
     <>
       <div className="mainLoginPage">
         <div className="loginDiv" style={{ width: "100%" }}>
           <div className="loginPage m-auto">
-            <div className="loginTitle mb-3  d-flex ">
-              <img src={logo} style={{ width: "50px" }} alt="logo" />
+            <div className="loginTitle mb-3 d-flex">
+              <img src={logo} style={{ width: "50px" }} alt="Skedisy" />
             </div>
-            <div className="fw-bold text-theme  me-auto my-auto welComeTitle">
-              Welcome Back
+            <p className="sk-portal-kicker mb-1">{copy.kicker}</p>
+            <div className="fw-bold text-theme me-auto my-auto welComeTitle">
+              {copy.welcome}
             </div>
-            <h1>Sign Up !</h1>
-            <h6 className="fw-bold text-theme  me-auto my-auto fs-15 py-2 title">
-              Please,Enter Your Email id , Password , Code
+            <h1 className="sk-portal-login-title">{copy.signUpTitle}</h1>
+            <p className="sk-portal-subtitle">{copy.signUpSubtitle}</p>
+            <h6 className="fw-bold text-theme me-auto my-auto fs-15 py-2 title">
+              {copy.signUpHint}
             </h6>
             <div>
-              <div className="col-12 ">
+              <div className="col-12">
                 <ExInput
-                  type={`text`}
-                  id={`email`}
-                  name={`email`}
-                  label={`Email`}
+                  type="text"
+                  id="email"
+                  name="email"
+                  label={copy.email}
                   value={email}
-                  placeholder={`Email`}
+                  placeholder={copy.email}
                   errorMessage={error.email && error.email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        email: `email Id is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        email: "",
-                      });
-                    }
+                    setError({
+                      ...error,
+                      email: !e.target.value ? copy.errEmail : "",
+                    });
                   }}
                 />
               </div>
-              <div className="col-12 ">
+              <div className="col-12">
                 <ExInput
-                  type={`password`}
-                  id={`password`}
-                  name={`password`}
+                  type="password"
+                  id="password"
+                  name="password"
                   value={password}
-                  label={`Password`}
-                  placeholder={`Password`}
+                  label={copy.password}
+                  placeholder={copy.password}
                   errorMessage={error.password && error.password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        password: `password is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        password: "",
-                      });
-                    }
+                    setError({
+                      ...error,
+                      password: !e.target.value ? copy.errPassword : "",
+                    });
                   }}
                 />
               </div>
-              <div className="col-12 ">
+              <div className="col-12">
                 <ExInput
-                  type={`password`}
-                  id={`confirmPassword`}
-                  name={`Confirm Password`}
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
                   value={newPassword}
-                  label={`Confirm Password`}
-                  placeholder={`Confirm Password`}
+                  label={copy.confirmPassword}
+                  placeholder={copy.confirmPassword}
                   errorMessage={error.newPassword && error.newPassword}
                   onChange={(e) => {
                     setNewPassword(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        newPassword: `Confirm Password is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        newPassword: "",
-                      });
-                    }
+                    setError({
+                      ...error,
+                      newPassword: !e.target.value
+                        ? copy.errConfirmPassword
+                        : newPassword !== password
+                          ? copy.errPasswordMismatch
+                          : "",
+                    });
                   }}
                 />
               </div>
-              <div className="col-12 ">
+              <div className="col-12">
                 <ExInput
-                  type={`text`}
-                  id={`loginpurachseCode`}
-                  name={`Code`}
+                  type="text"
+                  id="loginpurachseCode"
+                  name="code"
                   value={code}
-                  label={`Code`}
-                  placeholder={`Code`}
+                  label={copy.code}
+                  placeholder={copy.code}
                   errorMessage={error.code && error.code}
                   onChange={(e) => {
                     setCode(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        code: `Code is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        code: "",
-                      });
-                    }
+                    setError({
+                      ...error,
+                      code: !e.target.value ? copy.errCode : "",
+                    });
                   }}
                 />
               </div>
               <div className="loginButton d-flex gx-2 justify-content-center">
                 <Button
-                  type={`submit`}
-                  className={`bg-theme text-light cursor m10-top col-6 mx-2`}
-                  text={`Sign Up`}
+                  type="submit"
+                  className="bg-theme text-light cursor m10-top col-6 mx-2"
+                  text={copy.submitSignUp}
                   onClick={submit}
                   style={{ borderRadius: "30px" }}
                 />

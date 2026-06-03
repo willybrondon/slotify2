@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   coupon: [],
@@ -62,7 +63,7 @@ const couponSlice = createSlice({
       state.isLoading = false;
       if (action?.payload?.status) {
         state.coupon.push(action?.payload?.data);
-        Success("Coupon Created Successfully");
+        Success(ui.toast.couponCreated);
       }
     });
     builder.addCase(createCoupon.rejected, (state) => {
@@ -78,7 +79,7 @@ const couponSlice = createSlice({
         state.coupon = state.coupon.filter(
           (coupon) => coupon._id !== action.meta.arg
         );
-        Success("Coupon Deleted Successfully");
+        Success(ui.toast.couponDeleted);
       }
     });
     builder.addCase(deleteCoupon.rejected, (state) => {

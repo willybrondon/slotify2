@@ -367,6 +367,23 @@ Skedisy  = « La réservation pour la communauté afro en Île-de-France —
 
 | Fichier | Rôle |
 |---------|------|
+| `../../salon/src/constants/skedisyPortalCopy.js` | Copy auth/profil — salon panel |
+| `../../salon/src/constants/skedisyUiCopy.js` | Menus, tableaux, dialogues, toasts — salon |
+| `../../frontend/src/constants/skedisyPortalCopy.js` | Copy auth/profil — console admin |
+| `../../frontend/src/constants/skedisyUiCopy.js` | Menus, tableaux, dialogues, toasts — admin |
+| `../../scripts/i18n-table-headers.js` | Migration en-têtes de tableaux → `col.*` |
+| `../../scripts/i18n-dialogs-batch.js` | Migration libellés dialogues/formulaires |
+| `../../scripts/fix-redux-imports.js` | Imports `ui` dans les slices Redux |
+| `../../scripts/i18n-final-pass.js` | Expert, bonus/pénalité, coupon, profil |
+| `../../scripts/i18n-settings-appointment.js` | Paramètres, RDV, retraits, notifications |
+| `../../scripts/i18n-add-salon.js` | Formulaire ajout / édition salon (admin) |
+| `../../scripts/i18n-setting-labels.js` | Titres sections Paramètres |
+| `../../scripts/i18n-rest-fix.js` | Reliquats titres, Setting inline, statuts retrait |
+| `../../scripts/i18n-rest-fix-v2.js` | Passe 2 (chemins Windows, profils, AddSalon salon) |
+| `../../scripts/i18n-headers-v3.js` | En-têtes settlement / coupon / prix |
+| `../../scripts/i18n-vague4.js` | Section `form`, placeholders, Redux toasts admin |
+| `../../salon/src/constants/skedisyApiMessage.js` | Traduction messages API + champs paiement dynamiques |
+| `../../frontend/src/constants/skedisyApiMessage.js` | Idem — console admin |
 | `../MARKETING_PLAN_ANALYSIS.md` | Plan marketing 30 jours, features techniques |
 | `../IMPLEMENTATION_GUIDE.md` | Scraping, onboarding salons IDF |
 | `../../salonportal/language.js` | Copy site FR/EN afro |
@@ -380,6 +397,10 @@ Skedisy  = « La réservation pour la communauté afro en Île-de-France —
 | Date | Modification |
 |------|--------------|
 | 2026-05 | Création document — pivot « confirmation RDV » → authenticité communauté afro IDF |
+| 2026-05 | i18n salon panel + console admin : `skedisyUiCopy`, scripts `dev/admin/scripts/` |
+| 2026-05 | Sections `settings`, `appointment`, `coupon`, `bonusPenalty` dans les copy UI |
+| 2026-05 | Passes 3–4 : `labels`, `form`, migrations tableaux/dialogues, builds salon + admin validés |
+| 2026-05 | Passe 5 : `skedisyApiMessage`, retrait admin FR, toasts/axios traduits |
 
 ---
 

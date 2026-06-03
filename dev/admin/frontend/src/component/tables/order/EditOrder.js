@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
 import Button from "../../extras/Button";
@@ -53,7 +54,7 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
         event.preventDefault(); // Prevent the page from refreshing
     
 
-        if (statusData === "Select status" || !statusData) {
+        if (statusData === ui.labels.selectStatus || !statusData) {
             // You can add a validation message here if needed
             return;
         }
@@ -125,7 +126,7 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
                                 <div className="mainDiaogBox">
                                     <div className="row justify-content-between align-items-center formHead">
                                         <div className="col-8">
-                                            <h2 className="text-theme m0">Edit Order</h2>
+                                            <h2 className="text-theme m0">{ui.labels.editOrder}</h2>
                                         </div>
                                         <div className="col-4">
                                             <div
@@ -166,7 +167,7 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
                                                         name={"deliveredServiceName"}
                                                         value={deliveredServiceName}
                                                         label={"Delivered Service Name"}
-                                                        placeholder={"Delivered service name"}
+                                                        placeholder={ui.form.deliveredServiceName}
                                                         errorMessage={error.deliveredServiceName && error.deliveredServiceName}
                                                         onChange={(e) => {
                                                             setDeliveredServiceName(e.target.value);
@@ -192,7 +193,7 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
                                                         name={"trackingId"}
                                                         value={trackingId}
                                                         label={"Tracking Id"}
-                                                        placeholder={"Tracking Id"}
+                                                        placeholder={ui.form.trackingId}
                                                         // errorMessage={error.trackingId && error.trackingId}
                                                         onChange={(e) => {
                                                             setTrackingId(e.target.value);
@@ -217,7 +218,7 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
                                                         name={"trackingLink"}
                                                         value={trackingLink}
                                                         label={"Tracking Link"}
-                                                        placeholder={"Tracking Link"}
+                                                        placeholder={ui.form.trackingLink}
                                                         // errorMessage={error.trackingLink && error.trackingLink}
                                                         onChange={(e) => {
                                                             setTrackingLink(e.target.value);
@@ -250,7 +251,7 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
                                                             value={dialogueData?.finalTotal}
                                                             disabled
                                                             label={"SubTotal"}
-                                                            placeholder={"SubTotal"}
+                                                            placeholder={ui.form.subTotal}
                                                         // errorMessage={
                                                         //     error.subTotal && error.subTotal ||
                                                         //     (dialogueData?.finalTotal < setting?.cancelOrderCharges
@@ -261,11 +262,11 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
                                                         />
                                                         {/* {dialogueData?.finalTotal >= setting?.cancelOrderCharges ? (
                                                             <span className="d-flex justify-content-end" style={{ color: "red", fontSize: "14px" }}>
-                                                                Your Cancel Order Charges ${setting?.cancelOrderCharges}
+                                                                ui.labels.cancelOrderChargesNote ${setting?.cancelOrderCharges}
                                                             </span>
                                                         ) : (
                                                             <span className="d-flex justify-content-end" style={{ color: "red", fontSize: "14px" }}>
-                                                                You cannot cancel the order as the SubTotal is less than the Cancel Order Charges
+                                                                ui.labels.cannotCancelOrder
                                                             </span>
                                                         )} */}
                                                     </div>
@@ -278,7 +279,7 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
                                             <div className="col-12 text-end m0">
                                                 <Button
                                                     className={`bg-gray text-light`}
-                                                    text={`Cancel`}
+                                                    text="Annuler"
                                                     type={`button`}
                                                     onClick={() => dispatch(closeDialog())}
                                                 />
@@ -286,7 +287,7 @@ const EditOrder = ({ page, rowsPerPage, type }) => {
                                                     type={`submit`}
                                                     className={`text-white m10-left`}
                                                     style={{ backgroundColor: "#1ebc1e" }}
-                                                    text={`Update`}
+                                                    text={ui.labels.updateBtn}
                                                 />
                                             </div>
                                         </div>

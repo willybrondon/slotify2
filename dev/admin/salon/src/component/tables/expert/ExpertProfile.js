@@ -298,7 +298,7 @@ const ExpertProfile = () => {
                             />
                             <div className="d-flex mt-2">
                               <Button
-                                text={`Submit`}
+                                text="Enregistrer"
                                 className={` text-white ms-auto`}
                                 style={{
                                   backgroundColor: "#1ebc1e",

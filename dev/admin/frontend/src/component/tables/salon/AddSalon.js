@@ -8,6 +8,9 @@ import { addSalon, updateSalon } from "../../../redux/slice/salonSlice";
 import ReactDropzone from "react-dropzone";
 import Title from "../../extras/Title";
 import { useLocation, useNavigate } from "react-router-dom";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
+
+const f = ui.salonForm;
 
 const AddSalon = () => {
   const { state } = useLocation();
@@ -123,22 +126,22 @@ const AddSalon = () => {
       !platformFee
     ) {
       let error = {};
-      if (!name) error.name = "Name is required";
-      if (!about) error.about = "About is required";
-      if (!email) error.email = "Email is required";
-      if (!password) error.password = "Password is required";
-      if (!platformFee) error.platformFee = "Plat form fee is required";
-      if (!mobile) error.mobile = "Mobile number is required";
-      if (!address) error.address = "Address is required";
-      if (!landMark) error.landMark = "Land mark is required";
-      if (!city) error.city = "City is required";
-      if (!states) error.state = "State is required";
-      if (!country) error.country = "Country is required";
-      if (!latitude) error.latitude = "Latitude is required";
-      if (!longitude) error.longitude = "Longitude is required";
-      if (!images) error.images = "Images is required";
-      if (images?.length === 0) error.images = "Images is required";
-      if (images?.length > 10) error.images = "Select max 10 images";
+      if (!name) error.name = f.nameRequired;
+      if (!about) error.about = f.aboutRequired;
+      if (!email) error.email = f.emailRequired;
+      if (!password) error.password = f.passwordRequired;
+      if (!platformFee) error.platformFee = f.platformFeeRequired;
+      if (!mobile) error.mobile = f.mobileRequired;
+      if (!address) error.address = f.addressRequired;
+      if (!landMark) error.landMark = f.landmarkRequired;
+      if (!city) error.city = f.cityRequired;
+      if (!states) error.state = f.stateRequired;
+      if (!country) error.country = f.countryRequired;
+      if (!latitude) error.latitude = f.latitudeRequired;
+      if (!longitude) error.longitude = f.longitudeRequired;
+      if (!images) error.images = f.imagesRequired;
+      if (images?.length === 0) error.images = f.imagesRequired;
+      if (images?.length > 10) error.images = f.imagesMax;
 
       return setError({ ...error });
     } else {
@@ -181,7 +184,7 @@ const AddSalon = () => {
 
   return (
     <div className="p-3">
-      <Title name={`Add salon`} />
+      <Title name={state?.row ? f.editTitle : f.addTitle} />
       <div className="card">
         <div className="card-body">
           <div className="">
@@ -192,15 +195,15 @@ const AddSalon = () => {
                   id={`name`}
                   name={`name`}
                   value={name}
-                  label={`Name`}
-                  placeholder={`Name`}
+                  label={f.name}
+                  placeholder={f.name}
                   errorMessage={error.name && error.name}
                   onChange={(e) => {
                     setName(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        name: ` Name is required`,
+                        name: f.nameRequired,
                       });
                     } else {
                       return setError({
@@ -217,15 +220,15 @@ const AddSalon = () => {
                   id={`email`}
                   name={`email`}
                   value={email}
-                  label={`email`}
-                  placeholder={`email`}
+                  label={f.email}
+                  placeholder={f.email}
                   errorMessage={error.email && error.email}
                   onChange={(e) => {
                     setEmail(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        email: `Email is required`,
+                        email: f.emailRequired,
                       });
                     } else {
                       return setError({
@@ -243,17 +246,17 @@ const AddSalon = () => {
                   value={mobile}
                   id={`mono`}
                   name={`mobile`}
-                  label={`Mobile number`}
+                  label={f.mobile}
                   minLength={6}
                   maxLength={13}
-                  placeholder={`Mobile number`}
+                  placeholder={f.mobile}
                   errorMessage={error.mobile && error.mobile}
                   onChange={(e) => {
                     setMobile(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        mobile: `Mobile number is required`,
+                        mobile: f.mobileRequired,
                       });
                     } else if (
                       e.target.value.length < 6 ||
@@ -279,15 +282,15 @@ const AddSalon = () => {
                   id={`password`}
                   name={`password`}
                   value={password}
-                  label={`Password`}
-                  placeholder={`Password`}
+                  label={f.password}
+                  placeholder={f.password}
                   errorMessage={error.password && error.password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        password: `Password is required`,
+                        password: f.passwordRequired,
                       });
                     } else {
                       return setError({
@@ -304,15 +307,15 @@ const AddSalon = () => {
                   id={`platformFee`}
                   name={`platformFee`}
                   value={platformFee}
-                  label={`Platform fee (%)`}
-                  placeholder={`Platform Fee`}
+                  label={f.platformFee}
+                  placeholder={f.platformFee}
                   errorMessage={error.platformFee && error.platformFee}
                   onChange={(e) => {
                     setPlatformFee(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        platformFee: `Plat form fee is required`,
+                        platformFee: f.platformFeeRequired,
                       });
                     } else if (e.target.value.length > 2) {
                       return setError({
@@ -340,15 +343,15 @@ const AddSalon = () => {
                   id={`address`}
                   name={`Address`}
                   value={address}
-                  label={`Address`}
-                  placeholder={`Address`}
+                  label={f.address}
+                  placeholder={f.address}
                   errorMessage={error.address && error.address}
                   onChange={(e) => {
                     setAddress(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        address: `Address is required`,
+                        address: f.addressRequired,
                       });
                     } else {
                       return setError({
@@ -365,15 +368,15 @@ const AddSalon = () => {
                   id={`landmark`}
                   name={`Landmark`}
                   value={landMark}
-                  label={`Landmark`}
-                  placeholder={`Landmark`}
+                  label={f.landmark}
+                  placeholder={f.landmark}
                   errorMessage={error.landMark && error.landMark}
                   onChange={(e) => {
                     setLandMark(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        landMark: `Landmark is required`,
+                        landMark: f.landmarkRequired,
                       });
                     } else {
                       return setError({
@@ -391,15 +394,15 @@ const AddSalon = () => {
                   id={`city`}
                   name={`city`}
                   value={city}
-                  label={`City`}
-                  placeholder={`City`}
+                  label={f.city}
+                  placeholder={f.city}
                   errorMessage={error.city && error.city}
                   onChange={(e) => {
                     setCity(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        city: ` City is required`,
+                        city: f.cityRequired,
                       });
                     } else {
                       return setError({
@@ -416,15 +419,15 @@ const AddSalon = () => {
                   id={`state`}
                   name={`state`}
                   value={states}
-                  label={`State`}
-                  placeholder={`State`}
+                  label={f.state}
+                  placeholder={f.state}
                   errorMessage={error.state && error.state}
                   onChange={(e) => {
                     setStates(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        state: `State is required`,
+                        state: f.stateRequired,
                       });
                     } else {
                       return setError({
@@ -441,15 +444,15 @@ const AddSalon = () => {
                   id={`country`}
                   name={`country`}
                   value={country}
-                  label={`Country`}
-                  placeholder={`Country`}
+                  label={f.country}
+                  placeholder={f.country}
                   errorMessage={error.country && error.country}
                   onChange={(e) => {
                     setCountry(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        country: `Country is required`,
+                        country: f.countryRequired,
                       });
                     } else {
                       return setError({
@@ -466,15 +469,15 @@ const AddSalon = () => {
                   id={`latitude`}
                   name={`latitude`}
                   value={latitude}
-                  label={`latitude`}
-                  placeholder={`latitude`}
+                  label={f.latitude}
+                  placeholder={f.latitude}
                   errorMessage={error.latitude && error.latitude}
                   onChange={(e) => {
                     setLatitude(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        latitude: `latitude is required`,
+                        latitude: f.latitudeRequired,
                       });
                     } else {
                       return setError({
@@ -491,15 +494,15 @@ const AddSalon = () => {
                   id={`longitude`}
                   name={`longitude`}
                   value={longitude}
-                  label={`longitude`}
-                  placeholder={`longitude`}
+                  label={f.longitude}
+                  placeholder={f.longitude}
                   errorMessage={error.longitude && error.longitude}
                   onChange={(e) => {
                     setLongitude(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        longitude: `longitude is required`,
+                        longitude: f.longitudeRequired,
                       });
                     } else {
                       return setError({
@@ -522,15 +525,15 @@ const AddSalon = () => {
                   name={`about`}
                   value={about}
                   row={3}
-                  label={`About`}
-                  placeholder={`about`}
+                  label={f.about}
+                  placeholder={f.about}
                   errorMessage={error.about && error.about}
                   onChange={(e) => {
                     setAbout(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        about: `About is required`,
+                        about: f.aboutRequired,
                       });
                     } else {
                       return setError({
@@ -545,7 +548,7 @@ const AddSalon = () => {
               {state?.row && (
                 <div className="col-12 d-flex">
                   <ExInput
-                    label={`Main Image`}
+                    label={f.mainImage}
                     id={`mainImage`}
                     type={`file`}
                     onChange={(e) => handleImage(e)}
@@ -571,7 +574,7 @@ const AddSalon = () => {
               <div className="col-12">
                 <div className="inputData text  flex-row justify-content-start text-start">
                   <label for="latitude" className="false ">
-                    Select multiple image
+                    {f.gallery}
                   </label>
 
                   <ReactDropzone
@@ -656,7 +659,7 @@ const AddSalon = () => {
               <div className="col-12 text-end m0">
                 <Button
                   className={`bg-gray text-light`}
-                  text={`Cancel`}
+                  text="Annuler"
                   type={`button`}
                   onClick={() => navigate(-1)}
                 />
@@ -664,7 +667,7 @@ const AddSalon = () => {
                   type={`submit`}
                   className={` text-white m10-left`}
                   style={{ backgroundColor: "#1ebc1e" }}
-                  text={`Submit`}
+                  text="Enregistrer"
                   onClick={(e) => handleSubmit(e)}
                 />
               </div>

@@ -5,6 +5,9 @@ import { closeDialog } from "../../../redux/slice/dialogueSlice";
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { createCoupon } from "../../../redux/slice/couponSlice";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
+
+const c = ui.coupon;
 
 const CouponDialogue = () => {
 
@@ -54,19 +57,18 @@ const CouponDialogue = () => {
       !minAmountToApply
     ) {
       let error = {}
-      if (!title) error.title = "title is required";
-      if (!prefix) error.prefix = "prefix is required";
-      if (!description) error.description = "description is required";
-      if (!expiryDate) error.expiryDate = "expiryDate number is required";
-
-      if (!couponType) error.couponType = "couponType is required";
-      if (!discountType) error.discountType = "discountType is required";
+      if (!title) error.title = c.titleRequired;
+      if (!prefix) error.prefix = c.prefixRequired;
+      if (!description) error.description = c.descriptionRequired;
+      if (!expiryDate) error.expiryDate = c.expiryRequired;
+      if (!couponType) error.couponType = c.couponTypeRequired;
+      if (!discountType) error.discountType = c.discountTypeRequired;
       if (discountType == 1 && !maxDiscount)
-        error.maxDiscount = "maxDiscount is required";
+        error.maxDiscount = c.maxDiscountRequired;
       if (discountType == 2 && !discountPercent)
-        error.discountPercent = "discountPercent is required";
+        error.discountPercent = c.discountPercentRequired;
       if (discountType == 2 && discountPercent > 99)
-        error.discountPercent = "Enter DiscountPercent between 0 to 99";
+        error.discountPercent = c.discountPercentRange;
       return setError({ ...error });
     } else {
       const data = {
@@ -87,13 +89,13 @@ const CouponDialogue = () => {
   };
 
   const types = [
-    { value: 1, name: "Wallet" },
-    { value: 2, name: "Appointment" },
+    { value: 1, name: c.typeWallet },
+    { value: 2, name: c.typeAppointment },
   ];
 
   const discountTypes = [
-    { value: 1, name: "Flat" },
-    { value: 2, name: "Percentage" },
+    { value: 1, name: c.discountFlat },
+    { value: 2, name: c.discountPercentType },
   ];
   return (
     <>
@@ -104,7 +106,7 @@ const CouponDialogue = () => {
               <div className="mainDiaogBox">
                 <div className="row justify-content-between align-items-center formHead">
                   <div className="col-8">
-                    <h2 className="text-theme m0">Coupon dialog</h2>
+                    <h2 className="text-theme m0">{c.dialogTitle}</h2>
                   </div>
                   <div className="col-4">
                     <div
@@ -125,8 +127,8 @@ const CouponDialogue = () => {
                       id={`title`}
                       name={`title`}
                       value={title}
-                      label={`Title`}
-                      placeholder={`Title`}
+                      label={c.title}
+                      placeholder={c.title}
                       defaultValue={dialogueData && dialogueData?.title}
                       errorMessage={error.title && error.title}
                       onChange={(e) => {
@@ -134,7 +136,7 @@ const CouponDialogue = () => {
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            title: ` title is required`,
+                            title: c.titleRequired,
                           });
                         } else {
                           return setError({
@@ -151,8 +153,8 @@ const CouponDialogue = () => {
                       id={`prefix`}
                       name={`prefix`}
                       value={prefix}
-                      label={`prefix (For Example :- FREETIER)`}
-                      placeholder={`prefix`}
+                      label={c.prefixHint}
+                      placeholder={c.prefix}
                       defaultValue={dialogueData && dialogueData?.prefix}
                       errorMessage={error.prefix && error.prefix}
                       onChange={(e) => {
@@ -160,7 +162,7 @@ const CouponDialogue = () => {
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            prefix: `Prefix is required`,
+                            prefix: c.prefixRequired,
                           });
                         } else {
                           return setError({
@@ -178,8 +180,8 @@ const CouponDialogue = () => {
                       id={`description`}
                       name={`description`}
                       value={description}
-                      label={`Description`}
-                      placeholder={`Description`}
+                      label={c.description}
+                      placeholder={c.description}
                       defaultValue={dialogueData && dialogueData?.description}
                       errorMessage={error.description && error.description}
                       onChange={(e) => {
@@ -187,7 +189,7 @@ const CouponDialogue = () => {
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            description: ` Description is required`,
+                            description: c.descriptionRequired,
                           });
                         } else {
                           return setError({
@@ -205,8 +207,8 @@ const CouponDialogue = () => {
                       id={`minAmountToApply`}
                       name={`minAmountToApply`}
                       value={minAmountToApply}
-                      label={`Min amount to apply`}
-                      placeholder={`Min Amount To Apply`}
+                      label={c.minAmount}
+                      placeholder={c.minAmount}
                       defaultValue={
                         dialogueData && dialogueData?.minAmountToApply
                       }
@@ -218,7 +220,7 @@ const CouponDialogue = () => {
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            minAmountToApply: `Min Amount To Apply is required`,
+                            minAmountToApply: c.minAmountRequired,
                           });
                         } else {
                           return setError({
@@ -232,7 +234,7 @@ const CouponDialogue = () => {
                   <div className="col-md-6">
                     <div className="inputData">
                       <label className=" " htmlFor="category">
-                        Coupon type
+                        {c.couponType}
                       </label>
                       <select
                         name="category"
@@ -244,7 +246,7 @@ const CouponDialogue = () => {
                           if (!e.target.value) {
                             return setError({
                               ...error,
-                              couponType: "couponType is Required !",
+                              couponType: c.couponTypeRequired,
                             });
                           } else {
                             setError({
@@ -255,7 +257,7 @@ const CouponDialogue = () => {
                         }}
                       >
                         <option value="" disabled selected>
-                          --Select couponType--
+                          {c.selectCouponType}
                         </option>
                         {types?.map((data) => {
                           return (
@@ -273,7 +275,7 @@ const CouponDialogue = () => {
                   <div className="col-md-6">
                     <div className="inputData">
                       <label className=" " htmlFor="category">
-                        Discount type
+                        {c.discountType}
                       </label>
                       <select
                         name="category"
@@ -285,7 +287,7 @@ const CouponDialogue = () => {
                           if (!e.target.value) {
                             return setError({
                               ...error,
-                              discountType: "DiscountType is Required !",
+                              discountType: c.discountTypeRequired,
                             });
                           } else {
                             setError({
@@ -296,7 +298,7 @@ const CouponDialogue = () => {
                         }}
                       >
                         <option value="" disabled selected>
-                          --Select DiscountType--
+                          {c.selectDiscountType}
                         </option>
                         {discountTypes?.map((data) => {
                           return (
@@ -315,20 +317,20 @@ const CouponDialogue = () => {
                     <div
                       className={`inputData flex-row justify-content-start text-start`}
                     >
-                      <label htmlFor="gender">Expiry date</label>
+                      <label htmlFor="gender">{c.expiryDate}</label>
                       <input
                         type={`date`}
                         id={`expiryDate`}
                         name={`expiryDate`}
                         value={expiryDate}
                         defaultValue={dialogueData && dialogueData?.expiryDate}
-                        placeholder={`Expiry Date`}
+                        placeholder={c.expiryDate}
                         onChange={(e) => {
                           setExpiryDate(e.target.value);
                           if (!e.target.value) {
                             return setError({
                               ...error,
-                              expiryDate: `Expiry Date is required`,
+                              expiryDate: c.expiryRequired,
                             });
                           } else {
                             return setError({
@@ -346,8 +348,8 @@ const CouponDialogue = () => {
                       id={`maxDiscount`}
                       name={`maxDiscount`}
                       value={maxDiscount}
-                      label={`Max discount`}
-                      placeholder={`Max Discount`}
+                      label={c.maxDiscount}
+                      placeholder={c.maxDiscount}
                       defaultValue={dialogueData && dialogueData?.maxDiscount}
                       errorMessage={error.maxDiscount && error.maxDiscount}
                       onChange={(e) => {
@@ -355,7 +357,7 @@ const CouponDialogue = () => {
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            maxDiscount: `Max Discount is required`,
+                            maxDiscount: c.maxDiscountRequired,
                           });
                         } else {
                           return setError({
@@ -371,8 +373,8 @@ const CouponDialogue = () => {
                         id={`discountPercent`}
                         name={`discountPercent`}
                         value={discountPercent}
-                        label={`Discount Percent`}
-                        placeholder={`Discount Percent`}
+                        label={c.discountPercent}
+                        placeholder={c.discountPercent}
                         defaultValue={
                           dialogueData && dialogueData?.discountPercent
                         }
@@ -384,7 +386,7 @@ const CouponDialogue = () => {
                           if (!e.target.value) {
                             return setError({
                               ...error,
-                              discountPercent: `Discount Percent is required`,
+                              discountPercent: c.discountPercentRequired,
                             });
                           } else {
                             return setError({
@@ -405,7 +407,7 @@ const CouponDialogue = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -413,7 +415,7 @@ const CouponDialogue = () => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                       onClick={(e) => handleSubmit(e)}
                     />
                   </div>

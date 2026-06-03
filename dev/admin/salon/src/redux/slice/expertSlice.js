@@ -2,6 +2,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   expert: [],
@@ -116,7 +117,7 @@ const expertSlice = createSlice({
     builder.addCase(expertAdd.fulfilled, (state, action) => {
       if (action.payload.status) {
         state.expert.unshift(action.payload?.expert);
-        Success("Expert Create Successfully");
+        Success(ui.toast.expertCreated);
       }
       state.isLoading = false;
     });
@@ -141,7 +142,7 @@ const expertSlice = createSlice({
           };
         }
         state.oneExpert = action.payload.expert
-        Success("Expert Update Successfully");
+        Success(ui.toast.expertUpdated);
       }
       state.isLoading = false;
     });
@@ -161,7 +162,7 @@ const expertSlice = createSlice({
         state.expert = state.expert.filter(
           (expert) => expert._id !== action.meta.arg
         );
-        Success("Expert Delete Successfully");
+        Success(ui.toast.expertDeleted);
       }
       state.isLoading = false;
     });
@@ -186,7 +187,7 @@ const expertSlice = createSlice({
             ...action.payload?.expert,
           };
         }
-        Success("Expert Update Successfully");
+        Success(ui.toast.expertUpdated);
       }
       // state.isLoading = false;
     });

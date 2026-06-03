@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable jsx-a11y/alt-text */
 import React from "react";
 import Title from "../../extras/Title";
@@ -106,13 +108,13 @@ const UserProfile = () => {
   };
   const walletTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "UniqueId",
+      Header: col.uniqueId,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -122,11 +124,11 @@ const UserProfile = () => {
       ),
     },
     {
-      Header: `Amount (${setting?.currencySymbol})`,
+      Header: `${col.amount} (${setting?.currencySymbol})`,
       Cell: ({ row }) => <span className="text-capitalize">{row?.amount || "-"}</span>,
     },
     {
-      Header: "Date",
+      Header: col.date,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -139,7 +141,7 @@ const UserProfile = () => {
     },
 
     {
-      Header: "Time",
+      Header: col.time,
       Cell: ({ row }) => (
         <div>
           {row?.time ? row?.time : "-"}
@@ -147,7 +149,7 @@ const UserProfile = () => {
       ),
     },
     {
-      Header: "Transaction Type",
+      Header: col.transactionType,
       Cell: ({ row }) =>
         row?.type === 1 ? (
           <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#1ebc1e" }}>
@@ -177,7 +179,7 @@ const UserProfile = () => {
         ),
     },
     {
-      Header: "Transaction Completed",
+      Header: col.transactionCompleted,
       Cell: ({ row }) =>
         row?.type === 1 ? (
           <button className="d-flex align-items-center justify-content-center"
@@ -192,7 +194,7 @@ const UserProfile = () => {
               style={{ backgroundColor: "#FFE7CF", borderRadius: "8px", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}
             >
               <WithDraw />
-              <span style={{ whiteSpace: "nowrap" }} className="ms-2">Booking Fee Deduction</span>
+              <span style={{ whiteSpace: "nowrap" }} className="ms-2">{ui.labels.bookingFeeDeduction}</span>
             </button>
         ) : row?.type === 3 ? (
 
@@ -311,7 +313,7 @@ const UserProfile = () => {
                 <ExInput
                   type={`text`}
                   value={userData?.fname}
-                  label={`First name`}
+                  label={ui.table.firstName}
                   readOnly={true}
                 />
               </div>
@@ -319,7 +321,7 @@ const UserProfile = () => {
                 <ExInput
                   type={`text`}
                   value={userData?.lname ? userData?.lname : "-"}
-                  label={`Last name`}
+                  label={ui.table.lastName}
                   readOnly={true}
                 />
               </div>
@@ -327,7 +329,7 @@ const UserProfile = () => {
                 <ExInput
                   type={`text`}
                   value={userData?.uniqueId}
-                  label={`Unique id`}
+                  label={ui.form.uniqueId}
                   readOnly={true}
                 />
               </div>
@@ -335,7 +337,7 @@ const UserProfile = () => {
                 <ExInput
                   type={`text`}
                   value={userData?.mobile ? userData?.mobile : "-"}
-                  label={`Mobile number`}
+                  label={ui.form.mobileNumber}
                   readOnly={true}
                 />
               </div>
@@ -343,7 +345,7 @@ const UserProfile = () => {
                 <ExInput
                   type={`text`}
                   value={userData?.gender}
-                  label={`Gender`}
+                  label={ui.form.gender}
                   readOnly={true}
                 />
               </div>
@@ -351,7 +353,7 @@ const UserProfile = () => {
                 <ExInput
                   type={`text`}
                   value={userData?.age ? userData?.age : "-"}
-                  label={`Age`}
+                  label={ui.form.age}
                   readOnly={true}
                 />
               </div>
@@ -359,7 +361,7 @@ const UserProfile = () => {
                 <ExInput
                   type={`text`}
                   value={userData?.email ? userData?.email : "-"}
-                  label={`Email id`}
+                  label={ui.form.emailId}
                   readOnly={true}
                 />
               </div>
@@ -373,9 +375,9 @@ const UserProfile = () => {
                         ? "Google Login"
                         : "Mobile Login"
                   }
-                  label={`Login type`}
+                  label={ui.form.loginType}
                   readOnly={true}
-                  placeholder={`Login Type`}
+                  placeholder={ui.form.loginType}
                 />
               </div>
             </>
@@ -411,7 +413,7 @@ const UserProfile = () => {
 
         <div className="orderDetails mt-2">
           <div className="row">
-            <Title name="Wallet History" className="mt-4" onClick={(e) => {
+            <Title name={ui.labels.walletHistory} className="mt-4" onClick={(e) => {
               // setOrderDetails(false);
               // setWalletDetails(true);
               setTransactionType("All");
@@ -460,7 +462,7 @@ const UserProfile = () => {
               <Analytics
                 analyticsStartDate={startDate}
                 analyticsStartEnd={endDate}
-                placeholder="Wallet"
+                placeholder={ui.form.wallet}
                 analyticsStartDateSet={setStartDate}
                 analyticsStartEndSet={setEndDate}
               />

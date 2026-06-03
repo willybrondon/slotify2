@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -45,11 +47,11 @@ const navigate = useNavigate()
   const mapData = [
 
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{parseInt(index) + 1}</span>,
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div
           className="userProfile"
@@ -69,7 +71,7 @@ const navigate = useNavigate()
       ),
     },
     {
-      Header: "User Name",
+      Header: col.userName,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -81,7 +83,7 @@ const navigate = useNavigate()
     },
     
     {
-      Header: "BookingId",
+      Header: col.bookingId,
       body: "amount",
       Cell: ({ row }) => (
         <span className="text-capitalize">
@@ -91,7 +93,7 @@ const navigate = useNavigate()
     },
 
     {
-      Header: "Amount",
+      Header: col.amount,
       sorting: { type: "client" },
       body: "revenue",
       Cell: ({ row }) => (
@@ -101,7 +103,7 @@ const navigate = useNavigate()
       ),
     },
     {
-      Header: "Admin Earning",
+      Header: col.adminEarning,
       sorting: { type: "client" },
       body: "adminEarning",
       Cell: ({ row }) => (
@@ -111,7 +113,7 @@ const navigate = useNavigate()
       ),
     },
     {
-      Header: "Expert Earning",
+      Header: col.expertEarning,
       sorting: { type: "client" },
       body: "expertEarning",
       Cell: ({ row }) => (
@@ -121,7 +123,7 @@ const navigate = useNavigate()
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       sorting: { type: "date" },
       body: "payoutDate",
       Cell: ({ row }) => (
@@ -131,7 +133,7 @@ const navigate = useNavigate()
       ),
     },
     {
-      Header: "Payment Date",
+      Header: col.paymentDate,
       body: "payoutDate",
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.payoutDate}</span>
@@ -142,7 +144,7 @@ const navigate = useNavigate()
 
   return (
     <div className="mainCategory">
-      <Title name="Expert Earnings" />
+      <Title name={ui.pages.expertEarnings} />
       <div>
         <Table data={data} mapData={mapData} />
       </div>

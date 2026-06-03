@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   complain: [],
@@ -53,7 +54,7 @@ const categorySlice = createSlice({
         if (complainIndex !== -1) {
           state.complain[complainIndex].type = updated?.type;
         }
-        Success("Complain Solved Succefully");
+        Success(ui.toast.complainSolved);
       }
       state.isLoading = false;
     });

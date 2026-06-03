@@ -5,8 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../redux/slice/dialogueSlice";
 
 import { bonusPenalty } from "../../redux/slice/salarySlice";
-
-
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const BonusPenaltyDialog = () => {
   const dispatch = useDispatch();
@@ -22,7 +21,7 @@ const BonusPenaltyDialog = () => {
   const handleSubmit = () => {
 
     if (!bonus && !penalty) {
-      setError("Bonus or Penalty is required");
+      setError(ui.bonusPenalty.required);
     } else {
       
       const payload = {
@@ -47,7 +46,7 @@ const BonusPenaltyDialog = () => {
             <div className="mainDiaogBox">
               <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
-                  <h2 className="text-theme m0">Bonus Penalty Dialog</h2>
+                  <h2 className="text-theme m0">{ui.bonusPenalty.title}</h2>
                 </div>
                 <div className="col-4">
                   <div
@@ -72,8 +71,8 @@ const BonusPenaltyDialog = () => {
                     name={`bonus`}
                     value={bonus}
                     disabled={penalty !== null && penalty.length > 0}
-                    label={`Bonus  (${setting?.currencySymbol})`}
-                    placeholder={`Bonus`}
+                    label={`${ui.bonusPenalty.bonus} (${setting?.currencySymbol})`}
+                    placeholder={ui.bonusPenalty.bonus}
                     errorMessage={error && error}
                     onChange={(e) => {
                       setBonus(e.target.value);
@@ -92,8 +91,8 @@ const BonusPenaltyDialog = () => {
                     name={`penalty`}
                     value={penalty}
                     disabled={bonus !== null && bonus.length > 0}
-                    label={`Penalty  (${setting?.currencySymbol})`}
-                    placeholder={`Penalty`}
+                    label={`${ui.bonusPenalty.penalty} (${setting?.currencySymbol})`}
+                    placeholder={ui.bonusPenalty.penalty}
                     errorMessage={error && error}
                     onChange={(e) => {
                       setPenalty(e.target.value);
@@ -106,8 +105,8 @@ const BonusPenaltyDialog = () => {
                     id={`note`}
                     name={`note`}
                     value={note}
-                    label={`Note`}
-                    placeholder={`Note`}
+                    label={ui.bonusPenalty.note}
+                    placeholder={ui.bonusPenalty.note}
                     onChange={(e) => {
                       setNote(e.target.value);
                     }}
@@ -115,13 +114,13 @@ const BonusPenaltyDialog = () => {
                 </div>
               </div>
               <div className="text-danger text-capitalize">
-                Note : you Can either give bonus or penalty.
+                {ui.bonusPenalty.hint}
               </div>
               <div className="row  formFooter">
                 <div className="col-12 text-end m0">
                   <Button
                     className={`bg-gray text-light`}
-                    text={`Cancel`}
+                    text="Annuler"
                     type={`button`}
                     onClick={() => dispatch(closeDialog())}
                   />
@@ -129,7 +128,7 @@ const BonusPenaltyDialog = () => {
                     type={`submit`}
                     className={` text-white m10-left`}
                     style={{ backgroundColor: "#1ebc1e" }}
-                    text={`Submit`}
+                    text="Enregistrer"
                     onClick={(e) => handleSubmit(e)}
                   />
                 </div>

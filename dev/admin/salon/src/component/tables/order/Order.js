@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import { useEffect, useState } from "react";
 import Title from "../../extras/Title";
 import { useDispatch, useSelector } from "react-redux";
@@ -96,7 +97,7 @@ const Order = () => {
 
     const orderTable = [
         {
-            Header: "SR NO",
+            Header: col.srNo,
             Cell: ({ row, index }) => {
                 if (row?.isGrouped && row?.srNo) {
                     return <span>{row?.srNo}</span>; // Use the srNo generated above
@@ -105,7 +106,7 @@ const Order = () => {
             }
         },
         {
-            Header: "Order ID",
+            Header: col.orderId,
             Cell: ({ row }) => (
                 row?.isGrouped ? (
                     <span style={{ color: "blue", cursor: "pointer" }} onClick={() => handleOrderView(row?.orderMainId)}>
@@ -115,11 +116,11 @@ const Order = () => {
             )
         },
         {
-            Header: "User Info",
+            Header: col.userInfo,
             Cell: ({ row }) => row?.isGrouped ? <div>{row?.firstName || "-"}</div> : null
         },
         {
-            Header: "Items",
+            Header: col.items,
             Cell: ({ row }) => (
                 <>
                     <div className="d-flex justify-content-start">
@@ -138,7 +139,7 @@ const Order = () => {
             )
         },
         {
-            Header: "Price",
+            Header: col.price,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.purchasedTimeProductPrice * row?.productQuantity ? row?.purchasedTimeProductPrice * row?.productQuantity : "-"}</div>
@@ -146,7 +147,7 @@ const Order = () => {
             )
         },
         {
-            Header: "Shipping Charge",
+            Header: col.shipping,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.purchasedTimeShippingCharges ? row?.purchasedTimeShippingCharges : "-"}</div>
@@ -154,7 +155,7 @@ const Order = () => {
             )
         },
         {
-            Header: "Admin Commission",
+            Header: col.adminCommission,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.commissionPerProductQuantity === 0 ? 0 : row?.commissionPerProductQuantity}</div>
@@ -162,7 +163,7 @@ const Order = () => {
             )
         },
         {
-            Header: "Status",
+            Header: col.status,
             Cell: ({ row }) => {
                 return (
                     <div className="mb-2"> {/* Add margin for spacing */}
@@ -196,7 +197,7 @@ const Order = () => {
             }
         },
         {
-            Header: "Action",  // Show the Action header
+            Header: col.action,  // Show the Action header
             Cell: ({ row }) => {
                 const { status } = row;  // Extract status from the row
                 return (
@@ -248,7 +249,7 @@ const Order = () => {
 
     return (
         <div className="mainExpert">
-            <Title name="Orders" />
+            <Title name="Commandes" />
             <div className="col-2">
                 <div className="inputData">
                     <label className="styleForTitle" htmlFor="orderType">

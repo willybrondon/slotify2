@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ExInput } from "../../extras/Input";
 import Button from "../../extras/Button";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 
 const CancleDetails = () => {
   const { dialogueData } = useSelector((state) => state.dialogue);
@@ -26,7 +27,7 @@ const CancleDetails = () => {
             <div className="mainDiaogBox">
               <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
-                  <h4 className="text-theme m0">Cancel booking</h4>
+                  <h4 className="text-theme m0">{ui.dialog.cancelBooking}</h4>
                 </div>
                 <div className="col-4">
                   <div
@@ -46,8 +47,8 @@ const CancleDetails = () => {
                       type={`text`}
                       id={`reason`}
                       name={`reason`}
-                      label={`Reason`}
-                      placeholder={`Reason`}
+                      label={ui.dialog.reason}
+                      placeholder={ui.dialog.reason}
                       value={mongoId?.cancel?.reason}
                     />
                   </div>
@@ -56,8 +57,8 @@ const CancleDetails = () => {
                       type={`text`}
                       id={`Date`}
                       name={`Date`}
-                      label={`Date`}
-                      placeholder={`Date`}
+                      label={ui.table.date}
+                      placeholder={ui.table.date}
                       value={mongoId?.cancel?.date}
                     />
                   </div>
@@ -66,8 +67,8 @@ const CancleDetails = () => {
                       type={`text`}
                       id={`Time`}
                       name={`Time`}
-                      label={`Time`}
-                      placeholder={`Time`}
+                      label={ui.form.time}
+                      placeholder={ui.form.time}
                       value={mongoId?.cancel?.time}
                     />
                   </div>
@@ -76,7 +77,7 @@ const CancleDetails = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />

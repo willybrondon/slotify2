@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -33,7 +34,7 @@ const AttributeDialogue = () => {
     e.preventDefault();
     let validationError = {};
 
-    if (!name) validationError.name = "Name is required!";
+    if (!name) validationError.name = ui.dialog.nameRequiredBang;
     if (!detail && addDetail?.length === 0)
       validationError.detail = "Details are required!";
 
@@ -127,7 +128,7 @@ const AttributeDialogue = () => {
                         className="rounded-2"
                         id="name"
                         value={name}
-                        placeholder="Enter Name"
+                        placeholder={ui.dialog.enterName}
                         onChange={(e) => {
                           setName(e.target.value);
                           setError({ ...error, name: "" });
@@ -175,7 +176,7 @@ const AttributeDialogue = () => {
                               type="text"
                               className="rounded-2"
                               value={detail}
-                              placeholder="Enter detail"
+                              placeholder={ui.dialog.enterDetail}
                               onChange={(e) => {
                                 setDetail(e.target.value);
                                 setError({ ...error, detail: "" });
@@ -242,7 +243,7 @@ const AttributeDialogue = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -250,7 +251,7 @@ const AttributeDialogue = () => {
                       type={`submit`}
                       className={`text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                     />
                   </div>
                 </div>

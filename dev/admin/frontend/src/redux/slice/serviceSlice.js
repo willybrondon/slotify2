@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   service: [],
@@ -105,7 +106,7 @@ const serviceSlice = createSlice({
         state.service.unshift(dataObject);
 
         state.total += 1;
-        Success("Service Add Successfully");
+        Success(ui.toast.serviceAdded);
       }
       state.isLoading = false;
     });
@@ -131,7 +132,7 @@ const serviceSlice = createSlice({
             };
           }
         }
-        Success("Service Update Successfully");
+        Success(ui.toast.serviceUpdated);
       }
       state.isLoading = false;
     });
@@ -150,7 +151,7 @@ const serviceSlice = createSlice({
           (service) => service._id !== action.meta.arg
         );
         state.total -= 1;
-        Success("Service Delete Successfully");
+        Success(ui.toast.serviceDeleted);
       }
       state.isLoading = false;
     });
@@ -173,7 +174,7 @@ const serviceSlice = createSlice({
         }
         state.isLoading = false;
 
-        Success("Updated Successfully");
+        Success(ui.toast.updated);
       }
     });
     builder.addCase(serviceStatus.rejected, (state, action) => {

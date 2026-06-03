@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { activeBreak, getSalonSchedule } from "../../../redux/slice/salonSlice";
@@ -55,45 +56,45 @@ const SalonSchedule = () => {
 
   const scheduleTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
 
     {
-      Header: "Day",
+      Header: col.day,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.day}</span>
       ),
     },
     {
-      Header: "Open Time",
+      Header: col.openTime,
       Cell: ({ row }) => (
         <span className="text-capitalize">{formatTime(row?.openTime)}</span>
       ),
     },
 
     {
-      Header: "Closed Time",
+      Header: col.closedTime,
       Cell: ({ row }) => <span>{formatTime(row?.closedTime)}</span>,
     },
 
     {
-      Header: "Salon Break Start Time",
+      Header: col.breakStart,
       Cell: ({ row }) => (
         <span>{row?.isBreak ? formatTime(row?.breakStartTime) : "-"}</span>
       ),
     },
 
     {
-      Header: "Salon Break End Time",
+      Header: col.breakEnd,
       Cell: ({ row }) => (
         <span>{row?.isBreak ? formatTime(row?.breakEndTime) : "-"}</span>
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span>
           <button

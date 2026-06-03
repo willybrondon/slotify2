@@ -859,7 +859,37 @@ button {
   padding: 10px 0;
 }
 
-/* ============= Login CSS ============= */
+/* ============= Login CSS (Skedisy portail) ============= */
+.sk-portal-kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $theme;
+  opacity: 0.85;
+}
+.sk-portal-login-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0.25rem 0 0.5rem;
+}
+.sk-portal-subtitle {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.45;
+  margin-bottom: 0.25rem;
+}
+.sk-portal-footer {
+  font-size: 0.8rem;
+  text-align: center;
+  a {
+    color: $theme;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 .mainLoginPage {
   height: 100vh;
   display: flex;

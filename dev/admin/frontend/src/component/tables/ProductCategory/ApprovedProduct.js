@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 import Button from "../../extras/Button";
 import Pagination from "../../extras/Pagination";
@@ -55,12 +57,12 @@ const ApprovedProduct = () => {
 
     const mapData = [
         {
-            Header: "No",
+            Header: col.no,
             width: "20px",
             Cell: ({ index }) => <span>{parseInt(index) + 1}</span>,
         },
         {
-            Header: "Product",
+            Header: col.product,
             body: "image",
             Cell: ({ row }) => (
                 <div className="d-flex ">
@@ -82,30 +84,30 @@ const ApprovedProduct = () => {
             ),
         },
 
-        { Header: "Product Code", body: "productCode" },
+        { Header: col.productCode, body: "productCode" },
 
         {
-            Header: `Price (${setting?.currencySymbol})`,
+            Header: `${col.price} (${setting?.currencySymbol})`,
             body: "price",
             Cell: ({ row }) => (
                 <span className="fw-bold text-dark">${row.price}</span>
             ),
         },
         {
-            Header: "Shipping Charges",
+            Header: col.shipping,
             body: "shippingCharges",
             Cell: ({ row }) => <span>${row.shippingCharges}</span>,
         },
 
         {
-            Header: "CreatedDate",
+            Header: col.createdAt,
             body: "createdAt",
             Cell: ({ row }) => (
                 <span>{dayjs(row.createdAt).format("DD MMM YYYY")}</span>
             ),
         },
         {
-            Header: "Create Status",
+            Header: col.createStatus,
             body: "status",
             Cell: ({ row }) => (
                 <div className="boxCenter">
@@ -125,7 +127,7 @@ const ApprovedProduct = () => {
             ),
         },
         {
-            Header: "Info",
+            Header: col.info,
             Cell: ({ row }) => (
                 <span>
                     <button
@@ -161,13 +163,13 @@ const ApprovedProduct = () => {
 
                                 <Button
                                     className={`bg-secondary m20-left p-10 mt-5 text-white`}
-                                    text={`New Items`}
+                                    text={ui.labels.newItems}
                                     style={{ padding: "9px 20px" }}
                                     onClick={() => setStatus("Create")}
                                 />
                                 <Button
                                     className={`bg-primary m20-left p-10 mt-5 text-white`}
-                                    text={`Updated Items`}
+                                    text={ui.labels.updatedItems}
                                     style={{ padding: "9px 20px" }}
                                     onClick={() => setStatus("Update")}
                                 />

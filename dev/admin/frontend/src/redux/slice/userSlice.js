@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   user: [],
@@ -151,7 +152,7 @@ const userSlice = createSlice({
         if (userIndex !== -1) {
           state.user[userIndex].isBlock = updatedUser?.isBlock;
         }
-        Success("Updated Successfully");
+        Success(ui.toast.updated);
       }
       state.isLoading = false;
     });

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "./Button";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const Searching = (props) => {
   const [search, setSearch] = useState("");
@@ -41,7 +42,7 @@ const Searching = (props) => {
           <input
             type="search"
             id="search"
-            placeholder="Searching for..."
+            placeholder={ui.common.searchPlaceholder}
             className="bg-none m0-top"
             style={{ fontWeight: "500", height: "48px" }}
             onChange={

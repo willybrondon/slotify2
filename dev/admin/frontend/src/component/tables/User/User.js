@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import Button from "../../extras/Button";
@@ -78,13 +80,13 @@ export const User = () => {
 
   const userTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -106,7 +108,7 @@ export const User = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -117,21 +119,21 @@ export const User = () => {
       ),
     },
     {
-      Header: "Unique ID",
+      Header: col.uniqueId,
       Cell: ({ row }) => <span>{row?.uniqueId}</span>,
     },
     {
-      Header: "Mobile No",
+      Header: col.mobile,
       Cell: ({ row }) => <span>{row?.mobile ? row?.mobile : "-"}</span>,
     },
     {
-      Header: "Email",
+      Header: col.email,
       Cell: ({ row }) => (
         <span>{row?.email ? row?.email : "demo@demo.com"}</span>
       ),
     },
     {
-      Header: "gender",
+      Header: col.gender,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.gender ? row?.gender : "Not Specified"}
@@ -139,7 +141,7 @@ export const User = () => {
       ),
     },
     {
-      Header: "Block",
+      Header: col.block,
       Cell: ({ row }) => (
         <ToggleSwitch
 
@@ -151,7 +153,7 @@ export const User = () => {
       ),
     },
     {
-      Header: "Booking",
+      Header: col.booking,
       Cell: ({ row }) => (
         <button
           className="py-1"
@@ -178,7 +180,7 @@ export const User = () => {
       ),
     },
     {
-      Header: "Order",
+      Header: col.order,
       Cell: ({ row }) => (
         <span className="">
           <button
@@ -192,7 +194,7 @@ export const User = () => {
       ),
     },
     {
-      Header: "Info",
+      Header: col.info,
       Cell: ({ row }) => (
         <span className="">
           <button
@@ -223,7 +225,7 @@ export const User = () => {
       ),
     },
     {
-      Header: "Notification",
+      Header: col.notification,
       Cell: ({ row }) => (
         <span className="">
           <button
@@ -380,7 +382,7 @@ export const User = () => {
           display: `${dialogueType === "userHistory" ? "none" : "block"}`,
         }}
       >
-        <Title name="Customer" />
+        <Title name={ui.pages.customers} />
         <div className="betBox">
           <div className="d-flex justify-content-start  gap-2">
             <Button

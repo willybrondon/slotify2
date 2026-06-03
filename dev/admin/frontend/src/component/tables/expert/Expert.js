@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable eqeqeq */
 /* eslint-disable no-use-before-define */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -87,13 +89,13 @@ export const Expert = () => {
 
   const expertTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -111,7 +113,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -122,25 +124,25 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Email",
+      Header: col.email,
       Cell: ({ row }) => <span>{row?.email}</span>,
     },
     {
-      Header: "Salon",
+      Header: col.salon,
       Cell: ({ row }) => <span>{row?.salon ? row?.salon : "-"}</span>,
     },
     {
-      Header: "Age",
+      Header: col.age,
       body: "age",
       Cell: ({ row }) => <span>{row?.age}</span>,
       sorting: { type: "client" },
     },
     {
-      Header: "Gender",
+      Header: col.gender,
       Cell: ({ row }) => <span className="text-capitalize">{row?.gender}</span>,
     },
     {
-      Header: "Commission",
+      Header: col.commission,
       body: "commission",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -150,7 +152,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Block",
+      Header: col.block,
       body: "isBlock",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -163,7 +165,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Booking",
+      Header: col.booking,
       body: "booking",
       Cell: ({ row }) => (
         <button
@@ -191,7 +193,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Earnings",
+      Header: col.earnings,
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
           <button
@@ -216,7 +218,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Info",
+      Header: col.info,
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
           <button
@@ -241,7 +243,7 @@ export const Expert = () => {
       ),
     },
     // {
-    //   Header: "Action",
+    //   Header: col.action,
     //   Cell: ({ row }) => (
     //     <span className="d-flex justify-content-center">
     //       <button
@@ -284,7 +286,7 @@ export const Expert = () => {
     //   ),
     // },
     {
-      Header: "Notification",
+      Header: col.notification,
       Cell: ({ row }) => (
         <span className="">
           <button
@@ -352,7 +354,7 @@ export const Expert = () => {
 
   return (
     <div className="mainExpert">
-      <Title name="Experts" />
+      <Title name={ui.pages.experts} />
 
       <div className="betBox">
         <div className="inputData pb-2 pt-2">
@@ -387,7 +389,7 @@ export const Expert = () => {
 
         {/* <Button
           className={`bg-button m20-left p-10 mt-5 text-white`}
-          text={`Add Expert`}
+          text={ui.pages.addExpert}
           style={{padding: "9px 20px"}}
           bIcon={`fa-solid fa-user-plus`}
           onClick={() => handleAddExpert()}

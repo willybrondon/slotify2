@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -72,28 +74,28 @@ const ParticularExpertEarnings = () => {
   };
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{parseInt(index) + 1}</span>,
     },
 
     {
-      Header: "UniqueId",
+      Header: col.uniqueId,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.uniqueId || "-"}</span>
       ),
     },
     {
-      Header: `Amount (${setting?.currencySymbol})`,
+      Header: `${col.amount} (${setting?.currencySymbol})`,
       Cell: ({ row }) => <span className="text-capitalize">{row?.amount || "-"}</span>,
     },
     {
-      Header: `Date`,
+      Header: col.date,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.date || "-"}</span>
       ),
     },
     {
-      Header: "Time",
+      Header: col.time,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.time ? row?.time : "-"}
@@ -102,7 +104,7 @@ const ParticularExpertEarnings = () => {
     },
 
     {
-      Header: 'Transaction Type',
+      Header: col.transactionType,
       Cell: ({ row }) => {
         const isCredit = row?.type === 1;
         const isDebit = row?.type === 2 && row?.payoutStatus === 2;
@@ -123,7 +125,7 @@ const ParticularExpertEarnings = () => {
       },
     },
     {
-      Header: 'Transaction Completed',
+      Header: col.transactionCompleted,
       Cell: ({ row }) => {
         const isCredit = row?.type === 1;
         const isDebit = row?.type === 2;
@@ -132,7 +134,7 @@ const ParticularExpertEarnings = () => {
           <button className="d-flex align-items-center justify-content-center"
             style={{ background: "#C0E9C0", color: "#14AF14", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
             <img src={Sign} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px" }} />
-            <span style={{ whiteSpace: "nowrap" }}>Booking Complete</span>
+            <span style={{ whiteSpace: "nowrap" }}>{ui.labels.bookingComplete}</span>
           </button>
         ) : isDebit ? (
           <>
@@ -141,7 +143,7 @@ const ParticularExpertEarnings = () => {
               style={{ background: "#D8F0F9", color: "#17A7DB", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
               <Refund />
               <span style={{ whiteSpace: "nowrap" }} className="ms-2">{
-                row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+                row?.payoutStatus === 1 && ui.labels.withdrawPending || row?.payoutStatus === 2 && ui.labels.withdrawApproved || row?.payoutStatus === 3 && ui.labels.withdrawDeclined
               }</span>
             </button>
           ) : (
@@ -149,7 +151,7 @@ const ParticularExpertEarnings = () => {
               style={{ background: "#F5DDC3", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
               <img src={With} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px", border: "none", borderRadius: "5px" }} />
               <span style={{ whiteSpace: "nowrap" }}>{
-                row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+                row?.payoutStatus === 1 && ui.labels.withdrawPending || row?.payoutStatus === 2 && ui.labels.withdrawApproved || row?.payoutStatus === 3 && ui.labels.withdrawDeclined
               }</span>
             </button>
           )
@@ -213,7 +215,7 @@ const ParticularExpertEarnings = () => {
             <Analytics
               analyticsStartDate={startDate}
               analyticsStartEnd={endDate}
-              placeholder="Wallet"
+              placeholder={ui.form.wallet}
               analyticsStartDateSet={setStartDate}
               analyticsStartEndSet={setEndDate}
             />

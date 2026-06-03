@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
 import axios from "axios";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   salon: [],
@@ -184,7 +185,7 @@ const salonSlice = createSlice({
       if (action.payload.status) {
         state.salon.unshift(action.payload?.data);
         state.total += 1;
-        Success("Salon Create Successfully");
+        Success(ui.toast.salonCreated);
       }
       state.isLoading = false;
     });
@@ -207,7 +208,7 @@ const salonSlice = createSlice({
             ...action.payload.data.data,
           };
         }
-        Success("salon Update Successfully");
+        Success(ui.toast.salonUpdated);
       }
       state.isLoading = false;
     });
@@ -225,7 +226,7 @@ const salonSlice = createSlice({
           (salon) => salon._id !== action.meta.arg
         );
         state.total -= 1;
-        Success("Salon Delete Successfully");
+        Success(ui.toast.salonDeleted);
       }
       state.isLoading = false;
     });
@@ -254,7 +255,7 @@ const salonSlice = createSlice({
     builder.addCase(updateSalonTime.fulfilled, (state, action) => {
       if (action.payload.status) {
         state.salonSchedule = action.payload.data.salonTime;
-        Success("Time Update Successfully");
+        Success(ui.toast.timeUpdated);
       }
       state.isLoading = false;
     });
@@ -278,7 +279,7 @@ const salonSlice = createSlice({
         if (salonIndx !== -1) {
           state.salonSchedule[salonIndx].isBreak = activeSalonIndx.isBreak
         }
-        Success("Salon Update Successfully");
+        Success(ui.toast.salonUpdated);
       }
       state.isLoading = false;
     });
@@ -303,7 +304,7 @@ const salonSlice = createSlice({
             ...action.payload?.salon,
           };
         }
-        Success("Salon Update Successfully");
+        Success(ui.toast.salonUpdated);
       }
       state.isLoading = false;
     });

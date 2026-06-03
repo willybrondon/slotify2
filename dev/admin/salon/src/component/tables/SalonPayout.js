@@ -1,3 +1,5 @@
+import { col } from "../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 /* eslint-disable eqeqeq */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -82,14 +84,14 @@ const SalonPayout = () => {
 
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
 
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -104,7 +106,7 @@ const SalonPayout = () => {
     },
 
     {
-      Header: "Salon",
+      Header: col.salon,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold cursor">
           {row?.salon?.name}
@@ -112,7 +114,7 @@ const SalonPayout = () => {
       ),
     },
     {
-      Header: "Total Bookings",
+      Header: col.totalBookings,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">
           {row?.bookingId?.length == 0 ? 0 : row?.bookingId?.length}
@@ -120,20 +122,20 @@ const SalonPayout = () => {
       ),
     },
     {
-      Header: `Total (Earnings) `,
+      Header: col.totalEarning,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.salonEarning + " " + setting?.currencySymbol}</span>
       ),
     },
     {
-      Header: `Salon Commission `,
+      Header: col.salonCommissionPct,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.salonCommission + " " + setting?.currencySymbol}</span>
       ),
     },
 
     {
-      Header: "Note",
+      Header: col.note,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.note
@@ -143,19 +145,19 @@ const SalonPayout = () => {
       ),
     },
     {
-      Header: `Bonus/Penalty `,
+      Header: col.bonusPenalty,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.bonus + " " + setting?.currencySymbol}</span>
       ),
     },
     {
-      Header: `Final Amount `,
+      Header: col.finalAmount,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.finalAmount + " " + setting?.currencySymbol}</span>
       ),
     },
     {
-      Header: `CreatedAt`,
+      Header: col.createdAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.createdAt && moment(row.createdAt).format("YYYY-MM-DD")}
@@ -163,7 +165,7 @@ const SalonPayout = () => {
       ),
     },
     {
-      Header: `Payment Date`,
+      Header: col.paymentDate,
       body: "createdAt",
       Cell: ({ row }) => (
         <span className="text-capitalize">
@@ -172,7 +174,7 @@ const SalonPayout = () => {
       ),
     },
     {
-      Header: "Earnings",
+      Header: col.earnings,
       Cell: ({ row }) => (
         <span>
           <button
@@ -197,7 +199,7 @@ const SalonPayout = () => {
       ),
     },
     {
-      Header: "Info",
+      Header: col.info,
       Cell: ({ row }) => (
         <span>
           <button
@@ -223,7 +225,7 @@ const SalonPayout = () => {
     },
 
     {
-      Header: "Pay",
+      Header: col.pay,
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
           {row?.statusOfTransaction === 0 ? (
@@ -331,10 +333,10 @@ const SalonPayout = () => {
   return (
     <div className="mainCategory">
       {dialogue && dialogueType === "bonus" && <BonusPenaltyDialog />}
-      <Title name="Salon payment" />
+      <Title name={ui.labels.salonPayment} />
       <div className="d-flex">
         <div className="m40-bottom inputData col-lg-3 col-md-4 me-3">
-          <label>Select date</label>
+          <label>{ui.labels.selectDate}</label>
           <Analytics
             analyticsStartDate={startDate}
             analyticsStartEnd={endDate}

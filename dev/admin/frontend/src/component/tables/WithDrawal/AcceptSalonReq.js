@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import { useEffect, useState } from "react";
 import Pagination from "../../extras/Pagination"
 import Table from "../../extras/Table"
@@ -31,13 +32,13 @@ const AcceptSalonReq = ({ status, startDate, endDate }) => {
 
     const acceptTable = [
         {
-            Header: "SR NO",
+            Header: col.srNo,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             )
         },
         {
-            Header: "Salon Image",
+            Header: col.salonImage,
             Cell: ({ row }) => (
                 <>
                     <img src={row?.salon?.mainImage} alt="expert" width="80" height="80" style={{ objectFit: "contain", cursor: "pointer" }} onClick={(e) => {
@@ -47,7 +48,7 @@ const AcceptSalonReq = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: "Salon Name",
+            Header: col.salonName,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.salon?.name ? row?.salon?.name : "-"}</div>
@@ -55,7 +56,7 @@ const AcceptSalonReq = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: `Amount (${setting?.currencySymbol})`,
+            Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.amount ? row?.amount : "-"}</div>
@@ -63,7 +64,7 @@ const AcceptSalonReq = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: "Date",
+            Header: col.date,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.paymentDate ? row?.paymentDate : "-"}</div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { ExInput, Textarea } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
@@ -34,8 +35,8 @@ const SalonRequestDialogue = () => {
                 <div className="col-6">
                   <ExInput
                     value={dialogueData?.mobile}
-                    label={`Mobile`}
-                    placeholder={`Details`}
+                    label={ui.form.mobile}
+                    placeholder={ui.form.details}
                     readOnly={true}
                   />
                 </div>
@@ -43,8 +44,8 @@ const SalonRequestDialogue = () => {
                 <div className="col-6">
                   <ExInput
                     value={dialogueData?.expertCount}
-                    label={`Expert count`}
-                    placeholder={`Details`}
+                    label={ui.form.expertCount}
+                    placeholder={ui.form.details}
                     readOnly={true}
                   />
                 </div>
@@ -80,16 +81,16 @@ const SalonRequestDialogue = () => {
                 <div className="col-12">
                   <Textarea
                     value={dialogueData?.about}
-                    label={`Details`}
-                    placeholder={`Details`}
+                    label={ui.form.details}
+                    placeholder={ui.form.details}
                     readOnly={true}
                   />
                 </div>
                 <div className="col-12">
                   <Textarea
                     value={dialogueData?.address}
-                    label={`Address`}
-                    placeholder={`Details`}
+                    label={ui.form.address}
+                    placeholder={ui.form.details}
                     readOnly={true}
                   />
                 </div>

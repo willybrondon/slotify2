@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { ExInput } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -93,7 +94,7 @@ const HolidayDialog = () => {
                 </div>
                 <div className="col-12">
                   <ExInput
-                    label={`Reason`}
+                    label={ui.dialog.reason}
                     id={`reason`}
                     type={`text`}
                     onChange={(e) => setReason(e.target.value)}
@@ -104,7 +105,7 @@ const HolidayDialog = () => {
                 <div className="col-12 text-end m0">
                   <Button
                     className={`bg-gray text-light`}
-                    text={`Cancel`}
+                    text="Annuler"
                     type={`button`}
                     onClick={() => dispatch(closeDialog())}
                   />
@@ -112,7 +113,7 @@ const HolidayDialog = () => {
                     type={`submit`}
                     className={` text-white m10-left`}
                     style={{ backgroundColor: "#1ebc1e" }}
-                    text={`Submit`}
+                    text="Enregistrer"
                     onClick={(e) => handleSubmit(e)}
                   />
                 </div>

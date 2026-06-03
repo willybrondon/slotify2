@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Select } from "./Input";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const Pagination = (props) => {
   const [pages, setPages] = useState([]);
@@ -55,7 +56,7 @@ const Pagination = (props) => {
                 id={`pagination`}
                 option={option}
                 defaultValue={serverPerPage}
-                label={`Show `}
+                label={ui.common.paginationShow}
                 onChange={onRowsPerPageChange}
                 className={`midBox paginationSelect`}
                 btnClass={`mt-0`}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { ExInput } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,8 +34,8 @@ const NotificationDialog = () => {
     
     if (!title || !message) {
       let error = {};
-      if (!title) error.title = "Title is Required";
-      if (!message) error.message = "Message is Required";
+      if (!title) error.title = ui.dialog.titleRequired;
+      if (!message) error.message = ui.dialog.messageRequired;
       return setError({ ...error });
     } else {
       ;
@@ -92,8 +93,8 @@ const NotificationDialog = () => {
     let payload;
     if (!title || !message) {
       let error = {};
-      if (!title) error.title = "Title is Required";
-      if (!message) error.message = "Message is Required";
+      if (!title) error.title = ui.dialog.titleRequired;
+      if (!message) error.message = ui.dialog.messageRequired;
       return setError({ ...error });
     } else {
       if (image.length !== 0) {
@@ -158,14 +159,14 @@ const NotificationDialog = () => {
                     id={`title`}
                     name={`title`}
                     value={title}
-                    label={`Title`}
-                    placeholder={`Title`}
+                    label={ui.form.title}
+                    placeholder={ui.form.title}
                     errorMessage={error && error.title}
                     onChange={(e) => {
                       setTitle(e.target.value);
                       if (!e.target.value) {
                         setError({
-                          title: "Title Is Required",
+                          title: ui.dialog.titleRequired,
                         });
                       } else {
                         setError({
@@ -182,14 +183,14 @@ const NotificationDialog = () => {
                     id={`message`}
                     name={`message`}
                     value={message}
-                    label={`Message`}
-                    placeholder={`Message`}
+                    label={ui.form.message}
+                    placeholder={ui.form.message}
                     errorMessage={error && error.message}
                     onChange={(e) => {
                       setMessage(e.target.value);
                       if (!e.target.value) {
                         setError({
-                          message: "Message Is Required",
+                          message: ui.dialog.messageRequired,
                         });
                       } else {
                         setError({
@@ -202,7 +203,7 @@ const NotificationDialog = () => {
 
                 <div className="col-6">
                   <ExInput
-                    label={`Image`}
+                    label={ui.form.image}
                     id={`image`}
                     type={`file`}
                     onChange={(e) => handleImage(e)}
@@ -225,7 +226,7 @@ const NotificationDialog = () => {
                 <div className="col-12 text-end m0">
                   <Button
                     className={`bg-gray text-light`}
-                    text={`Cancel`}
+                    text="Annuler"
                     type={`button`}
                     onClick={() => dispatch(closeDialog())}
                   />
@@ -234,7 +235,7 @@ const NotificationDialog = () => {
                       type={`submit`}
                       className={`text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                       onClick={(e) => handleSubmit(e)}
                     />
                   )}
@@ -243,7 +244,7 @@ const NotificationDialog = () => {
                       type={`submit`}
                       className={`text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                       onClick={(e) => handleAllUser(e)}
                     />
                   )}

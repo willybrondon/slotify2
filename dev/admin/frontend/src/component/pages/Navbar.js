@@ -10,6 +10,7 @@ import { openDialog } from "../../redux/slice/dialogueSlice";
 import NotificationDialog from "../tables/User/NotificationDialog";
 import male from "../../assets/images/male.png";
 import { getSetting } from "../../redux/slice/settingSlice";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 const Navbar = () => {  
   const { admin } = useSelector((state) => state.auth);
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
@@ -110,7 +111,7 @@ const Navbar = () => {
                   onClick={() => handleNavigate()}
                 >
                   <h6 className="m0 text-capitalize">{admin?.name}</h6>
-                  <p className="m0">Admin</p>
+                  <p className="m0">{ui.roleAdmin}</p>
                 </div>
               </div>
             </div>

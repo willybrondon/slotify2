@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   booking: [],
@@ -126,7 +127,7 @@ const bookingSlice = createSlice({
             ...action.payload.booking,
           };
         }
-        Success("Booking Cancel Successfully");
+        Success(ui.toast.bookingCancelled);
       }
       state.isLoading = false;
     });

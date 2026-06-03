@@ -5,6 +5,7 @@ import jwt_decode from "jwt-decode";
 import { SetDevKey, setToken } from "../../util/setAuth";
 import { secretKey } from "../../util/config";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 import axios from "axios";
 
 const initialState = {
@@ -85,11 +86,11 @@ const authSlice = createSlice({
           
           // Force a small delay to ensure session storage is properly set
           setTimeout(() => {
-            Success("Login successfully");
+            Success(ui.toast.loginOk);
           }, 50);
         } catch (error) {
           console.error("Error setting session storage:", error);
-          DangerRight("Login failed - please try again");
+          DangerRight(ui.toast.loginFail);
         }
       } else {
         DangerRight(action?.payload?.message);
@@ -120,7 +121,7 @@ const authSlice = createSlice({
         ...action.payload.data,
       };
       state.isLoading = false;
-      Success("Admin Updated Successfully");
+      Success(ui.toast.adminUpdated);
     });
 
     builder.addCase(updateAdmin.rejected, (state, action) => {
@@ -143,7 +144,7 @@ const authSlice = createSlice({
       // state.isAuth = false;
 
       // window.location.href = "/salonPanel/login";
-      Success("Salon Password Updated Successfully");
+      Success(ui.toast.passwordUpdated);
     });
 
     builder.addCase(updateAdminPassword.rejected, (state, action) => {

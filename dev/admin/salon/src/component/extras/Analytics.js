@@ -5,8 +5,10 @@ import DateRangePicker from "react-bootstrap-daterangepicker";
 import moment from "moment";
 import dayjs from "dayjs";
 import $ from "jquery";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const Analytics = (props) => {
+  const a = ui.analytics;
   const {
     analyticsStartDate,
     analyticsStartEnd,
@@ -20,8 +22,10 @@ const Analytics = (props) => {
     let start = dayjs(picker.startDate).format("YYYY-MM-DD");
     let end = dayjs(picker.endDate).format("YYYY-MM-DD");
 
-    // Convert 'all' to 'ALL' when necessary
-    if (picker.chosenLabel.toLowerCase() === "Select Date") {
+    if (
+      picker.chosenLabel === a.selectDate ||
+      picker.chosenLabel?.toLowerCase() === "select date"
+    ) {
       start = "ALL";
       end = "ALL";
     }
@@ -36,16 +40,9 @@ const Analytics = (props) => {
   });
   const { start, end } = state;
 
-  const handleCancel = (event, picker) => {
-    picker?.element.val("");
-    analyticsStartDateSet("");
-    analyticsStartEndSet("");
-  };
-
   const handleCallback = (start, end) => {
     setState({ start, end });
   };
-  const label = start.format("DD/MM/YYYY") + " - " + end.format("DD/MM/YYYY");
 
   const { color, bgcolor } = props;
 
@@ -60,37 +57,43 @@ const Analytics = (props) => {
     setDateRangePickerVisible(!isDateRangePickerVisible);
   };
 
+  const ranges = {
+    ...(allAllow !== false && {
+      [a.all]: [new Date("1970-01-01"), moment().toDate()],
+    }),
+    [a.today]: [moment().toDate(), moment().toDate()],
+    [a.yesterday]: [
+      moment().subtract(1, "days").toDate(),
+      moment().subtract(1, "days").toDate(),
+    ],
+    [a.last7]: [moment().subtract(6, "days").toDate(), moment().toDate()],
+    [a.last30]: [moment().subtract(29, "days").toDate(), moment().toDate()],
+    [a.thisMonth]: [
+      moment().startOf("month").toDate(),
+      moment().endOf("month").toDate(),
+    ],
+    [a.lastMonth]: [
+      moment().subtract(1, "month").startOf("month").toDate(),
+      moment().subtract(1, "month").endOf("month").toDate(),
+    ],
+  };
+
+  const displayValue =
+    (analyticsStartDate === startAllDate && analyticsStartEnd === endAllDate) ||
+    (String(analyticsStartDate).toUpperCase() === "ALL" &&
+      String(analyticsStartEnd).toUpperCase() === "ALL")
+      ? a.all
+      : `${moment(analyticsStartDate).format("YYYY-MM-DD")} ${a.rangeTo} ${moment(
+          analyticsStartEnd
+        ).format("YYYY-MM-DD")}`;
+
   return (
-    <div className="d-flex my-2" style={{ width: "285px", justifyContent: direction }}>
+    <div
+      className="d-flex my-2"
+      style={{ width: "285px", justifyContent: direction }}
+    >
       <DateRangePicker
-        initialSettings={{
-          ranges: {
-            ...(allAllow !== false && {
-              ALL: [new Date("1970-01-01"), moment().toDate()],
-            }),
-            Today: [moment().toDate(), moment().toDate()],
-            Yesterday: [
-              moment().subtract(1, "days").toDate(),
-              moment().subtract(1, "days").toDate(),
-            ],
-            "Last 7 Days": [
-              moment().subtract(6, "days").toDate(),
-              moment().toDate(),
-            ],
-            "Last 30 Days": [
-              moment().subtract(29, "days").toDate(),
-              moment().toDate(),
-            ],
-            "This Month": [
-              moment().startOf("month").toDate(),
-              moment().endOf("month").toDate(),
-            ],
-            "Last Month": [
-              moment().subtract(1, "month").startOf("month").toDate(),
-              moment().subtract(1, "month").endOf("month").toDate(),
-            ],
-          },
-        }}
+        initialSettings={{ ranges }}
         onCallback={handleCallback}
         onApply={handleApply}
       >
@@ -101,14 +104,7 @@ const Analytics = (props) => {
           readOnly
           onClick={handleInputClick}
           className={`daterange float-right mr-4 text-center ${bgcolor} ${color}`}
-          value={
-            (analyticsStartDate === startAllDate && analyticsStartEnd === endAllDate) ||
-              (analyticsStartDate.toUpperCase() === "ALL" && analyticsStartEnd.toUpperCase() === "ALL")
-              ? "ALL" // Display "ALL" in uppercase
-              : `${moment(analyticsStartDate).format("YYYY-MM-DD")} To ${moment(
-                analyticsStartEnd
-              ).format("YYYY-MM-DD")}`
-          }
+          value={displayValue}
           style={{
             width: "85%",
             fontWeight: 600,
@@ -122,7 +118,8 @@ const Analytics = (props) => {
             height: "48px !important",
             color: "#000",
             background: "white",
-            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+            boxShadow:
+              "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
           }}
         />
       </DateRangePicker>

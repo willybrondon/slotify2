@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { ExInput } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,9 +55,9 @@ const TimeDialogue = () => {
     e.preventDefault();
     if (!openTime || !closeTime || !day || !slotTime) {
       let error = {};
-      if (!openTime) error.openTime = "Open time is required";
-      if (!day) error.day = "Day is required";
-      if (!closeTime) error.closeTime = "Close time is required";
+      if (!openTime) error.openTime = ui.settings.openTimeRequired;
+      if (!day) error.day = ui.labels.dayRequired;
+      if (!closeTime) error.closeTime = ui.settings.closeTimeRequired;
       return setError({ ...error });
     } else {
       let addTax = {
@@ -150,15 +151,15 @@ const TimeDialogue = () => {
                       type={`text`}
                       id={`day`}
                       name={`day`}
-                      label={`Day`}
-                      placeholder={`Day`}
+                      label={ui.form.day}
+                      placeholder={ui.form.day}
                       value={day}
                       onChange={(e) => {
                         setDay(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            day: "Day is Required !",
+                            day: ui.labels.dayRequiredBang,
                           });
                         } else {
                           setError({
@@ -180,15 +181,15 @@ const TimeDialogue = () => {
                       type={`number`}
                       id={`slotTime`}
                       name={`slotTime`}
-                      label={`Slot Time (Minute)`}
-                      placeholder={`slotTime`}
+                      label={ui.form.slotTimeMinute}
+                      placeholder={ui.form.slotTimeMinute}
                       value={slotTime}
                       onChange={(e) => {
                         setSlotTime(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            slotTime: "slotTime is Required !",
+                            slotTime: ui.labels.slotTimeRequired,
                           });
                         } else {
                           setError({
@@ -276,7 +277,7 @@ const TimeDialogue = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -284,7 +285,7 @@ const TimeDialogue = () => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                     />
                   </div>
                 </div>

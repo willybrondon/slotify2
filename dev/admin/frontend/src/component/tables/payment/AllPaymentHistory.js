@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -51,13 +52,13 @@ const AllPaymentHistory = () => {
 
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div
           className="userProfile"
@@ -75,7 +76,7 @@ const AllPaymentHistory = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -85,7 +86,7 @@ const AllPaymentHistory = () => {
       ),
     },
     {
-      Header: "Total Bookings",
+      Header: col.totalBookings,
       sorting: { type: "client" },
       body: "totalBookings",
       Cell: ({ row }) => (
@@ -94,7 +95,7 @@ const AllPaymentHistory = () => {
     },
 
     {
-      Header: "Paid Payment",
+      Header: col.paidPayment,
       sorting: { type: "client" },
       body: "amount",
       Cell: ({ row }) => (
@@ -104,7 +105,7 @@ const AllPaymentHistory = () => {
       ),
     },
     {
-      Header: "Service Earning",
+      Header: col.serviceEarning,
       sorting: { type: "client" },
       body: "serviceAmount",
       Cell: ({ row }) => (
@@ -114,7 +115,7 @@ const AllPaymentHistory = () => {
       ),
     },
     {
-      Header: "Bonus/Penalty",
+      Header: col.bonusPenalty,
       body: "bonus_penalty",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -124,13 +125,13 @@ const AllPaymentHistory = () => {
       ),
     },
     {
-      Header: "Settlement Month",
+      Header: col.settlementMonth,
       sorting: { type: "client" },
       body: "month",
       Cell: ({ row }) => <span className="text-capitalize">{row?.month}</span>,
     },
     {
-      Header: "Payment Date",
+      Header: col.paymentDate,
       sorting: { type: "client" },
       body: "payoutDate",
       Cell: ({ row }) => (
@@ -138,7 +139,7 @@ const AllPaymentHistory = () => {
       ),
     },
     {
-      Header: "Payment Mode",
+      Header: col.paymentMode,
       sorting: { type: "client" },
       body: "payoutDate",
       Cell: ({ row }) => (
@@ -149,7 +150,7 @@ const AllPaymentHistory = () => {
     },
 
     {
-      Header: "Details",
+      Header: col.details,
       Cell: ({ row }) => (
         <span>
           <button

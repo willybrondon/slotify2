@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
     product: [],
@@ -290,7 +291,7 @@ const productSlice = createSlice({
             if (action.payload.status) {
                 state?.productCategory?.unshift(action?.payload?.data);
                 state.total += 1;
-                Success("ProductCategory Add Successfully");
+                Success(ui.toast.productCategoryAdded);
             }
             state.isLoading = false;
         });
@@ -309,7 +310,7 @@ const productSlice = createSlice({
                 state.product = state.product.filter(
                   (product) => product._id !== action.meta.arg
                 );
-                Success("Product Deleted Successfully");
+                Success(ui.toast.productDeleted);
                 state.total -= 1;
               }else{
 

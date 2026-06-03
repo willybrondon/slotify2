@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
+import {
+  translateApiMessage,
+  translatePaymentDetail,
+  translatePaymentMethod,
+} from "../../constants/skedisyApiMessage";
+
+const w = ui.withdraw;
 import Analytics from "../extras/Analytics";
 import moment from "moment";
 import withDrawBanner from "../../../src/assets/images/withDraw.png";
@@ -86,9 +94,9 @@ const WithDrawMoney = () => {
             .then((res) => {
                 if (res?.payload?.status) {
                     dispatch(getWithDrawMethod());
-                    toast.success(res?.payload?.message);
+                    toast.success(translateApiMessage(res?.payload?.message));
                 } else {
-                    toast.error(res?.payload?.message);
+                    toast.error(translateApiMessage(res?.payload?.message));
                 }
             });
     };
@@ -97,31 +105,29 @@ const WithDrawMoney = () => {
     return (
         <>
             <div className="mainExpert">
-                <Title name="Withdraw Money" />
+                <Title name={w.title} />
 
                 <div className="row">
                     <div className="col-md-6" style={{ position: "relative" }}>
-                        {/* Text positioned on top of the image */}
-                        <div style={{ position: "absolute", top: "14%", left: "20%", transform: "translateX(-50%)", color: "white", fontSize: "24px", zIndex: 2 }}>
-                            My Available Balance
+                        <div style={{ position: "absolute", top: "5%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "17px", zIndex: 2, fontWeight: "bold" }}>
+                            {w.balanceLabel}
                         </div>
-                        <div style={{ position: "absolute", top: "20%", left: "13%", transform: "translateX(-50%)", color: "white", fontSize: "40px", zIndex: 2 }}>{currency?.currencySymbol} {admin?.earning}</div>
+                        <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>{currency?.currencySymbol} {admin?.earning}</div>
 
-                        {/* Image */}
-                        <img src={withDrawBanner} alt="Withdraw Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
+                        <img src={withDrawBanner} alt={w.bannerAlt} height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
 
                         <div className="inputData">
                             <label className="styleForTitle mt-2" htmlFor="withdrawAmount">
-                                Enter Withdraw Amount
+                                {w.amountLabel}
                             </label>
                             <div className="input-group mt-2">
-                                <span className="input-group-text fw-bold">$</span>
+                                <span className="input-group-text fw-bold">{currency?.currencySymbol}</span>
                                 <input
                                     type="number"
                                     name="withdrawAmount"
                                     className="form-control fw-bold p-3"
                                     id="withdrawAmount"
-                                    placeholder="Enter amount"
+                                    placeholder={w.amountPlaceholder}
                                     onChange={(e) => {
                                         setAmount(e.target.value);
                                     }}
@@ -129,15 +135,13 @@ const WithDrawMoney = () => {
                             </div>
                         </div>
 
-
                         <div className="row mt-4">
                             <div className="inputData mt-4 col-md-11">
                                 <label className="styleForTitle fw-bold" style={{ color: "#1C2B20", fontSize: "24px" }}>
-                                    Withdraw Instruction :
+                                    {w.instructionsTitle}
                                 </label>
                                 <div style={{ fontSize: "14px", lineHeight: "25px", color: "#A5A5A5" }}>
-                                    <div>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</div>
-                                    <div style={{ wordWrap: "break-word" }}>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</div>
+                                    <div>{w.instructions}</div>
                                 </div>
                             </div>
                         </div>
@@ -149,7 +153,7 @@ const WithDrawMoney = () => {
 
                         <div className="inputData mt-2">
                             <label className="styleForTitle" htmlFor="paymentType">
-                                Select Payment Option
+                                {w.paymentOption}
                             </label>
                             <select
                                 name="paymentType"
@@ -160,7 +164,7 @@ const WithDrawMoney = () => {
                             >
                                 {withDraw?.map((data) => (
                                     <option key={data._id} value={data.name}>
-                                        {data.name}
+                                        {translatePaymentMethod(data.name)}
                                     </option>
                                 ))}
                             </select>
@@ -168,11 +172,11 @@ const WithDrawMoney = () => {
                             {/* Display dynamic input fields based on selected payment details */}
                             {selectedDetails?.map((detail, index) => (
                                 <div className="inputData mt-4" key={index}>
-                                    <label className="styleForTitle">Enter Your {detail}</label>
+                                    <label className="styleForTitle">{w.paymentField} {translatePaymentDetail(detail)}</label>
                                     <input
                                         type="text"
                                         className="rounded-2 fw-bold p-4"
-                                        placeholder={`Enter your ${detail.toLowerCase()}`}
+                                        placeholder={`${w.paymentFieldPlaceholder} ${translatePaymentDetail(detail).toLowerCase()}`}
                                         onChange={(e) => handleDetailChange(detail, e.target.value)} // Capture both name and value
                                     />
                                 </div>
@@ -184,7 +188,7 @@ const WithDrawMoney = () => {
                                     type={`submit`}
                                     className={`text-white m10-left`}
                                     style={{ backgroundColor: "#1ebc1e" }}
-                                    text={`Submit`}
+                                    text={w.submit}
                                     onClick={handleSubmit}
                                 />
                             </div>

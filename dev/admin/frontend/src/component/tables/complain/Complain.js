@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 /* eslint-disable eqeqeq */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
@@ -68,13 +69,13 @@ const Complain = () => {
 
   const userTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -89,7 +90,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "BookingId",
+      Header: col.bookingId,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">
           {row?.bookingId ? row?.bookingId : "-"}
@@ -97,7 +98,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "User Name",
+      Header: col.userName,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">
           {row?.userId?.fname
@@ -107,13 +108,13 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Details",
+      Header: col.details,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.details}</span>
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.date ? row?.date?.split(",")[0] : "-"}
@@ -121,7 +122,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Time",
+      Header: col.time,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.date ? row?.date?.split(",")[1] : "-"}
@@ -129,7 +130,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Status",
+      Header: col.status,
       Cell: ({ row }) => (
         <span>
           {row?.type == 0 && (
@@ -149,7 +150,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span>
           <button
@@ -176,13 +177,13 @@ const Complain = () => {
 
   const expertTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -197,7 +198,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "BookingId",
+      Header: col.bookingId,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">
           {row?.bookingId ? row?.bookingId : "-"}
@@ -205,7 +206,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Expert Name",
+      Header: col.expertName,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">
           {row?.expertId
@@ -215,13 +216,13 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Details",
+      Header: col.details,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.details}</span>
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.date ? row?.date?.split(",")[0] : "-"}
@@ -229,7 +230,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Time",
+      Header: col.time,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.date ? row?.date?.split(",")[1] : "-"}
@@ -237,7 +238,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Status",
+      Header: col.status,
       Cell: ({ row }) => (
         <span>
           {row?.type == 0 && (
@@ -257,7 +258,7 @@ const Complain = () => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span>
           <button

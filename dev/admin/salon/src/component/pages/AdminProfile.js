@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 import Title from "../extras/Title";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -17,7 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import Male from "../../../src/assets/images/male.png";
 import { ExInput, Textarea } from "../extras/Input";
 import ToggleSwitch from "../extras/ToggleSwitch";
-
+import { SKEDISY_SALON_PORTAL_COPY as portalCopy } from "../../constants/skedisyPortalCopy";
 
 export const AdminProfile = () => {
   const dispatch = useDispatch();
@@ -136,13 +137,12 @@ export const AdminProfile = () => {
       !oldPassword
     ) {
       let error = {};
-      if (!newPassword) error.newPassword = "New password is required !";
+      if (!newPassword) error.newPassword = portalCopy.newPasswordRequired;
       if (!confirmPassword)
-        error.confirmPassword = "Confirm password Is required !";
+        error.confirmPassword = portalCopy.confirmPasswordRequired;
       if (newPassword !== confirmPassword)
-        error.confirmPassword =
-          "New password and confirm password doesn't match";
-      if (!oldPassword) error.oldPassword = "Old password is required !";
+        error.confirmPassword = portalCopy.passwordMismatch;
+      if (!oldPassword) error.oldPassword = portalCopy.oldPasswordRequired;
       return setError({ ...error });
     } else {
       let data = {
@@ -158,8 +158,8 @@ export const AdminProfile = () => {
 
     if (!imagePath || !name || image.length === 0) {
       let error = {};
-      if (!name) error.name = "name is required";
-      if (!image || imagePath?.length < 0) error.image = "image is required";
+      if (!name) error.name = portalCopy.nameRequired;
+      if (!image || imagePath?.length < 0) error.image = portalCopy.imageRequired;
     } else {
       const formData = new FormData();
       formData.append("mainImage", image);
@@ -203,11 +203,13 @@ export const AdminProfile = () => {
   return (
     <div className="mainAdminProfile">
       <div className="p-3">
-        <Title name={`${data ? data?.name : "Salon"}'s   Profile`} />
+        <Title
+          name={`${data?.name || portalCopy.profileSalonFallback}${portalCopy.profileTitleSuffix}`}
+        />
         <div className="d-flex justify-content-end mb-4">
           <Button
             onClick={updateProfile}
-            text={`Submit`}
+            text="Enregistrer"
             className={` text-white`}
             style={{ backgroundColor: "#1ebc1e" }}
           />
@@ -282,15 +284,15 @@ export const AdminProfile = () => {
                       id={`salonName`}
                       name={`salonName`}
                       value={name}
-                      label={`Salon Name`}
-                      placeholder={`salonName`}
+                      label={ui.form.salonName}
+                      placeholder={ui.form.salonName}
                       errorMessage={error.name && error.name}
                       onChange={(e) => {
                         setName(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            name: ` Name Is Required`,
+                            name: ui.dialog.nameRequiredBang,
                           });
                         } else {
                           return setError({
@@ -307,8 +309,8 @@ export const AdminProfile = () => {
                       id={`email`}
                       name={`email`}
                       value={email}
-                      label={`email`}
-                      placeholder={`email`}
+                      label={portalCopy.email}
+                      placeholder={ui.form.email}
                       errorMessage={error.email && error.email}
                       readOnly
                     />
@@ -319,8 +321,8 @@ export const AdminProfile = () => {
                       id={`platformFee`}
                       name={`platformFee`}
                       value={platformFee}
-                      label={`Plateform Fees (%)`}
-                      placeholder={`platformFee`}
+                      label={ui.form.platformFeePct}
+                      placeholder={ui.form.platformFeePct}
                       readOnly
                     />
                   </div>
@@ -330,15 +332,15 @@ export const AdminProfile = () => {
                       id={`mobileNumber`}
                       name={`mobileNumber`}
                       value={mobile}
-                      label={`Mobile Number`}
-                      placeholder={`mobileNumber`}
+                      label={portalCopy.mobileLabel}
+                      placeholder={ui.form.mobileNumber}
                       errorMessage={error.mobile && error.mobile}
                       onChange={(e) => {
                         setMobile(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            mobile: `Mobile Number Is Required`,
+                            mobile: portalCopy.mobileRequired,
                           });
                         } else if (
                           e.target.value.length < 6 ||
@@ -363,15 +365,15 @@ export const AdminProfile = () => {
                       id={`latitude`}
                       name={`latitude`}
                       value={latitude}
-                      label={`Latitude`}
-                      placeholder={`latitude`}
+                      label={portalCopy.latitudeLabel}
+                      placeholder={ui.form.latitude}
                       errorMessage={error.latitude && error.latitude}
                       onChange={(e) => {
                         setLatitude(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            latitude: `Latitude Is Required`,
+                            latitude: portalCopy.latitudeRequired,
                           });
                         } else {
                           return setError({
@@ -388,15 +390,15 @@ export const AdminProfile = () => {
                       id={`longitude`}
                       name={`longitude`}
                       value={longitude}
-                      label={`Longitude`}
-                      placeholder={`longitude`}
+                      label={portalCopy.longitudeLabel}
+                      placeholder={ui.form.longitude}
                       errorMessage={error.longitude && error.longitude}
                       onChange={(e) => {
                         setLongitude(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            longitude: `longitude Is Required`,
+                            longitude: portalCopy.longitudeRequired,
                           });
                         } else {
                           return setError({
@@ -421,15 +423,15 @@ export const AdminProfile = () => {
                       value={about}
                       id={`about`}
                       name={`about`}
-                      label={`About`}
-                      placeholder={`about`}
+                      label={portalCopy.aboutLabel}
+                      placeholder={portalCopy.aboutLabel}
                       errorMessage={error.about && error.about}
                       onChange={(e) => {
                         setAbout(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            about: `About Is Required`,
+                            about: portalCopy.aboutRequired,
                           });
                         } else {
                           return setError({
@@ -498,7 +500,7 @@ export const AdminProfile = () => {
                         </div>
                       </div>
                       <p style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
-                        Recommended: 1200x400px. This image appears at the top of your public salon page.
+                        {portalCopy.profileHeroHint} Format conseillé : 1200×400 px.
                       </p>
                     </div>
                   </div>
@@ -508,8 +510,8 @@ export const AdminProfile = () => {
                       id={`valuePropositionTitle`}
                       name={`valuePropositionTitle`}
                       value={valuePropositionTitle}
-                      label={`Value Proposition Title`}
-                      placeholder={`e.g., Premier Hair & Beauty Experience`}
+                      label={portalCopy.profileValueTitleLabel}
+                      placeholder={portalCopy.profileValueTitlePlaceholder}
                       errorMessage={error.valuePropositionTitle && error.valuePropositionTitle}
                       onChange={(e) => {
                         setValuePropositionTitle(e.target.value);
@@ -524,8 +526,8 @@ export const AdminProfile = () => {
                       value={valuePropositionDescription}
                       id={`valuePropositionDescription`}
                       name={`valuePropositionDescription`}
-                      label={`Value Proposition Description`}
-                      placeholder={`Brief description of what makes your salon special`}
+                      label={portalCopy.profileValueDescLabel}
+                      placeholder={portalCopy.profileValueDescPlaceholder}
                       errorMessage={error.valuePropositionDescription && error.valuePropositionDescription}
                       onChange={(e) => {
                         setValuePropositionDescription(e.target.value);
@@ -540,8 +542,8 @@ export const AdminProfile = () => {
                       id={`valuePropositionFeatures`}
                       name={`valuePropositionFeatures`}
                       value={valuePropositionFeatures}
-                      label={`Key Features (comma-separated)`}
-                      placeholder={`e.g., Expert stylists, Elegant atmosphere, Personalized service`}
+                      label={portalCopy.profileValueFeaturesLabel}
+                      placeholder={portalCopy.profileValueFeaturesPlaceholder}
                       errorMessage={error.valuePropositionFeatures && error.valuePropositionFeatures}
                       onChange={(e) => {
                         setValuePropositionFeatures(e.target.value);
@@ -552,7 +554,7 @@ export const AdminProfile = () => {
                       }}
                     />
                     <p style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
-                      Separate multiple features with commas. These will appear as highlights on your public page.
+                      {portalCopy.profileValueFeaturesHint}
                     </p>
                   </div>
                 </div>
@@ -595,15 +597,15 @@ export const AdminProfile = () => {
                       id={`address`}
                       name={`address`}
                       value={address}
-                      label={`Address`}
-                      placeholder={`address`}
+                      label={portalCopy.addressLabel}
+                      placeholder={ui.form.address}
                       errorMessage={error.address && error.address}
                       onChange={(e) => {
                         setAddress(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            address: `Address Is Required`,
+                            address: portalCopy.addressRequired,
                           });
                         } else {
                           return setError({
@@ -620,15 +622,15 @@ export const AdminProfile = () => {
                       id={`landmark`}
                       name={`landmark`}
                       value={landMark}
-                      label={`LandMark`}
-                      placeholder={`landmark`}
+                      label={portalCopy.landmarkLabel}
+                      placeholder={ui.form.landmark}
                       errorMessage={error.landMark && error.landMark}
                       onChange={(e) => {
                         setLandMark(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            landMark: `LandMark Is Required`,
+                            landMark: portalCopy.landmarkRequired,
                           });
                         } else {
                           return setError({
@@ -645,15 +647,15 @@ export const AdminProfile = () => {
                       id={`city`}
                       name={`city`}
                       value={city}
-                      label={`City`}
-                      placeholder={`city`}
+                      label={portalCopy.cityLabel}
+                      placeholder={ui.form.city}
                       errorMessage={error.city && error.city}
                       onChange={(e) => {
                         setCity(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            city: `City Is Required`,
+                            city: portalCopy.cityRequired,
                           });
                         } else {
                           return setError({
@@ -670,15 +672,15 @@ export const AdminProfile = () => {
                       id={`state`}
                       name={`state`}
                       value={state}
-                      label={`State`}
-                      placeholder={`state`}
+                      label={portalCopy.stateLabel}
+                      placeholder={ui.form.state}
                       errorMessage={error.state && error.state}
                       onChange={(e) => {
                         setState(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            state: `State Is Required`,
+                            state: portalCopy.stateRequired,
                           });
                         } else {
                           return setError({
@@ -695,15 +697,15 @@ export const AdminProfile = () => {
                       id={`country`}
                       name={`country`}
                       value={country}
-                      label={`Country`}
-                      placeholder={`country`}
+                      label={portalCopy.countryLabel}
+                      placeholder={ui.form.country}
                       errorMessage={error.country && error.country}
                       onChange={(e) => {
                         setCountry(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            country: `Country Is Required`,
+                            country: portalCopy.countryRequired,
                           });
                         } else {
                           return setError({
@@ -727,15 +729,15 @@ export const AdminProfile = () => {
                       id={`oldPassword`}
                       name={`oldPassword`}
                       value={oldPassword}
-                      label={`Old Password`}
-                      placeholder={`Old Password`}
+                      label={portalCopy.oldPassword}
+                      placeholder={portalCopy.oldPassword}
                       errorMessage={error.oldPassword && error.oldPassword}
                       onChange={(e) => {
                         setOldPassword(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            oldPassword: "Old password is required !",
+                            oldPassword: portalCopy.oldPasswordRequired,
                           });
                         } else {
                           return setError({
@@ -752,15 +754,15 @@ export const AdminProfile = () => {
                       id={`newPassword`}
                       name={`newPassword`}
                       value={newPassword}
-                      label={`New Password`}
-                      placeholder={`New Password`}
+                      label={portalCopy.newPassword}
+                      placeholder={portalCopy.newPassword}
                       errorMessage={error.newPassword && error.newPassword}
                       onChange={(e) => {
                         setNewPassword(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            newPassword: "New password is required !",
+                            newPassword: portalCopy.newPasswordRequired,
                           });
                         } else {
                           return setError({
@@ -777,8 +779,8 @@ export const AdminProfile = () => {
                       id={`confirmPassword`}
                       name={`confirmPassword`}
                       value={confirmPassword}
-                      label={`Confirm Password`}
-                      placeholder={`Confirm Password`}
+                      label={portalCopy.confirmPasswordField}
+                      placeholder={portalCopy.confirmPasswordField}
                       errorMessage={
                         error.confirmPassword && error.confirmPassword
                       }
@@ -787,7 +789,7 @@ export const AdminProfile = () => {
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            confirmPassword: "Confirm password is required !",
+                            confirmPassword: portalCopy.confirmPasswordRequired,
                           });
                         } else {
                           return setError({
@@ -802,7 +804,7 @@ export const AdminProfile = () => {
                 <div className="d-flex justify-content-end">
                   <Button
                     onClick={handleChangePassword}
-                    text={`Submit`}
+                    text="Enregistrer"
                     className={`bg-theme text-white`}
                   />
                 </div>

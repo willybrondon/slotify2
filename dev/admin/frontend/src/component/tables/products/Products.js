@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable eqeqeq */
 /* eslint-disable no-use-before-define */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -84,13 +86,13 @@ const Products = () => {
 
     const expertTable = [
         {
-            Header: "No",
+            Header: col.no,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             ),
         },
         {
-            Header: "Product Code",
+            Header: col.productCode,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -100,7 +102,7 @@ const Products = () => {
             ),
         },
         {
-            Header: "Name",
+            Header: col.name,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -110,7 +112,7 @@ const Products = () => {
             ),
         },
         {
-            Header: "Brand",
+            Header: col.brand,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -120,7 +122,7 @@ const Products = () => {
             ),
         },
         {
-            Header: "Category Name",
+            Header: col.categoryName,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -130,7 +132,7 @@ const Products = () => {
             ),
         },
         {
-            Header: "Image",
+            Header: col.image,
             Cell: ({ row }) => (
                 <div
                     className="userProfile"
@@ -151,19 +153,19 @@ const Products = () => {
         },
 
         {
-            Header: "Price",
+            Header: col.price,
             Cell: ({ row }) => <span>{row?.price ? row?.price : "-"}</span>,
         },
         {
-            Header: "Mrp",
+            Header: col.mrp,
             Cell: ({ row }) => <span>{row?.mrp ? row?.mrp : "-"}</span>,
         },
         {
-            Header: "Shipping Charges",
+            Header: col.shipping,
             Cell: ({ row }) => <span>{row?.shippingCharges ? row?.shippingCharges : "-"}</span>,
         },
         {
-            Header: "Is OutOfStock",
+            Header: col.outOfStock,
             body: "isOutOfStock",
             sorting: { type: "client" },
             Cell: ({ row }) => (
@@ -188,7 +190,7 @@ const Products = () => {
             ),
         },
         {
-            Header: "Info",
+            Header: col.info,
             Cell: ({ row }) => (
                 <span>
                     <button
@@ -213,7 +215,7 @@ const Products = () => {
             ),
         },
         {
-            Header: "Action",
+            Header: col.action,
             Cell: ({ row }) => (
                 <span className="d-flex justify-content-center">
                     <button
@@ -303,12 +305,12 @@ const Products = () => {
 
     return (
         <div className="mainExpert">
-            <Title name="Products" />
+            <Title name={ui.pages.products} />
 
             <div className="betBox">
                 <Button
                     className={`bg-button p-10 text-black m8-bottom`}
-                    text={`Add Products`}
+                    text={ui.labels.addProducts}
                     bIcon={`fa-solid fa-user-plus`}
                     onClick={() => handleAddProduct()}
                 />

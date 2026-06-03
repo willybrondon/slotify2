@@ -4,6 +4,7 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
@@ -72,10 +73,10 @@ const ServiceDialogue = (props) => {
         let error = {};
         if (!name) error.name = "Name is Required";
         if (!duration) error.duration = "Duration is Required";
-        // if (!price) error.price = "Price is Required";
+        // if (!price) error.price = ui.dialog.priceRequired;
         if (!categoryy) error.categoryy = "category is Required";
-        // if (price <= 0) error.price = "Enter Correct price";
-        if (duration <= 0) error.duration = "Enter Correct duration";
+        // if (price <= 0) error.price = ui.dialog.priceInvalid;
+        if (duration <= 0) error.duration = ui.dialog.durationInvalid;
         if (!image?.length === 0 || !imagePath)
           error.image = "Name is Required";
         if (!imagePath) error.imagePath = "imagePath is Required";
@@ -109,7 +110,7 @@ const ServiceDialogue = (props) => {
     if (!e.target.files) {
       setError((prevErrors) => ({
         ...prevErrors,
-        image: "Image is Required",
+        image: ui.dialog.imageRequiredCategory,
       }));
     }
     setImage(e.target.files[0]);
@@ -153,13 +154,13 @@ const ServiceDialogue = (props) => {
                       className="rounded-2"
                       id="name"
                       value={name}
-                      placeholder="Enter Name"
+                      placeholder={ui.dialog.enterName}
                       onChange={(e) => {
                         setName(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            name: ` Name is required`,
+                            name: ui.dialog.nameRequiredBang,
                           });
                         } else {
                           return setError({
@@ -187,13 +188,13 @@ const ServiceDialogue = (props) => {
                       className="rounded-2"
                       id="duration"
                       value={duration}
-                      placeholder="Enter Duration"
+                      placeholder={ui.dialog.enterDuration}
                       onChange={(e) => {
                         setDuration(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            duration: ` Duration is required`,
+                            duration: ui.dialog.durationRequired,
                           });
                         } else {
                           return setError({
@@ -221,13 +222,13 @@ const ServiceDialogue = (props) => {
                       className="rounded-2"
                       id="price"
                       value={price}
-                      placeholder="Enter Price"
+                      placeholder={ui.dialog.enterPrice}
                       onChange={(e) => {
                         setPrice(e.target.value);
                         if (!e.target.value) {
                           return setError({
                             ...error,
-                            price: ` Price is required`,
+                            price: ui.dialog.priceRequired,
                           });
                         } else {
                           return setError({
@@ -333,7 +334,7 @@ const ServiceDialogue = (props) => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -341,7 +342,7 @@ const ServiceDialogue = (props) => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                       onClick={(e) => handleSubmit(e)}
                     />
                   </div>

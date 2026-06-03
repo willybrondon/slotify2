@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Input, { ExInput } from "../extras/Input";
+import { ExInput } from "../extras/Input";
 import Button from "../extras/Button";
 import { login } from "../../redux/slice/authSlice";
 import logo from "../../assets/images/logo.png";
+import { SKEDISY_SALON_PORTAL_COPY as copy } from "../../constants/skedisyPortalCopy";
 
 const Login = (props) => {
   let navigate = useNavigate();
@@ -14,7 +15,6 @@ const Login = (props) => {
   const isAuth = useSelector((state) => state.auth.isAuth);
 
   useEffect(() => {
-    
     isAuth && navigate("/salonPanel/salonDashboard");
   }, [isAuth, navigate]);
 
@@ -27,111 +27,99 @@ const Login = (props) => {
 
   const submit = async () => {
     if (!email || !password) {
-      let error = {};
-      if (!email) error.email = "Email is required";
-      if (!password) error.password = "password is required";
-    } else {
-      const loginData = {
-        email,
-        password,
-      };
+      const nextError = {};
+      if (!email) nextError.email = copy.errEmail;
+      if (!password) nextError.password = copy.errPassword;
+      return setError(nextError);
+    }
+    const loginData = { email, password };
 
-      try {
-        let response = await dispatch(login(loginData)).unwrap();
-        console.log("response", response);
-        
-        if (response?.status) {
-          // Add a small delay to ensure session storage is properly set
-          setTimeout(() => {
-            // Force a page reload to ensure all state is properly synchronized
-            window.location.href = "/salonPanel/salonDashboard";
-          }, 100);
-        }
-      } catch (error) {
-        console.error("Login error:", error);
+    try {
+      let response = await dispatch(login(loginData)).unwrap();
+      if (response?.status) {
+        setTimeout(() => {
+          window.location.href = "/salonPanel/salonDashboard";
+        }, 100);
       }
+    } catch (err) {
+      console.error("Login error:", err);
     }
   };
-
 
   return (
     <>
       <div className="mainLoginPage">
         <div className="loginDiv" style={{ width: "100%" }}>
           <div className="loginPage m-auto">
-            <div className="loginTitle mb-3  d-flex ">
-              <a href="https://skedisy.com" style={{ textDecoration: "none", display: "inline-block" }}>
-                <img src={logo} style={{ width: "50px" }} alt="logo" />
+            <div className="loginTitle mb-3 d-flex">
+              <a
+                href="https://skedisy.com"
+                style={{ textDecoration: "none", display: "inline-block" }}
+              >
+                <img src={logo} style={{ width: "50px" }} alt="Skedisy" />
               </a>
             </div>
-            <div className="fw-bold text-theme  me-auto my-auto welComeTitle">
-              Welcome Back
+            <p className="sk-portal-kicker mb-1">{copy.kicker}</p>
+            <div className="fw-bold text-theme me-auto my-auto welComeTitle">
+              {copy.welcome}
             </div>
-            <h1>Log In !</h1>
-            <h6 className="fw-bold text-theme  me-auto my-auto fs-15 py-2 title">
-              Please,Enter Your Email id and Password
+            <h1 className="sk-portal-login-title">{copy.loginTitle}</h1>
+            <p className="sk-portal-subtitle">{copy.loginSubtitle}</p>
+            <h6 className="fw-bold text-theme me-auto my-auto fs-15 py-2 title">
+              {copy.loginHint}
             </h6>
             <div>
-              <div className="col-12 ">
+              <div className="col-12">
                 <ExInput
-                  type={`text`}
-                  id={`email`}
-                  name={`email`}
-                  label={`Email`}
+                  type="text"
+                  id="email"
+                  name="email"
+                  label={copy.email}
                   value={email}
-                  placeholder={`Email`}
+                  placeholder={copy.email}
                   errorMessage={error.email && error.email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        email: `email Id is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        email: "",
-                      });
-                    }
+                    setError({
+                      ...error,
+                      email: !e.target.value ? copy.errEmail : "",
+                    });
                   }}
                 />
               </div>
-              <div className="col-12 ">
+              <div className="col-12">
                 <ExInput
-                  type={`password`}
-                  id={`password`}
-                  name={`password`}
+                  type="password"
+                  id="password"
+                  name="password"
                   value={password}
-                  label={`Password`}
-                  placeholder={`Password`}
+                  label={copy.password}
+                  placeholder={copy.password}
                   errorMessage={error.password && error.password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    if (!e.target.value) {
-                      return setError({
-                        ...error,
-                        password: `password is Required`,
-                      });
-                    } else {
-                      return setError({
-                        ...error,
-                        password: "",
-                      });
-                    }
+                    setError({
+                      ...error,
+                      password: !e.target.value ? copy.errPassword : "",
+                    });
                   }}
                 />
               </div>
-              <div className="loginButton d-flex gx-2 justify-content-center">            
+              <div className="loginButton d-flex gx-2 justify-content-center">
                 <Button
-                  type={`submit`}
-                  className={`bg-theme text-light cursor m10-top col-6 mx-2`}
-                  text={`Log In`}
+                  type="submit"
+                  className="bg-theme text-light cursor m10-top col-6 mx-2"
+                  text={copy.submitLogin}
                   onClick={submit}
                   style={{ borderRadius: "30px" }}
                 />
               </div>
             </div>
+            <p className="sk-portal-footer mt-3 mb-0">
+              <a href="https://skedisy.com">{copy.footerLink}</a>
+              {" · "}
+              <a href="https://skedisy.com/salon/claim">{copy.footerPro}</a>
+            </p>
           </div>
         </div>
       </div>

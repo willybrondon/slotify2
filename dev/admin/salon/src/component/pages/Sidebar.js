@@ -9,14 +9,17 @@ import { closeDialog } from "../../redux/slice/dialogueSlice";
 import logo from "../../assets/images/logo2.png";
 import { ReactComponent as Services } from "../../assets/images/services.svg"
 import { ReactComponent as Category } from "../../assets/images/category.svg"
-import { ReactComponent as WithdrawMoney } from "../../assets/images/withDrawMoney.svg"
+import { ReactComponent as WithdrawMoney } from "../../assets/images/withDrawMoney.svg";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
+
+const n = ui.nav;
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const data = warning("Logout");
+    const data = warning(ui.alert.logout);
     data
       .then((logouts) => {
         const yes = logouts.isConfirmed;
@@ -36,7 +39,7 @@ const Sidebar = () => {
 
   const navBarArray = [
     {
-      name: "Dashboard",
+      name: n.dashboard,
       path: "/salonpanel/salonDashboard",
       navSVG: (
         <svg
@@ -64,7 +67,7 @@ const Sidebar = () => {
 
   const array2 = [
     {
-      name: "Expert",
+      name: n.experts,
       path: "/salonpanel/allExperts",
 
       navSVG: (
@@ -90,7 +93,7 @@ const Sidebar = () => {
 
 
     {
-      name: "Reviews",
+      name: n.reviews,
       path: "/salonpanel/reviewTable",
       navSVG: (
         <svg
@@ -109,7 +112,7 @@ const Sidebar = () => {
       onClick: handleOnClick,
     },
     {
-      name: "Complain",
+      name: n.complaints,
       path: "/salonpanel/complainTable",
       navSVG: (
         <svg
@@ -155,7 +158,7 @@ const Sidebar = () => {
       onClick: handleOnClick,
     },
     {
-      name: "Expert attendance",
+      name: n.attendance,
       path: "/salonpanel/attendanceTable",
       navSVG: (
         <svg
@@ -192,7 +195,7 @@ const Sidebar = () => {
 
   const array7 = [
     {
-      name: "Products",
+      name: n.products,
       path: "/salonpanel/productsTable",
       navSVG: (
         <Category height={20} width={20} />
@@ -200,7 +203,7 @@ const Sidebar = () => {
       onClick: handleOnClick,
     },
     {
-      name: "Attributes",
+      name: n.attributes,
       path: "/salonpanel/attribute",
       navSVG: (
         <Category height={20} width={20} />
@@ -212,7 +215,7 @@ const Sidebar = () => {
 
   const array8 = [
     {
-      name: "Orders",
+      name: n.orders,
       path: "/salonpanel/orderTable",
       navSVG: (
         <svg
@@ -233,13 +236,13 @@ const Sidebar = () => {
   ];
   const array9 = [
     {
-      name: "Services",
+      name: n.services,
       path: "/salonpanel/cityServiceTable",
       navSVG: (<Services height={20} width={20} />),
       onClick: handleOnClick,
     },
     {
-      name: "Products",
+      name: n.products,
       path: "/salonpanel/cityProductTable",
       navSVG: (<Category height={20} width={20} />),
       onClick: handleOnClick,
@@ -247,7 +250,7 @@ const Sidebar = () => {
   ]
   const array3 = [
     {
-      name: "Services",
+      name: n.services,
       path: "/salonpanel/serviceTable",
       navSVG: (
         // <img src={Services} height={20} width={20}/>
@@ -308,7 +311,7 @@ const Sidebar = () => {
     //   onClick: handleOnClick,
     // },
     {
-      name: "Withdraw Money",
+      name: n.withdraw,
       path: "/salonpanel/withdrawMoney",
       navSVG: (
         <WithdrawMoney height={20} width={20} />
@@ -316,7 +319,7 @@ const Sidebar = () => {
       onClick: handleOnClick,
     },
     {
-      name: "Wallet",
+      name: n.wallet,
       path: "/salonpanel/wallet",
       navSVG: (
         <svg
@@ -335,7 +338,7 @@ const Sidebar = () => {
       onClick: handleOnClick,
     },
     {
-      name: "Wallet History",
+      name: n.walletHistory,
       path: "/salonpanel/walletHistory",
       navSVG: (
         <svg
@@ -357,7 +360,7 @@ const Sidebar = () => {
   ];
   const array6 = [
     {
-      name: "Salon Time",
+      name: n.salonTime,
       navSVG: (
         <svg
           width="24"
@@ -383,7 +386,7 @@ const Sidebar = () => {
       path: "/salonpanel/timeTable",
     },
     {
-      name: "Salon Holiday",
+      name: n.salonHoliday,
       navSVG: (
         <svg
           width="24"
@@ -422,7 +425,7 @@ const Sidebar = () => {
   ];
   const array5 = [
     {
-      name: "Salon Time",
+      name: n.salonTime,
       navSVG: (
         <svg
           width="24"
@@ -448,7 +451,7 @@ const Sidebar = () => {
       path: "/salonpanel/timeTable",
     },
     {
-      name: "Salon Holiday",
+      name: n.salonHoliday,
       navSVG: (
         <svg
           width="24"
@@ -467,7 +470,7 @@ const Sidebar = () => {
     },
 
     {
-      name: "LogOut",
+      name: n.logout,
       navSVG: (
         <svg
           width="24"
@@ -504,7 +507,7 @@ const Sidebar = () => {
               className="cursor text-nowrap mb-0 ms-3"
               onClick={() => navigate("/salonpanel/salonDashboard")}
             >
-              Salon Slot
+              {ui.brand}
             </h3>
           </div>
 
@@ -518,7 +521,7 @@ const Sidebar = () => {
             <ul
               className={`mainMenu ${webSize < 991 ? "mobMenu" : " webMenu"}`}
             >
-              <p className="navTitle">Menu</p>
+              <p className="navTitle">{n.menu}</p>
               {navBarArray.map((res, i) => {
                 return (
                   <>
@@ -548,7 +551,7 @@ const Sidebar = () => {
                 );
               })}
 
-              <p className="navTitle">Expert</p>
+              <p className="navTitle">{n.expert}</p>
               {array2.map((res, i) => {
                 return (
                   <>
@@ -577,7 +580,7 @@ const Sidebar = () => {
                   </>
                 );
               })}
-              <p className="navTitle">Order</p>
+              <p className="navTitle">{n.order}</p>
               {array8.map((res, i) => {
                 return (
                   <>
@@ -607,7 +610,7 @@ const Sidebar = () => {
                 );
               })}
 
-              <p className="navTitle">Services</p>
+              <p className="navTitle">{n.services}</p>
               {array3.map((res, i) => {
                 return (
                   <>
@@ -636,7 +639,7 @@ const Sidebar = () => {
                   </>
                 );
               })}
-              <p className="navTitle">E-Commerce</p>
+              <p className="navTitle">{n.ecommerce}</p>
               {array7.map((res, i) => {
                 return (
                   <>
@@ -723,7 +726,7 @@ const Sidebar = () => {
                   </>
                 );
               })} */}
-              <p className="navTitle">Finance</p>
+              <p className="navTitle">{n.finance}</p>
               {array4.map((res, i) => {
                 return (
                   <>
@@ -753,7 +756,7 @@ const Sidebar = () => {
                 );
               })}
 
-              <p className="navTitle">Report</p>
+              <p className="navTitle">{n.report}</p>
               {array5.map((res, i) => {
                 return (
                   <>

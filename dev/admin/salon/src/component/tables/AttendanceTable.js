@@ -1,3 +1,5 @@
+import { col } from "../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
@@ -43,11 +45,11 @@ const AttendanceTable = () => {
 
   const expertTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{index + 1}</span>,
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
           <div
             className="userProfile"
@@ -68,7 +70,7 @@ const AttendanceTable = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -79,23 +81,23 @@ const AttendanceTable = () => {
       ),
     },
     {
-      Header: "Month Year",
+      Header: col.monthYear,
       Cell: ({ row }) => <span className="text-capitalize">{row?.month}</span>,
     },
     {
-      Header: "Available Days",
+      Header: col.availableDays,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.attendCount}</span>
       ),
     },
     {
-      Header: "Absent Days",
+      Header: col.absentDays,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.absentCount}</span>
       ),
     },
     {
-      Header: "Total Days",
+      Header: col.totalDays,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.totalDays}</span>
       ),
@@ -110,9 +112,9 @@ const AttendanceTable = () => {
     console.log('selectedDate', selectedDate)
   return (
     <div className="mainExpert">
-      <Title name="Staff attendance data" />
+      <Title name={ui.pages.staffAttendanceData} />
       <div className="m12-bottom inputData col-lg-2 col-md-4 z-index-3 position-relative">
-        <label>Select month</label>
+        <label>{ui.labels.selectMonth}</label>
         <DatePicker
           selected={selectedDate}
           onChange={handleDateChange}

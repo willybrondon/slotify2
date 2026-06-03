@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useDispatch, useSelector } from "react-redux";
 import { ExInput } from "../../extras/Input";
 import Button from "../../extras/Button";
@@ -24,7 +25,7 @@ const CompleteBookingDetails = () => {
                         <div className="mainDiaogBox">
                             <div className="row justify-content-between align-items-center formHead">
                                 <div className="col-8">
-                                    <h4 className="text-theme m0">Booking Info</h4>
+                                    <h4 className="text-theme m0">{ui.dialog.bookingInfo}</h4>
                                 </div>
                                 <div className="col-4">
                                     <div
@@ -44,8 +45,8 @@ const CompleteBookingDetails = () => {
                                             type={`text`}
                                             id={`reason`}
                                             name={`reason`}
-                                            label={`check in time`}
-                                            placeholder={`Reason`}
+                                            label={ui.dialog.checkInTime}
+                                            placeholder={ui.dialog.checkInTime}
                                             value={mongoId?.checkInTime}
                                             disabled={true}
                                         />
@@ -55,8 +56,8 @@ const CompleteBookingDetails = () => {
                                             type={`text`}
                                             id={`Date`}
                                             name={`Date`}
-                                            label={`Check out time`}
-                                            placeholder={`Date`}
+                                            label={ui.form.checkOutTime}
+                                            placeholder={ui.form.date}
                                             value={mongoId?.checkOutTime}
                                             disabled={true}
                                         />
@@ -67,7 +68,7 @@ const CompleteBookingDetails = () => {
                                     <div className="col-12 text-end m0">
                                         <Button
                                             className={`bg-gray text-light`}
-                                            text={`Cancel`}
+                                            text="Annuler"
                                             type={`button`}
                                             onClick={() => dispatch(closeDialog())}
                                         />

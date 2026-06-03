@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   productCategory: [],
@@ -68,7 +69,7 @@ const productCategorySLice = createSlice({
       if (action.payload.status) {
         state?.productCategory?.unshift(action?.payload?.data);
         state.total += 1;
-        // Success("ProductCategory Add Successfully");
+        // Success(ui.toast.productCategoryAdded);
       }
       state.isLoading = false;
     });

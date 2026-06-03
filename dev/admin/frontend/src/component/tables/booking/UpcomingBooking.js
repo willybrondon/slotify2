@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-undef */
@@ -68,13 +70,13 @@ const UpcomingBooking = () => {
 
   const upcomingBooking = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "User",
+      Header: col.user,
       Cell: ({ row }) => (
         <div
           className="userProfile"
@@ -91,7 +93,7 @@ const UpcomingBooking = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -104,7 +106,7 @@ const UpcomingBooking = () => {
       ),
     },
     {
-      Header: "Expert",
+      Header: col.expert,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -115,7 +117,7 @@ const UpcomingBooking = () => {
       ),
     },
     {
-      Header: "Salon",
+      Header: col.salon,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold cursor">
           {row?.salonId?.name}
@@ -123,7 +125,7 @@ const UpcomingBooking = () => {
       ),
     },
     {
-      Header: "Service",
+      Header: col.service,
       Cell: ({ row }) => (
         <div>
           {row?.serviceId &&
@@ -138,7 +140,7 @@ const UpcomingBooking = () => {
     },
 
     {
-      Header: `Price `,
+      Header: col.price,
       body: "rupee",
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.amount?.toFixed(2) + " " + setting?.currencySymbol}</span>
@@ -146,7 +148,7 @@ const UpcomingBooking = () => {
       sorting: { type: "client" },
     },
     {
-      Header: `Admin Commission `,
+      Header: col.adminCommission,
       body: "commission",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -157,25 +159,25 @@ const UpcomingBooking = () => {
     },
 
     {
-      Header: "Duration",
+      Header: col.duration,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.duration + " " + "Min"}</span>
       ),
     },
     {
-      Header: "Booked At",
+      Header: col.bookedAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.createdAt?.split("T")[0]}</span>
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.date?.split("T")[0]}</span>
       ),
     },
     {
-      Header: "First Slot",
+      Header: col.firstSlot,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.time[0]}</span>
       ),
@@ -200,7 +202,7 @@ const UpcomingBooking = () => {
 
   return (
     <div className="mainBooking">
-      <Title name={` Today's Pending Bookings`} />
+      <Title name={ui.pages.todayPending} />
       <div>
         <Table
           data={data}

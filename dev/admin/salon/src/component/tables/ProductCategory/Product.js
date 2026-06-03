@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProduct, getProductInfo, getStatusWiseData, updateOutOfStockProduct } from "../../../redux/slice/productSlice";
@@ -59,13 +61,13 @@ const Product = () => {
     };
     const expertTable = [
         {
-            Header: "No",
+            Header: col.no,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             ),
         },
         {
-            Header: "Product Code",
+            Header: col.productCode,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -75,7 +77,7 @@ const Product = () => {
             ),
         },
         {
-            Header: "Name",
+            Header: col.name,
             Cell: ({ row }) =>
             (
                 <span
@@ -86,7 +88,7 @@ const Product = () => {
             ),
         },
         {
-            Header: "Brand",
+            Header: col.brand,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -96,7 +98,7 @@ const Product = () => {
             ),
         },
         {
-            Header: "Category Name",
+            Header: col.categoryName,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -106,7 +108,7 @@ const Product = () => {
             ),
         },
         {
-            Header: "Image",
+            Header: col.image,
             Cell: ({ row }) => (
                 <div
                     className="userProfile"
@@ -127,19 +129,19 @@ const Product = () => {
         },
 
         {
-            Header: "Price",
+            Header: col.price,
             Cell: ({ row }) => <span>{row?.price ? row?.price : "-"}</span>,
         },
         {
-            Header: "Mrp",
+            Header: col.mrp,
             Cell: ({ row }) => <span>{row?.mrp ? row?.mrp : "-"}</span>,
         },
         {
-            Header: "Shipping Charges",
+            Header: col.shipping,
             Cell: ({ row }) => <span>{row?.shippingCharges ? row?.shippingCharges : "-"}</span>,
         },
         {
-            Header: "Status",
+            Header: col.status,
             Cell: ({ row }) => {
                 return (
                     <div className="mb-2"> {/* Add margin for spacing */}
@@ -168,7 +170,7 @@ const Product = () => {
             }
         },
         {
-            Header: "Is OutOfStock",
+            Header: col.outOfStock,
             body: "isOutOfStock",
             sorting: { type: "client" },
             Cell: ({ row }) =>
@@ -195,7 +197,7 @@ const Product = () => {
         },
 
         {
-            Header: "Is Trending",
+            Header: col.trending,
             body: "isTrending",
             sorting: { type: "client" },
             Cell: ({ row }) => (
@@ -220,7 +222,7 @@ const Product = () => {
             ),
         },
         {
-            Header: "Is New Collection",
+            Header: col.newCollection,
             body: "isNewCollection",
             sorting: { type: "client" },
             Cell: ({ row }) => (
@@ -245,7 +247,7 @@ const Product = () => {
             ),
         },
         {
-            Header: "Action",
+            Header: col.action,
             Cell: ({ row }) => (
                 <span className="d-flex justify-content-center">
                     <button
@@ -272,7 +274,7 @@ const Product = () => {
             ),
         },
         {
-            Header: "Info",
+            Header: col.info,
             Cell: ({ row }) => (
                 <span>
                     <button
@@ -304,7 +306,7 @@ const Product = () => {
     ]
     return (
         <div className="mainCategory">
-            <Title name="Product" />
+            <Title name={ui.pages.product} />
             <div className="row ">
                 <div className="mt-2 col-2">
                     <div className="inputData">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import Title from "../../extras/Title";
 import PendingRequest from "./PendingRequest";
 import AcceptRequest from "./AcceptRequest";
@@ -13,7 +14,7 @@ const ExpertRequest = () => {
     return (
         <div className="mainSetting">
             <div className="row">
-                <Title name="Expert Withdrawal Request" className="mt-4" />
+                <Title name={ui.labels.expertWithdrawRequest} className="mt-4" />
             </div>
             <div className="d-flex justify-content-between">
                 <div
@@ -63,7 +64,7 @@ const ExpertRequest = () => {
                 <Analytics
                     analyticsStartDate={startDate}
                     analyticsStartEnd={endDate}
-                    placeholder="Wallet"
+                    placeholder={ui.form.wallet}
                     analyticsStartDateSet={setStartDate}
                     analyticsStartEndSet={setEndDate}
                 />

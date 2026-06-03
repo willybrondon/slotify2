@@ -1,11 +1,14 @@
 import React from "react";
-import {toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
+import { translateApiMessage } from "../../constants/skedisyApiMessage";
 
 export function Success(msg) {
+  const text = typeof msg === "string" ? translateApiMessage(msg) : msg;
   toast.success(
     <p className="text-dark tx-16 mb-0">
-      Success: {msg}
+      {ui.toast.success} : {text}
     </p>,
     {
       position: toast.POSITION.TOP_RIGHT,
@@ -18,7 +21,7 @@ export function Success(msg) {
 
 export function Secondary(msg) {
     toast.error(
-      <p className=" tx-16 mb-0">Oops! {msg}</p>,
+      <p className=" tx-16 mb-0">{ui.toast.oops} — {msg}</p>,
       {
         position: toast.POSITION.TOP_CENTER,
         hideProgressBar: false,
@@ -30,7 +33,7 @@ export function Secondary(msg) {
 
 export function LeftNotifier(msg) {
     toast.warn(
-      <p className=" tx-16 mb-0">Warning: {msg}</p>,
+      <p className=" tx-16 mb-0">{ui.toast.warning} : {msg}</p>,
       {
         position: toast.POSITION.TOP_LEFT,
         hideProgressBar: false,
@@ -41,7 +44,7 @@ export function LeftNotifier(msg) {
 }
 
 export function CenterInfo(msg) {
-    toast.info(<p className=" tx-16 mb-0">Info: {msg}</p>, {
+    toast.info(<p className=" tx-16 mb-0">{ui.toast.info} : {msg}</p>, {
       position: toast.POSITION.TOP_CENTER,
       hideProgressBar: false,
       autoClose: 2000,
@@ -50,7 +53,7 @@ export function CenterInfo(msg) {
 }
 
 export const CenterDanger = (msg) => {
-  toast.error(<p className=" tx-16 mb-0">Error: {msg}</p>, {
+  toast.error(<p className=" tx-16 mb-0">{ui.toast.error} : {msg}</p>, {
     position: toast.POSITION.TOP_CENTER,
     hideProgressBar: false,
     autoClose: 2000,
@@ -72,7 +75,8 @@ export function Centerwarning(msg) {
 export function SuccessLeft(msg) {
     toast.success(
       <p className=" tx-16 mb-0">
-        <h3>Notice!</h3>{msg}
+        <h3>{ui.toast.notice}</h3>
+        {msg}
       </p>,
       {
         position: toast.POSITION.TOP_RIGHT,
@@ -86,7 +90,8 @@ export function SuccessLeft(msg) {
 export function WarningLeft(msg) {
     toast.warn(
       <p className=" tx-16 mb-0">
-        <h3>Warning!</h3>{msg}
+        <h3>{ui.toast.warning}</h3>
+        {msg}
       </p>,
       {
         position: toast.POSITION.TOP_RIGHT,
@@ -98,9 +103,10 @@ export function WarningLeft(msg) {
 }
 
 export function DangerRight(msg) {
+  const text = typeof msg === "string" ? translateApiMessage(msg) : msg;
   toast.error(
     <p className=" tx-16 mb-0">
-      {msg}
+      {text}
     </p>,
     {
       position: toast.POSITION.TOP_RIGHT,
@@ -116,7 +122,8 @@ export function DangerRight(msg) {
 export function GradientSuccess(msg) {
     toast.success(
       <p className=" tx-16 mb-0">
-        <h3>Error!</h3>please check Your details ...file is missing
+        <h3>{ui.toast.error}</h3>
+        {ui.toast.missingFile}
       </p>,
       {
         position: toast.POSITION.TOP_RIGHT,
@@ -144,7 +151,8 @@ export function GradientWarning(msg) {
 export function GradientDanger() {
     toast.error(
       <p className=" tx-16 mb-0">
-        <h3>Error!</h3>please check Your details ...file is missing
+        <h3>{ui.toast.error}</h3>
+        {ui.toast.missingFile}
       </p>,
 
       {

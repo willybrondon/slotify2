@@ -1,4 +1,5 @@
 import React from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { ExInput, Textarea } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
@@ -33,8 +34,8 @@ const ComplainDialog = () => {
                 <div className="col-12">
                   <Textarea
                     value={dialogueData?.details}
-                    label={`Details`}
-                    placeholder={`Details`}
+                    label={ui.form.details}
+                    placeholder={ui.form.details}
                     readOnly={true}
                   />
                 </div>
@@ -100,8 +101,8 @@ const ComplainDialog = () => {
                 <div className="col-12 col-md-6">
                   <ExInput
                     value={dialogueData?.date}
-                    label={`Date and time of report`}
-                    placeholder={`Date & Time`}
+                    label={ui.form.reportDateTime}
+                    placeholder={ui.form.reportDateTime}
                     readOnly={true}
                   />
                               </div>
@@ -109,8 +110,8 @@ const ComplainDialog = () => {
                                   <div className="col-12 col-md-6">
                                   <ExInput
                                     value={dialogueData?.solvedDate}
-                                    label={`Solved date and time `}
-                                    placeholder={`Date & Time`}
+                                    label={ui.form.solvedDateTime}
+                                    placeholder={ui.form.reportDateTime}
                                     readOnly={true}
                                   />
                                 </div>

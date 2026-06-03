@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import Table from "../../extras/Table";
 import Button from "../../extras/Button";
 import React, { useEffect, useState } from "react";
@@ -36,32 +38,32 @@ const WeekTime = () => {
 
   const timeTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{index + 1}</span>,
     },
     {
-      Header: "Day",
+      Header: col.day,
       Cell: ({ row }) => <span className="text-capitalize">{row?.day}</span>,
     },
     {
-      Header: "Open Time",
+      Header: col.openTime,
       Cell: ({ row }) => <span>{formatTime(row?.openTime)}</span>,
     },
     {
-      Header: "Close Time",
+      Header: col.closeTime,
       Cell: ({ row }) => <span>{formatTime(row?.closedTime)}</span>,
     },
     {
-      Header: "Salon Break Start Time",
+      Header: col.breakStart,
       Cell: ({ row }) => <span>{row?.isBreak === true ? formatTime(row?.breakStartTime) : '-'}</span>,
     },
     {
-      Header: "Salon Break End Time",
+      Header: col.breakEnd,
       Cell: ({ row }) => <span>{row?.isBreak === true ? formatTime(row?.breakEndTime) : '-'}</span>,
     },
 
     {
-      Header: "Edit",
+      Header: col.edit,
       Cell: ({ row }) => (
         <span>
           <button
@@ -95,7 +97,7 @@ const WeekTime = () => {
   };
   return (
     <div className="mainTimeTable">
-      <Title name="Salon time" />
+      <Title name={ui.pages.salonTime} />
 
       <div>
         <Table data={data} mapData={timeTable} />

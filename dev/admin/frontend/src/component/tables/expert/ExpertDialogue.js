@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import Input, { Image, ExInput } from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -112,30 +113,30 @@ export const ExpertDialogue = ({ data, setData }) => {
       !salonId
     ) {
       let error = {};
-      if (!lname) error.lname = "Last name is required";
-      if (!fname) error.fname = "First name is required";
-      if (!salonId) error.salonId = "Salon name is required";
+      if (!lname) error.lname = ui.dialog.lastNameRequired;
+      if (!fname) error.fname = ui.dialog.firstNameRequired;
+      if (!salonId) error.salonId = ui.dialog.salonRequired;
       if (!image?.length === 0 || !imagePath)
-        error.image = "Image is required!";
-      if (!age) error.age = "Age is required";
-      if (!commission) error.commission = "Commission is required";
-      if (!mobile) error.mobile = "Mobile number is required";
+        error.image = ui.dialog.imageRequired;
+      if (!age) error.age = ui.dialog.ageRequired;
+      if (!commission) error.commission = ui.dialog.commissionRequired;
+      if (!mobile) error.mobile = ui.dialog.mobileRequired;
       if (mobile.length < 6 || mobile.length > 13)
-        error.mobile = "Mobile number must be 6 to 13 digits";
-      if (age < 18 || age > 100) error.age = "Invalid Age";
+        error.mobile = ui.dialog.mobileInvalid;
+      if (age < 18 || age > 100) error.age = ui.dialog.ageInvalid;
       if (commission < 0 || commission > 99)
-        error.commission = "Invalid Commission";
-      if (!bankName) error.bankName = "Bank name is required";
-      if (!accountNumber) error.accountNumber = "Account number is required";
-      if (!branchName) error.branchName = "Branch name is required";
-      if (!IFSCCode) error.IFSCCode = "IFSC code is required";
-      if (!upiId) error.upiId = "Upi id is required";
-      if (!password) error.password = "Password is required";
+        error.commission = ui.dialog.commissionInvalid;
+      if (!bankName) error.bankName = ui.dialog.bankNameRequired;
+      if (!accountNumber) error.accountNumber = ui.dialog.accountRequired;
+      if (!branchName) error.branchName = ui.dialog.branchRequired;
+      if (!IFSCCode) error.IFSCCode = ui.dialog.ifscRequired;
+      if (!upiId) error.upiId = ui.dialog.upiRequired;
+      if (!password) error.password = ui.dialog.passwordRequired;
       if (!allService?.length)
-        error.allService = "At least one service must be selected";
+        error.allService = ui.dialog.servicePickRequired;
       return setError({ ...error });
     } else if (!isEmailValid) {
-      const error = { email: "Email address is invalid" };
+      const error = { email: ui.dialog.emailInvalid };
       return setError({ ...error });
     } else {
       const formData = new FormData();
@@ -216,7 +217,7 @@ export const ExpertDialogue = ({ data, setData }) => {
 
   return (
     <div className="p-3">
-      <Title name={`Add Expert`} />
+      <Title name={ui.pages.addExpert} />
       <div className="card">
         <div className="card-body">
           <div className="">
@@ -225,7 +226,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                 <div className="col-12">
                   <div className="inputData text  flex-row justify-content-start text-start">
                     <label for="fname" className="false text-capitalize">
-                      Select Salon
+                      {ui.dialog.selectSalon}
                     </label>
                     <select
                       name="bookingType"
@@ -239,7 +240,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                       }}
                     >
                       <option selected disabled={true}>
-                        Select Salon
+                        {ui.dialog.selectSalon}
                       </option>
                       {salon.map((data) => (
                         <option key={data?._id} value={data?._id}>
@@ -251,7 +252,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                 </div>
                 <div className="col-12">
                   <label for="fname" className="false text-capitalize">
-                    Select Services
+                    {ui.dialog.selectServices}
                   </label>
                   <Multiselect
                     options={serviceList}
@@ -275,15 +276,15 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`fname`}
                   name={`fname`}
                   value={fname}
-                  label={`First name`}
-                  placeholder={`First name`}
+                  label={ui.table.firstName}
+                  placeholder={ui.table.firstName}
                   errorMessage={error.fname && error.fname}
                   onChange={(e) => {
                     setFname(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        fname: `First Name is required`,
+                        fname: ui.dialog.firstNameRequired,
                       });
                     } else {
                       return setError({
@@ -301,15 +302,15 @@ export const ExpertDialogue = ({ data, setData }) => {
                   value={lname}
                   id={`lname`}
                   name={`lname`}
-                  label={`Last name`}
-                  placeholder={`Last name`}
+                  label={ui.table.lastName}
+                  placeholder={ui.table.lastName}
                   errorMessage={error.lname && error.lname}
                   onChange={(e) => {
                     setLname(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        lname: `Last name is required`,
+                        lname: ui.dialog.lastNameRequired,
                       });
                     } else {
                       return setError({
@@ -327,17 +328,17 @@ export const ExpertDialogue = ({ data, setData }) => {
                   value={mobile}
                   id={`mono`}
                   name={`mobile`}
-                  label={`Mobile number`}
+                  label={ui.form.mobileNumber}
                   minLength={6}
                   maxLength={13}
-                  placeholder={`Mobile number`}
+                  placeholder={ui.form.mobileNumber}
                   errorMessage={error.mobile && error.mobile}
                   onChange={(e) => {
                     setMobile(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        mobile: `Mobile number is required`,
+                        mobile: ui.dialog.mobileRequired,
                       });
                     } else if (
                       e.target.value.length < 6 ||
@@ -345,7 +346,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                     ) {
                       return setError({
                         ...error,
-                        mobile: "Mobile number must be 6 to 13 digits",
+                        mobile: ui.dialog.mobileInvalid,
                       });
                     } else {
                       return setError({
@@ -362,9 +363,9 @@ export const ExpertDialogue = ({ data, setData }) => {
                   type={`text`}
                   id={`email`}
                   name={`email`}
-                  label={`Email`}
+                  label={ui.form.email}
                   value={email}
-                  placeholder={`Email`}
+                  placeholder={ui.form.email}
                   errorMessage={error.email && error.email}
                   onChange={(e) => {
                     setEmail(e.target.value);
@@ -389,8 +390,8 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`age`}
                   name={`age`}
                   value={age}
-                  label={`Age`}
-                  placeholder={`Age`}
+                  label={ui.form.age}
+                  placeholder={ui.form.age}
                   minLength={2}
                   maxLength={2}
                   errorMessage={error.age && error.age}
@@ -399,7 +400,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        age: `age is Required`,
+                        age: ui.dialog.ageRequired,
                       });
                     } else if (
                       e.target.value.length < 2 ||
@@ -407,7 +408,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                     ) {
                       return setError({
                         ...error,
-                        age: "Invalid Age",
+                        age: ui.dialog.ageInvalid,
                       });
                     } else {
                       return setError({
@@ -425,20 +426,20 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`commission`}
                   name={`commission`}
                   value={commission}
-                  label={`Admin Commission (%)`}
-                  placeholder={`Admin Commission`}
+                  label={ui.form.adminCommissionPct}
+                  placeholder={ui.form.adminCommissionPct}
                   errorMessage={error.commission && error.commission}
                   onChange={(e) => {
                     setCommission(e.target.value);
                     if (!e.target.value) {
                       return setError({
                         ...error,
-                        commission: `Commission is Required`,
+                        commission: ui.dialog.commissionRequired,
                       });
                     } else if (e.target.value > 99 || e.target.value < 0) {
                       return setError({
                         ...error,
-                        commission: "Invalid Commission",
+                        commission: ui.dialog.commissionInvalid,
                       });
                     } else {
                       return setError({
@@ -456,8 +457,8 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`bankName`}
                   name={`bankName`}
                   value={bankName}
-                  label={`Bank Name`}
-                  placeholder={`Bank Name`}
+                  label={ui.form.bankName}
+                  placeholder={ui.form.bankName}
                   errorMessage={error.bankName && error.bankName}
                   onChange={(e) => {
                     setBankName(e.target.value);
@@ -482,8 +483,8 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`accountNumber`}
                   name={`accountNumber`}
                   value={accountNumber}
-                  label={`Account Number`}
-                  placeholder={`Account Number`}
+                  label={ui.form.accountNumber}
+                  placeholder={ui.form.accountNumber}
                   errorMessage={error.accountNumber && error.accountNumber}
                   onChange={(e) => {
                     setAccountNumber(e.target.value);
@@ -508,8 +509,8 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`branchName`}
                   name={`branchName`}
                   value={branchName}
-                  label={`Branch Name)`}
-                  placeholder={`Branch Name`}
+                  label={ui.form.branchNameTypo}
+                  placeholder={ui.form.branchName}
                   errorMessage={error.branchName && error.branchName}
                   onChange={(e) => {
                     setBranchName(e.target.value);
@@ -534,8 +535,8 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`IFSCCode`}
                   name={`IFSCCode`}
                   value={IFSCCode}
-                  label={`IFSC Code`}
-                  placeholder={`IFSC Code`}
+                  label={ui.form.ifscCode}
+                  placeholder={ui.form.ifscCode}
                   errorMessage={error.IFSCCode && error.IFSCCode}
                   onChange={(e) => {
                     setIFSCCode(e.target.value);
@@ -560,8 +561,8 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`upiId`}
                   name={`upiId`}
                   value={upiId}
-                  label={`Upi Id`}
-                  placeholder={`Upi Id`}
+                  label={ui.form.upiId}
+                  placeholder={ui.form.upiId}
                   errorMessage={error.upiId && error.upiId}
                   onChange={(e) => {
                     setUpiId(e.target.value);
@@ -586,8 +587,8 @@ export const ExpertDialogue = ({ data, setData }) => {
                   id={`password`}
                   name={`password`}
                   value={password}
-                  label={`Password`}
-                  placeholder={`Password`}
+                  label={ui.form.password}
+                  placeholder={ui.form.password}
                   errorMessage={error.password && error.password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -612,7 +613,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                   <ExInput
                     type={`radio`}
                     id={`male`}
-                    label={`Male`}
+                    label={ui.form.male}
                     name={`gender`}
                     value={`male`}
                     checked={(gender === "male" || gender === "Male") && true}
@@ -621,7 +622,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                       if (!e.target.value) {
                         return setError({
                           ...error,
-                          gender: `Gender is required`,
+                          gender: ui.dialog.genderRequired,
                         });
                       } else {
                         return setError({
@@ -637,7 +638,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                   <ExInput
                     type={`radio`}
                     id={`female`}
-                    label={`Female`}
+                    label={ui.form.female}
                     name={`gender`}
                     value={`female`}
                     checked={
@@ -648,7 +649,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                       if (!e.target.value) {
                         return setError({
                           ...error,
-                          gender: `Gender is required`,
+                          gender: ui.dialog.genderRequired,
                         });
                       } else {
                         return setError({
@@ -663,7 +664,7 @@ export const ExpertDialogue = ({ data, setData }) => {
 
               <div className="col-6">
                 <ExInput
-                  label={`Image`}
+                  label={ui.form.image}
                   id={`image`}
                   type={`file`}
                   onChange={(e) => handleImage(e)}
@@ -685,7 +686,7 @@ export const ExpertDialogue = ({ data, setData }) => {
               <div className="col-12 text-end m0">
                 <Button
                   className={`bg-gray text-light`}
-                  text={`Cancel`}
+                  text="Annuler"
                   type={`button`}
                   onClick={() => navigate(-1)}
                 />
@@ -693,7 +694,7 @@ export const ExpertDialogue = ({ data, setData }) => {
                   type={`submit`}
                   className={` text-white m10-left`}
                   style={{ backgroundColor: "#1ebc1e" }}
-                  text={`Submit`}
+                  text="Enregistrer"
                   onClick={(e) => handleSubmit(e)}
                 />
               </div>

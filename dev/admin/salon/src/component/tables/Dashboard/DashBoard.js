@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useDispatch, useSelector } from "react-redux";
@@ -22,7 +23,11 @@ import Analytics from "../../extras/Analytics";
 import { ExInput } from "../../extras/Input";
 import { getUpComingOrders } from "../../../redux/slice/orderSlice";
 import Pagination from "../../extras/Pagination";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
+
 const DashBoard = () => {
+    const d = ui.dashboard;
+    const t = ui.table;
     const { booking, dashData } = useSelector((state) => state.dash);
     const { upComingOrders } = useSelector((state) => state.order);
     const { futureBooking } = useSelector((state) => state.booking);
@@ -93,11 +98,11 @@ const DashBoard = () => {
 
     const mapData = [
         {
-            Header: "No",
+            Header: t.no,
             Cell: ({ index }) => <span>{index + 1}</span>,
         },
         {
-            Header: "Expert",
+            Header: t.expert,
             Cell: ({ row }) => (
                 <>
                     <span>{row?.expertFname + " " + row?.expertLname}</span>
@@ -105,11 +110,11 @@ const DashBoard = () => {
             ),
         },
         {
-            Header: "Bookings",
+            Header: t.bookings,
             Cell: ({ row }) => <span>{row?.bookings}</span>,
         },
         {
-            Header: "Expert Earning",
+            Header: t.expertEarning,
             Cell: ({ row }) => (
                 <span>
                     {row?.expertEarning + " " + setting?.currencySymbol}
@@ -117,7 +122,7 @@ const DashBoard = () => {
             ),
         },
         {
-            Header: "Salon Commission",
+            Header: t.salonCommission,
             Cell: ({ row }) => (
                 <span>
                     {row?.salonCommission + " " + setting?.currencySymbol}
@@ -128,7 +133,7 @@ const DashBoard = () => {
 
     const appointMentData = [
         {
-            Header: "User",
+            Header: t.user,
             Cell: ({ row }) => (
                 <div className="d-flex">
                     <div>
@@ -146,7 +151,7 @@ const DashBoard = () => {
                     <span className="ms-3 fw-bold fs-18">
                         {row?.userId?.fname
                             ? row?.userId?.fname + "  " + row?.userId?.lname
-                            : "Salon User"}
+                            : d.fallbackUser}
                         <div
                             className="fs-12 fw-500 text-start"
                             style={{ opacity: "0.65" }}
@@ -158,13 +163,13 @@ const DashBoard = () => {
             ),
         },
         {
-            Header: "Time",
+            Header: t.time,
             thClass: "extraMargin",
             tdClass: "extraPadding",
             Cell: ({ row }) => <span>{row?.time[0]}</span>,
         },
         {
-            Header: "Show More",
+            Header: t.showMore,
             thClass: "text-decoration-underline special cursor",
             thClick: () => navigate("/salonPanel/futureBooking"),
         },
@@ -218,7 +223,7 @@ const DashBoard = () => {
 
     const upComingOrderData = [
         {
-            Header: "SR NO",
+            Header: col.srNo,
             Cell: ({ row, index }) => {
                 if (row?.isGrouped && row?.srNo) {
                     return <span>{row?.srNo}</span>; // Use the srNo generated above
@@ -227,7 +232,7 @@ const DashBoard = () => {
             },
         },
         {
-            Header: "Order ID",
+            Header: col.orderId,
             Cell: ({ row }) =>
                 row?.isGrouped ? (
                     <span
@@ -239,12 +244,12 @@ const DashBoard = () => {
                 ) : null,
         },
         {
-            Header: "User Info",
+            Header: col.userInfo,
             Cell: ({ row }) =>
                 row?.isGrouped ? <div>{row?.firstName || "-"}</div> : null,
         },
         {
-            Header: "Items",
+            Header: col.items,
             Cell: ({ row }) => (
                 <>
                     <div className="d-flex justify-content-start">
@@ -264,7 +269,7 @@ const DashBoard = () => {
             ),
         },
         {
-            Header: "Total Price",
+            Header: col.totalPrice,
             Cell: ({ row }) => (
                 <>
                     <div>
@@ -277,7 +282,7 @@ const DashBoard = () => {
             ),
         },
         {
-            Header: "Shipping Charge",
+            Header: col.shipping,
             Cell: ({ row }) => (
                 <>
                     <div>
@@ -289,7 +294,7 @@ const DashBoard = () => {
             ),
         },
         {
-            Header: "Status",
+            Header: col.status,
             Cell: ({ row }) => {
                 return (
                     // <div className="boxCenter">
@@ -382,11 +387,11 @@ const DashBoard = () => {
     return (
         <div className="mainDashboard">
             <div className="dashBoardHead">
-                <h3 className="m3-bottom text-start">Welcome back, Salon! 👋</h3>
+                <h3 className="m3-bottom text-start">{d.welcome} 👋</h3>
                 <div className="row mb-0">
                     <div className="col-3 mb-0 d-flex align-items-center">
                         <Title
-                            name={"Dashboard Overview"}
+                            name={d.title}
                             display={"none"}
                             bottom={"0"}
                         />
@@ -407,7 +412,7 @@ const DashBoard = () => {
                 <div className="row">
                     <div className="col-lg-3 col-sm-6 col-12">
                         <DashBox
-                            title={`TOTAL EXPERTS `}
+                            title={d.totalExperts}
                             dashSVG={
                                 <svg
                                     width="60"
@@ -432,7 +437,7 @@ const DashBoard = () => {
                     </div>
                     <div className="col-lg-3 col-sm-6 col-12">
                         <DashBox
-                            title={`COMPLETED BOOKING`}
+                            title={d.completedBooking}
                             dashSVG={
                                 <svg
                                     width="60"
@@ -496,7 +501,7 @@ const DashBoard = () => {
                     </div>
                     <div className="col-lg-3 col-sm-6 col-12">
                         <DashBox
-                            title={`TOTAL REVENUE`}
+                            title={d.totalRevenue}
                             dashSVG={
                                 <svg
                                     width="60"
@@ -593,7 +598,7 @@ const DashBoard = () => {
                     </div>
                     <div className="col-lg-3 col-sm-6 col-12">
                         <DashBox
-                            title={`SALES COMMISSION`}
+                            title={d.salesCommission}
                             dashSVG={
                                 <svg
                                     width="60"
@@ -626,8 +631,8 @@ const DashBoard = () => {
                 <div className="col-12">
                     <div className="table-container">
                         <div className="table-title">
-                            <h5>Data Analysis</h5>
-                            <span>Revenue and Booking Data</span>
+                            <h5>{d.dataAnalysis}</h5>
+                            <span>{d.revenueBookingChart}</span>
                         </div>
                         <ApexChart />
                     </div>
@@ -638,7 +643,7 @@ const DashBoard = () => {
                 <div className="col-12">
                     <div className="table-container">
                         <div className="table-title">
-                            <h5>Upcoming Orders</h5>
+                            <h5>{d.upcomingOrders}</h5>
                             <span>Recent order activity</span>
                         </div>
                         <Table
@@ -656,12 +661,12 @@ const DashBoard = () => {
                 <div className="col-lg-6 col-md-12">
                     <div className="table-container">
                         <div className="table-title">
-                            <h5>Top Experts</h5>
+                            <h5>{d.topExperts}</h5>
                             <button
                                 className="show-more-btn"
                                 onClick={() => navigate("/salonPanel/allExperts")}
                             >
-                                View All
+                                {d.viewAll}
                             </button>
                         </div>
                         <Table
@@ -674,12 +679,12 @@ const DashBoard = () => {
                 <div className="col-lg-6 col-md-12">
                     <div className="table-container">
                         <div className="table-title">
-                            <h5>Today's Upcoming Bookings</h5>
+                            <h5>{d.todayBookings}</h5>
                             <button
                                 className="show-more-btn"
                                 onClick={() => navigate("/salonPanel/bookingTable")}
                             >
-                                Show More
+                                {d.showMore}
                             </button>
                         </div>
                         <Table

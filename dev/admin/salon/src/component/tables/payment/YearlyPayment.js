@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -36,12 +38,12 @@ const YearlyPayment = () => {
 
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{parseInt(index) + 1}</span>,
     },
 
     {
-      Header: "Month",
+      Header: col.month,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -51,7 +53,7 @@ const YearlyPayment = () => {
       ),
     },
     {
-      Header: "Total Bookings",
+      Header: col.totalBookings,
       sorting: { type: "client" },
       body: "totalBookings",
       Cell: ({ row }) => (
@@ -60,7 +62,7 @@ const YearlyPayment = () => {
     },
 
     {
-      Header: "Bonus-Penalty",
+      Header: col.bonusPenalty,
       sorting: { type: "client" },
       body: "totalBonusPenalty",
       Cell: ({ row }) => (
@@ -70,7 +72,7 @@ const YearlyPayment = () => {
       ),
     },
     {
-      Header: "Total Payment (To Expert)",
+      Header: col.totalPaymentToExpert,
       sorting: { type: "client" },
       body: "serviceAmount",
       Cell: ({ row }) => (
@@ -80,7 +82,7 @@ const YearlyPayment = () => {
       ),
     },
     {
-      Header: "Total Experts",
+      Header: col.totalExperts,
       sorting: { type: "client" },
       body: "serviceAmount",
       Cell: ({ row }) => (
@@ -89,7 +91,7 @@ const YearlyPayment = () => {
     },
 
     {
-      Header: "Details",
+      Header: col.details,
       Cell: ({ row }) => (
         <span>
           <button
@@ -121,10 +123,10 @@ const YearlyPayment = () => {
 
   return (
     <div className="mainCategory">
-      <Title name="Year Wise Payment history" />
+      <Title name={ui.labels.yearlyPayment} />
       <div>
         <div className="m40-bottom inputData col-lg-2 col-md-4 me-3">
-          <label>Select Month</label>
+          <label>{ui.labels.selectMonth}</label>
           <input
             type="year"
             value={selectedDate}

@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import React, { useEffect, useState } from "react";
 import Pagination from "../../extras/Pagination";
 import Table from "../../extras/Table";
@@ -46,11 +47,11 @@ const ParticularExpertSettlementInfo = () => {
   };
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{parseInt(index) + 1}</span>,
     },
     {
-      Header: "User Image",
+      Header: col.userImage,
       Cell: ({ row }) => (
         <div
           className="userProfile"
@@ -69,7 +70,7 @@ const ParticularExpertSettlementInfo = () => {
       ),
     },
     {
-      Header: "User",
+      Header: col.user,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold cursor">
           {row?.userId?.fname
@@ -80,7 +81,7 @@ const ParticularExpertSettlementInfo = () => {
     },
 
     {
-      Header: `Expert Earnings `,
+      Header: col.expertEarning,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.expertEarning + " " + setting?.currencySymbol}
@@ -88,7 +89,7 @@ const ParticularExpertSettlementInfo = () => {
       ),
     },
     {
-      Header: `Salon Commission `,
+      Header: col.salonCommissionPct,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.salonCommission + " " + setting?.currencySymbol}
@@ -96,7 +97,7 @@ const ParticularExpertSettlementInfo = () => {
       ),
     },
     {
-      Header: `Tax `,
+      Header: col.tax,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.tax + " " + setting?.currencySymbol}
@@ -104,7 +105,7 @@ const ParticularExpertSettlementInfo = () => {
       ),
     },
     {
-      Header: `Admin Commission `,
+      Header: col.adminCommission,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.platformFee + " " + setting?.currencySymbol}
@@ -112,7 +113,7 @@ const ParticularExpertSettlementInfo = () => {
       ),
     },
     {
-      Header: `Final Amount `,
+      Header: col.finalAmount,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.amount?.toFixed(2) + " " + setting?.currencySymbol}
@@ -121,7 +122,7 @@ const ParticularExpertSettlementInfo = () => {
     },
 
     {
-      Header: "Payment Type",
+      Header: col.paymentType,
       Cell: ({ row }) => <span>{row?.paymentType}</span>,
     },
   ];

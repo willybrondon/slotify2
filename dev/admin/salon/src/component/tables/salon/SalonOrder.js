@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalonOrderDetails } from "../../../redux/slice/salonSlice";
@@ -81,7 +83,7 @@ const SalonOrder = () => {
 
     const orderTable = [
         {
-            Header: "SR NO",
+            Header: col.srNo,
             Cell: ({ row }) => {
                 if (row?.isGrouped && row?.srNo) {
                     return <span>{row?.srNo}</span>; // Use the srNo generated above
@@ -90,7 +92,7 @@ const SalonOrder = () => {
             }
         },
         {
-            Header: "Order ID",
+            Header: col.orderId,
             Cell: ({ row }) => (
                 row?.isGrouped ? (
                     <span style={{ color: "blue", cursor: "pointer" }} onClick={() => handleOrderView(row?.orderMainId)}>
@@ -100,13 +102,13 @@ const SalonOrder = () => {
             )
         },
         {
-            Header: "User Info",
+            Header: col.userInfo,
             Cell: ({ row }) => (
                 row?.isGrouped ? <div>{row?.userFirstName || "-"}</div> : null
             )
         },
         {
-            Header: "Items",
+            Header: col.items,
             Cell: ({ row }) => (
                 <div className="d-flex justify-content-start mb-2">
                     <div>
@@ -121,19 +123,19 @@ const SalonOrder = () => {
             ),
         },
         {
-            Header: "Total Price",
+            Header: col.totalPrice,
             Cell: ({ row }) => (
                 <div>{row?.purchasedTimeProductPrice * row?.productQuantity || "-"}</div>
             ),
         },
         {
-            Header: "Shipping Charge",
+            Header: col.shipping,
             Cell: ({ row }) => (
                 <div>{row?.purchasedTimeShippingCharges || "-"}</div>
             ),
         },
         {
-            Header: "Status",
+            Header: col.status,
             Cell: ({ row }) => {
                 return (
                     <div className="boxCenter">
@@ -175,7 +177,7 @@ const SalonOrder = () => {
 
     ]
     return (
-        <> <Title name={"Salon Orders"} />
+        <> <Title name={ui.labels.salonOrders} />
             <div className="col-2">
 
                 <div className="inputData">

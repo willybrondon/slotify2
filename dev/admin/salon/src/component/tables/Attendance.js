@@ -1,3 +1,5 @@
+import { col } from "../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
@@ -56,11 +58,11 @@ const Attendance = () => {
 
   const expertTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{index + 1}</span>,
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div
           className="userProfile"
@@ -80,13 +82,13 @@ const Attendance = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.fname + " " + row?.lname}</span>
       ),
     },
     {
-      Header: "All Attendance Info",
+      Header: col.allAttendanceInfo,
       Cell: ({ row }) => (
         <span>
           <button
@@ -101,7 +103,7 @@ const Attendance = () => {
       width: "50px",
     },
     {
-      Header: "Present",
+      Header: col.present,
       Cell: ({ row }) => (
         <span>
           <button
@@ -118,7 +120,7 @@ const Attendance = () => {
       width: "200px",
     },
     {
-      Header: "Absent",
+      Header: col.absent,
       Cell: ({ row }) => (
         <span>
           <button
@@ -137,7 +139,7 @@ const Attendance = () => {
 
   return (
     <div className="mainExpert">
-      <Title name="Staff attendance" />
+      <Title name={ui.pages.staffAttendance} />
       <div className="col-md-8 col-lg-5  ms-auto">
         <Searching
           type={`server`}

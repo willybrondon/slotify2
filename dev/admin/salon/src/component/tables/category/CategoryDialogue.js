@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import Button from "../../extras/Button";
 import Input from "../../extras/Input";
 import { useDispatch, useSelector } from "react-redux";
@@ -75,9 +76,9 @@ const CategoryDialogue = () => {
                       type={`text`}
                       id={`name`}
                       name={`name`}
-                      label={`Name`}
-                      placeholder={`Name`}
-                      errorMessage={`Enter Name`}
+                      label={ui.form.name}
+                      placeholder={ui.form.name}
+                      errorMessage={ui.dialog.enterName}
                     />
                   </div>
                   <div className="col-12 ">
@@ -85,8 +86,8 @@ const CategoryDialogue = () => {
                       type={`file`}
                       id={`image`}
                       name={`image`}
-                      label={`Image`}
-                      errorMessage={`Image is required`}
+                      label={ui.form.image}
+                      errorMessage={ui.dialog.imageRequiredCategory}
                       accept={"image/ "}
                     />
                   </div>
@@ -95,7 +96,7 @@ const CategoryDialogue = () => {
                   <div className="col-12 text-end m0">
                     <Button
                       className={`bg-gray text-light`}
-                      text={`Cancel`}
+                      text="Annuler"
                       type={`button`}
                       onClick={() => dispatch(closeDialog())}
                     />
@@ -103,7 +104,7 @@ const CategoryDialogue = () => {
                       type={`submit`}
                       className={` text-white m10-left`}
                       style={{ backgroundColor: "#1ebc1e" }}
-                      text={`Submit`}
+                      text="Enregistrer"
                     />
                   </div>
                 </div>

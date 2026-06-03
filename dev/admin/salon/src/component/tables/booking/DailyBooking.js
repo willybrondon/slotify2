@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-undef */
@@ -81,29 +82,29 @@ const DailyBooking = () => {
 
   const bookingTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       Cell: ({ row }) => <span className="text-capitalize">{row?.date}</span>,
     },
     {
-      Header: "No. Booking",
+      Header: col.noBooking,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.totalBookings}</span>
       ),
     },
     {
-      Header: "No. Experts",
+      Header: col.noExperts,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.experts}</span>
       ),
     },
     {
-      Header: "Salon Commission",
+      Header: col.salonCommission,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.salonCommission?.toFixed(2) + " " + setting?.currencySymbol}
@@ -111,7 +112,7 @@ const DailyBooking = () => {
       ),
     },
     {
-      Header: "Expert Earning",
+      Header: col.expertEarning,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.expertEarning?.toFixed(2) + " " + setting?.currencySymbol}
@@ -119,7 +120,7 @@ const DailyBooking = () => {
       ),
     },
     {
-      Header: "Total Earning",
+      Header: col.totalEarning,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.totalAmount?.toFixed(2) + " " + setting?.currencySymbol

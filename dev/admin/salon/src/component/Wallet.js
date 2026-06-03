@@ -8,8 +8,10 @@ import { getCurrency, getSetting } from "../redux/slice/settingSlice";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import withDrawBanner from "../assets/images/withDraw.png";
 import { baseURL, secretKey } from "../util/config";
+import { SKEDISY_SALON_UI as ui } from "../constants/skedisyUiCopy";
 
 const Wallet = () => {
+    const w = ui.wallet;
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { setting } = useSelector((state) => state.setting);
@@ -64,7 +66,7 @@ const Wallet = () => {
             const data = await response.json();
 
             if (data.status) {
-                toast.success(data.message || "Payment successful! Wallet credited.");
+                toast.success(data.message || w.paymentSuccess);
                 setAmount("");
                 setSelectedAmount("");
                 // Refresh wallet history and balance - wait for it to complete
@@ -72,11 +74,11 @@ const Wallet = () => {
                 // Remove query params from URL
                 navigate("/salonpanel/wallet", { replace: true });
             } else {
-                toast.error(data.message || "Payment verification failed");
+                toast.error(data.message || w.paymentVerifyFailed);
             }
         } catch (error) {
             console.error("Payment success handler error:", error);
-            toast.error("An error occurred while processing payment");
+            toast.error(w.paymentError);
         } finally {
             setIsProcessing(false);
         }
@@ -96,7 +98,7 @@ const Wallet = () => {
             handleStripePaymentSuccess(sessionId);
         } else if (paymentStatus === "cancelled") {
             // Payment was cancelled - show message and clean up
-            toast.info("Payment was cancelled. You can try again when ready.");
+            toast.info(w.paymentCancelled);
             setIsProcessing(false);
             setAmount("");
             setSelectedAmount("");
@@ -136,7 +138,7 @@ const Wallet = () => {
 
         const checkStatus = async () => {
             if (attempts >= maxAttempts) {
-                toast.error("Payment timeout. Please check your phone or try again.");
+                toast.error(w.paymentTimeout);
                 setIsProcessing(false);
                 setPaymentReference(null);
                 return;
@@ -170,7 +172,7 @@ const Wallet = () => {
 
                 if (data.status && data.paymentStatus === "SUCCESSFUL") {
                     // Payment successful
-                    toast.success(data.message || "Payment successful! Wallet credited.");
+                    toast.success(data.message || w.paymentSuccess);
                     setAmount("");
                     setSelectedAmount("");
                     setPhoneNumber("");
@@ -203,18 +205,18 @@ const Wallet = () => {
         const rechargeAmount = amount.trim();
         
         if (!rechargeAmount || rechargeAmount === "0" || parseFloat(rechargeAmount) <= 0) {
-            toast.error("Please enter a valid amount to recharge");
+            toast.error(w.amountInvalid);
             setAmountError(true);
             return;
         }
 
         if (!paymentMethod) {
-            toast.error("Please select a payment method");
+            toast.error(w.selectPaymentMethod);
             return;
         }
 
         if (availablePaymentMethods.length === 0) {
-            toast.error("No payment methods are enabled. Please contact admin.");
+            toast.error(w.noMethodsEnabled);
             return;
         }
 
@@ -267,7 +269,7 @@ const Wallet = () => {
             } else if (paymentMethod === "MTN MoMo") {
                 // Validate phone number
                 if (!phoneNumber || phoneNumber.trim() === "") {
-                    toast.error("Please enter your MTN MoMo phone number");
+                    toast.error(w.enterMomoPhone);
                     setPhoneError(true);
                     setIsProcessing(false);
                     return;
@@ -276,7 +278,7 @@ const Wallet = () => {
                 // Clean phone number (remove spaces, dashes, etc.)
                 const cleanPhone = phoneNumber.replace(/\D/g, "");
                 if (cleanPhone.length < 9) {
-                    toast.error("Please enter a valid phone number");
+                    toast.error(w.invalidPhone);
                     setPhoneError(true);
                     setIsProcessing(false);
                     return;
@@ -317,7 +319,7 @@ const Wallet = () => {
                 const data = await response.json();
 
                 if (data.status && data.reference) {
-                    toast.success(data.message || "Payment request sent. Please approve on your phone.");
+                    toast.success(data.message || w.momoSent);
                     setPaymentReference(data.reference);
                     
                     // Start polling for payment status
@@ -327,7 +329,7 @@ const Wallet = () => {
                 setIsProcessing(false);
                 }
             } else {
-                toast.error("Selected payment method is not supported");
+                toast.error(w.methodNotSupported);
                 setIsProcessing(false);
             }
         } catch (error) {
@@ -395,17 +397,17 @@ const Wallet = () => {
                 `}
             </style>
             <div className="mainExpert">
-                <Title name="Wallet" />
+                <Title name={w.title} />
 
                 <div className="row">
                     {/* Left Column - Balance Banner */}
                     <div className="col-md-6" style={{ position: "relative" }}>
                         {/* Text positioned on top of the image */}
                         <div style={{ position: "absolute", top: "5%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "17px", zIndex: 2, fontWeight: "bold" }}>
-                            My Wallet Balance
+                            {w.balance}
                         </div>
                         <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", color: "white", fontSize: "30px", zIndex: 2, fontWeight: "bold" }}>
-                            {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {isSkeleton ? "Loading..." : (walletBalance?.toFixed(2) || "0.00")}
+                            {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {isSkeleton ? ui.loading : (walletBalance?.toFixed(2) || "0.00")}
                         </div>
 
                         {/* Image */}
@@ -415,16 +417,18 @@ const Wallet = () => {
                         {minSalonWalletBalance > 0 && (
                             <div className="mt-4">
                                 <div className={`alert ${isBalanceInsufficient ? "alert-warning" : "alert-info"}`} role="alert">
-                                    <strong>Minimum Required Balance:</strong> {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {minSalonWalletBalance.toFixed(2)}
+                                    <strong>{w.minBalance} :</strong> {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {minSalonWalletBalance.toFixed(2)}
                                     <br />
                                     <small>
                                         {isBalanceInsufficient ? (
                                             <>
-                                                Your wallet balance is below the minimum required amount. 
-                                                You need to add at least <strong>{currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {deficit.toFixed(2)}</strong> to accept bookings.
+                                                {w.balanceBelowMin}{" "}
+                                                {w.needAddAmount}{" "}
+                                                <strong>{currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {deficit.toFixed(2)}</strong>{" "}
+                                                {w.toAcceptBookings}
                                             </>
                                         ) : (
-                                            "Your wallet must have at least this amount plus the commission fee to accept new bookings."
+                                            w.balanceRule
                                         )}
                                     </small>
                                 </div>
@@ -435,17 +439,12 @@ const Wallet = () => {
                         <div className="row mt-4">
                             <div className="inputData mt-4 col-md-11">
                                 <label className="styleForTitle fw-bold" style={{ color: "#1C2B20", fontSize: "24px" }}>
-                                    Wallet Recharge Instructions :
+                                    {w.instructionsTitle}
                                 </label>
                                 <div style={{ fontSize: "14px", lineHeight: "25px", color: "#A5A5A5" }}>
-                                    <div>
-                                        To recharge your wallet, select or enter the desired amount and choose your preferred payment method (Stripe or MTN MoMo). 
-                                        Once the payment is processed successfully, the amount will be automatically credited to your wallet. 
-                                        Your wallet balance must meet the minimum required amount plus commission fees to accept new bookings.
-                                    </div>
+                                    <div>{w.rechargeBody1}</div>
                                     <div style={{ wordWrap: "break-word", marginTop: "10px" }}>
-                                        You can view your wallet transaction history in the "Wallet History" section. 
-                                        All transactions including recharges, commission deductions, and refunds will be recorded there.
+                                        {w.rechargeBody2}
                                     </div>
                                 </div>
                             </div>
@@ -456,7 +455,7 @@ const Wallet = () => {
                     <div className="col-md-6">
                         <div className="inputData mt-2">
                             <label className="styleForTitle" htmlFor="rechargeAmount">
-                                Enter Recharge Amount
+                                {w.enterAmount}
                             </label>
                             <div className="input-group mt-2" style={{ position: "relative", display: "flex", alignItems: "center" }}>
                                 <span className="input-group-text fw-bold" style={{ position: "relative", display: "flex", alignItems: "center", background: "#1C2B20", color: "white" }}>
@@ -472,7 +471,7 @@ const Wallet = () => {
                                         borderTopLeftRadius: "0",
                                         borderBottomLeftRadius: "0",
                                     }}
-                                    placeholder="Enter amount"
+                                    placeholder={w.amountPlaceholder}
                                     value={amount}
                                     onChange={(e) => {
                                         const value = e.target.value;
@@ -486,14 +485,14 @@ const Wallet = () => {
                             </div>
                             {amountError && (
                                 <label className="d-flex justify-content-end mt-1" style={{ color: "red", fontSize: "15px" }}>
-                                    *Please enter a valid amount
+                                    *{w.amountErrorLabel}
                                 </label>
                             )}
                         </div>
 
                         {/* Quick Amount Selection */}
                         <div className="inputData mt-4">
-                            <label className="styleForTitle">Or Select Quick Amount</label>
+                            <label className="styleForTitle">{w.quickAmount}</label>
                             <div className="d-flex flex-wrap gap-2 mt-2">
                                 {quickAmounts.map((amt) => (
                                     <button
@@ -514,7 +513,7 @@ const Wallet = () => {
                             <>
                             <div className="inputData mt-4">
                                     <label className="styleForTitle">
-                                    Select Payment Method
+                                    {w.selectPayment}
                                 </label>
                                     <div className="mt-2">
                                         {availablePaymentMethods.map((method) => (
@@ -648,14 +647,14 @@ const Wallet = () => {
                                 {paymentMethod === "MTN MoMo" && (
                                     <div className="inputData mt-4">
                                         <label className="styleForTitle" htmlFor="phoneNumber">
-                                            MTN MoMo Phone Number
+                                            {w.momoPhone}
                                         </label>
                                         <input
                                             type="tel"
                                             name="phoneNumber"
                                             className={`form-control fw-bold p-3 ${phoneError ? "border-danger" : ""}`}
                                             id="phoneNumber"
-                                            placeholder="Enter your MTN MoMo phone number (e.g., 237612345678)"
+                                            placeholder={w.momoPhonePlaceholder}
                                             value={phoneNumber}
                                             onChange={(e) => {
                                                 setPhoneNumber(e.target.value);
@@ -665,20 +664,20 @@ const Wallet = () => {
                                         />
                                         {phoneError && (
                                             <label className="d-flex justify-content-end mt-1" style={{ color: "red", fontSize: "15px" }}>
-                                                *Please enter a valid phone number
+                                                *{w.invalidPhone}
                                             </label>
                                         )}
                                         <small className="text-muted mt-1 d-block">
-                                            Enter your MTN Mobile Money registered phone number
+                                            {w.momoPhoneHint}
                                         </small>
                             </div>
                                 )}
                             </>
                         ) : (
                             <div className="alert alert-warning mt-4" role="alert">
-                                <strong>No Payment Methods Available</strong>
+                                <strong>{w.noPaymentMethods}</strong>
                                 <br />
-                                <small>Please contact admin to enable payment methods (Stripe or MTN MoMo).</small>
+                                <small>{w.noPaymentMethodsHint}</small>
                             </div>
                         )}
 
@@ -689,7 +688,7 @@ const Wallet = () => {
                                     type="submit"
                                     className="text-white m10-left"
                                     style={{ backgroundColor: "#1ebc1e" }}
-                                    text={isProcessing ? "Processing..." : "Recharge Wallet"}
+                                    text={isProcessing ? ui.actions.processing : w.recharge}
                                     onClick={handleRecharge}
                                     disabled={isProcessing || !amount || parseFloat(amount) <= 0 || availablePaymentMethods.length === 0 || (paymentMethod === "MTN MoMo" && (!phoneNumber || phoneNumber.trim() === ""))}
                                 />
@@ -699,9 +698,7 @@ const Wallet = () => {
                         {/* Info Message */}
                         <div className="alert alert-info mt-4" role="alert">
                             <small>
-                                <strong>Note:</strong> Payment gateway integration is required. 
-                                After successful payment, the amount will be credited to your wallet automatically. 
-                                You can view your transaction history in the "Wallet History" section.
+                                <strong>Note :</strong> {w.noteFooter}
                             </small>
                         </div>
                     </div>

@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 // /* eslint-disable react-hooks/exhaustive-deps */
 // /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
@@ -169,26 +171,26 @@ const Setting = (props) => {
     ) {
       let error = {};
       if (!privacyPolicyLink)
-        error.privacyPolicyLink = "Privacy Policy Link is required";
-      if (!tnc) error.tnc = "T&C is required";
+        error.privacyPolicyLink = ui.settings.privacyPolicyRequired;
+      if (!tnc) error.tnc = ui.settings.tncRequired;
       if (!stripePublishableKey)
-        error.stripePublishableKey = "Stripe Publishable Key is required";
+        error.stripePublishableKey = ui.settings.stripePublishableRequired;
       if (!stripeSecretKey)
-        error.stripeSecretKey = "Stripe Secret Key is required";
-      if (!razorPayId) error.razorPayId = "Razor Pay Id is required";
+        error.stripeSecretKey = ui.settings.stripeSecretRequired;
+      if (!razorPayId) error.razorPayId = ui.settings.razorIdRequired;
       if (!razorSecretKey)
-        error.razorSecretKey = "Razor Secret Key is required";
-      if (!tax) error.tax = "Tax is required";
-      if (!currencyName) error.currencyName = "Currency Name is required";
-      if (!currencySymbol) error.currencySymbol = "Currency Symbol is required";
+        error.razorSecretKey = ui.settings.razorSecretRequired;
+      if (!tax) error.tax = ui.settings.taxRequired;
+      if (!currencyName) error.currencyName = ui.settings.currencyNameRequired;
+      if (!currencySymbol) error.currencySymbol = ui.settings.currencySymbolRequired;
       if (!flutterWaveKey)
-        error.flutterWaveKey = "Flutter Wave Key is required";
-      if (!firebaseKey) error.firebaseKey = "Firebase Key is required";
-      if (!adminCommissionCharges) error.commissionPerProductQuantity = "Admin Commission (for products) is required";
-      if (!customerCommissionCharges) error.customerCommissionCharges = "Customer Commission Charge is required";
-      if (!salonCommissionCharges) error.salonCommissionCharges = "Salon Commission Charge is required";
-      if (!cancelOrderCharges) error.cancelOrderCharges = "cancelOrderCharges Key is required";
-      if (!minWithdrawalRequestedAmount) error.minWithdrawalRequestedAmount = "withDrawReq is required";
+        error.flutterWaveKey = ui.settings.flutterWaveRequired;
+      if (!firebaseKey) error.firebaseKey = ui.settings.firebaseRequired;
+      if (!adminCommissionCharges) error.commissionPerProductQuantity = ui.settings.adminCommissionRequired;
+      if (!customerCommissionCharges) error.customerCommissionCharges = ui.settings.customerCommissionRequired;
+      if (!salonCommissionCharges) error.salonCommissionCharges = ui.settings.salonCommissionRequired;
+      if (!cancelOrderCharges) error.cancelOrderCharges = ui.settings.cancelOrderRequired;
+      if (!minWithdrawalRequestedAmount) error.minWithdrawalRequestedAmount = ui.settings.minWithdrawRequired;
       return setError({ ...error });
     } else {
       const data = {
@@ -264,26 +266,26 @@ const Setting = (props) => {
 
   const withDrawTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
 
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <img src={row?.image} alt={"image"} width="50px" height="50px" />
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.name}</span>
       ),
     },
     {
-      Header: "Details",
+      Header: col.details,
       Cell: ({ row }) => {
         const details = row?.
           details
@@ -299,13 +301,13 @@ const Setting = (props) => {
       },
     },
     {
-      Header: "Created At",
+      Header: col.createdAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.createdAt?.split("T")[0]}</span>
       ),
     },
     {
-      Header: "Is Active",
+      Header: col.isActive,
       Cell: ({ row }) => (
         <ToggleSwitch
           value={row?.isEnabled}
@@ -322,7 +324,7 @@ const Setting = (props) => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <>
           <span>
@@ -367,15 +369,13 @@ const Setting = (props) => {
           type="button"
           className={`${type === "setting" ? "activeBtn" : "disabledBtn"}`}
           onClick={() => setType("setting")}
-        >
-          Setting
-        </button>
+        >{ui.settings.tabSettings}</button>
         <button
           type="button"
           className={`${type === "paymentSetting" ? "activeBtn" : "disabledBtn"}`}
           onClick={() => setType("paymentSetting")}
         >
-          Payment
+          {ui.settings.tabPayments}
         </button>
         <button
           type="button"
@@ -383,7 +383,7 @@ const Setting = (props) => {
             } ms-1`}
           onClick={() => setType("withdraw")}
         >
-          WithDraw
+          {ui.settings.tabWithdraw}
         </button>
       </div>
 
@@ -396,7 +396,7 @@ const Setting = (props) => {
                   <Button
                     type={`submit`}
                     className={`text-light m10-left fw-bold`}
-                    text={`Submit`}
+                    text="Enregistrer"
                     style={{ backgroundColor: "#1ebc1e" }}
                     onClick={onsubmit}
                   />
@@ -406,7 +406,7 @@ const Setting = (props) => {
                 <div className="col-12 col-md-6 mt-3 ">
                   <div className="settingBoxOuter">
                     <div className="settingBoxHeader">
-                      <h4>STRIPE PAY SETTING</h4>
+                      <h4>{ui.settings.stripeSection}</h4>
                     </div>
                     <div className="col-12 ">
                       <div className="inputData text  flex-row justify-content-start text-start">
@@ -414,20 +414,20 @@ const Setting = (props) => {
                           htmlFor="stripePublishableKey"
                           className="ms-2 order-1"
                         >
-                          Stripe publishable key
+                          {ui.settings.stripePublishableLabel}
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="stripePublishableKey"
                           value={stripePublishableKey}
-                          placeholder="Enter Stripe Publishable Key"
+                          placeholder={ui.settings.stripePublishablePh}
                           onChange={(e) => {
                             setStripePublishableKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                stripePublishableKey: ` stripePublishableKey Is Required`,
+                                stripePublishableKey: ui.settings.stripePublishableRequired,
                               });
                             } else {
                               return setError({
@@ -447,20 +447,20 @@ const Setting = (props) => {
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label htmlFor="stripeSecretKey" className="ms-2 order-1">
-                          Stripe secret key
+                          {ui.settings.stripeSecretLabel}
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="stripeSecretKey"
                           value={stripeSecretKey}
-                          placeholder="Enter Stripe Secret Key"
+                          placeholder={ui.settings.stripeSecretPh}
                           onChange={(e) => {
                             setStripeSecretKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                stripeSecretKey: ` Stripe Secret Key Is Required`,
+                                stripeSecretKey: ui.settings.stripeSecretRequired,
                               });
                             } else {
                               return setError({
@@ -479,7 +479,7 @@ const Setting = (props) => {
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">Stripe pay active (enable/disable stripe pay)</label>
+                        <label className="my-3">{ui.settings.stripeActive}</label>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 2)}
@@ -493,7 +493,7 @@ const Setting = (props) => {
                 <div className="col-12 col-md-6 mt-3 ">
                   <div className="settingBoxOuter">
                     <div className="settingBoxHeader">
-                      <h4>MTN MOMO SETTING</h4>
+                      <h4>{ui.settings.mtnSection}</h4>
                     </div>
                     <div className="col-12 ">
                       <div className="inputData text  flex-row justify-content-start text-start">
@@ -508,13 +508,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="mtnMomoSubscriptionKey"
                           value={mtnMomoSubscriptionKey}
-                          placeholder="Enter MTN MoMo Subscription Key (Primary or Secondary from subscription)"
+                          placeholder={ui.settings.mtnSubscriptionPh}
                           onChange={(e) => {
                             setMtnMomoSubscriptionKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                mtnMomoSubscriptionKey: ` MTN MoMo Subscription Key Is Required`,
+                                mtnMomoSubscriptionKey: ui.settings.mtnSubscriptionRequired,
                               });
                             } else {
                               return setError({
@@ -544,13 +544,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="mtnMomoApiUserId"
                           value={mtnMomoApiUserId}
-                          placeholder="Enter MTN MoMo API User ID (UUID format)"
+                          placeholder={ui.settings.mtnApiUserPh}
                           onChange={(e) => {
                             setMtnMomoApiUserId(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                mtnMomoApiUserId: ` MTN MoMo API User ID Is Required`,
+                                mtnMomoApiUserId: ui.settings.mtnApiUserRequired,
                               });
                             } else {
                               return setError({
@@ -580,13 +580,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="mtnMomoApiKey"
                           value={mtnMomoApiKey}
-                          placeholder="Enter MTN MoMo API Key"
+                          placeholder={ui.settings.mtnApiKeyPh}
                           onChange={(e) => {
                             setMtnMomoApiKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                mtnMomoApiKey: ` MTN MoMo API Key Is Required`,
+                                mtnMomoApiKey: ui.settings.mtnApiKeyRequired,
                               });
                             } else {
                               return setError({
@@ -616,7 +616,7 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="mtnMomoCallbackHost"
                           value={mtnMomoCallbackHost}
-                          placeholder="Enter callback host (e.g., skedisy.com or api.skedisy.com)"
+                          placeholder={ui.settings.mtnCallbackPh}
                           onChange={(e) => {
                             setMtnMomoCallbackHost(e.target.value);
                               return setError({
@@ -639,7 +639,7 @@ const Setting = (props) => {
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
-                          <strong>Note:</strong> The Subscription Key for <code>Ocp-Apim-Subscription-Key</code> header will use API Key if provided, otherwise Primary Key. 
+                          {ui.settings.mtnSubKeyHint} 
                           You can also use Secondary Key if needed - both work as subscription keys.
                         </label>
                       </div>
@@ -657,16 +657,16 @@ const Setting = (props) => {
                             setMtnMomoEnvironment(e.target.value);
                           }}
                         >
-                          <option value="sandbox">Sandbox</option>
-                          <option value="production">Production</option>
+                          <option value="sandbox">{ui.settings.mtnEnvSandbox}</option>
+                          <option value="production">{ui.settings.mtnEnvProduction}</option>
                         </select>
                       </div>
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">MTN MoMo active (enable/disable MTN MoMo)</label>
+                        <label className="my-3">{ui.settings.mtnActive}</label>
                         <label style={{ fontSize: "12px", color: "#666", marginTop: "5px", display: "block" }}>
-                          ⚠️ <strong>Important:</strong> Make sure to enable this toggle switch after adding all MTN MoMo keys above. 
+                          {ui.settings.mtnEnableHint} 
                           The payment will not work if this is disabled, even if all keys are configured.
                         </label>
                       </div>
@@ -675,9 +675,9 @@ const Setting = (props) => {
                         value={setting?.isMtnMomo}
                       />
                       {setting?.isMtnMomo ? (
-                        <span style={{ color: "#1ebc1e", fontSize: "12px", marginLeft: "10px" }}>✓ Enabled</span>
+                        <span style={{ color: "#1ebc1e", fontSize: "12px", marginLeft: "10px" }}>{ui.settings.mtnEnabled}</span>
                       ) : (
-                        <span style={{ color: "#dc3545", fontSize: "12px", marginLeft: "10px" }}>✗ Disabled</span>
+                        <span style={{ color: "#dc3545", fontSize: "12px", marginLeft: "10px" }}>{ui.settings.mtnDisabled}</span>
                       )}
                     </div>
                   </div>
@@ -686,23 +686,23 @@ const Setting = (props) => {
                 <div className="col-12 col-md-6 mt-3 ">
                   <div className="settingBoxOuter">
                     <div className="settingBoxHeader">
-                      <h4>RAZOR PAY SETTING</h4>
+                      <h4>{ui.settings.razorSection}</h4>
                     </div>
                     <div className="col-12 ">
                       <div className="inputData text  flex-row justify-content-start text-start">
-                        <label className="my-3">Razor pay active (enable/disable razor pay)</label>
+                        <label className="my-3">{ui.settings.razorActive}</label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="razorSecretKey"
                           value={razorSecretKey}
-                          placeholder="Enter Razorpay Secret Key"
+                          placeholder={ui.settings.razorSecretPh}
                           onChange={(e) => {
                             setRazorSecretKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                razorSecretKey: ` Razorpay Secret Key Is Required`,
+                                razorSecretKey: ui.settings.razorSecretRequired,
                               });
                             } else {
                               return setError({
@@ -729,13 +729,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="razorPayId"
                           value={razorPayId}
-                          placeholder="Enter razorPay Id"
+                          placeholder={ui.settings.razorIdPh}
                           onChange={(e) => {
                             setRazorPayId(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                razorPayId: ` razorPay Id Is Required`,
+                                razorPayId: ui.settings.razorIdRequired,
                               });
                             } else {
                               return setError({
@@ -754,7 +754,7 @@ const Setting = (props) => {
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">Razor pay active</label>
+                        <label className="my-3">{ui.settings.razorActive}</label>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 1)}
@@ -766,7 +766,7 @@ const Setting = (props) => {
                 <div className="col-12 col-md-6 mt-3 ">
                   <div className="settingBoxOuter">
                     <div className="settingBoxHeader">
-                      <h4>FLUTTER WAVE SETTING</h4>
+                      <h4>{ui.settings.flutterSection}</h4>
                     </div>
 
                     <div className="col-12">
@@ -779,13 +779,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="flutterWaveKey"
                           value={flutterWaveKey}
-                          placeholder="EnterFlutterWave Key"
+                          placeholder={ui.settings.flutterWavePh}
                           onChange={(e) => {
                             setFlutterWaveKey(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                flutterWaveKey: `FlutterWave Key Is Required`,
+                                flutterWaveKey: ui.settings.flutterWaveRequired,
                               });
                             } else {
                               return setError({
@@ -804,7 +804,7 @@ const Setting = (props) => {
                     </div>
                     <div className="inputData">
                       <div>
-                        <label className="my-3">flutterwave payment (enable/disable)</label>
+                        <label className="my-3">{ui.settings.flutterActive}</label>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 4)}
@@ -829,7 +829,7 @@ const Setting = (props) => {
                   <Button
                     type={`submit`}
                     className={`text-light m10-left fw-bold`}
-                    text={`Submit`}
+                    text="Enregistrer"
                     style={{ backgroundColor: "#1ebc1e" }}
                     onClick={onsubmit}
                   />
@@ -840,9 +840,9 @@ const Setting = (props) => {
                 <div className="col-12 col-md-6 mt-3">
                   <div className="settingBoxOuter">
                     <div className="settingBoxHeader d-flex justify-content-between">
-                      <h4>APP SETTING</h4>
+                      <h4>{ui.settings.appSection}</h4>
                       <div className="inputData">
-                        <label className="me-2">Maintenance Mode</label>
+                        <label className="me-2">{ui.settings.maintenanceMode}</label>
                         <ToggleSwitch
                           onClick={() => handleAppActive(setting?._id)}
                           value={setting?.maintenanceMode}
@@ -859,13 +859,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="privacyPolicyLink"
                           value={privacyPolicyLink}
-                          placeholder="Enter privacyPolicyLink"
+                          placeholder={ui.settings.privacyPolicyPh}
                           onChange={(e) => {
                             setPrivacyPolicyLink(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                privacyPolicyLink: ` privacyPolicyLink Is Required`,
+                                privacyPolicyLink: ui.settings.privacyPolicyRequired,
                               });
                             } else {
                               return setError({
@@ -892,13 +892,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="tnc"
                           value={tnc}
-                          placeholder="Enter tnc"
+                          placeholder={ui.settings.tncPh}
                           onChange={(e) => {
                             setTnc(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                tnc: ` Terms And Condition Is Required`,
+                                tnc: ui.settings.tncRequired,
                               });
                             } else {
                               return setError({
@@ -925,13 +925,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="tax"
                           value={tax}
-                          placeholder="Enter tax"
+                          placeholder={ui.settings.taxPh}
                           onChange={(e) => {
                             setTax(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                tax: ` tax Is Required`,
+                                tax: ui.settings.taxRequired,
                               });
                             } else {
                               return setError({
@@ -957,7 +957,7 @@ const Setting = (props) => {
                   <div className="settingBoxOuter ">
                     <div className="d-flex justify-content-between">
                       <div className="settingBoxHeader">
-                        <h4>Add Product Request</h4>
+                        <h4>{ui.settings.addProductRequest}</h4>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 6)}
@@ -967,14 +967,14 @@ const Setting = (props) => {
 
                     <div className="inputData">
                       <div>
-                        <label className="my-3" style={{ fontSize: "20px" }}>New product request enable/disable for seller</label>
+                        <label className="my-3" style={{ fontSize: "20px" }}>{ui.settings.productRequestNew}</label>
                       </div>
                     </div>
                   </div>
                   <div className="settingBoxOuter mt-5">
                     <div className="d-flex justify-content-between">
                       <div className="settingBoxHeader">
-                        <h4>Update  Product Request</h4>
+                        <h4>{ui.settings.updateProductRequest}</h4>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 7)}
@@ -984,7 +984,7 @@ const Setting = (props) => {
 
                     <div className="inputData">
                       <div>
-                        <label className="my-3" style={{ fontSize: "20px" }}>Enable/disable product request update for seller</label>
+                        <label className="my-3" style={{ fontSize: "20px" }}>{ui.settings.productRequestUpdate}</label>
                       </div>
                     </div>
                   </div>
@@ -993,7 +993,7 @@ const Setting = (props) => {
                   <div className="settingBoxOuter ">
                     <div className="d-flex justify-content-between">
                       <div className="settingBoxHeader">
-                        <h4>Update  Product Request</h4>
+                        <h4>{ui.settings.updateProductRequest}</h4>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 7)}
@@ -1003,7 +1003,7 @@ const Setting = (props) => {
 
                     <div className="inputData">
                       <div>
-                        <label className="my-3" style={{ fontSize: "20px" }}>Enable/disable product request update for seller</label>
+                        <label className="my-3" style={{ fontSize: "20px" }}>{ui.settings.productRequestUpdate}</label>
                       </div>
                     </div>
                   </div>
@@ -1022,20 +1022,20 @@ const Setting = (props) => {
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label htmlFor="cancelOrderCharges" className="ms-2 order-1">
-                          Cancel Order Charges (%)
+                          {ui.labels.cancelOrderChargesPct}
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="cancelOrderCharges"
                           value={cancelOrderCharges}
-                          placeholder="Enter Cancel Order Charges"
+                          placeholder={ui.settings.cancelOrderPh}
                           onChange={(e) => {
                             setCancelOrderCharges(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                cancelOrderCharges: ` Cancel Order Charges Is Required`,
+                                cancelOrderCharges: ui.settings.cancelOrderRequired,
                               });
                             } else {
                               return setError({
@@ -1054,21 +1054,21 @@ const Setting = (props) => {
                     </div>
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
-                        <label htmlFor="Admin Commission Charges (%)" className="ms-2 order-1">
-                          Admin Commission Charges (%) - For Products
+                        <label htmlFor="{ui.settings.adminCommissionLabel}" className="ms-2 order-1">
+                          {ui.settings.adminCommissionLabel} - For Products
                         </label>
                         <input
                           type="text"
                           className="rounded-2"
                           id="adminCommissionCharges"
                           value={adminCommissionCharges}
-                          placeholder="Enter Admin Commission for Products"
+                          placeholder={ui.settings.adminCommissionPh}
                           onChange={(e) => {
                             setAdminCommissionCharges(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                adminCommissionCharges: ` Admin Commission Is Required`,
+                                adminCommissionCharges: ui.settings.adminCommissionRequired,
                               });
                             } else {
                               return setError({
@@ -1098,13 +1098,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="customerCommissionCharges"
                           value={customerCommissionCharges}
-                          placeholder="Enter Customer Commission Charge"
+                          placeholder={ui.settings.customerCommissionPh}
                           onChange={(e) => {
                             setCustomerCommissionCharges(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                customerCommissionCharges: ` Customer Commission Charge Is Required`,
+                                customerCommissionCharges: ui.settings.customerCommissionRequired,
                               });
                             } else {
                               return setError({
@@ -1134,13 +1134,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="salonCommissionCharges"
                           value={salonCommissionCharges}
-                          placeholder="Enter Salon Commission Charge"
+                          placeholder={ui.settings.salonCommissionPh}
                           onChange={(e) => {
                             setSalonCommissionCharges(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                salonCommissionCharges: ` Salon Commission Charge Is Required`,
+                                salonCommissionCharges: ui.settings.salonCommissionRequired,
                               });
                             } else {
                               return setError({
@@ -1170,7 +1170,7 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="minSalonWalletBalance"
                           value={minSalonWalletBalance}
-                          placeholder="Enter Minimum Salon Wallet Balance"
+                          placeholder={ui.settings.minWalletPh}
                           onChange={(e) => {
                             setMinSalonWalletBalance(e.target.value);
                             if (e.target.value && parseFloat(e.target.value) < 0) {
@@ -1236,13 +1236,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="currencyName"
                           value={currencyName}
-                          placeholder="Enter currency Name"
+                          placeholder={ui.settings.currencyNamePh}
                           onChange={(e) => {
                             setCurrencyName(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                currencyName: ` currency Name Is Required`,
+                                currencyName: ui.settings.currencyNameRequired,
                               });
                             } else {
                               return setError({
@@ -1269,13 +1269,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="currencySymbol"
                           value={currencySymbol}
-                          placeholder="Enter Currency Symbol"
+                          placeholder={ui.settings.currencySymbolPh}
                           onChange={(e) => {
                             setCurrencySymbol(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                currencySymbol: ` Currency Symbol Is Required`,
+                                currencySymbol: ui.settings.currencySymbolRequired,
                               });
                             } else {
                               return setError({
@@ -1324,7 +1324,7 @@ const Setting = (props) => {
                             setfirebaseKey(newValue);
                             return setError({
                               ...error,
-                              firebaseKey: "Invalid JSON input",
+                              firebaseKey: ui.settings.invalidJson,
                             });
                           }
                         }}
@@ -1353,12 +1353,12 @@ const Setting = (props) => {
                   <div className="settingBoxOuter">
                     <div className=" d-flex justify-content-between">
                       <div>
-                        <label style={{fontWeight:"bold"}}>Minimum Withdrawal request amount</label>
+                        <label style={{fontWeight:"bold"}}>{ui.labels.minWithdrawLabel}</label>
                       </div>
                       <Button
                         type={`submit`}
                         className={`text-light d-flex justify-end fw-bold`}
-                        text={`Submit`}
+                        text="Enregistrer"
                         style={{ backgroundColor: "#1ebc1e" }}
                         onClick={onsubmit}
                       />
@@ -1371,13 +1371,13 @@ const Setting = (props) => {
                           className="rounded-2"
                           id="minWithdrawalRequestedAmount"
                           value={minWithdrawalRequestedAmount}
-                          placeholder="Enter minWithdrawalRequestedAmount"
+                          placeholder={ui.settings.minWithdrawPh}
                           onChange={(e) => {
                             setMinWithdrawalRequestedAmount(e.target.value);
                             if (!e.target.value) {
                               return setError({
                                 ...error,
-                                razorSecretKey: `WithdrawalRequestedAmount Key Is Required`,
+                                minWithdrawalRequestedAmount: ui.settings.minWithdrawRequired,
                               });
                             } else {
                               return setError({
@@ -1398,7 +1398,7 @@ const Setting = (props) => {
               <div className="d-flex justify-content-end">
                 <Button
                   className={`bg-button p-10 text-black m20-bottom`}
-                  text={`Add New`}
+                  text={ui.labels.addNew}
                   bIcon={`fa-solid fa-user-plus`}
                   onClick={() => {
                     dispatch(openDialog({ type: "withdraw" }));

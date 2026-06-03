@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -53,13 +55,13 @@ const Service = () => {
 
   const serviceTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -74,28 +76,28 @@ const Service = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.name}</span>
       ),
     },
     {
-      Header: "Category",
+      Header: col.category,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.categoryname}</span>
       ),
     },
 
     {
-      Header: `Price  ${"(" + setting?.currencySymbol + ")"}`,
+      Header: `${col.price} (${setting?.currencySymbol})`,
       Cell: ({ row }) => <span>{row?.price}</span>,
     },
     {
-      Header: "Duration",
+      Header: col.duration,
       Cell: ({ row }) => <span>{row?.duration + " min"}</span>,
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
           <button
@@ -138,7 +140,7 @@ const Service = () => {
 
   return (
     <div className="mainCategory">
-      <Title name="Services" />
+      <Title name="Prestations" />
 
       <div className="row">
         <div className="col-lg-4 col-md-6 col-12">
@@ -241,27 +243,27 @@ const Service = () => {
                           <ExInput
                             type={`text`}
                             value={item?.id?.name}
-                            label={`Service name`}
+                            label={ui.form.serviceName}
                             readOnly={true}
-                            placeholder={`Service name`}
+                            placeholder={ui.form.serviceName}
                           />
                         </div>
                         <div className="px-3">
                           <ExInput
                             type={`text`}
                             value={setting?.currencySymbol + " " + item?.price}
-                            label={`Service charge`}
+                            label={ui.form.serviceCharge}
                             readOnly={true}
-                            placeholder={`Service charge`}
+                            placeholder={ui.form.serviceCharge}
                           />
                         </div>
                         <div className="px-3">
                           <ExInput
                             type={`text`}
                             value={item?.id?.duration}
-                            label={`Service duration`}
+                            label={ui.form.serviceDuration}
                             readOnly={true}
-                            placeholder={`Service duration`}
+                            placeholder={ui.form.serviceDuration}
                           />
                         </div>
                         <div className="d-flex justify-content-center align-items-center">

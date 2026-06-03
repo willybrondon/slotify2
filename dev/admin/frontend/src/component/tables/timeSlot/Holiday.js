@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable no-useless-concat */
 /* eslint-disable eqeqeq */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -57,13 +59,13 @@ const Holiday = () => {
 
   const bookingTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       body: "name",
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold cursor">
@@ -72,7 +74,7 @@ const Holiday = () => {
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       sorting: { type: "client" },
       body: "date",
       Cell: ({ row }) => (
@@ -81,7 +83,7 @@ const Holiday = () => {
     },
 
     {
-      Header: "Reason",
+      Header: col.reason,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.reason ? row?.reason : "-"}
@@ -89,7 +91,7 @@ const Holiday = () => {
       ),
     },
     {
-      Header: "Delete",
+      Header: col.delete,
       Cell: ({ row }) => (
         <span>
           <button
@@ -133,7 +135,7 @@ const Holiday = () => {
         <div className="d-flex">
           <Button
             className={`bg-button p-8 text-black my-2 me-3`}
-            text={`New holiday`}
+            text={ui.actions.newHoliday}
             bIcon={`fa-solid fa-user-plus`}
             onClick={() => {
               dispatch(openDialog({ type: "holiday" }));

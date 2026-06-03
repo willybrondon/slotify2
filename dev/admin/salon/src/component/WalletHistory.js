@@ -1,3 +1,5 @@
+import { col } from "../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -64,13 +66,13 @@ const WalletHistory = () => {
 
     const walletTable = [
         {
-            Header: "No",
+            Header: col.no,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             ),
         },
         {
-            Header: "UniqueId",
+            Header: col.uniqueId,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -81,7 +83,7 @@ const WalletHistory = () => {
             ),
         },
         {
-            Header: `Amount (${setting?.currencySymbol})`,
+            Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -92,7 +94,7 @@ const WalletHistory = () => {
             ),
         },
         {
-            Header: "Date",
+            Header: col.date,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -105,7 +107,7 @@ const WalletHistory = () => {
             ),
         },
         {
-            Header: "Time",
+            Header: col.time,
             Cell: ({ row }) => (
                 <div>
                     {row?.time ? row?.time : "-"}
@@ -113,7 +115,7 @@ const WalletHistory = () => {
             ),
         },
         {
-            Header: "Transaction Type",
+            Header: col.transactionType,
             Cell: ({ row }) =>
                 row?.type === 1 || row?.type === 2 || row?.type === 5 ? (
                     <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#1ebc1e" }}>
@@ -130,7 +132,7 @@ const WalletHistory = () => {
                 ),
         },
         {
-            Header: "Transaction Details",
+            Header: col.transactionDetails,
             Cell: ({ row }) => {
                 // Type 1: Credit from Admin
                 if (row?.type === 1) {
@@ -171,7 +173,7 @@ const WalletHistory = () => {
                                     border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
                             {row?.payoutStatus === 1 ? <Refund /> : <WithDraw />}
                             <span style={{ whiteSpace: "nowrap" }} className="ms-2">
-                                {row?.payoutStatus === 1 ? "Withdraw Pending" : row?.payoutStatus === 2 ? "Withdraw Approved" : "Withdraw Declined"}
+                                {row?.payoutStatus === 1 ? ui.labels.withdrawPending : row?.payoutStatus === 2 ? "Withdraw Approved" : ui.labels.withdrawDeclined}
                             </span>
                         </button>
                     );
@@ -217,7 +219,7 @@ const WalletHistory = () => {
             </style>
             <div className="orderDetails mt-2">
                 <div className="row">
-                    <Title name="Wallet History" className="mt-4" />
+                    <Title name={ui.labels.walletHistory} className="mt-4" />
                     {walletBalance !== undefined && (
                         <div className="col-12 mb-3">
                             <div className="betBox p-3" style={{ background: "#f8f9fa", borderRadius: "8px" }}>
@@ -266,7 +268,7 @@ const WalletHistory = () => {
                         <Analytics
                             analyticsStartDate={startDate}
                             analyticsStartEnd={endDate}
-                            placeholder="Wallet"
+                            placeholder={ui.form.wallet}
                             analyticsStartDateSet={setStartDate}
                             analyticsStartEndSet={setEndDate}
                         />

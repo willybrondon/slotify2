@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 /* eslint-disable eqeqeq */
 /* eslint-disable no-use-before-define */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -22,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import Searching from "../../extras/Searching";
 import Male from "../../../assets/images/male.png";
 import NotificationDialog from "../User/NotificationDialog";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 
 export const Expert = () => {
   const [data, setData] = useState([]);
@@ -80,13 +82,13 @@ export const Expert = () => {
 
   const expertTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div
           className="userProfile"
@@ -106,31 +108,31 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
           onClick={() => handleInfo(row._id)}
         >
-          {row?.fname ? row?.fname + " " + row?.lname : "Salon User"}
+          {row?.fname ? row?.fname + " " + row?.lname : ui.table.salonUserFallback}
         </span>
       ),
     },
     {
-      Header: "Email",
+      Header: col.email,
       Cell: ({ row }) => <span>{row?.email}</span>,
     },
     {
-      Header: "Mobile No",
+      Header: col.mobile,
       Cell: ({ row }) => <span>{row?.mobile}</span>,
     },
     {
-      Header: "Unique Id",
+      Header: col.uniqueId,
       Cell: ({ row }) => <span>{row?.uniqueId}</span>,
     },
 
     {
-      Header: "Commission",
+      Header: col.commission,
       body: "commission",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -138,7 +140,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Rating",
+      Header: col.rating,
       body: "averageRating",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -146,7 +148,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Block",
+      Header: col.block,
       body: "isBlock",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -160,7 +162,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Booking",
+      Header: col.booking,
       Cell: ({ row }) => (
         <span>
           <button
@@ -189,7 +191,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Earning",
+      Header: col.earning,
       Cell: ({ row }) => (
         <span>
           <button
@@ -214,7 +216,7 @@ export const Expert = () => {
       ),
     },
     {
-      Header: "Info",
+      Header: col.info,
       Cell: ({ row }) => (
         <span>
           <button
@@ -240,7 +242,7 @@ export const Expert = () => {
     },
 
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
           <button
@@ -329,7 +331,7 @@ export const Expert = () => {
 
   return (
     <div className="mainExpert">
-      <Title name="Experts" />
+      <Title name={ui.pages.experts} />
       {dialogue && dialogueType === "notification" && (
         <div className="userTable">
           <NotificationDialog />
@@ -338,7 +340,7 @@ export const Expert = () => {
       <div className="betBox">
         <Button
           className={`bg-button p-10 text-black m8-bottom`}
-          text={`Add expert`}
+          text={ui.pages.addExpert}
           bIcon={`fa-solid fa-user-plus`}
           onClick={() => handleAddExpert()}
         />

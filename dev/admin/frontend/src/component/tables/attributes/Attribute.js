@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useDispatch, useSelector } from "react-redux";
 import { openDialog } from "../../../redux/slice/dialogueSlice";
 import Title from "../../extras/Title";
@@ -34,19 +36,19 @@ const Attribute = () => {
   };
   const attributeTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.name}</span>
       ),
     },
     {
-      Header: "Details",
+      Header: col.details,
       Cell: ({ row }) => {
         const details = row?.value?.join(', ');
         const words = details.split(' ');
@@ -60,13 +62,13 @@ const Attribute = () => {
       },
     },
     {
-      Header: "Created At",
+      Header: col.createdAt,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.createdAt.split("T")[0]}</span>
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span>
           <button
@@ -84,7 +86,7 @@ const Attribute = () => {
   ];
   return (
     <div className="mainCategory">
-      <Title name="Attribute" />
+      <Title name={ui.pages.attribute} />
       <Button
         className={`bg-button p-10 text-black m20-bottom`}
         text={`Add Attribute`}

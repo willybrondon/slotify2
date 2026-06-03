@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   setting: {},
@@ -77,7 +78,7 @@ const settingSlice = createSlice({
     builder.addCase(updateSetting.fulfilled, (state, action) => {
       if (action.payload.status) {
         state.setting = { ...state.setting, ...action.payload.setting };
-        Success("Setting Updated Successfully");
+        Success(ui.toast.settingUpdated);
       }
       state.isLoading = false;
     });
@@ -87,13 +88,13 @@ const settingSlice = createSlice({
     builder.addCase(maintenanceMode.fulfilled, (state, action) => {
       if (action.payload.status) {
         state.setting = { ...state.setting, ...action.payload.setting };
-        Success("Maintenance Mode Updated Successfully");
+        Success(ui.toast.maintenanceUpdated);
       }
       state.isLoading = false;
     });
     builder.addCase(handleSetting.fulfilled, (state, action) => {
       state.setting = action.payload.setting;
-      Success("Updated Successfully");
+      Success(ui.toast.updated);
     });
   },
 });

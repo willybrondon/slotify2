@@ -1,3 +1,5 @@
+import { col } from "../../constants/tableHeaders";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -66,13 +68,13 @@ const StaffEarning = () => {
 
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div
           className="userProfile"
@@ -89,7 +91,7 @@ const StaffEarning = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold cursor">
           {row?.expert?.fname + " " + row?.expert?.lname}
@@ -97,7 +99,7 @@ const StaffEarning = () => {
       ),
     },
     {
-      Header: "Total Bookings",
+      Header: col.totalBookings,
       sorting: { type: "client" },
       body: "totalBookings",
       Cell: ({ row }) => (
@@ -108,7 +110,7 @@ const StaffEarning = () => {
     },
 
     {
-      Header: "Expert Earning",
+      Header: col.expertEarning,
       sorting: { type: "client" },
       body: "expertEarning",
       Cell: ({ row }) => (
@@ -119,21 +121,21 @@ const StaffEarning = () => {
     },
 
     {
-      Header: `Bonus / Penalty`,
+      Header: col.bonusPenalty,
       body: "bonus",
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.bonus+ " " + setting?.currencySymbol}</span>
       ),
     },
     {
-      Header: `Final Amount`,
+      Header: col.finalAmount,
       body: "finalAmount",
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold">{row?.finalAmount?.toFixed(2)+ " " + setting?.currencySymbol}</span>
       ),
     },
     {
-      Header: `Settlement Date`,
+      Header: col.settlementDate,
       body: "createdAt",
       Cell: ({ row }) => (
         <span className="text-capitalize">
@@ -142,7 +144,7 @@ const StaffEarning = () => {
       ),
     },
     {
-      Header: `Payment Date`,
+      Header: col.paymentDate,
       body: "createdAt",
       Cell: ({ row }) => (
         <span className="text-capitalize">
@@ -152,7 +154,7 @@ const StaffEarning = () => {
     },
 
     {
-      Header: "Earning",
+      Header: col.earning,
       Cell: ({ row }) => (
         <span>
           <button
@@ -177,7 +179,7 @@ const StaffEarning = () => {
       ),
     },
     {
-      Header: "Info",
+      Header: col.info,
       Cell: ({ row }) => (
         <span>
           <button
@@ -202,7 +204,7 @@ const StaffEarning = () => {
       ),
     },
     {
-      Header: "Action",
+      Header: col.action,
       Cell: ({ row }) => (
         <span className="d-flex justify-content-center">
           {row?.statusOfTransaction === 0 ? (
@@ -303,7 +305,7 @@ const StaffEarning = () => {
   return (
     <div className="mainCategory">
       {dialogue && dialogueType === "bonus" && <BonusPenaltyDialog />}
-      <Title name="Expert earnings" />
+      <Title name={ui.pages.expertEarnings} />
       <div className="row ">
         <div className="mt-2 col-md-9">
           <Analytics

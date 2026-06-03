@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { toast } from "react-toastify";
 import Pagination from "../../extras/Pagination"
 import Table from "../../extras/Table"
@@ -63,13 +65,13 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
 
     const pendingTable = [
         {
-            Header: "SR NO",
+            Header: col.srNo,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             )
         },
         {
-            Header: "Salon Image",
+            Header: col.salonImage,
             Cell: ({ row }) => (
                 <>
                     <img src={row?.salon?.mainImage} alt="expert" width="80" height="80" style={{ objectFit: "contain", cursor: "pointer" }} onClick={(e) => {
@@ -79,7 +81,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: "Salon Name",
+            Header: col.salonName,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.salon?.name ? row?.salon?.name : "-"}</div>
@@ -87,7 +89,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: `Amount (${setting?.currencySymbol})`,
+            Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (
                 <>
                     <div>{row?.amount ? row?.amount : "-"}</div>
@@ -95,7 +97,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: "Date",
+            Header: col.date,
             Cell: ({ row }) => (
                 <>
                     <div>{moment(row?.createdAt).format("DD.MM.YYYY") ? moment(row?.createdAt).format("DD.MM.YYYY") : "-"}</div>
@@ -103,7 +105,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
             )
         },
         {
-            Header: "Info",
+            Header: col.info,
             Cell: ({ row }) => (
                 <span>
                     <button
@@ -121,7 +123,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
             width: "50px",
         },
         {
-            Header: "Accept",
+            Header: col.accept,
             body: "",
             Cell: ({ row }) =>
             (
@@ -134,7 +136,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
             ),
         },
         {
-            Header: "Reject",
+            Header: col.reject,
             body: "",
             Cell: ({ row }) => (
                 <>
@@ -219,7 +221,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
                                                                     <input
                                                                         type="text"
                                                                         className="form-control"
-                                                                        placeholder={`Enter your ${label.toLowerCase()}`}
+                                                                        placeholder={`${ui.common.enterYour} ${label.toLowerCase()}`}
                                                                         value={value?.trim()}
                                                                         disabled
                                                                     />
@@ -238,7 +240,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
                                                         type={`cancel`}
                                                         className={` text-white m10-left`}
                                                         style={{ backgroundColor: "#1ebc1e" }}
-                                                        text={`Cancel`}
+                                                        text="Annuler"
                                                         onClick={() => { setModal(false) }}
                                                     />
                                                 </div>
@@ -294,7 +296,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
                                                 <div className="col-12 text-end m0">
                                                     <Button
                                                         className={`bg-gray text-light`}
-                                                        text={`Cancel`}
+                                                        text="Annuler"
                                                         type={`button`}
                                                         onClick={() => {
                                                             setReasonModal(false);
@@ -305,7 +307,7 @@ const PendingSalonReq = ({ status, startDate, endDate }) => {
                                                         type={`submit`}
                                                         className={` text-white m10-left`}
                                                         style={{ backgroundColor: "#1ebc1e" }}
-                                                        text={`Submit`}
+                                                        text="Enregistrer"
                                                     />
                                                 </div>
                                             </div>

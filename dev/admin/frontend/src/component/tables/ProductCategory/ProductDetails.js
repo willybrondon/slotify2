@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -74,19 +75,19 @@ const ProductDetails = () => {
 
     const reviewTable = [
         {
-            Header: "No",
+            Header: col.no,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             ),
         },
         {
-            Header: "Image",
+            Header: col.image,
             Cell: ({ row }) => (
                 <img src={row?.userImage} style={{ width: "50px", height: "50px" }} />
             ),
         },
         {
-            Header: "First Name",
+            Header: col.firstName,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -96,7 +97,7 @@ const ProductDetails = () => {
             ),
         },
         {
-            Header: "Last Name",
+            Header: col.lastName,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -106,7 +107,7 @@ const ProductDetails = () => {
             ),
         },
         {
-            Header: "Review",
+            Header: col.review,
             Cell: ({ row }) => (
                 <div>
                     {row?.review ? row?.review : "-"}
@@ -114,13 +115,13 @@ const ProductDetails = () => {
             ),
         },
         {
-            Header: "Rating",
+            Header: col.rating,
             Cell: ({ row }) => (
                 <Rating name="read-only" value={row?.rating} readOnly />
             ),
         },
         {
-            Header: "Time",
+            Header: col.time,
             Cell: ({ row }) => (
                 <div>
                     {row?.time ? row?.time : "-"}

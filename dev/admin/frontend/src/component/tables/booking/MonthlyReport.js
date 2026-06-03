@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-unused-vars */
@@ -46,23 +48,23 @@ const MonthlyReport = () => {
   };
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{parseInt(index) + 1}</span>,
     },
     {
-      Header: "Month",
+      Header: col.month,
       Cell: ({ row }) => (
         <span className="text-capitalize fw-bold cursor">{row?.month}</span>
       ),
     },
     {
-      Header: "Total Experts",
+      Header: col.totalExperts,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.experts}</span>
       ),
     },
     {
-      Header: "Total Completed Bookings",
+      Header: col.totalCompletedBookings,
       body: "completedBookings",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -70,7 +72,7 @@ const MonthlyReport = () => {
       ),
     },
     {
-      Header: "Admin Earning",
+      Header: col.adminEarning,
       body: "adminEarning",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -82,11 +84,11 @@ const MonthlyReport = () => {
       ),
     },
     {
-      Header: "+",
+      Header: col.plus,
       thClass: "text-center fs-20 fw-bold",
     },
     {
-      Header: "Salon Commission",
+      Header: col.salonCommission,
       body: "salonCommission",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -98,11 +100,11 @@ const MonthlyReport = () => {
       ),
     },
     {
-      Header: "+",
+      Header: col.plus,
       thClass: "text-center fs-20 fw-bold",
     },
     {
-      Header: "Expert Earning",
+      Header: col.expertEarning,
       body: "expertEarning",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -114,11 +116,11 @@ const MonthlyReport = () => {
       ),
     },
     {
-      Header: "+",
+      Header: col.plus,
       thClass: "text-center fs-20 fw-bold",
     },
     {
-      Header: " Tax ",
+      Header: col.tax,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.tax ? row?.tax.toFixed(2) + " " + " " + setting?.currencySymbol : "-"}
@@ -126,11 +128,11 @@ const MonthlyReport = () => {
       ),
     },
     {
-      Header: "=",
+      Header: col.eq,
       thClass: "text-center fs-20 fw-bold",
     },
     {
-      Header: "Total Revenue",
+      Header: col.totalRevenue,
       body: "revenue",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -151,7 +153,7 @@ const MonthlyReport = () => {
 
   return (
     <div className="mainCategory">
-      <Title name="Month wise report" />
+      <Title name={ui.pages.monthlyReport} />
       <div className="inputData col-lg-2 col-md-4 me-3 mb-0">
         <label>Select year</label>
       </div>

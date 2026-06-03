@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
   notification: [],
@@ -52,7 +53,7 @@ const notificationSlice = createSlice({
     builder.addCase(userNotification.fulfilled, (state, action) => {
       if (action?.payload.status) {
         state.notification = action?.payload?.notification;
-        Success("Notification Send SuccessFully");
+        Success(ui.toast.notificationSent);
       }
       state.isLoading = false;
     });
@@ -68,7 +69,7 @@ const notificationSlice = createSlice({
     builder.addCase(expertNotification.fulfilled, (state, action) => {
       if (action?.payload?.status) {
         state.notification = action?.payload?.notification;
-        Success("Notification Send SuccessFully");
+        Success(ui.toast.notificationSent);
       }
       state.isLoading = false;
     });
@@ -83,7 +84,7 @@ const notificationSlice = createSlice({
 
     builder.addCase(allUserNotification.fulfilled, (state, action) => {
       if (action?.payload?.status) {
-        Success("Notification Send SuccessFully");
+        Success(ui.toast.notificationSent);
       }
       state.isLoading = false;
     });

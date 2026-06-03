@@ -23,6 +23,8 @@ import CancleDetails from "./CancleDetails";
 
 import CompleteBookingDetails from "./CompleteBookingDialog";
 import Button from "../../extras/Button";
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { getAllSalons, getSalonDetail } from "../../../redux/slice/salonSlice";
 import { getAllExpert } from "../../../redux/slice/expertSlice";
 import ReactDatePicker from "react-datepicker";
@@ -144,15 +146,17 @@ const Booking = () => {
     });
   };
 
+  const st = ui.status;
+
   const bookingTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "User",
+      Header: col.user,
       Cell: ({ row }) => (
         <div
           className="userProfile cursor"
@@ -171,7 +175,7 @@ const Booking = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -179,12 +183,12 @@ const Booking = () => {
         >
           {row?.user?.fname
             ? row?.user?.fname + " " + row?.user?.lname
-            : "Salon User"}
+            : ui.dashboard.fallbackUser}
         </span>
       ),
     },
     {
-      Header: "Expert",
+      Header: col.expert,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -195,7 +199,7 @@ const Booking = () => {
       ),
     },
     {
-      Header: "Salon",
+      Header: col.salon,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold "
@@ -205,7 +209,7 @@ const Booking = () => {
       ),
     },
     {
-      Header: "Service",
+      Header: col.service,
       Cell: ({ row }) => (
         <div>
           {row?.services?.map((dur, index) => (
@@ -218,11 +222,11 @@ const Booking = () => {
       ),
     },
     {
-      Header: "Booking Id",
+      Header: col.bookingId,
       body: "bookingId",
     },
     {
-      Header: `Price `,
+      Header: col.price,
       body: "amount",
       Cell: ({ row }) => (
         <span className="text-capitalize">
@@ -232,7 +236,7 @@ const Booking = () => {
       sorting: { type: "client" },
     },
     {
-      Header: `Admin Commission`,
+      Header: col.adminCommission,
       body: "platformFee",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -244,7 +248,7 @@ const Booking = () => {
       ),
     },
     {
-      Header: "Duration",
+      Header: col.duration,
       body: "duration",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -252,7 +256,7 @@ const Booking = () => {
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       body: "date",
       sorting: { type: "client" },
       Cell: ({ row }) => (
@@ -260,18 +264,18 @@ const Booking = () => {
       ),
     },
     {
-      Header: "Status",
+      Header: col.status,
       Cell: ({ row }) =>
         row?.status === "completed" ? (
           <button
             className="bg-success text-white m5-right p12-x p4-y fs-12 br-5 "
             onClick={() => handleCompleteOpenDialogue(row)}
           >
-            Completed
+            {st.completed}
           </button>
         ) : row?.status === "confirm" ? (
           <button className="bg-info text-white m5-right p12-x p4-y fs-12 br-5 ">
-            Confirm
+            {st.confirm}
           </button>
         ) : row?.status === "cancel" ? (
           <button
@@ -279,7 +283,7 @@ const Booking = () => {
             style={{ cursor: "pointer" }}
             onClick={() => handleOpenDialogue(row)}
           >
-            Cancel
+            {st.cancel}
           </button>
         ) : (
           <span>
@@ -288,13 +292,13 @@ const Booking = () => {
               style={{ backgroundColor: "#ff7512" }}
               onClick={() => handleCancel(row._id)}
             >
-              Pending
+              {st.pending}
             </button>
           </span>
         ),
     },
     {
-      Header: "Start time",
+      Header: col.startTime,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.time ? row?.time[0] : "-"}
@@ -310,10 +314,10 @@ const Booking = () => {
 
   const bookingType = [
     // { name: "ALL", value: "ALL" },
-    { name: "Pending", value: "pending" },
-    { name: "Confirm", value: "confirm" },
-    { name: "Completed", value: "completed" },
-    { name: "Cancelled", value: "cancel" },
+    { name: st.pending, value: "pending" },
+    { name: st.confirm, value: "confirm" },
+    { name: st.completed, value: "completed" },
+    { name: st.cancel, value: "cancel" },
   ];
 
   const handleOpenDialogue = (row) => {
@@ -341,7 +345,7 @@ const Booking = () => {
 
   return (
     <div className="mainBooking">
-      <Title name={`Bookings`} />
+      <Title name={ui.pages.bookings} />
       {dialogue && dialogueType === "cancelBooking" && (
         <CancelBookingDialog setData={setData} data={data} />
       )}
@@ -358,7 +362,7 @@ const Booking = () => {
         <div className="col-2">
           <div className="inputData">
             <label className="styleForTitle" htmlFor="bookingType">
-              Booking type
+              {ui.labels.bookingType}
             </label>
             <select
               name="bookingType"

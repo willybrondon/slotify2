@@ -5,6 +5,7 @@ import jwt_decode from "jwt-decode";
 import { SetDevKey, setToken } from "../../util/setAuth";
 import { secretKey } from "../../util/config";
 import { DangerRight, Success } from "../../component/api/toastServices";
+import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 import axios from "axios";
 
 const initialState = {
@@ -82,7 +83,7 @@ const authSlice = createSlice({
         setToken(action.payload.token);
         localStorage.setItem("adminToken", action.payload.token);
         localStorage.setItem("key", secretKey ? secretKey : undefined);
-        Success("Login successfully");
+        Success(ui.toast.loginOk);
       } else {
         DangerRight(action?.payload?.message);
       }
@@ -99,7 +100,7 @@ const authSlice = createSlice({
 
     builder.addCase(signUp.fulfilled, (state, action) => {
       if (action?.payload?.status) {
-        Success("Admin Create Successfully");
+        Success(ui.toast.adminCreated);
       }
       state.isLoading = false;
     });
@@ -113,7 +114,7 @@ const authSlice = createSlice({
 
     builder.addCase(updateCode.fulfilled, (state, action) => {
       state.isLoading = false;
-      Success("Code Update Successfully");
+      Success(ui.toast.codeUpdated);
       setTimeout(() => {
         window.location.href = "/admin";
       }, 10);
@@ -150,7 +151,7 @@ const authSlice = createSlice({
         image: action.payload?.admin?.image,
       };
       state.isLoading = false;
-      Success("Admin Updated Successfully");
+      Success(ui.toast.adminUpdated);
     });
 
     builder.addCase(updateAdmin.rejected, (state, action) => {
@@ -172,7 +173,7 @@ const authSlice = createSlice({
       state.isAuth = false;
 
       window.location.href = "/login";
-      Success("Admin Updated Successfully");
+      Success(ui.toast.passwordUpdated);
     });
 
     builder.addCase(updateAdminPassword.rejected, (state, action) => {

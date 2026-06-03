@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductsDetails, getProductsRating } from "../../../redux/slice/productSlice";
@@ -80,7 +81,7 @@ const ProductDetails = () => {
             )
         },
         {
-            Header: "Name",
+            Header: col.name,
             Cell: ({ row }) => (
                 <span>{row?.fname + row?.lname || "-"}</span>
             )

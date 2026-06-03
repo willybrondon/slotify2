@@ -3,6 +3,7 @@ import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight, Success } from "../../component/api/toastServices";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 const initialState = {
     attendance: [],
     isLoading: false,
@@ -49,7 +50,7 @@ const attendanceSlice = createSlice({
         builder.addCase(attendExpert.fulfilled,(state,action)=>{
             if (action?.payload?.status) {
                 state.attendance = action?.payload?.data;
-                Success('Expert attendance Updated Successfully')
+                Success(ui.toast.attendanceUpdated)
             } 
             state.isLoading = false;
         })
@@ -68,7 +69,7 @@ const attendanceSlice = createSlice({
 
             
             if (action?.payload?.status) {
-                Success('Expert attendance Updated Successfully')
+                Success(ui.toast.attendanceUpdated)
             } 
             state.isLoading = false;
         })

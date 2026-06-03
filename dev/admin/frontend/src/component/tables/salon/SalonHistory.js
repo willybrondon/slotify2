@@ -1,3 +1,5 @@
+import { col } from "../../../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Title from "../../extras/Title";
@@ -48,13 +50,13 @@ const SalonHistory = () => {
 
   const walletTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => (
         <span>{page * rowsPerPage + parseInt(index) + 1}</span>
       ),
     },
     {
-      Header: "UniqueId",
+      Header: col.uniqueId,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -65,7 +67,7 @@ const SalonHistory = () => {
       ),
     },
     {
-      Header: `Amount (${setting.currencySymbol})`,
+      Header: `${col.amount} (${setting.currencySymbol})`,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -76,7 +78,7 @@ const SalonHistory = () => {
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -89,7 +91,7 @@ const SalonHistory = () => {
       ),
     },
     {
-      Header: "Time",
+      Header: col.time,
       Cell: ({ row }) => (
         <div>
           {row?.time ? row?.time : "-"}
@@ -97,7 +99,7 @@ const SalonHistory = () => {
       ),
     },
     {
-      Header: "Transaction Type",
+      Header: col.transactionType,
       Cell: ({ row }) =>
         row?.type === 3 ? (
           <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#14AF14" }}>
@@ -118,7 +120,7 @@ const SalonHistory = () => {
         ),
     },
     {
-      Header: "Transaction Completed",
+      Header: col.transactionCompleted,
       Cell: ({ row }) =>
         row?.type === 2 ? (
           <>
@@ -127,7 +129,7 @@ const SalonHistory = () => {
               style={{ background: "#D8F0F9", color: "#17A7DB", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
               <Refund />
               <span style={{ whiteSpace: "nowrap" }} className="ms-2">{
-                row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+                row?.payoutStatus === 1 && ui.labels.withdrawPending || row?.payoutStatus === 2 && ui.labels.withdrawApproved || row?.payoutStatus === 3 && ui.labels.withdrawDeclined
               }</span>
             </button>
           ) : (
@@ -135,7 +137,7 @@ const SalonHistory = () => {
               style={{ background: "#F5DDC3", color: "#EB8213", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
               <img src={With} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px", border: "none", borderRadius: "5px" }} />
               <span style={{ whiteSpace: "nowrap" }}>{
-                row?.payoutStatus === 1 && "Withdraw Pending" || row?.payoutStatus === 2 && "Withdraw Approve" || row?.payoutStatus === 3 && "Withdraw Declined"
+                row?.payoutStatus === 1 && ui.labels.withdrawPending || row?.payoutStatus === 2 && ui.labels.withdrawApproved || row?.payoutStatus === 3 && ui.labels.withdrawDeclined
               }</span>
             </button>
           )
@@ -153,7 +155,7 @@ const SalonHistory = () => {
           <button className="d-flex align-items-center justify-content-center"
             style={{ background: "#D9F2E7", color: "#0EC070", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
             <img src={Sign} height={28} width={25} alt="Icon" style={{ objectFit: "contain", marginRight: "8px" }} />
-            <span style={{ whiteSpace: "nowrap" }}>Booking Completed</span>
+            <span style={{ whiteSpace: "nowrap" }}>{ui.labels.bookingComplete}d</span>
           </button>
 
         ) : (
@@ -166,7 +168,7 @@ const SalonHistory = () => {
     <>
       <div className="orderDetails mt-2">
         <div className="row">
-          <Title name="Wallet History" className="mt-4" />
+          <Title name={ui.labels.walletHistory} className="mt-4" />
         </div>
         <div className="betBox">
           <div className="inputData pb-2">
@@ -209,7 +211,7 @@ const SalonHistory = () => {
             <Analytics
               analyticsStartDate={startDate}
               analyticsStartEnd={endDate}
-              placeholder="Wallet"
+              placeholder={ui.form.wallet}
               analyticsStartDateSet={setStartDate}
               analyticsStartEndSet={setEndDate}
             />

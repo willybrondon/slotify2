@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-unused-vars */
@@ -66,11 +67,11 @@ const ExpertIncome = () => {
   };
   const mapData = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{parseInt(index) + 1}</span>,
     },
     {
-      Header: "User Image",
+      Header: col.userImage,
       Cell: ({ row }) => (
         <div
           className="userProfile"
@@ -91,7 +92,7 @@ const ExpertIncome = () => {
       ),
     },
     {
-      Header: "User",
+      Header: col.user,
       Cell: ({ row }) => (
         <span
           className="text-capitalize fw-bold cursor"
@@ -104,11 +105,11 @@ const ExpertIncome = () => {
       ),
     },
     {
-      Header: "Date",
+      Header: col.date,
       Cell: ({ row }) => <span className="text-capitalize">{row?.date}</span>,
     },
     {
-      Header: "Earnings (Expert)",
+      Header: col.earningsExpert,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.expertEarning + " " + setting?.currencySymbol}
@@ -116,7 +117,7 @@ const ExpertIncome = () => {
       ),
     },
     {
-      Header: "Earnings (Admin)",
+      Header: col.earningsAdmin,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.adminEarning + " " + setting?.currencySymbol}
@@ -124,18 +125,18 @@ const ExpertIncome = () => {
       ),
     },
     {
-      Header: "Amount",
+      Header: col.amount,
       Cell: ({ row }) => (
         <span className="text-capitalize">{row?.revenue + " " + setting?.currencySymbol}</span>
       ),
     },
     {
-      Header: "Payout Month",
+      Header: col.payoutMonth,
       Cell: ({ row }) => <span className="text-capitalize">{row?.month}</span>,
     },
 
     {
-      Header: "Settlement Type",
+      Header: col.settlementType,
       Cell: ({ row }) => (
         <span>
           {row?.type === 1 && (
@@ -152,7 +153,7 @@ const ExpertIncome = () => {
       ),
     },
     {
-      Header: "Payment Status",
+      Header: col.paymentStatus,
       Cell: ({ row }) => (
         <span>
           {row?.statusOfTransaction === 1 && (
@@ -169,7 +170,7 @@ const ExpertIncome = () => {
       ),
     },
     {
-      Header: "Settlement Date",
+      Header: col.settlementDate,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.settlementDate ? row?.settlementDate : "-"}
@@ -177,7 +178,7 @@ const ExpertIncome = () => {
       ),
     },
     {
-      Header: "Payment Date",
+      Header: col.paymentDate,
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.payoutDate ? row?.payoutDate : "Pending"}

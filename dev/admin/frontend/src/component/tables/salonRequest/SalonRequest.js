@@ -1,3 +1,4 @@
+import { col } from "../../../constants/tableHeaders";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Table from "../../extras/Table";
@@ -24,11 +25,11 @@ export const SalonRequest = () => {
 
   const salonRequestTable = [
     {
-      Header: "No",
+      Header: col.no,
       Cell: ({ index }) => <span>{index + 1}</span>,
     },
     {
-      Header: "Image",
+      Header: col.image,
       Cell: ({ row }) => (
         <div className="userProfile">
           <img
@@ -46,22 +47,22 @@ export const SalonRequest = () => {
       ),
     },
     {
-      Header: "Name",
+      Header: col.name,
       Cell: ({ row }) => <span className="text-capitalize">{row?.name}</span>,
     },
 
     {
-      Header: "Email",
+      Header: col.email,
       Cell: ({ row }) => <span className="text-capitalize">{row?.email}</span>,
     },
 
     {
-      Header: "About",
+      Header: col.about,
       Cell: ({ row }) => <span className="text-capitalize">{row?.about}</span>,
     },
 
     {
-      Header: "Info",
+      Header: col.info,
       Cell: ({ row }) => (
         <span>
           <button

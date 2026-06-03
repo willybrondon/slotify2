@@ -1,3 +1,5 @@
+import { col } from "../constants/tableHeaders";
+import { SKEDISY_ADMIN_UI as ui } from "../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -63,13 +65,13 @@ const WalletHistory = () => {
 
     const walletTable = [
         {
-            Header: "No",
+            Header: col.no,
             Cell: ({ index }) => (
                 <span>{page * rowsPerPage + parseInt(index) + 1}</span>
             ),
         },
         {
-            Header: "UniqueId",
+            Header: col.uniqueId,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -80,7 +82,7 @@ const WalletHistory = () => {
             ),
         },
         {
-            Header: `Amount (${setting?.currencySymbol})`,
+            Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -91,7 +93,7 @@ const WalletHistory = () => {
             ),
         },
         {
-            Header: "Date",
+            Header: col.date,
             Cell: ({ row }) => (
                 <span
                     className="text-capitalize fw-bold cursor"
@@ -104,7 +106,7 @@ const WalletHistory = () => {
             ),
         },
         {
-            Header: "Time",
+            Header: col.time,
             Cell: ({ row }) => (
                 <div>
                     {row?.time ? row?.time : "-"}
@@ -112,7 +114,7 @@ const WalletHistory = () => {
             ),
         },
         {
-            Header: "Transaction Type",
+            Header: col.transactionType,
             Cell: ({ row }) =>
                 row?.type === 3 ? (
                     <button className="text-white m5-right p12-x p4-y fs-12 br-5 " style={{ backgroundColor: "#1ebc1e" }}>
@@ -131,7 +133,7 @@ const WalletHistory = () => {
                 ),
         },
         {
-            Header: "Transaction Completed",
+            Header: col.transactionCompleted,
             Cell: ({ row }) =>
                 row?.type === 2 ? (
                     <button className="d-flex align-items-center justify-content-center"
@@ -151,7 +153,7 @@ const WalletHistory = () => {
                     <button className="d-flex align-items-center justify-content-center"
                                 style={{ background: "#D9F2E7", color: "#0EC070", border: "none", borderRadius: "5px", padding: "8px 12px", marginLeft: "70px" }}>
                         <Complete />
-                        <span style={{ whiteSpace: "nowrap" }} className="ms-2">Booking Completed</span>
+                        <span style={{ whiteSpace: "nowrap" }} className="ms-2">{ui.labels.bookingComplete}d</span>
                     </button>
 
                 ) : (
@@ -163,7 +165,7 @@ const WalletHistory = () => {
     return (
         <div className="orderDetails mt-2">
             <div className="row">
-                <Title name="Wallet History" className="mt-4" />
+                <Title name={ui.labels.walletHistory} className="mt-4" />
             </div>
             <div className="betBox">
                 <div className="inputData pb-2">
@@ -199,7 +201,7 @@ const WalletHistory = () => {
                         <Analytics
                         analyticsStartDate={startDate}
                         analyticsStartEnd={endDate}
-                        placeholder="Wallet"
+                        placeholder={ui.form.wallet}
                         analyticsStartDateSet={setStartDate}
                         analyticsStartEndSet={setEndDate}
                     />
