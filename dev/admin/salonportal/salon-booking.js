@@ -30,6 +30,10 @@
     slotPickHint: "",
     calendarYear: null,
     calendarMonth: null,
+    /** Ouverture depuis une puce « Notre équipe » : expert déjà choisi. */
+    bookingFromExpert: false,
+    /** Retour depuis l’étape expert pour ajouter des prestations. */
+    returnToExpertStep: false,
   };
 
   const payCfg = cfg.payment || {};
@@ -71,6 +75,7 @@
         salonId: cfg.salonId,
         selectedServiceIds: state.selectedServiceIds,
         expertId: state.expertId,
+        bookingFromExpert: state.bookingFromExpert,
         date: state.date,
         timeSlots: state.timeSlots,
         slotPickHint: state.slotPickHint,
@@ -378,10 +383,36 @@
     `;
   }
 
+  function getExpertById(expertId) {
+    return cfg.experts.find((e) => String(e.id) === String(expertId));
+  }
+
   function servicesForExpert(expertId) {
-    const ex = cfg.experts.find((e) => e.id === expertId);
+    const ex = getExpertById(expertId);
     if (!ex) return cfg.services;
-    return cfg.services.filter((s) => ex.serviceIds.includes(s.id));
+    const allowed = new Set((ex.serviceIds || []).map(normalizeServiceId));
+    return cfg.services.filter((s) => allowed.has(normalizeServiceId(s.id)));
+  }
+
+  function afterServicesContinue() {
+    if (state.bookingFromExpert && state.expertId) {
+      renderStepDateTime();
+      return;
+    }
+    if (state.returnToExpertStep) {
+      state.returnToExpertStep = false;
+      renderStepExperts();
+      return;
+    }
+    renderStepExperts();
+  }
+
+  function backFromDateTime() {
+    if (state.bookingFromExpert && state.expertId) {
+      renderStepServices();
+      return;
+    }
+    renderStepExperts();
   }
 
   function renderExpertsRow() {
@@ -713,8 +744,18 @@
       state.expertId != null
         ? servicesForExpert(state.expertId)
         : cfg.services;
+    const ex =
+      state.bookingFromExpert && state.expertId
+        ? getExpertById(state.expertId)
+        : null;
+    const expertHint = ex
+      ? `<p class="sq-booking-step__hint sq-booking-step__hint--expert">${escapeHtml(
+          tFmt("expertPreselectedHint", "__NAME__", ex.name || "")
+        )}</p>`
+      : "";
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectServices)}</p>
+      ${expertHint}
       <p class="sq-booking-step__hint">${escapeHtml(t("servicesMultiHint"))}</p>
       <div class="sq-service-tabs sq-service-tabs--modal" id="bookingServiceTabs"></div>
       <div class="sq-services-grid-4" id="bookingServicesGrid"></div>
@@ -764,7 +805,7 @@
         showBookingNotice("error", t("selectOneService"), () => renderStepServices());
         return;
       }
-      renderStepExperts();
+      afterServicesContinue();
     };
   }
 
@@ -783,9 +824,18 @@
     }
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectExpert)}</p>
+      <div class="sq-booking-services-summary" id="expertStepServicesSummary" aria-live="polite"></div>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost sq-booking-btn--compact" id="btnAddMoreServices">${escapeHtml(t("addOrChangeServices"))}</button>
       <div class="sq-experts-row sq-experts-row--modal" id="bookingExpertsPick"></div>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackSvc">${escapeHtml(t("back"))}</button>
     `;
+    renderServicesSelectionSummary(
+      document.getElementById("expertStepServicesSummary")
+    );
+    document.getElementById("btnAddMoreServices").onclick = () => {
+      state.returnToExpertStep = true;
+      renderStepServices();
+    };
     const row = document.getElementById("bookingExpertsPick");
     row.innerHTML = data.data
       .map((ex) => {
@@ -984,7 +1034,7 @@
       };
     }
 
-    document.getElementById("btnBackExp").onclick = renderStepExperts;
+    document.getElementById("btnBackExp").onclick = backFromDateTime;
     btnNext.onclick = renderStepContact;
     refreshMonthUi();
     loadSlots();
@@ -1239,6 +1289,8 @@
 
     state.selectedServiceIds = draft.selectedServiceIds || [];
     state.expertId = draft.expertId || null;
+    state.bookingFromExpert = Boolean(draft.bookingFromExpert);
+    state.returnToExpertStep = false;
     state.date = draft.date || "";
     state.timeSlots = draft.timeSlots || [];
     state.slotPickHint = draft.slotPickHint || "";
@@ -1273,8 +1325,12 @@
 
   window.SalonBooking = {
     open(opts = {}) {
-      state.selectedServiceIds = opts.serviceId ? [opts.serviceId] : [];
+      state.bookingFromExpert = Boolean(opts.expertId);
+      state.returnToExpertStep = false;
       state.expertId = opts.expertId || null;
+      state.selectedServiceIds = opts.serviceId
+        ? [normalizeServiceId(opts.serviceId)]
+        : [];
       state.date = "";
       state.timeSlots = [];
       state.slotPickHint = "";
@@ -1284,13 +1340,7 @@
       state.couponDiscount = 0;
       destroyStripeElement();
       openModal();
-      if (state.expertId && !state.selectedServiceIds.length) {
-        renderStepServices();
-      } else if (state.selectedServiceIds.length) {
-        renderStepExperts();
-      } else {
-        renderStepServices();
-      }
+      renderStepServices();
     },
     close: closeModal,
     saveDraft: saveBookingDraft,

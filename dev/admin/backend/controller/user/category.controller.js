@@ -500,7 +500,7 @@ exports.getExpertsByCategory = async (req, res) => {
       search,
       limit,
     });
-
+    
     return res.status(200).json({
       status: true,
       message: "Experts retrieved successfully",
@@ -742,7 +742,7 @@ exports.serveCategoryPage = async (req, res) => {
     }
     </script>
     
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="${baseURL}/styles.css">
@@ -810,7 +810,7 @@ exports.serveCategoryPage = async (req, res) => {
         <header class="sq-category-discover__head sq-category-discover__head--with-img">
             <div class="sq-category-discover__head-img">
                 <img src="${categoryImage}" alt="${categoryDisplayName.replace(/"/g, "&quot;")}" loading="lazy" onerror="this.style.display='none'">
-            </div>
+                </div>
             <div class="sq-category-discover__head-text">
                 <h1 class="sq-category-discover__title">${pageTitle}</h1>
                 <p class="sq-category-discover__lead">${pageLead}</p>
@@ -821,9 +821,9 @@ exports.serveCategoryPage = async (req, res) => {
             <div class="search-container sq-search-wrap">
                 <i class="fas fa-search sq-search-wrap__icon" aria-hidden="true"></i>
                 <input type="search" id="searchInput" class="search-input sq-search-wrap__input" placeholder="${copy.searchPlaceholder.replace(/"/g, "&quot;")}" value="${search.replace(/"/g, "&quot;")}" autocomplete="off">
-            </div>
         </div>
-
+    </div>
+    
         <div class="sq-category-discover__toolbar">
             <div class="sq-category-discover__stats-wrap">
                 <p class="sq-category-discover__stats" id="categoryStats">${statsLabel}</p>
@@ -832,18 +832,18 @@ exports.serveCategoryPage = async (req, res) => {
             <div class="sq-category-discover__view-toggle" role="group" aria-label="Affichage">
                 <button type="button" class="sq-view-btn sq-view-btn--active" id="btnListView" data-view="list">${copy.listView}</button>
                 <button type="button" class="sq-view-btn" id="btnMapView" data-view="map">${copy.mapView}</button>
-            </div>
         </div>
-
+    </div>
+    
         <div class="sq-category-discover__main sq-category-discover__main--list" id="categoryMain">
             <div id="categoryMap" class="sq-category-discover__map" aria-hidden="true"></div>
             <div class="sq-category-discover__list-wrap">
-                <p class="price-disclaimer">${priceDisclaimer}</p>
+        <p class="price-disclaimer">${priceDisclaimer}</p>
                 <div class="salons-grid sq-salons-grid--3" id="salonsGrid">
-                    ${salonsHtml}
+            ${salonsHtml}
                 </div>
-            </div>
         </div>
+    </div>
 
         <section class="sq-category-discover__experts" aria-labelledby="expertsHeading">
             <h2 id="expertsHeading" class="sq-category-discover__experts-title">${copy.categoryExpertsTitle}</h2>

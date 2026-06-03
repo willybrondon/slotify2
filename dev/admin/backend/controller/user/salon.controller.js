@@ -836,7 +836,7 @@ exports.serveSalonWebPage = async (req, res) => {
         <h3 class="section-title">${copy.services}</h3>
         <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
         <div class="sq-services-grid-4" id="salonServicesGrid"></div>
-      </div>`;
+            </div>`;
     } else {
       servicesHtml = `<div class="section"><h3 class="section-title">${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
     }
@@ -851,7 +851,7 @@ exports.serveSalonWebPage = async (req, res) => {
             "&quot;"
           );
           const productImage = product.mainImage || "";
-          const productPrice = product.price || 0;
+        const productPrice = product.price || 0;
           const imageHtml = productImage
             ? `<img src="${productImage}" alt="${productName}" class="sq-product-card__img" loading="lazy" onerror="this.style.display='none'">`
             : `<div class="sq-product-card__placeholder">${productName.charAt(0).toUpperCase()}</div>`;
@@ -929,7 +929,7 @@ exports.serveSalonWebPage = async (req, res) => {
                                 <p class="sq-salon-download__lead">${copy.noAppDesc}</p>
                                 <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill sq-salon-download__cta">${copy.downloadAppCta}</a>
                                 <div class="sq-store-badges-mount" data-app="customer" data-center="true"></div>
-                            </div>
+                    </div>
                         </div>`;
 
     const returnPath =
@@ -1164,12 +1164,12 @@ exports.serveSalonWebPage = async (req, res) => {
                         <p class="sq-salon-detail__desc">${salonDescription}</p>
                         ${salonAddressBlock}
                         ${openingHoursHtml}
-                    </div>
+                        </div>
                     <aside class="sq-salon-detail__aside sidebar-content">
                         ${bookingCardHtml}
                     </aside>
-                </div>
-
+        </div>
+        
                 <div class="sq-salon-detail__body content-grid">
                     <div class="main-content">
                         ${staffHtml}
@@ -1191,7 +1191,7 @@ exports.serveSalonWebPage = async (req, res) => {
             <i class="fas fa-calendar-check"></i> ${copy.bookNow}
         </button>
     </div>
-
+    
     <div id="salonBookingModal" class="sq-booking-modal" aria-hidden="true">
         <div class="sq-booking-modal__backdrop" data-close-booking></div>
         <div class="sq-booking-modal__panel" role="dialog" aria-labelledby="bookingModalTitle">
@@ -1251,6 +1251,8 @@ exports.serveSalonWebPage = async (req, res) => {
                 paymentCancelled: ${JSON.stringify(copy.paymentCancelled)},
                 selectOneService: ${JSON.stringify(copy.selectOneService)},
                 servicesMultiHint: ${JSON.stringify(copy.servicesMultiHint)},
+                expertPreselectedHint: ${JSON.stringify(copy.expertPreselectedHint)},
+                addOrChangeServices: ${JSON.stringify(copy.addOrChangeServices)},
                 servicesSelectedCount: ${JSON.stringify(copy.servicesSelectedCount)},
                 noExpertForService: ${JSON.stringify(copy.noExpertForService)},
                 dateLabel: ${JSON.stringify(copy.dateLabel)},

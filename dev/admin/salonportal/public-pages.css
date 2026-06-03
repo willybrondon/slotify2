@@ -1978,6 +1978,18 @@ body.sk-public-page .main-wrapper {
     line-height: 1.45;
 }
 
+.sq-booking-step__hint--expert {
+    color: var(--sk-text, #111);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sq-booking-btn--compact {
+    margin-bottom: 12px;
+    width: auto;
+    align-self: flex-start;
+}
+
 .sq-booking-services-summary {
     margin: 16px 0 12px;
     padding: 14px 16px;
