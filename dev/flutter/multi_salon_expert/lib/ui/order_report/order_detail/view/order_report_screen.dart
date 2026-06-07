@@ -81,13 +81,28 @@ class _OrderReportScreenState extends State<OrderReportScreen> {
                             ),
                           ),
                           Text(
-                            "Welcome to our best services, ${Constant.storage.read<String>('fName').toString()}",
+                            "txtWelcomeExpertGreeting".trParams({
+                              "name": Constant.storage
+                                      .read<String>('fName')
+                                      ?.toString() ??
+                                  "",
+                            }),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(
                               fontFamily: AppFontFamily.heeBo400,
                               fontSize: 15,
                               color: AppColors.blackColor,
+                            ),
+                          ),
+                          Text(
+                            "txtWelcomeExpertSubtitle".tr,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.heeBo400,
+                              fontSize: 13,
+                              color: AppColors.blackColor.withOpacity(0.7),
                             ),
                           ),
                         ],

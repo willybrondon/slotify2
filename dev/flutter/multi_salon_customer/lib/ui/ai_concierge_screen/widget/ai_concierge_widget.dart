@@ -45,7 +45,7 @@ class AiConciergeMainView extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Get Personalized Beauty Recommendations",
+                  "txtAiConciergeHeroTitle".tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -55,7 +55,7 @@ class AiConciergeMainView extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Upload your selfie and let AI analyze your skin, hair, and facial features to recommend the perfect beauty services for you.",
+                  "txtAiConciergeHeroBody".tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -121,7 +121,7 @@ class AiConciergeMainView extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              "Upload Your Selfie",
+                              "txtAiConciergeUploadTitle".tr,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -130,7 +130,7 @@ class AiConciergeMainView extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              "Tap the button below to select",
+                              "txtAiConciergeUploadHint".tr,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: AppColors.grey,
@@ -160,8 +160,8 @@ class AiConciergeMainView extends StatelessWidget {
                             ),
                             label: Text(
                               logic.selectImageFile != null
-                                  ? "Change Image"
-                                  : "Select Image",
+                                  ? "txtAiConciergeChangeImage".tr
+                                  : "txtAiConciergeSelectImage".tr,
                               style: TextStyle(
                                 color: AppColors.whiteColor,
                                 fontSize: 16,
@@ -216,8 +216,8 @@ class AiConciergeMainView extends StatelessWidget {
                                 ),
                           label: Text(
                             logic.isLoading.value
-                                ? "Analyzing..."
-                                : "Analyze My Beauty",
+                                ? "txtAiConciergeAnalyzing".tr
+                                : "txtAiConciergeAnalyze".tr,
                             style: TextStyle(
                               color: AppColors.whiteColor,
                               fontSize: 16,
@@ -549,7 +549,7 @@ class AiConciergeResultsView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Recommended Services",
+            "txtAiConciergeRecommendedServices".tr,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -678,7 +678,7 @@ class AiConciergeResultsView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Recommended Salons",
+            "txtAiConciergeRecommendedSalons".tr,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

@@ -81,8 +81,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
 
   ///------- Share App --------- ///
   void _shareApp() {
-    Share.share(
-        'Check out Skedisy - Your beauty booking companion! https://skedisy.com');
+    Share.share("txtShareAppMessage".tr);
   }
 
   @override

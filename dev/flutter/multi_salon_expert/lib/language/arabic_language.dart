@@ -160,4 +160,23 @@ final Map<String, String> arDZ = {
   "desPleaseEnterAmount": "الرجاء إدخال المبلغ...",
   "desDataNoAdd": "لم تتم إضافة هذه البيانات بعد !!",
   "desNotAvailableWork": "الآن غير متاح للعمل",
+  "txtWelcomeService": "Skedisy Pro — for afro salon pros in Île-de-France",
+  "txtWelcomeExpertGreeting": "Hello, @name",
+  "txtWelcomeExpertSubtitle": "Your schedule, your clients — afro salon IDF",
+  "txtAboutAppDescription":
+      "Skedisy Pro supports stylists and managers at afro salons in Île-de-France: online calendar, bookings, slots, earnings and visibility with clients who understand your craft.",
+  "txtAppFeatures": "Features",
+  "txtFeature1": "• Calendar and slots — fewer no-shows",
+  "txtFeature2": "• Real-time client bookings",
+  "txtFeature3": "• Earnings and service tracking",
+  "txtFeature4": "• Manage busy time and days off",
+  "txtFeature5": "• Visibility on Skedisy — afro salons IDF",
+  "txtCopyright": "© 2026 Skedisy. All rights reserved.",
+  "txtShareAppMessage":
+      "Skedisy Pro — the app for afro salon experts in IDF: https://skedisy.com/professionnel/",
+  "txtWebsite": "skedisy.com/professionnel",
+  "txtAppName": "Skedisy Pro",
+  "txtVersion": "Version",
+  "txtLegalInformation": "Legal information",
+  "txtRateShare": "Rate & share",
 };

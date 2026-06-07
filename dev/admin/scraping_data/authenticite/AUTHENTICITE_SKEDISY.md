@@ -384,6 +384,9 @@ Skedisy  = « La réservation pour la communauté afro en Île-de-France —
 | `../../scripts/i18n-vague4.js` | Section `form`, placeholders, Redux toasts admin |
 | `../../salon/src/constants/skedisyApiMessage.js` | Traduction messages API + champs paiement dynamiques |
 | `../../frontend/src/constants/skedisyApiMessage.js` | Idem — console admin |
+| `../../scripts/i18n-flutter-brand.js` | Copy marque apps Flutter cliente + expert (`*_language.dart`) |
+| `../../flutter/multi_salon_customer/lib/language/` | i18n app cliente — ton afro IDF |
+| `../../flutter/multi_salon_expert/lib/language/` | i18n app expert / Skedisy Pro |
 | `../MARKETING_PLAN_ANALYSIS.md` | Plan marketing 30 jours, features techniques |
 | `../IMPLEMENTATION_GUIDE.md` | Scraping, onboarding salons IDF |
 | `../../salonportal/language.js` | Copy site FR/EN afro |
@@ -401,6 +404,7 @@ Skedisy  = « La réservation pour la communauté afro en Île-de-France —
 | 2026-05 | Sections `settings`, `appointment`, `coupon`, `bonusPenalty` dans les copy UI |
 | 2026-05 | Passes 3–4 : `labels`, `form`, migrations tableaux/dialogues, builds salon + admin validés |
 | 2026-05 | Passe 5 : `skedisyApiMessage`, retrait admin FR, toasts/axios traduits |
+| 2026-05 | Apps Flutter : `i18n-flutter-brand.js` — accueil, Concierge IA, À propos, expert Pro (FR/EN + 17 langues) |
 
 ---
 

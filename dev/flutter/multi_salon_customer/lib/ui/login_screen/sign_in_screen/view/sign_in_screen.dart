@@ -92,7 +92,7 @@ class SignInScreen extends StatelessWidget {
                           color: AppColors.blackColor),
                     ),
                     Text(
-                      "txtLongTime".tr,
+                      "txtWelcomeTagline".tr,
                       style: TextStyle(
                           fontFamily: AppFontFamily.sfProDisplayRegular,
                           fontSize: 13,
