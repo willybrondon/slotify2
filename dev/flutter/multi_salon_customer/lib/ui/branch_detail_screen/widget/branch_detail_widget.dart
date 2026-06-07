@@ -886,173 +886,181 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             GridView.builder(
-                          itemCount: logic.getSalonDetailCategory?.salon
-                                  ?.serviceIds?.length ??
-                              0,
-                          shrinkWrap: true,
-                          padding: EdgeInsets.zero,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.87,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                          ),
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                if (logic.isBranchSelected[index] == true) {
-                                  logic.onCheckBoxClick(false, index);
-                                } else {
-                                  logic.onCheckBoxClick(true, index);
-                                }
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(18),
-                                  color: AppColors.whiteColor,
-                                  border: Border.all(
-                                    color: AppColors.serviceBgBorder,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    // Service image with solid square border
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 15),
-                                      alignment: Alignment.center,
-                                      child: Container(
-                                        height: 80,
-                                        width: 80,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: AppColors.roundBorder,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        clipBehavior: Clip.hardEdge,
-                                        child: CachedNetworkImage(
-                                          imageUrl:
-                                              "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) {
-                                            return Image.asset(AppAsset
-                                                    .icServicePlaceholder)
-                                                .paddingAll(11);
-                                          },
-                                          errorWidget: (context, url, error) {
-                                            return Image.asset(AppAsset
-                                                    .icServicePlaceholder)
-                                                .paddingAll(11);
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              SizedBox(
-                                                width: Get.width * 0.3,
-                                                child: Text(
-                                                  logic
-                                                          .getSalonDetailCategory
-                                                          ?.salon
-                                                          ?.serviceIds?[index]
-                                                          .serviceIdId
-                                                          ?.name ??
-                                                      "",
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        AppFontFamily.heeBo700,
-                                                    fontSize: 13.5,
-                                                    color: AppColors.appText,
-                                                  ),
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              Image.asset(
-                                                AppAsset.icStarFilled,
-                                                height: 14,
-                                                width: 14,
-                                              ).paddingOnly(right: 5),
-                                              Text(
-                                                "4.8",
-                                                style: TextStyle(
-                                                  color: AppColors.ratingYellow,
-                                                  fontSize: 12,
-                                                  fontFamily:
-                                                      AppFontFamily.heeBo700,
-                                                ),
-                                              ).paddingOnly(top: 3),
-                                            ],
-                                          ),
-                                          Text(
-                                            "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.duration} ${"txtMinutes".tr}",
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  AppFontFamily.heeBo600,
-                                              fontSize: 13,
-                                              color: AppColors.service,
-                                            ),
-                                          ).paddingOnly(top: 4, bottom: 4),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                "${"txtPriceFrom".tr} $currency ${logic.getSalonDetailCategory?.salon?.serviceIds?[index].price?.toStringAsFixed(2)}",
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      AppFontFamily.heeBo800,
-                                                  fontSize: 14.5,
-                                                  color:
-                                                      AppColors.primaryAppColor,
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  if (logic.isBranchSelected[
-                                                          index] ==
-                                                      true) {
-                                                    logic.onCheckBoxClick(
-                                                        false, index);
-                                                  } else {
-                                                    logic.onCheckBoxClick(
-                                                        true, index);
-                                                  }
-                                                },
-                                                child: logic
-                                                        .isBranchSelected[index]
-                                                    ? Image.asset(
-                                                        AppAsset.icCheckRound,
-                                                        height: 28)
-                                                    : Image.asset(
-                                                        AppAsset.icPlusRound,
-                                                        height: 28),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              itemCount: logic.getSalonDetailCategory?.salon
+                                      ?.serviceIds?.length ??
+                                  0,
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 0.87,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
                               ),
-                            );
-                          },
-                        ).paddingOnly(left: 12, right: 12, bottom: 4),
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (logic.isBranchSelected[index] == true) {
+                                      logic.onCheckBoxClick(false, index);
+                                    } else {
+                                      logic.onCheckBoxClick(true, index);
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(18),
+                                      color: AppColors.whiteColor,
+                                      border: Border.all(
+                                        color: AppColors.serviceBgBorder,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        // Service image with solid square border
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 15),
+                                          alignment: Alignment.center,
+                                          child: Container(
+                                            height: 80,
+                                            width: 80,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                color: AppColors.roundBorder,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) {
+                                                return Image.asset(AppAsset
+                                                        .icServicePlaceholder)
+                                                    .paddingAll(11);
+                                              },
+                                              errorWidget:
+                                                  (context, url, error) {
+                                                return Image.asset(AppAsset
+                                                        .icServicePlaceholder)
+                                                    .paddingAll(11);
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: Get.width * 0.3,
+                                                    child: Text(
+                                                      logic
+                                                              .getSalonDetailCategory
+                                                              ?.salon
+                                                              ?.serviceIds?[
+                                                                  index]
+                                                              .serviceIdId
+                                                              ?.name ??
+                                                          "",
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            AppFontFamily
+                                                                .heeBo700,
+                                                        fontSize: 13.5,
+                                                        color:
+                                                            AppColors.appText,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const Spacer(),
+                                                  Image.asset(
+                                                    AppAsset.icStarFilled,
+                                                    height: 14,
+                                                    width: 14,
+                                                  ).paddingOnly(right: 5),
+                                                  Text(
+                                                    "4.8",
+                                                    style: TextStyle(
+                                                      color: AppColors
+                                                          .ratingYellow,
+                                                      fontSize: 12,
+                                                      fontFamily: AppFontFamily
+                                                          .heeBo700,
+                                                    ),
+                                                  ).paddingOnly(top: 3),
+                                                ],
+                                              ),
+                                              Text(
+                                                "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.duration} ${"txtMinutes".tr}",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      AppFontFamily.heeBo600,
+                                                  fontSize: 13,
+                                                  color: AppColors.service,
+                                                ),
+                                              ).paddingOnly(top: 4, bottom: 4),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "${"txtPriceFrom".tr} $currency ${logic.getSalonDetailCategory?.salon?.serviceIds?[index].price?.toStringAsFixed(2)}",
+                                                    style: TextStyle(
+                                                      fontFamily: AppFontFamily
+                                                          .heeBo800,
+                                                      fontSize: 14.5,
+                                                      color: AppColors
+                                                          .primaryAppColor,
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      if (logic.isBranchSelected[
+                                                              index] ==
+                                                          true) {
+                                                        logic.onCheckBoxClick(
+                                                            false, index);
+                                                      } else {
+                                                        logic.onCheckBoxClick(
+                                                            true, index);
+                                                      }
+                                                    },
+                                                    child: logic.isBranchSelected[
+                                                            index]
+                                                        ? Image.asset(
+                                                            AppAsset
+                                                                .icCheckRound,
+                                                            height: 28)
+                                                        : Image.asset(
+                                                            AppAsset
+                                                                .icPlusRound,
+                                                            height: 28),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ).paddingOnly(left: 12, right: 12, bottom: 4),
                             Padding(
                               padding: const EdgeInsets.only(
                                   left: 16, right: 16, bottom: 12),

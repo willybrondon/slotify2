@@ -610,10 +610,11 @@ class HomeScreenController extends GetxController {
 
       // Get current language code (default to 'en')
       final languageCode = Get.locale?.languageCode ?? 'en';
-      
+
       final queryParameters = {"language": languageCode};
       String queryString = Uri(queryParameters: queryParameters).query;
-      final url = Uri.parse("${ApiConstant.BASE_URL}${ApiConstant.getAllCategory}?$queryString");
+      final url = Uri.parse(
+          "${ApiConstant.BASE_URL}${ApiConstant.getAllCategory}?$queryString");
 
       log("Get All Category Url :: $url");
 

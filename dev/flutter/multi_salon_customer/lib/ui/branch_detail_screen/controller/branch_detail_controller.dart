@@ -32,8 +32,10 @@ class BranchDetailController extends GetxController
   String? localCity;
   double? localLatitude;
   double? localLongitude;
+
   /// From web deep link: pre-select this MongoDB service id on the venue / services step
   String? deepLinkServiceId;
+
   /// Optional: "At Salon" | "At Home" — applied on booking screen when user taps Book Now
   String? deepLinkVenuePreference;
   dynamic args = Get.arguments;
@@ -123,8 +125,7 @@ class BranchDetailController extends GetxController
     }
     for (int i = 0; i < n; i++) {
       final sid = services[i].serviceIdId?.id;
-      if (sid != null &&
-          sid.toString().toLowerCase() == want.toLowerCase()) {
+      if (sid != null && sid.toString().toLowerCase() == want.toLowerCase()) {
         if (!isBranchSelected[i]) {
           onCheckBoxClick(true, i);
         }

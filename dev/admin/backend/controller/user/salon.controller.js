@@ -834,6 +834,7 @@ exports.serveSalonWebPage = async (req, res) => {
     if (bookingServices.length > 0) {
       servicesHtml = `<div class="section sq-salon-services-block">
         <h3 class="section-title">${copy.services}</h3>
+        <p class="sq-booking-step__hint sq-salon-services-hint">${copy.servicesMultiHint}</p>
         <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
         <div class="sq-services-grid-4" id="salonServicesGrid"></div>
             </div>`;

@@ -17,8 +17,10 @@ class CategoryDetailController extends GetxController {
   int selectIndex = -1;
   num totalMinute = 0;
 
-  late List<bool> isCategorySelected = List.generate((getServiceCategory?.services?.length ?? 0), (index) => false);
-  TextEditingController categoryDetailEditingController = TextEditingController();
+  late List<bool> isCategorySelected = List.generate(
+      (getServiceCategory?.services?.length ?? 0), (index) => false);
+  TextEditingController categoryDetailEditingController =
+      TextEditingController();
   String? categoryId;
   String? categoryName;
   dynamic args = Get.arguments;
@@ -100,11 +102,15 @@ class CategoryDetailController extends GetxController {
 
       String queryString = Uri(queryParameters: queryParameters).query;
 
-      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.getService + queryString);
+      final url = Uri.parse(
+          ApiConstant.BASE_URL + ApiConstant.getService + queryString);
 
       log("Get Service Url :: $url");
 
-      final headers = {"key": ApiConstant.SECRET_KEY, 'Content-Type': 'application/json'};
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json'
+      };
       log("Get Service Headers :: $headers");
 
       final response = await http.get(url, headers: headers);
@@ -120,7 +126,8 @@ class CategoryDetailController extends GetxController {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get Service Api :: $e");
-      Utils.showToast(Get.context!, getServiceCategory?.message.toString() ?? "");
+      Utils.showToast(
+          Get.context!, getServiceCategory?.message.toString() ?? "");
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idServiceList]);

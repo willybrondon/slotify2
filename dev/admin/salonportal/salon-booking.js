@@ -478,7 +478,8 @@
       .join("");
     gridEl.querySelectorAll(".sq-service-card").forEach((card) => {
       card.addEventListener("click", () => {
-        SalonBooking.open({ serviceId: card.getAttribute("data-service-id") });
+        toggleServiceSelection(card.getAttribute("data-service-id"));
+        renderServicesGrid();
       });
     });
   }
@@ -495,6 +496,7 @@
     modal.classList.remove("sq-booking-modal--open");
     modal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    renderServicesGrid();
   }
 
   modal?.querySelectorAll("[data-close-booking]").forEach((el) => {
@@ -1328,9 +1330,16 @@
       state.bookingFromExpert = Boolean(opts.expertId);
       state.returnToExpertStep = false;
       state.expertId = opts.expertId || null;
-      state.selectedServiceIds = opts.serviceId
-        ? [normalizeServiceId(opts.serviceId)]
-        : [];
+
+      if (opts.expertId && !opts.serviceId) {
+        state.selectedServiceIds = [];
+      } else if (opts.serviceId) {
+        const sid = normalizeServiceId(opts.serviceId);
+        if (!isServiceSelected(sid)) {
+          state.selectedServiceIds = [...state.selectedServiceIds, sid];
+        }
+      }
+
       state.date = "";
       state.timeSlots = [];
       state.slotPickHint = "";

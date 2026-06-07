@@ -100,29 +100,36 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                children: [
-                                  Text(
-                                    "${"txtPriceFrom".tr} $currency ${logic.withOutTaxRupeeExpert.toStringAsFixed(2)}",
-                                    style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplay,
-                                        fontSize: 15,
-                                        color: AppColors.currency.withOpacity(0.9)),
-                                  ),
-                                  Text(
-                                    " ($currency${logic.finalTaxRupeeExpert.toStringAsFixed(2)} ${"txtTax".tr})",
-                                    style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplay,
-                                        fontSize: 12,
-                                        color: AppColors.currency.withOpacity(0.9)),
-                                  ),
-                                  SizedBox(width: Get.width * 0.02),
-                                  Text(
-                                    "= ${"txtPriceFrom".tr} $currency ${logic.totalPriceExpert.toStringAsFixed(2)}",
-                                    style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplayBold, fontSize: 17, color: AppColors.currency),
-                                  ),
-                                ],
-                              ).paddingOnly(left: 5),
+                                    children: [
+                                      Text(
+                                        "${"txtPriceFrom".tr} $currency ${logic.withOutTaxRupeeExpert.toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplay,
+                                            fontSize: 15,
+                                            color: AppColors.currency
+                                                .withOpacity(0.9)),
+                                      ),
+                                      Text(
+                                        " ($currency${logic.finalTaxRupeeExpert.toStringAsFixed(2)} ${"txtTax".tr})",
+                                        style: TextStyle(
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplay,
+                                            fontSize: 12,
+                                            color: AppColors.currency
+                                                .withOpacity(0.9)),
+                                      ),
+                                      SizedBox(width: Get.width * 0.02),
+                                      Text(
+                                        "= ${"txtPriceFrom".tr} $currency ${logic.totalPriceExpert.toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplayBold,
+                                            fontSize: 17,
+                                            color: AppColors.currency),
+                                      ),
+                                    ],
+                                  ).paddingOnly(left: 5),
                                   Padding(
                                     padding: const EdgeInsets.only(
                                         left: 5, right: 8, top: 6),
@@ -142,7 +149,6 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-
                         GetBuilder<HomeScreenController>(
                           id: Constant.idConfirm,
                           builder: (logic) {
@@ -155,9 +161,12 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                               fontFamily: AppFontFamily.sfProDisplayMedium,
                               fontSize: 15,
                               onTap: () async {
-                                if (Constant.storage.read<bool>('isLogIn') ?? false) {
-                                  Constant.storage
-                                      .write("expertDetail", homeScreenController.getExpertCategory?.data?.expert?.id);
+                                if (Constant.storage.read<bool>('isLogIn') ??
+                                    false) {
+                                  Constant.storage.write(
+                                      "expertDetail",
+                                      homeScreenController
+                                          .getExpertCategory?.data?.expert?.id);
 
                                   Get.toNamed(AppRoutes.booking, arguments: [
                                     homeScreenController.checkItemExpert,
@@ -166,11 +175,16 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                     homeScreenController.totalMinuteExpert,
                                     homeScreenController.serviceIdExpert,
                                     homeScreenController.withOutTaxRupeeExpert,
-                                    homeScreenController.getExpertCategory?.data?.expert?.salonId?.id
+                                    homeScreenController.getExpertCategory?.data
+                                        ?.expert?.salonId?.id
                                   ]);
                                 } else {
-                                  Get.toNamed(AppRoutes.signIn, arguments: [homeScreenController.checkItemExpert.isNotEmpty]);
-                                  await Get.find<SignInController>().getDataFromArgs();
+                                  Get.toNamed(AppRoutes.signIn, arguments: [
+                                    homeScreenController
+                                        .checkItemExpert.isNotEmpty
+                                  ]);
+                                  await Get.find<SignInController>()
+                                      .getDataFromArgs();
                                 }
                               },
                             );
@@ -201,7 +215,8 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                   return AnimationConfiguration.staggeredGrid(
                     position: index,
                     duration: const Duration(milliseconds: 800),
-                    columnCount: logic.getExpertCategory?.data?.services?.length ?? 0,
+                    columnCount:
+                        logic.getExpertCategory?.data?.services?.length ?? 0,
                     child: FadeInAnimation(
                       child: ScaleAnimation(
                         child: Column(
@@ -225,13 +240,18 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                     child: Container(
                                       height: 70,
                                       width: 70,
-                                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                                      decoration: const BoxDecoration(
+                                          shape: BoxShape.circle),
                                       clipBehavior: Clip.hardEdge,
                                       child: CachedNetworkImage(
-                                        imageUrl: logic.getExpertCategory?.data?.services?[index].id?.image ?? "",
+                                        imageUrl: logic.getExpertCategory?.data
+                                                ?.services?[index].id?.image ??
+                                            "",
                                         fit: BoxFit.cover,
                                         placeholder: (context, url) {
-                                          return Image.asset(AppAsset.icServicePlaceholder).paddingAll(10);
+                                          return Image.asset(
+                                                  AppAsset.icServicePlaceholder)
+                                              .paddingAll(10);
                                         },
                                         errorWidget: (context, url, error) {
                                           return Icon(
@@ -265,7 +285,9 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              logic.getExpertCategory?.data?.services?[index].id?.name ?? "",
+                              logic.getExpertCategory?.data?.services?[index].id
+                                      ?.name ??
+                                  "",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
