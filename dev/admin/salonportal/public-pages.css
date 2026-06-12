@@ -1357,20 +1357,50 @@ body.sk-public-page .main-wrapper {
 }
 
 .sk-public-page .sq-service-card {
+    position: relative;
     text-align: left;
     padding: 12px;
+    padding-top: 28px;
     border: 1px solid var(--sk-border);
     border-radius: 10px;
     background: var(--sk-bg);
     cursor: pointer;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
     font-family: inherit;
 }
 
-.sk-public-page .sq-service-card:hover,
-.sk-public-page .sq-service-card--selected {
+.sk-public-page .sq-service-card:hover {
     border-color: var(--sk-primary);
     box-shadow: 0 4px 12px var(--sk-shadow);
+}
+
+.sk-public-page .sq-service-card--selected {
+    border-color: var(--sk-primary);
+    background: color-mix(in srgb, var(--sk-primary) 8%, var(--sk-bg));
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--sk-primary) 25%, transparent);
+}
+
+.sk-public-page .sq-service-card__check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: var(--sk-primary);
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.sk-public-page .sq-service-card__state {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--sk-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.sk-public-page .sq-service-card__state--selected {
+    color: var(--sk-primary);
 }
 
 .sk-public-page .sq-service-card__name {

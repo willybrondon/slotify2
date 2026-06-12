@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
@@ -10,68 +11,150 @@ import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+String _captureHeroTitle(AiConciergeController logic) {
+  if (logic.fromShare && logic.selectImageFile != null) {
+    return 'txtCaptureSharedHeroTitle'.tr;
+  }
+  return logic.captureMode
+      ? 'txtCaptureHeroTitle'.tr
+      : 'txtAiConciergeHeroTitle'.tr;
+}
+
+String _captureHeroBody(AiConciergeController logic) {
+  if (logic.fromShare && logic.selectImageFile != null) {
+    return 'txtCaptureSharedHeroBody'.tr;
+  }
+  return logic.captureMode
+      ? 'txtCaptureHeroBody'.tr
+      : 'txtAiConciergeHeroBody'.tr;
+}
+
+Widget _buildLinkHintBanner(AiConciergeController logic) {
+  return Container(
+    margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: AppColors.primaryAppColor.withOpacity(0.08),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: AppColors.primaryAppColor.withOpacity(0.25)),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.info_outline, color: AppColors.primaryAppColor, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            'txtCaptureLinkHint'.tr,
+            style: TextStyle(fontSize: 13, color: AppColors.primaryTextColor),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildPasteLinkRow(AiConciergeController logic) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: OutlinedButton.icon(
+      onPressed: () async {
+        final data = await FlutterClipboard.paste();
+        if (data.trim().isEmpty) return;
+        logic.setSharedLink(data.trim());
+      },
+      icon: const Icon(Icons.link),
+      label: Text('txtCapturePasteLink'.tr),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
+  );
+}
+
 /// Main view for image selection and analysis
 class AiConciergeMainView extends StatelessWidget {
   const AiConciergeMainView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
+    return GetBuilder<AiConciergeController>(
+      id: Constant.idProgressView,
+      builder: (logic) {
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
 
-          // Header Section
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.whiteColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.blackColor.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.blackColor.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.face_retouching_natural,
-                  size: 60,
-                  color: AppColors.primaryAppColor,
+                child: Column(
+                  children: [
+                    Icon(
+                      logic.captureMode
+                          ? Icons.share_outlined
+                          : Icons.face_retouching_natural,
+                      size: 60,
+                      color: AppColors.primaryAppColor,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _captureHeroTitle(logic),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryAppColor,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _captureHeroBody(logic),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  "txtAiConciergeHeroTitle".tr,
+              ),
+
+              if (logic.sharedLink != null && logic.sharedLink!.isNotEmpty)
+                _buildLinkHintBanner(logic),
+
+              const SizedBox(height: 16),
+              _buildPasteLinkRow(logic),
+              const SizedBox(height: 16),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'txtCapturePrivacy'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryAppColor,
+                    fontSize: 12,
+                    color: AppColors.grey.withOpacity(0.9),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  "txtAiConciergeHeroBody".tr,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
 
-          const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-          // Image Selection Section
-          GetBuilder<AiConciergeController>(
-            builder: (logic) {
-              return Container(
+              Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
@@ -217,7 +300,9 @@ class AiConciergeMainView extends StatelessWidget {
                           label: Text(
                             logic.isLoading.value
                                 ? "txtAiConciergeAnalyzing".tr
-                                : "txtAiConciergeAnalyze".tr,
+                                : logic.captureMode
+                                    ? "txtCaptureAnalyzeLook".tr
+                                    : "txtAiConciergeAnalyze".tr,
                             style: TextStyle(
                               color: AppColors.whiteColor,
                               fontSize: 16,
@@ -236,13 +321,13 @@ class AiConciergeMainView extends StatelessWidget {
                       ),
                   ],
                 ),
-              );
-            },
-          ),
+              ),
 
-          const SizedBox(height: 30),
-        ],
-      ),
+              const SizedBox(height: 30),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -253,10 +338,36 @@ class AiConciergeResultsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AiConciergeController>();
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (controller.captureMode)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primaryAppColor.withOpacity(0.12),
+                    AppColors.primaryAppColor.withOpacity(0.04),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'txtCaptureResultFound'.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryAppColor,
+                ),
+              ),
+            ),
+
           // Header with image
           Builder(
             builder: (context) {

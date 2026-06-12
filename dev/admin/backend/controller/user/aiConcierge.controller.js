@@ -1,4 +1,5 @@
 const selfieAnalysisService = require('../../services/selfieAnalysis.service');
+const { validateImageFile, sanitizeImageFile } = require('../../utils/imageSecurity.util');
 const path = require('path');
 const fs = require('fs');
 
@@ -17,7 +18,27 @@ exports.analyzeSelfie = async (req, res) => {
     }
 
     // Use absolute path for file access (handles different working directories)
-    const imagePath = path.isAbsolute(req.file.path) ? req.file.path : path.resolve(process.cwd(), req.file.path);
+    let imagePath = path.isAbsolute(req.file.path) ? req.file.path : path.resolve(process.cwd(), req.file.path);
+
+    const validation = validateImageFile(imagePath, req.file.mimetype);
+    if (!validation.ok) {
+      if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+      return res.status(200).send({
+        status: false,
+        message: validation.error || 'Invalid image file',
+      });
+    }
+
+    const sanitized = await sanitizeImageFile(imagePath);
+    if (!sanitized.ok) {
+      if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+      return res.status(200).send({
+        status: false,
+        message: sanitized.error || 'Failed to process image safely',
+      });
+    }
+    imagePath = sanitized.path;
+
     const userId = req.body.userId || req.query.userId || null;
     
     // Context information (optional)

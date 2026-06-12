@@ -18,12 +18,16 @@ class AiConciergeScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: AppColors.primaryAppColor),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          "AI Beauty Concierge",
-          style: TextStyle(
-            color: AppColors.primaryAppColor,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+        title: GetBuilder<AiConciergeController>(
+          builder: (logic) => Text(
+            logic.captureMode
+                ? "txtCaptureScreenTitle".tr
+                : "txtAiConciergeTitle".tr,
+            style: TextStyle(
+              color: AppColors.primaryAppColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         centerTitle: true,

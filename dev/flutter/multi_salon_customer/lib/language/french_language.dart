@@ -420,4 +420,20 @@ final Map<String, String> frCH = {
   "txtAiConciergeRecommendedSalons": "Salons recommandés",
   "txtAiConciergeSelectImage": "Choisir une photo",
   "txtAiConciergeChangeImage": "Changer la photo",
+  "txtCaptureScreenTitle": "Réserver ce look",
+  "txtCaptureHeroTitle": "Capture → Réservation",
+  "txtCaptureHeroBody":
+      "Partage une capture depuis Instagram, TikTok ou Facebook : on détecte le style et on te propose les salons afro en Île-de-France.",
+  "txtCaptureSharedHeroTitle": "On analyse ton look",
+  "txtCaptureSharedHeroBody":
+      "Quelques secondes — on trouve les salons qui réalisent ce style près de chez toi.",
+  "txtCaptureAnalyzeLook": "Trouver ce look",
+  "txtCaptureBookLook": "Réserver ce look",
+  "txtCaptureLinkHint":
+      "Pour un lien Instagram ou TikTok, fais une capture d'écran puis Partager → Skedisy.",
+  "txtCapturePrivacy":
+      "Skedisy analyse uniquement ta photo de coiffure. Aucun accès à tes comptes sociaux.",
+  "txtCapturePasteLink": "Coller un lien",
+  "txtCaptureImageError": "Impossible de charger l'image partagée.",
+  "txtCaptureResultFound": "On a trouvé ce style. Réserve-le ici.",
 };

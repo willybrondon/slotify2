@@ -20,6 +20,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:salon_2/localization/localizations_delegate.dart';
 import 'package:salon_2/routes/app_pages.dart';
 import 'package:salon_2/routes/app_routes.dart';
+import 'package:salon_2/services/share_capture_service.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/preference.dart';
 import 'localization/locale_constant.dart';
@@ -279,6 +280,9 @@ Future<void> main() async {
     // Initialize deep link handling
     _initializeDeepLinks();
 
+    // Share sheet: Instagram, TikTok, Facebook → Skedisy
+    ShareCaptureService.init();
+
     runApp(const MyApp());
   } catch (e) {
     log("Error in main initialization: $e");
@@ -338,8 +342,12 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-// Global flag to track if deep link navigation occurred
+// Global flag to track if deep link / share capture navigation occurred
 bool _deepLinkNavigated = false;
+
+void markCaptureNavigated() {
+  _deepLinkNavigated = true;
+}
 
 // Handle incoming deep links
 void _initializeDeepLinks() {
@@ -383,6 +391,18 @@ String? _mapVenueQuery(String? v) {
 void _handleIncomingLink(Uri uri) {
   try {
     log("Handling incoming link: $uri");
+
+    // skedisy://capture?url=... or slotify://capture — visual booking entry
+    if ((uri.scheme == 'skedisy' || uri.scheme == 'slotify') &&
+        uri.host == 'capture') {
+      final sharedUrl = uri.queryParameters['url'];
+      log("Capture deep link: url=$sharedUrl");
+      _deepLinkNavigated = true;
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        ShareCaptureService.openFromDeepLink(url: sharedUrl);
+      });
+      return;
+    }
 
     // Handle custom scheme: slotify://salon/{salonId}?serviceId=...&venue=salon|home
     if (uri.scheme == 'slotify' && uri.host == 'salon') {

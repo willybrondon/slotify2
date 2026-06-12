@@ -4,10 +4,12 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:salon_2/main.dart' show city, latitude, longitude;
 import 'package:salon_2/ui/ai_concierge_screen/model/ai_concierge_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
@@ -26,9 +28,60 @@ class AiConciergeController extends GetxController {
   BeautyAnalysis? beautyAnalysis;
   Recommendations? recommendations;
 
+  /// Visual capture flow (share sheet / deep link)
+  bool captureMode = false;
+  bool fromShare = false;
+  String? sharedLink;
+
   @override
   void onInit() {
     super.onInit();
+    final args = Get.arguments;
+    if (args is Map) {
+      fromShare = args['fromShare'] == true;
+      captureMode =
+          args['captureMode'] == true || fromShare || args['sharedLink'] != null;
+      sharedLink = args['sharedLink'] as String?;
+      final path = args['sharedImagePath'] as String?;
+      final autoAnalyze = args['autoAnalyze'] == true;
+      if (path != null && path.isNotEmpty) {
+        _loadSharedImage(path, autoAnalyze: autoAnalyze);
+      }
+    }
+  }
+
+  Future<void> _loadSharedImage(String path, {bool autoAnalyze = false}) async {
+    try {
+      image = XFile(path);
+      selectImageFile = File(path);
+      update([Constant.idProgressView]);
+      if (autoAnalyze) {
+        SchedulerBinding.instance.addPostFrameCallback((_) async {
+          await runCaptureAnalysis();
+        });
+      }
+    } catch (e) {
+      log('Share image load error: $e');
+      Utils.showToast(Get.context!, 'txtCaptureImageError'.tr);
+    }
+  }
+
+  Future<void> runCaptureAnalysis() async {
+    final userId = Constant.storage.read<String>('userId');
+    await onAnalyzeSelfieApiCall(
+      userId: userId,
+      latitude: latitude?.toString(),
+      longitude: longitude?.toString(),
+      city: city,
+    );
+  }
+
+  void setSharedLink(String? value) {
+    sharedLink = value?.trim();
+    if (sharedLink != null && sharedLink!.isNotEmpty) {
+      captureMode = true;
+    }
+    update([Constant.idProgressView]);
   }
 
   /// Pick image from gallery

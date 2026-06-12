@@ -276,7 +276,10 @@ class HomeScreenAiConciergeBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.toNamed(AppRoutes.aiConcierge);
+        Get.toNamed(
+          AppRoutes.aiConcierge,
+          arguments: <String, dynamic>{'captureMode': true},
+        );
       },
       child: Container(
         width: double.infinity,

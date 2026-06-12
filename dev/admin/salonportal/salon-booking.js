@@ -320,6 +320,8 @@
   const tabsEl = document.getElementById("salonServiceTabs");
   const gridEl = document.getElementById("salonServicesGrid");
   const expertsRowEl = document.getElementById("salonExpertsRow");
+  const servicesSummaryEl = document.getElementById("salonServicesSummary");
+  const asideSummaryEl = document.getElementById("salonBookingAsideSummary");
   let activeCategory = "all";
 
   function $(sel) {
@@ -352,6 +354,56 @@
     } else {
       state.selectedServiceIds = [...state.selectedServiceIds, sid];
     }
+  }
+
+  function buildServiceCardHtml(s) {
+    const selected = isServiceSelected(s.id);
+    const check = selected
+      ? `<span class="sq-service-card__check" aria-hidden="true"><i class="fas fa-check-circle"></i></span>`
+      : "";
+    const stateLabel = selected
+      ? t("serviceTapToDeselect")
+      : t("serviceTapToSelect");
+    return `<button type="button" class="sq-service-card${selected ? " sq-service-card--selected" : ""}" data-service-id="${escapeHtml(s.id)}" aria-pressed="${selected ? "true" : "false"}">
+        ${check}
+        <span class="sq-service-card__name">${escapeHtml(s.name)}</span>
+        <span class="sq-service-card__meta">${escapeHtml(cfg.currency)}${s.price} · ${s.duration} ${escapeHtml(cfg.copy.min)}</span>
+        <span class="sq-service-card__state${selected ? " sq-service-card__state--selected" : ""}">${escapeHtml(stateLabel)}</span>
+      </button>`;
+  }
+
+  function bindServiceCardClicks(rootEl, onAfterToggle) {
+    if (!rootEl) return;
+    rootEl.querySelectorAll(".sq-service-card[data-service-id]").forEach((card) => {
+      card.addEventListener("click", () => {
+        toggleServiceSelection(card.getAttribute("data-service-id"));
+        if (typeof onAfterToggle === "function") onAfterToggle();
+      });
+    });
+  }
+
+  function updateBookButtons() {
+    const count = state.selectedServiceIds.length;
+    const label =
+      count > 0
+        ? tFmt("bookNowWithCount", "{n}", String(count))
+        : t("bookNow");
+    document
+      .querySelectorAll(".open-app-btn, .sticky-booking-btn button")
+      .forEach((btn) => {
+        const icon = btn.querySelector("i");
+        if (icon) {
+          btn.innerHTML = `${icon.outerHTML} ${escapeHtml(label)}`;
+        } else {
+          btn.textContent = label;
+        }
+      });
+  }
+
+  function renderSalonPageSelectionUI() {
+    renderServicesSelectionSummary(servicesSummaryEl);
+    renderServicesSelectionSummary(asideSummaryEl);
+    updateBookButtons();
   }
 
   function expertsForServices(serviceIds) {
@@ -467,21 +519,11 @@
       activeCategory === "all"
         ? cfg.services
         : cfg.services.filter((s) => s.categoryId === activeCategory);
-    gridEl.innerHTML = list
-      .map((s) => {
-        const selected = isServiceSelected(s.id);
-        return `<button type="button" class="sq-service-card${selected ? " sq-service-card--selected" : ""}" data-service-id="${escapeHtml(s.id)}">
-        <span class="sq-service-card__name">${escapeHtml(s.name)}</span>
-        <span class="sq-service-card__meta">${escapeHtml(cfg.currency)}${s.price} · ${s.duration} ${cfg.copy.min}</span>
-      </button>`;
-      })
-      .join("");
-    gridEl.querySelectorAll(".sq-service-card").forEach((card) => {
-      card.addEventListener("click", () => {
-        toggleServiceSelection(card.getAttribute("data-service-id"));
-        renderServicesGrid();
-      });
+    gridEl.innerHTML = list.map((s) => buildServiceCardHtml(s)).join("");
+    bindServiceCardClicks(gridEl, () => {
+      renderServicesGrid();
     });
+    renderSalonPageSelectionUI();
   }
 
   function openModal() {
@@ -784,22 +826,10 @@
       });
       const filtered =
         cat === "all" ? list : list.filter((s) => s.categoryId === cat);
-      bGrid.innerHTML = filtered
-        .map((s) => {
-          const sel = isServiceSelected(s.id);
-          return `<button type="button" class="sq-service-card${sel ? " sq-service-card--selected" : ""}" data-sid="${escapeHtml(s.id)}" aria-pressed="${sel ? "true" : "false"}">
-            <span class="sq-service-card__name">${escapeHtml(s.name)}</span>
-            <span class="sq-service-card__meta">${escapeHtml(cfg.currency)}${s.price} · ${s.duration} ${escapeHtml(cfg.copy.min)}</span>
-          </button>`;
-        })
-        .join("");
-      bGrid.querySelectorAll("[data-sid]").forEach((btn) => {
-        btn.onclick = () => {
-          toggleServiceSelection(btn.getAttribute("data-sid"));
-          paint();
-        };
-      });
+      bGrid.innerHTML = filtered.map((s) => buildServiceCardHtml(s)).join("");
+      bindServiceCardClicks(bGrid, paint);
       renderServicesSelectionSummary(bSummary);
+      renderSalonPageSelectionUI();
     }
     paint();
     document.getElementById("btnServicesNext").onclick = () => {
@@ -1334,10 +1364,7 @@
       if (opts.expertId && !opts.serviceId) {
         state.selectedServiceIds = [];
       } else if (opts.serviceId) {
-        const sid = normalizeServiceId(opts.serviceId);
-        if (!isServiceSelected(sid)) {
-          state.selectedServiceIds = [...state.selectedServiceIds, sid];
-        }
+        toggleServiceSelection(opts.serviceId);
       }
 
       state.date = "";
@@ -1348,6 +1375,7 @@
       state.couponCode = "";
       state.couponDiscount = 0;
       destroyStripeElement();
+      renderServicesGrid();
       openModal();
       renderStepServices();
     },

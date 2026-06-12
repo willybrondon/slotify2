@@ -412,4 +412,20 @@ final Map<String, String> enUS = {
   "txtAiConciergeRecommendedSalons": "Recommended salons",
   "txtAiConciergeSelectImage": "Select photo",
   "txtAiConciergeChangeImage": "Change photo",
+  "txtCaptureScreenTitle": "Book this look",
+  "txtCaptureHeroTitle": "Capture → Book",
+  "txtCaptureHeroBody":
+      "Share a screenshot from Instagram, TikTok or Facebook — we detect the style and match afro salons in Île-de-France.",
+  "txtCaptureSharedHeroTitle": "Analyzing your look",
+  "txtCaptureSharedHeroBody":
+      "A few seconds — we'll find salons near you that do this style.",
+  "txtCaptureAnalyzeLook": "Find this look",
+  "txtCaptureBookLook": "Book this look",
+  "txtCaptureLinkHint":
+      "For an Instagram or TikTok link, take a screenshot then Share → Skedisy.",
+  "txtCapturePrivacy":
+      "Skedisy only analyzes your hairstyle photo. We never access your social accounts.",
+  "txtCapturePasteLink": "Paste a link",
+  "txtCaptureImageError": "Could not load the shared image.",
+  "txtCaptureResultFound": "We found this style. Book it here.",
 };

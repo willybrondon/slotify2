@@ -837,6 +837,7 @@ exports.serveSalonWebPage = async (req, res) => {
         <p class="sq-booking-step__hint sq-salon-services-hint">${copy.servicesMultiHint}</p>
         <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
         <div class="sq-services-grid-4" id="salonServicesGrid"></div>
+        <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonServicesSummary" aria-live="polite"></div>
             </div>`;
     } else {
       servicesHtml = `<div class="section"><h3 class="section-title">${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
@@ -923,6 +924,7 @@ exports.serveSalonWebPage = async (req, res) => {
 
     const bookingCardHtml = `<div class="booking-card">
                             <h3>${copy.bookingCardTitle}</h3>
+                            <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonBookingAsideSummary" aria-live="polite"></div>
                             <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
                                 <i class="fas fa-calendar-check"></i> ${copy.bookNow}
                             </button>
@@ -1252,6 +1254,9 @@ exports.serveSalonWebPage = async (req, res) => {
                 paymentCancelled: ${JSON.stringify(copy.paymentCancelled)},
                 selectOneService: ${JSON.stringify(copy.selectOneService)},
                 servicesMultiHint: ${JSON.stringify(copy.servicesMultiHint)},
+                serviceTapToSelect: ${JSON.stringify(copy.serviceTapToSelect)},
+                serviceTapToDeselect: ${JSON.stringify(copy.serviceTapToDeselect)},
+                bookNowWithCount: ${JSON.stringify(copy.bookNowWithCount)},
                 expertPreselectedHint: ${JSON.stringify(copy.expertPreselectedHint)},
                 addOrChangeServices: ${JSON.stringify(copy.addOrChangeServices)},
                 servicesSelectedCount: ${JSON.stringify(copy.servicesSelectedCount)},

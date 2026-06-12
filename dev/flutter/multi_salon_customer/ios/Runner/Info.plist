@@ -36,9 +36,12 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>slotify</string>
+				<string>skedisy</string>
 			</array>
 		</dict>
 	</array>
+	<key>AppGroupId</key>
+	<string>group.com.skedisy.customer</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:skedisy.com</string>
