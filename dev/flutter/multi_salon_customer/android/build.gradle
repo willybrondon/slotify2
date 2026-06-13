@@ -20,11 +20,20 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
+subprojects { sub ->
+    sub.buildDir = "${rootProject.buildDir}/${sub.name}"
+    sub.evaluationDependsOn(':app')
+    sub.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
+    sub.pluginManager.withPlugin("com.android.library") {
+        sub.android.compileOptions {
+            sourceCompatibility JavaVersion.VERSION_17
+            targetCompatibility JavaVersion.VERSION_17
+        }
+    }
 }
 
 tasks.register("clean", Delete) {
