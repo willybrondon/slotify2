@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstanceFetch } from "../../component/api/axiosApi";
 import { DangerRight } from "../../component/api/toastServices";
+import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
 const initialState = {
     booking: [],
@@ -39,6 +40,7 @@ const dashSlice = createSlice({
 
         builder.addCase(topExperts.rejected,(state,action) =>{
             state.isSkeleton = false;
+            DangerRight(action?.error?.message || ui.toast.loadFailed || "Failed to load experts");
         })
 
         builder.addCase(getDashData.pending,(state,action) =>{
@@ -46,12 +48,13 @@ const dashSlice = createSlice({
         })
 
         builder.addCase(getDashData.fulfilled,(state,action) =>{
-            state.dashData = action?.payload?.data
+            state.dashData = action?.payload?.data || {}
             state.isSkeleton = false;
         })
 
         builder.addCase(getDashData.rejected,(state,action) =>{
             state.isSkeleton = false;
+            DangerRight(action?.error?.message || "Failed to load dashboard");
         })
 
         builder.addCase(getChart.fulfilled,(state,action) =>{

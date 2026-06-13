@@ -1,7 +1,5 @@
 import axios from "axios";
 import { apiInstance, apiInstanceFetch } from "../component/api/axiosApi";
-import { useEffect } from "react";
-import { key } from "./config";
 
 // Set Token In Axios
 export function setToken(token) {

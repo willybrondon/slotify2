@@ -283,7 +283,13 @@ echo "
 # Create config.js in the util directory
 cd /home/admin/salon/src/util || exit
 cat > config.js << EOF
-export const baseURL = "https://$app_domain/";
+function resolveBaseURL() {
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return \`\${window.location.origin}/\`;
+  }
+  return "https://$app_domain/";
+}
+export const baseURL = resolveBaseURL();
 export const secretKey = "$shared_secret_key";
 export const projectName = "$app_name";
 EOF

@@ -11,7 +11,8 @@ import "../src/assets/scss/default/default.css";
 import "../src/assets/scss/style/style.css";
 import "../src/assets/scss/dateRange.css";
 import { setOldAdmin } from "./redux/slice/authSlice";
-import { setToken } from "./util/setAuth";
+import { setToken, SetDevKey } from "./util/setAuth";
+import { secretKey } from "./util/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 function App() {
   const dispatch = useDispatch();
@@ -43,13 +44,17 @@ function App() {
   };
 
   useEffect(() => {
-    if (!token && !key) return;
-    
-    // Add a small delay to ensure proper state synchronization
+    if (!token) return;
+
     const timer = setTimeout(() => {
       dispatch(setOldAdmin(token));
+      setToken(token);
+      const storedKey = sessionStorage.getItem("key");
+      SetDevKey(
+        storedKey && storedKey !== "undefined" ? storedKey : secretKey
+      );
     }, 50);
-    
+
     return () => clearTimeout(timer);
   }, [dispatch, token, key]);
 

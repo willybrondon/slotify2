@@ -48,11 +48,17 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setOldAdmin(state, action) {
-      let token = action.payload;
-      state.admin = token;
+      const raw = action.payload;
+      if (!raw) return;
+      try {
+        state.admin = jwt_decode(raw);
+      } catch (e) {
+        state.admin = {};
+      }
       state.isAuth = true;
-      SetDevKey(secretKey);
-      setToken(token);
+      const storedKey = sessionStorage.getItem("key");
+      SetDevKey(storedKey && storedKey !== "undefined" ? storedKey : secretKey);
+      setToken(raw);
     },
     logout(state, action) {
       sessionStorage.removeItem("token");
@@ -81,7 +87,9 @@ const authSlice = createSlice({
         // Ensure session storage is set synchronously
         try {
           sessionStorage.setItem("token", action.payload.token);
-          sessionStorage.setItem("key", secretKey ? secretKey : undefined);
+          if (secretKey) {
+            sessionStorage.setItem("key", secretKey);
+          }
           sessionStorage.setItem("isAuth", "true");
           
           // Force a small delay to ensure session storage is properly set
