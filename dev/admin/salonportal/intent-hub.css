@@ -1,0 +1,277 @@
+/* 3-door intent hub + hair profile strip (web ↔ app Flutter) */
+
+.sq-intent-hub {
+  padding: 2.5rem 0 1.5rem;
+  background: var(--sq-bg, #faf9f7);
+}
+
+.sq-intent-hub__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: #1a1a1a;
+}
+
+.sq-intent-hub__subtitle {
+  margin: 0 0 1.25rem;
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  max-width: 36rem;
+}
+
+.sq-intent-doors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.sq-intent-door {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sq-intent-door:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.sq-intent-door--primary {
+  background: var(--sq-primary, #c45c26);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(196, 92, 38, 0.28);
+}
+
+.sq-intent-door--primary:hover {
+  box-shadow: 0 8px 24px rgba(196, 92, 38, 0.35);
+}
+
+.sq-intent-door--secondary {
+  border-style: dashed;
+  border-color: #ddd;
+}
+
+.sq-intent-door__icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+
+.sq-intent-door--primary .sq-intent-door__icon {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.sq-intent-door:not(.sq-intent-door--primary) .sq-intent-door__icon {
+  background: rgba(196, 92, 38, 0.1);
+  color: var(--sq-primary, #c45c26);
+}
+
+.sq-intent-door--secondary .sq-intent-door__icon {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.sq-intent-door__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.sq-intent-door__body h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sq-intent-door__body p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.sq-intent-door--primary .sq-intent-door__body p {
+  opacity: 0.92;
+}
+
+.sq-intent-door__chevron {
+  flex-shrink: 0;
+  opacity: 0.5;
+  font-size: 0.85rem;
+}
+
+.sq-hair-strip-mount {
+  margin-top: 1rem;
+}
+
+.sq-hair-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.sq-hair-strip--incomplete {
+  background: rgba(196, 92, 38, 0.08);
+  border: 1px solid rgba(196, 92, 38, 0.2);
+  color: #1a1a1a;
+}
+
+.sq-hair-strip--incomplete i:first-child {
+  color: var(--sq-primary, #c45c26);
+}
+
+.sq-hair-strip--incomplete span {
+  flex: 1;
+}
+
+.sq-hair-strip--complete {
+  background: #fff;
+  border: 1px solid #efefef;
+}
+
+.sq-hair-strip--complete i:first-child {
+  color: var(--sq-primary, #c45c26);
+  font-size: 1rem;
+}
+
+.sq-hair-strip--complete span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sq-hair-strip__edit {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--sq-primary, #c45c26);
+  font-size: 0.8rem;
+}
+
+/* Hair profile page */
+.sq-hair-profile-section {
+  padding: 2rem 0 4rem;
+}
+
+.sq-hair-lead {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 1.75rem;
+  max-width: 40rem;
+}
+
+.sq-hair-section {
+  margin-bottom: 1.5rem;
+}
+
+.sq-hair-section__title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.65rem;
+}
+
+.sq-hair-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sq-hair-chip {
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid #e8e8e8;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.sq-hair-chip:hover {
+  border-color: var(--sq-primary, #c45c26);
+}
+
+.sq-hair-chip--selected {
+  border-color: var(--sq-primary, #c45c26);
+  background: rgba(196, 92, 38, 0.12);
+  color: var(--sq-primary, #c45c26);
+  font-weight: 600;
+}
+
+.sq-hair-actions {
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+.sq-hair-actions .sq-btn {
+  min-width: 12rem;
+}
+
+.sq-hair-actions .sq-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Capture mode extras on AI concierge */
+.sq-capture-link-row {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.sq-capture-link-row label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.sq-capture-link-row input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.sq-capture-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+.sq-capture-privacy {
+  font-size: 0.78rem;
+  color: #999;
+  margin-top: 0.75rem;
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  .sq-intent-doors {
+    max-width: 32rem;
+  }
+}

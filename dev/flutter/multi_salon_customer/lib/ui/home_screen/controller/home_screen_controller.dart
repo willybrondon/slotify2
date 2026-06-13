@@ -4,7 +4,11 @@ import 'dart:developer';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:salon_2/routes/app_routes.dart';
+import 'package:salon_2/services/hair_profile_service.dart';
+import 'package:salon_2/ui/bottom_bar_screen/controller/bottom_bar_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_2/main.dart';
 import 'package:share_plus/share_plus.dart';
@@ -172,7 +176,23 @@ class HomeScreenController extends GetxController {
     serviceIdExpert.clear();
     serviceNameExpert.clear();
 
+    _maybePromptHairProfile();
+
     super.onInit();
+  }
+
+  void _maybePromptHairProfile() {
+    final svc = HairProfileService.instance;
+    if (svc.isComplete || svc.hasBeenPrompted) return;
+
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      if (!Get.isRegistered<BottomBarController>()) return;
+      final bottom = Get.find<BottomBarController>();
+      if (bottom.selectIndex != 0) return;
+
+      await svc.markPrompted();
+      await Get.toNamed(AppRoutes.hairProfile);
+    });
   }
 
   // Simplified and consistent search method

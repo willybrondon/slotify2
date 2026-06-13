@@ -40,9 +40,11 @@ class HomeScreen extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.backGround,
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(200),
-          child: HomeScreenTopView(),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(
+            MediaQuery.of(context).padding.top + 72,
+          ),
+          child: const HomeScreenTopView(),
         ),
         body: GetBuilder<HomeScreenController>(
           id: Constant.idProgressView,
@@ -60,7 +62,9 @@ class HomeScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const HomeScreenAiConciergeBanner()
+                        const HomeScreenIntentHub()
+                            .paddingOnly(left: 15, right: 15, bottom: 12),
+                        const HomeScreenHairProfileStrip()
                             .paddingOnly(left: 15, right: 15, bottom: 15),
                         const HomeScreenCategoryView()
                             .paddingOnly(left: 15, right: 15),

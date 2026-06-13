@@ -45,6 +45,8 @@ import 'package:salon_2/ui/language_screen/binding/language_binding.dart';
 import 'package:salon_2/ui/language_screen/view/language_screen.dart';
 import 'package:salon_2/ui/ai_concierge_screen/binding/ai_concierge_binding.dart';
 import 'package:salon_2/ui/ai_concierge_screen/view/ai_concierge_screen.dart';
+import 'package:salon_2/ui/hair_profile_screen/binding/hair_profile_binding.dart';
+import 'package:salon_2/ui/hair_profile_screen/view/hair_profile_screen.dart';
 import 'package:salon_2/ui/login_screen/forgot_password_screen/binding/forgot_password_binding.dart';
 import 'package:salon_2/ui/login_screen/forgot_password_screen/view/forgot_password_screen.dart';
 import 'package:salon_2/ui/login_screen/login_screen/binding/login_screen_binding.dart';
@@ -393,6 +395,11 @@ class AppPages {
       name: AppRoutes.aiConcierge,
       page: () => const AiConciergeScreen(),
       binding: AiConciergeBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.hairProfile,
+      page: () => const HairProfileScreen(),
+      binding: HairProfileBinding(),
     ),
   ];
 }

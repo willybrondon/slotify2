@@ -55,4 +55,5 @@ class AppRoutes {
   static const String setting = '/setting';
   static const String language = '/language';
   static const String aiConcierge = '/aiConcierge';
+  static const String hairProfile = '/hairProfile';
 }

@@ -23,6 +23,47 @@ const analyzeAnotherBtn = document.getElementById('analyzeAnotherBtn');
 
 let selectedFile = null;
 let clientLocation = { lat: null, lng: null, active: false };
+let captureMode = false;
+
+function t(key) {
+    if (typeof getTranslation === 'function') return getTranslation(key);
+    return key;
+}
+
+function isCaptureMode() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('capture') === '1' || params.get('capture') === 'true';
+}
+
+function applyCaptureModeUI() {
+    captureMode = isCaptureMode();
+    const title = document.getElementById('conciergeTitle');
+    const subtitle = document.getElementById('conciergeSubtitle');
+    const description = document.getElementById('conciergeDescription');
+    const captureLinkRow = document.getElementById('captureLinkRow');
+    const capturePrivacy = document.getElementById('capturePrivacy');
+    const uploadKicker = document.querySelector('.sq-upload-kicker');
+    const uploadH3 = document.querySelector('#uploadPlaceholder h3');
+    const uploadLead = document.querySelector('.sq-upload-lead');
+    const analyzeLabel = document.getElementById('analyzeBtnLabel');
+    const uploadBtnLabel = document.getElementById('uploadBtnLabel');
+
+    if (captureMode) {
+        if (title) title.textContent = t('capture.screenTitle');
+        if (subtitle) subtitle.textContent = t('capture.heroTitle');
+        if (description) description.innerHTML = t('capture.heroBody');
+        if (captureLinkRow) captureLinkRow.style.display = 'block';
+        if (capturePrivacy) capturePrivacy.style.display = 'block';
+        if (uploadKicker) uploadKicker.textContent = t('capture.uploadKicker');
+        if (uploadH3) uploadH3.textContent = t('capture.uploadTitle');
+        if (uploadLead) uploadLead.innerHTML = t('capture.uploadLead');
+        if (analyzeLabel) analyzeLabel.textContent = t('capture.analyzeLook');
+        if (uploadBtnLabel) uploadBtnLabel.textContent = t('capture.choosePhoto');
+        document.title = t('capture.screenTitle') + ' | Skedisy';
+    } else {
+        if (analyzeLabel) analyzeLabel.textContent = t('concierge.analyzeBtn');
+    }
+}
 
 function isMobileConcierge() {
     return window.matchMedia('(max-width: 768px)').matches;
@@ -86,6 +127,7 @@ function appendLocationToFormData(formData) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
+    applyCaptureModeUI();
     setupEventListeners();
     if (isMobileConcierge()) {
         requestClientLocation();
@@ -93,6 +135,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLocationStatusUI();
     }
 });
+
+document.addEventListener('skedisy:language-changed', applyCaptureModeUI);
 
 function setupEventListeners() {
     // Upload button click
@@ -197,7 +241,8 @@ function analyzeImage() {
     // Show loading state
     analyzeBtn.disabled = true;
     spinner.style.display = 'inline-block';
-    analyzeBtn.querySelector('span').textContent = 'Analyse en cours…';
+    const analyzeLabel = document.getElementById('analyzeBtnLabel');
+    if (analyzeLabel) analyzeLabel.textContent = t('concierge.analyzing');
     hideError();
     
     // Create FormData
@@ -206,6 +251,9 @@ function analyzeImage() {
     
     const runAnalyze = () => {
         appendLocationToFormData(formData);
+        if (window.SkedisyHairProfile) {
+            SkedisyHairProfile.appendToFormData(formData);
+        }
         if (isMobileConcierge() && !clientLocation.active) {
             const ok = window.confirm(
                 'Sans localisation, les salons ne seront pas triés par distance.\n\nAutoriser la position maintenant ?'
@@ -267,7 +315,10 @@ function sendAnalysisRequest(formData) {
 function resetAnalyzeButton() {
     analyzeBtn.disabled = false;
     spinner.style.display = 'none';
-    analyzeBtn.querySelector('span').textContent = 'Analyser et trouver mon salon';
+    const label = document.getElementById('analyzeBtnLabel');
+    if (label) {
+        label.textContent = captureMode ? t('capture.analyzeLook') : t('concierge.analyzeBtn');
+    }
 }
 
 function displayResults(data) {

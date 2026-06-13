@@ -46,7 +46,12 @@ exports.analyzeSelfie = async (req, res) => {
       latitude: req.body.latitude || req.query.latitude || null,
       longitude: req.body.longitude || req.query.longitude || null,
       city: req.body.city || req.query.city || null,
-      occasion: req.body.occasion || req.query.occasion || null
+      occasion: req.body.occasion || req.query.occasion || null,
+      hairType: req.body.hairType || req.query.hairType || null,
+      hairCondition: req.body.hairCondition || req.query.hairCondition || null,
+      styleInterest: req.body.styleInterest || req.query.styleInterest || null,
+      scalpSensitivity: req.body.scalpSensitivity || req.query.scalpSensitivity || null,
+      bookingGoal: req.body.bookingGoal || req.query.bookingGoal || null,
     };
 
     // Analyze the selfie

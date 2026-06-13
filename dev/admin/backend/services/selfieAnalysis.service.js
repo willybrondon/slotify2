@@ -139,6 +139,17 @@ class SelfieAnalysisService {
     return score;
   }
 
+  buildHairProfilePromptBlock(context = {}) {
+    const lines = [];
+    if (context.hairType) lines.push(`- Hair type (client): ${context.hairType}`);
+    if (context.hairCondition) lines.push(`- Hair condition (client): ${context.hairCondition}`);
+    if (context.styleInterest) lines.push(`- Style interest (client): ${context.styleInterest}`);
+    if (context.scalpSensitivity) lines.push(`- Scalp sensitivity (client): ${context.scalpSensitivity}`);
+    if (context.bookingGoal) lines.push(`- Booking goal (client): ${context.bookingGoal}`);
+    if (!lines.length) return '';
+    return `\nClient hair profile (from Skedisy app — trust and refine with the photo):\n${lines.join('\n')}\n`;
+  }
+
   /**
    * Analyze selfie image and extract beauty features using Google Gemini
    */
@@ -157,15 +168,17 @@ class SelfieAnalysisService {
       const mimeType = this.getImageMimeType(imagePath);
 
       // Create detailed analysis prompt
+      const hairProfileBlock = this.buildHairProfilePromptBlock(context);
       const analysisPrompt = `You are the Skedisy AI beauty concierge for Afro beauty salons in Île-de-France (France).
 Analyze this selfie for a client from the Afro community. Focus on textured/coily/curly hair and realistic salon services (not generic Western spa menus).
 
 Categories on Skedisy: Tresses, Locks, Perruques, Homme (barber), Esthétique (nails, makeup, skin, waxing).
-
+${hairProfileBlock}
 1. Skin: type, tone, undertone, concerns (hyperpigmentation, dryness…), condition
 2. Hair (priority): type (straight, wavy, curly, coily), texture, color, condition, length, protective-style needs
 3. Face: shape, eyes, lips, brows
 4. recommendedNeeds: what to book at an Afro salon in IDF (categories + service keywords in French/English, e.g. knotless, box braids, retwist, lace front, fade, soin visage)
+${context.occasion ? `\nClient occasion / goal: ${context.occasion}` : ''}
 
 Return ONLY valid JSON (no markdown):
 {

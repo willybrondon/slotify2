@@ -8,6 +8,7 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
+    <link rel="stylesheet" href="intent-hub.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <script src="language.js" defer></script>
@@ -91,6 +92,41 @@
                     <img src="images/client/app-menu.png" alt="App Skedisy — menu principal" width="280" height="560" loading="lazy">
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- 3 portes d'entrée (capture · concierge · recherche) -->
+    <section class="sq-intent-hub" id="sqIntentHub">
+        <div class="container">
+            <h2 class="sq-intent-hub__title" data-translate="intentHub.title">Comment veux-tu réserver ?</h2>
+            <p class="sq-intent-hub__subtitle" data-translate="intentHub.subtitle">Partage un look, demande au concierge IA, ou cherche — trois entrées.</p>
+            <div class="sq-intent-doors">
+                <a href="ai-concierge.html?capture=1" class="sq-intent-door sq-intent-door--primary">
+                    <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
+                    <span class="sq-intent-door__body">
+                        <h3 data-translate="intentHub.captureTitle">Partager un look</h3>
+                        <p data-translate="intentHub.captureBody">Capture Instagram ou TikTok → envoie la photo ici. On trouve les salons qui font ce style.</p>
+                    </span>
+                    <i class="fas fa-chevron-right sq-intent-door__chevron" aria-hidden="true"></i>
+                </a>
+                <a href="ai-concierge.html" class="sq-intent-door">
+                    <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-wand-magic-sparkles"></i></span>
+                    <span class="sq-intent-door__body">
+                        <h3 data-translate="intentHub.conciergeTitle">Concierge IA</h3>
+                        <p data-translate="intentHub.conciergeBody">Selfie + ton profil capillaire → prestations et salons près de chez toi.</p>
+                    </span>
+                    <i class="fas fa-chevron-right sq-intent-door__chevron" aria-hidden="true"></i>
+                </a>
+                <a href="#categories-browse" class="sq-intent-door sq-intent-door--secondary">
+                    <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+                    <span class="sq-intent-door__body">
+                        <h3 data-translate="intentHub.searchTitle">Chercher un salon</h3>
+                        <p data-translate="intentHub.searchBody">Par nom, prestation ou quartier via les catégories.</p>
+                    </span>
+                    <i class="fas fa-chevron-right sq-intent-door__chevron" aria-hidden="true"></i>
+                </a>
+            </div>
+            <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
         </div>
     </section>
 
@@ -401,5 +437,6 @@
     <script src="cookie-consent.js"></script>
     <script type="module" src="qr-code-init.js"></script>
     <script src="script.js"></script>
+    <script src="hair-profile.js"></script>
 </body>
 </html>

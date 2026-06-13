@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:salon_2/main.dart' show city, latitude, longitude;
+import 'package:salon_2/services/hair_profile_service.dart';
 import 'package:salon_2/ui/ai_concierge_screen/model/ai_concierge_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
@@ -226,6 +227,30 @@ class AiConciergeController extends GetxController {
       }
       if (occasion != null && occasion.isNotEmpty) {
         requestBody["occasion"] = occasion;
+      }
+
+      final hairProfile = HairProfileService.instance.load();
+      if (hairProfile.hairType != null && hairProfile.hairType!.isNotEmpty) {
+        requestBody["hairType"] = hairProfile.hairType!.tr;
+      }
+      if (hairProfile.hairCondition != null &&
+          hairProfile.hairCondition!.isNotEmpty) {
+        requestBody["hairCondition"] = hairProfile.hairCondition!.tr;
+      }
+      if (hairProfile.styleInterest != null &&
+          hairProfile.styleInterest!.isNotEmpty) {
+        requestBody["styleInterest"] = hairProfile.styleInterest!.tr;
+      }
+      if (hairProfile.scalpSensitivity != null &&
+          hairProfile.scalpSensitivity!.isNotEmpty) {
+        requestBody["scalpSensitivity"] = hairProfile.scalpSensitivity!.tr;
+      }
+      if (hairProfile.bookingGoal != null &&
+          hairProfile.bookingGoal!.isNotEmpty) {
+        requestBody["bookingGoal"] = hairProfile.bookingGoal!.tr;
+        if (occasion == null || occasion.isEmpty) {
+          requestBody["occasion"] = hairProfile.bookingGoal!.tr;
+        }
       }
 
       log("Analyze Selfie Body :: $requestBody");

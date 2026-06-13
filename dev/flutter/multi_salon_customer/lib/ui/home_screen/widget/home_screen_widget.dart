@@ -8,6 +8,7 @@ import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/bottom_bar_screen/controller/bottom_bar_controller.dart';
 import 'package:salon_2/ui/home_screen/widget/view_all_screen_widget.dart';
 import 'package:salon_2/routes/app_routes.dart';
+import 'package:salon_2/services/hair_profile_service.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/login_screen/sign_in_screen/controller/sign_in_controller.dart';
 import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
@@ -24,103 +25,68 @@ class HomeScreenTopView extends StatelessWidget {
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
-    return Stack(
-      children: [
-        Container(
-          height: Get.height * 0.15 + statusBarHeight,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.whiteColor,
-          ),
-          child: Row(
+    return Container(
+      height: Get.height * 0.09 + statusBarHeight,
+      width: double.infinity,
+      padding: EdgeInsets.only(
+        top: statusBarHeight,
+        left: 16,
+        right: 16,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.whiteColor,
+      ),
+      child: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GetBuilder<ProfileScreenController>(
-                    id: Constant.idProgressView,
-                    init: ProfileScreenController(),
-                    builder: (logic) {
-                      return Text(
-                        "Skedisy",
-                        style: TextStyle(
-                          fontFamily: AppFontFamily.sfProDisplayBold,
-                          fontSize: 20,
-                          color: AppColors.blackColor,
-                        ),
-                      );
-                    },
-                  ),
-                  Text(
-                    Constant.storage.read<String>("fName") ?? "txtGuest".tr,
+              GetBuilder<ProfileScreenController>(
+                id: Constant.idProgressView,
+                init: ProfileScreenController(),
+                builder: (logic) {
+                  return Text(
+                    "Skedisy",
                     style: TextStyle(
-                      fontFamily: AppFontFamily.sfProDisplayRegular,
-                      fontSize: 16,
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 20,
                       color: AppColors.blackColor,
                     ),
-                  ),
-                ],
-              ).paddingOnly(bottom: 10),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {
-                  Get.toNamed(AppRoutes.wishlist);
+                  );
                 },
-                child: Image.asset(
-                  AppAsset.icLikeOutline,
-                  height: 40,
-                ).paddingOnly(right: 13),
               ),
-              GestureDetector(
-                onTap: () {
-                  Get.toNamed(AppRoutes.cart);
-                },
-                child: Image.asset(
-                  AppAsset.icCart,
-                  height: 40,
+              Text(
+                Constant.storage.read<String>("fName") ?? "txtGuest".tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayRegular,
+                  fontSize: 16,
+                  color: AppColors.blackColor,
                 ),
               ),
             ],
           ),
-        ),
-        GestureDetector(
-          onTap: () {
-            Get.toNamed(AppRoutes.search);
-          },
-          child: Container(
-            height: 55,
-            width: double.infinity,
-            margin:
-                EdgeInsets.only(top: Get.height * 0.15, left: 16, right: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: AppColors.whiteColor,
-              boxShadow: Constant.boxShadow,
-            ),
-            child: Row(
-              children: [
-                Image.asset(
-                  AppAsset.icSearch,
-                  height: 23,
-                  width: 23,
-                ).paddingOnly(left: 10, right: 10),
-                Text(
-                  "txtSearchServices".tr,
-                  style: TextStyle(
-                    color: AppColors.email,
-                    fontSize: 17,
-                    fontFamily: AppFontFamily.sfProDisplayRegular,
-                  ),
-                ),
-              ],
+          const Spacer(),
+          GestureDetector(
+            onTap: () {
+              Get.toNamed(AppRoutes.wishlist);
+            },
+            child: Image.asset(
+              AppAsset.icLikeOutline,
+              height: 40,
+            ).paddingOnly(right: 13),
+          ),
+          GestureDetector(
+            onTap: () {
+              Get.toNamed(AppRoutes.cart);
+            },
+            child: Image.asset(
+              AppAsset.icCart,
+              height: 40,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -269,114 +235,271 @@ class HomeScreenCategoryView extends StatelessWidget {
   }
 }
 
-class HomeScreenAiConciergeBanner extends StatelessWidget {
-  const HomeScreenAiConciergeBanner({super.key});
+class HomeScreenIntentHub extends StatelessWidget {
+  const HomeScreenIntentHub({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'txtIntentHubTitle'.tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 18,
+            color: AppColors.blackColor,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'txtIntentHubSubtitle'.tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayRegular,
+            fontSize: 13,
+            color: AppColors.grey,
+            height: 1.35,
+          ),
+        ),
+        const SizedBox(height: 14),
+        _IntentDoorCard(
+          icon: Icons.ios_share_rounded,
+          title: 'txtIntentCaptureTitle'.tr,
+          body: 'txtIntentCaptureBody'.tr,
+          accent: AppColors.primaryAppColor,
+          filled: true,
+          onTap: () => Get.toNamed(
+            AppRoutes.aiConcierge,
+            arguments: <String, dynamic>{'captureMode': true},
+          ),
+        ),
+        const SizedBox(height: 10),
+        _IntentDoorCard(
+          icon: Icons.auto_awesome,
+          title: 'txtIntentConciergeTitle'.tr,
+          body: 'txtIntentConciergeBody'.tr,
+          accent: AppColors.primaryAppColor,
+          onTap: () => Get.toNamed(AppRoutes.aiConcierge),
+        ),
+        const SizedBox(height: 10),
+        _IntentDoorCard(
+          icon: Icons.search,
+          title: 'txtIntentSearchTitle'.tr,
+          body: 'txtIntentSearchBody'.tr,
+          accent: AppColors.grey,
+          isSecondary: true,
+          onTap: () => Get.toNamed(AppRoutes.search),
+        ),
+      ],
+    );
+  }
+}
+
+class _IntentDoorCard extends StatelessWidget {
+  const _IntentDoorCard({
+    required this.icon,
+    required this.title,
+    required this.body,
+    required this.accent,
+    required this.onTap,
+    this.filled = false,
+    this.isSecondary = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+  final Color accent;
+  final VoidCallback onTap;
+  final bool filled;
+  final bool isSecondary;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = filled
+        ? accent
+        : isSecondary
+            ? AppColors.whiteColor
+            : AppColors.whiteColor;
+    final titleColor =
+        filled ? AppColors.whiteColor : AppColors.blackColor;
+    final bodyColor = filled
+        ? AppColors.whiteColor.withOpacity(0.9)
+        : AppColors.grey;
+
     return GestureDetector(
-      onTap: () {
-        Get.toNamed(
-          AppRoutes.aiConcierge,
-          arguments: <String, dynamic>{'captureMode': true},
-        );
-      },
+      onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primaryAppColor,
-              AppColors.primaryAppColor.withOpacity(0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primaryAppColor.withOpacity(0.3),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
+          color: bg,
+          borderRadius: BorderRadius.circular(14),
+          border: filled
+              ? null
+              : Border.all(
+                  color: isSecondary
+                      ? AppColors.lineColor
+                      : accent.withOpacity(0.25),
+                ),
+          boxShadow: filled
+              ? [
+                  BoxShadow(
+                    color: accent.withOpacity(0.25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : Constant.boxShadow,
         ),
         child: Row(
           children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: filled
+                    ? AppColors.whiteColor.withOpacity(0.2)
+                    : accent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: filled ? AppColors.whiteColor : accent),
+            ),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.auto_awesome,
-                        color: AppColors.whiteColor,
-                        size: 24,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "txtAiConciergeTitle".tr,
-                        style: TextStyle(
-                          color: AppColors.whiteColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
                   Text(
-                    "txtAiConciergeSubtitle".tr,
+                    title,
                     style: TextStyle(
-                      color: AppColors.whiteColor,
-                      fontSize: 13,
-                      height: 1.4,
+                      fontFamily: AppFontFamily.sfProDisplayBold,
+                      fontSize: 15,
+                      color: titleColor,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.whiteColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: AppColors.whiteColor.withOpacity(0.3),
-                      ),
-                    ),
-                    child: Text(
-                      "txtAiConciergeCta".tr,
-                      style: TextStyle(
-                        color: AppColors.whiteColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  const SizedBox(height: 4),
+                  Text(
+                    body,
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.sfProDisplayRegular,
+                      fontSize: 12.5,
+                      height: 1.35,
+                      color: bodyColor,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.whiteColor.withOpacity(0.2),
-                shape: BoxShape.circle,
+            Icon(
+              Icons.chevron_right,
+              color: filled
+                  ? AppColors.whiteColor
+                  : AppColors.grey.withOpacity(0.8),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class HomeScreenHairProfileStrip extends StatelessWidget {
+  const HomeScreenHairProfileStrip({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<HomeScreenController>(
+      id: Constant.idProgressView,
+      builder: (_) {
+        final profile = HairProfileService.instance.load();
+
+    if (!profile.isComplete) {
+      return GestureDetector(
+        onTap: () => Get.toNamed(AppRoutes.hairProfile),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.primaryAppColor.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.primaryAppColor.withOpacity(0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.spa_outlined,
+                color: AppColors.primaryAppColor,
+                size: 22,
               ),
-              child: Icon(
-                Icons.face_retouching_natural,
-                color: AppColors.whiteColor,
-                size: 40,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'txtHairProfileIncomplete'.tr,
+                  style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    fontSize: 13,
+                    color: AppColors.blackColor,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: AppColors.primaryAppColor,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final summary = [
+      if (profile.hairType != null) profile.hairType!.tr,
+      if (profile.styleInterest != null) profile.styleInterest!.tr,
+    ].join(' · ');
+
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoutes.hairProfile),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.lineColor),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.check_circle, color: AppColors.primaryAppColor, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '${'txtHairProfileSummary'.tr}: $summary',
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayRegular,
+                  fontSize: 13,
+                  color: AppColors.blackColor,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              'txtHairProfileEdit'.tr,
+              style: TextStyle(
+                fontFamily: AppFontFamily.sfProDisplayBold,
+                fontSize: 12,
+                color: AppColors.primaryAppColor,
               ),
             ),
           ],
         ),
       ),
+    );
+      },
     );
   }
 }
