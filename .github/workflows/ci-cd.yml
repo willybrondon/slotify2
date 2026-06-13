@@ -20,17 +20,7 @@ env:
   FIREBASE_APP_ID: "gzgz"
   FIREBASE_TOKEN: "gehehe"
   MATCH_PASSWORD: "hdhdg"
-  # env for ios 
-  # BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-  # P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-  # BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
-  # KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 
-  # env android 
-  # AAB_PATH: build/app/outputs/bundle/release/app-release.aab
-  # KEYSTORE_PATH: android/upload-keystore.jks
-  # KEY_PROPS_PATH: android/key.properties
-  # SERVICE_ACCOUNT_PATH: store_credentials.json
 
 
 jobs:
@@ -162,16 +152,6 @@ jobs:
         channel: 'stable'
       # setup env 
     
-    # Decode Android env variables (not needed)
-  #   - name: Decode Android keystore
-  #     run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > ${{ env.KEYSTORE_PATH }}
-
-  #   - name: Decode Android key properties
-  #     run: echo "${{ secrets.ANDROID_KEY_PROPERTIES }}" | base64 --decode > ${{ env.KEY_PROPS_PATH }}
-
-  # # Decode Android release Service Account
-  #   - name: Decode Android Service Account
-  #     run: echo "${{ secrets.PRODUCTION_CREDENTIAL_FILE }}" | base64 --decode > ${{ env.SERVICE_ACCOUNT_PATH }}
 
     - name: Get Flutter dependencies
       run: |
@@ -365,51 +345,7 @@ jobs:
             security cms -D -i "$profile" | grep -A1 -B1 -E "(application-identifier|TeamIdentifier|Name|UUID|Entitlements)" || true
             echo "---"
           done
-
-      # - name: Check Certificate in Profile
-      #   run: |
-      #     echo "=== Certificate Fingerprint ==="
-      #     security find-certificate -c "Apple Development: BRONDON WILLY (6Y8CH5T373)" -p | openssl x509 -noout -fingerprint -sha1
-      #     echo "=== Profile Certificates ==="
-      #     security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/mobile_pp.tgz | grep -A 20 "DeveloperCertificates" || true
-
-      # - name: Configure iOS Signing Settings
-      #   env:
-      #     CODE_SIGN_IDENTITY: 'Apple Development'
-      #     PROVISIONING_PROFILE_SPECIFIER: pslot
-      #     PROVISIONING_PROFILE_UUID: cf5e456e-5f78-44cb-9b64-0a4b946a4be0
-      #   run: |
-      #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-          
-      #     # Force all signing settings to Manual and set the correct valuesA
-      #     # sed -i.bak 's/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
-          
-      #     sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
-      #     sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = '"$PROVISIONING_PROFILE_SPECIFIER"';/g' Runner.xcodeproj/project.pbxproj
-      #     sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "'"$CODE_SIGN_IDENTITY"'";/g' Runner.xcodeproj/project.pbxproj
-      #     sed -i.bak 's/PROVISIONING_PROFILE = [^;]*;/PROVISIONING_PROFILE = '"$PROVISIONING_PROFILE_UUID"';/g' Runner.xcodeproj/project.pbxproj
-          
-         
-
-      # - name: Configure Production Signing
-      #   run: |
-      #     # Configure signing for customer app
-      #     cd "dev/flutter/multi_salon_customer/ios"
-      #     sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
-      #     sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
-      #     sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = "";/g' Runner.xcodeproj/project.pbxproj
-      #     # Use iPhone Distribution for production builds
-      #     sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "iPhone Distribution";/g' Runner.xcodeproj/project.pbxproj
-          
-      #     # Configure signing for expert app
-      #     cd "../../multi_salon_expert/ios"
-      #     sed -i.bak 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' Runner.xcodeproj/project.pbxproj
-      #     sed -i.bak 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = 7B755FRMAM;/g' Runner.xcodeproj/project.pbxproj
-      #     sed -i.bak 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = "";/g' Runner.xcodeproj/project.pbxproj
-      #     # Use iPhone Distribution for production builds
-      #     sed -i.bak 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "iPhone Distribution";/g' Runner.xcodeproj/project.pbxproj
-          
-      #     echo "Production signing configured for distribution builds"
+       
 
       - name: install pod ios for testting 
         run: |
@@ -421,11 +357,6 @@ jobs:
           sudo gem install cocoapods -v 1.5.0
           pod install --repo-update
 
-      # - name: run for build log
-      #   run: |
-      #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-      #     xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -destination 'generic/platform=iOS' clean build | tee xcodebuild.log
-      #     tail -n 100 xcodebuild.log
       - name: build archive
         run: |
           cd "dev/flutter/multi_salon_${{ matrix.app }}/ios"
@@ -469,225 +400,6 @@ jobs:
           # you can also archive the entire directory oka 
           # path: ${{ runner.temp }}/build
           retention-days: 3
-
-    # - name: install pod ios
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-    #     rm -rf ~/Library/Developer/Xcode/DerivedData
-    #     pod cache clean --all
-    #     rm -rf Podfile.lock Pods
-    #     pod install --repo-update
-    
-    # - name: Flutter build ipa
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-    #     flutter build ipa --no-codesign
-  
-    # - name: Upload IPA
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: app-release-ipa-${{ matrix.environment }}-${{ matrix.app }}
-    #     path: ${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/ios/ipa/Runner.ipa
-    #     overwrite: false
-
-    # - name: Export IPA from Xcode archive
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-    #     xcodebuild -exportArchive \
-    #       -archivePath build/ios/archive/Runner.xcarchive \
-    #       -exportPath build/ios/ipa \
-    #       -exportOptionsPlist ios/exportOptions.plist
-  
-
-    # - name: Upload Android APK artifact
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: ${{ matrix.app }}-android-${{ matrix.environment }}
-    #     path: "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk"
-    
-    # - name: Distribute APK via Firebase
-    #   run: |
-    #     firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
-    #       --app ${{ env.FIREBASE_APP_ID }} \
-    #       --groups testers \
-    #       --token ${{ env.FIREBASE_TOKEN }}
-
-  # Android App Build and Deploy
-  # android-build-deploy:
-  #   name: Android Build and Deploy
-  #   runs-on: ubuntu-latest
-  #   needs: [admin-tests, flutter-tests]
-  #   if: github.ref == 'refs/heads/main'
-  #   strategy:
-  #     matrix:
-  #       app: [customer, expert]
-  #       environment: [prd]
-    
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v4
-
-  #   - name: Setup Flutter
-  #     uses: subosito/flutter-action@v2
-  #     with:
-  #       flutter-version: ${{ env.FLUTTER_VERSION }}
-  #       channel: 'stable'
-
-  #   - name: Setup Java
-  #     uses: actions/setup-java@v4
-  #     with:
-  #       distribution: 'zulu'
-  #       java-version: '17'
-
-  #   - name: Get Flutter dependencies
-  #     run: |
-  #       cd "slotify/flutter/multi_salon_${{ matrix.app }}"
-  #       flutter pub get
-
-  #   - name: Update app configuration for production
-  #     run: |
-  #       cd "slotify/flutter/multi_salon_${{ matrix.app }}"
-  #       # Update config for production environment
-  #       sed -i 's|http://dev-server:5000/|http://${{ env.DROPLET_IP }}:5000/|g' lib/utils/config.dart
-  #       sed -i 's|dev_secret_key|5TIvw5cpc0|g' lib/utils/config.dart
-
-  #   - name: Build Android App Bundle
-  #     run: |
-  #       cd "slotify/flutter/multi_salon_${{ matrix.app }}"
-  #       flutter build appbundle --release
-
-  #   - name: Sign Android App Bundle
-  #     run: |
-  #       cd "slotify/flutter/multi_salon_${{ matrix.app }}"
-  #       # Create keystore for signing
-  #       keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEYSTORE_PASSWORD }} -dname "CN=Slotify, OU=Mobile, O=Slotify, L=City, S=State, C=US"
-        
-  #       # Sign the AAB
-  #       jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore android/app/upload-keystore.jks build/app/outputs/bundle/release/app-release.aab upload -storepass ${{ secrets.KEYSTORE_PASSWORD }}
-
-  #   - name: Upload to Play Store
-  #     uses: r0adkll/upload-google-play@v1
-  #     with:
-  #       serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_CREDENTIALS }}
-  #       packageName: com.slotify.${{ matrix.app }}
-  #       releaseFiles: slotify/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/bundle/release/app-release.aab
-  #       track: internal
-  #       status: completed
-
-  #   - name: Upload Android artifact
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: ${{ matrix.app }}-android-release
-  #       path: slotify/flutter/multi_salon_${{ matrix.app }}/build/app/outputs/bundle/release/app-release.aab
-
-    
-
-
-  # iOS App Build and Deploy
-  # ios-build-deploy:
-  #   name: iOS Build and Deploy
-  #   runs-on: macos-latest
-  #   needs: [admin-tests, flutter-tests]
-  #   if: github.ref == 'refs/heads/main'
-  #   strategy:
-  #     matrix:
-  #       app: [customer, expert]
-  #       environment: [prd]
-    
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v4
-
-  #   - name: Setup Flutter
-  #     uses: subosito/flutter-action@v2
-  #     with:
-  #       flutter-version: ${{ env.FLUTTER_VERSION }}
-  #       channel: 'stable'
-
-  #   - name: Get Flutter dependencies
-  #     run: |
-  #       cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-  #       flutter pub get
-    
-    
-
-  
-
-    # - name: Update app configuration for production
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-    #     # Update config for production environment
-    #     sed -i '' 's|http://dev-server:5000/|http://${{ env.DROPLET_IP }}:5000/|g' lib/utils/config.dart
-    #     sed -i '' 's|dev_secret_key|5TIvw5cpc0|g' lib/utils/config.dart
-
-    # - name: Setup iOS certificates
-    #   uses: apple-actions/import-codesigning-certs@v1
-    #   with:
-    #     p12-file-base64: ${{ secrets.IOS_P12_CERTIFICATE }}
-    #     p12-password: ${{ secrets.IOS_P12_PASSWORD }}
-
-    # - name: Setup provisioning profile
-    #   uses: apple-actions/download-provisioning-profiles@v1
-    #   with:
-    #     bundle-id: com.slotify.${{ matrix.app }}
-    #     profile-type: IOS_APP_STORE
-    #     issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-    #     api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-    #     api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-
-    # - name: Build iOS App
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-    #     flutter build ios --release --no-codesign
-
-    # - name: Setup Ruby
-    #   uses: ruby/setup-ruby@v1
-    #   with:
-    #     ruby-version: '3.2'
-
-    # - name: Install Fastlane
-    #   run: gem install fastlane
-
-    # - name: Fastlane Match Setup
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
-    #     bundle exec fastlane match appstore
-    #   env:
-    #     MATCH_PASSWORD: "hdgd" # ${{ env.MATCH_PASSWORD }}
-    #     GIT_AUTHORIZATION: "sgdgd" # ${{ env.MATCH_GIT_AUTH }}
-
-    # - name: Deploy to TestFlight
-    #   run: |
-    #     cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/ios"
-    #     fastlane beta
-    #   env:
-    #     APP_STORE_CONNECT_API_KEY_ID: "hdjdhd" # ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-    #     APP_STORE_CONNECT_API_ISSUER_ID: "dhdgd" # ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
-    #     APP_STORE_CONNECT_API_KEY: "gdhdgd" # ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-
-    # - name: Build iOS Archive
-    #   run: |
-    #     cd "slotify/flutter/multi_salon_${{ matrix.app }}/ios"
-    #     xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
-
-    # - name: Export iOS IPA
-    #   run: |
-    #     cd "slotify/flutter/multi_salon_${{ matrix.app }}/ios"
-    #     xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportPath build/ios -exportOptionsPlist exportOptions.plist
-
-    # - name: Upload to App Store Connect
-    #   uses: apple-actions/upload-testflight@v1
-    #   with:
-    #     app-path: slotify/flutter/multi_salon_${{ matrix.app }}/ios/build/ios/Runner.ipa
-    #     issuer-id: "gdgdg" # ${{ secrets.APPSTORE_ISSUER_ID }}
-    #     api-key-id: "gdgdgd" # ${{ secrets.APPSTORE_API_KEY_ID }}
-    #     api-private-key: "gdhdgd" # ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-
-    # - name: Upload iOS artifact
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: ${{ matrix.app }}-ios-release
-    #     path: slotify/flutter/multi_salon_${{ matrix.app }}/ios/build/ios/Runner.ipa
 
   # Deploy to Development Environment
   deploy-dev:
@@ -779,22 +491,6 @@ jobs:
           echo "⚠️ Salon panel might not be accessible yet"
         fi
 
-  # Security Scan
-  # security-scan:
-  #   name: Security Scan
-  #   runs-on: ubuntu-latest
-    
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v4
-
-  #   - name: Run security scan
-  #     uses: github/codeql-action/init@v3
-  #     with:
-  #       languages: javascript, python
-
-  #   - name: Perform CodeQL Analysis
-  #     uses: github/codeql-action/analyze@v3
 
   # Performance Test
   performance-test:
