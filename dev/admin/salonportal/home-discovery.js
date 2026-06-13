@@ -120,33 +120,46 @@
         const url = salon._id || salon.id ? buildSalonUrl(salon) : '#';
         const name = escapeHtml((expert.fname || '') + ' ' + (expert.lname || '')).trim() || 'Experte';
         const img = expert.image || '';
-        const salonName = escapeHtml(salon.name || '');
-        const rating =
-            expert.review != null
-                ? '<span class="sq-discovery-card__rating"><i class="fas fa-star" aria-hidden="true"></i> ' +
+        const salonName = salon.name || '';
+        const initial = escapeHtml((expert.fname || expert.lname || '?').charAt(0));
+
+        const imageHtml = img
+            ? '<img src="' +
+              escapeHtml(img) +
+              '" alt="' +
+              name +
+              '" class="sq-expert-card__img" loading="lazy">'
+            : '<div class="sq-expert-card__placeholder" aria-hidden="true">' + initial + '</div>';
+
+        const ratingHtml =
+            expert.review > 0
+                ? '<span class="sq-expert-card__rating">★ ' +
                   Number(expert.review).toFixed(1) +
-                  '</span>'
+                  ' (' +
+                  (expert.reviewCount || 0) +
+                  ')</span>'
                 : '';
 
+        const salonLine = salonName
+            ? '<span class="sq-expert-card__salon">' +
+              escapeHtml(t('homeProduct.expertAtSalonTpl').replace('__SALON__', salonName)) +
+              '</span>'
+            : '';
+
         return (
-            '<a class="sq-discovery-card sq-discovery-card--expert" href="' +
+            '<a href="' +
             escapeHtml(url) +
-            '">' +
-            '<span class="sq-discovery-card__media sq-discovery-card__media--round">' +
-            (img
-                ? '<img src="' + escapeHtml(img) + '" alt="" loading="lazy">'
-                : '<span class="sq-discovery-card__placeholder"><i class="fas fa-user" aria-hidden="true"></i></span>') +
-            '</span>' +
-            '<span class="sq-discovery-card__body sq-discovery-card__body--center">' +
-            '<strong class="sq-discovery-card__title">' +
+            '" class="sq-expert-card">' +
+            '<div class="sq-expert-card__avatar">' +
+            imageHtml +
+            '</div>' +
+            '<div class="sq-expert-card__body">' +
+            '<span class="sq-expert-card__name">' +
             name +
-            '</strong>' +
-            (salonName ? '<span class="sq-discovery-card__meta">' + salonName + '</span>' : '') +
-            rating +
-            '<span class="sq-discovery-card__cta">' +
-            escapeHtml(t('homeProduct.viewSalon')) +
             '</span>' +
-            '</span></a>'
+            ratingHtml +
+            salonLine +
+            '</div></a>'
         );
     }
 

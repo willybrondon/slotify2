@@ -552,6 +552,17 @@ html {
     color: #a84d1f !important;
 }
 
+.btn-for-clients-mobile {
+    border: 2px solid #c45c26 !important;
+    background: #fff !important;
+    color: #c45c26 !important;
+}
+
+.btn-for-clients-mobile:hover {
+    background: #fdf6f0 !important;
+    color: #a84d1f !important;
+}
+
 .btn-login-mobile-menu {
     display: block !important;
     background: #111 !important;

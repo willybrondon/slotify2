@@ -8,8 +8,8 @@ function initHomeSalonSearch() {
         e.preventDefault();
         const q = input.value.trim();
         if (!q) {
-            const categories = document.getElementById('categories-browse');
-            if (categories) categories.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const nearby = document.getElementById('sqNearbySalons');
+            if (nearby) nearby.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
         }
         if (typeof window.homeSearchSalons === 'function') {
