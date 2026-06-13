@@ -1,6 +1,26 @@
 // Navigation functionality
+function initHomeSalonSearch() {
+    const form = document.getElementById('homeSalonSearchForm');
+    const input = document.getElementById('homeSalonSearchInput');
+    if (!form || !input) return;
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const q = input.value.trim();
+        if (!q) {
+            const categories = document.getElementById('categories-browse');
+            if (categories) categories.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+        if (typeof window.homeSearchSalons === 'function') {
+            window.homeSearchSalons(q);
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     mountStoreBadges();
+    initHomeSalonSearch();
 
     if (typeof setLanguage === 'function') {
         const savedLang = localStorage.getItem('skedisy-language') || 'fr';

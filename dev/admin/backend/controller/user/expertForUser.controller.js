@@ -97,12 +97,13 @@ exports.getTopExperts = async (req, res) => {
           fname: 1,
           lname: 1,
           image: 1,
-          _id: 1,
+          salonId: 1,
+          salonInfo: { $arrayElemAt: ["$salonInfo", 0] },
         },
       },
+      { $sort: { review: -1 } },
       { $skip: skipAmount },
       { $limit: limit },
-      { $sort: { review: -1 } },
     ]);
 
     return res.status(200).json({

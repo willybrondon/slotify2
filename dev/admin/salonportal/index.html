@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skedisy — Réserve ta beauté afro en Île-de-France</title>
-    <meta name="description" content="Trouve et réserve dans les salons de beauté afro en Île-de-France. Tresses, locks, perruques. Réservation sur l'app Skedisy.">
+    <title>Skedisy — Ta beauté afro en IDF. Les bons salons. Une app à nous.</title>
+    <meta name="description" content="La réservation pour la communauté afro en Île-de-France — ses salons, ses cheveux, ses quartiers. Découvre ici, réserve sur l'app Skedisy.">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
@@ -80,17 +80,9 @@
     <section class="sq-home-product" id="sqHomeProduct">
         <div class="container sq-home-product-inner">
             <div class="sq-home-intro">
-                <p class="sq-kicker" data-translate="homeProduct.eyebrow">Île-de-France · Beauté afro</p>
-                <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve dans les salons afro en Île-de-France</h1>
+                <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Ta beauté afro en IDF. Les bons salons. Une app à nous.</h1>
                 <p class="sq-home-essence" data-translate="homeProduct.essence">Parce que réserver des tresses, ce n'est pas réserver une coupe.</p>
-                <p class="sq-home-lead" data-translate="homeProduct.lead">Skedisy, c'est la réservation pour la communauté afro en IDF — tresses, locks, perruques, homme, esthétique. Découvre ici, réserve sur l'app.</p>
-                <div class="sq-pills sq-pills--home" aria-label="Catégories">
-                    <span data-translate="trust.tresses">Tresses</span>
-                    <span data-translate="trust.locks">Locks</span>
-                    <span data-translate="trust.wigs">Perruques</span>
-                    <span data-translate="trust.homme">Homme</span>
-                    <span data-translate="trust.esthetique">Esthétique</span>
-                </div>
+                <p class="sq-home-lead" data-translate="homeProduct.lead">La réservation pour la communauté afro en Île-de-France — ses salons, ses cheveux, ses quartiers.</p>
             </div>
         </div>
     </section>
@@ -117,16 +109,56 @@
                     </span>
                     <i class="fas fa-chevron-right sq-intent-door__chevron" aria-hidden="true"></i>
                 </a>
-                <a href="#categories-browse" class="sq-intent-door sq-intent-door--secondary">
-                    <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
-                    <span class="sq-intent-door__body">
-                        <h3 data-translate="intentHub.searchTitle">Chercher un salon</h3>
-                        <p data-translate="intentHub.searchBody">Par nom, prestation ou quartier via les catégories.</p>
-                    </span>
-                    <i class="fas fa-chevron-right sq-intent-door__chevron" aria-hidden="true"></i>
-                </a>
+                <div class="sq-intent-door sq-intent-door--search">
+                    <form id="homeSalonSearchForm" class="sq-intent-search-form" role="search">
+                        <label class="sq-sr-only" for="homeSalonSearchInput" data-translate="intentHub.searchTitle">Chercher un salon</label>
+                        <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+                        <div class="sq-intent-search-form__field">
+                            <input type="search" id="homeSalonSearchInput" name="q" class="sq-intent-search-form__input" data-translate="intentHub.searchPlaceholder" placeholder="Chercher un salon" autocomplete="off" enterkeyhint="search">
+                        </div>
+                    </form>
+                </div>
             </div>
             <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
+        </div>
+    </section>
+
+    <!-- 4 piliers d'authenticité Skedisy (AUTHENTICITE_SKEDISY §6) -->
+    <section class="sq-pillars" id="sqAuthenticityPillars" aria-labelledby="sqPillarsTitle">
+        <div class="container">
+            <h2 class="sq-pillars__title" id="sqPillarsTitle" data-translate="pillars.title">Pourquoi Skedisy, ce n'est pas un agenda générique</h2>
+            <p class="sq-pillars__subtitle" data-translate="pillars.subtitle">Quatre piliers — la communauté afro en Île-de-France se reconnaît ici.</p>
+            <div class="sq-pillars-grid">
+                <article class="sq-pillar-card">
+                    <span class="sq-pillar-card__badge" aria-hidden="true">1</span>
+                    <span class="sq-pillar-card__icon" aria-hidden="true"><i class="fas fa-people-group"></i></span>
+                    <h3 class="sq-pillar-card__name" data-translate="pillars.belongingTitle">Appartenance</h3>
+                    <p class="sq-pillar-card__tagline" data-translate="pillars.belongingTagline">« C'est notre app »</p>
+                    <p class="sq-pillar-card__body" data-translate="pillars.belongingBody">Enfin un outil où tu cherches tresses, locks ou 4C — pas « coiffeur » au hasard. Vocabulaire et prestations de la communauté.</p>
+                </article>
+                <article class="sq-pillar-card">
+                    <span class="sq-pillar-card__badge" aria-hidden="true">2</span>
+                    <span class="sq-pillar-card__icon" aria-hidden="true"><i class="fas fa-wand-magic-sparkles"></i></span>
+                    <h3 class="sq-pillar-card__name" data-translate="pillars.understandingTitle">Compréhension</h3>
+                    <p class="sq-pillar-card__tagline" data-translate="pillars.understandingTagline">On connaît la pratique</p>
+                    <p class="sq-pillar-card__body" data-translate="pillars.understandingBody">Durées réalistes, entretien, protective styles — et un concierge IA qui recommande selon tes cheveux, pas un menu générique.</p>
+                </article>
+                <article class="sq-pillar-card">
+                    <span class="sq-pillar-card__badge" aria-hidden="true">3</span>
+                    <span class="sq-pillar-card__icon" aria-hidden="true"><i class="fas fa-location-dot"></i></span>
+                    <h3 class="sq-pillar-card__name" data-translate="pillars.territoryTitle">Territoire</h3>
+                    <p class="sq-pillar-card__tagline" data-translate="pillars.territoryTagline">Île-de-France, en profondeur</p>
+                    <p class="sq-pillar-card__body" data-translate="pillars.territoryBody">Salons du 75, 93, 94, 91, 92, 95, 78… Quartiers et banlieue nommés — pas une promesse « toute la France ».</p>
+                </article>
+                <article class="sq-pillar-card">
+                    <span class="sq-pillar-card__badge" aria-hidden="true">4</span>
+                    <span class="sq-pillar-card__icon" aria-hidden="true"><i class="fas fa-store"></i></span>
+                    <h3 class="sq-pillar-card__name" data-translate="pillars.visibilityTitle">Visibilité du salon</h3>
+                    <p class="sq-pillar-card__tagline" data-translate="pillars.visibilityTagline">Le salon est héros</p>
+                    <p class="sq-pillar-card__body" data-translate="pillars.visibilityBody">Équipes, quartier, clientèle fidèle — ton salon mérite d'être trouvable, pas seulement décor de Reel.</p>
+                </article>
+            </div>
+            <p class="sq-pillars__filter" data-translate="pillars.filter">Tu te sens vue, pas seulement servie ? C'est l'authenticité Skedisy.</p>
         </div>
     </section>
 
@@ -141,6 +173,36 @@
             </div>
             <div class="sq-home-categories-grid" id="homeCategoriesGrid" aria-live="polite">
                 <p class="sq-home-categories-loading" data-translate="homeProduct.categoriesLoading">Chargement des catégories…</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Salons à proximité (comme l'app) -->
+    <section class="sq-home-discovery sq-home-discovery--salons" id="sqNearbySalons">
+        <div class="container">
+            <div class="sq-home-discovery-head">
+                <div>
+                    <h2 class="sq-section-title sq-section-title--left" data-translate="homeProduct.nearbySalons">Salons afro à proximité</h2>
+                    <p class="sq-home-discovery-sub" id="nearbySalonsLead" data-translate="homeProduct.nearbySalonsSub">Salons de la communauté près de chez toi en Île-de-France.</p>
+                </div>
+            </div>
+            <div class="sq-home-discovery-track" id="nearbySalonsTrack" aria-live="polite">
+                <p class="sq-home-discovery-loading" data-translate="homeProduct.salonsLoading">Chargement des salons…</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Meilleurs experts (comme l'app) -->
+    <section class="sq-home-discovery sq-home-discovery--experts" id="sqTopExperts">
+        <div class="container">
+            <div class="sq-home-discovery-head">
+                <div>
+                    <h2 class="sq-section-title sq-section-title--left" data-translate="homeProduct.topExperts">Meilleurs experts</h2>
+                    <p class="sq-home-discovery-sub" data-translate="homeProduct.topExpertsSub">Expertes les mieux notées dans nos salons afro.</p>
+                </div>
+            </div>
+            <div class="sq-home-discovery-track sq-home-discovery-track--experts" id="topExpertsTrack" aria-live="polite">
+                <p class="sq-home-discovery-loading" data-translate="homeProduct.expertsLoading">Chargement des expertes…</p>
             </div>
         </div>
     </section>
@@ -486,6 +548,7 @@
     <script src="cookie-consent.js"></script>
     <script type="module" src="qr-code-init.js"></script>
     <script src="script.js"></script>
+    <script src="home-discovery.js"></script>
     <script src="hair-profile.js"></script>
 </body>
 </html>
