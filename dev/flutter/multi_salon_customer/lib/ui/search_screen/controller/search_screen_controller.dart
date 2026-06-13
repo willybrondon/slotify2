@@ -11,12 +11,9 @@ class SearchScreenController extends GetxController {
   List serviceId = [];
   List serviceName = [];
   double? withTaxRupee;
-  // double totalPrice = 0.0;
-  // double withOutTaxRupee = 0.0;
-  // double finalTaxRupee = 0.0;
   int totalMinute = 0;
+  bool salonMapView = false;
 
-  // late List<bool> isSelected = List.generate((homeScreenController.getService.length), (index) => false);
   final HomeScreenController homeScreenController = Get.find<HomeScreenController>();
 
   var text = " ";
@@ -60,5 +57,10 @@ class SearchScreenController extends GetxController {
       return text;
     }
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
+  }
+
+  void setSalonMapView(bool value) {
+    salonMapView = value;
+    update(['salonMapView']);
   }
 }

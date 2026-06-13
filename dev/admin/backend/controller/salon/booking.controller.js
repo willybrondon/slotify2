@@ -388,7 +388,7 @@ exports.upcomingBookings = async (req, res) => {
     let futureBookings = await Booking.find({
       salonId: salon._id,
       date: todayDate,
-      status: "pending",
+      status: { $in: ["pending", "confirm"] },
     })
       .populate("userId serviceId expertId")
       .sort({ startTime: 1 });

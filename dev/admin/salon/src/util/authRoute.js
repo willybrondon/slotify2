@@ -34,7 +34,7 @@ const PrivateRoute = () => {
     return <div>Loading...</div>;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/salonPanel/login" />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/salonpanel/login" />;
 };
 
 export default PrivateRoute;

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concierge IA — Beauté afro en Île-de-France | Skedisy</title>
-    <meta name="description" content="Analysez votre selfie et trouvez les salons afro adaptés en Île-de-France. Réservez sur la fiche salon Skedisy.">
+    <title data-translate="concierge.pageTitle">Concierge IA — Beauté afro en Île-de-France | Skedisy</title>
+    <meta name="description" content="Trouve ton look et réserve dans un salon afro en Île-de-France. Capture, vidéo ou Concierge IA Skedisy.">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
@@ -23,36 +23,62 @@
         <div class="container">
             <div class="ai-concierge-header" id="conciergeHeader">
                 <p class="sq-legal-kicker">Île-de-France · Beauté afro</p>
-                <h1 id="conciergeTitle">Concierge IA Skedisy</h1>
-                <p class="subtitle" id="conciergeSubtitle">Parce que réserver des tresses, ce n'est pas réserver une coupe.</p>
-                <p class="description" id="conciergeDescription">
-                    Envoyez un selfie : notre IA analyse vos cheveux texturés et votre peau, puis vous propose
-                    des <strong>salons afro en Île-de-France</strong> dont les prestations correspondent vraiment à votre profil.
-                    Cliquez sur un salon pour voir sa fiche et <strong>réserver sur le web</strong>.
+                <h1 id="conciergeTitle" data-translate="concierge.title">Concierge IA Skedisy</h1>
+                <p class="subtitle" id="conciergeSubtitle" data-translate="concierge.subtitle">Parce que réserver des tresses, ce n'est pas réserver une coupe.</p>
+                <p class="description" id="conciergeDescription" data-translate-html="concierge.description">
+                    Selfie ou look partagé : notre IA propose des <strong>salons afro en Île-de-France</strong> adaptés à tes cheveux texturés.
                 </p>
             </div>
 
             <div class="sq-hair-strip-mount" data-hair-profile-strip style="margin-bottom: 1.25rem;"></div>
 
+            <div class="sq-capture-trust" id="captureTrustBar" hidden>
+                <p data-translate="capture.trustLine">Beauté afro uniquement — pas de beauté générique.</p>
+                <div class="sq-capture-pills" aria-hidden="true">
+                    <span>Tresses</span><span>Locks</span><span>Perruques</span><span>Homme</span><span>Esthétique</span>
+                </div>
+            </div>
+
             <div class="ai-concierge-content" id="mainContent">
                 <div class="upload-section" id="uploadSection">
+                    <div id="linkCapturePanel" class="sq-link-capture-panel" hidden>
+                        <div class="sq-link-capture-panel__head">
+                            <i class="fab fa-instagram" id="linkPlatformIcon" aria-hidden="true"></i>
+                            <div>
+                                <strong id="linkPlatformLabel">Instagram</strong>
+                                <p id="linkCaptureLead" class="sq-link-capture-panel__lead"></p>
+                            </div>
+                        </div>
+                        <ol id="linkCaptureSteps" class="sq-link-capture-panel__steps"></ol>
+                        <button type="button" class="btn-upload sq-link-upload-cta" id="linkGoUploadBtn">
+                            <i class="fas fa-cloud-arrow-up" aria-hidden="true"></i>
+                            <span data-translate="capture.linkUploadCta">Envoyer ma capture ou vidéo</span>
+                        </button>
+                    </div>
+
+                    <div class="sq-capture-link-block" id="captureLinkBlock" hidden>
+                        <label for="sharedLinkInput" data-translate="capture.pasteLink">Coller un lien</label>
+                        <div class="sq-capture-link-input-row">
+                            <input type="url" id="sharedLinkInput" placeholder="https://instagram.com/reel/…" autocomplete="off" inputmode="url">
+                            <button type="button" class="sq-link-validate-btn" id="linkValidateBtn" data-translate="capture.linkValidateBtn">Valider</button>
+                        </div>
+                        <p class="sq-capture-hint" data-translate="capture.linkHint">Pour un lien, enregistre l'écran pendant la vidéo puis envoie le fichier ici.</p>
+                    </div>
+
+                    <p class="sq-capture-privacy sq-capture-privacy--block" id="capturePrivacy" hidden data-translate="capture.privacy">Skedisy analyse uniquement ta photo ou vidéo. Aucun accès à tes comptes sociaux.</p>
+
                     <div class="upload-area" id="uploadArea">
                         <div class="upload-placeholder" id="uploadPlaceholder">
-                            <p class="sq-upload-kicker">Île-de-France · Cheveux texturés · afro</p>
-                            <i class="fas fa-camera" aria-hidden="true"></i>
-                            <h3>Ta photo, ton profil beauté</h3>
-                            <p class="sq-upload-lead">Une selfie bien éclairée : on analyse tes cheveux et ta peau pour te proposer des <strong>salons afro près de chez toi</strong>.</p>
-                            <p class="upload-hint">JPG ou PNG · max. 10 Mo · visage et cheveux visibles</p>
+                            <p class="sq-upload-kicker" id="uploadKicker" data-translate="concierge.uploadKicker">Île-de-France · Cheveux texturés · afro</p>
+                            <i class="fas fa-camera" id="uploadAreaIcon" aria-hidden="true"></i>
+                            <h3 id="uploadTitle" data-translate="concierge.uploadTitle">Ta photo, ton profil beauté</h3>
+                            <p class="sq-upload-lead" id="uploadLead" data-translate-html="concierge.uploadLead">Une selfie bien éclairée : on analyse tes cheveux et ta peau pour te proposer des <strong>salons afro près de chez toi</strong>.</p>
+                            <p class="upload-hint" id="uploadHint" data-translate="concierge.uploadHint">JPG ou PNG · max. 10 Mo · visage et cheveux visibles</p>
+                            <p class="sq-capture-screen-tip" id="screenRecordTip" hidden></p>
                             <p class="sq-location-status" id="locationStatus" aria-live="polite"></p>
                             <button type="button" class="btn-upload" id="uploadBtn">
-                                <i class="fas fa-image" aria-hidden="true"></i> <span id="uploadBtnLabel">Prendre ou choisir une photo</span>
+                                <i class="fas fa-image" aria-hidden="true"></i> <span id="uploadBtnLabel" data-translate="concierge.chooseMedia">Prendre ou choisir une photo</span>
                             </button>
-                            <div class="sq-capture-link-row" id="captureLinkRow" style="display: none;">
-                                <label for="sharedLinkInput" data-translate="capture.pasteLink">Coller un lien</label>
-                                <input type="url" id="sharedLinkInput" placeholder="https://instagram.com/…" autocomplete="off">
-                                <p class="sq-capture-hint" data-translate="capture.linkHint">Pour un lien Instagram ou TikTok, fais une capture d'écran puis envoie la photo ici.</p>
-                            </div>
-                            <p class="sq-capture-privacy" id="capturePrivacy" style="display: none;" data-translate="capture.privacy">Skedisy analyse uniquement ta photo de coiffure. Aucun accès à tes comptes sociaux.</p>
                         </div>
                         <div class="image-preview" id="imagePreview" style="display: none;">
                             <img id="previewImage" src="" alt="Aperçu de votre photo">
@@ -60,7 +86,7 @@
                                 <i class="fas fa-times" aria-hidden="true"></i> Supprimer
                             </button>
                         </div>
-                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                        <input type="file" id="fileInput" accept="image/*,video/mp4,video/quicktime,video/webm,video/3gpp" style="display: none;">
                     </div>
 
                     <div class="analyze-section" id="analyzeSection" style="display: none;">

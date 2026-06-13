@@ -350,12 +350,13 @@ html {
 
 .mobile-menu {
     position: fixed !important;
-    top: 0 !important;
+    top: 12px !important;
     right: -100%;
     width: 85%;
     max-width: 320px;
-    height: 100vh !important;
-    max-height: 100vh !important;
+    height: auto !important;
+    max-height: calc(100vh - 24px) !important;
+    min-height: 0 !important;
     background: #fff !important;
     box-shadow: -2px 0 10px rgba(0,0,0,0.1);
     z-index: 99999 !important;
@@ -364,6 +365,7 @@ html {
     display: flex !important;
     flex-direction: column !important;
     visibility: visible !important;
+    border-radius: 14px 0 0 14px;
 }
 
 .mobile-menu.active {
@@ -446,7 +448,7 @@ html {
 }
 
 .mobile-menu-content {
-    padding: 20px;
+    padding: 20px 20px 28px;
     display: flex !important;
     flex-direction: column !important;
     visibility: visible !important;
@@ -454,12 +456,100 @@ html {
     min-height: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    flex: 1 1 auto !important;
+    flex: 0 1 auto !important;
     gap: 12px;
     position: relative !important;
     z-index: 2 !important;
     width: 100% !important;
     height: auto !important;
+}
+
+.btn-mobile-action {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.mobile-categories-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.mobile-categories-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.mobile-categories-toggle__icon {
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+.mobile-categories-toggle[aria-expanded="true"] .mobile-categories-toggle__icon {
+    transform: rotate(180deg);
+}
+
+.mobile-categories-drawer {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e8e8e8;
+    background: #fafafa;
+    max-height: min(50vh, 320px);
+    overflow-y: auto;
+}
+
+.mobile-categories-drawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #111;
+}
+
+.mobile-categories-drawer__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #666;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.mobile-categories-drawer__close:hover {
+    color: #111;
+}
+
+.mobile-categories-drawer .mobile-categories {
+    gap: 8px;
+}
+
+.mobile-categories-drawer .category-link {
+    background: #fff !important;
+    color: #111 !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 12px 14px;
+    border: 1px solid #e0e0e0;
+}
+
+.btn-for-business-mobile {
+    border: 2px solid #c45c26 !important;
+    background: #fff !important;
+    color: #c45c26 !important;
+}
+
+.btn-for-business-mobile:hover {
+    background: #fdf6f0 !important;
+    color: #a84d1f !important;
 }
 
 .btn-login-mobile-menu {
@@ -2625,6 +2715,96 @@ html {
   }
 } 
 
+/* Floating actions — mobile sticky on scroll */
+.sq-mobile-float-bar {
+    display: none;
+    position: fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: 16px;
+    right: 16px;
+    z-index: 3001;
+    gap: 10px;
+    align-items: flex-end;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.sq-mobile-float-bar > * {
+    pointer-events: auto;
+}
+
+.sq-mobile-float-bar--pro {
+    justify-content: center;
+}
+
+.sq-mobile-float-bar--pro .floating-download-btn {
+    flex: 1;
+    max-width: 100%;
+    justify-content: center;
+}
+
+.floating-download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #111;
+    color: #fff;
+    padding: 14px 18px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    max-width: calc(50% - 5px);
+    white-space: nowrap;
+}
+
+.floating-download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    color: #fff;
+}
+
+.floating-download-btn--expert {
+    background: #c45c26;
+    max-width: 100%;
+}
+
+.floating-download-btn--expert:hover {
+    background: #a84d1f;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .sq-mobile-float-bar.mobile-only {
+        display: flex !important;
+    }
+
+    .sq-page:not(.menu-open) {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+    }
+
+    .sq-mobile-float-bar .floating-ai-btn {
+        position: static;
+        bottom: auto;
+        left: auto;
+        margin: 0;
+        max-width: calc(50% - 5px);
+        animation: none;
+        flex: 1;
+        justify-content: center;
+        padding: 14px 16px;
+        font-size: 0.82rem;
+    }
+
+    .sq-mobile-float-bar .floating-ai-btn span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
 .download-app-btn {
     display: none;
     background: #111;
@@ -2647,8 +2827,8 @@ html {
 .download-app-btn:focus {
     background: #333;
 }
-/* Floating AI Concierge Button for Mobile */
-.floating-ai-btn {
+/* Floating AI Concierge Button for Mobile (standalone pages without float bar) */
+.floating-ai-btn:not(.sq-mobile-float-bar .floating-ai-btn) {
     position: fixed;
     bottom: 20px;
     left: 20px;
@@ -2692,22 +2872,15 @@ html {
 }
 
 @media (min-width: 769px) {
-    .floating-ai-btn {
+    .floating-ai-btn,
+    .sq-mobile-float-bar {
         display: none !important;
     }
 }
 
 @media (max-width: 600px) {
   .mobile-download-btns {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    bottom: 20px;
-    right: 10px;
-    z-index: 3000;
-    gap: 10px;
-    width: 180px;
-    align-items: flex-end;
+    display: none !important;
   }
   .mobile-download-btn {
     background: #fff;
@@ -2739,8 +2912,9 @@ html {
   .qr-topright, .login-above-qr, #download-app-btn {
     display: none !important;
   }
+  .hamburger.mobile-only,
   .hamburger {
-    display: none !important;
+    display: flex !important;
   }
   .btn-login-mobile {
     display: inline-block !important;
@@ -3590,7 +3764,7 @@ html {
 /* AI Concierge = client journey only — never show on /professionnel/ */
 .pro-page .floating-ai-btn,
 .pro-page .btn-ai-concierge-mobile,
-.pro-page a[href*="ai-concierge"] {
+.pro-page a[href*="ai-concierge"]:not(.sq-mobile-float-bar a) {
     display: none !important;
 }
 

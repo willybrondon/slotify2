@@ -41,62 +41,62 @@
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
-                <h3 data-translate="nav.menu">Menu</h3>
+                <h3 data-translate="nav.forClients">Pour les clientes</h3>
                 <div class="mobile-menu-header-right">
-                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English"><i class="fas fa-globe"></i> <span>EN</span></button>
-                    <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Passer en anglais"><i class="fas fa-globe"></i> <span>FR</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
                 </div>
             </div>
-            <div class="mobile-menu-content">
-                <a href="/professionnel/" class="btn-login-mobile-menu btn-pro-mobile-menu" data-translate="nav.pro">Pro</a>
+            <div class="mobile-menu-content mobile-menu-content--client">
                 <a href="/compte/connexion" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
-                <a href="/blog/" class="btn-login-mobile-menu" data-translate="nav.blog">Blog</a>
-                <a href="ai-concierge.html" class="btn-ai-concierge-mobile"><i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">AI Concierge</span></a>
-                <div class="mobile-categories" id="mobileCategories"></div>
+                <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer" data-translate="client.downloadAppCta">Télécharger l'app</button>
+                <div class="mobile-categories-panel">
+                    <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">
+                        <span data-translate="nav.allCategories">Toutes les catégories</span>
+                        <i class="fas fa-chevron-down mobile-categories-toggle__icon" aria-hidden="true"></i>
+                    </button>
+                    <div class="mobile-categories-drawer" id="mobileCategoriesDrawer" hidden>
+                        <div class="mobile-categories-drawer__head">
+                            <span data-translate="nav.allCategories">Toutes les catégories</span>
+                            <button type="button" class="mobile-categories-drawer__close" id="mobileCategoriesClose" aria-label="Fermer">&times;</button>
+                        </div>
+                        <div class="mobile-categories" id="mobileCategories"></div>
+                    </div>
+                </div>
+                <a href="/professionnel/" class="btn-login-mobile-menu btn-for-business-mobile" data-translate="nav.forBusiness">Pour les professionnels</a>
             </div>
         </div>
     </nav>
 
-    <a href="ai-concierge.html" class="floating-ai-btn mobile-only" id="floatingAiBtn">
-        <i class="fas fa-robot"></i>
-        <span data-translate="nav.aiConcierge">AI Concierge</span>
-    </a>
-
-    <a href="#" id="download-app-btn" class="download-app-btn" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Download the App</a>
-    <div class="mobile-download-btns">
-        <a href="#" class="mobile-download-btn customer" onclick="openPhoneSelection('customer'); return false;" data-translate="qr.customerApp">Download Customer App</a>
+    <div class="sq-mobile-float-bar mobile-only" aria-label="Actions rapides">
+        <a href="ai-concierge.html" class="floating-ai-btn" id="floatingAiBtn">
+            <i class="fas fa-robot" aria-hidden="true"></i>
+            <span data-translate="nav.aiConcierge">Concierge IA</span>
+        </a>
+        <a href="#" class="floating-download-btn floating-download-btn--customer" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a>
     </div>
 
-    <!-- Hero — structure Squire, ton Skedisy -->
-    <section class="sq-hero">
-        <div class="sq-hero-grid">
-            <div class="sq-hero-copy">
-                <p class="sq-kicker" data-translate="client.heroEyebrow">Île-de-France · Beauté afro</p>
-                <h1 class="sq-display" data-translate="client.heroHeadline">L'app pour réserver ta beauté afro</h1>
-                <p class="sq-lead" data-translate="client.heroSubheadline">
-                    Salons de la communauté — tresses, locks, perruques, homme, esthétique.<br>
-                    Découvre sur le site, réserve sur l'app.
-                </p>
-                <div class="sq-cta-row">
-                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
-                    <a href="#categories-browse" class="sq-btn sq-btn-ghost" data-translate="client.browseSalons">Parcourir les prestations</a>
-                </div>
-                <div class="sq-store-badges-mount" data-app="customer"></div>
-                <p class="sq-note" data-translate="client.heroAppNote">La réservation des créneaux se fait sur l'app Skedisy (gratuite).</p>
-            </div>
-            <div class="sq-hero-visual">
-                <div class="sq-photo-frame">
-                    <img src="images/client/experience-salon.png" alt="Expérience salon beauté afro Skedisy" width="600" height="750" loading="eager">
-                </div>
-                <div class="sq-device-frame" aria-hidden="true">
-                    <img src="images/client/app-menu.png" alt="App Skedisy — menu principal" width="280" height="560" loading="lazy">
+    <!-- Zone produit — ce qu'est Skedisy + parcours app (avant le marketing) -->
+    <section class="sq-home-product" id="sqHomeProduct">
+        <div class="container sq-home-product-inner">
+            <div class="sq-home-intro">
+                <p class="sq-kicker" data-translate="homeProduct.eyebrow">Île-de-France · Beauté afro</p>
+                <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve dans les salons afro en Île-de-France</h1>
+                <p class="sq-home-essence" data-translate="homeProduct.essence">Parce que réserver des tresses, ce n'est pas réserver une coupe.</p>
+                <p class="sq-home-lead" data-translate="homeProduct.lead">Skedisy, c'est la réservation pour la communauté afro en IDF — tresses, locks, perruques, homme, esthétique. Découvre ici, réserve sur l'app.</p>
+                <div class="sq-pills sq-pills--home" aria-label="Catégories">
+                    <span data-translate="trust.tresses">Tresses</span>
+                    <span data-translate="trust.locks">Locks</span>
+                    <span data-translate="trust.wigs">Perruques</span>
+                    <span data-translate="trust.homme">Homme</span>
+                    <span data-translate="trust.esthetique">Esthétique</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 3 portes d'entrée (capture · concierge · recherche) -->
-    <section class="sq-intent-hub" id="sqIntentHub">
+    <!-- 3 portes d'entrée (comme l'app) -->
+    <section class="sq-intent-hub sq-intent-hub--home" id="sqIntentHub">
         <div class="container">
             <h2 class="sq-intent-hub__title" data-translate="intentHub.title">Comment veux-tu réserver ?</h2>
             <p class="sq-intent-hub__subtitle" data-translate="intentHub.subtitle">Partage un look, demande au concierge IA, ou cherche — trois entrées.</p>
@@ -127,6 +127,62 @@
                 </a>
             </div>
             <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
+        </div>
+    </section>
+
+    <!-- Grille catégories (menu principal app) -->
+    <section class="sq-home-categories" id="categories-browse">
+        <div class="container">
+            <div class="sq-home-categories-head">
+                <div>
+                    <h2 class="sq-section-title sq-section-title--left" data-translate="homeProduct.categoriesTitle">Catégories</h2>
+                    <p class="sq-home-categories-sub" data-translate="homeProduct.categoriesSubtitle">Choisis une prestation — salons afro en Île-de-France.</p>
+                </div>
+            </div>
+            <div class="sq-home-categories-grid" id="homeCategoriesGrid" aria-live="polite">
+                <p class="sq-home-categories-loading" data-translate="homeProduct.categoriesLoading">Chargement des catégories…</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bandeau app (style Fresha) -->
+    <section class="sq-home-app-strip" id="sqHomeAppStrip">
+        <div class="container sq-home-app-strip-inner">
+            <div class="sq-home-app-strip-copy">
+                <h2 data-translate="homeProduct.appStripTitle">Télécharge l'app Skedisy</h2>
+                <p data-translate="homeProduct.appStripBody">Créneaux, expertes, rappels SMS — la réservation se fait sur l'app gratuite.</p>
+            </div>
+            <div class="sq-home-app-strip-actions">
+                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                <div class="sq-store-badges-mount" data-app="customer"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Story marketing (visuels — après la zone produit) -->
+    <section class="sq-hero sq-hero--story">
+        <div class="sq-hero-grid">
+            <div class="sq-hero-copy">
+                <p class="sq-kicker" data-translate="client.marketingEyebrow">La communauté Skedisy</p>
+                <h2 class="sq-display sq-display--story" data-translate="client.marketingHeadline">L'app où les salons afro d'IDF et leurs clientes se retrouvent</h2>
+                <p class="sq-lead" data-translate="client.marketingSubheadline">
+                    Salons de quartier, cheveux texturés, prestations qui vous comprennent.<br>
+                    Visible sur le web, réservable en quelques taps.
+                </p>
+                <div class="sq-cta-row">
+                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                    <a href="#categories-browse" class="sq-btn sq-btn-ghost" data-translate="client.browseSalons">Parcourir les prestations</a>
+                </div>
+                <p class="sq-note" data-translate="client.heroAppNote">La réservation des créneaux se fait sur l'app Skedisy (gratuite).</p>
+            </div>
+            <div class="sq-hero-visual">
+                <div class="sq-photo-frame">
+                    <img src="images/client/experience-salon.png" alt="Expérience salon beauté afro Skedisy" width="600" height="750" loading="lazy">
+                </div>
+                <div class="sq-device-frame" aria-hidden="true">
+                    <img src="images/client/app-menu.png" alt="App Skedisy — menu principal" width="280" height="560" loading="lazy">
+                </div>
+            </div>
         </div>
     </section>
 
@@ -298,14 +354,7 @@
         </div>
     </section>
 
-    <section class="categories-hint-section sq-categories" id="categories-browse">
-        <div class="container">
-            <h2 class="sq-section-title" data-translate="client.categoriesTitle">Que cherchez-vous ?</h2>
-            <p class="categories-hint" data-translate="client.categoriesHint">Utilisez le menu en haut pour explorer les catégories et trouver un salon près de chez vous.</p>
-        </div>
-    </section>
-
-    <section class="faq faq-client sq-faq">
+    <!-- Blocs alternés type Squire -->
         <div class="container">
             <h2 class="sq-section-title" data-translate="faq.title">Questions fréquentes</h2>
             <div class="faq-grid">

@@ -15,7 +15,7 @@ const Login = (props) => {
   const isAuth = useSelector((state) => state.auth.isAuth);
 
   useEffect(() => {
-    isAuth && navigate("/salonPanel/salonDashboard");
+    isAuth && navigate("/salonpanel/salonDashboard");
   }, [isAuth, navigate]);
 
   const [email, setEmail] = useState("");
@@ -38,7 +38,7 @@ const Login = (props) => {
       let response = await dispatch(login(loginData)).unwrap();
       if (response?.status) {
         setTimeout(() => {
-          window.location.href = "/salonPanel/salonDashboard";
+          window.location.href = "/salonpanel/salonDashboard";
         }, 100);
       }
     } catch (err) {

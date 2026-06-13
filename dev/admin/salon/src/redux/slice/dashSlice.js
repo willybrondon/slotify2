@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
-import { DangerRight, Success } from "../../component/api/toastServices";
-import axios from "axios";
+import { apiInstanceFetch } from "../../component/api/axiosApi";
+import { DangerRight } from "../../component/api/toastServices";
 
 const initialState = {
     booking: [],
@@ -11,32 +10,17 @@ const initialState = {
     chartData:[]
 }
 
-const token = sessionStorage.getItem("token")
-
 export const topExperts = createAsyncThunk("salon/dashboard/topExperts", async (payload) =>{
-    return  axios.get(`salon/dashboard/topExperts?startDate=${payload.startDate}&endDate=${payload.endDate}` , {
-      headers : {
-          Authorization : token
-      }
-    })
-  })
-  
-  export const getDashData = createAsyncThunk("salon/dashboard/allStats", async (payload) =>{
-      return  axios.get(`salon/dashboard/allStats?startDate=${payload.startDate}&endDate=${payload.endDate}`, {
-          headers : {
-              Authorization : token
-          }
-        })
-    })
-  
-    export const getChart = createAsyncThunk("salon/dashboard/chart", async (payload) =>{
-      return  axios.get(`salon/dashboard/chart?startDate=${payload?.startDate}&endDate=${payload?.endDate}`, {
-          headers : {
-              Authorization : token
-          }
-       })
-    }) 
+  return apiInstanceFetch.get(`salon/dashboard/topExperts?startDate=${payload.startDate}&endDate=${payload.endDate}`)
+})
 
+export const getDashData = createAsyncThunk("salon/dashboard/allStats", async (payload) =>{
+    return apiInstanceFetch.get(`salon/dashboard/allStats?startDate=${payload.startDate}&endDate=${payload.endDate}`)
+  })
+
+  export const getChart = createAsyncThunk("salon/dashboard/chart", async (payload) =>{
+    return apiInstanceFetch.get(`salon/dashboard/chart?startDate=${payload?.startDate}&endDate=${payload?.endDate}`)
+  })
 
 const dashSlice = createSlice({
     name:"dashSlice",
@@ -49,13 +33,11 @@ const dashSlice = createSlice({
         })
 
         builder.addCase(topExperts.fulfilled,(state,action) =>{
-            
-            state.booking = action?.payload?.topExperts || action?.payload?.data?.topExperts
+            state.booking = action?.payload?.topExperts
             state.isSkeleton = false;
         })
 
         builder.addCase(topExperts.rejected,(state,action) =>{
-            
             state.isSkeleton = false;
         })
 
@@ -64,24 +46,20 @@ const dashSlice = createSlice({
         })
 
         builder.addCase(getDashData.fulfilled,(state,action) =>{
-            
-            state.dashData = action?.payload?.data.data
+            state.dashData = action?.payload?.data
             state.isSkeleton = false;
         })
 
         builder.addCase(getDashData.rejected,(state,action) =>{
-            
             state.isSkeleton = false;
         })
 
         builder.addCase(getChart.fulfilled,(state,action) =>{
-            
             state.chartData = action?.payload?.data
             state.isSkeleton = false;
         })
 
         builder.addCase(getChart.rejected,(state,action) =>{
-            
             state.isSkeleton = false;
             DangerRight(action?.message)
         })

@@ -150,26 +150,18 @@ class SelfieAnalysisService {
     return `\nClient hair profile (from Skedisy app — trust and refine with the photo):\n${lines.join('\n')}\n`;
   }
 
-  /**
-   * Analyze selfie image and extract beauty features using Google Gemini
-   */
-  async analyzeSelfie(imagePath, userId = null, context = {}) {
-    try {
-      // Validate image path
-      if (!imagePath || !fs.existsSync(imagePath)) {
-        throw new Error('Image file not found');
-      }
+  isLookCapture(context = {}) {
+    return (
+      context.captureMode === true ||
+      context.captureMode === 'true' ||
+      context.mediaType === 'video' ||
+      context.mediaType === 'look'
+    );
+  }
 
-      // Read image file
-      const imageBuffer = fs.readFileSync(imagePath);
-      const base64Image = imageBuffer.toString('base64');
-
-      // Get image MIME type
-      const mimeType = this.getImageMimeType(imagePath);
-
-      // Create detailed analysis prompt
-      const hairProfileBlock = this.buildHairProfilePromptBlock(context);
-      const analysisPrompt = `You are the Skedisy AI beauty concierge for Afro beauty salons in Île-de-France (France).
+  buildSelfieAnalysisPrompt(context = {}) {
+    const hairProfileBlock = this.buildHairProfilePromptBlock(context);
+    return `You are the Skedisy AI beauty concierge for Afro beauty salons in Île-de-France (France).
 Analyze this selfie for a client from the Afro community. Focus on textured/coily/curly hair and realistic salon services (not generic Western spa menus).
 
 Categories on Skedisy: Tresses, Locks, Perruques, Homme (barber), Esthétique (nails, makeup, skin, waxing).
@@ -197,6 +189,61 @@ Return ONLY valid JSON (no markdown):
     "summary": "One sentence in French for the client"
   }
 }`;
+  }
+
+  buildLookCapturePrompt(context = {}) {
+    const hairProfileBlock = this.buildHairProfilePromptBlock(context);
+    const fromVideo = context.mediaType === 'video';
+    return `You are the Skedisy AI beauty concierge for Afro beauty salons in Île-de-France (France).
+The client shared ${fromVideo ? 'a screen recording (frame) from TikTok, Instagram, Facebook, Snapchat or another app' : 'a screenshot from social media (Instagram, TikTok, Facebook, Snapchat…)'}.
+Your job: identify the HAIRSTYLE / LOOK shown and match it to real Afro salon services in IDF — not a generic selfie analysis.
+
+Focus on: braid type (knotless, box braids, cornrows…), locs, wig/lace, color, length, fade/barber, protective style, glam.
+Categories on Skedisy: Tresses, Locks, Perruques, Homme (barber), Esthétique.
+${hairProfileBlock}
+${context.occasion ? `Client goal: ${context.occasion}\n` : ''}
+If the image is blurry or UI chrome is visible, infer the hairstyle intent anyway.
+
+Return ONLY valid JSON (no markdown):
+{
+  "skin": { "type": "", "tone": "", "undertone": "", "concerns": [], "condition": "", "texture": "" },
+  "hair": { "type": "", "texture": "", "color": "", "condition": "", "length": "" },
+  "face": { "shape": "", "eyeShape": "", "lipShape": "", "eyebrowShape": "" },
+  "beautyProfile": {
+    "ageEstimate": "",
+    "assessment": "Describe the shared look in French",
+    "areasToImprove": [],
+    "featuresToEnhance": []
+  },
+  "recommendedNeeds": {
+    "primaryCategories": ["Tresses"],
+    "serviceKeywords": ["knotless", "box braids"],
+    "summary": "One sentence in French: we found this style, book at an Afro salon near you"
+  }
+}`;
+  }
+
+  /**
+   * Analyze selfie image and extract beauty features using Google Gemini
+   */
+  async analyzeSelfie(imagePath, userId = null, context = {}) {
+    try {
+      // Validate image path
+      if (!imagePath || !fs.existsSync(imagePath)) {
+        throw new Error('Image file not found');
+      }
+
+      // Read image file
+      const imageBuffer = fs.readFileSync(imagePath);
+      const base64Image = imageBuffer.toString('base64');
+
+      // Get image MIME type
+      const mimeType = this.getImageMimeType(imagePath);
+
+      // Create detailed analysis prompt
+      const analysisPrompt = this.isLookCapture(context)
+        ? this.buildLookCapturePrompt(context)
+        : this.buildSelfieAnalysisPrompt(context);
 
       // Try Gemini first (primary)
       let analysisText = null;

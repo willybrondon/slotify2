@@ -20,6 +20,11 @@ class AiConciergeController extends GetxController {
   ImagePicker picker = ImagePicker();
   XFile? image;
   File? selectImageFile;
+  XFile? video;
+  bool isVideoMedia = false;
+
+  bool get hasCaptureMedia =>
+      selectImageFile != null || (video != null && video!.path.isNotEmpty);
 
   // API Variables
   AiConciergeModel? aiConciergeModel;
@@ -44,10 +49,31 @@ class AiConciergeController extends GetxController {
           args['captureMode'] == true || fromShare || args['sharedLink'] != null;
       sharedLink = args['sharedLink'] as String?;
       final path = args['sharedImagePath'] as String?;
+      final videoPath = args['sharedVideoPath'] as String?;
       final autoAnalyze = args['autoAnalyze'] == true;
-      if (path != null && path.isNotEmpty) {
+      if (videoPath != null && videoPath.isNotEmpty) {
+        _loadSharedVideo(videoPath, autoAnalyze: autoAnalyze);
+      } else if (path != null && path.isNotEmpty) {
         _loadSharedImage(path, autoAnalyze: autoAnalyze);
       }
+    }
+  }
+
+  Future<void> _loadSharedVideo(String path, {bool autoAnalyze = false}) async {
+    try {
+      video = XFile(path);
+      isVideoMedia = true;
+      image = null;
+      selectImageFile = null;
+      update([Constant.idProgressView]);
+      if (autoAnalyze) {
+        SchedulerBinding.instance.addPostFrameCallback((_) async {
+          await runCaptureAnalysis();
+        });
+      }
+    } catch (e) {
+      log('Share video load error: $e');
+      Utils.showToast(Get.context!, 'txtCaptureVideoError'.tr);
     }
   }
 
@@ -55,6 +81,8 @@ class AiConciergeController extends GetxController {
     try {
       image = XFile(path);
       selectImageFile = File(path);
+      isVideoMedia = false;
+      video = null;
       update([Constant.idProgressView]);
       if (autoAnalyze) {
         SchedulerBinding.instance.addPostFrameCallback((_) async {
@@ -85,6 +113,26 @@ class AiConciergeController extends GetxController {
     update([Constant.idProgressView]);
   }
 
+  /// Pick video from gallery (screen recording, shared clip)
+  Future<void> onPickVideo() async {
+    try {
+      video = await picker.pickVideo(
+        source: ImageSource.gallery,
+        maxDuration: const Duration(seconds: 60),
+      );
+      if (video != null) {
+        isVideoMedia = true;
+        image = null;
+        selectImageFile = null;
+        captureMode = true;
+        update([Constant.idProgressView]);
+      }
+    } catch (e) {
+      log('Error picking video: $e');
+      Utils.showToast(Get.context!, 'txtCaptureVideoError'.tr);
+    }
+  }
+
   /// Pick image from gallery
   onPickImage() async {
     try {
@@ -96,6 +144,8 @@ class AiConciergeController extends GetxController {
       );
       if (image != null) {
         selectImageFile = File(image!.path);
+        isVideoMedia = false;
+        video = null;
         update();
       }
     } catch (e) {
@@ -115,6 +165,8 @@ class AiConciergeController extends GetxController {
       );
       if (image != null) {
         selectImageFile = File(image!.path);
+        isVideoMedia = false;
+        video = null;
         update();
       }
     } catch (e) {
@@ -123,11 +175,13 @@ class AiConciergeController extends GetxController {
     }
   }
 
-  /// Show image source selection dialog
+  /// Show image / video source selection dialog
   showImageSourceDialog() {
     Get.dialog(
       AlertDialog(
-        title: Text("txtSelectImageSource".tr),
+        title: Text(
+          captureMode ? 'txtCaptureMediaSource'.tr : 'txtSelectImageSource'.tr,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -139,6 +193,19 @@ class AiConciergeController extends GetxController {
                 onPickImage();
               },
             ),
+            if (captureMode)
+              ListTile(
+                leading: const Icon(Icons.video_library_outlined),
+                title: Text('txtCapturePickVideo'.tr),
+                subtitle: Text(
+                  'txtCapturePickVideoHint'.tr,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                onTap: () {
+                  Get.back();
+                  onPickVideo();
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.camera_alt),
               title: Text("txtCamera".tr),
@@ -162,8 +229,8 @@ class AiConciergeController extends GetxController {
     String? occasion,
   }) async {
     try {
-      if (image == null && selectImageFile == null) {
-        Utils.showToast(Get.context!, "Please select an image first");
+      if (!hasCaptureMedia) {
+        Utils.showToast(Get.context!, 'txtCaptureMediaRequired'.tr);
         return;
       }
 
@@ -175,38 +242,62 @@ class AiConciergeController extends GetxController {
 
       var request = http.MultipartRequest("POST", uri);
 
-      // Use XFile.readAsBytes() for reliable upload on iOS/Android - handles content URIs,
-      // temporary cache paths, and scoped storage. File(path) fails on Android content:// URIs.
-      final Uint8List imageBytes = image != null
-          ? await image!.readAsBytes()
-          : await selectImageFile!.readAsBytes();
+      final Uint8List mediaBytes;
+      String ext;
+      String mimeType;
+      String filename;
 
-      if (imageBytes.isEmpty) {
-        Utils.showToast(Get.context!, "Failed to read image. Please try again.");
+      if (isVideoMedia && video != null) {
+        mediaBytes = await video!.readAsBytes();
+        final pathOrName =
+            (video!.path.isNotEmpty ? video!.path : video!.name).toLowerCase();
+        if (pathOrName.endsWith('.mov')) {
+          ext = 'mov';
+          mimeType = 'video/quicktime';
+        } else if (pathOrName.endsWith('.webm')) {
+          ext = 'webm';
+          mimeType = 'video/webm';
+        } else if (pathOrName.endsWith('.3gp')) {
+          ext = '3gp';
+          mimeType = 'video/3gpp';
+        } else {
+          ext = 'mp4';
+          mimeType = 'video/mp4';
+        }
+        filename = 'look-capture.$ext';
+      } else {
+        mediaBytes = image != null
+            ? await image!.readAsBytes()
+            : await selectImageFile!.readAsBytes();
+        ext = 'jpg';
+        if (image != null) {
+          final pathOrName =
+              (image!.path.isNotEmpty ? image!.path : image!.name).toLowerCase();
+          if (pathOrName.endsWith('.png')) ext = 'png';
+          else if (pathOrName.endsWith('.webp')) ext = 'webp';
+        } else if (selectImageFile != null) {
+          final p = selectImageFile!.path.toLowerCase();
+          if (p.endsWith('.png')) ext = 'png';
+          else if (p.endsWith('.webp')) ext = 'webp';
+        }
+        mimeType =
+            ext == 'png' ? 'image/png' : ext == 'webp' ? 'image/webp' : 'image/jpeg';
+        filename = 'selfie.$ext';
+      }
+
+      if (mediaBytes.isEmpty) {
+        Utils.showToast(Get.context!, "txtCaptureMediaReadError".tr);
         return;
       }
 
-      // Determine extension from path or name (path may be invalid on mobile)
-      String ext = 'jpg';
-      if (image != null) {
-        final pathOrName = (image!.path.isNotEmpty ? image!.path : image!.name).toLowerCase();
-        if (pathOrName.endsWith('.png')) ext = 'png';
-        else if (pathOrName.endsWith('.webp')) ext = 'webp';
-      } else if (selectImageFile != null) {
-        final p = selectImageFile!.path.toLowerCase();
-        if (p.endsWith('.png')) ext = 'png';
-        else if (p.endsWith('.webp')) ext = 'webp';
-      }
-
-      final mimeType = ext == 'png' ? 'image/png' : ext == 'webp' ? 'image/webp' : 'image/jpeg';
-      final addImage = http.MultipartFile.fromBytes(
+      final addFile = http.MultipartFile.fromBytes(
         "image",
-        imageBytes,
-        filename: "selfie.$ext",
+        mediaBytes,
+        filename: filename,
         contentType: MediaType.parse(mimeType),
       );
-      request.files.add(addImage);
-      log("Image size: ${imageBytes.length} bytes, ext: $ext");
+      request.files.add(addFile);
+      log("Media size: ${mediaBytes.length} bytes, type: $mimeType");
 
       // Add headers
       request.headers.addAll({"key": ApiConstant.SECRET_KEY});
@@ -252,13 +343,19 @@ class AiConciergeController extends GetxController {
           requestBody["occasion"] = hairProfile.bookingGoal!.tr;
         }
       }
+      if (captureMode) {
+        requestBody["captureMode"] = "true";
+      }
+      if (isVideoMedia) {
+        requestBody["mediaType"] = "video";
+      }
 
       log("Analyze Selfie Body :: $requestBody");
       request.fields.addAll(requestBody);
 
-      // Send request with timeout (60s for AI analysis)
+      final timeoutSec = isVideoMedia ? 120 : 60;
       var res1 = await request.send().timeout(
-        const Duration(seconds: 60),
+        Duration(seconds: timeoutSec),
         onTimeout: () => throw Exception('Request timed out. Please check your connection and try again.'),
       );
       var res = await http.Response.fromStream(res1);
@@ -429,11 +526,13 @@ class AiConciergeController extends GetxController {
     }
   }
 
-  /// Clear selected image
+  /// Clear selected image or video
   clearImage() {
     image = null;
     selectImageFile = null;
-    update();
+    video = null;
+    isVideoMedia = false;
+    update([Constant.idProgressView]);
   }
 
   /// Reset analysis results

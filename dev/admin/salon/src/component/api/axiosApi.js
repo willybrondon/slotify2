@@ -17,6 +17,8 @@ apiInstance.defaults.headers.common["key"] = secretKey;
 apiInstance.interceptors.request.use(
   function (config) {
     config.cancelToken = cancelTokenSource.token;
+    config.headers.Authorization = getTokenData();
+    config.headers.key = secretKey;
     return config;
   },
 
@@ -72,7 +74,7 @@ const handleErrors = async (response) => {
 
 const getHeaders = () => ({
   key: secretKey,
-  Authorization: token,
+  Authorization: getTokenData(),
   "Content-Type": "application/json",
 });
 

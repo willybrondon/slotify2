@@ -9,6 +9,11 @@ const translations = {
         'nav.login': 'Login',
         'nav.pro': 'Pro',
         'nav.forClients': 'For clients',
+        'nav.forProfessionals': 'For professionals',
+        'nav.forBusiness': 'For business',
+        'nav.allCategories': 'All categories',
+        'nav.switchToEnglish': 'Switch to English',
+        'nav.switchToFrench': 'Switch to French',
 
         // Blog hub
         'blog.pageTitle': 'Skedisy Blog — Afro beauty in Île-de-France',
@@ -43,6 +48,18 @@ const translations = {
         'client.heroEyebrow': 'Île-de-France · Afro beauty',
         'client.heroHeadline': 'The app to book Afro beauty',
         'client.heroSubheadline': 'Community salons — braids, locks, wigs, barber, glam.<br>Discover on the site, book on the app.',
+        'homeProduct.eyebrow': 'Île-de-France · Afro beauty',
+        'homeProduct.headline': 'Book Afro salons in Île-de-France',
+        'homeProduct.essence': 'Because booking braids is not booking a haircut.',
+        'homeProduct.lead': 'Skedisy is booking for the Afro community in IDF — braids, locks, wigs, barber, glam. Discover here, book on the app.',
+        'homeProduct.categoriesTitle': 'Categories',
+        'homeProduct.categoriesSubtitle': 'Pick a service — Afro salons in Île-de-France.',
+        'homeProduct.categoriesLoading': 'Loading categories…',
+        'homeProduct.appStripTitle': 'Download the Skedisy app',
+        'homeProduct.appStripBody': 'Time slots, stylists, SMS reminders — booking happens on the free app.',
+        'client.marketingEyebrow': 'The Skedisy community',
+        'client.marketingHeadline': 'Where Afro salons in IDF and their clients meet',
+        'client.marketingSubheadline': 'Neighborhood salons, textured hair, services that get you.<br>Visible on the web, bookable in a few taps.',
         'client.trustBar': 'Afro beauty only — not generic beauty.',
         'client.feature1Label': 'Find your salon',
         'client.feature1Title': 'Where the community books',
@@ -96,7 +113,7 @@ const translations = {
         'intentHub.title': 'How do you want to book?',
         'intentHub.subtitle': 'Share a look, ask the AI concierge, or search — three ways in.',
         'intentHub.captureTitle': 'Share a look',
-        'intentHub.captureBody': 'Screenshot from Instagram or TikTok → upload here. We match salons that do this style.',
+        'intentHub.captureBody': 'Screen recording or screenshot from Instagram or TikTok → upload here. We match salons that do this style.',
         'intentHub.conciergeTitle': 'AI concierge',
         'intentHub.conciergeBody': 'Selfie + your hair profile → personalized services and salons near you.',
         'intentHub.searchTitle': 'Search salons',
@@ -139,21 +156,56 @@ const translations = {
         'hairProfile.goalNewLook': 'Complete new look',
 
         // AI concierge page
+        'concierge.pageTitle': 'AI Concierge — Afro beauty in Île-de-France | Skedisy',
+        'concierge.title': 'Skedisy AI Concierge',
+        'concierge.subtitle': 'Because booking braids is not booking a haircut.',
+        'concierge.description': 'Selfie or shared look: our AI suggests <strong>Afro salons in Île-de-France</strong> suited to your textured hair — then book on the web.',
+        'concierge.uploadKicker': 'Île-de-France · Textured hair · Afro',
+        'concierge.uploadTitle': 'Your photo, your beauty profile',
+        'concierge.uploadLead': 'A well-lit selfie: we analyze your hair and skin to suggest <strong>Afro salons near you</strong>.',
+        'concierge.uploadHint': 'JPG or PNG · max. 10 MB · face and hair visible',
+        'concierge.chooseMedia': 'Take or choose a photo',
         'concierge.analyzeBtn': 'Analyze and find my salon',
         'concierge.analyzing': 'Analyzing…',
 
         // Capture mode (web)
+        'capture.pageTitle': 'Book this look — Afro beauty in Île-de-France | Skedisy',
         'capture.screenTitle': 'Book this look',
         'capture.heroTitle': 'Capture → Book',
-        'capture.heroBody': 'Upload a screenshot of a hairstyle from social media. Our AI finds Afro salons in Île-de-France that can do this look.',
+        'capture.heroBody': 'Saw a style on Instagram or TikTok? Paste the link or send a screen recording. We match <strong>Afro salons in Île-de-France</strong> that can do this look.',
+        'capture.trustLine': 'Afro beauty only — not generic beauty.',
         'capture.uploadKicker': 'Île-de-France · Share your look',
         'capture.uploadTitle': 'Your look, matched to salons',
-        'capture.uploadLead': 'Upload a clear photo of the hairstyle you want. We analyze it and suggest <strong>matching Afro salons near you</strong>.',
+        'capture.uploadLead': 'Send a photo or screen recording of the style you want. We analyze it and suggest <strong>matching Afro salons near you</strong>.',
+        'capture.uploadHint': 'Photo JPG/PNG · or video MP4 · max. 50 MB',
         'capture.analyzeLook': 'Find this look',
         'capture.choosePhoto': 'Choose or upload a photo',
+        'capture.chooseMedia': 'Choose photo or screen recording',
+        'capture.videoTooLarge': 'Video must be under 50MB. Try a shorter screen recording.',
+        'capture.imageTooLarge': 'Image must be under 10MB.',
+        'capture.invalidFile': 'Please select a photo or video (MP4, MOV, WebM).',
+        'capture.screenRecordTip': 'TikTok / Instagram / Snapchat: play the video → screen record → upload here.',
         'capture.pasteLink': 'Paste a link',
-        'capture.linkHint': 'For an Instagram or TikTok link, take a screenshot then upload the photo here.',
-        'capture.privacy': 'Skedisy only analyzes your hairstyle photo. We never access your social accounts.',
+        'capture.linkValidateBtn': 'Validate',
+        'capture.linkHint': 'For a link, screen-record while the video plays, then upload the file below.',
+        'capture.linkInvalid': 'Paste a valid Instagram, TikTok, Facebook or Snapchat link.',
+        'capture.linkUploadCta': 'Upload my capture or video',
+        'capture.linkPlatformInstagram': 'Instagram',
+        'capture.linkLeadInstagram': 'Link saved — Instagram does not let us analyze the video directly.',
+        'capture.linkStepsInstagram': 'Open this reel in the Instagram app|Play the video|Screen record while it plays|Upload the recording below',
+        'capture.linkPlatformTiktok': 'TikTok',
+        'capture.linkLeadTiktok': 'Link saved — send a screen recording of the video.',
+        'capture.linkStepsTiktok': 'Open the TikTok link|Play the video|Screen record while it plays|Upload the recording below',
+        'capture.linkPlatformFacebook': 'Facebook',
+        'capture.linkLeadFacebook': 'Link saved — send a screen recording of the video.',
+        'capture.linkStepsFacebook': 'Open the video on Facebook|Play it full screen|Screen record while it plays|Upload the recording below',
+        'capture.linkPlatformSnapchat': 'Snapchat',
+        'capture.linkLeadSnapchat': 'Link saved — send a screen recording of the story or spotlight.',
+        'capture.linkStepsSnapchat': 'Open the Snap in the app|Play the video|Screen record while it plays|Upload the recording below',
+        'capture.linkPlatformOther': 'Social link',
+        'capture.linkLeadOther': 'Link saved — send a photo or screen recording of the look.',
+        'capture.linkStepsOther': 'Open the link on your phone|Capture the hairstyle clearly|Upload the photo or video below',
+        'capture.privacy': 'Skedisy only analyzes your photo or video. We never access your social accounts.',
         'client.faqWhyApp': 'Why do I need the app to book?',
         'client.faqWhyAppDesc': 'On skedisy.com you discover Afro salons in IDF. To pick a time slot, stylist, and pay securely, booking is on the free Skedisy app.',
         'client.faqAccountStep1': 'Scan the QR code or download the Skedisy app.',
@@ -796,7 +848,12 @@ const translations = {
         'nav.menu': 'Menu',
         'nav.login': 'Connexion',
         'nav.pro': 'Pro',
-        'nav.forClients': 'Clients',
+        'nav.forClients': 'Pour les clientes',
+        'nav.forProfessionals': 'Pour les professionnels',
+        'nav.forBusiness': 'Pour les professionnels',
+        'nav.allCategories': 'Toutes les catégories',
+        'nav.switchToEnglish': 'Passer en anglais',
+        'nav.switchToFrench': 'Passer en français',
 
         // Blog hub
         'blog.pageTitle': 'Blog Skedisy — Beauté afro en Île-de-France',
@@ -831,6 +888,18 @@ const translations = {
         'client.heroEyebrow': 'Île-de-France · Beauté afro',
         'client.heroHeadline': 'L\'app pour réserver ta beauté afro',
         'client.heroSubheadline': 'Salons de la communauté — tresses, locks, perruques, homme, esthétique.<br>Découvre sur le site, réserve sur l\'app.',
+        'homeProduct.eyebrow': 'Île-de-France · Beauté afro',
+        'homeProduct.headline': 'Réserve dans les salons afro en Île-de-France',
+        'homeProduct.essence': 'Parce que réserver des tresses, ce n\'est pas réserver une coupe.',
+        'homeProduct.lead': 'Skedisy, c\'est la réservation pour la communauté afro en IDF — tresses, locks, perruques, homme, esthétique. Découvre ici, réserve sur l\'app.',
+        'homeProduct.categoriesTitle': 'Catégories',
+        'homeProduct.categoriesSubtitle': 'Choisis une prestation — salons afro en Île-de-France.',
+        'homeProduct.categoriesLoading': 'Chargement des catégories…',
+        'homeProduct.appStripTitle': 'Télécharge l\'app Skedisy',
+        'homeProduct.appStripBody': 'Créneaux, expertes, rappels SMS — la réservation se fait sur l\'app gratuite.',
+        'client.marketingEyebrow': 'La communauté Skedisy',
+        'client.marketingHeadline': 'L\'app où les salons afro d\'IDF et leurs clientes se retrouvent',
+        'client.marketingSubheadline': 'Salons de quartier, cheveux texturés, prestations qui vous comprennent.<br>Visible sur le web, réservable en quelques taps.',
         'client.trustBar': 'Beauté afro uniquement — pas de beauté générique.',
         'client.feature1Label': 'Trouve ton salon',
         'client.feature1Title': 'Là où la communauté réserve',
@@ -884,7 +953,7 @@ const translations = {
         'intentHub.title': 'Comment veux-tu réserver ?',
         'intentHub.subtitle': 'Partage un look, demande au concierge IA, ou cherche — trois entrées.',
         'intentHub.captureTitle': 'Partager un look',
-        'intentHub.captureBody': 'Capture Instagram ou TikTok → envoie la photo ici. On trouve les salons qui font ce style.',
+        'intentHub.captureBody': 'Enregistrement d\'écran ou capture depuis Instagram ou TikTok → envoie ici. On trouve les salons qui font ce style.',
         'intentHub.conciergeTitle': 'Concierge IA',
         'intentHub.conciergeBody': 'Selfie + ton profil capillaire → prestations et salons près de chez toi.',
         'intentHub.searchTitle': 'Chercher un salon',
@@ -926,20 +995,55 @@ const translations = {
         'hairProfile.goalVacation': 'Vacances / style protecteur',
         'hairProfile.goalNewLook': 'Nouveau look complet',
 
+        'concierge.pageTitle': 'Concierge IA — Beauté afro en Île-de-France | Skedisy',
+        'concierge.title': 'Concierge IA Skedisy',
+        'concierge.subtitle': 'Parce que réserver des tresses, ce n\'est pas réserver une coupe.',
+        'concierge.description': 'Selfie ou look partagé : notre IA propose des <strong>salons afro en Île-de-France</strong> adaptés à tes cheveux texturés — puis réserve sur le web.',
+        'concierge.uploadKicker': 'Île-de-France · Cheveux texturés · afro',
+        'concierge.uploadTitle': 'Ta photo, ton profil beauté',
+        'concierge.uploadLead': 'Une selfie bien éclairée : on analyse tes cheveux et ta peau pour te proposer des <strong>salons afro près de chez toi</strong>.',
+        'concierge.uploadHint': 'JPG ou PNG · max. 10 Mo · visage et cheveux visibles',
+        'concierge.chooseMedia': 'Prendre ou choisir une photo',
         'concierge.analyzeBtn': 'Analyser et trouver mon salon',
         'concierge.analyzing': 'Analyse en cours…',
 
+        'capture.pageTitle': 'Réserver ce look — Beauté afro en Île-de-France | Skedisy',
         'capture.screenTitle': 'Réserver ce look',
         'capture.heroTitle': 'Capture → Réservation',
-        'capture.heroBody': 'Envoie une capture d\'écran d\'une coiffure vue sur les réseaux. Notre IA trouve les salons afro en Île-de-France qui peuvent reproduire ce look.',
+        'capture.heroBody': 'Tu as vu un style sur Instagram ou TikTok ? Colle le lien ou envoie un enregistrement d\'écran. On te propose des <strong>salons afro en Île-de-France</strong> qui peuvent le faire.',
+        'capture.trustLine': 'Beauté afro uniquement — pas de beauté générique.',
         'capture.uploadKicker': 'Île-de-France · Partage ton look',
         'capture.uploadTitle': 'Ton look, des salons adaptés',
-        'capture.uploadLead': 'Envoie une photo nette de la coiffure que tu veux. On l\'analyse et on te propose des <strong>salons afro près de chez toi</strong>.',
+        'capture.uploadLead': 'Envoie une photo ou un enregistrement d\'écran du style que tu veux. On l\'analyse et on te propose des <strong>salons afro près de chez toi</strong>.',
+        'capture.uploadHint': 'Photo JPG/PNG · ou vidéo MP4 · max. 50 Mo',
         'capture.analyzeLook': 'Trouver ce look',
         'capture.choosePhoto': 'Choisir ou envoyer une photo',
+        'capture.chooseMedia': 'Choisir photo ou enregistrement d\'écran',
+        'capture.videoTooLarge': 'Vidéo max. 50 Mo. Essaie un enregistrement plus court.',
+        'capture.imageTooLarge': 'Image max. 10 Mo.',
+        'capture.invalidFile': 'Choisis une photo ou une vidéo (MP4, MOV, WebM).',
+        'capture.screenRecordTip': 'TikTok / Instagram / Snapchat : lis la vidéo → enregistre l\'écran → envoie ici.',
         'capture.pasteLink': 'Coller un lien',
-        'capture.linkHint': 'Pour un lien Instagram ou TikTok, fais une capture d\'écran puis envoie la photo ici.',
-        'capture.privacy': 'Skedisy analyse uniquement ta photo de coiffure. Aucun accès à tes comptes sociaux.',
+        'capture.linkValidateBtn': 'Valider',
+        'capture.linkHint': 'Pour un lien, enregistre l\'écran pendant la vidéo puis envoie le fichier ci-dessous.',
+        'capture.linkInvalid': 'Colle un lien Instagram, TikTok, Facebook ou Snapchat valide.',
+        'capture.linkUploadCta': 'Envoyer ma capture ou vidéo',
+        'capture.linkPlatformInstagram': 'Instagram',
+        'capture.linkLeadInstagram': 'Lien enregistré — Instagram ne nous permet pas d\'analyser la vidéo directement.',
+        'capture.linkStepsInstagram': 'Ouvre ce reel dans l\'app Instagram|Lis la vidéo|Enregistre l\'écran pendant la lecture|Envoie l\'enregistrement ci-dessous',
+        'capture.linkPlatformTiktok': 'TikTok',
+        'capture.linkLeadTiktok': 'Lien enregistré — envoie un enregistrement d\'écran de la vidéo.',
+        'capture.linkStepsTiktok': 'Ouvre le lien TikTok|Lis la vidéo|Enregistre l\'écran pendant la lecture|Envoie l\'enregistrement ci-dessous',
+        'capture.linkPlatformFacebook': 'Facebook',
+        'capture.linkLeadFacebook': 'Lien enregistré — envoie un enregistrement d\'écran de la vidéo.',
+        'capture.linkStepsFacebook': 'Ouvre la vidéo sur Facebook|Lis-la en plein écran|Enregistre l\'écran pendant la lecture|Envoie l\'enregistrement ci-dessous',
+        'capture.linkPlatformSnapchat': 'Snapchat',
+        'capture.linkLeadSnapchat': 'Lien enregistré — envoie un enregistrement de la story ou du spotlight.',
+        'capture.linkStepsSnapchat': 'Ouvre le Snap dans l\'app|Lis la vidéo|Enregistre l\'écran pendant la lecture|Envoie l\'enregistrement ci-dessous',
+        'capture.linkPlatformOther': 'Lien social',
+        'capture.linkLeadOther': 'Lien enregistré — envoie une photo ou un enregistrement du look.',
+        'capture.linkStepsOther': 'Ouvre le lien sur ton téléphone|Capture clairement la coiffure|Envoie la photo ou la vidéo ci-dessous',
+        'capture.privacy': 'Skedisy analyse uniquement ta photo ou vidéo. Aucun accès à tes comptes sociaux.',
         'client.faqWhyApp': 'Pourquoi télécharger l\'app pour réserver ?',
         'client.faqWhyAppDesc': 'Sur skedisy.com vous découvrez les salons afro en IDF. Pour choisir un créneau, une experte et payer en sécurité, la réservation se fait sur l\'app Skedisy (gratuite).',
         'client.faqAccountStep1': 'Scannez le QR code ou téléchargez l\'app Skedisy.',
@@ -1629,27 +1733,26 @@ function translatePage() {
 function updateLanguageSwitcher() {
     const switchers = document.querySelectorAll('.lang-switcher');
     switchers.forEach(switcher => {
-        const newLang = currentLanguage === 'fr' ? 'en' : 'fr';
-        const newLangName = currentLanguage === 'fr' ? 'English' : 'Français';
-        const shortName = currentLanguage === 'fr' ? 'EN' : 'FR';
-        
-        // Update data-lang attribute
-        switcher.setAttribute('data-lang', newLang);
-        
-        // Update text content - preserve icon if it exists
+        const switchToLang = currentLanguage === 'fr' ? 'en' : 'fr';
+        const displayLang = currentLanguage === 'fr' ? 'FR' : 'EN';
+        const title =
+            currentLanguage === 'fr'
+                ? (getTranslation('nav.switchToEnglish') || 'Passer en anglais')
+                : (getTranslation('nav.switchToFrench') || 'Switch to French');
+
+        switcher.setAttribute('data-lang', switchToLang);
+        switcher.setAttribute('title', title);
+        switcher.setAttribute('aria-label', displayLang + ' — ' + title);
+
         const icon = switcher.querySelector('i');
         const span = switcher.querySelector('span');
-        
+
         if (span) {
-            // Both mobile and desktop show short name (EN/FR)
-            span.textContent = shortName;
+            span.textContent = displayLang;
+        } else if (icon) {
+            switcher.innerHTML = icon.outerHTML + ' <span>' + displayLang + '</span>';
         } else {
-            // If no span, update entire content but preserve icon
-            if (icon) {
-                switcher.innerHTML = icon.outerHTML + ' <span>' + shortName + '</span>';
-            } else {
-                switcher.innerHTML = '<i class="fas fa-globe"></i> <span>' + shortName + '</span>';
-            }
+            switcher.innerHTML = '<i class="fas fa-globe"></i> <span>' + displayLang + '</span>';
         }
     });
 }

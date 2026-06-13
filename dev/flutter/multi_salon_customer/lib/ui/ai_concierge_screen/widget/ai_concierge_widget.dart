@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -10,10 +12,13 @@ import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:video_player/video_player.dart';
 
 String _captureHeroTitle(AiConciergeController logic) {
-  if (logic.fromShare && logic.selectImageFile != null) {
-    return 'txtCaptureSharedHeroTitle'.tr;
+  if (logic.fromShare && logic.hasCaptureMedia) {
+    return logic.isVideoMedia
+        ? 'txtCaptureSharedVideoTitle'.tr
+        : 'txtCaptureSharedHeroTitle'.tr;
   }
   return logic.captureMode
       ? 'txtCaptureHeroTitle'.tr
@@ -21,8 +26,10 @@ String _captureHeroTitle(AiConciergeController logic) {
 }
 
 String _captureHeroBody(AiConciergeController logic) {
-  if (logic.fromShare && logic.selectImageFile != null) {
-    return 'txtCaptureSharedHeroBody'.tr;
+  if (logic.fromShare && logic.hasCaptureMedia) {
+    return logic.isVideoMedia
+        ? 'txtCaptureSharedVideoBody'.tr
+        : 'txtCaptureSharedHeroBody'.tr;
   }
   return logic.captureMode
       ? 'txtCaptureHeroBody'.tr
@@ -73,6 +80,87 @@ Widget _buildPasteLinkRow(AiConciergeController logic) {
   );
 }
 
+class _CaptureVideoPreview extends StatefulWidget {
+  const _CaptureVideoPreview({required this.path});
+
+  final String path;
+
+  @override
+  State<_CaptureVideoPreview> createState() => _CaptureVideoPreviewState();
+}
+
+class _CaptureVideoPreviewState extends State<_CaptureVideoPreview> {
+  VideoPlayerController? _controller;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.file(File(widget.path))
+      ..initialize().then((_) {
+        if (mounted) setState(() {});
+        _controller?.setLooping(true);
+        _controller?.play();
+      }).catchError((_) {
+        if (mounted) setState(() => _failed = true);
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_failed || _controller == null || !_controller!.value.isInitialized) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.videocam, size: 64, color: AppColors.primaryAppColor),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'txtCaptureVideoReady'.tr,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.grey, fontSize: 14),
+            ),
+          ),
+        ],
+      );
+    }
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        AspectRatio(
+          aspectRatio: _controller!.value.aspectRatio,
+          child: VideoPlayer(_controller!),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.videocam, color: Colors.white, size: 16),
+              const SizedBox(width: 6),
+              Text(
+                'txtCaptureVideoLabel'.tr,
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Main view for image selection and analysis
 class AiConciergeMainView extends StatelessWidget {
   const AiConciergeMainView({super.key});
@@ -105,7 +193,9 @@ class AiConciergeMainView extends StatelessWidget {
                   children: [
                     Icon(
                       logic.captureMode
-                          ? Icons.share_outlined
+                          ? (logic.isVideoMedia
+                              ? Icons.videocam_outlined
+                              : Icons.share_outlined)
                           : Icons.face_retouching_natural,
                       size: 60,
                       color: AppColors.primaryAppColor,
@@ -159,7 +249,7 @@ class AiConciergeMainView extends StatelessWidget {
                 child: Column(
                   children: [
                     // Selected Image Preview
-                    if (logic.selectImageFile != null)
+                    if (logic.hasCaptureMedia)
                       Container(
                         height: Get.height * 0.4,
                         width: double.infinity,
@@ -170,13 +260,18 @@ class AiConciergeMainView extends StatelessWidget {
                             color: AppColors.lineColor,
                             width: 2,
                           ),
+                          color: AppColors.blackColor,
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(14),
-                          child: Image.file(
-                            logic.selectImageFile!,
-                            fit: BoxFit.cover,
-                          ),
+                          child: logic.isVideoMedia && logic.video != null
+                              ? _CaptureVideoPreview(path: logic.video!.path)
+                              : Image.file(
+                                  logic.selectImageFile!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
                         ),
                       )
                     else
@@ -198,13 +293,17 @@ class AiConciergeMainView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.add_photo_alternate_outlined,
+                              logic.captureMode
+                                  ? Icons.perm_media_outlined
+                                  : Icons.add_photo_alternate_outlined,
                               size: 80,
                               color: AppColors.grey,
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              "txtAiConciergeUploadTitle".tr,
+                              logic.captureMode
+                                  ? "txtCaptureUploadTitle".tr
+                                  : "txtAiConciergeUploadTitle".tr,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -213,7 +312,9 @@ class AiConciergeMainView extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              "txtAiConciergeUploadHint".tr,
+                              logic.captureMode
+                                  ? "txtCaptureUploadHint".tr
+                                  : "txtAiConciergeUploadHint".tr,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: AppColors.grey,
@@ -228,7 +329,7 @@ class AiConciergeMainView extends StatelessWidget {
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: logic.selectImageFile != null
+                            onPressed: logic.hasCaptureMedia
                                 ? () {
                                     logic.clearImage();
                                   }
@@ -236,15 +337,17 @@ class AiConciergeMainView extends StatelessWidget {
                                     logic.showImageSourceDialog();
                                   },
                             icon: Icon(
-                              logic.selectImageFile != null
+                              logic.hasCaptureMedia
                                   ? Icons.refresh
                                   : Icons.add_photo_alternate,
                               color: AppColors.whiteColor,
                             ),
                             label: Text(
-                              logic.selectImageFile != null
+                              logic.hasCaptureMedia
                                   ? "txtAiConciergeChangeImage".tr
-                                  : "txtAiConciergeSelectImage".tr,
+                                  : (logic.captureMode
+                                      ? "txtCaptureAddMedia".tr
+                                      : "txtAiConciergeSelectImage".tr),
                               style: TextStyle(
                                 color: AppColors.whiteColor,
                                 fontSize: 16,
@@ -266,7 +369,7 @@ class AiConciergeMainView extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Analyze Button
-                    if (logic.selectImageFile != null)
+                    if (logic.hasCaptureMedia)
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -372,7 +475,22 @@ class AiConciergeResultsView extends StatelessWidget {
           Builder(
             builder: (context) {
               final controller = Get.find<AiConciergeController>();
-              if (controller.selectImageFile != null) {
+              if (controller.hasCaptureMedia) {
+                if (controller.isVideoMedia && controller.video != null) {
+                  return Container(
+                    height: Get.height * 0.3,
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.blackColor,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: _CaptureVideoPreview(path: controller.video!.path),
+                    ),
+                  );
+                }
                 return Container(
                   height: Get.height * 0.3,
                   width: double.infinity,

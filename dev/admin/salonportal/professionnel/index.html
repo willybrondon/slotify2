@@ -40,20 +40,24 @@
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
-                <h3 data-translate="nav.menu">Menu</h3>
+                <h3 data-translate="nav.forProfessionals">Pour les professionnels</h3>
                 <div class="mobile-menu-header-right">
-                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English"><i class="fas fa-globe"></i> <span>EN</span></button>
-                    <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Passer en anglais"><i class="fas fa-globe"></i> <span>FR</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
                 </div>
             </div>
-            <div class="mobile-menu-content">
-                <a href="/" class="btn-login-mobile-menu" data-translate="nav.forClients">For clients</a>
-                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Login</a>
+            <div class="mobile-menu-content mobile-menu-content--pro">
+                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
                 <a href="/blog/" class="btn-login-mobile-menu" data-translate="nav.blog">Blog</a>
-                <a href="../request-adding-salon.html" class="btn-request mobile-documentation-link" data-translate="hero.joinFree">Join for free</a>
+                <a href="../request-adding-salon.html" class="btn-login-mobile-menu" data-translate="hero.joinFree">Rejoindre gratuitement</a>
+                <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="expert" data-translate="qr.expertApp">Télécharger l'app Expert</button>
             </div>
         </div>
     </nav>
+
+    <div class="sq-mobile-float-bar sq-mobile-float-bar--pro mobile-only" aria-label="Télécharger l'app">
+        <a href="#" class="floating-download-btn floating-download-btn--expert" onclick="openPhoneSelection('expert'); return false;" data-translate="qr.expertApp">Télécharger l'app Expert</a>
+    </div>
 
     <section class="sq-hero sq-hero--pro">
         <div class="sq-hero-grid">

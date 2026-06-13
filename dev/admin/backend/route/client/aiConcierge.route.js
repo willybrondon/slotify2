@@ -6,14 +6,17 @@ const storage = require("../../middleware/multer");
 const upload = multer({ 
   storage: storage,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: 50 * 1024 * 1024 // 50MB — screen recordings
   },
   fileFilter: (req, file, cb) => {
-    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowed = [
+      'image/jpeg', 'image/png', 'image/webp',
+      'video/mp4', 'video/quicktime', 'video/webm', 'video/3gpp', 'video/x-matroska',
+    ];
     if (allowed.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only JPEG, PNG and WebP images are allowed'), false);
+      cb(new Error('Only JPEG, PNG, WebP images or MP4/MOV/WebM videos are allowed'), false);
     }
   }
 });

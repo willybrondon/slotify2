@@ -19,8 +19,20 @@ Android fonctionne après build. **iOS nécessite une étape Xcode** pour ajoute
 6. Target **Runner** → vérifier le même App Group
 7. Build & run sur appareil réel
 
-## Test
+## Test — capture d’écran
 
 1. Capture d’écran dans Photos ou Instagram
 2. **Partager** → **Skedisy**
 3. L’app s’ouvre sur « Réserver ce look » avec analyse automatique
+
+## Test — enregistrement d’écran (TikTok, Instagram, Snapchat, Facebook)
+
+Les apps sociales ne permettent souvent **pas** de partager une vidéo directement. Le flux recommandé :
+
+1. Ouvre la vidéo (TikTok, Reels, Story Snapchat, etc.)
+2. **Enregistre l’écran** (iOS : Centre de contrôle → Enregistrement d’écran)
+3. Arrête l’enregistrement → la vidéo est dans **Photos**
+4. Ouvre la vidéo dans Photos → **Partager** → **Skedisy**
+5. Skedisy extrait la coiffure et propose des salons afro en IDF
+
+> Skedisy analyse uniquement le fichier que tu partages. Aucun accès à tes comptes sociaux.

@@ -2,13 +2,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     mountStoreBadges();
 
-    // Initialize language system (if language.js is loaded)
     if (typeof setLanguage === 'function') {
         const savedLang = localStorage.getItem('skedisy-language') || 'fr';
         setLanguage(savedLang);
     }
-    
-    // Load categories (client homepage only — not on /professionnel)
+
     const isProPage = document.body.dataset.page === 'pro';
     if (isProPage) {
         initProNavigation();
@@ -22,131 +20,110 @@ document.addEventListener('DOMContentLoaded', function() {
             el.classList.add('nav-btn--active');
         });
     }
-    
-    // Mobile menu toggle
+
     const hamburger = document.getElementById('mobileMenuToggle');
     const mobileMenu = document.getElementById('mobileMenu');
     const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
     const mobileMenuClose = document.getElementById('mobileMenuClose');
-    
-    // Debug: Log all elements
-    console.log('Mobile Menu Debug:', {
-        hamburger: hamburger ? 'Found' : 'NOT FOUND',
-        mobileMenu: mobileMenu ? 'Found' : 'NOT FOUND',
-        mobileMenuOverlay: mobileMenuOverlay ? 'Found' : 'NOT FOUND',
-        mobileMenuClose: mobileMenuClose ? 'Found' : 'NOT FOUND'
-    });
-    
+    const categoriesDrawer = document.getElementById('mobileCategoriesDrawer');
+    const categoriesToggle = document.getElementById('mobileCategoriesToggle');
+    const categoriesClose = document.getElementById('mobileCategoriesClose');
+
+    function closeCategoriesDrawer() {
+        if (!categoriesDrawer || !categoriesToggle) return;
+        categoriesDrawer.hidden = true;
+        categoriesToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function openCategoriesDrawer() {
+        if (!categoriesDrawer || !categoriesToggle) return;
+        categoriesDrawer.hidden = false;
+        categoriesToggle.setAttribute('aria-expanded', 'true');
+        fitMobileMenuHeight();
+    }
+
+    function fitMobileMenuHeight() {
+        if (!mobileMenu || !mobileMenu.classList.contains('active')) return;
+        requestAnimationFrame(function () {
+            mobileMenu.style.height = 'auto';
+        });
+    }
+
     function openMobileMenu() {
-        console.log('openMobileMenu called');
-        if (mobileMenu && mobileMenuOverlay) {
-            console.log('Adding active classes');
-            
-            // Store current scroll position
-            const scrollY = window.scrollY;
-            document.body.style.top = `-${scrollY}px`;
-            
-            mobileMenu.classList.add('active');
-            mobileMenuOverlay.classList.add('active');
-            document.body.classList.add('menu-open');
-            document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
-            document.body.style.height = '100%';
-            document.body.style.top = '0';
-            document.body.style.left = '0';
-            
-            // Force visibility of menu content
-            const menuContent = document.querySelector('.mobile-menu-content');
-            const loginBtn = document.querySelector('.btn-login-mobile-menu');
-            const categories = document.getElementById('mobileCategories');
-            
-            if (menuContent) {
-                menuContent.style.display = 'flex';
-                menuContent.style.visibility = 'visible';
-                menuContent.style.opacity = '1';
-            }
-            if (loginBtn) {
-                loginBtn.style.display = 'block';
-                loginBtn.style.visibility = 'visible';
-                loginBtn.style.opacity = '1';
-            }
-            if (categories) {
-                categories.style.display = 'flex';
-                categories.style.visibility = 'visible';
-                categories.style.opacity = '1';
-            }
-            
-            console.log('Menu should be open now. mobileMenu classes:', mobileMenu.className);
-            console.log('Menu content visibility:', {
-                menuContent: menuContent ? 'Found' : 'NOT FOUND',
-                loginBtn: loginBtn ? 'Found' : 'NOT FOUND',
-                categories: categories ? 'Found' : 'NOT FOUND'
-            });
-        } else {
-            console.error('Cannot open menu - elements missing:', {
-                mobileMenu: !!mobileMenu,
-                mobileMenuOverlay: !!mobileMenuOverlay
-            });
-        }
+        if (!mobileMenu || !mobileMenuOverlay) return;
+        const scrollY = window.scrollY;
+        document.body.dataset.scrollLock = String(scrollY);
+        mobileMenu.classList.add('active');
+        mobileMenuOverlay.classList.add('active');
+        document.body.classList.add('menu-open');
+        document.body.style.overflow = 'hidden';
+        fitMobileMenuHeight();
     }
-    
+
     function closeMobileMenu() {
-        console.log('closeMobileMenu called');
-        if (mobileMenu && mobileMenuOverlay) {
-            mobileMenu.classList.remove('active');
-            mobileMenuOverlay.classList.remove('active');
-            document.body.classList.remove('menu-open');
-            
-            // Restore scroll position
-            const scrollY = document.body.style.top;
-            document.body.style.overflow = '';
-            document.body.style.position = '';
-            document.body.style.width = '';
-            document.body.style.height = '';
-            document.body.style.top = '';
-            document.body.style.left = '';
-            
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || '0') * -1);
-            }
-        }
+        if (!mobileMenu || !mobileMenuOverlay) return;
+        closeCategoriesDrawer();
+        mobileMenu.classList.remove('active');
+        mobileMenuOverlay.classList.remove('active');
+        document.body.classList.remove('menu-open');
+        document.body.style.overflow = '';
+        const scrollY = parseInt(document.body.dataset.scrollLock || '0', 10);
+        delete document.body.dataset.scrollLock;
+        window.scrollTo(0, scrollY);
     }
-    
+
+    if (categoriesToggle && categoriesDrawer) {
+        categoriesToggle.addEventListener('click', function () {
+            if (categoriesDrawer.hidden) openCategoriesDrawer();
+            else closeCategoriesDrawer();
+        });
+    }
+    if (categoriesClose) {
+        categoriesClose.addEventListener('click', closeCategoriesDrawer);
+    }
+
+    document.querySelectorAll('[data-mobile-download]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const appType = btn.getAttribute('data-mobile-download') || 'customer';
+            if (typeof openPhoneSelection === 'function') {
+                openPhoneSelection(appType);
+            }
+            closeMobileMenu();
+            if (hamburger) hamburger.classList.remove('active');
+        });
+    });
+
     if (hamburger) {
-        console.log('Hamburger menu found and initializing...');
-        hamburger.addEventListener('click', function(e) {
-            console.log('Hamburger clicked!', e);
+        hamburger.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            hamburger.classList.toggle('active');
-            console.log('Hamburger active class toggled. Calling openMobileMenu...');
-            openMobileMenu();
+            if (mobileMenu.classList.contains('active')) {
+                closeMobileMenu();
+                hamburger.classList.remove('active');
+            } else {
+                hamburger.classList.add('active');
+                openMobileMenu();
+            }
         });
-        console.log('Hamburger click listener attached');
-    } else {
-        console.error('Hamburger menu element not found!');
     }
-    
+
     if (mobileMenuClose) {
-        mobileMenuClose.addEventListener('click', function() {
+        mobileMenuClose.addEventListener('click', function () {
             closeMobileMenu();
             if (hamburger) hamburger.classList.remove('active');
         });
     }
-    
-    // Close mobile menu when clicking overlay
+
     if (mobileMenuOverlay) {
-        mobileMenuOverlay.addEventListener('click', function() {
+        mobileMenuOverlay.addEventListener('click', function () {
             closeMobileMenu();
             if (hamburger) hamburger.classList.remove('active');
         });
     }
-    
-    // Close mobile menu when clicking outside (but not on hamburger)
-    document.addEventListener('click', function(e) {
-        if (mobileMenu && mobileMenuOverlay && hamburger && 
-            !mobileMenu.contains(e.target) && 
+
+    document.addEventListener('click', function (e) {
+        if (mobileMenu && mobileMenuOverlay && hamburger &&
+            !mobileMenu.contains(e.target) &&
             !hamburger.contains(e.target) &&
             !mobileMenuOverlay.contains(e.target) &&
             mobileMenu.classList.contains('active')) {
@@ -154,14 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hamburger.classList.remove('active');
         }
     });
-    
-    // Test function to manually trigger menu (for debugging)
-    window.testMobileMenu = function() {
-        console.log('Testing mobile menu manually');
-        if (hamburger) {
-            openMobileMenu();
-        }
-    };
 
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -362,14 +331,14 @@ function initProNavigation() {
     const desktopMenu = document.getElementById('proNavMenu');
     const currentLang = localStorage.getItem('skedisy-language') || 'fr';
     const switchToLang = currentLang === 'fr' ? 'en' : 'fr';
-    const switchToShort = switchToLang.toUpperCase();
+    const displayLang = currentLang === 'fr' ? 'FR' : 'EN';
     const blogHref = '/blog/';
     const navBits =
         '<span class="nav-menu-actions">' +
         '<a href="' + blogHref + '" class="nav-btn" data-translate="nav.blog">Blog</a>' +
         '<a href="/professionnel/" class="nav-btn nav-btn--active" data-translate="nav.pro">Pro</a>' +
-        '<button type="button" class="nav-btn lang-switcher desktop-only" data-lang="' + switchToLang + '" title="Switch to ' + switchToShort + '">' +
-        '<i class="fas fa-globe"></i> <span>' + switchToShort + '</span></button>' +
+        '<button type="button" class="nav-btn lang-switcher desktop-only" data-lang="' + switchToLang + '">' +
+        '<i class="fas fa-globe"></i> <span>' + displayLang + '</span></button>' +
         '</span>';
     if (desktopMenu) {
         desktopMenu.innerHTML = navBits;
@@ -397,10 +366,13 @@ function loadCategories() {
                 renderCategories(data.data);
             } else {
                 console.warn('No categories found');
-                // Show message if no categories
                 const mobileMenu = document.getElementById('mobileCategories');
+                const homeGrid = document.getElementById('homeCategoriesGrid');
                 if (mobileMenu) {
                     mobileMenu.innerHTML = '<p style="padding: 12px; color: #666; text-align: center;">No categories available</p>';
+                }
+                if (homeGrid) {
+                    homeGrid.innerHTML = '<p class="sq-home-categories-empty">No categories available</p>';
                 }
             }
         })
@@ -426,14 +398,43 @@ function generateCategorySlug(name) {
         .replace(/^-+|-+$/g, "");
 }
 
-// Render categories in header
+// Render categories in header + home grid (app-like)
+function escapeHtmlText(s) {
+    return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function renderHomeCategoriesGrid(categories) {
+    const grid = document.getElementById('homeCategoriesGrid');
+    if (!grid || !categories || !categories.length) return;
+
+    grid.innerHTML = categories.map(function (category) {
+        const slug = generateCategorySlug(category.name);
+        const shortId = category._id.toString().substring(0, 6);
+        const categoryUrl = '/category/' + slug + '-' + shortId;
+        const name = escapeHtmlText(category.name);
+        const img = category.image
+            ? '<img src="' + escapeHtmlText(category.image) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+              '<span class="sq-home-cat-card__fallback" style="display:none" aria-hidden="true"><i class="fas fa-spa"></i></span>'
+            : '<span class="sq-home-cat-card__fallback" aria-hidden="true"><i class="fas fa-spa"></i></span>';
+        return (
+            '<a href="' + categoryUrl + '" class="sq-home-cat-card">' +
+            '<span class="sq-home-cat-card__media">' + img + '</span>' +
+            '<span class="sq-home-cat-card__name">' + name + '</span>' +
+            '</a>'
+        );
+    }).join('');
+}
+
 function renderCategories(categories) {
     const desktopMenu = document.getElementById('categoriesMenu');
     const mobileMenu = document.getElementById('mobileCategories');
-    
-    if (!desktopMenu || !mobileMenu) return;
-    
-    // Desktop menu - add Docs link and Language Switcher at the end
+
+    renderHomeCategoriesGrid(categories);
+
     const categoriesHtml = categories.map(category => {
         const slug = generateCategorySlug(category.name);
         const shortId = category._id.toString().substring(0, 6);
@@ -444,22 +445,30 @@ function renderCategories(categories) {
     // Get current language for the switcher button
     const currentLang = localStorage.getItem('skedisy-language') || 'fr';
     const switchToLang = currentLang === 'fr' ? 'en' : 'fr';
-    const switchToShort = switchToLang.toUpperCase(); // EN or FR
-    
-    desktopMenu.innerHTML = categoriesHtml +
-        '<span class="nav-menu-actions">' +
-        '<a href="/blog/" class="nav-btn" data-translate="nav.blog">Blog</a>' +
-        `<button type="button" class="nav-btn lang-switcher desktop-only" data-lang="${switchToLang}" title="Switch to ${switchToShort}">` +
-        `<i class="fas fa-globe"></i> <span>${switchToShort}</span></button>` +
-        '</span>';
-    
-    // Mobile menu
+    const displayLang = currentLang === 'fr' ? 'FR' : 'EN';
+
+    if (desktopMenu) {
+        desktopMenu.innerHTML = categoriesHtml +
+            '<span class="nav-menu-actions">' +
+            '<a href="/blog/" class="nav-btn" data-translate="nav.blog">Blog</a>' +
+            `<button type="button" class="nav-btn lang-switcher desktop-only" data-lang="${switchToLang}">` +
+            `<i class="fas fa-globe"></i> <span>${displayLang}</span></button>` +
+            '</span>';
+    }
+
+    if (mobileMenu) {
     mobileMenu.innerHTML = categories.map(category => {
         const slug = generateCategorySlug(category.name);
         const shortId = category._id.toString().substring(0, 6);
         const categoryUrl = `/category/${slug}-${shortId}`;
         return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
     }).join('');
+    }
+
+    const activeMenu = document.getElementById('mobileMenu');
+    if (activeMenu && activeMenu.classList.contains('active')) {
+        activeMenu.style.height = 'auto';
+    }
     
     // Update language switcher display after categories are loaded
     // The event delegation in initLanguage should handle clicks, but we need to update the display

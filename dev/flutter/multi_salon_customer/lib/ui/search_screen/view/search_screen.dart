@@ -8,6 +8,9 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/app_bar/app_bar.dart';
 import 'package:salon_2/custom/app_button/app_button.dart';
+import 'package:salon_2/custom/salon_map/salon_map_marker_data.dart';
+import 'package:salon_2/custom/salon_map/salon_map_view.dart';
+import 'package:salon_2/custom/salon_map/salon_view_mode_toggle.dart';
 import 'package:salon_2/custom/text_field/text_field_custom.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
@@ -447,128 +450,163 @@ class SearchScreen extends StatelessWidget {
 
   // Helper method to build salon results
   Widget _buildSalonResults(HomeScreenController logic) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            "Salons Found",
-            style: TextStyle(
-              fontFamily: AppFontFamily.sfProDisplayBold,
-              fontSize: 18,
-              color: AppColors.primaryTextColor,
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 200,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: logic.getAllSalonCategory?.data?.length ?? 0,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemBuilder: (context, index) {
-              final salon = logic.getAllSalonCategory?.data?[index];
-              return Container(
-                width: 200,
-                margin: const EdgeInsets.only(right: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: AppColors.whiteColor,
-                  boxShadow: Constant.boxShadow,
-                  border: Border.all(
-                      color: AppColors.grey.withOpacity(0.1), width: 1),
+    final salons = logic.getAllSalonCategory?.data ?? [];
+    final searchCtrl = Get.find<SearchScreenController>();
+
+    return GetBuilder<SearchScreenController>(
+      id: 'salonMapView',
+      builder: (sc) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Text(
+                "txtSalonsFound".tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                  fontSize: 18,
+                  color: AppColors.primaryTextColor,
                 ),
-                child: InkWell(
-                  onTap: () {
-                    Get.toNamed(AppRoutes.branchDetail, arguments: [
-                      salon?.id,
-                      city,
-                      latitude,
-                      longitude,
-                    ]);
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                        child: CachedNetworkImage(
-                          imageUrl: salon?.mainImage ?? "",
-                          height: 100,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            height: 100,
-                            color: AppColors.grey.withOpacity(0.3),
-                            child: const Center(
-                                child: CircularProgressIndicator()),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            height: 100,
-                            color: AppColors.grey.withOpacity(0.3),
-                            child: const Icon(Icons.error),
-                          ),
-                        ),
+              ),
+            ),
+            SalonViewModeToggle(
+              isMapView: sc.salonMapView,
+              onChanged: searchCtrl.setSalonMapView,
+            ),
+            if (sc.salonMapView)
+              SizedBox(
+                height: 280,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
+                  child: SalonMapView(
+                    markers: salonMarkersFromData(salons),
+                    userLatitude: latitude,
+                    userLongitude: longitude,
+                    onSalonTap: (m) {
+                      Get.toNamed(AppRoutes.branchDetail, arguments: [
+                        m.salon.id,
+                        city,
+                        latitude,
+                        longitude,
+                      ]);
+                    },
+                  ),
+                ),
+              )
+            else
+              SizedBox(
+                height: 200,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: salons.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemBuilder: (context, index) {
+                    final salon = salons[index];
+                    return Container(
+                      width: 200,
+                      margin: const EdgeInsets.only(right: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: AppColors.whiteColor,
+                        boxShadow: Constant.boxShadow,
+                        border: Border.all(
+                            color: AppColors.grey.withOpacity(0.1), width: 1),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
+                      child: InkWell(
+                        onTap: () {
+                          Get.toNamed(AppRoutes.branchDetail, arguments: [
+                            salon.id,
+                            city,
+                            latitude,
+                            longitude,
+                          ]);
+                        },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              salon?.name ?? "",
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold,
-                                fontSize: 14,
-                                color: AppColors.primaryTextColor,
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(12),
+                                topRight: Radius.circular(12),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              salon?.addressDetails?.addressLine1 ?? "",
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayRegular,
-                                fontSize: 12,
-                                color: AppColors.darkGrey3,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(Icons.location_on,
-                                    size: 12, color: AppColors.primaryAppColor),
-                                const SizedBox(width: 4),
-                                Text(
-                                  "${salon?.distance?.toStringAsFixed(1) ?? "0"} km",
-                                  style: TextStyle(
-                                    fontFamily:
-                                        AppFontFamily.sfProDisplayMedium,
-                                    fontSize: 12,
-                                    color: AppColors.primaryAppColor,
-                                  ),
+                              child: CachedNetworkImage(
+                                imageUrl: salon.mainImage ?? "",
+                                height: 100,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  height: 100,
+                                  color: AppColors.grey.withOpacity(0.3),
+                                  child: const Center(
+                                      child: CircularProgressIndicator()),
                                 ),
-                              ],
+                                errorWidget: (context, url, error) => Container(
+                                  height: 100,
+                                  color: AppColors.grey.withOpacity(0.3),
+                                  child: const Icon(Icons.error),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    salon.name ?? "",
+                                    style: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontSize: 14,
+                                      color: AppColors.primaryTextColor,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    salon.addressDetails?.addressLine1 ?? "",
+                                    style: TextStyle(
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayRegular,
+                                      fontSize: 12,
+                                      color: AppColors.darkGrey3,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.location_on,
+                                          size: 12,
+                                          color: AppColors.primaryAppColor),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        "${salon.distance?.toStringAsFixed(1) ?? "0"} km",
+                                        style: TextStyle(
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayMedium,
+                                          fontSize: 12,
+                                          color: AppColors.primaryAppColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 16),
-      ],
+              ),
+            const SizedBox(height: 16),
+          ],
+        );
+      },
     );
   }
 

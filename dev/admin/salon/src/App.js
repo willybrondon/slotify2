@@ -18,6 +18,14 @@ function App() {
   const key = sessionStorage.getItem("key");
   const token = sessionStorage.getItem("token");
 
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (/^\/salonPanel/i.test(path) && !path.startsWith("/salonpanel")) {
+      const normalized = path.replace(/^\/salonPanel/i, "/salonpanel");
+      window.history.replaceState(null, "", normalized + window.location.search + window.location.hash);
+    }
+  }, []);
+
   const sessionTimeout = 20 * 60 * 1000; // 5 minutes in milliseconds
   let activityTimeout;
 

@@ -1,74 +1,122 @@
 const selfieAnalysisService = require('../../services/selfieAnalysis.service');
 const { validateImageFile, sanitizeImageFile } = require('../../utils/imageSecurity.util');
+const { validateVideoFile, extractVideoFrames, cleanupPaths } = require('../../utils/videoSecurity.util');
 const path = require('path');
 const fs = require('fs');
 
+function isTruthy(val) {
+  return val === true || val === 'true' || val === '1';
+}
+
+function buildContext(req) {
+  return {
+    latitude: req.body.latitude || req.query.latitude || null,
+    longitude: req.body.longitude || req.query.longitude || null,
+    city: req.body.city || req.query.city || null,
+    occasion: req.body.occasion || req.query.occasion || null,
+    hairType: req.body.hairType || req.query.hairType || null,
+    hairCondition: req.body.hairCondition || req.query.hairCondition || null,
+    styleInterest: req.body.styleInterest || req.query.styleInterest || null,
+    scalpSensitivity: req.body.scalpSensitivity || req.query.scalpSensitivity || null,
+    bookingGoal: req.body.bookingGoal || req.query.bookingGoal || null,
+    captureMode: isTruthy(req.body.captureMode) || isTruthy(req.query.captureMode),
+    mediaType: req.body.mediaType || req.query.mediaType || null,
+  };
+}
+
 /**
- * Analyze selfie image and provide beauty recommendations
+ * Analyze selfie image or shared look (screenshot / screen-recording) and provide recommendations
  */
 exports.analyzeSelfie = async (req, res) => {
+  let tempFramePaths = [];
+  let filePathToAnalyze = null;
+
   try {
-    // Check if image file is uploaded (multer stores in req.file for single upload)
     if (!req.file) {
-      console.error('[AI Concierge] No file received. Check: 1) Field name must be "image" 2) Content-Type: multipart/form-data 3) File size under 10MB');
+      console.error('[AI Concierge] No file received. Field name must be "image", multipart/form-data, max 50MB');
       return res.status(200).send({
         status: false,
-        message: 'Please upload a selfie image. Make sure to select or take a photo first.'
+        message: 'Please upload a photo or screen recording. Select or share media first.',
       });
     }
 
-    // Use absolute path for file access (handles different working directories)
-    let imagePath = path.isAbsolute(req.file.path) ? req.file.path : path.resolve(process.cwd(), req.file.path);
+    let uploadPath = path.isAbsolute(req.file.path)
+      ? req.file.path
+      : path.resolve(process.cwd(), req.file.path);
 
-    const validation = validateImageFile(imagePath, req.file.mimetype);
-    if (!validation.ok) {
-      if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-      return res.status(200).send({
-        status: false,
-        message: validation.error || 'Invalid image file',
-      });
-    }
+    const context = buildContext(req);
+    const isVideo =
+      (req.file.mimetype && req.file.mimetype.startsWith('video/')) ||
+      context.mediaType === 'video';
 
-    const sanitized = await sanitizeImageFile(imagePath);
-    if (!sanitized.ok) {
-      if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-      return res.status(200).send({
-        status: false,
-        message: sanitized.error || 'Failed to process image safely',
-      });
+    if (isVideo) {
+      const vValidation = validateVideoFile(uploadPath, req.file.mimetype);
+      if (!vValidation.ok) {
+        if (fs.existsSync(uploadPath)) fs.unlinkSync(uploadPath);
+        return res.status(200).send({
+          status: false,
+          message: vValidation.error || 'Invalid video file',
+        });
+      }
+
+      context.captureMode = true;
+      context.mediaType = 'video';
+
+      try {
+        tempFramePaths = await extractVideoFrames(uploadPath, 3);
+        filePathToAnalyze = tempFramePaths[Math.floor(tempFramePaths.length / 2)] || tempFramePaths[0];
+      } catch (videoErr) {
+        if (fs.existsSync(uploadPath)) fs.unlinkSync(uploadPath);
+        return res.status(200).send({
+          status: false,
+          message: videoErr.message || 'Failed to process video',
+        });
+      } finally {
+        if (fs.existsSync(uploadPath)) {
+          try {
+            fs.unlinkSync(uploadPath);
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      }
+    } else {
+      const validation = validateImageFile(uploadPath, req.file.mimetype);
+      if (!validation.ok) {
+        if (fs.existsSync(uploadPath)) fs.unlinkSync(uploadPath);
+        return res.status(200).send({
+          status: false,
+          message: validation.error || 'Invalid image file',
+        });
+      }
+
+      const sanitized = await sanitizeImageFile(uploadPath);
+      if (!sanitized.ok) {
+        if (fs.existsSync(uploadPath)) fs.unlinkSync(uploadPath);
+        return res.status(200).send({
+          status: false,
+          message: sanitized.error || 'Failed to process image safely',
+        });
+      }
+      filePathToAnalyze = sanitized.path;
     }
-    imagePath = sanitized.path;
 
     const userId = req.body.userId || req.query.userId || null;
-    
-    // Context information (optional)
-    const context = {
-      latitude: req.body.latitude || req.query.latitude || null,
-      longitude: req.body.longitude || req.query.longitude || null,
-      city: req.body.city || req.query.city || null,
-      occasion: req.body.occasion || req.query.occasion || null,
-      hairType: req.body.hairType || req.query.hairType || null,
-      hairCondition: req.body.hairCondition || req.query.hairCondition || null,
-      styleInterest: req.body.styleInterest || req.query.styleInterest || null,
-      scalpSensitivity: req.body.scalpSensitivity || req.query.scalpSensitivity || null,
-      bookingGoal: req.body.bookingGoal || req.query.bookingGoal || null,
-    };
 
-    // Analyze the selfie
-    const result = await selfieAnalysisService.analyzeSelfie(imagePath, userId, context);
+    const result = await selfieAnalysisService.analyzeSelfie(filePathToAnalyze, userId, context);
 
-    // Clean up uploaded file after analysis (optional - you may want to keep it)
-    // fs.unlinkSync(imagePath);
+    cleanupPaths(tempFramePaths);
 
     return res.status(200).send({
       status: true,
-      message: 'Selfie analyzed successfully',
+      message: isVideo ? 'Video look analyzed successfully' : 'Selfie analyzed successfully',
       data: {
         analysis: result.analysis,
         recommendations: result.recommendations,
         provider: result.provider,
         locationUsed: !!(result.recommendations && result.recommendations.locationUsed),
-      }
+        mediaType: isVideo ? 'video' : 'image',
+      },
     });
   } catch (error) {
     // Only log error if it's not a configuration issue (those are expected)
@@ -77,6 +125,7 @@ exports.analyzeSelfie = async (req, res) => {
     }
     
     // Clean up file on error
+    cleanupPaths(tempFramePaths);
     if (req.file && req.file.path && fs.existsSync(req.file.path)) {
       try {
         fs.unlinkSync(req.file.path);

@@ -6,7 +6,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:salon_2/main.dart' as app;
 import 'package:salon_2/routes/app_routes.dart';
 
-/// Handles images and links shared from Instagram, TikTok, Facebook, etc.
+/// Handles images, videos and links shared from Instagram, TikTok, Facebook, Snapchat, etc.
 class ShareCaptureService {
   static StreamSubscription<List<SharedMediaFile>>? _mediaSub;
   static bool _initialized = false;
@@ -33,6 +33,17 @@ class ShareCaptureService {
     _initialized = false;
   }
 
+  static bool _isVideoPath(String path) {
+    final lower = path.toLowerCase();
+    return lower.endsWith('.mp4') ||
+        lower.endsWith('.mov') ||
+        lower.endsWith('.webm') ||
+        lower.endsWith('.3gp') ||
+        lower.endsWith('.m4v') ||
+        lower.contains('.mp4?') ||
+        lower.contains('.mov?');
+  }
+
   static void _onMedia(List<SharedMediaFile> files) {
     if (files.isEmpty) return;
     final file = files.first;
@@ -43,6 +54,16 @@ class ShareCaptureService {
       log('ShareCapture: image received → $path');
       _openCapture(
         sharedImagePath: path,
+        fromShare: true,
+        autoAnalyze: true,
+      );
+    } else if (file.type == SharedMediaType.video ||
+        (file.type == SharedMediaType.file && _isVideoPath(file.path))) {
+      final path = file.path;
+      if (path.isEmpty) return;
+      log('ShareCapture: video received → $path');
+      _openCapture(
+        sharedVideoPath: path,
         fromShare: true,
         autoAnalyze: true,
       );
@@ -73,23 +94,31 @@ class ShareCaptureService {
   }
 
   static void openFromDeepLink({String? url}) {
-    _navigate(null, url, false, false);
+    _navigate(null, null, url, false, false);
   }
 
   static void _openCapture({
     String? sharedImagePath,
+    String? sharedVideoPath,
     String? sharedLink,
     required bool fromShare,
     required bool autoAnalyze,
   }) {
     app.markCaptureNavigated();
     Future.delayed(const Duration(milliseconds: 1000), () {
-      _navigate(sharedImagePath, sharedLink, fromShare, autoAnalyze);
+      _navigate(
+        sharedImagePath,
+        sharedVideoPath,
+        sharedLink,
+        fromShare,
+        autoAnalyze,
+      );
     });
   }
 
   static void _navigate(
     String? sharedImagePath,
+    String? sharedVideoPath,
     String? sharedLink,
     bool fromShare,
     bool autoAnalyze,
@@ -100,6 +129,7 @@ class ShareCaptureService {
         'fromShare': fromShare,
         'autoAnalyze': autoAnalyze,
         'sharedImagePath': sharedImagePath,
+        'sharedVideoPath': sharedVideoPath,
         'sharedLink': sharedLink,
         'captureMode': true,
       },

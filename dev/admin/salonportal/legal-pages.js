@@ -38,21 +38,39 @@
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
-                <h3 data-translate="nav.menu">Menu</h3>
+                <h3 data-translate="nav.forClients">Pour les clientes</h3>
                 <div class="mobile-menu-header-right">
-                    <button class="lang-switcher mobile-only" data-lang="en" title="Switch to English"><i class="fas fa-globe"></i> <span>EN</span></button>
-                    <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Passer en anglais"><i class="fas fa-globe"></i> <span>FR</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
                 </div>
             </div>
-            <div class="mobile-menu-content">
-                <a href="/professionnel/" class="btn-login-mobile-menu btn-pro-mobile-menu" data-translate="nav.pro">Pro</a>
+            <div class="mobile-menu-content mobile-menu-content--client">
                 <a href="/compte/connexion" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
-                <a href="/blog/" class="btn-login-mobile-menu" data-translate="nav.blog">Blog</a>
-                <a href="${asset("ai-concierge.html")}" class="btn-ai-concierge-mobile"><i class="fas fa-robot"></i> <span data-translate="nav.aiConcierge">Concierge IA</span></a>
-                <div class="mobile-categories" id="mobileCategories"></div>
+                <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer" data-translate="client.downloadAppCta">Télécharger l'app</button>
+                <div class="mobile-categories-panel">
+                    <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">
+                        <span data-translate="nav.allCategories">Toutes les catégories</span>
+                        <i class="fas fa-chevron-down mobile-categories-toggle__icon" aria-hidden="true"></i>
+                    </button>
+                    <div class="mobile-categories-drawer" id="mobileCategoriesDrawer" hidden>
+                        <div class="mobile-categories-drawer__head">
+                            <span data-translate="nav.allCategories">Toutes les catégories</span>
+                            <button type="button" class="mobile-categories-drawer__close" id="mobileCategoriesClose" aria-label="Fermer">&times;</button>
+                        </div>
+                        <div class="mobile-categories" id="mobileCategories"></div>
+                    </div>
+                </div>
+                <a href="/professionnel/" class="btn-login-mobile-menu btn-for-business-mobile" data-translate="nav.forBusiness">Pour les professionnels</a>
             </div>
         </div>
-    </nav>`;
+    </nav>
+    <div class="sq-mobile-float-bar mobile-only" aria-label="Actions rapides">
+        <a href="${asset("ai-concierge.html")}" class="floating-ai-btn" id="floatingAiBtn">
+            <i class="fas fa-robot" aria-hidden="true"></i>
+            <span data-translate="nav.aiConcierge">Concierge IA</span>
+        </a>
+        <a href="#" class="floating-download-btn floating-download-btn--customer" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a>
+    </div>`;
 
   const footerHtml = `
     <footer class="footer sq-footer">

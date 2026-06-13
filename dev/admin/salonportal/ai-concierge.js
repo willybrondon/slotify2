@@ -24,6 +24,15 @@ const analyzeAnotherBtn = document.getElementById('analyzeAnotherBtn');
 let selectedFile = null;
 let clientLocation = { lat: null, lng: null, active: false };
 let captureMode = false;
+let sharedSocialLink = null;
+
+const SOCIAL_PLATFORMS = {
+    instagram: { icon: 'fab fa-instagram', labelKey: 'capture.linkPlatformInstagram', leadKey: 'capture.linkLeadInstagram', stepsKey: 'capture.linkStepsInstagram' },
+    tiktok: { icon: 'fab fa-tiktok', labelKey: 'capture.linkPlatformTiktok', leadKey: 'capture.linkLeadTiktok', stepsKey: 'capture.linkStepsTiktok' },
+    facebook: { icon: 'fab fa-facebook', labelKey: 'capture.linkPlatformFacebook', leadKey: 'capture.linkLeadFacebook', stepsKey: 'capture.linkStepsFacebook' },
+    snapchat: { icon: 'fab fa-snapchat', labelKey: 'capture.linkPlatformSnapchat', leadKey: 'capture.linkLeadSnapchat', stepsKey: 'capture.linkStepsSnapchat' },
+    other: { icon: 'fas fa-link', labelKey: 'capture.linkPlatformOther', leadKey: 'capture.linkLeadOther', stepsKey: 'capture.linkStepsOther' }
+};
 
 function t(key) {
     if (typeof getTranslation === 'function') return getTranslation(key);
@@ -35,33 +44,166 @@ function isCaptureMode() {
     return params.get('capture') === '1' || params.get('capture') === 'true';
 }
 
+function parseSocialLink(raw) {
+    let url = (raw || '').trim();
+    if (!url) return null;
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    try {
+        const u = new URL(url);
+        const h = u.hostname.toLowerCase().replace(/^www\./, '');
+        if (h.includes('instagram.com') || h === 'instagr.am') return { platform: 'instagram', url: u.href };
+        if (h.includes('tiktok.com') || h === 'vm.tiktok.com') return { platform: 'tiktok', url: u.href };
+        if (h.includes('facebook.com') || h.includes('fb.com') || h === 'fb.watch') return { platform: 'facebook', url: u.href };
+        if (h.includes('snapchat.com')) return { platform: 'snapchat', url: u.href };
+        return { platform: 'other', url: u.href };
+    } catch {
+        return null;
+    }
+}
+
+function hideLinkPanel() {
+    const panel = document.getElementById('linkCapturePanel');
+    if (panel) panel.hidden = true;
+}
+
+function showLinkPanel(parsed) {
+    const panel = document.getElementById('linkCapturePanel');
+    const icon = document.getElementById('linkPlatformIcon');
+    const label = document.getElementById('linkPlatformLabel');
+    const lead = document.getElementById('linkCaptureLead');
+    const stepsEl = document.getElementById('linkCaptureSteps');
+    if (!panel || !parsed) return;
+
+    const cfg = SOCIAL_PLATFORMS[parsed.platform] || SOCIAL_PLATFORMS.other;
+    panel.hidden = false;
+    if (icon) icon.className = cfg.icon;
+    if (label) label.textContent = t(cfg.labelKey);
+    if (lead) lead.textContent = t(cfg.leadKey);
+    if (stepsEl) {
+        stepsEl.innerHTML = '';
+        t(cfg.stepsKey).split('|').forEach((step) => {
+            const text = step.trim();
+            if (!text) return;
+            const li = document.createElement('li');
+            li.textContent = text;
+            stepsEl.appendChild(li);
+        });
+    }
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function scrollToUploadArea() {
+    const target = document.getElementById('uploadArea') || document.getElementById('uploadSection');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function handleSocialLinkInput() {
+    const input = document.getElementById('sharedLinkInput');
+    if (!input) return;
+    const parsed = parseSocialLink(input.value);
+    if (!parsed) {
+        sharedSocialLink = null;
+        hideLinkPanel();
+        if (input.value.trim()) showError(t('capture.linkInvalid'));
+        return;
+    }
+    hideError();
+    sharedSocialLink = parsed;
+    showLinkPanel(parsed);
+}
+
+function setupLinkCapture() {
+    const input = document.getElementById('sharedLinkInput');
+    const validateBtn = document.getElementById('linkValidateBtn');
+    const goUploadBtn = document.getElementById('linkGoUploadBtn');
+    if (!input) return;
+
+    validateBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleSocialLinkInput();
+    });
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSocialLinkInput();
+        }
+    });
+    input.addEventListener('paste', () => {
+        setTimeout(handleSocialLinkInput, 80);
+    });
+    input.addEventListener('input', () => {
+        if (!input.value.trim()) {
+            sharedSocialLink = null;
+            hideLinkPanel();
+            hideError();
+        }
+    });
+    goUploadBtn?.addEventListener('click', () => {
+        fileInput.click();
+        scrollToUploadArea();
+    });
+
+    if (captureMode) {
+        const params = new URLSearchParams(window.location.search);
+        const urlParam = params.get('url');
+        if (urlParam) {
+            input.value = decodeURIComponent(urlParam);
+            handleSocialLinkInput();
+        }
+    }
+}
+
 function applyCaptureModeUI() {
     captureMode = isCaptureMode();
+    document.body.classList.toggle('sq-capture-mode', captureMode);
+
     const title = document.getElementById('conciergeTitle');
     const subtitle = document.getElementById('conciergeSubtitle');
     const description = document.getElementById('conciergeDescription');
-    const captureLinkRow = document.getElementById('captureLinkRow');
+    const captureLinkBlock = document.getElementById('captureLinkBlock');
+    const captureTrustBar = document.getElementById('captureTrustBar');
     const capturePrivacy = document.getElementById('capturePrivacy');
-    const uploadKicker = document.querySelector('.sq-upload-kicker');
-    const uploadH3 = document.querySelector('#uploadPlaceholder h3');
-    const uploadLead = document.querySelector('.sq-upload-lead');
+    const uploadKicker = document.getElementById('uploadKicker');
+    const uploadTitle = document.getElementById('uploadTitle');
+    const uploadLead = document.getElementById('uploadLead');
+    const uploadHint = document.getElementById('uploadHint');
+    const screenRecordTip = document.getElementById('screenRecordTip');
     const analyzeLabel = document.getElementById('analyzeBtnLabel');
     const uploadBtnLabel = document.getElementById('uploadBtnLabel');
+    const uploadAreaIcon = document.getElementById('uploadAreaIcon');
 
     if (captureMode) {
         if (title) title.textContent = t('capture.screenTitle');
         if (subtitle) subtitle.textContent = t('capture.heroTitle');
         if (description) description.innerHTML = t('capture.heroBody');
-        if (captureLinkRow) captureLinkRow.style.display = 'block';
-        if (capturePrivacy) capturePrivacy.style.display = 'block';
+        if (captureLinkBlock) captureLinkBlock.hidden = false;
+        if (captureTrustBar) captureTrustBar.hidden = false;
+        if (capturePrivacy) capturePrivacy.hidden = false;
         if (uploadKicker) uploadKicker.textContent = t('capture.uploadKicker');
-        if (uploadH3) uploadH3.textContent = t('capture.uploadTitle');
+        if (uploadTitle) uploadTitle.textContent = t('capture.uploadTitle');
         if (uploadLead) uploadLead.innerHTML = t('capture.uploadLead');
+        if (uploadHint) uploadHint.textContent = t('capture.uploadHint');
+        if (screenRecordTip) {
+            screenRecordTip.textContent = t('capture.screenRecordTip');
+            screenRecordTip.hidden = false;
+        }
         if (analyzeLabel) analyzeLabel.textContent = t('capture.analyzeLook');
-        if (uploadBtnLabel) uploadBtnLabel.textContent = t('capture.choosePhoto');
-        document.title = t('capture.screenTitle') + ' | Skedisy';
+        if (uploadBtnLabel) uploadBtnLabel.textContent = t('capture.chooseMedia');
+        if (uploadAreaIcon) uploadAreaIcon.className = 'fas fa-share-from-square sq-capture-upload-icon';
+        document.title = t('capture.pageTitle');
     } else {
+        if (captureLinkBlock) captureLinkBlock.hidden = true;
+        if (captureTrustBar) captureTrustBar.hidden = true;
+        if (capturePrivacy) capturePrivacy.hidden = true;
+        if (screenRecordTip) {
+            screenRecordTip.textContent = '';
+            screenRecordTip.hidden = true;
+        }
+        if (uploadAreaIcon) uploadAreaIcon.className = 'fas fa-camera';
+        hideLinkPanel();
+        if (typeof translatePage === 'function') translatePage();
         if (analyzeLabel) analyzeLabel.textContent = t('concierge.analyzeBtn');
+        document.title = t('concierge.pageTitle');
     }
 }
 
@@ -128,6 +270,7 @@ function appendLocationToFormData(formData) {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     applyCaptureModeUI();
+    setupLinkCapture();
     setupEventListeners();
     if (isMobileConcierge()) {
         requestClientLocation();
@@ -136,7 +279,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-document.addEventListener('skedisy:language-changed', applyCaptureModeUI);
+document.addEventListener('skedisy:language-changed', function() {
+    applyCaptureModeUI();
+    if (sharedSocialLink) showLinkPanel(sharedSocialLink);
+});
 
 function setupEventListeners() {
     // Upload button click
@@ -189,32 +335,53 @@ function handleDrop(e) {
     uploadArea.classList.remove('dragover');
     
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && (file.type.startsWith('image/') || file.type.startsWith('video/'))) {
         processFile(file);
     } else {
-        showError('Please select a valid image file');
+        showError(t('capture.invalidFile'));
     }
 }
 
+let selectedIsVideo = false;
+
 function processFile(file) {
-    // Validate file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-        showError('File size must be less than 10MB');
+    const isVideo = file.type.startsWith('video/');
+    const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+        showError(isVideo ? t('capture.videoTooLarge') : t('capture.imageTooLarge'));
         return;
     }
     
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-        showError('Please select an image file');
+    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+        showError(t('capture.invalidFile'));
         return;
     }
     
     selectedFile = file;
+    selectedIsVideo = isVideo;
     
-    // Show preview
     const reader = new FileReader();
     reader.onload = (e) => {
-        previewImage.src = e.target.result;
+        if (isVideo) {
+            let videoEl = document.getElementById('previewVideo');
+            if (!videoEl) {
+                videoEl = document.createElement('video');
+                videoEl.id = 'previewVideo';
+                videoEl.controls = true;
+                videoEl.playsInline = true;
+                videoEl.style.width = '100%';
+                videoEl.style.maxHeight = '320px';
+                imagePreview.insertBefore(videoEl, previewImage);
+            }
+            previewImage.style.display = 'none';
+            videoEl.style.display = 'block';
+            videoEl.src = e.target.result;
+        } else {
+            const videoEl = document.getElementById('previewVideo');
+            if (videoEl) videoEl.style.display = 'none';
+            previewImage.style.display = 'block';
+            previewImage.src = e.target.result;
+        }
         uploadPlaceholder.style.display = 'none';
         imagePreview.style.display = 'block';
         analyzeSection.style.display = 'block';
@@ -225,7 +392,14 @@ function processFile(file) {
 
 function removeImage() {
     selectedFile = null;
+    selectedIsVideo = false;
     fileInput.value = '';
+    const videoEl = document.getElementById('previewVideo');
+    if (videoEl) {
+        videoEl.removeAttribute('src');
+        videoEl.style.display = 'none';
+    }
+    previewImage.style.display = 'block';
     uploadPlaceholder.style.display = 'flex';
     imagePreview.style.display = 'none';
     analyzeSection.style.display = 'none';
@@ -253,6 +427,16 @@ function analyzeImage() {
         appendLocationToFormData(formData);
         if (window.SkedisyHairProfile) {
             SkedisyHairProfile.appendToFormData(formData);
+        }
+        if (captureMode) {
+            formData.append('captureMode', 'true');
+        }
+        if (selectedIsVideo) {
+            formData.append('mediaType', 'video');
+        }
+        if (sharedSocialLink?.url) {
+            formData.append('referenceUrl', sharedSocialLink.url);
+            formData.append('referencePlatform', sharedSocialLink.platform);
         }
         if (isMobileConcierge() && !clientLocation.active) {
             const ok = window.confirm(
@@ -548,8 +732,8 @@ function displayRecommendations(recommendations, locationUsed) {
 }
 
 function resetAnalysis() {
-    // Reset everything
     selectedFile = null;
+    selectedIsVideo = false;
     fileInput.value = '';
     uploadPlaceholder.style.display = 'flex';
     imagePreview.style.display = 'none';
