@@ -414,7 +414,10 @@ final Map<String, String> enUS = {
   "txtAiConciergeAnalyze": "Analyze my hair",
   "txtAiConciergeAnalyzing": "Analyzing…",
   "txtAiConciergeRecommendedServices": "Recommended services",
-  "txtAiConciergeRecommendedSalons": "Recommended salons",
+  "txtAiConciergeRecommendedSalons": "Recommended salons (max 4)",
+  "txtAiConciergeDetectedService": "Service identified from your photo",
+  "txtAiConciergeMatchedService": "Matched service",
+  "txtAiConciergeMatchScore": "match",
   "txtAiConciergeSelectImage": "Select photo",
   "txtAiConciergeChangeImage": "Change photo",
   "txtCaptureScreenTitle": "Book this look",
@@ -448,9 +451,7 @@ final Map<String, String> enUS = {
   "txtCaptureMediaReadError": "Failed to read media. Please try again.",
   "txtCaptureScreenRecordSteps":
       "On TikTok or Instagram: play the video → screen record → Share → Skedisy.",
-  "txtIntentHubTitle": "How do you want to book?",
-  "txtIntentHubSubtitle":
-      "Share a look, ask the AI concierge, or search — three ways in.",
+  "txtIntentHubTitle": "Book your Afro beauty in IDF",
   "txtIntentCaptureTitle": "Share a look",
   "txtIntentCaptureBody":
       "Screenshot from Instagram or TikTok → Share → Skedisy. We match salons that do this style.",

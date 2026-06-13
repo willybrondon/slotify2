@@ -219,14 +219,30 @@ class BeautyProfile {
 }
 
 class Recommendations {
+  DetectedService? detectedService;
   List<ServiceItem>? services;
   List<SalonItem>? salons;
   List<ExpertItem>? experts;
   List<String>? beautyTips;
+  bool? noMatch;
+  String? noMatchMessage;
+  bool? locationUsed;
 
-  Recommendations({this.services, this.salons, this.experts, this.beautyTips});
+  Recommendations({
+    this.detectedService,
+    this.services,
+    this.salons,
+    this.experts,
+    this.beautyTips,
+    this.noMatch,
+    this.noMatchMessage,
+    this.locationUsed,
+  });
 
   Recommendations.fromJson(Map<String, dynamic> json) {
+    detectedService = json['detectedService'] != null
+        ? DetectedService.fromJson(json['detectedService'])
+        : null;
     if (json['services'] != null) {
       services = <ServiceItem>[];
       json['services'].forEach((v) {
@@ -248,10 +264,16 @@ class Recommendations {
     beautyTips = json['beautyTips'] != null
         ? List<String>.from(json['beautyTips'])
         : null;
+    noMatch = json['noMatch'] == true;
+    noMatchMessage = json['noMatchMessage']?.toString();
+    locationUsed = json['locationUsed'] == true;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    if (detectedService != null) {
+      data['detectedService'] = detectedService!.toJson();
+    }
     if (services != null) {
       data['services'] = services!.map((v) => v.toJson()).toList();
     }
@@ -264,6 +286,43 @@ class Recommendations {
     if (beautyTips != null) {
       data['beautyTips'] = beautyTips;
     }
+    data['noMatch'] = noMatch;
+    data['noMatchMessage'] = noMatchMessage;
+    data['locationUsed'] = locationUsed;
+    return data;
+  }
+}
+
+class DetectedService {
+  String? label;
+  String? summary;
+  List<String>? categories;
+  List<String>? keywords;
+  ServiceItem? catalogMatch;
+
+  DetectedService({this.label, this.summary, this.categories, this.keywords, this.catalogMatch});
+
+  DetectedService.fromJson(Map<String, dynamic> json) {
+    label = json['label']?.toString();
+    summary = json['summary']?.toString();
+    categories = json['categories'] != null
+        ? List<String>.from(json['categories'])
+        : null;
+    keywords = json['keywords'] != null
+        ? List<String>.from(json['keywords'])
+        : null;
+    catalogMatch = json['catalogMatch'] != null
+        ? ServiceItem.fromJson(json['catalogMatch'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['label'] = label;
+    data['summary'] = summary;
+    if (categories != null) data['categories'] = categories;
+    if (keywords != null) data['keywords'] = keywords;
+    if (catalogMatch != null) data['catalogMatch'] = catalogMatch!.toJson();
     return data;
   }
 }
@@ -277,6 +336,7 @@ class ServiceItem {
   String? categoryId;
   String? categoryName;
   String? shareUrl;
+  num? price;
 
   ServiceItem(
       {this.id,
@@ -286,7 +346,8 @@ class ServiceItem {
       this.status,
       this.categoryId,
       this.categoryName,
-      this.shareUrl});
+      this.shareUrl,
+      this.price});
 
   ServiceItem.fromJson(Map<String, dynamic> json) {
     // Handle _id which can be ObjectId or string
@@ -325,6 +386,9 @@ class ServiceItem {
     }
 
     shareUrl = json['shareUrl']?.toString();
+    price = json['price'] is num
+        ? json['price']
+        : num.tryParse(json['price']?.toString() ?? '');
   }
 
   Map<String, dynamic> toJson() {
@@ -337,7 +401,55 @@ class ServiceItem {
     data['categoryId'] = categoryId;
     data['categoryName'] = categoryName;
     data['shareUrl'] = shareUrl;
+    data['price'] = price;
     return data;
+  }
+}
+
+class MatchedServiceItem {
+  String? id;
+  String? name;
+  String? image;
+  int? duration;
+  num? price;
+  String? categoryName;
+
+  MatchedServiceItem(
+      {this.id, this.name, this.image, this.duration, this.price, this.categoryName});
+
+  MatchedServiceItem.fromJson(Map<String, dynamic> json) {
+    id = json['id']?.toString() ?? json['_id']?.toString();
+    name = json['name']?.toString();
+    image = json['image']?.toString();
+    duration = json['duration'] != null
+        ? (json['duration'] is int
+            ? json['duration']
+            : int.tryParse(json['duration'].toString()))
+        : null;
+    price = json['price'] is num
+        ? json['price']
+        : num.tryParse(json['price']?.toString() ?? '');
+    categoryName = json['categoryName']?.toString();
+  }
+}
+
+class MatchedExpertItem {
+  String? id;
+  String? name;
+  String? image;
+  double? review;
+
+  MatchedExpertItem({this.id, this.name, this.image, this.review});
+
+  MatchedExpertItem.fromJson(Map<String, dynamic> json) {
+    id = json['id']?.toString() ?? json['_id']?.toString();
+    name = json['name']?.toString();
+    image = json['image']?.toString();
+    review = json['review'] != null
+        ? (json['review'] is num
+            ? json['review'].toDouble()
+            : double.tryParse(json['review'].toString()))
+        : null;
   }
 }
 
@@ -348,14 +460,23 @@ class SalonItem {
   double? review;
   String? address;
   String? shareUrl;
+  double? distance;
+  int? confidenceScore;
+  MatchedServiceItem? matchedService;
+  MatchedExpertItem? matchedExpert;
 
-  SalonItem(
-      {this.id,
-      this.name,
-      this.image,
-      this.review,
-      this.address,
-      this.shareUrl});
+  SalonItem({
+    this.id,
+    this.name,
+    this.image,
+    this.review,
+    this.address,
+    this.shareUrl,
+    this.distance,
+    this.confidenceScore,
+    this.matchedService,
+    this.matchedExpert,
+  });
 
   SalonItem.fromJson(Map<String, dynamic> json) {
     // Handle _id which can be ObjectId or string
@@ -391,6 +512,22 @@ class SalonItem {
     }
 
     shareUrl = json['shareUrl']?.toString();
+    distance = json['distance'] != null
+        ? (json['distance'] is num
+            ? json['distance'].toDouble()
+            : double.tryParse(json['distance'].toString()))
+        : null;
+    confidenceScore = json['confidenceScore'] != null
+        ? (json['confidenceScore'] is int
+            ? json['confidenceScore']
+            : int.tryParse(json['confidenceScore'].toString()))
+        : null;
+    matchedService = json['matchedService'] != null
+        ? MatchedServiceItem.fromJson(json['matchedService'])
+        : null;
+    matchedExpert = json['matchedExpert'] != null
+        ? MatchedExpertItem.fromJson(json['matchedExpert'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {

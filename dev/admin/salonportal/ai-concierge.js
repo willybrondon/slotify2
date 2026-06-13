@@ -514,7 +514,7 @@ function displayResults(data) {
     
     // Display analysis
     if (data.analysis) {
-        displayAnalysis(data.analysis);
+        displayAnalysis(data.analysis, data.recommendations?.detectedService);
     }
     
     // Display recommendations
@@ -526,10 +526,21 @@ function displayResults(data) {
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function displayAnalysis(analysis) {
+function displayAnalysis(analysis, detectedService) {
     let html = '';
 
-    if (analysis.recommendedNeeds?.summary) {
+    if (detectedService?.label) {
+        html += `
+            <div class="analysis-item analysis-item--detected">
+                <h3><i class="fas fa-scissors" aria-hidden="true"></i> Prestation identifiée</h3>
+                <p class="detected-service-label">${escapeHtml(detectedService.label)}</p>
+                ${detectedService.summary ? `<p>${escapeHtml(detectedService.summary)}</p>` : ''}
+                ${detectedService.categories?.length
+                    ? `<p><strong>Catégories :</strong> ${escapeHtml(detectedService.categories.join(', '))}</p>`
+                    : ''}
+            </div>
+        `;
+    } else if (analysis.recommendedNeeds?.summary) {
         html += `
             <div class="analysis-item analysis-item--summary">
                 <h3><i class="fas fa-star" aria-hidden="true"></i> Recommandation Skedisy</h3>
@@ -656,21 +667,32 @@ function displayRecommendations(recommendations, locationUsed) {
     if (locationUsed || clientLocation.active) {
         salons = sortSalonsByDistance(salons);
     }
+
+    if (recommendations.noMatch && recommendations.noMatchMessage) {
+        html += `
+            <div class="recommendations-section recommendations-section--nomatch">
+                <h3><i class="fas fa-info-circle" aria-hidden="true"></i> Aucun match fiable</h3>
+                <p class="recommendations-lead">${escapeHtml(recommendations.noMatchMessage)}</p>
+            </div>
+        `;
+    }
     
-    // Services
+    // Services catalogue (max 4)
     if (recommendations.services && recommendations.services.length > 0) {
         html += `
             <div class="recommendations-section">
-                <h3><i class="fas fa-spa" aria-hidden="true"></i> Prestations suggérées</h3>
+                <h3><i class="fas fa-spa" aria-hidden="true"></i> Prestations du catalogue Skedisy</h3>
                 <div class="services-grid">
         `;
         
-        recommendations.services.forEach(service => {
+        recommendations.services.slice(0, 4).forEach(service => {
+            const priceLine = service.price != null ? `<p class="service-price">${service.price} €</p>` : '';
             html += `
                 <div class="service-card">
                     ${service.image ? `<img src="${service.image}" alt="${service.name || 'Service'}" onerror="this.style.display='none'">` : ''}
-                    <h4>${service.name || 'Service'}</h4>
+                    <h4>${escapeHtml(service.name || 'Service')}</h4>
                     ${service.duration ? `<p style="color: #666; font-size: 12px;">${service.duration} min</p>` : ''}
+                    ${priceLine}
                 </div>
             `;
         });
@@ -681,34 +703,34 @@ function displayRecommendations(recommendations, locationUsed) {
         `;
     }
     
-    // Salons - Always show salon recommendations section
+    // Salons — max 4, prestation liée
     const leadText = locationUsed || clientLocation.active
-        ? 'Salons afro en Île-de-France, classés selon votre position et votre profil.'
-        : 'Salons afro en Île-de-France classés selon vos besoins (prestations, catégories).';
+        ? 'Jusqu\'à 4 salons en Île-de-France, classés par match prestation, distance et notes.'
+        : 'Jusqu\'à 4 salons en Île-de-France, classés par match prestation et notes.';
 
+    if (salons.length > 0) {
     html += `
         <div class="recommendations-section${mobile ? ' recommendations-section--mobile' : ''}">
-            <h3><i class="fas fa-store" aria-hidden="true"></i> Salons afro en Île-de-France</h3>
+            <h3><i class="fas fa-store" aria-hidden="true"></i> Salons recommandés</h3>
             <p class="recommendations-lead">${escapeHtml(leadText)}</p>
     `;
 
-    if (salons.length > 0) {
         html += `<div class="salon-list${mobile ? ' salon-list--mobile' : ''}">`;
-        salons.forEach((salon) => {
+        salons.slice(0, 4).forEach((salon) => {
             html += renderSalonCard(salon);
         });
-        html += `</div>`;
-    } else {
-        // Show message if no salons found
+        html += `</div></div>`;
+    } else if (!recommendations.noMatch) {
         html += `
-            <div style="padding: 20px; text-align: center; color: #666;">
-                <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px; color: #999;"></i>
-                <p>Aucun salon trouvé pour le moment. Essayez une autre photo ou parcourez les prestations sur l'accueil.</p>
+            <div class="recommendations-section${mobile ? ' recommendations-section--mobile' : ''}">
+                <h3><i class="fas fa-store" aria-hidden="true"></i> Salons afro en Île-de-France</h3>
+                <div style="padding: 20px; text-align: center; color: #666;">
+                    <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px; color: #999;"></i>
+                    <p>Aucun salon ne correspond assez précisément à cette photo. Essayez une autre image ou parcourez les prestations sur l'accueil.</p>
+                </div>
             </div>
         `;
     }
-    
-    html += `</div>`;
     
     // Beauty Tips
     if (recommendations.beautyTips && recommendations.beautyTips.length > 0) {
@@ -767,6 +789,15 @@ function escapeHtml(s) {
 }
 
 function formatSalonMatchHint(salon) {
+    const ms = salon.matchedService;
+    if (ms?.name) {
+        const price = ms.price != null && ms.price > 0 ? ` · ${ms.price} €` : '';
+        const expert = salon.matchedExpert?.name
+            ? ` · ${salon.matchedExpert.name}${salon.matchedExpert.review ? ` (${Number(salon.matchedExpert.review).toFixed(1)}★)` : ''}`
+            : '';
+        const conf = salon.confidenceScore ? ` · ${salon.confidenceScore}% match` : '';
+        return escapeHtml(`Prestation : ${ms.name}${price}${expert}${conf}`);
+    }
     const types = salon.matchingServiceTypes || [];
     const count = salon.matchingServiceCount || 0;
     if (types.length) {

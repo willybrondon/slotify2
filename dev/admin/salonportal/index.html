@@ -89,9 +89,16 @@
     <!-- 3 portes d'entrée (comme l'app) -->
     <section class="sq-intent-hub sq-intent-hub--home" id="sqIntentHub">
         <div class="container">
-            <h2 class="sq-intent-hub__title" data-translate="intentHub.title">Comment veux-tu réserver ?</h2>
-            <p class="sq-intent-hub__subtitle" data-translate="intentHub.subtitle">Partage un look, demande au concierge IA, ou cherche — trois entrées.</p>
             <div class="sq-intent-doors">
+                <div class="sq-intent-door sq-intent-door--search">
+                    <form id="homeSalonSearchForm" class="sq-intent-search-form" role="search">
+                        <label class="sq-sr-only" for="homeSalonSearchInput" data-translate="intentHub.searchTitle">Chercher un salon</label>
+                        <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+                        <div class="sq-intent-search-form__field">
+                            <input type="search" id="homeSalonSearchInput" name="q" class="sq-intent-search-form__input" data-translate="intentHub.searchPlaceholder" placeholder="Chercher un salon" autocomplete="off" enterkeyhint="search">
+                        </div>
+                    </form>
+                </div>
                 <a href="ai-concierge.html?capture=1" class="sq-intent-door sq-intent-door--primary">
                     <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
                     <span class="sq-intent-door__body">
@@ -108,15 +115,6 @@
                     </span>
                     <i class="fas fa-chevron-right sq-intent-door__chevron" aria-hidden="true"></i>
                 </a>
-                <div class="sq-intent-door sq-intent-door--search">
-                    <form id="homeSalonSearchForm" class="sq-intent-search-form" role="search">
-                        <label class="sq-sr-only" for="homeSalonSearchInput" data-translate="intentHub.searchTitle">Chercher un salon</label>
-                        <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
-                        <div class="sq-intent-search-form__field">
-                            <input type="search" id="homeSalonSearchInput" name="q" class="sq-intent-search-form__input" data-translate="intentHub.searchPlaceholder" placeholder="Chercher un salon" autocomplete="off" enterkeyhint="search">
-                        </div>
-                    </form>
-                </div>
             </div>
             <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
         </div>

@@ -422,7 +422,10 @@ final Map<String, String> frCH = {
   "txtAiConciergeAnalyze": "Analyser mes cheveux",
   "txtAiConciergeAnalyzing": "Analyse en cours…",
   "txtAiConciergeRecommendedServices": "Prestations recommandées",
-  "txtAiConciergeRecommendedSalons": "Salons recommandés",
+  "txtAiConciergeRecommendedSalons": "Salons recommandés (max 4)",
+  "txtAiConciergeDetectedService": "Prestation identifiée sur ta photo",
+  "txtAiConciergeMatchedService": "Prestation",
+  "txtAiConciergeMatchScore": "correspondance",
   "txtAiConciergeSelectImage": "Choisir une photo",
   "txtAiConciergeChangeImage": "Changer la photo",
   "txtCaptureScreenTitle": "Réserver ce look",
@@ -456,9 +459,7 @@ final Map<String, String> frCH = {
   "txtCaptureMediaReadError": "Impossible de lire le fichier. Réessaie.",
   "txtCaptureScreenRecordSteps":
       "Sur TikTok ou Instagram : lis la vidéo → enregistre l'écran → Partager → Skedisy.",
-  "txtIntentHubTitle": "Comment veux-tu réserver ?",
-  "txtIntentHubSubtitle":
-      "Partage un look, demande au concierge IA, ou cherche — trois entrées.",
+  "txtIntentHubTitle": "Réserve ta beauté afro en IDF",
   "txtIntentCaptureTitle": "Partager un look",
   "txtIntentCaptureBody":
       "Capture Instagram ou TikTok → Partager → Skedisy. On trouve les salons qui font ce style.",

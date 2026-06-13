@@ -39,6 +39,12 @@ const IDF_LOCATION_HINTS = [
   'saint-denis', 'argenteuil', 'cergy', 'melun', 'évry', 'evry', 'france'
 ];
 
+/** Max salons proposés — ancré catalogue Skedisy */
+const MAX_SALON_PROPOSALS = 4;
+/** Score minimum (0–100) pour afficher un salon — évite les faux positifs */
+const MIN_CONFIDENCE_SCORE = 42;
+const IDF_RADIUS_KM = 55;
+
 class SelfieAnalysisService {
   normalizeText(value) {
     return String(value || '')
@@ -602,102 +608,240 @@ Return ONLY valid JSON (no markdown):
       // Generate beauty tips
       const beautyTips = this.generateBeautyTips(analysis);
 
+      const detectedService = this.buildDetectedService(analysis, servicesWithUrl);
+      const topServices = servicesWithUrl.slice(0, MAX_SALON_PROPOSALS);
+      const hasSalons = (salonMatches.salons || []).length > 0;
+
       return {
-        services: servicesWithUrl,
+        detectedService,
+        services: topServices,
         salons: salonMatches.salons,
         experts: salonMatches.experts,
         beautyTips: beautyTips,
         locationUsed: salonMatches.locationUsed,
+        noMatch: !hasSalons,
+        noMatchMessage: hasSalons
+          ? null
+          : 'Aucun salon en Île-de-France ne propose exactement cette prestation près de chez vous. Essayez une autre photo ou parcourez les catégories sur l\'accueil.',
       };
     } catch (error) {
       console.error('[Selfie Analysis] Recommendation error:', error);
-      return { services: [], salons: [], experts: [], beautyTips: [], locationUsed: false };
+      return { services: [], salons: [], experts: [], beautyTips: [], locationUsed: false, noMatch: true, noMatchMessage: 'Impossible de générer des recommandations pour le moment.' };
     }
   }
 
   /**
-   * Match salons and experts based on recommended services, location, and hair analysis
-   * Prioritize salons based on their service types matching user's needs
+   * Prestation détectée après analyse photo (avant matching catalogue).
+   */
+  buildDetectedService(analysis, catalogServices = []) {
+    const needs = analysis?.recommendedNeeds || {};
+    const keywords = needs.serviceKeywords || [];
+    const catalog = catalogServices[0];
+    const label =
+      catalog?.name ||
+      (keywords.length ? keywords.slice(0, 2).join(' · ') : null) ||
+      needs.primaryCategories?.[0] ||
+      'Prestation identifiée';
+
+    return {
+      label,
+      summary: needs.summary || null,
+      categories: needs.primaryCategories || [],
+      keywords,
+      catalogMatch: catalog
+        ? {
+            id: catalog._id?.toString?.() || catalog.id,
+            name: catalog.name,
+            duration: catalog.duration || null,
+            shareUrl: catalog.shareUrl || null,
+          }
+        : null,
+    };
+  }
+
+  /**
+   * Score composite 0–100 : match prestation, distance, note salon, prix, expert.
+   */
+  computeConfidenceScore(salon, matchedService) {
+    let score = 0;
+    const rawMatch = salon.serviceMatchScore || 0;
+    score += Math.min(40, rawMatch * 0.45);
+
+    if (salon.distance != null && !isNaN(salon.distance)) {
+      score += Math.max(0, 25 * (1 - salon.distance / IDF_RADIUS_KM));
+    } else {
+      score += 10;
+    }
+
+    score += Math.min(15, ((salon.review || 0) / 5) * 15);
+
+    if (matchedService?.price != null && matchedService.price > 0) {
+      score += 10;
+    } else if (matchedService) {
+      score += 4;
+    }
+
+    if (salon.matchedExpert?.review) {
+      score += Math.min(10, (salon.matchedExpert.review / 5) * 10);
+    }
+
+    return Math.round(Math.min(100, score));
+  }
+
+  pickBestMatchedService(salon, terms, recommendedServiceIds, primaryCats, analysis) {
+    let best = null;
+    let bestScore = 0;
+
+    if (!salon.serviceIds?.length) return null;
+
+    salon.serviceIds.forEach((serviceItem) => {
+      const svc = serviceItem.id;
+      if (!svc?._id) return;
+
+      const serviceId = svc._id.toString();
+      const serviceName = svc.name || '';
+      const categoryName = svc.categoryId?.name || '';
+      const blob = `${serviceName} ${categoryName}`;
+
+      let score = 0;
+      const termHits = this.textMatchScore(blob, terms);
+      const catHits = this.detectAfroCategoriesInText(blob);
+
+      if (recommendedServiceIds.has(serviceId)) score += 24;
+      if (termHits > 0) score += 8 + termHits;
+
+      primaryCats.forEach((pc) => {
+        if (this.normalizeText(categoryName).includes(pc) || catHits.has(pc)) {
+          score += 10;
+        }
+      });
+
+      if (analysis?.hair) {
+        const hairType = this.normalizeText(analysis.hair.type);
+        const normName = this.normalizeText(serviceName);
+        if (
+          (hairType === 'coily' || hairType === 'curly') &&
+          (normName.includes('tresse') ||
+            normName.includes('braid') ||
+            normName.includes('knotless') ||
+            normName.includes('lock') ||
+            normName.includes('afro'))
+        ) {
+          score += 8;
+        }
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        best = {
+          id: serviceId,
+          name: serviceName,
+          image: svc.image || null,
+          duration: svc.duration || null,
+          price: serviceItem.price != null ? serviceItem.price : null,
+          categoryName: categoryName || null,
+          serviceMatchScore: score,
+        };
+      }
+    });
+
+    return bestScore > 0 ? best : null;
+  }
+
+  async attachExpertsToSalons(salons) {
+    const enriched = [];
+    for (const salon of salons) {
+      const serviceId = salon.matchedService?.id;
+      let matchedExpert = null;
+
+      if (serviceId && salon._id) {
+        const expert = await Expert.findOne({
+          salonId: salon._id,
+          serviceId: { $in: [serviceId] },
+          isBlock: false,
+          isDelete: false,
+        })
+          .select('fname lname image review reviewCount')
+          .sort({ review: -1 })
+          .lean();
+
+        if (expert) {
+          matchedExpert = {
+            id: expert._id.toString(),
+            name: `${expert.fname || ''} ${expert.lname || ''}`.trim(),
+            image: expert.image || '',
+            review: expert.review || 0,
+            reviewCount: expert.reviewCount || 0,
+          };
+        }
+      }
+
+      enriched.push({ ...salon, matchedExpert });
+    }
+    return enriched;
+  }
+
+  /**
+   * Match salons and experts — max 4, seuil de confiance, pas de fallback générique.
    */
   async getSalonMatches(services, context, analysis = null) {
-    const IDF_RADIUS_KM = 55;
     let locationUsed = false;
     try {
-      // Always try to get salon recommendations, even if no services found
-      // This ensures users always see salon recommendations
-      const serviceIds = services && services.length > 0 ? services.map(s => s._id) : [];
+      const serviceIds = services?.length ? services.map((s) => s._id) : [];
+      if (!serviceIds.length) {
+        console.log('[Selfie Analysis] No catalog services matched — skipping salon proposals');
+        return { salons: [], experts: [], locationUsed: false };
+      }
 
-      // Find salons that offer these services
-      // If no services found, still try to get some salons (fallback)
-      let salons = [];
-      
-      if (serviceIds && serviceIds.length > 0) {
-        salons = await Salon.find({
-          'serviceIds.id': { $in: serviceIds },
-          isActive: true,
-          isDelete: false
+      let salons = await Salon.find({
+        'serviceIds.id': { $in: serviceIds },
+        isActive: true,
+        isDelete: false,
+      })
+        .populate({
+          path: 'serviceIds.id',
+          populate: { path: 'categoryId', select: 'name' },
         })
-          .populate({
-            path: 'serviceIds.id',
-            populate: {
-              path: 'categoryId',
-              select: 'name'
-            }
-          })
-          .lean(); // Use lean() for better JSON serialization
+        .lean();
+
+      if (!salons.length) {
+        console.log('[Selfie Analysis] No salons offer matched catalog services');
+        return { salons: [], experts: [], locationUsed: false };
       }
-      
-      // If no salons found with matching services, get top-rated salons as fallback
-      // This ensures we always have salon recommendations
-      if (salons.length === 0) {
-        console.log('[Selfie Analysis] No salons found with matching services, using fallback: top-rated salons');
-        salons = await Salon.find({
-          isActive: true,
-          isDelete: false
-        })
-          .populate({
-            path: 'serviceIds.id',
-            populate: {
-              path: 'categoryId',
-              select: 'name'
-            }
-          })
-          .sort({ review: -1, reviewCount: -1 })
-          .limit(10)
-          .lean();
-      }
-      
+
       const searchTerms = this.extractSearchTermsFromAnalysis(analysis);
       salons = this.scoreSalonsByServiceTypes(salons, services, analysis, searchTerms);
-      
-      // Calculate distance and filter by location if provided
+
+      // Garder uniquement les salons avec une prestation catalogue identifiée
+      salons = salons
+        .filter((s) => s.matchedService && (s.serviceMatchScore || 0) > 0)
+        .slice(0, MAX_SALON_PROPOSALS * 2);
+
       if (context.latitude && context.longitude) {
         const userLocation = {
           latitude: parseFloat(context.latitude),
-          longitude: parseFloat(context.longitude)
+          longitude: parseFloat(context.longitude),
         };
-        
-        // Check if coordinates are valid (not NaN)
-        const isValidLocation = !isNaN(userLocation.latitude) && !isNaN(userLocation.longitude);
-        
+        const isValidLocation =
+          !isNaN(userLocation.latitude) && !isNaN(userLocation.longitude);
+
         if (isValidLocation) {
           locationUsed = true;
-          salons = salons.map(salon => {
-            if (salon.locationCoordinates && salon.locationCoordinates.latitude && salon.locationCoordinates.longitude) {
+          salons = salons.map((salon) => {
+            if (
+              salon.locationCoordinates?.latitude &&
+              salon.locationCoordinates?.longitude
+            ) {
               const salonLat = parseFloat(salon.locationCoordinates.latitude);
               const salonLng = parseFloat(salon.locationCoordinates.longitude);
-              
-              // Check if salon coordinates are valid
               if (!isNaN(salonLat) && !isNaN(salonLng)) {
-                const salonLocation = {
-                  latitude: salonLat,
-                  longitude: salonLng
-                };
                 try {
-                  const distanceInMeters = geolib.getDistance(userLocation, salonLocation);
-                  salon.distance = distanceInMeters / 1000; // Convert to kilometers
-                } catch (distanceError) {
-                  console.error('[Selfie Analysis] Distance calculation error:', distanceError);
+                  const distanceInMeters = geolib.getDistance(userLocation, {
+                    latitude: salonLat,
+                    longitude: salonLng,
+                  });
+                  salon.distance = distanceInMeters / 1000;
+                } catch (e) {
                   salon.distance = null;
                 }
               } else {
@@ -708,126 +852,103 @@ Return ONLY valid JSON (no markdown):
             }
             return salon;
           });
-          
-          // Separate salons with and without distance
-          const salonsWithDistance = salons.filter(salon => salon.distance !== null);
-          const salonsWithoutDistance = salons.filter(salon => salon.distance === null);
-          
-          // Île-de-France : prioriser les salons proches du client
-          let nearbySalons = salonsWithDistance.filter((s) => s.distance <= IDF_RADIUS_KM);
-          if (!nearbySalons.length) {
-            nearbySalons = salonsWithDistance.filter((s) => s.distance <= 100);
-          }
-          const salonsToShow = nearbySalons.length > 0 ? nearbySalons : salonsWithDistance;
 
-          const sortByDistanceThenMatch = (a, b) => {
+          const withDist = salons.filter((s) => s.distance != null);
+          const withoutDist = salons.filter((s) => s.distance == null);
+          let nearby = withDist.filter((s) => s.distance <= IDF_RADIUS_KM);
+          if (!nearby.length) nearby = withDist.filter((s) => s.distance <= 100);
+          const pool = nearby.length ? nearby : withDist;
+
+          const sortFn = (a, b) => {
             if (a.distance != null && b.distance != null && a.distance !== b.distance) {
               return a.distance - b.distance;
             }
-            if (b.serviceMatchScore !== a.serviceMatchScore) {
-              return b.serviceMatchScore - a.serviceMatchScore;
+            if ((b.confidenceScore || 0) !== (a.confidenceScore || 0)) {
+              return (b.confidenceScore || 0) - (a.confidenceScore || 0);
             }
             return (b.review || 0) - (a.review || 0);
           };
 
-          salonsToShow.sort(sortByDistanceThenMatch);
-          salonsWithoutDistance.sort((a, b) => {
-            if (b.serviceMatchScore !== a.serviceMatchScore) {
-              return b.serviceMatchScore - a.serviceMatchScore;
-            }
-            return (b.review || 0) - (a.review || 0);
-          });
-
-          salons = [...salonsToShow, ...salonsWithoutDistance.slice(0, 2)];
-        } else {
-          console.warn('[Selfie Analysis] Invalid location coordinates provided');
-          // If location is invalid, treat as no location
-          salons.sort((a, b) => {
-            if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
-              if (b.serviceMatchScore !== a.serviceMatchScore) {
-                return b.serviceMatchScore - a.serviceMatchScore;
-              }
-            }
-            return (b.review || 0) - (a.review || 0);
-          });
+          pool.sort(sortFn);
+          withoutDist.sort(sortFn);
+          salons = [...pool, ...withoutDist.slice(0, 1)];
         }
       } else {
-        // If no location, sort by service match score first, then rating
         salons.sort((a, b) => {
-          if (a.serviceMatchScore !== undefined && b.serviceMatchScore !== undefined) {
-            if (b.serviceMatchScore !== a.serviceMatchScore) {
-              return b.serviceMatchScore - a.serviceMatchScore;
-            }
+          if ((b.confidenceScore || 0) !== (a.confidenceScore || 0)) {
+            return (b.confidenceScore || 0) - (a.confidenceScore || 0);
           }
           return (b.review || 0) - (a.review || 0);
         });
       }
-      
-      // Limit to top 5-8 most relevant salons (increased for better coverage)
-      const maxSalons = context.latitude && context.longitude ? 8 : 5;
-      salons = salons.slice(0, maxSalons);
-      
-      // Format salons to ensure _id is included and properly formatted
+
+      salons = await this.attachExpertsToSalons(salons);
+
+      salons = salons
+        .map((salon) => ({
+          ...salon,
+          confidenceScore: this.computeConfidenceScore(salon, salon.matchedService),
+        }))
+        .filter((s) => s.confidenceScore >= MIN_CONFIDENCE_SCORE)
+        .sort((a, b) => b.confidenceScore - a.confidenceScore)
+        .slice(0, MAX_SALON_PROPOSALS);
+
       const generateSlug = (name) => {
-        if (!name) return "";
+        if (!name) return '';
         return name
           .toLowerCase()
           .trim()
-          .replace(/[^\w\s-]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/-+/g, "-")
-          .replace(/^-+|-+$/g, "");
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '');
       };
-      const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
-      
-      const formattedSalons = salons.map(salon => {
-        // With lean(), salon is already a plain object
+      const baseURL = (process.env.baseURL || 'https://skedisy.com').replace(/\/+$/, '');
+
+      const formattedSalons = salons.map((salon) => {
         const addressDetails = salon.addressDetails || {};
-        const addressLine1 = addressDetails.addressLine1 || "";
-        const city = addressDetails.city || "";
-        const country = addressDetails.country || "";
-        const fullAddress = [addressLine1, city, country].filter(Boolean).join(", ");
-        
-        // Generate salon share URL: /salon/{slug}-{shortId}
+        const fullAddress = [
+          addressDetails.addressLine1,
+          addressDetails.city,
+          addressDetails.country,
+        ]
+          .filter(Boolean)
+          .join(', ');
         const salonSlug = generateSlug(salon.name);
         const salonShortId = salon._id.toString().substring(0, 6);
-        const salonSlugWithId = `${salonSlug}-${salonShortId}`;
-        const shareUrl = `${baseURL}/salon/${salonSlugWithId}`;
-        
+
         return {
           _id: salon._id,
-          id: salon._id ? salon._id.toString() : null, // Add id field for compatibility
-          name: salon.name || "",
-          mainImage: salon.mainImage || (salon.image && salon.image.length > 0 ? salon.image[0] : ""),
+          id: salon._id.toString(),
+          name: salon.name || '',
+          mainImage: salon.mainImage || (salon.image?.[0] ?? ''),
           review: salon.review || 0,
           reviewCount: salon.reviewCount || 0,
-          addressDetails: addressDetails,
-          address: fullAddress, // Add formatted address string for easy access
+          addressDetails,
+          address: fullAddress,
           locationCoordinates: salon.locationCoordinates || {},
-          distance: salon.distance || null, // Include distance if calculated
-          shareUrl: shareUrl, // Add share URL for web linking
+          distance: salon.distance ?? null,
+          shareUrl: `${baseURL}/salon/${salonSlug}-${salonShortId}`,
           matchingServiceCount: salon.matchingServiceCount || 0,
           matchingServiceTypes: salon.matchingServiceTypes || [],
           matchSummary: salon.matchSummary || null,
-          about: salon.about || '',
+          confidenceScore: salon.confidenceScore,
+          matchReason: salon.matchReason || null,
+          matchedService: salon.matchedService || null,
+          matchedExpert: salon.matchedExpert || null,
         };
       });
 
-      // Find experts specialized in these services (limit to 3)
-      const experts = await Expert.find({
-        serviceId: { $in: serviceIds },
-        isActive: true,
-        isDelete: false
-      })
-        .populate('serviceId')
-        .sort({ review: -1 })
-        .limit(3);
+      const experts = formattedSalons
+        .filter((s) => s.matchedExpert)
+        .map((s) => ({
+          ...s.matchedExpert,
+          salonId: s.id,
+          salonName: s.name,
+          serviceId: s.matchedService?.id,
+        }));
 
-      return {
-        salons: formattedSalons,
-        experts: experts,
-        locationUsed,
-      };
+      return { salons: formattedSalons, experts, locationUsed };
     } catch (error) {
       console.error('[Selfie Analysis] Salon matching error:', error);
       return { salons: [], experts: [], locationUsed: false };
@@ -841,7 +962,7 @@ Return ONLY valid JSON (no markdown):
     if (!salons || salons.length === 0) return salons;
 
     const terms =
-      searchTerms && searchTerms.length
+      searchTerms?.length
         ? searchTerms
         : analysis
           ? this.extractSearchTermsFromAnalysis(analysis)
@@ -883,7 +1004,6 @@ Return ONLY valid JSON (no markdown):
           const serviceName = svc.name || '';
           const categoryName = svc.categoryId?.name || '';
           const blob = `${serviceName} ${categoryName}`;
-
           const termHits = this.textMatchScore(blob, terms);
           const catHits = this.detectAfroCategoriesInText(blob);
 
@@ -926,21 +1046,37 @@ Return ONLY valid JSON (no markdown):
         serviceMatchScore += (matchingServiceCount - 1) * 3;
       }
 
+      const matchedService = this.pickBestMatchedService(
+        salon,
+        terms,
+        recommendedServiceIds,
+        primaryCats,
+        analysis
+      );
+
       const catLabels = [...matchingServiceTypes];
       salon.serviceMatchScore = serviceMatchScore;
       salon.matchingServiceCount = matchingServiceCount;
       salon.matchingServiceTypes = catLabels.length ? catLabels : primaryCats.slice(0, 2);
       salon.matchSummary = analysis?.recommendedNeeds?.summary || null;
+      salon.matchedService = matchedService;
+      salon.matchReason = matchedService
+        ? `Prestation catalogue : ${matchedService.name}${matchedService.price ? ` · ${matchedService.price} €` : ''}`
+        : null;
+      salon.confidenceScore = this.computeConfidenceScore(
+        { ...salon, matchedExpert: null },
+        matchedService
+      );
 
       return salon;
     });
 
     scoredSalons.sort((a, b) => {
+      if (b.confidenceScore !== a.confidenceScore) {
+        return b.confidenceScore - a.confidenceScore;
+      }
       if (b.serviceMatchScore !== a.serviceMatchScore) {
         return b.serviceMatchScore - a.serviceMatchScore;
-      }
-      if (b.matchingServiceCount !== a.matchingServiceCount) {
-        return b.matchingServiceCount - a.matchingServiceCount;
       }
       return (b.review || 0) - (a.review || 0);
     });

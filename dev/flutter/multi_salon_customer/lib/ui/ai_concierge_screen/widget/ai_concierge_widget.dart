@@ -753,21 +753,90 @@ class AiConciergeResultsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Services
+        if (recommendations.detectedService?.label != null)
+          _buildDetectedServiceBanner(recommendations.detectedService!),
+
+        if (recommendations.noMatch == true &&
+            recommendations.noMatchMessage != null)
+          _buildNoMatchBanner(recommendations.noMatchMessage!),
+
         if (recommendations.services != null &&
             recommendations.services!.isNotEmpty)
-          _buildServicesSection(recommendations.services!),
+          _buildServicesSection(recommendations.services!.take(4).toList()),
 
-        // Salons
         if (recommendations.salons != null &&
             recommendations.salons!.isNotEmpty)
-          _buildSalonsSection(recommendations.salons!),
+          _buildSalonsSection(recommendations.salons!.take(4).toList()),
 
-        // Beauty Tips
         if (recommendations.beautyTips != null &&
             recommendations.beautyTips!.isNotEmpty)
           _buildBeautyTipsSection(recommendations.beautyTips!),
       ],
+    );
+  }
+
+  Widget _buildDetectedServiceBanner(DetectedService detected) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.primaryAppColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primaryAppColor.withOpacity(0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'txtAiConciergeDetectedService'.tr,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryAppColor,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            detected.label ?? '',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryTextColor,
+            ),
+          ),
+          if (detected.summary != null && detected.summary!.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              detected.summary!,
+              style: TextStyle(fontSize: 13, color: AppColors.grey, height: 1.35),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoMatchBanner(String message) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.lineColor.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, color: AppColors.grey, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(fontSize: 13, color: AppColors.grey, height: 1.4),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1020,7 +1089,45 @@ class AiConciergeResultsView extends StatelessWidget {
                                       color: AppColors.grey,
                                     ),
                                   ),
+                                  if (salon.distance != null) ...[
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${salon.distance!.toStringAsFixed(1)} km',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.grey,
+                                      ),
+                                    ),
+                                  ],
                                 ],
+                              ),
+                            if (salon.matchedService?.name != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  '${'txtAiConciergeMatchedService'.tr}: ${salon.matchedService!.name}${salon.matchedService!.price != null ? ' · ${salon.matchedService!.price} €' : ''}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryAppColor,
+                                  ),
+                                ),
+                              ),
+                            if (salon.matchedExpert?.name != null)
+                              Text(
+                                salon.matchedExpert!.name!,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.grey,
+                                ),
+                              ),
+                            if (salon.confidenceScore != null)
+                              Text(
+                                '${salon.confidenceScore}% ${'txtAiConciergeMatchScore'.tr}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.grey,
+                                ),
                               ),
                             if (salon.address != null)
                               Text(

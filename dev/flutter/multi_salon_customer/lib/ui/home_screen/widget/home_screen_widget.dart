@@ -251,17 +251,9 @@ class HomeScreenIntentHub extends StatelessWidget {
             color: AppColors.blackColor,
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          'txtIntentHubSubtitle'.tr,
-          style: TextStyle(
-            fontFamily: AppFontFamily.sfProDisplayRegular,
-            fontSize: 13,
-            color: AppColors.grey,
-            height: 1.35,
-          ),
-        ),
         const SizedBox(height: 14),
+        const _IntentSearchDoor(),
+        const SizedBox(height: 10),
         _IntentDoorCard(
           icon: Icons.ios_share_rounded,
           title: 'txtIntentCaptureTitle'.tr,
@@ -281,16 +273,84 @@ class HomeScreenIntentHub extends StatelessWidget {
           accent: AppColors.primaryAppColor,
           onTap: () => Get.toNamed(AppRoutes.aiConcierge),
         ),
-        const SizedBox(height: 10),
-        _IntentDoorCard(
-          icon: Icons.search,
-          title: 'txtIntentSearchTitle'.tr,
-          body: 'txtIntentSearchBody'.tr,
-          accent: AppColors.grey,
-          isSecondary: true,
-          onTap: () => Get.toNamed(AppRoutes.search),
-        ),
       ],
+    );
+  }
+}
+
+class _IntentSearchDoor extends StatelessWidget {
+  const _IntentSearchDoor();
+
+  static const Color _searchBorder = Color(0xFFDDDDDD);
+
+  InputBorder _searchFieldBorder({Color? color}) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: color ?? _searchBorder),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DottedBorder(
+      borderType: BorderType.RRect,
+      radius: const Radius.circular(14),
+      color: _searchBorder,
+      strokeWidth: 1,
+      dashPattern: const [6, 4],
+      padding: EdgeInsets.zero,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: Constant.boxShadow,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppColors.grey.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.search,
+                color: AppColors.grey,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                readOnly: true,
+                onTap: () => Get.toNamed(AppRoutes.search),
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: 'txtIntentSearchTitle'.tr,
+                  hintStyle: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    fontSize: 14,
+                    color: AppColors.grey,
+                  ),
+                  filled: true,
+                  fillColor: AppColors.whiteColor,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  border: _searchFieldBorder(),
+                  enabledBorder: _searchFieldBorder(),
+                  focusedBorder: _searchFieldBorder(
+                    color: AppColors.primaryAppColor,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -303,7 +363,6 @@ class _IntentDoorCard extends StatelessWidget {
     required this.accent,
     required this.onTap,
     this.filled = false,
-    this.isSecondary = false,
   });
 
   final IconData icon;
@@ -312,15 +371,9 @@ class _IntentDoorCard extends StatelessWidget {
   final Color accent;
   final VoidCallback onTap;
   final bool filled;
-  final bool isSecondary;
 
   @override
   Widget build(BuildContext context) {
-    final bg = filled
-        ? accent
-        : isSecondary
-            ? AppColors.whiteColor
-            : AppColors.whiteColor;
     final titleColor =
         filled ? AppColors.whiteColor : AppColors.blackColor;
     final bodyColor = filled
@@ -333,14 +386,12 @@ class _IntentDoorCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: bg,
+          color: filled ? accent : AppColors.whiteColor,
           borderRadius: BorderRadius.circular(14),
           border: filled
               ? null
               : Border.all(
-                  color: isSecondary
-                      ? AppColors.lineColor
-                      : accent.withOpacity(0.25),
+                  color: accent.withOpacity(0.25),
                 ),
           boxShadow: filled
               ? [
