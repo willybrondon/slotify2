@@ -1096,7 +1096,7 @@ body.sq-capture-mode .btn-upload:hover {
   line-height: 1.35;
 }
 
-/* ——— Barre de recherche unifiée : [salon + prestation] | [localisation] ——— */
+/* ——— Barre de recherche unifiée : [salon ou prestation] | [localisation] ——— */
 .sq-search-bar-unified {
   display: flex;
   align-items: stretch;
@@ -1105,8 +1105,10 @@ body.sq-capture-mode .btn-upload:hover {
   background: #fff;
   border: 1px dashed #ddd;
   border-radius: 16px;
-  margin-bottom: 0.85rem;
-  min-height: 72px;
+  margin-bottom: 0;
+  min-height: 56px;
+  position: relative;
+  z-index: 20;
 }
 
 .sq-search-bar-unified--home {
@@ -1137,9 +1139,18 @@ body.sq-capture-mode .btn-upload:hover {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.2rem;
   padding: 0.35rem 0.65rem;
   min-width: 0;
+}
+
+.sq-search-bar-unified__query-wrap {
+  position: relative;
+}
+
+.sq-search-bar-unified__input--query {
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.35rem 0;
 }
 
 .sq-search-bar-unified__group--location {
@@ -1218,6 +1229,101 @@ body.sq-capture-mode .btn-upload:hover {
 
 .sq-search-bar-unified__submit:hover {
   background: #333;
+}
+
+/* Séparateur horizontal recherche / partager un look */
+.sq-intent-hub__divider {
+  border: none;
+  border-top: 1px solid #e8e8e8;
+  margin: 1.1rem 0;
+}
+
+/* Panneau suggestions au focus */
+.sq-search-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: -0.65rem;
+  right: -0.35rem;
+  z-index: 50;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  padding: 0.65rem 0.5rem 0.75rem;
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+}
+
+.sq-search-suggestions__section + .sq-search-suggestions__section {
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.sq-search-suggestions__heading {
+  margin: 0 0.45rem 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.sq-search-suggestions__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sq-search-suggestions__item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.55rem 0.5rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #1a1a1a;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.sq-search-suggestions__item:hover,
+.sq-search-suggestions__item:focus-visible {
+  background: #faf6f3;
+  outline: none;
+}
+
+.sq-search-suggestions__item-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(196, 92, 38, 0.1);
+  color: var(--sq-primary, #c45c26);
+  font-size: 0.78rem;
+}
+
+.sq-search-suggestions__item-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sq-search-suggestions__empty {
+  padding: 0.45rem 0.5rem;
+  font-size: 0.85rem;
+  color: #999;
 }
 
 /* Legacy grid bar (deprecated) */
@@ -1508,6 +1614,11 @@ body.sq-capture-mode .btn-upload:hover {
     width: 100%;
     height: 42px;
     border-radius: 10px;
+  }
+
+  .sq-search-suggestions {
+    left: 0;
+    right: 0;
   }
 }
 

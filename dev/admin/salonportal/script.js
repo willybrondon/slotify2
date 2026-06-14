@@ -5,19 +5,17 @@ function initHomeSalonSearch() {
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-        const salon = (document.getElementById('homeSalonSearchInput')?.value || '').trim();
-        const service = (document.getElementById('homeServiceSearchInput')?.value || '').trim();
+        const query = (document.getElementById('homeQuerySearchInput')?.value || '').trim();
         const location = (document.getElementById('homeLocationSearchInput')?.value || '').trim();
 
-        if (!salon && !service && !location) {
+        if (!query && !location) {
             const nearby = document.getElementById('sqNearbySalons');
             if (nearby) nearby.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
         }
 
         const params = new URLSearchParams();
-        if (salon) params.set('salon', salon);
-        if (service) params.set('service', service);
+        if (query) params.set('q', query);
         if (location) params.set('location', location);
         window.location.href = '/recherche?' + params.toString();
     });

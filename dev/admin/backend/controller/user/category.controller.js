@@ -2,6 +2,7 @@ const Category = require("../../models/category.model");
 const Salon = require("../../models/salon.model");
 const Service = require("../../models/service.model");
 const Expert = require("../../models/expert.model");
+const Booking = require("../../models/booking.model");
 const mongoose = require("mongoose");
 const geolib = require("geolib");
 const {
@@ -899,10 +900,183 @@ exports.serveCategoryPage = async (req, res) => {
   }
 };
 
+const COUNTABLE_BOOKING_STATUSES = ["confirm", "completed"];
+
+const buildServiceNameRegex = (term) => ({
+  isDelete: false,
+  status: true,
+  $or: [
+    { name: { $regex: term, $options: "i" } },
+    { nameEn: { $regex: term, $options: "i" } },
+    { nameFr: { $regex: term, $options: "i" } },
+    { namePt: { $regex: term, $options: "i" } },
+  ],
+});
+
+/** Suggestions recherche : top 5 catégories + top 10 prestations (réservations) */
+exports.getSearchSuggestions = async (req, res) => {
+  try {
+    const language = resolveLang(req.query.lang || req.query.language);
+
+    const topServicesAgg = await Booking.aggregate([
+      { $match: { isDelete: false, status: { $in: COUNTABLE_BOOKING_STATUSES } } },
+      { $unwind: "$serviceId" },
+      { $group: { _id: "$serviceId", bookings: { $sum: 1 } } },
+      { $sort: { bookings: -1 } },
+      { $limit: 10 },
+    ]);
+
+    let services = [];
+    if (topServicesAgg.length) {
+      const serviceIds = topServicesAgg.map((row) => row._id);
+      const serviceDocs = await Service.find({
+        _id: { $in: serviceIds },
+        isDelete: false,
+        status: true,
+      })
+        .select("name nameEn nameFr namePt categoryId")
+        .lean();
+      const order = new Map(
+        topServicesAgg.map((row, index) => [String(row._id), index])
+      );
+      services = serviceDocs
+        .sort(
+          (a, b) =>
+            (order.get(String(a._id)) ?? 99) - (order.get(String(b._id)) ?? 99)
+        )
+        .map((service) => {
+          const stats = topServicesAgg.find(
+            (row) => String(row._id) === String(service._id)
+          );
+          return {
+            _id: service._id,
+            name: getTranslatedServiceName(service, language),
+            categoryId: service.categoryId,
+            bookings: stats?.bookings || 0,
+          };
+        });
+    }
+
+    if (services.length < 10) {
+      const existingIds = services.map((s) => s._id);
+      const fallbackServices = await Service.find({
+        _id: { $nin: existingIds },
+        isDelete: false,
+        status: true,
+      })
+        .select("name nameEn nameFr namePt categoryId")
+        .sort({ createdAt: -1 })
+        .limit(10 - services.length)
+        .lean();
+      services = services.concat(
+        fallbackServices.map((service) => ({
+          _id: service._id,
+          name: getTranslatedServiceName(service, language),
+          categoryId: service.categoryId,
+          bookings: 0,
+        }))
+      );
+    }
+
+    const topCategoriesAgg = await Booking.aggregate([
+      { $match: { isDelete: false, status: { $in: COUNTABLE_BOOKING_STATUSES } } },
+      { $unwind: "$serviceId" },
+      {
+        $lookup: {
+          from: "services",
+          localField: "serviceId",
+          foreignField: "_id",
+          as: "svc",
+        },
+      },
+      { $unwind: "$svc" },
+      { $match: { "svc.categoryId": { $ne: null }, "svc.isDelete": false } },
+      { $group: { _id: "$svc.categoryId", bookings: { $sum: 1 } } },
+      { $sort: { bookings: -1 } },
+      { $limit: 5 },
+    ]);
+
+    let categories = [];
+    if (topCategoriesAgg.length) {
+      const categoryIds = topCategoriesAgg.map((row) => row._id);
+      const categoryDocs = await Category.find({
+        _id: { $in: categoryIds },
+        isDelete: false,
+        status: true,
+      })
+        .select("name nameEn nameFr namePt image")
+        .lean();
+      const order = new Map(
+        topCategoriesAgg.map((row, index) => [String(row._id), index])
+      );
+      categories = categoryDocs
+        .sort(
+          (a, b) =>
+            (order.get(String(a._id)) ?? 99) - (order.get(String(b._id)) ?? 99)
+        )
+        .map((category) => {
+          const translated = getTranslatedName(category, language);
+          const stats = topCategoriesAgg.find(
+            (row) => String(row._id) === String(category._id)
+          );
+          return {
+            _id: category._id,
+            name: translated,
+            image: category.image || "",
+            bookings: stats?.bookings || 0,
+            url: `/category/${generateSlug(translated)}-${category._id
+              .toString()
+              .substring(0, 6)}`,
+          };
+        });
+    }
+
+    if (categories.length < 5) {
+      const existingIds = categories.map((c) => c._id);
+      const fallbackCategories = await Category.find({
+        _id: { $nin: existingIds },
+        isDelete: false,
+        status: true,
+      })
+        .select("name nameEn nameFr namePt image")
+        .sort({ createdAt: -1 })
+        .limit(5 - categories.length)
+        .lean();
+      categories = categories.concat(
+        fallbackCategories.map((category) => {
+          const translated = getTranslatedName(category, language);
+          return {
+            _id: category._id,
+            name: translated,
+            image: category.image || "",
+            bookings: 0,
+            url: `/category/${generateSlug(translated)}-${category._id
+              .toString()
+              .substring(0, 6)}`,
+          };
+        })
+      );
+    }
+
+    return res.status(200).json({
+      status: true,
+      categories,
+      services,
+    });
+  } catch (error) {
+    console.error("[Search Suggestions] Error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
 /** Recherche publique salons (salon + prestation + localisation) — page /recherche */
 exports.searchSalonsPublic = async (req, res) => {
   try {
-    const salonTerm = (req.query.salon || req.query.q || "").trim();
+    const unifiedQ = (req.query.q || "").trim();
+    const salonTerm = (req.query.salon || "").trim();
     const serviceTerm = (req.query.service || req.query.prestation || "").trim();
     const locationTerm = (req.query.location || req.query.city || "").trim();
     const latitude = req.query.latitude;
@@ -915,7 +1089,20 @@ exports.searchSalonsPublic = async (req, res) => {
     let query = { isDelete: false, isActive: true };
     const andConditions = [];
 
-    if (salonTerm) {
+    if (unifiedQ && !salonTerm && !serviceTerm) {
+      const matchedServices = await Service.find(buildServiceNameRegex(unifiedQ)).select(
+        "_id"
+      );
+      const serviceIds = matchedServices.map((s) => s._id);
+      const orClause = [
+        { name: { $regex: unifiedQ, $options: "i" } },
+        { about: { $regex: unifiedQ, $options: "i" } },
+      ];
+      if (serviceIds.length) {
+        orClause.push({ "serviceIds.id": { $in: serviceIds } });
+      }
+      andConditions.push({ $or: orClause });
+    } else if (salonTerm) {
       andConditions.push({
         $or: [
           { name: { $regex: salonTerm, $options: "i" } },
@@ -935,16 +1122,10 @@ exports.searchSalonsPublic = async (req, res) => {
       });
     }
 
-    if (serviceTerm) {
-      const services = await Service.find({
-        isDelete: false,
-        status: true,
-        $or: [
-          { name: { $regex: serviceTerm, $options: "i" } },
-          { nameEn: { $regex: serviceTerm, $options: "i" } },
-          { nameFr: { $regex: serviceTerm, $options: "i" } },
-        ],
-      }).select("_id");
+    if (serviceTerm && !(unifiedQ && !salonTerm && !serviceTerm)) {
+      const services = await Service.find(buildServiceNameRegex(serviceTerm)).select(
+        "_id"
+      );
       const serviceIds = services.map((s) => s._id);
       if (!serviceIds.length) {
         return res.status(200).json({

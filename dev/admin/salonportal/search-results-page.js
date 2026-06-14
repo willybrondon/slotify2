@@ -27,8 +27,7 @@
     const mapEl = document.getElementById("categoryMap");
     const filterBtn = document.getElementById("btnFilter");
     const filterPanel = document.getElementById("filterPanel");
-    const salonInput = document.getElementById("searchSalonInput");
-    const serviceInput = document.getElementById("searchServiceInput");
+    const queryInput = document.getElementById("searchQueryInput");
     const locationInput = document.getElementById("searchLocationInput");
     const searchForm = document.getElementById("searchResultsForm");
 
@@ -170,17 +169,19 @@
     }
 
     async function fetchResults() {
-        const salon = salonInput?.value.trim() || params.get("salon") || params.get("q") || "";
-        const service = serviceInput?.value.trim() || params.get("service") || "";
+        const legacySalon = params.get("salon") || "";
+        const legacyService = params.get("service") || "";
+        const query =
+            queryInput?.value.trim() ||
+            params.get("q") ||
+            [legacySalon, legacyService].filter(Boolean).join(" ").trim();
         const location = locationInput?.value.trim() || params.get("location") || "";
 
-        if (salonInput) salonInput.value = salon;
-        if (serviceInput) serviceInput.value = service;
+        if (queryInput) queryInput.value = query;
         if (locationInput) locationInput.value = location;
 
         const qs = new URLSearchParams({ language: lang });
-        if (salon) qs.set("salon", salon);
-        if (service) qs.set("service", service);
+        if (query) qs.set("q", query);
         if (location) qs.set("location", location);
         if (clientCoords.lat) qs.set("latitude", String(clientCoords.lat));
         if (clientCoords.lng) qs.set("longitude", String(clientCoords.lng));
@@ -213,10 +214,10 @@
         }
 
         const url = new URL(window.location.href);
-        if (salon) url.searchParams.set("salon", salon);
-        else url.searchParams.delete("salon");
-        if (service) url.searchParams.set("service", service);
-        else url.searchParams.delete("service");
+        if (query) url.searchParams.set("q", query);
+        else url.searchParams.delete("q");
+        url.searchParams.delete("salon");
+        url.searchParams.delete("service");
         if (location) url.searchParams.set("location", location);
         else url.searchParams.delete("location");
         window.history.replaceState({}, "", url);
@@ -249,8 +250,13 @@
     btnMapView?.addEventListener("click", () => setViewMode("map"));
 
     document.addEventListener("DOMContentLoaded", () => {
-        if (salonInput) salonInput.value = params.get("salon") || params.get("q") || "";
-        if (serviceInput) serviceInput.value = params.get("service") || "";
+        const legacySalon = params.get("salon") || "";
+        const legacyService = params.get("service") || "";
+        if (queryInput) {
+            queryInput.value =
+                params.get("q") ||
+                [legacySalon, legacyService].filter(Boolean).join(" ").trim();
+        }
         if (locationInput) locationInput.value = params.get("location") || "";
         requestLocation().then(fetchResults);
     });

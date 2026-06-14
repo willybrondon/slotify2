@@ -381,6 +381,7 @@ app.get("/api/public/categories", async (req, res) => {
 app.get("/api/public/salons-by-category", categoryController.getSalonsByCategory);
 app.get("/api/public/experts-by-category", categoryController.getExpertsByCategory);
 app.get("/api/public/search-salons", categoryController.searchSalonsPublic);
+app.get("/api/public/search-suggestions", categoryController.getSearchSuggestions);
 
 app.get("/recherche", function (req, res) {
   const searchPage = path.join(salonportalPath, "search-results.html");
