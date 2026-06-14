@@ -72,6 +72,9 @@ class ApiConstant {
   static const getService = "user/service/serviceBasedCategory?";
   static const getAllService = "user/service/getAll?";
 
+  /// Public search suggestions (top categories + services)
+  static const searchSuggestions = "api/public/search-suggestions?";
+
   /// ---------- Salon ---------- ///
   static const getAllSalon = "user/salon/getAll?";
   static const getServiceBasedSalon = "user/salon/serviceBaseSalon";

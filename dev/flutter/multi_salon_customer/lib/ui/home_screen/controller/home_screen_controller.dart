@@ -23,6 +23,7 @@ import 'package:salon_2/ui/home_screen/model/get_all_salon_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_new_product_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_trending_product_model.dart';
 import 'package:salon_2/ui/product_screen/model/get_product_category_model.dart';
+import 'package:salon_2/ui/home_screen/model/search_suggestions_model.dart';
 import 'package:salon_2/ui/search_screen/model/get_all_service_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_service_base_salon_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
@@ -86,6 +87,13 @@ class HomeScreenController extends GetxController {
   final BookingDetailScreenController bookingDetailScreenController =
       Get.find<BookingDetailScreenController>();
   TextEditingController searchEditingController = TextEditingController();
+  TextEditingController intentQueryController = TextEditingController();
+  TextEditingController intentLocationController = TextEditingController();
+  FocusNode intentQueryFocusNode = FocusNode();
+
+  SearchSuggestionsModel? searchSuggestions;
+  bool showIntentSuggestions = false;
+  bool loadingIntentSuggestions = false;
 
   // CartScreenController cartScreenController = Get.put(CartScreenController());
 
@@ -119,6 +127,8 @@ class HomeScreenController extends GetxController {
 
     expertScrollController.addListener(onExpertPagination);
     serviceScrollController.addListener(onServicePagination);
+    intentQueryFocusNode.addListener(_onIntentQueryFocusChanged);
+    intentQueryController.addListener(_onIntentQueryTextChanged);
     getTrendingProductModel == null
         ? await onGetTrendingProductApiCall()
         : null;
@@ -229,8 +239,113 @@ class HomeScreenController extends GetxController {
   void dispose() {
     expertScrollController.dispose();
     serviceScrollController.dispose();
+    intentQueryFocusNode.removeListener(_onIntentQueryFocusChanged);
+    intentQueryFocusNode.dispose();
+    intentQueryController.removeListener(_onIntentQueryTextChanged);
+    intentQueryController.dispose();
+    intentLocationController.dispose();
     searchEditingController.dispose();
     super.dispose();
+  }
+
+  void _onIntentQueryFocusChanged() {
+    if (intentQueryFocusNode.hasFocus) {
+      showIntentSuggestions = true;
+      if (searchSuggestions == null) {
+        onGetSearchSuggestionsApiCall();
+      }
+      update([Constant.idIntentSearch]);
+    } else {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (!intentQueryFocusNode.hasFocus) {
+          hideIntentSuggestions();
+        }
+      });
+    }
+  }
+
+  void _onIntentQueryTextChanged() {
+    if (showIntentSuggestions) {
+      update([Constant.idIntentSearch]);
+    }
+  }
+
+  void hideIntentSuggestions() {
+    if (!showIntentSuggestions) return;
+    showIntentSuggestions = false;
+    update([Constant.idIntentSearch]);
+  }
+
+  Future<void> onGetSearchSuggestionsApiCall() async {
+    if (loadingIntentSuggestions) return;
+    try {
+      loadingIntentSuggestions = true;
+      update([Constant.idIntentSearch]);
+
+      final languageCode = Get.locale?.languageCode ?? 'fr';
+      final queryParameters = {"language": languageCode};
+      final queryString = Uri(queryParameters: queryParameters).query;
+      final url = Uri.parse(
+        ApiConstant.BASE_URL + ApiConstant.searchSuggestions + queryString,
+      );
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        searchSuggestions =
+            SearchSuggestionsModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      log("Error loading search suggestions :: $e");
+    } finally {
+      loadingIntentSuggestions = false;
+      update([Constant.idIntentSearch]);
+    }
+  }
+
+  Future<void> submitIntentSearch() async {
+    final query = intentQueryController.text.trim();
+    final location = intentLocationController.text.trim();
+
+    if (query.isEmpty && location.isEmpty) return;
+
+    hideIntentSuggestions();
+    intentQueryFocusNode.unfocus();
+
+    searchEditingController.text = query;
+    if (location.isNotEmpty) {
+      city = location;
+    }
+
+    await Get.toNamed(AppRoutes.search);
+
+    if (query.isNotEmpty) {
+      await printLatestValue(query);
+    } else if (location.isNotEmpty) {
+      await onGetAllSalonApiCall(
+        latitude: latitude ?? 0.0,
+        longitude: longitude ?? 0.0,
+        userId: Constant.storage.read<String>('userId') ?? "",
+        search: location,
+      );
+      update([Constant.idSearchService, Constant.idProgressView]);
+    }
+  }
+
+  void onIntentServiceSuggestionTap(String name) {
+    intentQueryController.text = name;
+    hideIntentSuggestions();
+    submitIntentSearch();
+  }
+
+  void onIntentCategorySuggestionTap(String? id, String? name) {
+    hideIntentSuggestions();
+    intentQueryFocusNode.unfocus();
+    if (id == null || name == null) return;
+    Get.toNamed(AppRoutes.categoryDetail, arguments: [id, name]);
   }
 
   void onExpertPagination() async {

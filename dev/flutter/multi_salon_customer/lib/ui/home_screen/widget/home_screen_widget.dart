@@ -238,149 +238,350 @@ class HomeScreenCategoryView extends StatelessWidget {
 class HomeScreenIntentHub extends StatelessWidget {
   const HomeScreenIntentHub({super.key});
 
+  static const double _wideBreakpoint = 600;
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= _wideBreakpoint;
+        final title = Text(
           'txtIntentHubTitle'.tr,
           style: TextStyle(
             fontFamily: AppFontFamily.sfProDisplayBold,
             fontSize: 18,
             color: AppColors.blackColor,
           ),
-        ),
-        const SizedBox(height: 14),
-        const _IntentSearchDoor(),
-        const SizedBox(height: 10),
-        _IntentDoorCard(
-          icon: Icons.ios_share_rounded,
-          title: 'txtIntentCaptureTitle'.tr,
-          body: 'txtIntentCaptureBody'.tr,
-          accent: AppColors.primaryAppColor,
-          filled: true,
-          onTap: () => Get.toNamed(
-            AppRoutes.aiConcierge,
-            arguments: <String, dynamic>{'captureMode': true},
-          ),
-        ),
-      ],
+        );
+        const searchBar = _IntentSearchBar();
+        final shareCard = _IntentShareLookCard(compact: wide);
+
+        if (wide) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              title,
+              const SizedBox(height: 14),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Expanded(flex: 3, child: searchBar),
+                    const SizedBox(width: 10),
+                    Expanded(flex: 2, child: shareCard),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            title,
+            const SizedBox(height: 14),
+            searchBar,
+            const SizedBox(height: 10),
+            const Divider(height: 1, thickness: 1, color: Color(0xFFE8E8E8)),
+            const SizedBox(height: 10),
+            shareCard,
+          ],
+        );
+      },
     );
   }
 }
 
-class _IntentSearchDoor extends StatelessWidget {
-  const _IntentSearchDoor();
+class _IntentShareLookCard extends StatelessWidget {
+  const _IntentShareLookCard({this.compact = false});
 
-  static const Color _searchBorder = Color(0xFFDDDDDD);
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    return DottedBorder(
-      borderType: BorderType.RRect,
-      radius: const Radius.circular(14),
-      color: _searchBorder,
-      strokeWidth: 1,
-      dashPattern: const [6, 4],
-      padding: EdgeInsets.zero,
-      child: Material(
-        color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () => Get.toNamed(AppRoutes.search),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: Constant.boxShadow,
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.search, color: AppColors.grey, size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'txtIntentSearchSalonHint'.tr,
-                        style: TextStyle(
-                          fontFamily: AppFontFamily.sfProDisplayMedium,
-                          fontSize: 14,
-                          color: AppColors.blackColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'txtIntentSearchServiceHint'.tr,
-                        style: TextStyle(
-                          fontFamily: AppFontFamily.sfProDisplayRegular,
-                          fontSize: 12,
-                          color: AppColors.grey,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  height: 36,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  color: const Color(0xFFDDDDDD),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 16,
-                        color: AppColors.primaryAppColor.withOpacity(0.85),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          'txtIntentSearchLocationHint'.tr,
-                          style: TextStyle(
-                            fontFamily: AppFontFamily.sfProDisplayRegular,
-                            fontSize: 13,
-                            color: AppColors.grey,
+    return _IntentDoorCard(
+      icon: Icons.ios_share_rounded,
+      title: 'txtIntentCaptureTitle'.tr,
+      body: 'txtIntentCaptureBody'.tr,
+      accent: AppColors.primaryAppColor,
+      filled: true,
+      compact: compact,
+      onTap: () => Get.toNamed(
+        AppRoutes.aiConcierge,
+        arguments: <String, dynamic>{'captureMode': true},
+      ),
+    );
+  }
+}
+
+class _IntentSearchBar extends StatelessWidget {
+  const _IntentSearchBar();
+
+  static const Color _searchBorder = Color(0xFFDDDDDD);
+
+  List<T> _filterByQuery<T>(List<T>? items, String? Function(T) label, String query) {
+    final q = query.trim().toLowerCase();
+    if (items == null) return [];
+    if (q.isEmpty) return items;
+    return items
+        .where((item) => (label(item) ?? '').toLowerCase().contains(q))
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<HomeScreenController>(
+      id: Constant.idIntentSearch,
+      builder: (logic) {
+        final categories = _filterByQuery(
+          logic.searchSuggestions?.categories,
+          (c) => c.name,
+          logic.intentQueryController.text,
+        ).take(5).toList();
+        final services = _filterByQuery(
+          logic.searchSuggestions?.services,
+          (s) => s.name,
+          logic.intentQueryController.text,
+        ).take(10).toList();
+        final showPanel = logic.showIntentSuggestions &&
+            (logic.intentQueryFocusNode.hasFocus ||
+                logic.loadingIntentSuggestions);
+
+        return DottedBorder(
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(14),
+          color: _searchBorder,
+          strokeWidth: 1,
+          dashPattern: const [6, 4],
+          padding: EdgeInsets.zero,
+          child: Material(
+            color: AppColors.whiteColor,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: Constant.boxShadow,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search, color: AppColors.grey, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 3,
+                          child: TextField(
+                            controller: logic.intentQueryController,
+                            focusNode: logic.intentQueryFocusNode,
+                            style: TextStyle(
+                              fontFamily: AppFontFamily.sfProDisplayMedium,
+                              fontSize: 14,
+                              color: AppColors.blackColor,
+                            ),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              border: InputBorder.none,
+                              hintText: 'txtIntentSearchQueryHint'.tr,
+                              hintStyle: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplayRegular,
+                                fontSize: 14,
+                                color: AppColors.grey,
+                              ),
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (_) => logic.submitIntentSearch(),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Container(
+                          width: 1,
+                          height: 32,
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          color: const Color(0xFFDDDDDD),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 16,
+                                color: AppColors.primaryAppColor.withOpacity(0.85),
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: TextField(
+                                  controller: logic.intentLocationController,
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                                    fontSize: 13,
+                                    color: AppColors.grey,
+                                  ),
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    hintText: 'txtIntentSearchLocationHint'.tr,
+                                    hintStyle: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplayRegular,
+                                      fontSize: 13,
+                                      color: AppColors.grey,
+                                    ),
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  textInputAction: TextInputAction.search,
+                                  onSubmitted: (_) => logic.submitIntentSearch(),
+                                  onTapOutside: (_) => logic.hideIntentSuggestions(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        InkWell(
+                          onTap: logic.submitIntentSearch,
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: AppColors.blackColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.arrow_forward,
+                              color: AppColors.whiteColor,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (showPanel)
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Color(0xFFF0F0F0)),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.blackColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.arrow_forward,
-                    color: AppColors.whiteColor,
-                    size: 18,
-                  ),
-                ),
-              ],
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+                      child: logic.loadingIntentSuggestions
+                          ? Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Text(
+                                'txtIntentSuggestLoading'.tr,
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.sfProDisplayRegular,
+                                  fontSize: 13,
+                                  color: AppColors.grey,
+                                ),
+                              ),
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (categories.isNotEmpty) ...[
+                                  Text(
+                                    'txtIntentSuggestCategoriesTitle'.tr,
+                                    style: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontSize: 11,
+                                      letterSpacing: 0.4,
+                                      color: AppColors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  ...categories.map(
+                                    (cat) => ListTile(
+                                      dense: true,
+                                      visualDensity: VisualDensity.compact,
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                      ),
+                                      leading: Icon(
+                                        Icons.layers_outlined,
+                                        size: 18,
+                                        color: AppColors.primaryAppColor,
+                                      ),
+                                      title: Text(
+                                        cat.name ?? '',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayMedium,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      onTap: () => logic.onIntentCategorySuggestionTap(
+                                        cat.id,
+                                        cat.name,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                if (categories.isNotEmpty && services.isNotEmpty)
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 6),
+                                    child: Divider(height: 1, color: Color(0xFFF0F0F0)),
+                                  ),
+                                if (services.isNotEmpty) ...[
+                                  Text(
+                                    'txtIntentSuggestServicesTitle'.tr,
+                                    style: TextStyle(
+                                      fontFamily: AppFontFamily.sfProDisplayBold,
+                                      fontSize: 11,
+                                      letterSpacing: 0.4,
+                                      color: AppColors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  ...services.map(
+                                    (svc) => ListTile(
+                                      dense: true,
+                                      visualDensity: VisualDensity.compact,
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                      ),
+                                      leading: Icon(
+                                        Icons.content_cut_outlined,
+                                        size: 18,
+                                        color: AppColors.primaryAppColor,
+                                      ),
+                                      title: Text(
+                                        svc.name ?? '',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayMedium,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      onTap: () => logic.onIntentServiceSuggestionTap(
+                                        svc.name ?? '',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                    ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -393,6 +594,7 @@ class _IntentDoorCard extends StatelessWidget {
     required this.accent,
     required this.onTap,
     this.filled = false,
+    this.compact = false,
   });
 
   final IconData icon;
@@ -401,6 +603,7 @@ class _IntentDoorCard extends StatelessWidget {
   final Color accent;
   final VoidCallback onTap;
   final bool filled;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -414,7 +617,8 @@ class _IntentDoorCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        height: compact ? double.infinity : null,
+        padding: EdgeInsets.all(compact ? 12 : 16),
         decoration: BoxDecoration(
           color: filled ? accent : AppColors.whiteColor,
           borderRadius: BorderRadius.circular(14),
@@ -436,35 +640,43 @@ class _IntentDoorCard extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: compact ? 40 : 44,
+              height: compact ? 40 : 44,
               decoration: BoxDecoration(
                 color: filled
                     ? AppColors.whiteColor.withOpacity(0.2)
                     : accent.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: filled ? AppColors.whiteColor : accent),
+              child: Icon(
+                icon,
+                size: compact ? 18 : 22,
+                color: filled ? AppColors.whiteColor : accent,
+              ),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: compact ? 10 : 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment:
+                    compact ? MainAxisAlignment.center : MainAxisAlignment.start,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
                       fontFamily: AppFontFamily.sfProDisplayBold,
-                      fontSize: 15,
+                      fontSize: compact ? 14 : 15,
                       color: titleColor,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: compact ? 2 : 4),
                   Text(
                     body,
+                    maxLines: compact ? 3 : null,
+                    overflow: compact ? TextOverflow.ellipsis : null,
                     style: TextStyle(
                       fontFamily: AppFontFamily.sfProDisplayRegular,
-                      fontSize: 12.5,
+                      fontSize: compact ? 11.5 : 12.5,
                       height: 1.35,
                       color: bodyColor,
                     ),

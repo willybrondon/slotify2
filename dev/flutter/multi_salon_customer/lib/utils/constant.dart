@@ -73,6 +73,7 @@ class Constant {
   static var idExpertDetail = 'idExpertDetail';
   static var idUserReview = 'idUserReview';
   static var idSearchService = 'idSearchService';
+  static var idIntentSearch = 'idIntentSearch';
   static var idHomeService = 'idHomeService';
   static var idOnChangeTabBar = 'idOnChangeTabBar';
   static var idChangeTab = 'idChangeTab';
