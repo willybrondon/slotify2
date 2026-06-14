@@ -21,6 +21,7 @@ import 'package:salon_2/localization/localizations_delegate.dart';
 import 'package:salon_2/routes/app_pages.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/services/share_capture_service.dart';
+import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/preference.dart';
 import 'localization/locale_constant.dart';
@@ -328,6 +329,17 @@ class _MyAppState extends State<MyApp> {
       },
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.brandTerracotta,
+            primary: AppColors.brandTerracotta,
+            onPrimary: AppColors.brandWhite,
+            surface: AppColors.brandWhite,
+            onSurface: AppColors.brandBlack,
+          ),
+          scaffoldBackgroundColor: AppColors.brandWhite,
+        ),
         locale: const Locale("fr"),
         translations: AppLanguages(),
         initialRoute: AppRoutes.initial,

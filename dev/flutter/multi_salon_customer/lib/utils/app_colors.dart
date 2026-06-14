@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
+/// Palette Skedisy : noir, blanc, terracotta (#C45C26) — alignée salonportal web.
 class AppColors {
-  static Color primaryAppColor = const Color(0xff000000);
-  static Color primaryTextColor = const Color(0xff223126);
-  static Color appText = const Color(0xff000000);
+  static const Color brandTerracotta = Color(0xFFC45C26);
+  static const Color brandTerracottaHover = Color(0xFFA84D1F);
+  static const Color brandBlack = Color(0xFF111111);
+  static const Color brandWhite = Color(0xFFFFFFFF);
+
+  static Color primaryAppColor = brandTerracotta;
+  static Color primaryTextColor = brandBlack;
+  static Color appText = brandBlack;
   static Color appointmentBg = const Color(0xff2C302E);
-  static Color backGround = const Color(0xffFDFFFC);
-  static Color whiteColor = const Color(0xffFFFFFF);
+  static Color backGround = brandWhite;
+  static Color whiteColor = brandWhite;
   static Color lineColor = const Color(0xffEFEFEF);
   static Color indicatorColor = const Color(0xffD9D9D9);
   static Color yellow2 = const Color(0xffFFFCF2);
@@ -14,7 +20,7 @@ class AppColors {
   static Color profileTitle = const Color(0xffABABAB);
   static Color currency = const Color(0xff0A4C09);
   static Color currencyGrey = const Color(0xffA5A5A5);
-  static Color yellow = const Color(0xffE96E14);
+  static Color yellow = brandTerracotta;
   static Color detailBg = const Color(0xffF7F8FF);
   static Color category = const Color(0xff1C2822);
   static Color categoryService = const Color(0xff1F2F23);
@@ -49,8 +55,8 @@ class AppColors {
   static Color bottomIcon = const Color(0xff929296);
   static Color dateSelect = const Color(0xffF2F6FF);
   static Color slotSelect = const Color(0xffFAF9FF);
-  static Color blackColor = const Color(0xff000000);
-  static Color blackColor1 = const Color(0xff111111);
+  static Color blackColor = brandBlack;
+  static Color blackColor1 = brandBlack;
   static Color review = const Color(0xff101C4A);
   static Color purple = const Color(0xffF2EBFF);
   static Color purpleText = const Color(0xff2E367F);
@@ -70,7 +76,7 @@ class AppColors {
   static Color oceanBlue = const Color(0xffD8F2F6);
   static Color yellowColor = const Color(0xffFFBB0D);
   static Color orangeBg = const Color(0xffFFF6EB);
-  static Color orange = const Color(0xffE96E14);
+  static Color orange = brandTerracotta;
   static Color yellow1 = const Color(0xffFFFAE7);
   static Color yellow3 = const Color(0xffFFC632);
   static Color sellerYellow = const Color(0xff8E610A);
@@ -89,9 +95,9 @@ class AppColors {
   static Color bgStepper = const Color(0xff8D9AA5);
   static Color locationText = const Color(0xff48484C);
   static Color greyColor3 = const Color(0xffCBCBCB);
-  static Color buttonColor = const Color(0xff6F42E5);
-  static Color directionBox = const Color(0xff488FED);
-  static Color callBox = const Color(0xff000000);
+  static Color buttonColor = brandTerracotta;
+  static Color directionBox = brandTerracotta;
+  static Color callBox = brandBlack;
   static Color greenColor = const Color(0xff2EB62C);
   static Color greenBox = const Color(0xffEFFEEE);
   static Color greenBg = const Color(0xffEBF7ED);

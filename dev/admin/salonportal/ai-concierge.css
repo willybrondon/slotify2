@@ -2,19 +2,19 @@
 .ai-concierge-section {
     padding: 120px 20px 60px;
     min-height: 100vh;
-    background: #f8f9fa;
+    background: var(--sk-white);
 }
 
 .ai-concierge-header {
     text-align: center;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 50px;
 }
 
 .ai-icon {
     font-size: 80px;
     margin-bottom: 20px;
-    color: #111;
+    color: var(--sk-black);
     animation: float 3s ease-in-out infinite;
 }
 
@@ -27,7 +27,7 @@
     font-size: 48px;
     font-weight: 700;
     margin-bottom: 15px;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .subtitle {
@@ -64,7 +64,7 @@
     min-height: 400px;
     border: 3px dashed #111;
     border-radius: 15px;
-    background: #f8f9fa;
+    background: var(--sk-white);
     transition: all 0.3s ease;
 }
 
@@ -86,7 +86,7 @@
 
 .upload-placeholder i {
     font-size: 80px;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 20px;
 }
 
@@ -149,13 +149,13 @@
     border-radius: 25px;
     cursor: pointer;
     font-size: 14px;
-    color: #e74c3c;
+    color: var(--sk-brand);
     transition: all 0.3s ease;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .btn-remove:hover {
-    background: #e74c3c;
+    background: var(--sk-brand);
     color: white;
     transform: scale(1.05);
 }
@@ -224,7 +224,7 @@
 
 .analysis-card h2 i,
 .recommendations-card h2 i {
-    color: #111;
+    color: var(--sk-black);
 }
 
 .analysis-content {
@@ -234,7 +234,7 @@
 }
 
 .analysis-item {
-    background: #f8f9fa;
+    background: var(--sk-white);
     padding: 25px;
     border-radius: 15px;
     border-left: 4px solid #111;
@@ -242,7 +242,7 @@
 
 .analysis-item h3 {
     font-size: 20px;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -267,7 +267,7 @@
 }
 
 .service-card {
-    background: #f8f9fa;
+    background: var(--sk-white);
     padding: 20px;
     border-radius: 15px;
     text-align: center;
@@ -303,7 +303,7 @@
 
 .salon-item,
 .salon-item--link {
-    background: #f8f9fa;
+    background: var(--sk-white);
     padding: 20px;
     border-radius: 15px;
     display: flex;
@@ -334,13 +334,13 @@
 }
 
 .salon-match-hint {
-    color: var(--sk-primary, #e96e14);
+    color: var(--sk-brand);
     font-size: 13px;
     font-weight: 600;
 }
 
 .salon-cta {
-    color: #111;
+    color: var(--sk-black);
     font-size: 13px;
     font-weight: 600;
     margin-top: 6px;
@@ -354,7 +354,7 @@
 }
 
 .analysis-item--summary {
-    border-left: 3px solid var(--sk-primary, #e96e14);
+    border-left: 3px solid var(--sk-brand);
     padding-left: 16px;
 }
 
@@ -385,7 +385,7 @@ body.sq-ai-concierge-page .ai-concierge-section {
 }
 
 .rating {
-    color: #f39c12;
+    color: var(--sk-brand);
     font-size: 14px;
 }
 
@@ -393,7 +393,7 @@ body.sq-ai-concierge-page .ai-concierge-section {
     background: #fff3cd;
     padding: 25px;
     border-radius: 15px;
-    border-left: 4px solid #ffc107;
+    border-left: 4px solid var(--sk-brand);
 }
 
 .beauty-tips h3 {
@@ -434,7 +434,7 @@ body.sq-ai-concierge-page .ai-concierge-section {
 .btn-secondary {
     padding: 15px 40px;
     background: white;
-    color: #111;
+    color: var(--sk-black);
     border: 2px solid #111;
     border-radius: 50px;
     font-size: 16px;
@@ -489,7 +489,7 @@ body.sq-ai-concierge-page .ai-concierge-section {
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--sk-primary, #e96e14);
+    color: var(--sk-brand);
     margin: 0 0 12px;
 }
 
@@ -532,7 +532,7 @@ body.sq-ai-concierge-page .ai-concierge-section {
 
     .upload-area {
         min-height: auto;
-        border-color: var(--sk-primary, #e96e14);
+        border-color: var(--sk-brand);
         border-width: 2px;
         background: #fff;
     }
@@ -545,7 +545,7 @@ body.sq-ai-concierge-page .ai-concierge-section {
 
     .upload-placeholder i {
         font-size: 52px;
-        color: var(--sk-primary, #e96e14);
+        color: var(--sk-brand);
     }
 
     .upload-placeholder h3 {
@@ -637,7 +637,7 @@ body.sq-ai-concierge-page .ai-concierge-section {
     }
 
     .salon-item--mobile .salon-address--primary i {
-        color: var(--sk-primary, #e96e14);
+        color: var(--sk-brand);
         margin-right: 4px;
     }
 
@@ -645,13 +645,13 @@ body.sq-ai-concierge-page .ai-concierge-section {
         font-size: 1.05rem;
         font-weight: 700;
         margin: 0 0 6px;
-        color: #111;
+        color: var(--sk-black);
     }
 
     .salon-item--mobile .salon-distance {
         font-size: 0.85rem;
         font-weight: 600;
-        color: var(--sk-primary, #e96e14);
+        color: var(--sk-brand);
     }
 
     .salon-item--mobile .salon-cta {

@@ -1,21 +1,34 @@
-/* Skedisy — palette cohérente (marketing + fiches salon + catégories) */
+/* Skedisy — palette 3 couleurs : noir, blanc, terracotta (web ↔ app Flutter) */
 :root {
-    --sk-text: #111;
-    --sk-text-muted: #666;
-    --sk-text-soft: #999;
-    --sk-bg: #fff;
-    --sk-bg-alt: #f5f5f5;
-    --sk-bg-muted: #f8f8f8;
-    --sk-border: #e0e0e0;
-    --sk-border-light: #eee;
-    --sk-primary: #111;
-    --sk-primary-hover: #333;
-    --sk-inverse: #fff;
-    --sk-footer-bg: #111;
+    --sk-brand: #c45c26;
+    --sk-brand-hover: #a84d1f;
+    --sk-brand-light: rgba(196, 92, 38, 0.08);
+    --sk-brand-softer: rgba(196, 92, 38, 0.14);
+    --sk-black: #111111;
+    --sk-white: #ffffff;
+
+    --sq-primary: var(--sk-brand);
+    --sq-primary-hover: var(--sk-brand-hover);
+    --sq-bg: var(--sk-white);
+
+    --sk-text: var(--sk-black);
+    --sk-text-muted: rgba(17, 17, 17, 0.62);
+    --sk-text-soft: rgba(17, 17, 17, 0.45);
+    --sk-bg: var(--sk-white);
+    --sk-bg-alt: var(--sk-white);
+    --sk-bg-muted: var(--sk-white);
+    --sk-border: rgba(17, 17, 17, 0.12);
+    --sk-border-light: rgba(17, 17, 17, 0.08);
+    --sk-primary: var(--sk-black);
+    --sk-primary-hover: #333333;
+    --sk-accent: var(--sk-brand);
+    --sk-accent-hover: var(--sk-brand-hover);
+    --sk-inverse: var(--sk-white);
+    --sk-footer-bg: var(--sk-black);
     --sk-hero-overlay-top: rgba(0, 0, 0, 0.45);
     --sk-hero-overlay-bottom: rgba(0, 0, 0, 0.75);
     --sk-shadow: rgba(0, 0, 0, 0.08);
-    --sk-star: #111;
+    --sk-star: var(--sk-black);
 }
 
 /* Reset and Base Styles */
@@ -37,7 +50,7 @@ canvas {
 body {
     font-family: 'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     line-height: 1.6;
-    color: #111;
+    color: var(--sk-black);
     overflow-x: hidden;
 }
 
@@ -88,7 +101,7 @@ html {
 .nav-menu-center .category-link,
 .nav-menu-center .nav-btn {
     text-decoration: none;
-    color: #111;
+    color: var(--sk-black);
     font-weight: 500;
     font-size: 0.95rem;
     padding: 8px 16px;
@@ -112,14 +125,14 @@ html {
 .nav-menu-center .category-link:hover,
 .nav-menu-center .nav-btn:hover {
     background: #f5f5f5;
-    color: #111;
+    color: var(--sk-black);
     text-decoration: none;
 }
 
 .nav-menu-center .nav-btn--active {
     font-weight: 600;
     background: #f0f0f0;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .nav-menu-actions {
@@ -144,7 +157,7 @@ html {
     padding: 8px 16px;
     font-size: 0.95rem;
     font-weight: 500;
-    color: #111;
+    color: var(--sk-black);
     cursor: pointer;
     transition: all 0.2s;
     display: inline-flex;
@@ -176,7 +189,7 @@ html {
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     background: transparent;
-    color: #111;
+    color: var(--sk-black);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -511,7 +524,7 @@ html {
     border-bottom: 1px solid #e0e0e0;
     font-weight: 700;
     font-size: 0.9rem;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .mobile-categories-drawer__close {
@@ -525,7 +538,7 @@ html {
 }
 
 .mobile-categories-drawer__close:hover {
-    color: #111;
+    color: var(--sk-black);
 }
 
 .mobile-categories-drawer .mobile-categories {
@@ -542,25 +555,25 @@ html {
 }
 
 .btn-for-business-mobile {
-    border: 2px solid #c45c26 !important;
+    border: 2px solid var(--sk-brand) !important;
     background: #fff !important;
-    color: #c45c26 !important;
+    color: var(--sk-brand) !important;
 }
 
 .btn-for-business-mobile:hover {
     background: #fdf6f0 !important;
-    color: #a84d1f !important;
+    color: var(--sk-brand-hover) !important;
 }
 
 .btn-for-clients-mobile {
-    border: 2px solid #c45c26 !important;
+    border: 2px solid var(--sk-brand) !important;
     background: #fff !important;
-    color: #c45c26 !important;
+    color: var(--sk-brand) !important;
 }
 
 .btn-for-clients-mobile:hover {
     background: #fdf6f0 !important;
-    color: #a84d1f !important;
+    color: var(--sk-brand-hover) !important;
 }
 
 .btn-login-mobile-menu {
@@ -627,7 +640,7 @@ html {
 .mobile-documentation-link {
     display: block !important;
     text-decoration: none;
-    color: #111;
+    color: var(--sk-black);
     font-weight: 700 !important;
     font-size: 1rem;
     padding: 12px 16px;
@@ -707,7 +720,7 @@ html {
 
 .mobile-categories .category-link {
     text-decoration: none;
-    color: #111;
+    color: var(--sk-black);
     font-weight: 500;
     font-size: 1rem;
     padding: 12px 16px;
@@ -932,7 +945,7 @@ html {
 .request-button-card h3 {
     font-size: 1.3rem;
     font-weight: 600;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 25px;
     line-height: 1.4;
 }
@@ -2008,7 +2021,7 @@ html {
     max-width: 320px;
 }
 .qr-block h2 {
-    color: #111;
+    color: var(--sk-black);
     font-size: 1.3rem;
     margin-bottom: 18px;
     font-weight: 600;
@@ -2025,7 +2038,7 @@ html {
     padding: 60px 0 40px;
 }
 .faq h2 {
-    color: #111;
+    color: var(--sk-black);
     font-size: 2rem;
     margin-bottom: 32px;
     text-align: center;
@@ -2047,7 +2060,7 @@ html {
     cursor: pointer;
 }
 .faq-item h3 {
-    color: #111;
+    color: var(--sk-black);
     font-size: 1.1rem;
     font-weight: 600;
     margin: 0;
@@ -2228,7 +2241,7 @@ html {
 .qr-label {
     font-weight: 700;
     font-size: 0.9rem;
-    color: #111;
+    color: var(--sk-black);
     margin-top: 8px;
     text-align: center;
     line-height: 1.2;
@@ -2252,7 +2265,7 @@ html {
     align-items: center;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #111;
+    color: var(--sk-black);
     margin: 0;
     padding: 22px 0 12px;
     user-select: none;
@@ -2265,7 +2278,7 @@ html {
     height: 28px;
     border-radius: 50%;
     background: #fff;
-    color: #111;
+    color: var(--sk-black);
     font-size: 1.5rem;
     font-weight: 700;
     box-shadow: 0 1px 4px rgba(0,0,0,0.07);
@@ -2316,7 +2329,7 @@ html {
     text-align: center;
 }
 .planity-feature-block h2 {
-    color: #111;
+    color: var(--sk-black);
     font-size: 1.3rem;
     font-weight: 700;
     margin-bottom: 18px;
@@ -2359,7 +2372,7 @@ html {
     text-align: left;
 }
 .discover-content h2 {
-    color: #111;
+    color: var(--sk-black);
     font-size: 1.4rem;
     font-weight: 700;
     margin-bottom: 18px;
@@ -2393,7 +2406,7 @@ html {
 }
 .qr-login-standalone {
     background: none;
-    color: #111;
+    color: var(--sk-black);
     font-size: 1.25rem;
     font-weight: 700;
     border: none;
@@ -2451,7 +2464,7 @@ html {
 .hero-feature-title {
     font-size: 3.2rem;
     font-weight: 800;
-    color: #111;
+    color: var(--sk-black);
     line-height: 1.05;
     margin-bottom: 36px;
     margin-top: 0;
@@ -2462,7 +2475,7 @@ html {
     margin: 0;
     font-size: 1.18rem;
     font-weight: 400;
-    color: #111;
+    color: var(--sk-black);
     line-height: 1.6;
 }
 .hero-feature-list li {
@@ -2529,7 +2542,7 @@ html {
 .pro-stats-title {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #111;
+    color: var(--sk-black);
     line-height: 1.12;
     margin-bottom: 36px;
     margin-top: 0;
@@ -2564,7 +2577,7 @@ html {
 .pro-stats-main {
     font-size: 2rem;
     font-weight: 600;
-    color: #111;
+    color: var(--sk-black);
     display: block;
     margin-bottom: 6px;
 }
@@ -2631,7 +2644,7 @@ html {
     margin-bottom: 18px;
 }
 .platform-feature-card h3 {
-    color: #111;
+    color: var(--sk-black);
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 12px;
@@ -2679,7 +2692,7 @@ html {
 .cta-content h2 {
     font-size: 2.2rem;
     font-weight: 800;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 18px;
 }
 .cta-content p {
@@ -2779,12 +2792,12 @@ html {
 }
 
 .floating-download-btn--expert {
-    background: #c45c26;
+    background: var(--sk-brand);
     max-width: 100%;
 }
 
 .floating-download-btn--expert:hover {
-    background: #a84d1f;
+    background: var(--sk-brand-hover);
     color: #fff;
 }
 
@@ -2895,7 +2908,7 @@ html {
   }
   .mobile-download-btn {
     background: #fff;
-    color: #111;
+    color: var(--sk-black);
     font-size: 0.75rem;
     font-weight: 600;
     border: 1px solid #eee;
@@ -2930,7 +2943,7 @@ html {
   .btn-login-mobile {
     display: inline-block !important;
     background: none;
-    color: #111;
+    color: var(--sk-black);
     font-weight: 700;
     font-size: 1.1rem;
     border: none;
@@ -3410,7 +3423,7 @@ html {
 }
 .problem-section h2 {
     font-size: 1.5rem;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 1.5rem;
     text-align: center;
 }
@@ -3441,7 +3454,7 @@ html {
 }
 .solution-section h2 {
     font-size: 1.5rem;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 2rem;
     text-align: center;
 }
@@ -3474,7 +3487,7 @@ html {
 }
 .trust-section h2 {
     font-size: 1.5rem;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 1.5rem;
     text-align: center;
 }
@@ -3497,7 +3510,7 @@ html {
     text-align: center;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #111;
+    color: var(--sk-black);
     margin: 0;
 }
 
@@ -3511,7 +3524,7 @@ html {
 }
 .cta-again-section h2 {
     font-size: 1.75rem;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 1.5rem;
 }
 
@@ -3555,7 +3568,7 @@ html {
 
 .client-hero .btn-primary {
     background: #fff;
-    color: #111;
+    color: var(--sk-black);
     border: none;
 }
 
@@ -3588,7 +3601,7 @@ html {
     text-align: center;
     font-size: 2rem;
     margin-bottom: 2.5rem;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .how-it-works-grid {
@@ -3621,7 +3634,7 @@ html {
 .how-step h3 {
     font-size: 1.25rem;
     margin-bottom: 0.75rem;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .how-step p {
@@ -3657,7 +3670,7 @@ html {
 .client-benefit-text h2 {
     font-size: 1.75rem;
     margin-bottom: 1rem;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .client-benefit-text p {
@@ -3814,7 +3827,7 @@ html {
     padding: 7rem 0 4rem;
     background: #fff;
     min-height: auto;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-hero--pro {
@@ -3850,7 +3863,7 @@ html {
     font-weight: 700;
     line-height: 1.08;
     letter-spacing: -0.02em;
-    color: #111;
+    color: var(--sk-black);
     margin-bottom: 1.25rem;
 }
 
@@ -3966,7 +3979,7 @@ html {
 
 .sq-btn-ghost {
     background: transparent;
-    color: #111;
+    color: var(--sk-black);
     border: 1px solid #111;
 }
 
@@ -3982,7 +3995,7 @@ html {
 
 .sq-btn-ghost--on-dark:hover {
     background: #fff;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-btn-sm {
@@ -4186,7 +4199,7 @@ html {
     letter-spacing: -0.03em;
     line-height: 1.1;
     margin-bottom: 1rem;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-feature--dark .sq-feature-copy h2 {
@@ -4224,7 +4237,7 @@ html {
 
 .sq-link {
     font-weight: 600;
-    color: #111;
+    color: var(--sk-black);
     text-decoration: none;
     border-bottom: 1px solid #111;
     padding-bottom: 2px;
@@ -4245,7 +4258,7 @@ html {
     text-align: center;
     letter-spacing: -0.02em;
     margin-bottom: 2.5rem;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-for {
@@ -4275,7 +4288,7 @@ html {
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 1;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-audience {
@@ -4343,12 +4356,12 @@ html {
 
 .sq-steps--light {
     background: #fff;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-steps--light .sq-step-num {
     border-color: #111;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-steps--light .sq-steps-list p {
@@ -4488,7 +4501,7 @@ html {
 
 .sq-final-cta .sq-btn-fill {
     background: #fff;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-final-cta .sq-btn-fill:hover {
@@ -4680,11 +4693,11 @@ html {
 
 .sq-request--light {
     background: #fff;
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-request--light h2 {
-    color: #111;
+    color: var(--sk-black);
 }
 
 .sq-request h2 {

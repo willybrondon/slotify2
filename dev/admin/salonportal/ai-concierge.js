@@ -39,6 +39,10 @@ function t(key) {
     return key;
 }
 
+function isShareLookPage() {
+    return document.body.classList.contains('sq-share-look-page') || window.SKEDISY_SHARE_LOOK_PAGE === true;
+}
+
 function isCaptureMode() {
     const params = new URLSearchParams(window.location.search);
     return params.get('capture') === '1' || params.get('capture') === 'true';
@@ -153,7 +157,27 @@ function setupLinkCapture() {
     }
 }
 
+function applyShareLookPageUI() {
+    captureMode = true;
+    document.body.classList.add('sq-capture-mode');
+
+    const screenRecordTip = document.getElementById('screenRecordTip');
+    const analyzeLabel = document.getElementById('analyzeBtnLabel');
+    const uploadAreaIcon = document.getElementById('uploadAreaIcon');
+
+    if (screenRecordTip) screenRecordTip.hidden = false;
+    if (uploadAreaIcon) uploadAreaIcon.className = 'fas fa-images';
+
+    if (typeof translatePage === 'function') translatePage();
+    if (analyzeLabel) analyzeLabel.textContent = t('shareLook.analyzeBtn');
+    document.title = t('shareLook.pageTitle');
+}
+
 function applyCaptureModeUI() {
+    if (isShareLookPage()) {
+        applyShareLookPageUI();
+        return;
+    }
     if (isCaptureMode()) {
         const target = (window.SKEDISY_ASSET_BASE || '.').replace(/\/$/, '') + '/partager-un-look.html';
         window.location.replace(target);
@@ -245,15 +269,57 @@ function appendLocationToFormData(formData) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
+    if (!fileInput || !uploadArea) return;
+
     applyCaptureModeUI();
     setupLinkCapture();
+    setupShareLookUploadButtons();
     setupEventListeners();
-    if (isMobileConcierge()) {
+    if (isMobileConcierge() || isShareLookPage()) {
         requestClientLocation();
     } else {
         updateLocationStatusUI();
     }
 });
+
+function setupShareLookUploadButtons() {
+    if (!isShareLookPage() || !fileInput) return;
+
+    const btnScreenshot = document.getElementById('btnUploadScreenshot');
+    const btnSelfie = document.getElementById('btnTakeSelfie');
+    const btnPhoto = document.getElementById('btnTakePhoto');
+
+    const openPicker = (mode) => {
+        fileInput.value = '';
+        fileInput.removeAttribute('capture');
+        if (mode === 'screenshot') {
+            fileInput.setAttribute(
+                'accept',
+                'image/*,video/mp4,video/quicktime,video/webm,video/3gpp'
+            );
+        } else {
+            fileInput.setAttribute('accept', 'image/*');
+            fileInput.setAttribute('capture', mode === 'selfie' ? 'user' : 'environment');
+        }
+        fileInput.click();
+    };
+
+    btnScreenshot?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openPicker('screenshot');
+    });
+    btnSelfie?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openPicker('selfie');
+    });
+    btnPhoto?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openPicker('photo');
+    });
+}
 
 document.addEventListener('skedisy:language-changed', function() {
     applyCaptureModeUI();
@@ -261,8 +327,12 @@ document.addEventListener('skedisy:language-changed', function() {
 });
 
 function setupEventListeners() {
-    // Upload button click
-    uploadBtn.addEventListener('click', () => fileInput.click());
+    if (!uploadBtn || !fileInput || !uploadArea) return;
+
+    // Upload button click (concierge page only)
+    if (!isShareLookPage()) {
+        uploadBtn.addEventListener('click', () => fileInput.click());
+    }
     
     // File input change
     fileInput.addEventListener('change', handleFileSelect);
@@ -281,8 +351,9 @@ function setupEventListeners() {
     uploadArea.addEventListener('dragleave', handleDragLeave);
     uploadArea.addEventListener('drop', handleDrop);
     
-    // Click on upload area
+    // Click on upload area (not on action buttons)
     uploadArea.addEventListener('click', (e) => {
+        if (isShareLookPage()) return;
         if (e.target === uploadArea || e.target === uploadPlaceholder) {
             fileInput.click();
         }
@@ -477,7 +548,9 @@ function resetAnalyzeButton() {
     spinner.style.display = 'none';
     const label = document.getElementById('analyzeBtnLabel');
     if (label) {
-        label.textContent = captureMode ? t('capture.analyzeLook') : t('concierge.analyzeBtn');
+        label.textContent = captureMode
+            ? (isShareLookPage() ? t('shareLook.analyzeBtn') : t('capture.analyzeLook'))
+            : t('concierge.analyzeBtn');
     }
 }
 

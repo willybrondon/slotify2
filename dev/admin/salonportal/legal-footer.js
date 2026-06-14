@@ -12,7 +12,7 @@ function mountLegalFooter() {
         '<div class="footer-content">' +
         '<div class="footer-section">' +
         "<h3>Skedisy</h3>" +
-        '<p data-translate="footer.clientTagline">La réservation pour la communauté afro en Île-de-France.</p>' +
+        '<p data-translate="footer.clientTagline">Réserve dans les salons coiffure afro en Île-de-France — pour toutes.</p>' +
         '<div class="contact-info">' +
         '<p><i class="fas fa-envelope"></i> support@skedisy.com</p>' +
         '<p><a href="https://wa.me/33766160394" class="btn-whatsapp-inline" target="_blank" rel="noopener noreferrer" data-translate="footer.whatsapp">' +
