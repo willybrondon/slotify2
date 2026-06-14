@@ -370,7 +370,7 @@ class _IntentSearchDoor extends StatelessWidget {
                     color: AppColors.blackColor,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_forward,
                     color: AppColors.whiteColor,
                     size: 18,
