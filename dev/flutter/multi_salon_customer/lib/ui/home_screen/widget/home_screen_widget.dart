@@ -265,14 +265,6 @@ class HomeScreenIntentHub extends StatelessWidget {
             arguments: <String, dynamic>{'captureMode': true},
           ),
         ),
-        const SizedBox(height: 10),
-        _IntentDoorCard(
-          icon: Icons.auto_awesome,
-          title: 'txtIntentConciergeTitle'.tr,
-          body: 'txtIntentConciergeBody'.tr,
-          accent: AppColors.primaryAppColor,
-          onTap: () => Get.toNamed(AppRoutes.aiConcierge),
-        ),
       ],
     );
   }

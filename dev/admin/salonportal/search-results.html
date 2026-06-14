@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="searchResults.pageTitle">Recherche salons — Skedisy</title>
+    <meta name="description" content="Trouve un salon afro en Île-de-France par prestation, nom ou ville.">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="cookie-consent.css">
+    <link rel="stylesheet" href="intent-hub.css">
+    <link rel="stylesheet" href="public-pages.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="language.js" defer></script>
+</head>
+<body class="client-page sq-page sk-public-page" data-page="client">
+    <div class="login-above-qr header-actions-above-qr">
+        <a href="/professionnel/" class="btn-nav-above btn-pro-above" data-translate="nav.pro">Pro</a>
+        <a href="/compte/connexion" class="btn-login-above" data-translate="nav.login">Connexion</a>
+    </div>
+
+    <nav class="navbar sq-navbar">
+        <div class="nav-container">
+            <div class="nav-logo"><a href="/" style="text-decoration:none;color:inherit;"><h2>Skedisy</h2></a></div>
+            <div class="nav-menu-center desktop-only" id="categoriesMenu"></div>
+            <div class="mobile-menu-wrapper">
+                <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+    </nav>
+
+  <section class="sq-home-product sq-home-product--compact" id="sqHomeProduct">
+    <div class="container sq-home-product-inner">
+      <div class="sq-home-intro">
+        <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta beauté afro en IDF.</h1>
+        <p class="sq-home-essence" data-translate="homeProduct.essence">Parce que les coiffures afro — tresses, locks, tissage — ne se résument pas à une coupe.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sq-intent-hub sq-intent-hub--search-page">
+    <div class="container">
+      <form id="searchResultsForm" class="sq-search-bar-expanded" role="search">
+        <div class="sq-search-bar-expanded__field">
+          <label for="searchSalonInput" data-translate="intentHub.searchSalonLabel">Salon</label>
+          <input type="search" id="searchSalonInput" name="salon" class="sq-intent-search-form__input" data-translate="intentHub.searchSalonPlaceholder" placeholder="Nom du salon" autocomplete="off">
+        </div>
+        <div class="sq-search-bar-expanded__field">
+          <label for="searchServiceInput" data-translate="intentHub.searchServiceLabel">Prestation</label>
+          <input type="search" id="searchServiceInput" name="service" class="sq-intent-search-form__input" data-translate="intentHub.searchServicePlaceholder" placeholder="Tresses, locks, tissage…" autocomplete="off">
+        </div>
+        <div class="sq-search-bar-expanded__field">
+          <label for="searchLocationInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+          <input type="search" id="searchLocationInput" name="location" class="sq-intent-search-form__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+        </div>
+        <button type="submit" class="sq-search-bar-expanded__submit">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <span data-translate="intentHub.searchSubmit">Rechercher</span>
+        </button>
+      </form>
+
+      <a href="partager-un-look.html" class="sq-share-look-banner">
+        <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
+        <span class="sq-share-look-banner__body">
+          <strong data-translate="intentHub.captureTitle">Partager un look</strong>
+          <span data-translate="intentHub.captureBodyShort">Capture d'écran depuis Instagram, TikTok, Facebook ou Snapchat → partage avec l'app Skedisy.</span>
+        </span>
+        <i class="fas fa-chevron-right sq-share-look-banner__chevron" aria-hidden="true"></i>
+      </a>
+    </div>
+  </section>
+
+  <main class="sq-category-discover sq-category-discover--search">
+    <div class="container">
+      <div class="sq-category-discover__toolbar">
+        <div class="sq-category-discover__stats-wrap">
+          <p class="sq-category-discover__stats" id="categoryStats">—</p>
+          <div id="categorySearchMessage"></div>
+        </div>
+        <div class="sq-category-discover__toolbar-actions">
+          <button type="button" class="sq-filter-btn" id="btnFilter" aria-expanded="false">
+            <i class="fas fa-sliders-h" aria-hidden="true"></i>
+            <span data-translate="searchResults.filter">Filtrer</span>
+          </button>
+          <div class="sq-category-discover__view-toggle" role="group">
+            <button type="button" class="sq-view-btn sq-view-btn--active" id="btnListView" data-translate="searchResults.listView">Liste</button>
+            <button type="button" class="sq-view-btn" id="btnMapView" data-translate="searchResults.mapView">Carte</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sq-filter-panel" id="filterPanel" hidden>
+        <p class="sq-filter-panel__label" data-translate="searchResults.filterRating">Note minimum</p>
+        <div class="sq-filter-chips">
+          <button type="button" class="sq-filter-chip sq-filter-chip--active" data-filter="minRating" data-value="0" data-translate="searchResults.filterAll">Toutes</button>
+          <button type="button" class="sq-filter-chip" data-filter="minRating" data-value="4">4+ ★</button>
+          <button type="button" class="sq-filter-chip" data-filter="minRating" data-value="4.5">4,5+ ★</button>
+        </div>
+        <p class="sq-filter-panel__label" data-translate="searchResults.filterSort">Trier par</p>
+        <div class="sq-filter-chips">
+          <button type="button" class="sq-filter-chip sq-filter-chip--active" data-filter="sort" data-value="distance" data-translate="searchResults.sortDistance">Distance</button>
+          <button type="button" class="sq-filter-chip" data-filter="sort" data-value="rating" data-translate="searchResults.sortRating">Note</button>
+          <button type="button" class="sq-filter-chip" data-filter="sort" data-value="reviews" data-translate="searchResults.sortReviews">Avis</button>
+        </div>
+      </div>
+
+      <div class="sq-category-discover__main sq-category-discover__main--list" id="categoryMain">
+        <div id="categoryMap" class="sq-category-discover__map" aria-hidden="true"></div>
+        <div class="sq-category-discover__list-wrap">
+          <div class="salons-grid sq-salons-grid--3" id="salonsGrid">
+            <p class="sq-home-discovery-loading" data-translate="homeProduct.salonsLoading">Chargement des salons…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="script.js"></script>
+  <script src="search-results-page.js"></script>
+</body>
+</html>

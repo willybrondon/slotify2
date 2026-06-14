@@ -1,20 +1,25 @@
 // Navigation functionality
 function initHomeSalonSearch() {
     const form = document.getElementById('homeSalonSearchForm');
-    const input = document.getElementById('homeSalonSearchInput');
-    if (!form || !input) return;
+    if (!form) return;
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-        const q = input.value.trim();
-        if (!q) {
+        const salon = (document.getElementById('homeSalonSearchInput')?.value || '').trim();
+        const service = (document.getElementById('homeServiceSearchInput')?.value || '').trim();
+        const location = (document.getElementById('homeLocationSearchInput')?.value || '').trim();
+
+        if (!salon && !service && !location) {
             const nearby = document.getElementById('sqNearbySalons');
             if (nearby) nearby.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
         }
-        if (typeof window.homeSearchSalons === 'function') {
-            window.homeSearchSalons(q);
-        }
+
+        const params = new URLSearchParams();
+        if (salon) params.set('salon', salon);
+        if (service) params.set('service', service);
+        if (location) params.set('location', location);
+        window.location.href = '/recherche?' + params.toString();
     });
 }
 

@@ -380,6 +380,15 @@ app.get("/api/public/categories", async (req, res) => {
 // Public API endpoint for salons by category (for category page)
 app.get("/api/public/salons-by-category", categoryController.getSalonsByCategory);
 app.get("/api/public/experts-by-category", categoryController.getExpertsByCategory);
+app.get("/api/public/search-salons", categoryController.searchSalonsPublic);
+
+app.get("/recherche", function (req, res) {
+  const searchPage = path.join(salonportalPath, "search-results.html");
+  if (fs.existsSync(searchPage)) {
+    return res.status(200).sendFile(searchPage);
+  }
+  res.status(404).send("Search page not found");
+});
 
 const publicWebBooking = require("./controller/user/publicWebBooking.controller");
 app.get("/api/public/booking/slots", publicWebBooking.publicCheckSlots);

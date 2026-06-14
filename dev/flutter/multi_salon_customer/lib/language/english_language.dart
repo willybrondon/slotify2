@@ -454,7 +454,7 @@ final Map<String, String> enUS = {
   "txtIntentHubTitle": "Book your Afro beauty in IDF",
   "txtIntentCaptureTitle": "Share a look",
   "txtIntentCaptureBody":
-      "Screenshot from Instagram or TikTok → Share → Skedisy. We match salons that do this style.",
+      "Screenshot on Instagram, TikTok, Facebook or Snapchat → Share → Skedisy. We suggest salons that match your look.",
   "txtIntentConciergeTitle": "AI concierge",
   "txtIntentConciergeBody":
       "Selfie + your hair profile → personalized services and salons near you.",

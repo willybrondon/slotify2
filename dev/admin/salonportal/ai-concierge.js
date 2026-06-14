@@ -154,57 +154,33 @@ function setupLinkCapture() {
 }
 
 function applyCaptureModeUI() {
-    captureMode = isCaptureMode();
-    document.body.classList.toggle('sq-capture-mode', captureMode);
+    if (isCaptureMode()) {
+        const target = (window.SKEDISY_ASSET_BASE || '.').replace(/\/$/, '') + '/partager-un-look.html';
+        window.location.replace(target);
+        return;
+    }
+    captureMode = false;
+    document.body.classList.toggle('sq-capture-mode', false);
 
-    const title = document.getElementById('conciergeTitle');
-    const subtitle = document.getElementById('conciergeSubtitle');
-    const description = document.getElementById('conciergeDescription');
     const captureLinkBlock = document.getElementById('captureLinkBlock');
     const captureTrustBar = document.getElementById('captureTrustBar');
     const capturePrivacy = document.getElementById('capturePrivacy');
-    const uploadKicker = document.getElementById('uploadKicker');
-    const uploadTitle = document.getElementById('uploadTitle');
-    const uploadLead = document.getElementById('uploadLead');
-    const uploadHint = document.getElementById('uploadHint');
     const screenRecordTip = document.getElementById('screenRecordTip');
     const analyzeLabel = document.getElementById('analyzeBtnLabel');
-    const uploadBtnLabel = document.getElementById('uploadBtnLabel');
     const uploadAreaIcon = document.getElementById('uploadAreaIcon');
 
-    if (captureMode) {
-        if (title) title.textContent = t('capture.screenTitle');
-        if (subtitle) subtitle.textContent = t('capture.heroTitle');
-        if (description) description.innerHTML = t('capture.heroBody');
-        if (captureLinkBlock) captureLinkBlock.hidden = false;
-        if (captureTrustBar) captureTrustBar.hidden = false;
-        if (capturePrivacy) capturePrivacy.hidden = false;
-        if (uploadKicker) uploadKicker.textContent = t('capture.uploadKicker');
-        if (uploadTitle) uploadTitle.textContent = t('capture.uploadTitle');
-        if (uploadLead) uploadLead.innerHTML = t('capture.uploadLead');
-        if (uploadHint) uploadHint.textContent = t('capture.uploadHint');
-        if (screenRecordTip) {
-            screenRecordTip.textContent = t('capture.screenRecordTip');
-            screenRecordTip.hidden = false;
-        }
-        if (analyzeLabel) analyzeLabel.textContent = t('capture.analyzeLook');
-        if (uploadBtnLabel) uploadBtnLabel.textContent = t('capture.chooseMedia');
-        if (uploadAreaIcon) uploadAreaIcon.className = 'fas fa-share-from-square sq-capture-upload-icon';
-        document.title = t('capture.pageTitle');
-    } else {
-        if (captureLinkBlock) captureLinkBlock.hidden = true;
-        if (captureTrustBar) captureTrustBar.hidden = true;
-        if (capturePrivacy) capturePrivacy.hidden = true;
-        if (screenRecordTip) {
-            screenRecordTip.textContent = '';
-            screenRecordTip.hidden = true;
-        }
-        if (uploadAreaIcon) uploadAreaIcon.className = 'fas fa-camera';
-        hideLinkPanel();
-        if (typeof translatePage === 'function') translatePage();
-        if (analyzeLabel) analyzeLabel.textContent = t('concierge.analyzeBtn');
-        document.title = t('concierge.pageTitle');
+    if (captureLinkBlock) captureLinkBlock.hidden = true;
+    if (captureTrustBar) captureTrustBar.hidden = true;
+    if (capturePrivacy) capturePrivacy.hidden = true;
+    if (screenRecordTip) {
+        screenRecordTip.textContent = '';
+        screenRecordTip.hidden = true;
     }
+    if (uploadAreaIcon) uploadAreaIcon.className = 'fas fa-camera';
+    hideLinkPanel();
+    if (typeof translatePage === 'function') translatePage();
+    if (analyzeLabel) analyzeLabel.textContent = t('concierge.analyzeBtn');
+    document.title = t('concierge.pageTitle');
 }
 
 function isMobileConcierge() {
@@ -598,6 +574,51 @@ function displayAnalysis(analysis, detectedService) {
     analysisContent.innerHTML = html;
 }
 
+function renderSalonCardV2(salon) {
+    const salonId = salon._id || salon.id;
+    let webUrl = salon.shareUrl;
+    if (!webUrl && salonId) {
+        const salonSlug =
+            salon.slug ||
+            (salon.name
+                ? salon.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+                : 'salon');
+        const shortId = salon.shortId || String(salonId).substring(0, 6);
+        webUrl = `${API_BASE_URL.replace(/\/+$/, '')}/salon/${salonSlug}-${shortId}`;
+    }
+    const name = escapeHtml(salon.name || 'Salon');
+    const addr = escapeHtml(
+        salon.address || (salon.addressDetails && salon.addressDetails.addressLine1) || ''
+    );
+    const img = salon.image || salon.mainImage;
+    const matchHint = formatSalonMatchHint(salon);
+    const pricePart =
+        salon.matchedService?.price != null
+            ? `<span class="salon-card-price">À partir de ${salon.matchedService.price} €</span>`
+            : '';
+    const ratingPart =
+        salon.review > 0
+            ? `<span class="salon-card-rating"><span class="rating-stars" aria-hidden="true">★</span> ${salon.review.toFixed(1)} (${salon.reviewCount || 0})</span>`
+            : '';
+    const metaRow = pricePart || ratingPart ? `<div class="salon-card-meta">${pricePart}${ratingPart}</div>` : '';
+    const imageHtml = img
+        ? `<div class="sq-salon-card-v2__media"><img src="${escapeHtml(img)}" alt="${name}" class="salon-card-image" loading="lazy"></div>`
+        : `<div class="sq-salon-card-v2__media sq-salon-card-v2__media--fallback"><div class="salon-card-image-placeholder">—</div></div>`;
+    const matchHtml = matchHint ? `<p class="salon-match-hint salon-match-hint--card">${matchHint}</p>` : '';
+
+    return `
+        <a href="${escapeHtml(webUrl || '#')}" class="salon-card sq-salon-card-v2" data-salon-id="${escapeHtml(String(salonId || ''))}">
+            ${imageHtml}
+            <div class="salon-card-content">
+                <h3 class="salon-card-name">${name}</h3>
+                ${metaRow}
+                ${matchHtml}
+                ${addr ? `<p class="salon-card-address">${addr}</p>` : ''}
+                ${salon.distance != null ? `<p class="salon-card-distance">${salon.distance.toFixed(1)} km</p>` : ''}
+            </div>
+        </a>`;
+}
+
 function renderSalonCard(salon) {
     const salonId = salon._id || salon.id;
     let webUrl = salon.shareUrl;
@@ -715,9 +736,9 @@ function displayRecommendations(recommendations, locationUsed) {
             <p class="recommendations-lead">${escapeHtml(leadText)}</p>
     `;
 
-        html += `<div class="salon-list${mobile ? ' salon-list--mobile' : ''}">`;
+        html += `<div class="salons-grid sq-salons-grid--3 sq-salons-grid--concierge">`;
         salons.slice(0, 4).forEach((salon) => {
-            html += renderSalonCard(salon);
+            html += renderSalonCardV2(salon);
         });
         html += `</div></div>`;
     } else if (!recommendations.noMatch) {

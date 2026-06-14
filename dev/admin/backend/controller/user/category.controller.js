@@ -898,3 +898,133 @@ exports.serveCategoryPage = async (req, res) => {
     res.status(500).send("Error loading category page");
   }
 };
+
+/** Recherche publique salons (salon + prestation + localisation) — page /recherche */
+exports.searchSalonsPublic = async (req, res) => {
+  try {
+    const salonTerm = (req.query.salon || req.query.q || "").trim();
+    const serviceTerm = (req.query.service || req.query.prestation || "").trim();
+    const locationTerm = (req.query.location || req.query.city || "").trim();
+    const latitude = req.query.latitude;
+    const longitude = req.query.longitude;
+    const minRating = parseFloat(req.query.minRating) || 0;
+    const sort = req.query.sort || "distance";
+    const language = resolveLang(req.query.lang || req.query.language);
+    const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
+
+    let query = { isDelete: false, isActive: true };
+    const andConditions = [];
+
+    if (salonTerm) {
+      andConditions.push({
+        $or: [
+          { name: { $regex: salonTerm, $options: "i" } },
+          { about: { $regex: salonTerm, $options: "i" } },
+        ],
+      });
+    }
+
+    if (locationTerm) {
+      andConditions.push({
+        $or: [
+          { "addressDetails.city": { $regex: locationTerm, $options: "i" } },
+          { "addressDetails.addressLine1": { $regex: locationTerm, $options: "i" } },
+          { "addressDetails.landMark": { $regex: locationTerm, $options: "i" } },
+          { "addressDetails.state": { $regex: locationTerm, $options: "i" } },
+        ],
+      });
+    }
+
+    if (serviceTerm) {
+      const services = await Service.find({
+        isDelete: false,
+        status: true,
+        $or: [
+          { name: { $regex: serviceTerm, $options: "i" } },
+          { nameEn: { $regex: serviceTerm, $options: "i" } },
+          { nameFr: { $regex: serviceTerm, $options: "i" } },
+        ],
+      }).select("_id");
+      const serviceIds = services.map((s) => s._id);
+      if (!serviceIds.length) {
+        return res.status(200).json({
+          status: true,
+          salons: [],
+          totalReviews: 0,
+          searchCity: null,
+        });
+      }
+      andConditions.push({ "serviceIds.id": { $in: serviceIds } });
+    }
+
+    if (andConditions.length) {
+      query.$and = andConditions;
+    }
+
+    let salons = await Salon.find(query)
+      .populate({
+        path: "serviceIds.id",
+        match: { isDelete: false, status: true },
+        select: "name price",
+      })
+      .select("name mainImage image review reviewCount addressDetails locationCoordinates about serviceIds")
+      .limit(100)
+      .lean();
+
+    salons = salons.filter((s) => s.serviceIds?.length ? true : true);
+
+    if (minRating > 0) {
+      salons = salons.filter((s) => (s.review || 0) >= minRating);
+    }
+
+    if (latitude && longitude) {
+      const userLocation = {
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+      };
+      salons = salons.map((salon) => {
+        if (salon.locationCoordinates?.latitude && salon.locationCoordinates?.longitude) {
+          const salonLocation = {
+            latitude: parseFloat(salon.locationCoordinates.latitude),
+            longitude: parseFloat(salon.locationCoordinates.longitude),
+          };
+          const distanceInMeters = geolib.getDistance(userLocation, salonLocation);
+          salon.distance = distanceInMeters / 1000;
+        } else {
+          salon.distance = null;
+        }
+        return salon;
+      });
+    }
+
+    if (sort === "rating") {
+      salons.sort((a, b) => (b.review || 0) - (a.review || 0));
+    } else if (sort === "reviews") {
+      salons.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
+    } else if (latitude && longitude) {
+      salons.sort((a, b) => {
+        if (a.distance === null) return 1;
+        if (b.distance === null) return -1;
+        return a.distance - b.distance;
+      });
+    }
+
+    const formattedSalons = salons.map((salon) =>
+      formatSalonForCategory(salon, { baseURL, language, copy: {} })
+    );
+    const searchCity =
+      locationTerm ||
+      inferSearchCity(salonTerm || serviceTerm, formattedSalons);
+
+    return res.status(200).json({
+      status: true,
+      salons: formattedSalons,
+      totalReviews: sumReviewCount(formattedSalons),
+      searchCity,
+      language,
+    });
+  } catch (error) {
+    console.error("[Search Salons Public] Error:", error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};

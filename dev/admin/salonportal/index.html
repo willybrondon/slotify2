@@ -69,9 +69,9 @@
     </nav>
 
     <div class="sq-mobile-float-bar mobile-only" aria-label="Actions rapides">
-        <a href="ai-concierge.html" class="floating-ai-btn" id="floatingAiBtn">
-            <i class="fas fa-robot" aria-hidden="true"></i>
-            <span data-translate="nav.aiConcierge">Concierge IA</span>
+        <a href="partager-un-look.html" class="floating-ai-btn floating-ai-btn--share">
+            <i class="fas fa-share-from-square" aria-hidden="true"></i>
+            <span data-translate="intentHub.captureTitle">Partager un look</span>
         </a>
         <a href="#" class="floating-download-btn floating-download-btn--customer" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a>
     </div>
@@ -86,36 +86,37 @@
         </div>
     </section>
 
-    <!-- 3 portes d'entrée (comme l'app) -->
+    <!-- Recherche + Partager un look -->
     <section class="sq-intent-hub sq-intent-hub--home" id="sqIntentHub">
         <div class="container">
-            <div class="sq-intent-doors">
-                <div class="sq-intent-door sq-intent-door--search">
-                    <form id="homeSalonSearchForm" class="sq-intent-search-form" role="search">
-                        <label class="sq-sr-only" for="homeSalonSearchInput" data-translate="intentHub.searchTitle">Chercher un salon</label>
-                        <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
-                        <div class="sq-intent-search-form__field">
-                            <input type="search" id="homeSalonSearchInput" name="q" class="sq-intent-search-form__input" data-translate="intentHub.searchPlaceholder" placeholder="Chercher un salon" autocomplete="off" enterkeyhint="search">
-                        </div>
-                    </form>
+            <form id="homeSalonSearchForm" class="sq-search-bar-expanded sq-search-bar-expanded--home" role="search">
+                <div class="sq-search-bar-expanded__field">
+                    <label for="homeSalonSearchInput" data-translate="intentHub.searchSalonLabel">Salon</label>
+                    <input type="search" id="homeSalonSearchInput" name="salon" class="sq-intent-search-form__input" data-translate="intentHub.searchSalonPlaceholder" placeholder="Nom du salon" autocomplete="off" enterkeyhint="search">
                 </div>
-                <a href="ai-concierge.html?capture=1" class="sq-intent-door sq-intent-door--primary">
-                    <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
-                    <span class="sq-intent-door__body">
-                        <h3 data-translate="intentHub.captureTitle">Partager un look</h3>
-                        <p data-translate="intentHub.captureBody">Capture Instagram ou TikTok → envoie la photo ici. On trouve les salons qui font ce style.</p>
-                    </span>
-                    <i class="fas fa-chevron-right sq-intent-door__chevron" aria-hidden="true"></i>
-                </a>
-                <a href="ai-concierge.html" class="sq-intent-door">
-                    <span class="sq-intent-door__icon" aria-hidden="true"><i class="fas fa-wand-magic-sparkles"></i></span>
-                    <span class="sq-intent-door__body">
-                        <h3 data-translate="intentHub.conciergeTitle">Concierge IA</h3>
-                        <p data-translate="intentHub.conciergeBody">Selfie + ton profil capillaire → prestations et salons près de chez toi.</p>
-                    </span>
-                    <i class="fas fa-chevron-right sq-intent-door__chevron" aria-hidden="true"></i>
-                </a>
-            </div>
+                <div class="sq-search-bar-expanded__field">
+                    <label for="homeServiceSearchInput" data-translate="intentHub.searchServiceLabel">Prestation</label>
+                    <input type="search" id="homeServiceSearchInput" name="service" class="sq-intent-search-form__input" data-translate="intentHub.searchServicePlaceholder" placeholder="Tresses, locks, tissage…" autocomplete="off">
+                </div>
+                <div class="sq-search-bar-expanded__field">
+                    <label for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+                    <input type="search" id="homeLocationSearchInput" name="location" class="sq-intent-search-form__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+                </div>
+                <button type="submit" class="sq-search-bar-expanded__submit">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <span data-translate="intentHub.searchSubmit">Rechercher</span>
+                </button>
+            </form>
+
+            <a href="partager-un-look.html" class="sq-share-look-banner">
+                <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
+                <span class="sq-share-look-banner__body">
+                    <strong data-translate="intentHub.captureTitle">Partager un look</strong>
+                    <span data-translate="intentHub.captureBodyShort">Capture d'écran depuis Instagram, TikTok, Facebook ou Snapchat → partage avec l'app Skedisy. On te propose des salons adaptés.</span>
+                </span>
+                <i class="fas fa-chevron-right sq-share-look-banner__chevron" aria-hidden="true"></i>
+            </a>
+
             <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
         </div>
     </section>
