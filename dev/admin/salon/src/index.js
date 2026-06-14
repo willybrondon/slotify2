@@ -8,14 +8,18 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import { ToastContainer } from "react-toastify";
 
-import { baseURL, secretKey } from "./util/config";
+import { getBaseURL, getSecretKey } from "./util/config";
 import Loader from "./util/Loader";
 import axios from "axios"
 import { CLOSE_LOADER, OPEN_LOADER } from "./redux/slice/loading.type";
 
-// Default Base URL Join In Axios
-axios.defaults.baseURL = baseURL;
-axios.defaults.headers.common["key"] = secretKey;
+axios.defaults.baseURL = getBaseURL();
+axios.interceptors.request.use((config) => {
+  config.baseURL = getBaseURL();
+  config.headers.key = sessionStorage.getItem("key") || getSecretKey();
+  config.headers.Authorization = sessionStorage.getItem("token");
+  return config;
+});
 
 
 

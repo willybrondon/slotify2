@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { getCurrency, getSetting } from "../redux/slice/settingSlice";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import withDrawBanner from "../assets/images/withDraw.png";
-import { baseURL, secretKey } from "../util/config";
+import { getBaseURL, getSecretKey } from "../util/config";
 import { SKEDISY_SALON_UI as ui } from "../constants/skedisyUiCopy";
 
 const Wallet = () => {
@@ -48,7 +48,7 @@ const Wallet = () => {
         try {
             setIsProcessing(true);
             // Fix URL construction to avoid double slashes
-            const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+            const baseUrlClean = getBaseURL().endsWith('/') ? getBaseURL().slice(0, -1) : getBaseURL();
             const successUrl = `${baseUrlClean}/salon/handleStripePaymentSuccess?session_id=${sessionId}`;
             
             const response = await fetch(
@@ -56,7 +56,7 @@ const Wallet = () => {
                 {
                     method: "GET",
                     headers: {
-                        "key": secretKey,
+                        "key": sessionStorage.getItem("key") || getSecretKey(),
                         "Authorization": sessionStorage.getItem("token") || "",
                         "Content-Type": "application/json",
                     },
@@ -147,7 +147,7 @@ const Wallet = () => {
             attempts++;
 
             try {
-                const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+                const baseUrlClean = getBaseURL().endsWith('/') ? getBaseURL().slice(0, -1) : getBaseURL();
                 const statusUrl = `${baseUrlClean}/salon/checkMTNMomoPaymentStatus?reference=${reference}`;
                 
                 const response = await fetch(
@@ -155,7 +155,7 @@ const Wallet = () => {
                     {
                         method: "GET",
                         headers: {
-                            "key": secretKey,
+                            "key": sessionStorage.getItem("key") || getSecretKey(),
                             "Authorization": sessionStorage.getItem("token") || "",
                             "Content-Type": "application/json",
                         },
@@ -227,7 +227,7 @@ const Wallet = () => {
             if (paymentMethod === "Stripe") {
                 // Create Stripe Checkout Session
                 // Fix URL construction to avoid double slashes
-                const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+                const baseUrlClean = getBaseURL().endsWith('/') ? getBaseURL().slice(0, -1) : getBaseURL();
                 const stripeUrl = `${baseUrlClean}/salon/createStripeCheckoutSession?amount=${rechargeAmount}`;
                 
                 const response = await fetch(
@@ -235,7 +235,7 @@ const Wallet = () => {
                     {
                         method: "GET",
                         headers: {
-                            "key": secretKey,
+                            "key": sessionStorage.getItem("key") || getSecretKey(),
                             "Authorization": sessionStorage.getItem("token") || "",
                             "Content-Type": "application/json",
                         },
@@ -287,7 +287,7 @@ const Wallet = () => {
                 setPhoneError(false);
 
                 // Create MTN MoMo payment request
-                const baseUrlClean = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+                const baseUrlClean = getBaseURL().endsWith('/') ? getBaseURL().slice(0, -1) : getBaseURL();
                 const momoUrl = `${baseUrlClean}/salon/createMTNMomoPaymentRequest?amount=${rechargeAmount}&phoneNumber=${encodeURIComponent(cleanPhone)}`;
                 
                 const response = await fetch(
@@ -295,7 +295,7 @@ const Wallet = () => {
                     {
                         method: "GET",
                         headers: {
-                            "key": secretKey,
+                            "key": sessionStorage.getItem("key") || getSecretKey(),
                             "Authorization": sessionStorage.getItem("token") || "",
                             "Content-Type": "application/json",
                         },

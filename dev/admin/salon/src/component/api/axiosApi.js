@@ -1,22 +1,35 @@
 import axios from "axios";
 
 import { DangerRight } from "./toastServices";
-import { baseURL, secretKey } from "../../util/config";
+import { getBaseURL, getSecretKey } from "../../util/config";
 
 const getTokenData = () => sessionStorage.getItem("token");
 
 function resolveApiKey() {
   const stored = sessionStorage.getItem("key");
-  if (stored && stored !== "undefined") return stored;
-  return secretKey || "";
+  if (stored && stored !== "undefined" && stored !== "null") return stored;
+  return getSecretKey() || "";
 }
 
 function resolveApiBase() {
-  if (baseURL && baseURL !== "/") return baseURL;
-  if (typeof window !== "undefined" && window.location?.origin) {
-    return `${window.location.origin}/`;
+  return getBaseURL();
+}
+
+/** Always build an absolute API URL on site root (never under /salonpanel/). */
+export function buildApiUrl(path) {
+  const raw = String(path || "").trim();
+  if (/^https?:\/\//i.test(raw)) {
+    return raw.replace(/\/salonpanel\/(salon|admin|user)\//, "/$1/");
   }
-  return "/";
+  const origin =
+    typeof window !== "undefined" && window.location?.origin
+      ? window.location.origin
+      : "https://skedisy.com";
+  const base = resolveApiBase().includes("/salonpanel")
+    ? `${origin}/`
+    : resolveApiBase();
+  const normalized = raw.replace(/^\//, "").replace(/^salonpanel\//, "");
+  return new URL(normalized, base.endsWith("/") ? base : `${base}/`).href;
 }
 
 export const apiInstance = axios.create({
@@ -24,16 +37,16 @@ export const apiInstance = axios.create({
 });
 
 const cancelTokenSource = axios.CancelToken.source();
-const token = sessionStorage.getItem("token");
-
-apiInstance.defaults.headers.common["Authorization"] = token;
-apiInstance.defaults.headers.common["key"] = secretKey;
 
 apiInstance.interceptors.request.use(
   function (config) {
     config.cancelToken = cancelTokenSource.token;
+    config.baseURL = resolveApiBase();
     config.headers.Authorization = getTokenData();
     config.headers.key = resolveApiKey();
+    if (config.url) {
+      config.url = config.url.replace(/^\//, "");
+    }
     return config;
   },
 
@@ -70,7 +83,12 @@ apiInstance.interceptors.response.use(
   }
 );
 
-const handleErrors = async (response) => {
+function isHtmlBody(text) {
+  const trimmed = (text || "").trim();
+  return trimmed.startsWith("<!") || trimmed.includes("<html");
+}
+
+const handleErrors = async (response, requestUrl) => {
   const contentType = response.headers.get("content-type") || "";
   let data = null;
 
@@ -91,14 +109,16 @@ const handleErrors = async (response) => {
         /* not JSON */
       }
     }
+    if (!data && isHtmlBody(trimmed)) {
+      console.error("[Salon API] HTML response for:", requestUrl);
+      DangerRight(
+        "API unreachable (got HTML instead of JSON). Reload the page."
+      );
+      return Promise.reject({ message: text, wrongPath: true });
+    }
     if (!data) {
-      const isHtml = trimmed.startsWith("<!") || trimmed.includes("<html");
       if (!response.ok) {
-        DangerRight(
-          isHtml
-            ? "API unreachable (got HTML instead of JSON). Reload the page."
-            : "Server error. Please try again."
-        );
+        DangerRight("Server error. Please try again.");
         return Promise.reject({ message: text });
       }
       DangerRight("Unexpected server response.");
@@ -134,36 +154,48 @@ const getHeaders = () => ({
 });
 
 export const apiInstanceFetch = {
-  baseURL: resolveApiBase(),
-  get: (url) =>
-    fetch(`${resolveApiBase()}${url}`, { method: "GET", headers: getHeaders() }).then(
-      handleErrors
-    ),
+  get baseURL() {
+    return resolveApiBase();
+  },
+  get: (url) => {
+    const fullUrl = buildApiUrl(url);
+    return fetch(fullUrl, { method: "GET", headers: getHeaders() }).then((res) =>
+      handleErrors(res, fullUrl)
+    );
+  },
 
-  post: (url, data) =>
-    fetch(`${resolveApiBase()}${url}`, {
+  post: (url, data) => {
+    const fullUrl = buildApiUrl(url);
+    return fetch(fullUrl, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(data),
-    }).then(handleErrors),
+    }).then((res) => handleErrors(res, fullUrl));
+  },
 
-  patch: (url, data) =>
-    fetch(`${resolveApiBase()}${url}`, {
+  patch: (url, data) => {
+    const fullUrl = buildApiUrl(url);
+    return fetch(fullUrl, {
       method: "PATCH",
       headers: getHeaders(),
       body: JSON.stringify(data),
-    }).then(handleErrors),
+    }).then((res) => handleErrors(res, fullUrl));
+  },
 
-  put: (url, data) =>
-    fetch(`${resolveApiBase()}${url}`, {
+  put: (url, data) => {
+    const fullUrl = buildApiUrl(url);
+    return fetch(fullUrl, {
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify(data),
-    }).then(handleErrors),
+    }).then((res) => handleErrors(res, fullUrl));
+  },
 
-  delete: (url) =>
-    fetch(`${resolveApiBase()}${url}`, {
+  delete: (url) => {
+    const fullUrl = buildApiUrl(url);
+    return fetch(fullUrl, {
       method: "DELETE",
       headers: getHeaders(),
-    }).then(handleErrors),
+    }).then((res) => handleErrors(res, fullUrl));
+  },
 };

@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
 import jwt_decode from "jwt-decode";
 import { SetDevKey, setToken } from "../../util/setAuth";
-import { secretKey } from "../../util/config";
+import { getSecretKey } from "../../util/config";
 import { DangerRight, Success } from "../../component/api/toastServices";
 import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 import axios from "axios";
@@ -57,7 +57,7 @@ const authSlice = createSlice({
       }
       state.isAuth = true;
       const storedKey = sessionStorage.getItem("key");
-      SetDevKey(storedKey && storedKey !== "undefined" ? storedKey : secretKey);
+      SetDevKey(storedKey && storedKey !== "undefined" ? storedKey : getSecretKey());
       setToken(raw);
     },
     logout(state, action) {
@@ -76,7 +76,7 @@ const authSlice = createSlice({
 
     builder.addCase(login.fulfilled, (state, action) => {
       if (action.payload && action.payload.status !== false) {
-        const apiKey = action.payload.apiKey || secretKey || "";
+        const apiKey = action.payload.apiKey || getSecretKey() || "";
         let token_ = jwt_decode(action.payload.token);
         state.admin = token_;
         state.isAuth = true;

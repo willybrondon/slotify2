@@ -12,7 +12,7 @@ import "../src/assets/scss/style/style.css";
 import "../src/assets/scss/dateRange.css";
 import { setOldAdmin } from "./redux/slice/authSlice";
 import { setToken, SetDevKey } from "./util/setAuth";
-import { secretKey } from "./util/config";
+import { getSecretKey } from "./util/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 function App() {
   const dispatch = useDispatch();
@@ -51,7 +51,7 @@ function App() {
       setToken(token);
       const storedKey = sessionStorage.getItem("key");
       SetDevKey(
-        storedKey && storedKey !== "undefined" ? storedKey : secretKey
+        storedKey && storedKey !== "undefined" ? storedKey : getSecretKey()
       );
     }, 50);
 
