@@ -1,6 +1,6 @@
 #!/bin/bash
-# Déploiement complet salon panel — à exécuter SUR LE VPS en tant qu'admin
-# Usage: bash DEPLOY_SALON_PANEL_NOW.sh
+# Déploiement complet salon panel — à exécuter SUR LE VPS (root ou admin)
+# Usage: cd /home/admin/slotify2 && bash dev/admin/scraping_data/DEPLOY_SALON_PANEL_NOW.sh
 
 set -e
 
@@ -10,6 +10,15 @@ REPO_DIR="${REPO_DIR:-/home/admin/slotify2}"
 SALON_SRC="/home/admin/salon"
 BACKEND_DIR="/home/admin/backend"
 API_BASE="https://${DOMAIN}/"
+
+fix_ownership() {
+  local target="$1"
+  if id admin &>/dev/null; then
+    chown -R admin:admin "$target" 2>/dev/null || sudo chown -R admin:admin "$target"
+  else
+    echo "   (pas d'utilisateur admin — chown ignoré, fichiers laissés à $(stat -c '%U' "$target" 2>/dev/null || echo root))"
+  fi
+}
 
 echo "=========================================="
 echo " Déploiement salon panel — ${DOMAIN}"
@@ -72,10 +81,10 @@ fs.writeFileSync(
 " API_BASE="$API_BASE" SECRET_KEY="$SECRET_KEY"
 
 # --- 6. Déployer le build ---
-sudo rm -rf "$BACKEND_DIR/salon"
-sudo mkdir -p "$BACKEND_DIR/salon"
-sudo cp -r build/* "$BACKEND_DIR/salon/"
-sudo chown -R admin:admin "$BACKEND_DIR/salon"
+rm -rf "$BACKEND_DIR/salon"
+mkdir -p "$BACKEND_DIR/salon"
+cp -r build/* "$BACKEND_DIR/salon/"
+fix_ownership "$BACKEND_DIR/salon"
 
 echo "✅ Build déployé dans $BACKEND_DIR/salon"
 
@@ -110,7 +119,8 @@ fi
 
 # --- 8. Redémarrer backend ---
 cd "$BACKEND_DIR"
-pm2 restart backend || pm2 start index.js --name backend
+npm install --omit=dev 2>/dev/null || npm install
+pm2 restart backend 2>/dev/null || pm2 start index.js --name backend
 pm2 save 2>/dev/null || true
 
 # --- 9. Tests ---
