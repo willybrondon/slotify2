@@ -275,13 +275,6 @@ class _IntentSearchDoor extends StatelessWidget {
 
   static const Color _searchBorder = Color(0xFFDDDDDD);
 
-  InputBorder _searchFieldBorder({Color? color}) {
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: color ?? _searchBorder),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return DottedBorder(
@@ -291,56 +284,101 @@ class _IntentSearchDoor extends StatelessWidget {
       strokeWidth: 1,
       dashPattern: const [6, 4],
       padding: EdgeInsets.zero,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.whiteColor,
+      child: Material(
+        color: AppColors.whiteColor,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
           borderRadius: BorderRadius.circular(14),
-          boxShadow: Constant.boxShadow,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.grey.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.search,
-                color: AppColors.grey,
-              ),
+          onTap: () => Get.toNamed(AppRoutes.search),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: Constant.boxShadow,
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextField(
-                readOnly: true,
-                onTap: () => Get.toNamed(AppRoutes.search),
-                decoration: InputDecoration(
-                  isDense: true,
-                  hintText: 'txtIntentSearchTitle'.tr,
-                  hintStyle: TextStyle(
-                    fontFamily: AppFontFamily.sfProDisplayRegular,
-                    fontSize: 14,
-                    color: AppColors.grey,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.whiteColor,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  border: _searchFieldBorder(),
-                  enabledBorder: _searchFieldBorder(),
-                  focusedBorder: _searchFieldBorder(
-                    color: AppColors.primaryAppColor,
+            child: Row(
+              children: [
+                Icon(Icons.search, color: AppColors.grey, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'txtIntentSearchSalonHint'.tr,
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplayMedium,
+                          fontSize: 14,
+                          color: AppColors.blackColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'txtIntentSearchServiceHint'.tr,
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplayRegular,
+                          fontSize: 12,
+                          color: AppColors.grey,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                Container(
+                  width: 1,
+                  height: 36,
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  color: const Color(0xFFDDDDDD),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 16,
+                        color: AppColors.primaryAppColor.withOpacity(0.85),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'txtIntentSearchLocationHint'.tr,
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplayRegular,
+                            fontSize: 13,
+                            color: AppColors.grey,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.blackColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward,
+                    color: AppColors.whiteColor,
+                    size: 18,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

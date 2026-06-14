@@ -459,6 +459,9 @@ final Map<String, String> enUS = {
   "txtIntentConciergeBody":
       "Selfie + your hair profile → personalized services and salons near you.",
   "txtIntentSearchTitle": "Search salons",
+  "txtIntentSearchSalonHint": "Salon name",
+  "txtIntentSearchServiceHint": "Braids, locks, weave…",
+  "txtIntentSearchLocationHint": "Paris, Seine-Saint-Denis…",
   "txtIntentSearchBody": "Browse by name, service, or neighborhood.",
   "txtHairProfileTitle": "Hair profile",
   "txtHairProfileLead":

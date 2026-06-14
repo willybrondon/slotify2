@@ -42,22 +42,24 @@
 
   <section class="sq-intent-hub sq-intent-hub--search-page">
     <div class="container">
-      <form id="searchResultsForm" class="sq-search-bar-expanded" role="search">
-        <div class="sq-search-bar-expanded__field">
-          <label for="searchSalonInput" data-translate="intentHub.searchSalonLabel">Salon</label>
-          <input type="search" id="searchSalonInput" name="salon" class="sq-intent-search-form__input" data-translate="intentHub.searchSalonPlaceholder" placeholder="Nom du salon" autocomplete="off">
+      <form id="searchResultsForm" class="sq-search-bar-unified" role="search">
+        <div class="sq-search-bar-unified__inner">
+          <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+          <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query">
+            <label class="sq-sr-only" for="searchSalonInput" data-translate="intentHub.searchSalonLabel">Salon</label>
+            <input type="search" id="searchSalonInput" name="salon" class="sq-search-bar-unified__input" data-translate="intentHub.searchSalonPlaceholder" placeholder="Nom du salon" autocomplete="off">
+            <label class="sq-sr-only" for="searchServiceInput" data-translate="intentHub.searchServiceLabel">Prestation</label>
+            <input type="search" id="searchServiceInput" name="service" class="sq-search-bar-unified__input sq-search-bar-unified__input--secondary" data-translate="intentHub.searchServicePlaceholder" placeholder="Tresses, locks, tissage…" autocomplete="off">
+          </div>
+          <span class="sq-search-bar-unified__divider" aria-hidden="true"></span>
+          <div class="sq-search-bar-unified__group sq-search-bar-unified__group--location">
+            <label class="sq-sr-only" for="searchLocationInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+            <span class="sq-search-bar-unified__loc-icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
+            <input type="search" id="searchLocationInput" name="location" class="sq-search-bar-unified__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+          </div>
         </div>
-        <div class="sq-search-bar-expanded__field">
-          <label for="searchServiceInput" data-translate="intentHub.searchServiceLabel">Prestation</label>
-          <input type="search" id="searchServiceInput" name="service" class="sq-intent-search-form__input" data-translate="intentHub.searchServicePlaceholder" placeholder="Tresses, locks, tissage…" autocomplete="off">
-        </div>
-        <div class="sq-search-bar-expanded__field">
-          <label for="searchLocationInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
-          <input type="search" id="searchLocationInput" name="location" class="sq-intent-search-form__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
-        </div>
-        <button type="submit" class="sq-search-bar-expanded__submit">
-          <i class="fas fa-search" aria-hidden="true"></i>
-          <span data-translate="intentHub.searchSubmit">Rechercher</span>
+        <button type="submit" class="sq-search-bar-unified__submit" aria-label="Rechercher">
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </button>
       </form>
 

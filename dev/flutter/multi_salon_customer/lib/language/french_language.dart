@@ -467,6 +467,9 @@ final Map<String, String> frCH = {
   "txtIntentConciergeBody":
       "Selfie + ton profil capillaire → prestations et salons près de toi.",
   "txtIntentSearchTitle": "Chercher un salon",
+  "txtIntentSearchSalonHint": "Nom du salon",
+  "txtIntentSearchServiceHint": "Tresses, locks, tissage…",
+  "txtIntentSearchLocationHint": "Paris, Seine-Saint-Denis…",
   "txtIntentSearchBody": "Par nom, prestation ou quartier.",
   "txtHairProfileTitle": "Profil capillaire",
   "txtHairProfileLead":
