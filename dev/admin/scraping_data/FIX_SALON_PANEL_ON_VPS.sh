@@ -19,21 +19,7 @@ if [ -z "$SECRET_KEY" ] && [ -f "/home/admin/backend/config.js" ]; then
 fi
 
 DOMAIN="${APP_DOMAIN:-skedisy.com}"
-
-cd /home/admin/salon/src/util || exit 1
-cat > config.js << EOF
-function resolveBaseURL() {
-  if (typeof window !== "undefined" && window.location?.origin) {
-    return \`\${window.location.origin}/\`;
-  }
-  return "https://${DOMAIN}/";
-}
-export const baseURL = resolveBaseURL();
-export const secretKey = "${SECRET_KEY}";
-export const projectName = "Skedisy";
-EOF
-
-echo "✅ config.js updated (secretKey length: ${#SECRET_KEY})"
+API_BASE="https://${DOMAIN}/"
 
 cd /home/admin/salon || exit 1
 export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
@@ -48,11 +34,29 @@ if [ ! -f "build/index.html" ]; then
   exit 1
 fi
 
+# Inject runtime config so API key works without baking into webpack
+node -e "
+const fs = require('fs');
+const cfg = { apiBase: process.env.API_BASE, apiKey: process.env.SECRET_KEY };
+fs.writeFileSync(
+  'build/runtime-config.js',
+  'window.__SKEDISY_SALON__=' + JSON.stringify(cfg) + ';'
+);
+" API_BASE="$API_BASE" SECRET_KEY="$SECRET_KEY"
+
 sudo rm -rf /home/admin/backend/salon
 sudo mkdir -p /home/admin/backend/salon
 sudo cp -r build/* /home/admin/backend/salon/
 
+# Sync backend fixes (runtime-config route, login apiKey, middleware)
+if [ -d "/home/admin/backend" ]; then
+  cd /home/admin/backend || true
+  git pull 2>/dev/null || echo "⚠️  git pull skipped — deploy backend/index.js manually if needed"
+fi
+
 pm2 restart backend
 
-echo "✅ Salon panel deployed. Test: https://${DOMAIN}/salonpanel"
-echo "   Network tab should show: GET https://${DOMAIN}/salon/dashboard/allStats"
+echo "✅ Salon panel deployed."
+echo "   Open: https://${DOMAIN}/salonpanel"
+echo "   Check Network: GET https://${DOMAIN}/salon/dashboard/allStats (headers: key, Authorization)"
+echo "   runtime-config: https://${DOMAIN}/salonpanel/runtime-config.js"

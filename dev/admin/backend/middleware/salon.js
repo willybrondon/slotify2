@@ -12,6 +12,9 @@ module.exports = async (req, res, next) => {
     const decodeToken = await jwt.verify(Authorization, process?.env?.JWT_SECRET);
 
     const salon = await Salon.findById(decodeToken.salon._id);
+    if (!salon || salon.isDelete) {
+      return res.status(403).json({ status: false, message: "Salon not found or inactive" });
+    }
     req.salon = salon;
     next();
   } catch (error) {

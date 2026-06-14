@@ -75,24 +75,21 @@ const authSlice = createSlice({
     });
 
     builder.addCase(login.fulfilled, (state, action) => {
-      // console.log("Actionnn",action)
       if (action.payload && action.payload.status !== false) {
+        const apiKey = action.payload.apiKey || secretKey || "";
         let token_ = jwt_decode(action.payload.token);
         state.admin = token_;
         state.isAuth = true;
-        SetDevKey(secretKey);
+        SetDevKey(apiKey);
         setToken(action.payload.token);
-        // console.log("action.payload.token", action.payload.token);
-        
-        // Ensure session storage is set synchronously
+
         try {
           sessionStorage.setItem("token", action.payload.token);
-          if (secretKey) {
-            sessionStorage.setItem("key", secretKey);
+          if (apiKey) {
+            sessionStorage.setItem("key", apiKey);
           }
           sessionStorage.setItem("isAuth", "true");
-          
-          // Force a small delay to ensure session storage is properly set
+
           setTimeout(() => {
             Success(ui.toast.loginOk);
           }, 50);

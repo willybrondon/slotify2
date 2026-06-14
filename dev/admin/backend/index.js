@@ -787,6 +787,19 @@ app.get("/salonportal/*", function (req, res) {
   res.status(200).sendFile(path.join(salonportalPath, "index.html"));
 });
 
+// Runtime config for salon panel (API key + base URL) — must be before static /salonpanel
+app.get("/salonpanel/runtime-config.js", (req, res) => {
+  const host = req.get("host") || "skedisy.com";
+  const proto = req.get("x-forwarded-proto") || req.protocol || "https";
+  const apiBase = `${proto}://${host}/`;
+  const apiKey = process.env.secretKey || "";
+  res.type("application/javascript");
+  res.set("Cache-Control", "no-store");
+  res.send(
+    `window.__SKEDISY_SALON__=${JSON.stringify({ apiBase, apiKey })};`
+  );
+});
+
 // Serve static files for salon panel at /salonpanel/ path
 const salonPath = path.join(__dirname, "salon");
 const salonIndexPath = path.join(salonPath, "index.html");

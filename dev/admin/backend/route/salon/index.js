@@ -28,7 +28,7 @@ route.use("/productCategory", salonMiddleware, productCategory);
 route.use("/attributes", salonMiddleware, attributes);
 route.use("/complain", salonMiddleware, complain);
 route.use("/review", salonMiddleware, review);
-route.use("/dashboard", salonMiddleware, dashboard);
+route.use("/dashboard", dashboard);
 route.use("/service", service);
 route.use("/booking", salonMiddleware, booking);
 route.use("/settlement", salonMiddleware, settlement);

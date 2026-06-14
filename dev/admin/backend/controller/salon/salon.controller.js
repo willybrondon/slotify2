@@ -69,6 +69,7 @@ exports.login = async (req, res) => {
       status: true,
       message: "Salon Login Successfully!!",
       token,
+      apiKey: process.env.secretKey || "",
     });
   } catch (error) {
     console.log(error);

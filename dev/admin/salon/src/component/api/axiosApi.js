@@ -83,12 +83,27 @@ const handleErrors = async (response) => {
     }
   } else {
     const text = await response.text();
-    if (!response.ok) {
-      DangerRight("Server error. Please try again.");
+    const trimmed = text.trim();
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      try {
+        data = JSON.parse(trimmed);
+      } catch (e) {
+        /* not JSON */
+      }
+    }
+    if (!data) {
+      const isHtml = trimmed.startsWith("<!") || trimmed.includes("<html");
+      if (!response.ok) {
+        DangerRight(
+          isHtml
+            ? "API unreachable (got HTML instead of JSON). Reload the page."
+            : "Server error. Please try again."
+        );
+        return Promise.reject({ message: text });
+      }
+      DangerRight("Unexpected server response.");
       return Promise.reject({ message: text });
     }
-    DangerRight("Unexpected server response.");
-    return Promise.reject({ message: text });
   }
 
   if (!response.ok) {

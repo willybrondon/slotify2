@@ -341,6 +341,16 @@ sudo mkdir -p /home/admin/backend/salon
 # Copy all build files (using cp instead of mv for better error handling)
 sudo cp -r /home/admin/salon/build/* /home/admin/backend/salon/
 
+# Runtime config: API key + base URL (loaded before React bundle)
+node -e "
+const fs = require('fs');
+const cfg = { apiBase: 'https://$app_domain/', apiKey: process.env.SECRET_KEY };
+fs.writeFileSync(
+  '/home/admin/backend/salon/runtime-config.js',
+  'window.__SKEDISY_SALON__=' + JSON.stringify(cfg) + ';'
+);
+" SECRET_KEY="$shared_secret_key"
+
 # Verify deployment
 if [ ! -f "/home/admin/backend/salon/index.html" ]; then
     echo "ERROR: Failed to deploy salon build - index.html not found in backend/salon!"
@@ -396,6 +406,16 @@ server {
         proxy_read_timeout 86400;
         proxy_redirect off;
         proxy_set_header X-Nginx-Proxy true;
+    }
+
+    # Runtime API key for salon panel (dynamic; not in webpack bundle)
+    location = /salonpanel/runtime-config.js {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     # Serve Salon panel SPA at /salonpanel
