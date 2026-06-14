@@ -280,19 +280,63 @@ echo "
 #                INSTALL SALON              #
 ################################################
 "
-# Create config.js in the util directory
+# Salon config.js is shipped in admin.zip (dev/admin/salon). Do not replace it with a static secretKey.
+# API key + base URL are injected at runtime via /salonpanel/runtime-config.js (see build step below).
 cd /home/admin/salon/src/util || exit
-cat > config.js << EOF
-function resolveBaseURL() {
-  if (typeof window !== "undefined" && window.location?.origin) {
-    return \`\${window.location.origin}/\`;
+if grep -q 'export function getSecretKey' config.js 2>/dev/null; then
+  echo "Salon config.js OK (from CI zip) — keeping source file"
+elif [ -f "/home/admin/slotify2/dev/admin/salon/src/util/config.js" ]; then
+  cp "/home/admin/slotify2/dev/admin/salon/src/util/config.js" config.js
+  echo "Salon config.js copied from slotify2 checkout"
+else
+  echo "WARN: salon config.js outdated — applying getBaseURL/getSecretKey template"
+  cat > config.js << 'EOFCFG'
+/** API root — always absolute (never /salonpanel/salon/...). */
+export function getBaseURL() {
+  const runtime =
+    typeof window !== "undefined" ? window.__SKEDISY_SALON__ : null;
+  if (runtime?.apiBase) {
+    let base = String(runtime.apiBase);
+    if (base.includes("/salonpanel")) {
+      const origin =
+        typeof window !== "undefined" && window.location?.origin
+          ? window.location.origin
+          : "https://skedisy.com";
+      base = `${origin}/`;
+    }
+    return base.endsWith("/") ? base : `${base}/`;
   }
-  return "https://$app_domain/";
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return `${window.location.origin}/`;
+  }
+  return "/";
 }
-export const baseURL = resolveBaseURL();
-export const secretKey = "$shared_secret_key";
-export const projectName = "$app_name";
-EOF
+
+export function getSecretKey() {
+  const runtime =
+    typeof window !== "undefined" ? window.__SKEDISY_SALON__ : null;
+  if (runtime?.apiKey) return String(runtime.apiKey);
+  if (typeof process !== "undefined" && process.env?.REACT_APP_SECRET_KEY) {
+    return process.env.REACT_APP_SECRET_KEY;
+  }
+  return "";
+}
+
+/** @deprecated Use getBaseURL() — evaluated once at import, may be stale */
+export const baseURL = getBaseURL();
+/** @deprecated Use getSecretKey() */
+export const secretKey = getSecretKey();
+
+export const projectName =
+  typeof process !== "undefined" && process.env?.REACT_APP_NAME
+    ? process.env.REACT_APP_NAME
+    : "Skedisy";
+EOFCFG
+fi
+if ! grep -q 'export function getSecretKey' config.js 2>/dev/null; then
+  echo "ERROR: salon config.js still missing getSecretKey export — check dev/admin/salon in admin.zip"
+  exit 1
+fi
 
 # Go back to salon root directory for npm commands
 cd /home/admin/salon || exit
