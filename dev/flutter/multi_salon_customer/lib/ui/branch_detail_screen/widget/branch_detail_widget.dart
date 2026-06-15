@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -142,9 +141,7 @@ class BranchDetailTopView extends StatelessWidget {
               Container(
                 height: Get.height * 0.3,
                 width: Get.width,
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                ),
+                color: AppColors.backGround,
                 clipBehavior: Clip.hardEdge,
                 child: CachedNetworkImage(
                   imageUrl: "${logic.getSalonDetailCategory?.salon?.mainImage}",
@@ -334,7 +331,7 @@ class BranchDetailDataView extends StatelessWidget {
               // Enhanced salon name with better visual hierarchy
               Container(
                 margin: const EdgeInsets.only(
-                    top: 15, left: 15, right: 15, bottom: 2),
+                    top: 8, left: 15, right: 15, bottom: 2),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -425,19 +422,25 @@ class BranchDetailDataView extends StatelessWidget {
                       AppAsset.icStarFilled,
                       height: 18,
                       width: 18,
-                      color: AppColors.ratingYellow,
+                      color: AppColors.brandTerracotta,
                     ).paddingOnly(right: 12),
                     RichText(
                       text: TextSpan(
-                        text: "4.8",
+                        text: (logic.getSalonDetailCategory?.salon?.review ??
+                                    0) >
+                                0
+                            ? logic.getSalonDetailCategory!.salon!.review!
+                                .toStringAsFixed(1)
+                            : '—',
                         style: TextStyle(
-                          color: AppColors.ratingYellow,
+                          color: AppColors.brandTerracotta,
                           fontSize: 17,
                           fontFamily: AppFontFamily.heeBo700,
                         ),
                         children: <TextSpan>[
                           TextSpan(
-                            text: "  (1280)",
+                            text:
+                                "  (${logic.getSalonDetailCategory?.salon?.reviewCount ?? 0})",
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: AppFontFamily.heeBo600,
@@ -557,56 +560,109 @@ class BranchDetailTabView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const BranchDetailTabBarView(),
-        Divider(color: AppColors.greyColor.withOpacity(0.2))
-            .paddingOnly(bottom: 5),
-        const BranchDetailTabBarItemView(),
-      ],
+    return ColoredBox(
+      color: AppColors.whiteColor,
+      child: Column(
+        children: [
+          const BranchDetailTabBarView(),
+          Divider(
+            height: 1,
+            color: AppColors.greyColor.withOpacity(0.15),
+          ),
+          const BranchDetailTabBarItemView(),
+        ],
+      ),
     );
   }
 }
 
-class BranchDetailTabBarView extends StatelessWidget {
+class BranchDetailTabBarView extends StatefulWidget {
   const BranchDetailTabBarView({super.key});
+
+  @override
+  State<BranchDetailTabBarView> createState() => _BranchDetailTabBarViewState();
+}
+
+class _BranchDetailTabBarViewState extends State<BranchDetailTabBarView> {
+  BranchDetailController? _logic;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final logic = Get.find<BranchDetailController>();
+    if (_logic != logic) {
+      _logic?.tabController?.removeListener(_onTabChanged);
+      _logic = logic;
+      _logic?.tabController?.addListener(_onTabChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    _logic?.tabController?.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<BranchDetailController>(
       builder: (logic) {
-        return Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: TabBar(
-            tabAlignment: TabAlignment.start,
-            controller: logic.tabController,
-            tabs: logic.tabs,
-            isScrollable: true,
-            labelStyle: const TextStyle(
-              fontSize: 16,
-              fontFamily: AppFontFamily.heeBo500,
-            ),
-            physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics()),
+        final controller = logic.tabController;
+        if (controller == null) return const SizedBox.shrink();
+
+        return SizedBox(
+          height: 52,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            indicatorPadding: const EdgeInsets.all(3),
-            indicator: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: AppColors.primaryAppColor,
-            ),
-            indicatorSize: TabBarIndicatorSize.tab,
-            labelColor: AppColors.whiteColor,
-            unselectedLabelStyle: const TextStyle(
-              fontFamily: AppFontFamily.heeBo500,
-              fontSize: 15,
-            ),
-            unselectedLabelColor: AppColors.service,
-            dividerColor: Colors.transparent,
-            overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+            itemCount: logic.tabs.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final selected = controller.index == index;
+              return GestureDetector(
+                onTap: () => controller.animateTo(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? AppColors.brandTerracotta
+                        : AppColors.whiteColor,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: selected
+                          ? AppColors.brandTerracotta
+                          : AppColors.greyColor.withOpacity(0.35),
+                    ),
+                  ),
+                  child: Text(
+                    _tabLabel(logic.tabs[index]),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: AppFontFamily.heeBo600,
+                      color: selected
+                          ? AppColors.whiteColor
+                          : AppColors.brandBlack,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         );
       },
     );
+  }
+
+  String _tabLabel(Tab tab) {
+    final child = tab.child;
+    if (child is Text) return child.data ?? '';
+    return '';
   }
 }
 
@@ -694,7 +750,7 @@ class BranchDetailTabBarAboutView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontFamily: AppFontFamily.heeBo700,
-                          color: AppColors.primaryAppColor,
+                          color: AppColors.brandTerracotta,
                         ),
                       ).paddingOnly(top: 15)
                     ],
@@ -781,16 +837,14 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                   style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 15,
-                                      color:
-                                          AppColors.currency.withOpacity(0.9)),
+                                      color: AppColors.brandTerracotta.withOpacity(0.9)),
                                 ),
                                 Text(
                                   " ($currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr})",
                                   style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplay,
                                       fontSize: 12,
-                                      color:
-                                          AppColors.currency.withOpacity(0.9)),
+                                      color: AppColors.brandTerracotta.withOpacity(0.9)),
                                 ),
                                 SizedBox(width: Get.width * 0.02),
                                 Text(
@@ -799,7 +853,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                       fontFamily:
                                           AppFontFamily.sfProDisplayBold,
                                       fontSize: 17,
-                                      color: AppColors.currency),
+                                      color: AppColors.brandTerracotta),
                                 ),
                               ],
                             ).paddingOnly(left: 5),
@@ -882,200 +936,212 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                   : GetBuilder<BranchDetailController>(
                       id: Constant.idServiceList,
                       builder: (logic) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            GridView.builder(
-                              itemCount: logic.getSalonDetailCategory?.salon
-                                      ?.serviceIds?.length ??
-                                  0,
-                              shrinkWrap: true,
-                              padding: EdgeInsets.zero,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 0.87,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                              ),
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (logic.isBranchSelected[index] == true) {
-                                      logic.onCheckBoxClick(false, index);
-                                    } else {
-                                      logic.onCheckBoxClick(true, index);
-                                    }
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(18),
-                                      color: AppColors.whiteColor,
-                                      border: Border.all(
-                                        color: AppColors.serviceBgBorder,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        // Service image with solid square border
-                                        Container(
+                        final total = logic.getSalonDetailCategory?.salon
+                                ?.serviceIds?.length ??
+                            0;
+                        final visibleIndices = <int>[
+                          for (var i = 0; i < total; i++)
+                            if (logic.serviceMatchesCategory(i)) i,
+                        ];
+
+                        return SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (logic.serviceCategoryFilters.length > 1)
+                                SizedBox(
+                                  height: 44,
+                                  child: ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    padding: const EdgeInsets.fromLTRB(
+                                        16, 4, 16, 8),
+                                    itemCount:
+                                        logic.serviceCategoryFilters.length,
+                                    separatorBuilder: (_, __) =>
+                                        const SizedBox(width: 8),
+                                    itemBuilder: (context, chipIndex) {
+                                      final entry = logic
+                                          .serviceCategoryFilters[chipIndex];
+                                      final selected =
+                                          logic.activeServiceCategory ==
+                                              entry.key;
+                                      return GestureDetector(
+                                        onTap: () => logic
+                                            .onServiceCategoryTap(entry.key),
+                                        child: Container(
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 15),
-                                          alignment: Alignment.center,
-                                          child: Container(
-                                            height: 80,
-                                            width: 80,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              border: Border.all(
-                                                color: AppColors.roundBorder,
-                                                width: 1,
-                                              ),
+                                            horizontal: 14,
+                                            vertical: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: selected
+                                                ? AppColors.brandBlack
+                                                : AppColors.whiteColor,
+                                            borderRadius:
+                                                BorderRadius.circular(999),
+                                            border: Border.all(
+                                              color: selected
+                                                  ? AppColors.brandBlack
+                                                  : AppColors.greyColor
+                                                      .withOpacity(0.35),
                                             ),
-                                            clipBehavior: Clip.hardEdge,
-                                            child: CachedNetworkImage(
-                                              imageUrl:
-                                                  "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.image}",
-                                              fit: BoxFit.cover,
-                                              placeholder: (context, url) {
-                                                return Image.asset(AppAsset
-                                                        .icServicePlaceholder)
-                                                    .paddingAll(11);
-                                              },
-                                              errorWidget:
-                                                  (context, url, error) {
-                                                return Image.asset(AppAsset
-                                                        .icServicePlaceholder)
-                                                    .paddingAll(11);
-                                              },
+                                          ),
+                                          child: Text(
+                                            entry.value,
+                                            style: TextStyle(
+                                              fontFamily:
+                                                  AppFontFamily.heeBo600,
+                                              fontSize: 13,
+                                              color: selected
+                                                  ? AppColors.whiteColor
+                                                  : AppColors.brandBlack,
                                             ),
                                           ),
                                         ),
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  SizedBox(
-                                                    width: Get.width * 0.3,
-                                                    child: Text(
-                                                      logic
-                                                              .getSalonDetailCategory
-                                                              ?.salon
-                                                              ?.serviceIds?[
-                                                                  index]
-                                                              .serviceIdId
-                                                              ?.name ??
-                                                          "",
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            AppFontFamily
-                                                                .heeBo700,
-                                                        fontSize: 13.5,
-                                                        color:
-                                                            AppColors.appText,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const Spacer(),
-                                                  Image.asset(
-                                                    AppAsset.icStarFilled,
-                                                    height: 14,
-                                                    width: 14,
-                                                  ).paddingOnly(right: 5),
-                                                  Text(
-                                                    "4.8",
-                                                    style: TextStyle(
-                                                      color: AppColors
-                                                          .ratingYellow,
-                                                      fontSize: 12,
-                                                      fontFamily: AppFontFamily
-                                                          .heeBo700,
-                                                    ),
-                                                  ).paddingOnly(top: 3),
-                                                ],
-                                              ),
-                                              Text(
-                                                "${logic.getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId?.duration} ${"txtMinutes".tr}",
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      AppFontFamily.heeBo600,
-                                                  fontSize: 13,
-                                                  color: AppColors.service,
-                                                ),
-                                              ).paddingOnly(top: 4, bottom: 4),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "${"txtPriceFrom".tr} $currency ${logic.getSalonDetailCategory?.salon?.serviceIds?[index].price?.toStringAsFixed(2)}",
-                                                    style: TextStyle(
-                                                      fontFamily: AppFontFamily
-                                                          .heeBo800,
-                                                      fontSize: 14.5,
-                                                      color: AppColors
-                                                          .primaryAppColor,
-                                                    ),
-                                                  ),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      if (logic.isBranchSelected[
-                                                              index] ==
-                                                          true) {
-                                                        logic.onCheckBoxClick(
-                                                            false, index);
-                                                      } else {
-                                                        logic.onCheckBoxClick(
-                                                            true, index);
-                                                      }
-                                                    },
-                                                    child: logic.isBranchSelected[
-                                                            index]
-                                                        ? Image.asset(
-                                                            AppAsset
-                                                                .icCheckRound,
-                                                            height: 28)
-                                                        : Image.asset(
-                                                            AppAsset
-                                                                .icPlusRound,
-                                                            height: 28),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                              if (visibleIndices.isEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.all(24),
+                                  child: Text(
+                                    "txtNotAvailableServices".tr,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppColors.termsDialog,
+                                      fontFamily: AppFontFamily.heeBo500,
+                                      fontSize: 14,
                                     ),
                                   ),
-                                );
-                              },
-                            ).paddingOnly(left: 12, right: 12, bottom: 4),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, right: 16, bottom: 12),
-                              child: Text(
-                                "txtPriceIndicativeHint".tr,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: AppFontFamily.sfProDisplay,
-                                  fontSize: 11.5,
-                                  color: AppColors.currencyGrey,
-                                  height: 1.35,
+                                )
+                              else
+                                ListView.separated(
+                                  itemCount: visibleIndices.length,
+                                  shrinkWrap: true,
+                                  padding: const EdgeInsets.fromLTRB(
+                                      16, 0, 16, 8),
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  separatorBuilder: (_, __) => Divider(
+                                    height: 1,
+                                    color:
+                                        AppColors.greyColor.withOpacity(0.15),
+                                  ),
+                                  itemBuilder: (context, listIndex) {
+                                    final index = visibleIndices[listIndex];
+                                    final service = logic
+                                        .getSalonDetailCategory
+                                        ?.salon
+                                        ?.serviceIds?[index];
+                                    final meta = service?.serviceIdId;
+                                    final selected =
+                                        logic.isBranchSelected[index];
+
+                                    return InkWell(
+                                      onTap: () => logic.onCheckBoxClick(
+                                        !selected,
+                                        index,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 56,
+                                              height: 56,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: selected
+                                                      ? AppColors
+                                                          .brandTerracotta
+                                                      : AppColors.greyColor
+                                                          .withOpacity(0.25),
+                                                  width: selected ? 2 : 1,
+                                                ),
+                                              ),
+                                              clipBehavior: Clip.hardEdge,
+                                              child: CachedNetworkImage(
+                                                imageUrl: meta?.image ?? '',
+                                                fit: BoxFit.cover,
+                                                placeholder: (_, __) =>
+                                                    Image.asset(AppAsset
+                                                        .icServicePlaceholder),
+                                                errorWidget: (_, __, ___) =>
+                                                    Image.asset(AppAsset
+                                                        .icServicePlaceholder),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    meta?.name ?? '',
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontFamily: AppFontFamily
+                                                          .heeBo700,
+                                                      fontSize: 15,
+                                                      color:
+                                                          AppColors.brandBlack,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    '${meta?.duration ?? 0} ${"txtMinutes".tr} · ${"txtPriceFrom".tr} $currency ${service?.price?.toStringAsFixed(2) ?? '0.00'}',
+                                                    style: TextStyle(
+                                                      fontFamily: AppFontFamily
+                                                          .heeBo500,
+                                                      fontSize: 13,
+                                                      color: AppColors
+                                                          .brandTerracotta,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Icon(
+                                              selected
+                                                  ? Icons.check_circle
+                                                  : Icons.add_circle_outline,
+                                              color: selected
+                                                  ? AppColors.brandTerracotta
+                                                  : AppColors.greyColor,
+                                              size: 28,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    16, 4, 16, 12),
+                                child: Text(
+                                  "txtPriceIndicativeHint".tr,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.sfProDisplay,
+                                    fontSize: 11.5,
+                                    color: AppColors.currencyGrey,
+                                    height: 1.35,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         );
                       },
                     );
@@ -1116,155 +1182,86 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                     ],
                   ),
                 )
-              : GridView.builder(
-                  scrollDirection: Axis.vertical,
-                  physics: const ScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  itemCount: logic.getSalonDetailCategory?.product?.length ?? 0,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 0.68,
-                    crossAxisSpacing: 10,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return InkWell(
-                      onTap: () async {
-                        if (Constant.storage.read<bool>('isLogIn') ?? false) {
-                          Get.toNamed(
-                            AppRoutes.productDetail,
-                            arguments: [
-                              logic.getSalonDetailCategory?.product?[index].id,
-                            ],
-                          );
-                        } else {
-                          Get.toNamed(AppRoutes.signIn,
-                              arguments: [logic.checkItem.isNotEmpty]);
-                          await Get.find<SignInController>().getDataFromArgs();
-                        }
-                      },
-                      overlayColor: WidgetStateColor.transparent,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(21),
-                          color: AppColors.whiteColor,
-                          boxShadow: Constant.boxShadow,
-                          border: Border.all(
-                            color: AppColors.grey.withOpacity(0.1),
-                            width: 1,
-                          ),
-                        ),
-                        child: Stack(
-                          children: [
-                            Column(
-                              children: [
-                                const Spacer(),
-                                const Spacer(),
-                                const Spacer(),
-                                const Spacer(),
-                                // Product image with solid square border
-                                Center(
-                                  child: Container(
-                                    height: 80,
-                                    width: 80,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: AppColors.roundBorder,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    clipBehavior: Clip.hardEdge,
-                                    child: CachedNetworkImage(
-                                      imageUrl: logic.getSalonDetailCategory
-                                              ?.product?[index].mainImage ??
-                                          "",
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) {
-                                        return Image.asset(
-                                                AppAsset.icImagePlaceholder)
-                                            .paddingAll(25);
-                                      },
-                                      errorWidget: (context, url, error) {
-                                        return Image.asset(
-                                                AppAsset.icImagePlaceholder)
-                                            .paddingAll(30);
-                                      },
-                                    ),
+              : SizedBox(
+                  height: 200,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    itemCount:
+                        logic.getSalonDetailCategory?.product?.length ?? 0,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (BuildContext context, int index) {
+                      final product =
+                          logic.getSalonDetailCategory?.product?[index];
+                      return InkWell(
+                        onTap: () async {
+                          if (Constant.storage.read<bool>('isLogIn') ?? false) {
+                            Get.toNamed(
+                              AppRoutes.productDetail,
+                              arguments: [product?.id],
+                            );
+                          } else {
+                            Get.toNamed(AppRoutes.signIn,
+                                arguments: [logic.checkItem.isNotEmpty]);
+                            await Get.find<SignInController>().getDataFromArgs();
+                          }
+                        },
+                        overlayColor: WidgetStateColor.transparent,
+                        child: SizedBox(
+                          width: 120,
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 72,
+                                height: 72,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.greyColor
+                                        .withOpacity(0.25),
                                   ),
                                 ),
-                                const Spacer(),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    Constant.capitalizeFirstLetter(logic
-                                            .getSalonDetailCategory
-                                            ?.product?[index]
-                                            .productName ??
-                                        ""),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontFamily: AppFontFamily.heeBo700,
-                                      fontSize: 14,
-                                      color: AppColors.appText,
-                                    ),
-                                  ).paddingOnly(left: 10, right: 5),
+                                clipBehavior: Clip.hardEdge,
+                                child: CachedNetworkImage(
+                                  imageUrl: product?.mainImage ?? '',
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => Image.asset(
+                                    AppAsset.icImagePlaceholder,
+                                  ).paddingAll(16),
+                                  errorWidget: (_, __, ___) => Image.asset(
+                                    AppAsset.icImagePlaceholder,
+                                  ).paddingAll(16),
                                 ),
-                                const Spacer(),
-                                Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: AppColors.currencyBg,
-                                        borderRadius: BorderRadius.circular(34),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 9),
-                                      child: Text(
-                                        "${"txtPriceFrom".tr} $currency ${logic.getSalonDetailCategory?.product?[index].price ?? ""}",
-                                        style: TextStyle(
-                                          fontFamily: AppFontFamily.heeBo800,
-                                          fontSize: 14,
-                                          color: AppColors.primaryAppColor,
-                                        ),
-                                      ),
-                                    ).paddingOnly(right: 7),
-                                  ],
-                                ).paddingOnly(left: 10, right: 6),
-                                const Spacer(),
-                              ],
-                            ),
-                            logic.getSalonDetailCategory?.salon?.isBestSeller ==
-                                    true
-                                ? Container(
-                                    height: 22,
-                                    width: Get.width * 0.18,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(21),
-                                        bottomRight: Radius.circular(21),
-                                        topRight: Radius.circular(21),
-                                      ),
-                                      color: AppColors.sellerBg,
-                                    ),
-                                    child: Text(
-                                      "txtBestSeller".tr,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontFamily: AppFontFamily.heeBo700,
-                                        fontSize: 10,
-                                        color: AppColors.sellerYellow,
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox(),
-                          ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                Constant.capitalizeFirstLetter(
+                                    product?.productName ?? ''),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.heeBo600,
+                                  fontSize: 13,
+                                  color: AppColors.brandBlack,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${"txtPriceFrom".tr} $currency ${product?.price ?? ''}',
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.heeBo700,
+                                  fontSize: 13,
+                                  color: AppColors.brandTerracotta,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ).paddingOnly(bottom: 10),
-                    );
-                  },
-                ).paddingOnly(left: 12, right: 12, bottom: 12);
+                      );
+                    },
+                  ),
+                );
         },
       ),
     );
@@ -1304,143 +1301,82 @@ class BranchDetailTabBarStaffView extends StatelessWidget {
                         ],
                       ),
                     ).paddingOnly(top: Get.height * 0.1)
-                  : GridView.builder(
-                      scrollDirection: Axis.vertical,
-                      physics: const ScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      itemCount: logic.getSalonDetailCategory?.experts?.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.80,
-                        crossAxisSpacing: 13.5,
-                        mainAxisSpacing: 2,
-                      ),
-                      itemBuilder: (BuildContext context, int index) {
-                        logic.rating = logic
-                            .getSalonDetailCategory?.experts?[index].review;
-                        logic.roundedRating = logic.rating?.round();
-                        logic.filledStars = logic.roundedRating?.clamp(0, 5);
+                  : SizedBox(
+                      height: 130,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                        itemCount:
+                            logic.getSalonDetailCategory?.experts?.length ?? 0,
+                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        itemBuilder: (BuildContext context, int index) {
+                          final expert =
+                              logic.getSalonDetailCategory?.experts?[index];
+                          final rating = expert?.review ?? 0;
 
-                        return InkWell(
-                          overlayColor:
-                              WidgetStatePropertyAll(AppColors.transparent),
-                          onTap: () {
-                            homeScreenController.onGetExpertApiCall(
-                                expertId: logic.getSalonDetailCategory
-                                        ?.experts?[index].id ??
-                                    "");
-
-                            Get.toNamed(
-                              AppRoutes.expertDetail,
-                              arguments: [
-                                logic
-                                    .getSalonDetailCategory?.experts?[index].id,
-                                index,
-                                logic.getSalonDetailCategory?.experts?[index]
-                                    .review
-                              ],
-                            );
-                          },
-                          child: Container(
-                            width: Get.width * 0.45,
-                            margin: const EdgeInsets.only(top: 10),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              color: AppColors.whiteColor,
-                              boxShadow: Constant.boxShadow,
-                            ),
-                            child: Align(
-                              alignment: Alignment.center,
+                          return InkWell(
+                            overlayColor:
+                                WidgetStatePropertyAll(AppColors.transparent),
+                            onTap: () {
+                              homeScreenController.onGetExpertApiCall(
+                                  expertId: expert?.id ?? '');
+                              Get.toNamed(
+                                AppRoutes.expertDetail,
+                                arguments: [expert?.id, index, expert?.review],
+                              );
+                            },
+                            child: SizedBox(
+                              width: 76,
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  DottedBorder(
-                                    color: AppColors.roundBorder,
-                                    borderType: BorderType.RRect,
-                                    radius: const Radius.circular(41),
-                                    strokeWidth: 1,
-                                    dashPattern: const [3, 3],
-                                    child: Container(
-                                      height: 80,
-                                      width: 80,
-                                      decoration: const BoxDecoration(
-                                          shape: BoxShape.circle),
-                                      clipBehavior: Clip.hardEdge,
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            "${logic.getSalonDetailCategory?.experts?[index].image}",
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) {
-                                          return Image.asset(
-                                              AppAsset.icPlaceHolder);
-                                        },
-                                        errorWidget: (context, url, error) {
-                                          return Image.asset(
-                                              AppAsset.icPlaceHolder);
-                                        },
+                                  Container(
+                                    width: 56,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.greyColor
+                                            .withOpacity(0.25),
                                       ),
                                     ),
+                                    clipBehavior: Clip.hardEdge,
+                                    child: CachedNetworkImage(
+                                      imageUrl: expert?.image ?? '',
+                                      fit: BoxFit.cover,
+                                      placeholder: (_, __) => Image.asset(
+                                          AppAsset.icPlaceHolder),
+                                      errorWidget: (_, __, ___) => Image.asset(
+                                          AppAsset.icPlaceHolder),
+                                    ),
                                   ),
-                                  SizedBox(height: Get.height * 0.015),
+                                  const SizedBox(height: 6),
                                   Text(
-                                    "${logic.getSalonDetailCategory?.experts?[index].fname} ${logic.getSalonDetailCategory?.experts?[index].lname}",
+                                    expert?.fname ?? '',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontFamily: AppFontFamily.heeBo700,
-                                      fontSize: 15.5,
-                                      color: AppColors.appText,
+                                      fontFamily: AppFontFamily.heeBo600,
+                                      fontSize: 12,
+                                      color: AppColors.brandBlack,
                                     ),
                                   ),
-                                  SizedBox(height: Get.height * 0.015),
-                                  Container(
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: AppColors.yellow2,
-                                    ),
-                                    child: SizedBox(
-                                      height: 15,
-                                      child: ListView.separated(
-                                        shrinkWrap: true,
-                                        itemCount: 5,
-                                        scrollDirection: Axis.horizontal,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 13),
-                                        itemBuilder: (context, index) {
-                                          if (index <
-                                              (logic.filledStars ?? 0)) {
-                                            return Image.asset(
-                                              AppAsset.icStarFilled,
-                                              height: 15,
-                                              width: 15,
-                                            );
-                                          } else {
-                                            return Image.asset(
-                                              AppAsset.icStarOutline,
-                                              height: 15,
-                                              width: 15,
-                                            );
-                                          }
-                                        },
-                                        separatorBuilder: (context, index) {
-                                          return SizedBox(
-                                              width: Get.width * 0.017);
-                                        },
+                                  if (rating > 0)
+                                    Text(
+                                      '★ ${rating.toStringAsFixed(1)}',
+                                      style: TextStyle(
+                                        fontFamily: AppFontFamily.heeBo500,
+                                        fontSize: 11,
+                                        color: AppColors.brandTerracotta,
                                       ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ).paddingOnly(left: 15, right: 15);
+                          );
+                        },
+                      ),
+                    );
         },
       ),
     );

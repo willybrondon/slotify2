@@ -24,6 +24,7 @@ final Map<String, String> frCH = {
   "txtDirection": "Direction",
   "txtCall": "Appel",
   "txtServices": "Prestations de service",
+  "txtAllCategories": "Tout",
   "txtAbout": "À propos",
   "txtWorkingHours": "Heures d'ouverture",
   "txtNoReviewSalon": "Aucun avis pour ce salon !!",

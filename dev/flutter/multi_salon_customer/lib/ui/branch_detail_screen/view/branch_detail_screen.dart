@@ -9,11 +9,14 @@ class BranchDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.whiteColor,
+      backgroundColor: AppColors.backGround,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(Get.height * 0.3),
         child: AppBar(
           automaticallyImplyLeading: false,
+          backgroundColor: AppColors.backGround,
+          elevation: 0,
+          scrolledUnderElevation: 0,
           flexibleSpace: const BranchDetailTopView(),
         ),
       ),

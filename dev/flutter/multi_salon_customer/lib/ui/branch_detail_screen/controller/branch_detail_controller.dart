@@ -61,6 +61,7 @@ class BranchDetailController extends GetxController
   //----------- API Variables -----------//
   GetSalonDetailModel? getSalonDetailCategory;
   RxBool isLoading = false.obs;
+  String activeServiceCategory = 'all';
 
   @override
   void onInit() async {
@@ -132,6 +133,32 @@ class BranchDetailController extends GetxController
         break;
       }
     }
+  }
+
+  void onServiceCategoryTap(String categoryId) {
+    activeServiceCategory = categoryId;
+    update([Constant.idServiceList]);
+  }
+
+  List<MapEntry<String, String>> get serviceCategoryFilters {
+    final services = getSalonDetailCategory?.salon?.serviceIds ?? [];
+    final byId = <String, String>{};
+    for (final service in services) {
+      final meta = service.serviceIdId;
+      if (meta == null) continue;
+      byId[meta.categoryKey] = meta.categoryLabel;
+    }
+    final filters = <MapEntry<String, String>>[
+      MapEntry('all', 'txtAllCategories'.tr),
+    ];
+    filters.addAll(byId.entries.map((e) => MapEntry(e.key, e.value)));
+    return filters;
+  }
+
+  bool serviceMatchesCategory(int index) {
+    if (activeServiceCategory == 'all') return true;
+    final meta = getSalonDetailCategory?.salon?.serviceIds?[index].serviceIdId;
+    return meta?.categoryKey == activeServiceCategory;
   }
 
   makingPhoneCall() async {

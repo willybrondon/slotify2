@@ -404,6 +404,7 @@ class Id {
   String? name;
   int? duration;
   String? categoryId;
+  String? categoryName;
   String? image;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -415,22 +416,44 @@ class Id {
     this.name,
     this.duration,
     this.categoryId,
+    this.categoryName,
     this.image,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory Id.fromJson(Map<String, dynamic> json) => Id(
+  String get categoryKey => categoryId?.trim().isNotEmpty == true ? categoryId! : 'other';
+
+  String get categoryLabel =>
+      categoryName?.trim().isNotEmpty == true ? categoryName!.trim() : 'Autres';
+
+  factory Id.fromJson(Map<String, dynamic> json) {
+    String? catId;
+    String? catName;
+    final rawCat = json["categoryId"];
+    if (rawCat is Map) {
+      catId = rawCat["_id"]?.toString();
+      catName = rawCat["name"]?.toString() ??
+          rawCat["nameFr"]?.toString() ??
+          rawCat["nameEn"]?.toString();
+    } else if (rawCat != null) {
+      catId = rawCat.toString();
+    }
+    catName ??= json["categoryName"]?.toString();
+
+    return Id(
         id: json["_id"],
         status: json["status"],
         isDelete: json["isDelete"],
         name: json["name"],
         duration: json["duration"],
-        categoryId: json["categoryId"],
+        categoryId: catId,
+        categoryName: catName,
         image: json["image"],
         createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
         updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
       );
+  }
 
   Map<String, dynamic> toJson() => {
         "_id": id,
@@ -439,6 +462,7 @@ class Id {
         "name": name,
         "duration": duration,
         "categoryId": categoryId,
+        "categoryName": categoryName,
         "image": image,
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),

@@ -23,6 +23,7 @@ final Map<String, String> enUS = {
   "txtConfirmExit": "Confirm Exit",
   "txtCall": "Call",
   "txtServices": "Services",
+  "txtAllCategories": "All",
   "txtAbout": "About",
   "txtWorkingHours": "Working Hours",
   "txtNoReviewSalon": "No review for this salon !!",
