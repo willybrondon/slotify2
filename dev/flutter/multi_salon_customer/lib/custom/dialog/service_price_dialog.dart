@@ -100,7 +100,7 @@ class ServicePriceDialog extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis),
                                 ).paddingOnly(right: 8)
                               : Text(
-                                  "${"txtPriceFrom".tr} $currency ${logic.getExpertServiceBaseSalonCategory?.matchedServices?[index].price?.toStringAsFixed(2)}",
+                                  "$currency ${logic.getExpertServiceBaseSalonCategory?.matchedServices?[index].price?.toStringAsFixed(2)}",
                                   style: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplayBold,
                                       color: AppColors.currency,

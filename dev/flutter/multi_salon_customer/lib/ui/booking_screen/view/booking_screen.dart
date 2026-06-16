@@ -200,73 +200,76 @@ class BookingScreen extends StatelessWidget {
                               : Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                  children: [
-                                    Text(
-                                      "${"txtPriceFrom".tr} $currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
-                                      style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplay,
-                                        fontSize: 15.5,
-                                        color:
-                                            AppColors.currency.withOpacity(0.9),
-                                      ),
-                                    ),
-                                    Text(
-                                      " ($currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr})",
-                                      style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplay,
-                                        fontSize: 12.5,
-                                        color:
-                                            AppColors.currency.withOpacity(0.9),
-                                      ),
-                                    ),
-                                    SizedBox(width: Get.width * 0.02),
-                                    GetBuilder<BookingScreenController>(
-                                      id: Constant.idApplyCoupon,
-                                      builder: (logic) {
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            if (logic.couponDiscountAmount >
-                                                0) ...[
-                                              Text(
-                                                "${"txtPriceFrom".tr} $currency ${(logic.withOutTaxRupee + logic.finalTaxRupee).toStringAsFixed(2)}",
-                                                style: TextStyle(
-                                                  fontFamily: AppFontFamily
-                                                      .sfProDisplay,
-                                                  fontSize: 14,
-                                                  color: AppColors.currencyGrey,
-                                                  decoration: TextDecoration
-                                                      .lineThrough,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${logic.totalMinute != null && logic.totalMinute! > 0 ? '${logic.totalMinute} ${"txtMin".tr} · ' : ''}$currency${logic.withOutTaxRupee.toStringAsFixed(2)}',
+                                          style: TextStyle(
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplay,
+                                            fontSize: 15.5,
+                                            color: AppColors.currency
+                                                .withOpacity(0.9),
+                                          ),
+                                        ),
+                                        Text(
+                                          '$currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr}',
+                                          style: TextStyle(
+                                            fontFamily:
+                                                AppFontFamily.sfProDisplay,
+                                            fontSize: 12.5,
+                                            color: AppColors.termsDialog,
+                                          ),
+                                        ),
+                                        GetBuilder<BookingScreenController>(
+                                          id: Constant.idApplyCoupon,
+                                          builder: (logic) {
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                if (logic.couponDiscountAmount >
+                                                    0) ...[
+                                                  Text(
+                                                    '$currency ${(logic.withOutTaxRupee + logic.finalTaxRupee).toStringAsFixed(2)}',
+                                                    style: TextStyle(
+                                                      fontFamily: AppFontFamily
+                                                          .sfProDisplay,
+                                                      fontSize: 14,
+                                                      color: AppColors
+                                                          .currencyGrey,
+                                                      decoration: TextDecoration
+                                                          .lineThrough,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '- $currency ${logic.couponDiscountAmount.toStringAsFixed(2)}',
+                                                    style: TextStyle(
+                                                      fontFamily: AppFontFamily
+                                                          .sfProDisplay,
+                                                      fontSize: 13,
+                                                      color: AppColors
+                                                          .primaryAppColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                                Text(
+                                                  '= $currency ${logic.totalPrice.toStringAsFixed(2)}',
+                                                  style: TextStyle(
+                                                    fontFamily: AppFontFamily
+                                                        .sfProDisplayBold,
+                                                    fontSize: 17,
+                                                    color: AppColors.currency,
+                                                  ),
                                                 ),
-                                              ),
-                                              Text(
-                                                "- $currency ${logic.couponDiscountAmount.toStringAsFixed(2)}",
-                                                style: TextStyle(
-                                                  fontFamily: AppFontFamily
-                                                      .sfProDisplay,
-                                                  fontSize: 13,
-                                                  color:
-                                                      AppColors.primaryAppColor,
-                                                ),
-                                              ),
-                                            ],
-                                            Text(
-                                              "= ${"txtPriceFrom".tr} $currency ${logic.totalPrice.toStringAsFixed(2)}",
-                                              style: TextStyle(
-                                                fontFamily: AppFontFamily
-                                                    .sfProDisplayBold,
-                                                fontSize: 17,
-                                                color: AppColors.currency,
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ).paddingOnly(left: 5),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ).paddingOnly(left: 5),
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           left: 5, right: 8, top: 6),

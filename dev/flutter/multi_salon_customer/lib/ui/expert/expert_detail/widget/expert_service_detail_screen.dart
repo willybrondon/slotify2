@@ -99,40 +99,34 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "${"txtPriceFrom".tr} $currency ${logic.withOutTaxRupeeExpert.toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplay,
-                                            fontSize: 15,
-                                            color: AppColors.currency
-                                                .withOpacity(0.9)),
-                                      ),
-                                      Text(
-                                        " ($currency${logic.finalTaxRupeeExpert.toStringAsFixed(2)} ${"txtTax".tr})",
-                                        style: TextStyle(
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplay,
-                                            fontSize: 12,
-                                            color: AppColors.currency
-                                                .withOpacity(0.9)),
-                                      ),
-                                      SizedBox(width: Get.width * 0.02),
-                                      Text(
-                                        "= ${"txtPriceFrom".tr} $currency ${logic.totalPriceExpert.toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplayBold,
-                                            fontSize: 17,
-                                            color: AppColors.currency),
-                                      ),
-                                    ],
-                                  ).paddingOnly(left: 5),
+                                  Text(
+                                    '${logic.totalMinuteExpert > 0 ? '${logic.totalMinuteExpert} ${"txtMin".tr} · ' : ''}$currency ${logic.withOutTaxRupeeExpert.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplay,
+                                        fontSize: 15,
+                                        color: AppColors.currency
+                                            .withOpacity(0.9)),
+                                  ),
+                                  Text(
+                                    '$currency${logic.finalTaxRupeeExpert.toStringAsFixed(2)} ${"txtTax".tr}',
+                                    style: TextStyle(
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplay,
+                                        fontSize: 12,
+                                        color: AppColors.termsDialog),
+                                  ),
+                                  Text(
+                                    '= $currency ${logic.totalPriceExpert.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplayBold,
+                                        fontSize: 17,
+                                        color: AppColors.currency),
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.only(
-                                        left: 5, right: 8, top: 6),
+                                        right: 8, top: 6),
                                     child: Text(
                                       "txtPriceIndicativeHint".tr,
                                       style: TextStyle(
@@ -144,7 +138,7 @@ class ExpertServiceDetailScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ],
-                              ),
+                              ).paddingOnly(left: 5),
                             ],
                           ),
                         ),
