@@ -411,7 +411,7 @@
 
 /* Capture mode — AI concierge (authenticité afro IDF) */
 body.sq-capture-mode .ai-concierge-section {
-  background: linear-gradient(180deg, var(--sk-brand-light) 0%, var(--sk-white) 40%);
+  background: linear-gradient(180deg, #fdf6f0 0%, #f8f9fa 40%);
 }
 
 .sq-capture-trust {
@@ -423,7 +423,7 @@ body.sq-capture-mode .ai-concierge-section {
 .sq-capture-trust p {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--sk-text-muted);
+  color: #5c3d2e;
   margin: 0 0 0.65rem;
 }
 
@@ -1451,10 +1451,36 @@ body.sq-capture-mode .btn-upload:hover {
   flex-shrink: 0;
 }
 
-/* Page Partager un look */
+/* Page Partager un look — fond blanc chaud + accents terracotta */
 .sq-share-look-page {
-  background: var(--sk-brand-light);
+  background: #fdf6f0;
   min-height: 100vh;
+}
+
+.sq-share-look-page .ai-concierge-section,
+.sq-share-look-page .sq-share-look-section {
+  background: transparent;
+}
+
+.sq-share-look-page .upload-section {
+  background: var(--sk-white);
+  box-shadow: 0 10px 40px rgba(92, 61, 46, 0.08);
+}
+
+.sq-share-look-page .upload-area {
+  border-color: rgba(196, 92, 38, 0.45);
+  background: var(--sk-white);
+}
+
+.sq-share-look-page .upload-area.dragover {
+  border-color: var(--sk-brand);
+  background: #fffaf7;
+}
+
+.sq-share-look-page .navbar,
+.sq-share-look-page .sq-navbar {
+  background: #fdf6f0 !important;
+  border-bottom-color: rgba(196, 92, 38, 0.12) !important;
 }
 
 .sq-share-look-hero {
