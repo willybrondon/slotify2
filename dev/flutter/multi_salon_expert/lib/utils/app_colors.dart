@@ -27,7 +27,9 @@ class AppColors {
   static Color stepperGrey = const Color(0xff959595);
   static Color primaryAppColor = const Color(0xff000000);
   static Color primaryTextColor = const Color(0xff223126);
-  static Color iconColor = const Color(0xff000000);
+  static const Color brandTerracotta = Color(0xFFC45C26);
+  static Color iconColor = brandTerracotta;
+  static Color iconAccent = brandTerracotta;
   static Color currency = const Color(0xff0A4C09);
   static Color tabUnSelect = const Color(0xffF8F8F8);
   static Color green = const Color(0xffF7FEF7);

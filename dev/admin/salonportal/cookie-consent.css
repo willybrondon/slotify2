@@ -94,14 +94,15 @@
 }
 
 .cookie-btn-secondary {
-    background: #e74c3c;
-    color: white;
+    background: transparent;
+    color: var(--sk-text);
+    border: 1px solid var(--sk-border);
 }
 
 .cookie-btn-secondary:hover {
-    background: #c0392b;
+    background: rgba(17, 17, 17, 0.06);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 4px 8px rgba(17, 17, 17, 0.08);
 }
 
 .cookie-btn-link {

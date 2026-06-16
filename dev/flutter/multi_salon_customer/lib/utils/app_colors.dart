@@ -7,7 +7,9 @@ class AppColors {
   static const Color brandBlack = Color(0xFF111111);
   static const Color brandWhite = Color(0xFFFFFFFF);
 
-  static Color primaryAppColor = brandTerracotta;
+  static Color iconAccent = brandTerracotta;
+
+  static Color primaryAppColor = brandBlack;
   static Color primaryTextColor = brandBlack;
   static Color appText = brandBlack;
   static Color appointmentBg = const Color(0xff2C302E);
@@ -95,8 +97,8 @@ class AppColors {
   static Color bgStepper = const Color(0xff8D9AA5);
   static Color locationText = const Color(0xff48484C);
   static Color greyColor3 = const Color(0xffCBCBCB);
-  static Color buttonColor = brandTerracotta;
-  static Color directionBox = brandTerracotta;
+  static Color buttonColor = brandBlack;
+  static Color directionBox = brandBlack;
   static Color callBox = brandBlack;
   static Color greenColor = const Color(0xff2EB62C);
   static Color greenBox = const Color(0xffEFFEEE);

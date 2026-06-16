@@ -332,13 +332,20 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
-            seedColor: AppColors.brandTerracotta,
-            primary: AppColors.brandTerracotta,
+            seedColor: AppColors.brandBlack,
+            primary: AppColors.brandBlack,
             onPrimary: AppColors.brandWhite,
             surface: AppColors.brandWhite,
             onSurface: AppColors.brandBlack,
           ),
           scaffoldBackgroundColor: AppColors.brandWhite,
+          iconTheme: const IconThemeData(color: AppColors.brandTerracotta),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.brandBlack,
+              foregroundColor: AppColors.brandWhite,
+            ),
+          ),
         ),
         locale: const Locale("fr"),
         translations: AppLanguages(),

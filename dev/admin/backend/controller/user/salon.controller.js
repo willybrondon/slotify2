@@ -1091,6 +1091,9 @@ exports.serveSalonWebPage = async (req, res) => {
     </script>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="${baseURL}/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="${baseURL}/favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c45c26">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/public-pages.css">

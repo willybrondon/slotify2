@@ -274,7 +274,7 @@ body.sk-public-page .main-wrapper {
 }
 
 .sk-public-page .open-app-btn {
-    background: var(--sk-primary);
+    background: var(--sk-btn, #111);
     color: var(--sk-inverse);
     border: none;
     padding: 16px 28px;
@@ -292,7 +292,7 @@ body.sk-public-page .main-wrapper {
 }
 
 .sk-public-page .open-app-btn:hover {
-    background: var(--sk-primary-hover);
+    background: var(--sk-btn-hover, #333);
     transform: translateY(-1px);
 }
 
@@ -332,12 +332,12 @@ body.sk-public-page .main-wrapper {
 }
 
 .sk-public-page .btn-primary {
-    background: var(--sk-primary);
+    background: var(--sk-btn, #111);
     color: var(--sk-inverse);
 }
 
 .sk-public-page .btn-primary:hover {
-    background: var(--sk-primary-hover);
+    background: var(--sk-btn-hover, #333);
 }
 
 /* Sections */
@@ -423,7 +423,7 @@ body.sk-public-page .main-wrapper {
 .sk-public-page .service-book-btn {
     margin-top: 16px;
     width: 100%;
-    background: var(--sk-primary);
+    background: var(--sk-btn, #111);
     color: var(--sk-inverse);
     border: none;
     padding: 12px 20px;
@@ -437,7 +437,7 @@ body.sk-public-page .main-wrapper {
 }
 
 .sk-public-page .service-book-btn:hover {
-    background: var(--sk-primary-hover);
+    background: var(--sk-btn-hover, #333);
 }
 
 .sk-public-page .service-price,
@@ -1833,7 +1833,7 @@ body.sk-public-page .main-wrapper {
 }
 
 .sq-cal-day--today .sq-cal-day__num {
-    color: var(--sk-primary, #e96e14);
+    color: var(--sk-primary, #c45c26);
 }
 
 .sq-cal-day--active {

@@ -21,8 +21,11 @@ $lightGray: #F9FAFB;
 $lightBlue: #F0F9FF;
 $transparent: transparent;
 
-// Modern Theme Colors
-$theme: #000000; // Unique black
+// Skedisy brand (icons / accents)
+$sk-brand: #c45c26;
+$sk-brand-hover: #a84d1f;
+$icon-accent: $sk-brand;
+$theme: #000000;
 $themeBlue: #7C3AED;
 $themeLight: rgba(147, 51, 234, 0.12);
 $themesky: rgba(124, 58, 237, 0.08);

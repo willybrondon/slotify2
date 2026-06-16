@@ -236,7 +236,7 @@
             }
             
             & > .activeMenu > div > svg > path{
-              fill: $theme !important;
+              fill: $icon-accent !important;
             }
             
             & > .activeMenu > div > svg {
@@ -257,7 +257,7 @@
                   0 2px 8px rgba(0, 0, 0, 0.05);
                 
                 & > div > svg > path {
-                  fill: $theme !important;
+                  fill: $icon-accent !important;
                 }
                 
                 & > div > svg {

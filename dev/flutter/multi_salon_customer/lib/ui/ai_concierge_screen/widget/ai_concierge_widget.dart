@@ -41,14 +41,14 @@ Widget _buildLinkHintBanner(AiConciergeController logic) {
     margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: AppColors.primaryAppColor.withOpacity(0.08),
+      color: AppColors.iconAccent.withOpacity(0.08),
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AppColors.primaryAppColor.withOpacity(0.25)),
+      border: Border.all(color: AppColors.iconAccent.withOpacity(0.25)),
     ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.info_outline, color: AppColors.primaryAppColor, size: 20),
+        Icon(Icons.info_outline, color: AppColors.iconAccent, size: 20),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
@@ -118,7 +118,7 @@ class _CaptureVideoPreviewState extends State<_CaptureVideoPreview> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.videocam, size: 64, color: AppColors.primaryAppColor),
+          Icon(Icons.videocam, size: 64, color: AppColors.iconAccent),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -170,6 +170,7 @@ class AiConciergeMainView extends StatelessWidget {
     return GetBuilder<AiConciergeController>(
       id: Constant.idProgressView,
       builder: (logic) {
+        final capture = logic.captureMode;
         return SingleChildScrollView(
           child: Column(
             children: [
@@ -179,7 +180,9 @@ class AiConciergeMainView extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
+                  color: capture
+                      ? const Color(0xFF1A1A1A)
+                      : AppColors.whiteColor,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -198,7 +201,7 @@ class AiConciergeMainView extends StatelessWidget {
                               : Icons.share_outlined)
                           : Icons.face_retouching_natural,
                       size: 60,
-                      color: AppColors.primaryAppColor,
+                      color: AppColors.iconAccent,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -207,7 +210,9 @@ class AiConciergeMainView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryAppColor,
+                        color: logic.captureMode
+                            ? AppColors.brandWhite
+                            : AppColors.primaryTextColor,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -216,7 +221,9 @@ class AiConciergeMainView extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.grey,
+                        color: capture
+                            ? AppColors.whiteColor.withOpacity(0.72)
+                            : AppColors.grey,
                       ),
                     ),
                   ],
@@ -237,7 +244,9 @@ class AiConciergeMainView extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.grey.withOpacity(0.9),
+                    color: capture
+                        ? AppColors.whiteColor.withOpacity(0.55)
+                        : AppColors.grey.withOpacity(0.9),
                   ),
                 ),
               ),
@@ -466,7 +475,7 @@ class AiConciergeResultsView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primaryAppColor,
+                  color: AppColors.iconAccent,
                 ),
               ),
             ),
@@ -622,7 +631,7 @@ class AiConciergeResultsView extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryAppColor,
+              color: AppColors.iconAccent,
             ),
           ),
           const SizedBox(height: 20),
@@ -780,9 +789,9 @@ class AiConciergeResultsView extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primaryAppColor.withOpacity(0.08),
+        color: AppColors.iconAccent.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryAppColor.withOpacity(0.25)),
+        border: Border.all(color: AppColors.iconAccent.withOpacity(0.25)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -792,7 +801,7 @@ class AiConciergeResultsView extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.primaryAppColor,
+              color: AppColors.iconAccent,
             ),
           ),
           const SizedBox(height: 6),
@@ -851,7 +860,7 @@ class AiConciergeResultsView extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryAppColor,
+              color: AppColors.iconAccent,
             ),
           ),
           const SizedBox(height: 12),
@@ -980,7 +989,7 @@ class AiConciergeResultsView extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryAppColor,
+              color: AppColors.iconAccent,
             ),
           ),
           const SizedBox(height: 12),
@@ -1109,7 +1118,7 @@ class AiConciergeResultsView extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryAppColor,
+                                    color: AppColors.iconAccent,
                                   ),
                                 ),
                               ),
@@ -1183,7 +1192,7 @@ class AiConciergeResultsView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryAppColor,
+                  color: AppColors.iconAccent,
                 ),
               ),
             ],
@@ -1199,7 +1208,7 @@ class AiConciergeResultsView extends StatelessWidget {
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: AppColors.primaryAppColor,
+                        color: AppColors.iconAccent,
                         shape: BoxShape.circle,
                       ),
                     ),

@@ -410,7 +410,14 @@
 }
 
 /* Capture mode — AI concierge (authenticité afro IDF) */
+body.sq-capture-mode {
+  background: var(--sk-black, #111);
+  color: var(--sk-white, #fff);
+}
+
 body.sq-capture-mode .ai-concierge-section {
+  background: var(--sk-black, #111);
+}
   background: linear-gradient(180deg, var(--sk-brand-light) 0%, var(--sk-white) 40%);
 }
 
@@ -1130,7 +1137,7 @@ body.sq-capture-mode .btn-upload:hover {
   align-items: center;
   justify-content: center;
   width: 40px;
-  color: var(--sk-text-soft);
+  color: var(--sk-icon-accent, var(--sk-brand));
   font-size: 1rem;
   align-self: center;
 }
@@ -1451,8 +1458,103 @@ body.sq-capture-mode .btn-upload:hover {
   flex-shrink: 0;
 }
 
-/* Page Partager un look */
+/* Page Partager un look — fond noir (web ↔ app capture) */
 .sq-share-look-page {
+  background: var(--sk-black, #111);
+  min-height: 100vh;
+  color: var(--sk-white, #fff);
+}
+
+.sq-share-look-page .navbar,
+.sq-share-look-page .sq-navbar {
+  background: var(--sk-black, #111) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.sq-share-look-page .nav-menu a,
+.sq-share-look-page .hamburger span {
+  color: var(--sk-white, #fff) !important;
+}
+
+.sq-share-look-page .hamburger span {
+  background: var(--sk-white, #fff) !important;
+}
+
+.sq-share-look-page .ai-concierge-section,
+.sq-share-look-page .sq-share-look-section {
+  background: var(--sk-black, #111);
+}
+
+.sq-share-look-page .sq-share-look-hero__kicker {
+  color: var(--sk-brand, #c45c26);
+}
+
+.sq-share-look-page .sq-share-look-hero__title {
+  color: var(--sk-white, #fff);
+}
+
+.sq-share-look-page .sq-share-look-hero__lead {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.sq-share-look-page .upload-area,
+.sq-share-look-page .sq-upload-kicker,
+.sq-share-look-page #uploadTitle,
+.sq-share-look-page .sq-upload-lead,
+.sq-share-look-page .upload-hint {
+  color: var(--sk-white, #fff);
+}
+
+.sq-share-look-page .upload-area {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sq-share-look-page .sq-share-look-upload-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--sk-white, #fff);
+}
+
+.sq-share-look-page .sq-share-look-upload-btn i {
+  color: var(--sk-brand, #c45c26);
+}
+
+.sq-share-look-page .sq-share-look-upload-btn--primary {
+  background: var(--sk-btn, #111);
+  border-color: var(--sk-btn, #111);
+  color: var(--sk-white, #fff);
+}
+
+.sq-share-look-page .sq-share-look-upload-btn--primary i {
+  color: var(--sk-white, #fff);
+}
+
+.sq-share-look-page .btn-upload,
+.sq-share-look-page .btn-analyze,
+.sq-share-look-page .btn-primary {
+  background: var(--sk-btn, #111) !important;
+  color: var(--sk-white, #fff) !important;
+}
+
+.sq-share-look-page .sq-share-look-cta--secondary {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+.sq-share-look-page .sq-share-look-note {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.sq-share-look-page .sq-share-look-back {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.sq-share-look-page .sq-share-look-back:hover {
+  color: var(--sk-brand, #c45c26);
+}
+
+/* legacy block below — keep structure */
+.sq-share-look-page-old {
   background: var(--sk-brand-light);
   min-height: 100vh;
 }
@@ -1539,12 +1641,12 @@ body.sq-capture-mode .btn-upload:hover {
 }
 
 .sq-btn--terracotta {
-  background: var(--sk-brand) !important;
-  border-color: var(--sk-brand) !important;
+  background: var(--sk-btn) !important;
+  border-color: var(--sk-btn) !important;
 }
 
 .sq-btn--terracotta:hover {
-  background: var(--sk-brand-hover) !important;
+  background: var(--sk-btn-hover) !important;
 }
 
 .sq-share-look-note {
@@ -1595,13 +1697,13 @@ body.sq-capture-mode .btn-upload:hover {
 
 .sq-share-look-upload-btn:hover {
   border-color: var(--sk-brand);
-  background: var(--sk-white)af7;
+  background: color-mix(in srgb, var(--sk-white) 97%, transparent);
   transform: translateY(-1px);
 }
 
 .sq-share-look-upload-btn--primary {
-  background: var(--sk-brand);
-  border-color: var(--sk-brand);
+  background: var(--sk-btn);
+  border-color: var(--sk-btn);
   color: var(--sk-white);
 }
 
@@ -1610,8 +1712,8 @@ body.sq-capture-mode .btn-upload:hover {
 }
 
 .sq-share-look-upload-btn--primary:hover {
-  background: var(--sk-brand-hover);
-  border-color: var(--sk-brand-hover);
+  background: var(--sk-btn-hover);
+  border-color: var(--sk-btn-hover);
 }
 
 .sq-share-look-cta--secondary {

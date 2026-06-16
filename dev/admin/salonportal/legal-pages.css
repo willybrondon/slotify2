@@ -29,7 +29,7 @@ body.sq-legal-page .sq-legal-kicker {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--sk-primary, #e96e14);
+    color: var(--sk-icon-accent, #c45c26);
     margin: 0 0 8px;
 }
 

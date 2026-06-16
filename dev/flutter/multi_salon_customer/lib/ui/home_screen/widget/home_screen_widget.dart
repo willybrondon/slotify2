@@ -375,7 +375,7 @@ class _IntentSearchBar extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.search, color: AppColors.grey, size: 20),
+                        Icon(Icons.search, color: AppColors.iconAccent, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           flex: 3,
@@ -394,7 +394,7 @@ class _IntentSearchBar extends StatelessWidget {
                               hintStyle: TextStyle(
                                 fontFamily: AppFontFamily.sfProDisplayRegular,
                                 fontSize: 14,
-                                color: AppColors.grey,
+                                color: AppColors.iconAccent,
                               ),
                               contentPadding: EdgeInsets.zero,
                             ),
@@ -424,7 +424,7 @@ class _IntentSearchBar extends StatelessWidget {
                                   style: TextStyle(
                                     fontFamily: AppFontFamily.sfProDisplayRegular,
                                     fontSize: 13,
-                                    color: AppColors.grey,
+                                    color: AppColors.iconAccent,
                                   ),
                                   decoration: InputDecoration(
                                     isDense: true,
@@ -433,7 +433,7 @@ class _IntentSearchBar extends StatelessWidget {
                                     hintStyle: TextStyle(
                                       fontFamily: AppFontFamily.sfProDisplayRegular,
                                       fontSize: 13,
-                                      color: AppColors.grey,
+                                      color: AppColors.iconAccent,
                                     ),
                                     contentPadding: EdgeInsets.zero,
                                   ),
@@ -482,7 +482,7 @@ class _IntentSearchBar extends StatelessWidget {
                                 style: TextStyle(
                                   fontFamily: AppFontFamily.sfProDisplayRegular,
                                   fontSize: 13,
-                                  color: AppColors.grey,
+                                  color: AppColors.iconAccent,
                                 ),
                               ),
                             )
@@ -496,7 +496,7 @@ class _IntentSearchBar extends StatelessWidget {
                                       fontFamily: AppFontFamily.sfProDisplayBold,
                                       fontSize: 11,
                                       letterSpacing: 0.4,
-                                      color: AppColors.grey,
+                                      color: AppColors.iconAccent,
                                     ),
                                   ),
                                   const SizedBox(height: 6),
@@ -541,7 +541,7 @@ class _IntentSearchBar extends StatelessWidget {
                                       fontFamily: AppFontFamily.sfProDisplayBold,
                                       fontSize: 11,
                                       letterSpacing: 0.4,
-                                      color: AppColors.grey,
+                                      color: AppColors.iconAccent,
                                     ),
                                   ),
                                   const SizedBox(height: 6),
@@ -1058,6 +1058,7 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                           AppAsset.icLocation,
                                           height: 17,
                                           width: 17,
+                                          color: AppColors.iconAccent,
                                         ).paddingOnly(right: 5),
                                         SizedBox(
                                           width: Get.width * 0.65,
@@ -1080,6 +1081,7 @@ class HomeScreenNearSalonView extends StatelessWidget {
                                           AppAsset.icDirection,
                                           height: 17,
                                           width: 17,
+                                          color: AppColors.iconAccent,
                                         ).paddingOnly(right: 5),
                                         RichText(
                                           text: TextSpan(

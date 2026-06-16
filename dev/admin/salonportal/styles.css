@@ -7,8 +7,8 @@
     --sk-black: #111111;
     --sk-white: #ffffff;
 
-    --sq-primary: var(--sk-brand);
-    --sq-primary-hover: var(--sk-brand-hover);
+    --sq-primary: var(--sk-black);
+    --sq-primary-hover: var(--sk-primary-hover);
     --sq-bg: var(--sk-white);
 
     --sk-text: var(--sk-black);
@@ -23,6 +23,9 @@
     --sk-primary-hover: #333333;
     --sk-accent: var(--sk-brand);
     --sk-accent-hover: var(--sk-brand-hover);
+    --sk-btn: var(--sk-black);
+    --sk-btn-hover: #333333;
+    --sk-icon-accent: var(--sk-brand);
     --sk-inverse: var(--sk-white);
     --sk-footer-bg: var(--sk-black);
     --sk-hero-overlay-top: rgba(0, 0, 0, 0.45);
@@ -857,7 +860,7 @@ html {
 }
 
 .btn-primary {
-    background: #e74c3c;
+    background: var(--sk-btn, #111);
     color: white;
     padding: 1rem 2rem;
     border-radius: 50px;
@@ -868,9 +871,9 @@ html {
 }
 
 .btn-primary:hover {
-    background: #c0392b;
+    background: var(--sk-btn-hover, #333);
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .trust-badge {
@@ -2702,7 +2705,7 @@ html {
 }
 .cta-btn {
     /* Use only .btn-primary styles for consistency */
-    background: #e74c3c;
+    background: var(--sk-btn);
     color: white;
     padding: 1rem 2rem;
     border-radius: 50px;
@@ -3552,7 +3555,7 @@ html {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #e96e14;
+    color: var(--sk-brand);
     margin-bottom: 0.75rem;
 }
 
@@ -4918,4 +4921,11 @@ html {
     }
 }
 
+/* Icônes décoratives (localisation, recherche) — terracotta */
+.sk-public-page .sq-search-bar-unified__loc-icon,
+.sk-public-page .sq-salon-detail__address i,
+.sk-public-page .fa-location-dot,
+.sk-public-page .fa-map-marker-alt {
+    color: var(--sk-icon-accent);
+}
  
