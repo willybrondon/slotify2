@@ -14,9 +14,10 @@ class BranchDetailScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(Get.height * 0.3),
         child: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: AppColors.backGround,
+          backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
+          toolbarHeight: Get.height * 0.3,
           flexibleSpace: const BranchDetailTopView(),
         ),
       ),

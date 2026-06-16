@@ -317,6 +317,8 @@
 
   const modal = document.getElementById("salonBookingModal");
   const stepsEl = document.getElementById("salonBookingSteps");
+  const stickyBarEl = document.getElementById("salonBookingStickyBar");
+  const stickyMobileBtn = document.getElementById("salonStickyBookingBtn");
   const tabsEl = document.getElementById("salonServiceTabs");
   const gridEl = document.getElementById("salonServicesGrid");
   const expertsRowEl = document.getElementById("salonExpertsRow");
@@ -382,22 +384,103 @@
     });
   }
 
+  function isModalOpen() {
+    return Boolean(modal?.classList.contains("sq-booking-modal--open"));
+  }
+
+  function hideBookingStickyBar() {
+    if (!stickyBarEl) return;
+    stickyBarEl.innerHTML = "";
+    stickyBarEl.classList.add("sq-booking-sticky-bar--hidden");
+  }
+
+  function continueFromServices() {
+    if (!state.selectedServiceIds.length) {
+      showBookingNotice("error", t("selectOneService"), () => renderStepServices());
+      return;
+    }
+    hideBookingStickyBar();
+    afterServicesContinue();
+  }
+
+  function renderServicesStickyBar() {
+    if (!stickyBarEl) return;
+    const selected = getSelectedServices();
+    if (!selected.length || !isModalOpen()) {
+      hideBookingStickyBar();
+      return;
+    }
+    const totals = calcTotals(selected);
+    const names = selected.map((s) => s.name).join(", ");
+    const taxLine =
+      totals.tax > 0
+        ? `<p class="sq-booking-sticky-bar__tax">${escapeHtml(cfg.currency)}${totals.tax.toFixed(2)} ${escapeHtml(cfg.copy.taxLabel || t("tax"))}</p>`
+        : "";
+    stickyBarEl.classList.remove("sq-booking-sticky-bar--hidden");
+    stickyBarEl.innerHTML = `
+      <div class="sq-booking-sticky-bar__inner">
+        <div class="sq-booking-sticky-bar__info">
+          <p class="sq-booking-sticky-bar__count">${escapeHtml(
+            tFmt("servicesSelectedCount", "{n}", String(selected.length))
+          )}</p>
+          <p class="sq-booking-sticky-bar__names">${escapeHtml(names)}</p>
+          <p class="sq-booking-sticky-bar__meta">${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)} · ${totals.dur} ${escapeHtml(t("min"))}</p>
+          ${taxLine}
+        </div>
+        <button type="button" class="sq-booking-sticky-bar__cta" id="stickyBarContinue">${escapeHtml(t("continue"))}</button>
+      </div>
+    `;
+    const btn = document.getElementById("stickyBarContinue");
+    if (btn) btn.onclick = continueFromServices;
+  }
+
+  function openBookingForSelection() {
+    if (!state.selectedServiceIds.length) {
+      openModal();
+      renderStepServices();
+      return;
+    }
+    if (!isModalOpen()) {
+      openModal();
+      renderStepServices();
+      if (stepsEl) stepsEl.scrollTop = 0;
+    } else {
+      renderServicesStickyBar();
+    }
+  }
+
+  function handleSalonPageServiceSelection() {
+    renderSalonPageSelectionUI();
+    if (state.selectedServiceIds.length > 0) {
+      openBookingForSelection();
+    } else if (isModalOpen()) {
+      renderServicesStickyBar();
+    }
+  }
+
   function updateBookButtons() {
     const count = state.selectedServiceIds.length;
-    const label =
+    const bookLabel =
       count > 0
         ? tFmt("bookNowWithCount", "{n}", String(count))
         : t("bookNow");
-    document
-      .querySelectorAll(".open-app-btn, .sticky-booking-btn button")
-      .forEach((btn) => {
-        const icon = btn.querySelector("i");
-        if (icon) {
-          btn.innerHTML = `${icon.outerHTML} ${escapeHtml(label)}`;
-        } else {
-          btn.textContent = label;
-        }
-      });
+    const stickyLabel = count > 0 ? t("continue") : t("bookNow");
+    document.querySelectorAll(".open-app-btn").forEach((btn) => {
+      const icon = btn.querySelector("i");
+      if (icon) {
+        btn.innerHTML = `${icon.outerHTML} ${escapeHtml(bookLabel)}`;
+      } else {
+        btn.textContent = bookLabel;
+      }
+    });
+    document.querySelectorAll(".sticky-booking-btn button").forEach((btn) => {
+      const icon = btn.querySelector("i");
+      if (icon) {
+        btn.innerHTML = `${icon.outerHTML} ${escapeHtml(stickyLabel)}`;
+      } else {
+        btn.textContent = stickyLabel;
+      }
+    });
   }
 
   function renderSalonPageSelectionUI() {
@@ -432,6 +515,7 @@
       )}</p>
       <p class="sq-booking-services-summary__names">${escapeHtml(names)}</p>
       <p class="sq-booking-services-summary__meta">${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)} · ${totals.dur} ${escapeHtml(t("min"))}</p>
+      ${totals.tax > 0 ? `<p class="sq-booking-services-summary__tax">${escapeHtml(cfg.currency)}${totals.tax.toFixed(2)} ${escapeHtml(cfg.copy.taxLabel || t("tax"))}</p>` : ""}
     `;
   }
 
@@ -522,6 +606,7 @@
     gridEl.innerHTML = list.map((s) => buildServiceCardHtml(s)).join("");
     bindServiceCardClicks(gridEl, () => {
       renderServicesGrid();
+      handleSalonPageServiceSelection();
     });
     renderSalonPageSelectionUI();
   }
@@ -538,6 +623,7 @@
     modal.classList.remove("sq-booking-modal--open");
     modal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    hideBookingStickyBar();
     renderServicesGrid();
   }
 
@@ -803,12 +889,9 @@
       <p class="sq-booking-step__hint">${escapeHtml(t("servicesMultiHint"))}</p>
       <div class="sq-service-tabs sq-service-tabs--modal" id="bookingServiceTabs"></div>
       <div class="sq-services-grid-4" id="bookingServicesGrid"></div>
-      <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="bookingServicesSummary" aria-live="polite"></div>
-      <button type="button" class="sq-booking-btn" id="btnServicesNext">${escapeHtml(t("continue"))}</button>
     `;
     const bTabs = document.getElementById("bookingServiceTabs");
     const bGrid = document.getElementById("bookingServicesGrid");
-    const bSummary = document.getElementById("bookingServicesSummary");
     const cats = [{ id: "all", name: cfg.copy.allCategoriesTab }, ...cfg.categories];
     let cat = "all";
     function paint() {
@@ -827,21 +910,20 @@
       const filtered =
         cat === "all" ? list : list.filter((s) => s.categoryId === cat);
       bGrid.innerHTML = filtered.map((s) => buildServiceCardHtml(s)).join("");
-      bindServiceCardClicks(bGrid, paint);
-      renderServicesSelectionSummary(bSummary);
+      bindServiceCardClicks(bGrid, () => {
+        paint();
+        renderSalonPageSelectionUI();
+        renderServicesStickyBar();
+      });
       renderSalonPageSelectionUI();
+      renderServicesStickyBar();
     }
     paint();
-    document.getElementById("btnServicesNext").onclick = () => {
-      if (!state.selectedServiceIds.length) {
-        showBookingNotice("error", t("selectOneService"), () => renderStepServices());
-        return;
-      }
-      afterServicesContinue();
-    };
+    if (stepsEl) stepsEl.scrollTop = 0;
   }
 
   async function renderStepExperts() {
+    hideBookingStickyBar();
     stepsEl.innerHTML = `<p>${escapeHtml(cfg.copy.selectExpert)}</p><div class="sq-booking-loading">…</div>`;
     const data = await fetchExpertsForService();
     if (!data.status || !data.data?.length) {
@@ -891,6 +973,7 @@
   }
 
   async function renderStepDateTime() {
+    hideBookingStickyBar();
     if (!state.date || isDateBeforeToday(state.date)) {
       state.date = todayYmd();
     }
@@ -1085,6 +1168,7 @@
   }
 
   function renderStepContact() {
+    hideBookingStickyBar();
     const totals = calcTotals(getSelectedServices());
     const webUser = getWebUser();
     const auth = cfg.authUrls || {};
@@ -1193,6 +1277,7 @@
   }
 
   function renderStepPayment() {
+    hideBookingStickyBar();
     const totals = calcTotals(getSelectedServices());
     const showCash = payCfg.cashAfterService !== false;
     const showStripe = payCfg.isStripePay && payCfg.stripePublishableKey;
@@ -1386,5 +1471,15 @@
   renderExpertsRow();
   renderServiceTabs();
   renderServicesGrid();
+
+  stickyMobileBtn?.addEventListener("click", () => {
+    if (state.selectedServiceIds.length > 0) {
+      openBookingForSelection();
+      return;
+    }
+    openModal();
+    renderStepServices();
+  });
+
   tryResumeBooking();
 })();

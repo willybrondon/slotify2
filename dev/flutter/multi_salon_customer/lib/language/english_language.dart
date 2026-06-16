@@ -40,6 +40,7 @@ final Map<String, String> enUS = {
   "txtSubtotal": "Subtotal",
   "txtContinue": "Continue",
   "txtTax": "Tax",
+  "txtMin": "min",
   "txtTotalAmount": "Total Amount",
   "txtPriceFrom": "From",
   "txtPriceIndicativeHint":

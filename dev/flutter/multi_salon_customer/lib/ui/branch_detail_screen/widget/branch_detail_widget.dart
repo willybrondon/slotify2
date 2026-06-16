@@ -133,47 +133,46 @@ class BranchDetailTopView extends StatelessWidget {
     return GetBuilder<BranchDetailController>(
       id: Constant.idProgressView,
       builder: (logic) {
-        return PreferredSize(
-          preferredSize: const Size.fromHeight(230),
-          child: Stack(
-            children: [
-              // Main photo without box container
-              Container(
-                height: Get.height * 0.3,
-                width: Get.width,
-                color: AppColors.backGround,
-                clipBehavior: Clip.hardEdge,
-                child: CachedNetworkImage(
-                  imageUrl: "${logic.getSalonDetailCategory?.salon?.mainImage}",
-                  fit: BoxFit.cover,
-                  width: Get.width,
-                  height: Get.height * 0.3,
-                  placeholder: (context, url) {
-                    return Container(
-                      width: Get.width,
-                      height: Get.height * 0.3,
-                      color: AppColors.grey.withOpacity(0.2),
-                      child: Center(
-                        child: Image.asset(AppAsset.icImagePlaceholder)
-                            .paddingAll(25),
-                      ),
-                    );
-                  },
-                  errorWidget: (context, url, error) {
-                    return Container(
-                      width: Get.width,
-                      height: Get.height * 0.3,
-                      color: AppColors.grey.withOpacity(0.2),
-                      child: Center(
-                        child: Image.asset(AppAsset.icImagePlaceholder)
-                            .paddingAll(30),
-                      ),
-                    );
-                  },
+        final imageUrl =
+            logic.getSalonDetailCategory?.salon?.mainImage?.trim() ?? '';
+
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            if (imageUrl.isNotEmpty)
+              CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                placeholder: (context, url) {
+                  return ColoredBox(
+                    color: AppColors.grey.withOpacity(0.2),
+                    child: Center(
+                      child: Image.asset(AppAsset.icImagePlaceholder)
+                          .paddingAll(25),
+                    ),
+                  );
+                },
+                errorWidget: (context, url, error) {
+                  return ColoredBox(
+                    color: AppColors.grey.withOpacity(0.2),
+                    child: Center(
+                      child: Image.asset(AppAsset.icImagePlaceholder)
+                          .paddingAll(30),
+                    ),
+                  );
+                },
+              )
+            else
+              ColoredBox(
+                color: AppColors.grey.withOpacity(0.2),
+                child: Center(
+                  child: Image.asset(AppAsset.icImagePlaceholder).paddingAll(25),
                 ),
               ),
-              // Back arrow and share button aligned horizontally in same row
-              Positioned(
+            // Back arrow and share button aligned horizontally in same row
+            Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
@@ -280,7 +279,6 @@ class BranchDetailTopView extends StatelessWidget {
                 ),
               ),
             ],
-          ),
         );
       },
     );
@@ -422,7 +420,7 @@ class BranchDetailDataView extends StatelessWidget {
                       AppAsset.icStarFilled,
                       height: 18,
                       width: 18,
-                      color: AppColors.brandTerracotta,
+                      color: AppColors.brandBlack,
                     ).paddingOnly(right: 12),
                     RichText(
                       text: TextSpan(
@@ -433,7 +431,7 @@ class BranchDetailDataView extends StatelessWidget {
                                 .toStringAsFixed(1)
                             : '—',
                         style: TextStyle(
-                          color: AppColors.brandTerracotta,
+                          color: AppColors.brandBlack,
                           fontSize: 17,
                           fontFamily: AppFontFamily.heeBo700,
                         ),
@@ -485,7 +483,7 @@ class BranchDetailDataView extends StatelessWidget {
                                 AppAsset.icDirection,
                                 height: 24,
                                 width: 24,
-                                color: AppColors.grey,
+                                color: AppColors.whiteColor,
                               ).paddingOnly(right: 12),
                               Text(
                                 "txtDirection".tr,
@@ -527,7 +525,7 @@ class BranchDetailDataView extends StatelessWidget {
                                 AppAsset.icCall,
                                 height: 24,
                                 width: 24,
-                                color: AppColors.grey,
+                                color: AppColors.whiteColor,
                               ).paddingOnly(right: 12),
                               Text(
                                 "txtCallSalon".tr,
@@ -631,12 +629,12 @@ class _BranchDetailTabBarViewState extends State<BranchDetailTabBarView> {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: selected
-                        ? AppColors.brandTerracotta
+                        ? AppColors.brandBlack
                         : AppColors.whiteColor,
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(
                       color: selected
-                          ? AppColors.brandTerracotta
+                          ? AppColors.brandBlack
                           : AppColors.greyColor.withOpacity(0.35),
                     ),
                   ),
@@ -750,7 +748,7 @@ class BranchDetailTabBarAboutView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontFamily: AppFontFamily.heeBo700,
-                          color: AppColors.brandTerracotta,
+                          color: AppColors.brandBlack,
                         ),
                       ).paddingOnly(top: 15)
                     ],
@@ -775,134 +773,101 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
         id: Constant.idBottomService,
         builder: (logic) {
           return logic.checkItem.isNotEmpty
-              ? Container(
-                  height: Get.height * 0.120,
-                  width: double.infinity,
-                  alignment: Alignment.bottomLeft,
-                  decoration: BoxDecoration(
-                    color: AppColors.categoryBottom,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.blackColor.withOpacity(0.05),
-                        offset: const Offset(
-                          0.0,
-                          1.0,
+              ? SafeArea(
+                  top: false,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppColors.categoryBottom,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.blackColor.withOpacity(0.05),
+                          offset: const Offset(0.0, 1.0),
+                          blurRadius: 2.0,
+                          spreadRadius: 2.0,
                         ),
-                        blurRadius: 2.0,
-                        spreadRadius: 2.0,
-                      ), //BoxShadow
-                      const BoxShadow(
-                        color: Colors.black12,
-                        offset: Offset(0.0, 0.0),
-                        blurRadius: 0.0,
-                        spreadRadius: 0.0,
+                        const BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, 0.0),
+                          blurRadius: 0.0,
+                          spreadRadius: 0.0,
+                        ),
+                      ],
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
                       ),
-                    ],
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
                     ),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: 23,
-                              width: Get.width * 0.61,
-                              child: SizedBox(
-                                height: 20,
-                                width: Get.width * 0.02,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Text(
-                                    logic.checkItem.join(", "),
-                                    style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplay,
-                                      fontSize: 17,
-                                      color: AppColors.categoryService,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ).paddingOnly(left: 5, bottom: 7),
-                            Row(
-                              children: [
-                                Text(
-                                  "${"txtPriceFrom".tr} $currency ${logic.withOutTaxRupee.toStringAsFixed(2)}",
-                                  style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplay,
-                                      fontSize: 15,
-                                      color: AppColors.brandTerracotta.withOpacity(0.9)),
-                                ),
-                                Text(
-                                  " ($currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr})",
-                                  style: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplay,
-                                      fontSize: 12,
-                                      color: AppColors.brandTerracotta.withOpacity(0.9)),
-                                ),
-                                SizedBox(width: Get.width * 0.02),
-                                Text(
-                                  "= ${"txtPriceFrom".tr} $currency ${logic.totalPrice.toStringAsFixed(2)}",
-                                  style: TextStyle(
-                                      fontFamily:
-                                          AppFontFamily.sfProDisplayBold,
-                                      fontSize: 17,
-                                      color: AppColors.brandTerracotta),
-                                ),
-                              ],
-                            ).paddingOnly(left: 5),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 5, right: 8, top: 6),
-                              child: Text(
-                                "txtPriceIndicativeHint".tr,
-                                style: TextStyle(
-                                  fontFamily: AppFontFamily.sfProDisplay,
-                                  fontSize: 11.5,
-                                  color: AppColors.currencyGrey,
-                                  height: 1.35,
-                                ),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          height: 22,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Text(
+                              logic.checkItem.join(", "),
+                              style: TextStyle(
+                                fontFamily: AppFontFamily.sfProDisplay,
+                                fontSize: 16,
+                                color: AppColors.categoryService,
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      AppButton(
-                        height: 50,
-                        buttonColor: AppColors.primaryAppColor,
-                        buttonText: "txtBookNow".tr,
-                        width: Get.width * 0.28,
-                        fontFamily: AppFontFamily.sfProDisplay,
-                        color: AppColors.whiteColor,
-                        onTap: () async {
-                          if (Constant.storage.read<bool>('isLogIn') ?? false) {
-                            log("Total Minute :: ${logic.totalMinute}");
-                            Get.toNamed(AppRoutes.booking, arguments: [
-                              logic.checkItem,
-                              double.parse(logic.totalPrice.toStringAsFixed(2)),
-                              double.parse(
-                                  logic.finalTaxRupee.toStringAsFixed(2)),
-                              logic.totalMinute,
-                              logic.serviceId,
-                              logic.withOutTaxRupee,
-                              logic.salonId
-                            ]);
-                          } else {
-                            Get.toNamed(AppRoutes.signIn,
-                                arguments: [logic.checkItem.isNotEmpty]);
-                            await Get.find<SignInController>()
-                                .getDataFromArgs();
-                          }
-                        },
-                      )
-                    ],
+                        const SizedBox(height: 8),
+                        Text(
+                          '$currency${logic.withOutTaxRupee.toStringAsFixed(2)} · ${logic.totalMinute} ${"txtMin".tr}',
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplay,
+                            fontSize: 15,
+                            color: AppColors.brandBlack,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr}',
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplay,
+                            fontSize: 13,
+                            color: AppColors.termsDialog,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        AppButton(
+                          height: 50,
+                          buttonColor: AppColors.appText,
+                          buttonText: "txtBookNow".tr,
+                          width: double.infinity,
+                          fontFamily: AppFontFamily.sfProDisplay,
+                          color: AppColors.whiteColor,
+                          onTap: () async {
+                            if (Constant.storage.read<bool>('isLogIn') ??
+                                false) {
+                              log("Total Minute :: ${logic.totalMinute}");
+                              Get.toNamed(AppRoutes.booking, arguments: [
+                                logic.checkItem,
+                                double.parse(
+                                    logic.totalPrice.toStringAsFixed(2)),
+                                double.parse(
+                                    logic.finalTaxRupee.toStringAsFixed(2)),
+                                logic.totalMinute,
+                                logic.serviceId,
+                                logic.withOutTaxRupee,
+                                logic.salonId
+                              ]);
+                            } else {
+                              Get.toNamed(AppRoutes.signIn,
+                                  arguments: [logic.checkItem.isNotEmpty]);
+                              await Get.find<SignInController>()
+                                  .getDataFromArgs();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : const SizedBox();
@@ -1037,6 +1002,12 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                     final meta = service?.serviceIdId;
                                     final selected =
                                         logic.isBranchSelected[index];
+                                    final price = service?.price ?? 0.0;
+                                    final taxPct =
+                                        logic.getSalonDetailCategory?.tax ??
+                                            0.0;
+                                    final taxAmount =
+                                        (price * taxPct) / 100;
 
                                     return InkWell(
                                       onTap: () => logic.onCheckBoxClick(
@@ -1058,8 +1029,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                 shape: BoxShape.circle,
                                                 border: Border.all(
                                                   color: selected
-                                                      ? AppColors
-                                                          .brandTerracotta
+                                                      ? AppColors.brandBlack
                                                       : AppColors.greyColor
                                                           .withOpacity(0.25),
                                                   width: selected ? 2 : 1,
@@ -1098,15 +1068,32 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                   ),
                                                   const SizedBox(height: 4),
                                                   Text(
-                                                    '${meta?.duration ?? 0} ${"txtMinutes".tr} · ${"txtPriceFrom".tr} $currency ${service?.price?.toStringAsFixed(2) ?? '0.00'}',
+                                                    '${meta?.duration ?? 0} ${"txtMin".tr} · $currency ${price.toStringAsFixed(2)}',
                                                     style: TextStyle(
                                                       fontFamily: AppFontFamily
                                                           .heeBo500,
                                                       fontSize: 13,
                                                       color: AppColors
-                                                          .brandTerracotta,
+                                                          .termsDialog,
                                                     ),
                                                   ),
+                                                  if (taxAmount > 0)
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 2),
+                                                      child: Text(
+                                                        '$currency${taxAmount.toStringAsFixed(2)} ${"txtTax".tr}',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              AppFontFamily
+                                                                  .heeBo500,
+                                                          fontSize: 12,
+                                                          color: AppColors
+                                                              .currencyGrey,
+                                                        ),
+                                                      ),
+                                                    ),
                                                 ],
                                               ),
                                             ),
@@ -1116,7 +1103,7 @@ class BranchDetailTabBarServiceView extends StatelessWidget {
                                                   ? Icons.check_circle
                                                   : Icons.add_circle_outline,
                                               color: selected
-                                                  ? AppColors.brandTerracotta
+                                                  ? AppColors.brandBlack
                                                   : AppColors.greyColor,
                                               size: 28,
                                             ),
@@ -1248,11 +1235,11 @@ class BranchDetailTabBarProductView extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${"txtPriceFrom".tr} $currency ${product?.price ?? ''}',
+                                '$currency ${product?.price ?? ''}',
                                 style: TextStyle(
                                   fontFamily: AppFontFamily.heeBo700,
                                   fontSize: 13,
-                                  color: AppColors.brandTerracotta,
+                                  color: AppColors.brandBlack,
                                 ),
                               ),
                             ],
@@ -1367,7 +1354,7 @@ class BranchDetailTabBarStaffView extends StatelessWidget {
                                       style: TextStyle(
                                         fontFamily: AppFontFamily.heeBo500,
                                         fontSize: 11,
-                                        color: AppColors.brandTerracotta,
+                                        color: AppColors.brandBlack,
                                       ),
                                     ),
                                 ],

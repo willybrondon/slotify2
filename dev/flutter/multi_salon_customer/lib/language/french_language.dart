@@ -36,6 +36,7 @@ final Map<String, String> frCH = {
   "txtSubtotal": "Total",
   "txtContinue": "Continuer",
   "txtTax": "Impôt",
+  "txtMin": "min",
   "txtTotalAmount": "Montant total",
   "txtPriceFrom": "À partir de",
   "txtPriceIndicativeHint":
