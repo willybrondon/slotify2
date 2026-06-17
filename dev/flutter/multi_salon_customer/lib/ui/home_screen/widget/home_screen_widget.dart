@@ -11,7 +11,6 @@ import 'package:salon_2/ui/home_screen/widget/view_all_screen_widget.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/services/hair_profile_service.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
-import 'package:salon_2/ui/login_screen/sign_in_screen/controller/sign_in_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/app_font_family.dart';
@@ -38,8 +37,6 @@ class HomeScreenTopView extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const _HomeLocationChip(),
-          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,6 +63,8 @@ class HomeScreenTopView extends StatelessWidget {
               ],
             ),
           ),
+          const _HomeLocationChip(),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: () {
               Get.toNamed(AppRoutes.wishlist);
@@ -848,388 +847,27 @@ class HomeScreenHairProfileStrip extends StatelessWidget {
   }
 }
 
-class HomeScreenNearSalonView extends StatelessWidget {
-  const HomeScreenNearSalonView({super.key});
+class HomeScreenMapViewLink extends StatelessWidget {
+  const HomeScreenMapViewLink({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                "txtNearbyBranches".tr,
-                style: TextStyle(
-                  fontFamily: AppFontFamily.heeBo700,
-                  fontSize: 18,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-            ),
-            TextButton.icon(
-              onPressed: () {
-                Get.toNamed(AppRoutes.branch, arguments: {'openMap': true});
-              },
-              icon: Icon(Icons.map_outlined, size: 18, color: AppColors.iconAccent),
-              label: Text(
-                'txtViewMap'.tr,
-                style: TextStyle(
-                  fontFamily: AppFontFamily.heeBo500,
-                  fontSize: 12,
-                  color: AppColors.iconAccent,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Get.toNamed(AppRoutes.branch),
-              child: Text(
-                "txtViewAll".tr,
-                style: TextStyle(
-                  fontFamily: AppFontFamily.heeBo500,
-                  fontSize: 12,
-                  color: AppColors.grey,
-                ),
-              ),
-            ),
-          ],
-        ).paddingOnly(bottom: 10, top: 5),
-        SizedBox(
-          height: 265,
-          child: GetBuilder<HomeScreenController>(
-            id: Constant.idProgressView,
-            builder: (logic) {
-              return logic.isLoading.value
-                  ? Shimmers.nearByBranchesShimmer()
-                  : logic.getAllSalonCategory?.data?.isEmpty == true
-                      ? Align(
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                AppAsset.icNoService,
-                                height: 120,
-                                width: 120,
-                              ),
-                              Text(
-                                "txtNotSalon".tr,
-                                style: TextStyle(
-                                  fontFamily: AppFontFamily.sfProDisplayMedium,
-                                  fontSize: 17,
-                                  color: AppColors.primaryTextColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount:
-                              (logic.getAllSalonCategory?.data?.length ?? 0) > 5
-                                  ? 5
-                                  : logic.getAllSalonCategory?.data?.length,
-                          physics: const BouncingScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Get.toNamed(AppRoutes.branchDetail, arguments: [
-                                  logic.getAllSalonCategory?.data?[index].id,
-                                  city,
-                                  latitude,
-                                  longitude
-                                ]);
-                              },
-                              child: Container(
-                                width: Get.width * 0.77,
-                                margin: const EdgeInsets.only(right: 10),
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: AppColors.whiteColor,
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(
-                                    color: AppColors.textFiledBg,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        Container(
-                                          height: 158,
-                                          width: Get.width * 0.75,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(13),
-                                            color:
-                                                AppColors.grey.withOpacity(0.2),
-                                          ),
-                                          clipBehavior: Clip.hardEdge,
-                                          child: CachedNetworkImage(
-                                            imageUrl: logic.getAllSalonCategory
-                                                    ?.data?[index].mainImage ??
-                                                "",
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) {
-                                              return Image.asset(AppAsset
-                                                      .icImagePlaceholder)
-                                                  .paddingAll(25);
-                                            },
-                                            errorWidget: (context, url, error) {
-                                              return Image.asset(AppAsset
-                                                      .icImagePlaceholder)
-                                                  .paddingAll(25);
-                                            },
-                                          ),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              // Heart (Like) Button
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  if (Constant.storage
-                                                          .read<bool>(
-                                                              'isLogIn') ??
-                                                      false) {
-                                                    logic.onLikeSalon(
-                                                      userId: Constant.storage
-                                                              .read<String>(
-                                                                  'userId') ??
-                                                          "",
-                                                      salonId: logic
-                                                              .getAllSalonCategory
-                                                              ?.data?[index]
-                                                              .id ??
-                                                          "",
-                                                      latitude:
-                                                          latitude.toString(),
-                                                      longitude:
-                                                          longitude.toString(),
-                                                    );
-                                                  } else {
-                                                    Get.toNamed(
-                                                        AppRoutes.signIn,
-                                                        arguments: [
-                                                          logic.checkItem
-                                                              .isNotEmpty
-                                                        ]);
-                                                    await Get.find<
-                                                            SignInController>()
-                                                        .getDataFromArgs();
-                                                  }
-                                                },
-                                                child: Container(
-                                                  height: 32,
-                                                  width: 32,
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.whiteColor,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Center(
-                                                    child: Image.asset(
-                                                      logic.isSalonSaved[
-                                                                  index] ==
-                                                              true
-                                                          ? AppAsset
-                                                              .icLikeFilled
-                                                          : AppAsset
-                                                              .icLikeOutline,
-                                                      height: 18,
-                                                      width: 18,
-                                                    ),
-                                                  ),
-                                                ).paddingOnly(right: 7, top: 7),
-                                              ),
-                                              // Share Button
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  final salonId = logic
-                                                          .getAllSalonCategory
-                                                          ?.data?[index]
-                                                          .id ??
-                                                      "";
-                                                  final salonName = logic
-                                                          .getAllSalonCategory
-                                                          ?.data?[index]
-                                                          .name ??
-                                                      "Salon";
-                                                  await logic.shareSalonLink(
-                                                    salonId: salonId,
-                                                    salonName: salonName,
-                                                  );
-                                                },
-                                                child: Container(
-                                                  height: 32,
-                                                  width: 32,
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.whiteColor,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Center(
-                                                    child: Image.asset(
-                                                      AppAsset.icShare,
-                                                      height: 18,
-                                                      width: 18,
-                                                    ),
-                                                  ),
-                                                ).paddingOnly(right: 7, top: 7),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          logic.getAllSalonCategory
-                                                  ?.data?[index].name ??
-                                              "",
-                                          style: TextStyle(
-                                            color: AppColors.primaryTextColor,
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplayBold,
-                                            fontSize: 16.5,
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Container(
-                                          height: 20,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(17),
-                                            color: AppColors.yellow1,
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 9),
-                                          margin:
-                                              const EdgeInsets.only(left: 5),
-                                          child: Row(
-                                            children: [
-                                              Image.asset(
-                                                AppAsset.icStarFilled,
-                                                height: 12,
-                                                width: 12,
-                                                color: AppColors.yellow3,
-                                              ).paddingOnly(right: 5),
-                                              Text(
-                                                logic.getAllSalonCategory
-                                                        ?.data?[index].review
-                                                        ?.toStringAsFixed(1) ??
-                                                    "",
-                                                style: TextStyle(
-                                                  color: AppColors.yellow3,
-                                                  fontFamily: AppFontFamily
-                                                      .sfProDisplayBold,
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ).paddingOnly(top: 10, left: 3, right: 3),
-                                    Row(
-                                      children: [
-                                        Image.asset(
-                                          AppAsset.icLocation,
-                                          height: 17,
-                                          width: 17,
-                                          color: AppColors.iconAccent,
-                                        ).paddingOnly(right: 5),
-                                        SizedBox(
-                                          width: Get.width * 0.65,
-                                          child: Text(
-                                            "${logic.getAllSalonCategory?.data?[index].addressDetails?.addressLine1}, ${logic.getAllSalonCategory?.data?[index].addressDetails?.landMark}, ${logic.getAllSalonCategory?.data?[index].addressDetails?.city}, ${logic.getAllSalonCategory?.data?[index].addressDetails?.country}",
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color: AppColors.termsDialog,
-                                              fontFamily:
-                                                  AppFontFamily.heeBo600,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ).paddingOnly(bottom: 8, top: 5),
-                                    Row(
-                                      children: [
-                                        Image.asset(
-                                          AppAsset.icDirection,
-                                          height: 17,
-                                          width: 17,
-                                          color: AppColors.iconAccent,
-                                        ).paddingOnly(right: 5),
-                                        RichText(
-                                          text: TextSpan(
-                                            text: logic
-                                                        .getAllSalonCategory
-                                                        ?.data?[index]
-                                                        .distance ==
-                                                    null
-                                                ? ""
-                                                : "${logic.getAllSalonCategory?.data?[index].distance?.toStringAsFixed(2)} ${"txtKMs".tr}  ",
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: AppColors.appText,
-                                              fontFamily:
-                                                  AppFontFamily.heeBo600,
-                                            ),
-                                            children: <TextSpan>[
-                                              TextSpan(
-                                                text: "txtFromLocation".tr,
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  fontFamily:
-                                                      AppFontFamily.heeBo600,
-                                                  color: AppColors.termsDialog,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Container(
-                                          height: 25,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                            color: AppColors.greenColorBg,
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          margin:
-                                              const EdgeInsets.only(left: 5),
-                                          child: Center(
-                                            child: Text(
-                                              "Open",
-                                              style: TextStyle(
-                                                color: AppColors.greenColor,
-                                                fontFamily:
-                                                    AppFontFamily.heeBo700,
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        );
-            },
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton.icon(
+        onPressed: () {
+          Get.toNamed(AppRoutes.branch, arguments: {'openMap': true});
+        },
+        icon: Icon(Icons.map_outlined, size: 18, color: AppColors.iconAccent),
+        label: Text(
+          'txtViewMap'.tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.heeBo500,
+            fontSize: 13,
+            color: AppColors.iconAccent,
           ),
         ),
-      ],
+      ),
     );
   }
 }

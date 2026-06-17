@@ -886,6 +886,7 @@ exports.serveCategoryPage = async (req, res) => {
         };
     </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="${baseURL}/salon-map-ui.js"></script>
     <script src="${baseURL}/category-page.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>

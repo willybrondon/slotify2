@@ -1214,6 +1214,155 @@ body.sk-public-page .main-wrapper {
     text-align: center;
 }
 
+/* ——— Carte salons style Squire (liste horizontale + popup) ——— */
+.sq-salons-grid--map-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0 !important;
+    grid-template-columns: unset !important;
+    margin-top: 0;
+    max-height: min(520px, 55vh);
+    overflow-y: auto;
+    border: 1px solid var(--sk-border);
+    border-radius: 12px;
+    background: var(--sk-white);
+    -webkit-overflow-scrolling: touch;
+}
+
+.sq-salon-card-v2--map-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--sk-border-light, #eee);
+    border-radius: 0;
+    text-decoration: none;
+    color: inherit;
+    min-height: 0;
+    height: auto;
+    overflow: visible;
+}
+
+.sq-salon-card-v2--map-row:last-child {
+    border-bottom: none;
+}
+
+.sq-salon-card-v2--map-row:hover {
+    background: var(--sk-bg-alt, #fafafa);
+}
+
+.sq-salon-thumb {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    background: #ececec;
+}
+
+.sq-salon-thumb__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.sq-salon-thumb--initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: var(--sk-black, #111);
+    color: var(--sk-white, #fff);
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+}
+
+.sq-salon-thumb--initials[hidden] {
+    display: none !important;
+}
+
+.sq-salon-card-v2--map-row .salon-card-content {
+    padding: 0;
+    flex: 1;
+    min-width: 0;
+}
+
+.sq-salon-card-v2--map-row .salon-card-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    -webkit-line-clamp: 2;
+}
+
+.sq-salon-card-v2--map-row .salon-card-address {
+    font-size: 0.78rem;
+    color: var(--sk-text-muted);
+    margin: 0;
+    line-height: 1.35;
+    -webkit-line-clamp: 2;
+}
+
+.sq-salon-card-v2--map-row .salon-card-meta {
+    margin: 4px 0 0;
+    font-size: 0.78rem;
+    gap: 6px;
+}
+
+.sq-map-popup-card {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    text-decoration: none;
+    color: inherit;
+    min-width: 200px;
+}
+
+.sq-map-popup-card__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.sq-map-popup-card__name {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.sq-map-popup-card__address {
+    margin: 0 0 4px;
+    font-size: 0.75rem;
+    color: var(--sk-text-muted);
+    line-height: 1.35;
+}
+
+.sq-map-popup-card__rating {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--sk-brand, #c45c26);
+}
+
+.leaflet-popup-content-wrapper.sq-leaflet-popup .leaflet-popup-content {
+    margin: 10px 12px;
+    line-height: 1.35;
+}
+
+@media (max-width: 1024px) {
+    .sq-salons-grid--map-list {
+        max-height: none;
+        border: none;
+        border-radius: 0;
+        border-top: 1px solid var(--sk-border);
+    }
+}
+
 .sq-category-discover__experts {
     border-top: 1px solid var(--sk-border-light);
     padding-top: 36px;

@@ -47,6 +47,8 @@
     const noImageLabel = lang === "fr" ? "Pas d'image" : "No image";
 
     let filters = { minRating: 0, sort: "distance" };
+    let mapListMode = false;
+    const mapUi = () => window.skedisySalonMapUi;
 
     function sumReviews(list) {
         return list.reduce((acc, s) => acc + (s.reviewCount || 0), 0);
@@ -104,6 +106,17 @@
             salonsGrid.innerHTML = `<div class="no-results"><p>${escapeHtml(t("searchResults.noSalons"))}</p></div>`;
             return;
         }
+        if (mapListMode && mapUi()) {
+            salonsGrid.innerHTML = salons
+                .map((salon) =>
+                    mapUi().renderSalonMapListCard(salon, {
+                        priceFromLabel,
+                        currency,
+                    })
+                )
+                .join("");
+            return;
+        }
         salonsGrid.innerHTML = salons.map(renderSalonCard).join("");
     }
 
@@ -114,7 +127,10 @@
         salons.forEach((salon) => {
             if (salon.latitude == null || salon.longitude == null) return;
             const marker = L.marker([salon.latitude, salon.longitude]);
-            marker.bindPopup(`<strong>${escapeHtml(salon.name)}</strong><br><a href="${escapeHtml(salon.shareUrl)}">${escapeHtml(t("homeProduct.viewSalon"))}</a>`);
+            const popupHtml = mapUi()
+                ? mapUi().renderSalonMapPopup(salon, t("homeProduct.viewSalon"))
+                : `<strong>${escapeHtml(salon.name)}</strong>`;
+            marker.bindPopup(popupHtml, { maxWidth: 300, className: "sq-leaflet-popup" });
             marker.on("click", () => {
                 const card = document.querySelector(`[data-salon-id="${salon._id}"]`);
                 if (card) {
@@ -148,6 +164,10 @@
     function setViewMode(mode) {
         if (!categoryMain) return;
         const isMap = mode === "map";
+        mapListMode = isMap;
+        if (salonsGrid) {
+            salonsGrid.classList.toggle("sq-salons-grid--map-list", isMap);
+        }
         categoryMain.classList.toggle("sq-category-discover__main--map", isMap);
         categoryMain.classList.toggle("sq-category-discover__main--list", !isMap);
         if (mapEl) mapEl.setAttribute("aria-hidden", isMap ? "false" : "true");
@@ -156,7 +176,10 @@
         if (isMap) {
             initMap();
             refreshMapMarkers();
+            renderSalons();
             setTimeout(() => mapInstance?.invalidateSize(), 300);
+        } else {
+            renderSalons();
         }
     }
 
