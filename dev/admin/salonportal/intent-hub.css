@@ -1414,7 +1414,6 @@ body.sq-capture-mode .btn-upload:hover {
   box-shadow: 0 12px 32px rgba(196, 92, 38, 0.38);
   color: var(--sk-white);
 }
-
 .sq-share-look-banner__icon {
   flex-shrink: 0;
   width: 48px;
