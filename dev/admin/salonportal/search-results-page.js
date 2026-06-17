@@ -28,8 +28,14 @@
     const filterBtn = document.getElementById("btnFilter");
     const filterPanel = document.getElementById("filterPanel");
     const queryInput = document.getElementById("searchQueryInput");
-    const locationInput = document.getElementById("searchLocationInput");
     const searchForm = document.getElementById("searchResultsForm");
+
+    function getLocationLabel() {
+        if (typeof window.skedisyGetLocationLabel === "function") {
+            return window.skedisyGetLocationLabel().trim();
+        }
+        return params.get("location") || localStorage.getItem("skedisy-location-label") || "";
+    }
 
     let salons = [];
     let mapInstance = null;
@@ -175,10 +181,9 @@
             queryInput?.value.trim() ||
             params.get("q") ||
             [legacySalon, legacyService].filter(Boolean).join(" ").trim();
-        const location = locationInput?.value.trim() || params.get("location") || "";
+        const location = getLocationLabel() || params.get("location") || "";
 
         if (queryInput) queryInput.value = query;
-        if (locationInput) locationInput.value = location;
 
         const qs = new URLSearchParams({ language: lang });
         if (query) qs.set("q", query);
@@ -257,7 +262,11 @@
                 params.get("q") ||
                 [legacySalon, legacyService].filter(Boolean).join(" ").trim();
         }
-        if (locationInput) locationInput.value = params.get("location") || "";
+        const urlLocation = params.get("location");
+        if (urlLocation && typeof window.skedisySetLocationLabel === "function") {
+            window.skedisySetLocationLabel(urlLocation);
+        }
+        if (params.get("view") === "map") setViewMode("map");
         requestLocation().then(fetchResults);
     });
 })();

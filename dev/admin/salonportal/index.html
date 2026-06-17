@@ -78,7 +78,8 @@
         <a href="#" class="floating-download-btn floating-download-btn--customer" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a>
     </div>
 
-    <!-- Zone produit — ce qu'est Skedisy + parcours app (avant le marketing) -->
+    <!-- Accueil : recherche en premier sur mobile (puce hors menu hamburger) -->
+    <div class="sq-home-landing-stack">
     <section class="sq-home-product" id="sqHomeProduct">
         <div class="container sq-home-product-inner">
             <div class="sq-home-intro">
@@ -88,42 +89,58 @@
         </div>
     </section>
 
-    <!-- Recherche + Partager un look -->
+    <!-- Recherche + Partager un look (style Squire) -->
     <section class="sq-intent-hub sq-intent-hub--home" id="sqIntentHub">
-        <div class="container">
-            <div class="sq-intent-hub__row">
-            <form id="homeSalonSearchForm" class="sq-search-bar-unified sq-search-bar-unified--home" role="search" data-search-unified>
-                <div class="sq-search-bar-unified__inner">
-                    <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
-                    <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
-                        <label class="sq-sr-only" for="homeQuerySearchInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
-                        <input type="search" id="homeQuerySearchInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off" enterkeyhint="search">
-                        <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
-                            <div class="sq-search-suggestions__section">
-                                <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
-                                <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
-                            </div>
-                            <div class="sq-search-suggestions__section">
-                                <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
-                                <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+        <div class="container sq-search-hero-wrap">
+            <div class="sq-search-hero">
+                <div class="sq-location-chip-wrap">
+                    <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                        <span class="sq-location-chip__text">
+                            <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
+                            <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
+                        </span>
+                        <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="sq-location-popover" id="homeLocationPopover" hidden>
+                        <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+                        <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+                        <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
+                    </div>
+                </div>
+
+                <form id="homeSalonSearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
+                    <div class="sq-search-bar-unified__inner sq-search-bar-unified__inner--query-only">
+                        <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+                        <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
+                            <label class="sq-sr-only" for="homeQuerySearchInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
+                            <input type="search" id="homeQuerySearchInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off" enterkeyhint="search">
+                            <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
+                                <div class="sq-search-suggestions__section">
+                                    <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
+                                    <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
+                                </div>
+                                <div class="sq-search-suggestions__section">
+                                    <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
+                                    <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <span class="sq-search-bar-unified__divider" aria-hidden="true"></span>
-                    <div class="sq-search-bar-unified__group sq-search-bar-unified__group--location">
-                        <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
-                        <span class="sq-search-bar-unified__loc-icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
-                        <input type="search" id="homeLocationSearchInput" name="location" class="sq-search-bar-unified__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
-                    </div>
-                </div>
-                <button type="submit" class="sq-search-bar-unified__submit" aria-label="Rechercher">
-                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                </button>
-            </form>
+                    <button type="submit" class="sq-search-bar-unified__submit" aria-label="Rechercher">
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
 
-            <hr class="sq-intent-hub__divider sq-intent-hub__divider--mobile" aria-hidden="true">
+            <div class="sq-search-hero-meta">
+                <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
+                    <i class="fas fa-map" aria-hidden="true"></i>
+                    <span data-translate="homeProduct.viewMap">Voir la carte</span>
+                </a>
+            </div>
 
-            <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub">
+            <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search">
                 <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
                 <span class="sq-share-look-banner__body">
                     <strong data-translate="intentHub.captureTitle">Partager un look</strong>
@@ -131,41 +148,11 @@
                 </span>
                 <i class="fas fa-chevron-right sq-share-look-banner__chevron" aria-hidden="true"></i>
             </a>
-            </div>
 
             <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
         </div>
     </section>
-
-    <!-- Salons à proximité (comme l'app) -->
-    <section class="sq-home-discovery sq-home-discovery--salons" id="sqNearbySalons">
-        <div class="container">
-            <div class="sq-home-discovery-head">
-                <div>
-                    <h2 class="sq-section-title sq-section-title--left" data-translate="homeProduct.nearbySalons">Salons coiffure afro à proximité</h2>
-                    <p class="sq-home-discovery-sub" id="nearbySalonsLead" data-translate="homeProduct.nearbySalonsSub">Des salons spécialisés près de chez toi en Île-de-France.</p>
-                </div>
-            </div>
-            <div class="sq-home-discovery-track" id="nearbySalonsTrack" aria-live="polite">
-                <p class="sq-home-discovery-loading" data-translate="homeProduct.salonsLoading">Chargement des salons…</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Meilleurs experts (comme l'app) -->
-    <section class="sq-home-discovery sq-home-discovery--experts" id="sqTopExperts">
-        <div class="container">
-            <div class="sq-home-discovery-head">
-                <div>
-                    <h2 class="sq-section-title sq-section-title--left" data-translate="homeProduct.topExperts">Meilleurs experts</h2>
-                    <p class="sq-home-discovery-sub" data-translate="homeProduct.topExpertsSub">Les expertes les mieux notées dans nos salons partenaires.</p>
-                </div>
-            </div>
-            <div class="sq-experts-scroll" id="topExpertsTrack" aria-live="polite">
-                <p class="sq-home-discovery-loading" data-translate="homeProduct.expertsLoading">Chargement des expertes…</p>
-            </div>
-        </div>
-    </section>
+    </div>
 
     <!-- Bandeau app (style Fresha) -->
     <section class="sq-home-app-strip" id="sqHomeAppStrip">
@@ -190,7 +177,7 @@
                 <p class="sq-lead" data-translate="client.marketingSubheadline">Salons de quartier, cheveux texturés, prestations qui vous comprennent. Visible sur le web, réservable en quelques taps.</p>
                 <div class="sq-cta-row">
                     <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
-                    <a href="#sqNearbySalons" class="sq-btn sq-btn-ghost" data-translate="client.browseSalons">Parcourir les prestations</a>
+                    <a href="/recherche" class="sq-btn sq-btn-ghost" data-translate="client.browseSalons">Parcourir les prestations</a>
                 </div>
                 <p class="sq-note" data-translate="client.heroAppNote">La réservation des créneaux se fait sur l'app Skedisy (gratuite).</p>
             </div>
@@ -228,7 +215,7 @@
                 <p class="sq-feature-label" data-translate="client.feature1Label">Trouve ton salon</p>
                 <h2 data-translate="client.feature1Title">Là où tout le monde réserve</h2>
                 <p data-translate="client.feature1Desc">Salons coiffure afro en Île-de-France : par quartier, par prestation, par avis. Visible sur le web, réservable sur l'app.</p>
-                <a href="#sqNearbySalons" class="sq-link" data-translate="client.feature1Link">Parcourir les prestations</a>
+                <a href="/recherche" class="sq-link" data-translate="client.feature1Link">Parcourir les prestations</a>
             </div>
         </div>
     </section>
@@ -270,7 +257,7 @@
                 <p class="sq-feature-label sq-feature-label--light" data-translate="client.feature4Label">Homme &amp; plus</p>
                 <h2 data-translate="client.feature4Title">Fade, barbe, tresses homme</h2>
                 <p data-translate="client.feature4Desc">Toutes les prestations en IDF — homme inclus. Découvre sur le site, réserve sur l'app.</p>
-                <a href="#sqNearbySalons" class="sq-link sq-link--light" data-translate="client.feature1Link">Parcourir les prestations</a>
+                <a href="/recherche" class="sq-link sq-link--light" data-translate="client.feature1Link">Parcourir les prestations</a>
             </div>
         </div>
     </section>
@@ -506,6 +493,7 @@
     <script type="module" src="qr-code-init.js"></script>
     <script src="script.js"></script>
     <script src="search-suggestions.js"></script>
+    <script src="location-chip.js"></script>
     <script src="home-discovery.js"></script>
     <script src="hair-profile.js"></script>
 </body>

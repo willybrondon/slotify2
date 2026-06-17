@@ -3,6 +3,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
+import 'package:salon_2/custom/app_button/app_button.dart';
 import 'package:salon_2/custom/random_color_generator/random_color_generator.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/bottom_bar_screen/controller/bottom_bar_controller.dart';
@@ -11,7 +12,6 @@ import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/services/hair_profile_service.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/login_screen/sign_in_screen/controller/sign_in_controller.dart';
-import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/app_font_family.dart';
@@ -38,35 +38,34 @@ class HomeScreenTopView extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GetBuilder<ProfileScreenController>(
-                id: Constant.idProgressView,
-                init: ProfileScreenController(),
-                builder: (logic) {
-                  return Text(
-                    "Skedisy",
-                    style: TextStyle(
-                      fontFamily: AppFontFamily.sfProDisplayBold,
-                      fontSize: 20,
-                      color: AppColors.blackColor,
-                    ),
-                  );
-                },
-              ),
-              Text(
-                Constant.storage.read<String>("fName") ?? "txtGuest".tr,
-                style: TextStyle(
-                  fontFamily: AppFontFamily.sfProDisplayRegular,
-                  fontSize: 16,
-                  color: AppColors.blackColor,
+          const _HomeLocationChip(),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Skedisy",
+                  style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayBold,
+                    fontSize: 20,
+                    color: AppColors.blackColor,
+                  ),
                 ),
-              ),
-            ],
+                Text(
+                  Constant.storage.read<String>("fName") ?? "txtGuest".tr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    fontSize: 14,
+                    color: AppColors.blackColor,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           GestureDetector(
             onTap: () {
               Get.toNamed(AppRoutes.wishlist);
@@ -88,6 +87,144 @@ class HomeScreenTopView extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _HomeLocationChip extends StatelessWidget {
+  const _HomeLocationChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<HomeScreenController>(
+      id: Constant.idIntentSearch,
+      builder: (logic) {
+        final label = (city != null && city!.trim().isNotEmpty)
+            ? city!.trim()
+            : (logic.intentLocationController.text.trim().isNotEmpty
+                ? logic.intentLocationController.text.trim()
+                : 'txtIntentSearchLocationHint'.tr);
+
+        return InkWell(
+          onTap: () => _showLocationEditor(context, logic),
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 118),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.whiteColor,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: AppColors.brandTerracotta.withOpacity(0.35),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.location_on_outlined,
+                    size: 16, color: AppColors.iconAccent),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'txtYourLocation'.tr,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplay,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.termsDialog,
+                        ),
+                      ),
+                      Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplayMedium,
+                          fontSize: 12,
+                          color: AppColors.blackColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showLocationEditor(BuildContext context, HomeScreenController logic) {
+    final controller = TextEditingController(
+      text: logic.intentLocationController.text.isNotEmpty
+          ? logic.intentLocationController.text
+          : (city ?? ''),
+    );
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.whiteColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            16 + MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'txtYourLocation'.tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'txtIntentSearchLocationHint'.tr,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => Navigator.pop(ctx),
+              ),
+              const SizedBox(height: 12),
+              AppButton(
+                height: 46,
+                width: double.infinity,
+                buttonText: 'txtContinue'.tr,
+                buttonColor: AppColors.primaryAppColor,
+                color: AppColors.whiteColor,
+                onTap: () => Navigator.pop(ctx),
+              ),
+            ],
+          ),
+        );
+      },
+    ).then((_) {
+      final value = controller.text.trim();
+      if (value.isEmpty) return;
+      logic.intentLocationController.text = value;
+      city = value;
+      logic.update([Constant.idIntentSearch, Constant.idProgressView]);
+    });
   }
 }
 
@@ -238,65 +375,23 @@ class HomeScreenCategoryView extends StatelessWidget {
 class HomeScreenIntentHub extends StatelessWidget {
   const HomeScreenIntentHub({super.key});
 
-  static const double _wideBreakpoint = 600;
-
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final wide = constraints.maxWidth >= _wideBreakpoint;
-        final title = Text(
-          'txtIntentHubTitle'.tr,
-          style: TextStyle(
-            fontFamily: AppFontFamily.sfProDisplayBold,
-            fontSize: 18,
-            color: AppColors.blackColor,
-          ),
-        );
-        const searchBar = _IntentSearchBar();
-        final shareCard = _IntentShareLookCard(compact: wide);
-
-        if (wide) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              title,
-              const SizedBox(height: 14),
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Expanded(flex: 3, child: searchBar),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 2, child: shareCard),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            title,
-            const SizedBox(height: 14),
-            searchBar,
-            const SizedBox(height: 10),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFE8E8E8)),
-            const SizedBox(height: 10),
-            shareCard,
-          ],
-        );
-      },
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _IntentSearchBar(),
+        SizedBox(height: 10),
+        Divider(height: 1, thickness: 1, color: Color(0xFFE8E8E8)),
+        SizedBox(height: 10),
+        _IntentShareLookCard(),
+      ],
     );
   }
 }
 
 class _IntentShareLookCard extends StatelessWidget {
-  const _IntentShareLookCard({this.compact = false});
-
-  final bool compact;
+  const _IntentShareLookCard();
 
   @override
   Widget build(BuildContext context) {
@@ -306,7 +401,7 @@ class _IntentShareLookCard extends StatelessWidget {
       body: 'txtIntentCaptureBody'.tr,
       accent: AppColors.primaryAppColor,
       filled: true,
-      compact: compact,
+      compact: false,
       onTap: () => Get.toNamed(
         AppRoutes.aiConcierge,
         arguments: <String, dynamic>{'captureMode': true},
@@ -378,7 +473,6 @@ class _IntentSearchBar extends StatelessWidget {
                         Icon(Icons.search, color: AppColors.iconAccent, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
-                          flex: 3,
                           child: TextField(
                             controller: logic.intentQueryController,
                             focusNode: logic.intentQueryFocusNode,
@@ -400,49 +494,6 @@ class _IntentSearchBar extends StatelessWidget {
                             ),
                             textInputAction: TextInputAction.search,
                             onSubmitted: (_) => logic.submitIntentSearch(),
-                          ),
-                        ),
-                        Container(
-                          width: 1,
-                          height: 32,
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
-                          color: const Color(0xFFDDDDDD),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 16,
-                                color: AppColors.primaryAppColor.withOpacity(0.85),
-                              ),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: TextField(
-                                  controller: logic.intentLocationController,
-                                  style: TextStyle(
-                                    fontFamily: AppFontFamily.sfProDisplayRegular,
-                                    fontSize: 13,
-                                    color: AppColors.iconAccent,
-                                  ),
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    border: InputBorder.none,
-                                    hintText: 'txtIntentSearchLocationHint'.tr,
-                                    hintStyle: TextStyle(
-                                      fontFamily: AppFontFamily.sfProDisplayRegular,
-                                      fontSize: 13,
-                                      color: AppColors.iconAccent,
-                                    ),
-                                    contentPadding: EdgeInsets.zero,
-                                  ),
-                                  textInputAction: TextInputAction.search,
-                                  onSubmitted: (_) => logic.submitIntentSearch(),
-                                  onTapOutside: (_) => logic.hideIntentSuggestions(),
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -805,12 +856,44 @@ class HomeScreenNearSalonView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ViewAll(
-          title: "txtNearbyBranches".tr,
-          subtitle: "txtViewAll".tr,
-          onTap: () {
-            Get.toNamed(AppRoutes.branch);
-          },
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                "txtNearbyBranches".tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.heeBo700,
+                  fontSize: 18,
+                  color: AppColors.primaryTextColor,
+                ),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () {
+                Get.toNamed(AppRoutes.branch, arguments: {'openMap': true});
+              },
+              icon: Icon(Icons.map_outlined, size: 18, color: AppColors.iconAccent),
+              label: Text(
+                'txtViewMap'.tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.heeBo500,
+                  fontSize: 12,
+                  color: AppColors.iconAccent,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Get.toNamed(AppRoutes.branch),
+              child: Text(
+                "txtViewAll".tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.heeBo500,
+                  fontSize: 12,
+                  color: AppColors.grey,
+                ),
+              ),
+            ),
+          ],
         ).paddingOnly(bottom: 10, top: 5),
         SizedBox(
           height: 265,

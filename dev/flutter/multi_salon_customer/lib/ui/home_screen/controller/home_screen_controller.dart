@@ -188,6 +188,10 @@ class HomeScreenController extends GetxController {
 
     _maybePromptHairProfile();
 
+    if (city != null && city!.trim().isNotEmpty) {
+      intentLocationController.text = city!.trim();
+    }
+
     super.onInit();
   }
 
@@ -308,7 +312,9 @@ class HomeScreenController extends GetxController {
 
   Future<void> submitIntentSearch() async {
     final query = intentQueryController.text.trim();
-    final location = intentLocationController.text.trim();
+    final location = intentLocationController.text.trim().isNotEmpty
+        ? intentLocationController.text.trim()
+        : (city ?? '').trim();
 
     if (query.isEmpty && location.isEmpty) return;
 

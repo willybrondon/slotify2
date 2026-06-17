@@ -33,6 +33,7 @@
         </div>
     </nav>
 
+  <div class="sq-home-landing-stack">
   <section class="sq-home-product sq-home-product--compact" id="sqHomeProduct">
     <div class="container sq-home-product-inner">
       <div class="sq-home-intro">
@@ -43,40 +44,56 @@
   </section>
 
   <section class="sq-intent-hub sq-intent-hub--search-page">
-    <div class="container">
-      <div class="sq-intent-hub__row">
-      <form id="searchResultsForm" class="sq-search-bar-unified" role="search" data-search-unified>
-        <div class="sq-search-bar-unified__inner">
-          <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
-          <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
-            <label class="sq-sr-only" for="searchQueryInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
-            <input type="search" id="searchQueryInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off">
-            <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
-              <div class="sq-search-suggestions__section">
-                <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
-                <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
-              </div>
-              <div class="sq-search-suggestions__section">
-                <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
-                <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+    <div class="container sq-search-hero-wrap">
+      <div class="sq-search-hero">
+        <div class="sq-location-chip-wrap">
+          <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
+            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+            <span class="sq-location-chip__text">
+              <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
+              <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
+            </span>
+            <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
+          </button>
+          <div class="sq-location-popover" id="homeLocationPopover" hidden>
+            <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+            <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+            <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
+          </div>
+        </div>
+
+        <form id="searchResultsForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
+          <div class="sq-search-bar-unified__inner sq-search-bar-unified__inner--query-only">
+            <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+            <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
+              <label class="sq-sr-only" for="searchQueryInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
+              <input type="search" id="searchQueryInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off" enterkeyhint="search">
+              <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
+                <div class="sq-search-suggestions__section">
+                  <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
+                  <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
+                </div>
+                <div class="sq-search-suggestions__section">
+                  <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
+                  <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+                </div>
               </div>
             </div>
           </div>
-          <span class="sq-search-bar-unified__divider" aria-hidden="true"></span>
-          <div class="sq-search-bar-unified__group sq-search-bar-unified__group--location">
-            <label class="sq-sr-only" for="searchLocationInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
-            <span class="sq-search-bar-unified__loc-icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
-            <input type="search" id="searchLocationInput" name="location" class="sq-search-bar-unified__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
-          </div>
-        </div>
-        <button type="submit" class="sq-search-bar-unified__submit" aria-label="Rechercher">
-          <i class="fas fa-arrow-right" aria-hidden="true"></i>
-        </button>
-      </form>
+          <button type="submit" class="sq-search-bar-unified__submit" aria-label="Rechercher">
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </form>
+      </div>
 
-      <hr class="sq-intent-hub__divider sq-intent-hub__divider--mobile" aria-hidden="true">
+      <div class="sq-search-hero-meta">
+        <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
+          <i class="fas fa-map" aria-hidden="true"></i>
+          <span data-translate="homeProduct.viewMap">Voir la carte</span>
+        </a>
+      </div>
 
-      <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub">
+      <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search">
         <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
         <span class="sq-share-look-banner__body">
           <strong data-translate="intentHub.captureTitle">Partager un look</strong>
@@ -84,9 +101,9 @@
         </span>
         <i class="fas fa-chevron-right sq-share-look-banner__chevron" aria-hidden="true"></i>
       </a>
-      </div>
     </div>
   </section>
+  </div>
 
   <main class="sq-category-discover sq-category-discover--search">
     <div class="container">
@@ -135,6 +152,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="script.js"></script>
+  <script src="location-chip.js"></script>
   <script src="search-suggestions.js"></script>
   <script src="search-results-page.js"></script>
 </body>

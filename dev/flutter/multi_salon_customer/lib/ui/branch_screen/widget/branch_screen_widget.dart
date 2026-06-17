@@ -24,6 +24,15 @@ class BranchScreenSalonView extends StatefulWidget {
 class _BranchScreenSalonViewState extends State<BranchScreenSalonView> {
   bool _mapView = false;
 
+  @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments;
+    if (args is Map && args['openMap'] == true) {
+      _mapView = true;
+    }
+  }
+
   void _openSalon(Datum salon) {
     Get.toNamed(
       AppRoutes.branchDetail,

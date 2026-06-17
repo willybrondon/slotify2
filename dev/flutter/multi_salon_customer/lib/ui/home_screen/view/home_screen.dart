@@ -66,8 +66,6 @@ class HomeScreen extends StatelessWidget {
                             .paddingOnly(left: 15, right: 15, bottom: 12),
                         const HomeScreenHairProfileStrip()
                             .paddingOnly(left: 15, right: 15, bottom: 15),
-                        const HomeScreenCategoryView()
-                            .paddingOnly(left: 15, right: 15),
                         const HomeScreenNearSalonView()
                             .paddingOnly(left: 15, right: 15),
                         logic.getNewProductModel?.data?.isEmpty == true

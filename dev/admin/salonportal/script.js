@@ -6,11 +6,11 @@ function initHomeSalonSearch() {
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         const query = (document.getElementById('homeQuerySearchInput')?.value || '').trim();
-        const location = (document.getElementById('homeLocationSearchInput')?.value || '').trim();
+        const location = (document.getElementById('homeLocationSearchInput')?.value || '').trim()
+            || (typeof window.skedisyGetLocationLabel === 'function' ? window.skedisyGetLocationLabel() : '');
 
         if (!query && !location) {
-            const nearby = document.getElementById('sqNearbySalons');
-            if (nearby) nearby.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.location.href = '/recherche?view=map';
             return;
         }
 

@@ -125,35 +125,23 @@ class BookingScreen extends StatelessWidget {
         bottomNavigationBar: GetBuilder<BookingScreenController>(
           id: Constant.idConfirm,
           builder: (logic) {
-            return InkWell(
-              overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-              onTap: () {
-                Get.dialog(
-                  barrierColor: AppColors.blackColor.withOpacity(0.8),
-                  Dialog(
-                    backgroundColor: AppColors.transparent,
-                    shadowColor: AppColors.transparent,
-                    elevation: 0,
-                    child: const ServicePriceDialog(),
-                  ),
-                );
-              },
+            final hasPrice = logic.withOutTaxRupee != 0.0 ||
+                logic.totalPrice != 0.0 ||
+                logic.finalTaxRupee != 0.0;
+
+            return SafeArea(
+              top: false,
               child: Container(
-                height: Get.height * 0.120,
                 width: double.infinity,
-                alignment: Alignment.bottomLeft,
                 decoration: BoxDecoration(
                   color: AppColors.categoryBottom,
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.blackColor.withOpacity(0.05),
-                      offset: const Offset(
-                        0.0,
-                        1.0,
-                      ),
+                      offset: const Offset(0.0, 1.0),
                       blurRadius: 2.0,
                       spreadRadius: 2.0,
-                    ), //BoxShadow
+                    ),
                     const BoxShadow(
                       color: Colors.black12,
                       offset: Offset(0.0, 0.0),
@@ -166,132 +154,119 @@ class BookingScreen extends StatelessWidget {
                     topRight: Radius.circular(16),
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Column(
+                    if (logic.checkItem.isNotEmpty)
+                      GestureDetector(
+                        onTap: () {
+                          Get.dialog(
+                            barrierColor:
+                                AppColors.blackColor.withOpacity(0.8),
+                            Dialog(
+                              backgroundColor: AppColors.transparent,
+                              shadowColor: AppColors.transparent,
+                              elevation: 0,
+                              child: const ServicePriceDialog(),
+                            ),
+                          );
+                        },
+                        child: SizedBox(
+                          height: 20,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: logic.checkItem.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 10),
+                            itemBuilder: (context, index) {
+                              return Text(
+                                logic.checkItem[index].toString(),
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.sfProDisplay,
+                                  fontSize: 13,
+                                  color: AppColors.categoryService,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    if (logic.checkItem.isNotEmpty && hasPrice)
+                      const SizedBox(height: 6),
+                    if (hasPrice)
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            height: 23,
-                            width: Get.width * 0.62,
-                            child: SizedBox(
-                              height: 20,
-                              width: Get.width * 0.02,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Text(
-                                  logic.checkItem.join(", "),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${logic.totalMinute != null && logic.totalMinute! > 0 ? '${logic.totalMinute} ${"txtMin".tr} · ' : ''}$currency${logic.withOutTaxRupee.toStringAsFixed(2)}',
                                   style: TextStyle(
                                     fontFamily: AppFontFamily.sfProDisplay,
-                                    fontSize: 17.5,
-                                    color: AppColors.categoryService,
+                                    fontSize: 14,
+                                    color: AppColors.brandBlack,
                                   ),
                                 ),
-                              ),
+                                Text(
+                                  '$currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr}',
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.sfProDisplay,
+                                    fontSize: 12,
+                                    color: AppColors.termsDialog,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ).paddingOnly(left: 5, bottom: 7),
-                          logic.withOutTaxRupee == 0.0 &&
-                                  logic.totalPrice == 0.0 &&
-                                  logic.finalTaxRupee == 0.0
-                              ? const SizedBox()
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${logic.totalMinute != null && logic.totalMinute! > 0 ? '${logic.totalMinute} ${"txtMin".tr} · ' : ''}$currency${logic.withOutTaxRupee.toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplay,
-                                            fontSize: 15.5,
-                                            color: AppColors.currency
-                                                .withOpacity(0.9),
-                                          ),
-                                        ),
-                                        Text(
-                                          '$currency${logic.finalTaxRupee.toStringAsFixed(2)} ${"txtTax".tr}',
-                                          style: TextStyle(
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplay,
-                                            fontSize: 12.5,
-                                            color: AppColors.termsDialog,
-                                          ),
-                                        ),
-                                        GetBuilder<BookingScreenController>(
-                                          id: Constant.idApplyCoupon,
-                                          builder: (logic) {
-                                            return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                if (logic.couponDiscountAmount >
-                                                    0) ...[
-                                                  Text(
-                                                    '$currency ${(logic.withOutTaxRupee + logic.finalTaxRupee).toStringAsFixed(2)}',
-                                                    style: TextStyle(
-                                                      fontFamily: AppFontFamily
-                                                          .sfProDisplay,
-                                                      fontSize: 14,
-                                                      color: AppColors
-                                                          .currencyGrey,
-                                                      decoration: TextDecoration
-                                                          .lineThrough,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '- $currency ${logic.couponDiscountAmount.toStringAsFixed(2)}',
-                                                    style: TextStyle(
-                                                      fontFamily: AppFontFamily
-                                                          .sfProDisplay,
-                                                      fontSize: 13,
-                                                      color: AppColors
-                                                          .primaryAppColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                                Text(
-                                                  '= $currency ${logic.totalPrice.toStringAsFixed(2)}',
-                                                  style: TextStyle(
-                                                    fontFamily: AppFontFamily
-                                                        .sfProDisplayBold,
-                                                    fontSize: 17,
-                                                    color: AppColors.currency,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ).paddingOnly(left: 5),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 5, right: 8, top: 6),
-                                      child: Text(
-                                        "txtPriceIndicativeHint".tr,
-                                        style: TextStyle(
-                                          fontFamily:
-                                              AppFontFamily.sfProDisplay,
-                                          fontSize: 11.5,
-                                          color: AppColors.currencyGrey,
-                                          height: 1.35,
-                                        ),
+                          ),
+                          GetBuilder<BookingScreenController>(
+                            id: Constant.idApplyCoupon,
+                            builder: (couponLogic) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  if (couponLogic.couponDiscountAmount > 0) ...[
+                                    Text(
+                                      '$currency ${(couponLogic.withOutTaxRupee + couponLogic.finalTaxRupee).toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplay,
+                                        fontSize: 13,
+                                        color: AppColors.currencyGrey,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                    Text(
+                                      '- $currency ${couponLogic.couponDiscountAmount.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        fontFamily:
+                                            AppFontFamily.sfProDisplay,
+                                        fontSize: 12,
+                                        color: AppColors.primaryAppColor,
                                       ),
                                     ),
                                   ],
-                                ),
+                                  Text(
+                                    '= $currency ${couponLogic.totalPrice.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
+                                      fontSize: 15,
+                                      color: AppColors.currency,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         ],
                       ),
-                    ),
-                    const Spacer(),
+                    const SizedBox(height: 10),
                     AppButton(
-                      height: 46,
+                      height: 50,
                       buttonColor: logic.currentStep == 0
                           ? logic.selectedVenue.isEmpty
                               ? AppColors.grey.withOpacity(0.5)
@@ -312,13 +287,14 @@ class BookingScreen extends StatelessWidget {
                       fontSize: 15,
                       buttonText: logic.currentStep == 3
                           ? "txtConfirm".tr
-                          : "txtNext".tr,
-                      width: Get.width * 0.28,
+                          : "txtContinue".tr,
+                      width: double.infinity,
                       onTap: () async {
                         if (logic.currentStep == 0) {
                           if (logic.searchEditingController.text.isEmpty &&
                               logic.selectedVenue == "At Home") {
-                            Utils.showToast(context, "Please enter an address");
+                            Utils.showToast(
+                                context, "txtPleaseEnterAddress".tr);
                           } else {
                             logic.onConfirmButton(context);
                           }
@@ -428,7 +404,7 @@ class BookingScreen extends StatelessWidget {
                           log("Error In Stepper");
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -444,7 +420,7 @@ class BookingScreen extends StatelessWidget {
                 physics: const BouncingScrollPhysics(),
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      const EdgeInsets.fromLTRB(12, 12, 12, 24),
                   child: GetBuilder<BookingScreenController>(
                     id: Constant.idCurrentStep,
                     builder: (logic) {
@@ -477,7 +453,7 @@ class BookingScreen extends StatelessWidget {
                                         logic.selectedVenue.isEmpty)
                                     ? stepDesign(
                                         color: AppColors.primaryAppColor,
-                                        title: "Venue",
+                                        title: "txtVenue".tr,
                                         widget: Text(
                                           "1",
                                           style: TextStyle(
@@ -492,7 +468,7 @@ class BookingScreen extends StatelessWidget {
                                             logic.selectedVenue.isNotEmpty)
                                         ? stepDesign(
                                             color: AppColors.primaryAppColor,
-                                            title: "Venue",
+                                            title: "txtVenue".tr,
                                             widget: Image.asset(
                                               AppAsset.icCheck1,
                                               height: 20,
@@ -503,7 +479,7 @@ class BookingScreen extends StatelessWidget {
                                             ? stepDesign(
                                                 color:
                                                     AppColors.primaryAppColor,
-                                                title: "Venue",
+                                                title: "txtVenue".tr,
                                                 widget: Image.asset(
                                                   AppAsset.icCheck1,
                                                   height: 20,
@@ -512,7 +488,7 @@ class BookingScreen extends StatelessWidget {
                                               )
                                             : stepDesign(
                                                 color: AppColors.transparent,
-                                                title: "Venue",
+                                                title: "txtVenue".tr,
                                                 fontColor: AppColors.greyColor2,
                                               ),
                                 const SizedBox(width: 10),
@@ -665,139 +641,48 @@ class BookingScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Select Service Venue",
+              "txtSelectServiceVenue".tr,
               style: TextStyle(
                 fontFamily: AppFontFamily.sfProDisplay,
                 fontSize: 15,
                 color: AppColors.primaryTextColor,
               ),
             ),
-            const SizedBox(height: 15),
-            GestureDetector(
-              onTap: () => logic.selectVenue("At Salon"),
-              child: Container(
-                height: 60,
-                width: Get.width,
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: logic.selectedVenue == "At Salon"
-                        ? AppColors.primaryAppColor
-                        : AppColors.greyColor.withOpacity(0.2),
-                    width: 0.7,
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _venueOptionCard(
+                    logic: logic,
+                    venueValue: "At Salon",
+                    label: "txtAtSalon".tr,
+                    icon: AppAsset.icSalonIcon,
+                    onTap: () {
+                      logic.selectVenue("At Salon");
+                      final ctx = Get.context;
+                      if (ctx != null) {
+                        logic.onConfirmButton(ctx);
+                      }
+                    },
                   ),
                 ),
-                padding: const EdgeInsets.only(left: 12, right: 12),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.roundBg,
-                      ),
-                      child: Image.asset(AppAsset.icSalonIcon).paddingAll(10),
-                    ),
-                    const SizedBox(width: 7),
-                    Text(
-                      "At Salon",
-                      style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplay,
-                        fontSize: 17,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      height: 22,
-                      width: 22,
-                      decoration: BoxDecoration(
-                        color: logic.selectedVenue == "At Salon"
-                            ? AppColors.primaryAppColor
-                            : AppColors.whiteColor,
-                        border: Border.all(
-                          color: AppColors.grey.withOpacity(0.2),
-                          width: 0.8,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: logic.selectedVenue == "At Salon"
-                          ? const Icon(Icons.check,
-                              size: 12, color: Colors.white)
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 15),
-            GestureDetector(
-              onTap: () => logic.selectVenue("At Home"),
-              child: Container(
-                height: 60,
-                width: Get.width,
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: logic.selectedVenue == "At Home"
-                        ? AppColors.primaryAppColor
-                        : AppColors.greyColor.withOpacity(0.2),
-                    width: 0.7,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _venueOptionCard(
+                    logic: logic,
+                    venueValue: "At Home",
+                    label: "txtAtHome".tr,
+                    icon: AppAsset.icHomeIcon,
+                    onTap: () => logic.selectVenue("At Home"),
                   ),
                 ),
-                padding: const EdgeInsets.only(left: 12, right: 12),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.roundBg,
-                      ),
-                      child: Image.asset(AppAsset.icHomeIcon).paddingAll(10),
-                    ),
-                    const SizedBox(width: 7),
-                    Text(
-                      "At Home",
-                      style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplay,
-                        fontSize: 17,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      height: 22,
-                      width: 22,
-                      decoration: BoxDecoration(
-                        color: logic.selectedVenue == "At Home"
-                            ? AppColors.primaryAppColor
-                            : AppColors.whiteColor,
-                        border: Border.all(
-                          color: AppColors.grey.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: logic.selectedVenue == "At Home"
-                          ? const Icon(Icons.check,
-                              size: 12, color: Colors.white)
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ),
             if (logic.selectedVenue == "At Home") ...[
-              const SizedBox(height: 15),
+              const SizedBox(height: 12),
               Container(
                 width: double.infinity,
-                height: 150,
-                margin: const EdgeInsets.only(bottom: 15),
+                height: 120,
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
@@ -808,10 +693,10 @@ class BookingScreen extends StatelessWidget {
                   ),
                 ),
                 child: TextFieldCustom(
-                  hintText: "Please enter address",
+                  hintText: "txtPleaseEnterAddress".tr,
                   obscureText: false,
                   textInputAction: TextInputAction.newline,
-                  maxLines: 5,
+                  maxLines: 4,
                   controller: logic.searchEditingController,
                 ),
               ),
@@ -819,6 +704,59 @@ class BookingScreen extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _venueOptionCard({
+    required BookingScreenController logic,
+    required String venueValue,
+    required String label,
+    required String icon,
+    required VoidCallback onTap,
+  }) {
+    final selected = logic.selectedVenue == venueValue;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 96,
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? AppColors.primaryAppColor
+                : AppColors.greyColor.withOpacity(0.2),
+            width: selected ? 1.2 : 0.7,
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 34,
+              width: 34,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.roundBg,
+              ),
+              child: Image.asset(icon).paddingAll(8),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: AppFontFamily.sfProDisplay,
+                fontSize: 13,
+                color: AppColors.primaryTextColor,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

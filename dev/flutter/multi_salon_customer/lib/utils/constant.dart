@@ -132,7 +132,7 @@ class Constant {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Select Service Venue",
+                "txtSelectServiceVenue".tr,
                 style: TextStyle(
                   fontFamily: AppFontFamily.sfProDisplayBold,
                   fontSize: 16,
