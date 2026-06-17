@@ -31,9 +31,36 @@
                 <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
             </div>
         </div>
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3 data-translate="nav.forClients">Pour les clientes</h3>
+                <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Passer en anglais"><i class="fas fa-globe"></i> <span>FR</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
+                </div>
+            </div>
+            <div class="mobile-menu-content mobile-menu-content--client">
+                <a href="/compte/connexion" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
+                <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer" data-translate="client.downloadAppCta">Télécharger l'app</button>
+                <div class="mobile-categories-panel">
+                    <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">
+                        <span data-translate="nav.allCategories">Toutes les catégories</span>
+                        <i class="fas fa-chevron-down mobile-categories-toggle__icon" aria-hidden="true"></i>
+                    </button>
+                    <div class="mobile-categories-drawer" id="mobileCategoriesDrawer" hidden>
+                        <div class="mobile-categories-drawer__head">
+                            <span data-translate="nav.allCategories">Toutes les catégories</span>
+                            <button type="button" class="mobile-categories-drawer__close" id="mobileCategoriesClose" aria-label="Fermer">&times;</button>
+                        </div>
+                        <div class="mobile-categories" id="mobileCategories"></div>
+                    </div>
+                </div>
+                <a href="/professionnel/" class="btn-login-mobile-menu btn-for-business-mobile" data-translate="nav.forBusiness">Pour les professionnels</a>
+            </div>
+        </div>
     </nav>
 
-  <div class="sq-home-landing-stack">
   <section class="sq-home-product sq-home-product--compact" id="sqHomeProduct">
     <div class="container sq-home-product-inner">
       <div class="sq-home-intro">
@@ -46,20 +73,26 @@
   <section class="sq-intent-hub sq-intent-hub--search-page">
     <div class="container sq-search-hero-wrap">
       <div class="sq-search-hero">
-        <div class="sq-location-chip-wrap">
-          <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
-            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-            <span class="sq-location-chip__text">
-              <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
-              <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
-            </span>
-            <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
-          </button>
-          <div class="sq-location-popover" id="homeLocationPopover" hidden>
-            <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
-            <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
-            <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
+        <div class="sq-search-hero-toolbar">
+          <div class="sq-location-chip-wrap">
+            <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
+              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+              <span class="sq-location-chip__text">
+                <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
+                <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
+              </span>
+              <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
+            </button>
+            <div class="sq-location-popover" id="homeLocationPopover" hidden>
+              <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+              <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+              <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
+            </div>
           </div>
+          <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
+            <i class="fas fa-map" aria-hidden="true"></i>
+            <span data-translate="homeProduct.viewMap">Voir la carte</span>
+          </a>
         </div>
 
         <form id="searchResultsForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
@@ -86,13 +119,6 @@
         </form>
       </div>
 
-      <div class="sq-search-hero-meta">
-        <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
-          <i class="fas fa-map" aria-hidden="true"></i>
-          <span data-translate="homeProduct.viewMap">Voir la carte</span>
-        </a>
-      </div>
-
       <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search">
         <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
         <span class="sq-share-look-banner__body">
@@ -103,7 +129,6 @@
       </a>
     </div>
   </section>
-  </div>
 
   <main class="sq-category-discover sq-category-discover--search">
     <div class="container">

@@ -78,8 +78,7 @@
         <a href="#" class="floating-download-btn floating-download-btn--customer" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a>
     </div>
 
-    <!-- Accueil : recherche en premier sur mobile (puce hors menu hamburger) -->
-    <div class="sq-home-landing-stack">
+    <!-- Accueil -->
     <section class="sq-home-product" id="sqHomeProduct">
         <div class="container sq-home-product-inner">
             <div class="sq-home-intro">
@@ -93,20 +92,26 @@
     <section class="sq-intent-hub sq-intent-hub--home" id="sqIntentHub">
         <div class="container sq-search-hero-wrap">
             <div class="sq-search-hero">
-                <div class="sq-location-chip-wrap">
-                    <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
-                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                        <span class="sq-location-chip__text">
-                            <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
-                            <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
-                        </span>
-                        <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
-                    </button>
-                    <div class="sq-location-popover" id="homeLocationPopover" hidden>
-                        <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
-                        <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
-                        <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
+                <div class="sq-search-hero-toolbar">
+                    <div class="sq-location-chip-wrap">
+                        <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            <span class="sq-location-chip__text">
+                                <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
+                                <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
+                            </span>
+                            <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
+                        </button>
+                        <div class="sq-location-popover" id="homeLocationPopover" hidden>
+                            <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+                            <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+                            <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
+                        </div>
                     </div>
+                    <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
+                        <i class="fas fa-map" aria-hidden="true"></i>
+                        <span data-translate="homeProduct.viewMap">Voir la carte</span>
+                    </a>
                 </div>
 
                 <form id="homeSalonSearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
@@ -133,13 +138,6 @@
                 </form>
             </div>
 
-            <div class="sq-search-hero-meta">
-                <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
-                    <i class="fas fa-map" aria-hidden="true"></i>
-                    <span data-translate="homeProduct.viewMap">Voir la carte</span>
-                </a>
-            </div>
-
             <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search">
                 <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
                 <span class="sq-share-look-banner__body">
@@ -152,7 +150,6 @@
             <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
         </div>
     </section>
-    </div>
 
     <!-- Bandeau app (style Fresha) -->
     <section class="sq-home-app-strip" id="sqHomeAppStrip">

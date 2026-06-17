@@ -73,8 +73,8 @@ for (const page of pages) {
         if (html.includes("sqNearbySalons") || html.includes("sqTopExperts")) {
             bad("index.html: sections nearby/experts encore présentes");
         } else ok("index.html: sections nearby/experts retirées");
-        if (html.includes("sq-home-landing-stack")) ok("index.html: stack mobile recherche en premier");
-        else bad("index.html: sq-home-landing-stack manquant");
+        if (html.includes("sq-search-hero-toolbar")) ok(`${page}: barre outils position/carte`);
+        else bad(`${page}: sq-search-hero-toolbar manquant`);
     }
 
     if (html.includes('data-search-unified')) ok(`${page}: barre recherche unifiée`);
@@ -97,10 +97,15 @@ if (intentCss.includes("padding-right: 200px") && intentCss.includes(".sq-search
 } else {
     bad("CSS desktop: padding-right QR manquant");
 }
-if (intentCss.includes("sq-home-landing-stack") && intentCss.includes("order: -1")) {
-    ok("CSS mobile: recherche remontée sous navbar");
+if (intentCss.includes("sq-search-hero-toolbar") && intentCss.includes("justify-content: space-between")) {
+    ok("CSS: toolbar position gauche / carte droite");
 } else {
-    bad("CSS mobile: ordre stack manquant");
+    bad("CSS: toolbar extremités manquant");
+}
+if (intentCss.includes("order: -1") && intentCss.includes("sq-search-bar-unified--home")) {
+    ok("CSS mobile: bouton recherche à gauche");
+} else {
+    bad("CSS mobile: bouton recherche à gauche manquant");
 }
 if (intentCss.includes("flex-direction: column") && intentCss.includes(".sq-search-hero")) {
     ok("CSS: colonne mobile puce au-dessus recherche");
