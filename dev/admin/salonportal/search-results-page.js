@@ -47,7 +47,6 @@
     const noImageLabel = lang === "fr" ? "Pas d'image" : "No image";
 
     let filters = { minRating: 0, sort: "distance" };
-    let mapListMode = false;
     const mapUi = () => window.skedisySalonMapUi;
 
     function sumReviews(list) {
@@ -106,17 +105,6 @@
             salonsGrid.innerHTML = `<div class="no-results"><p>${escapeHtml(t("searchResults.noSalons"))}</p></div>`;
             return;
         }
-        if (mapListMode && mapUi()) {
-            salonsGrid.innerHTML = salons
-                .map((salon) =>
-                    mapUi().renderSalonMapListCard(salon, {
-                        priceFromLabel,
-                        currency,
-                    })
-                )
-                .join("");
-            return;
-        }
         salonsGrid.innerHTML = salons.map(renderSalonCard).join("");
     }
 
@@ -164,10 +152,6 @@
     function setViewMode(mode) {
         if (!categoryMain) return;
         const isMap = mode === "map";
-        mapListMode = isMap;
-        if (salonsGrid) {
-            salonsGrid.classList.toggle("sq-salons-grid--map-list", isMap);
-        }
         categoryMain.classList.toggle("sq-category-discover__main--map", isMap);
         categoryMain.classList.toggle("sq-category-discover__main--list", !isMap);
         if (mapEl) mapEl.setAttribute("aria-hidden", isMap ? "false" : "true");
@@ -176,10 +160,7 @@
         if (isMap) {
             initMap();
             refreshMapMarkers();
-            renderSalons();
             setTimeout(() => mapInstance?.invalidateSize(), 300);
-        } else {
-            renderSalons();
         }
     }
 

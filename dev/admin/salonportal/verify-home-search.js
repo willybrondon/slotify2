@@ -102,10 +102,16 @@ if (intentCss.includes("sq-search-hero-toolbar") && intentCss.includes("justify-
 } else {
     bad("CSS: toolbar extremités manquant");
 }
-if (intentCss.includes("order: -1") && intentCss.includes("sq-search-bar-unified--home")) {
-    ok("CSS mobile: bouton recherche à gauche");
+if (
+    intentCss.includes("sq-search-bar-unified--home") &&
+    intentCss.includes("flex-direction: row") &&
+    intentCss.includes("order: 2") &&
+    intentCss.includes("margin-left: auto") &&
+    !intentCss.match(/sq-search-bar-unified--home[\s\S]*?__submit[\s\S]*?order:\s*-1/)
+) {
+    ok("CSS mobile: bouton recherche à droite");
 } else {
-    bad("CSS mobile: bouton recherche à gauche manquant");
+    bad("CSS mobile: bouton recherche à droite (petit carré) manquant");
 }
 if (intentCss.includes("flex-direction: column") && intentCss.includes(".sq-search-hero")) {
     ok("CSS: colonne mobile puce au-dessus recherche");

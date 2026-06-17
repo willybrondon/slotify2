@@ -78,76 +78,90 @@
         <a href="#" class="floating-download-btn floating-download-btn--customer" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a>
     </div>
 
-    <!-- Accueil -->
-    <section class="sq-home-product" id="sqHomeProduct">
-        <div class="container sq-home-product-inner">
-            <div class="sq-home-intro">
-                <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta coiffure en IDF.</h1>
-                <p class="sq-home-essence" data-translate="homeProduct.essence">Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.</p>
-            </div>
-        </div>
-    </section>
+    <!-- Accueil desktop : colonne gauche (intro + recherche) · visuels à droite -->
+    <section class="sq-home-landing" id="sqHomeLanding">
+        <div class="sq-home-landing__grid">
+            <div class="sq-home-landing__left">
+                <header class="sq-home-landing__intro desktop-only">
+                    <p class="sq-kicker" data-translate="client.marketingEyebrow">Skedisy</p>
+                    <h1 class="sq-display sq-home-landing__headline" data-translate="client.marketingHeadline">L'app où les salons coiffure afro d'IDF rencontrent leurs clientes</h1>
+                    <p class="sq-lead sq-home-landing__lead" data-translate="client.marketingSubheadline">Salons de quartier, cheveux texturés, prestations qui vous comprennent. Visible sur le web, réservable en quelques taps.</p>
+                </header>
 
-    <!-- Recherche + Partager un look (style Squire) -->
-    <section class="sq-intent-hub sq-intent-hub--home" id="sqIntentHub">
-        <div class="container sq-search-hero-wrap">
-            <div class="sq-search-hero">
-                <div class="sq-search-hero-toolbar">
-                    <div class="sq-location-chip-wrap">
-                        <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
-                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                            <span class="sq-location-chip__text">
-                                <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
-                                <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
-                            </span>
-                            <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
-                        </button>
-                        <div class="sq-location-popover" id="homeLocationPopover" hidden>
-                            <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
-                            <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
-                            <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
-                        </div>
-                    </div>
-                    <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
-                        <i class="fas fa-map" aria-hidden="true"></i>
-                        <span data-translate="homeProduct.viewMap">Voir la carte</span>
-                    </a>
+                <div class="sq-home-landing__intro sq-home-landing__intro--mobile mobile-only">
+                    <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta coiffure en IDF.</h1>
+                    <p class="sq-home-essence" data-translate="homeProduct.essence">Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.</p>
                 </div>
 
-                <form id="homeSalonSearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
-                    <div class="sq-search-bar-unified__inner sq-search-bar-unified__inner--query-only">
-                        <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
-                        <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
-                            <label class="sq-sr-only" for="homeQuerySearchInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
-                            <input type="search" id="homeQuerySearchInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off" enterkeyhint="search">
-                            <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
-                                <div class="sq-search-suggestions__section">
-                                    <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
-                                    <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
-                                </div>
-                                <div class="sq-search-suggestions__section">
-                                    <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
-                                    <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+                <div class="sq-search-hero-wrap" id="sqIntentHub">
+                    <div class="sq-search-hero">
+                        <div class="sq-search-hero-toolbar">
+                            <div class="sq-location-chip-wrap">
+                                <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
+                                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                                    <span class="sq-location-chip__text">
+                                        <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
+                                        <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
+                                    </span>
+                                    <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
+                                </button>
+                                <div class="sq-location-popover" id="homeLocationPopover" hidden>
+                                    <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+                                    <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+                                    <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
                                 </div>
                             </div>
+                            <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
+                                <i class="fas fa-map" aria-hidden="true"></i>
+                                <span data-translate="homeProduct.viewMap">Voir la carte</span>
+                            </a>
                         </div>
+
+                        <form id="homeSalonSearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
+                            <div class="sq-search-bar-unified__inner sq-search-bar-unified__inner--query-only">
+                                <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+                                <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
+                                    <label class="sq-sr-only" for="homeQuerySearchInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
+                                    <input type="search" id="homeQuerySearchInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off" enterkeyhint="search">
+                                    <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
+                                        <div class="sq-search-suggestions__section">
+                                            <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
+                                            <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
+                                        </div>
+                                        <div class="sq-search-suggestions__section">
+                                            <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
+                                            <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="sq-search-bar-unified__submit" aria-label="Rechercher">
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </button>
+                        </form>
                     </div>
-                    <button type="submit" class="sq-search-bar-unified__submit" aria-label="Rechercher">
-                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                    </button>
-                </form>
+
+                    <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search">
+                        <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
+                        <span class="sq-share-look-banner__body">
+                            <strong data-translate="intentHub.captureTitle">Partager un look</strong>
+                            <span data-translate="intentHub.captureBodyShort">Capture d'écran depuis Instagram, TikTok, Facebook ou Snapchat → partage avec l'app Skedisy. On te propose des salons adaptés.</span>
+                        </span>
+                        <i class="fas fa-chevron-right sq-share-look-banner__chevron" aria-hidden="true"></i>
+                    </a>
+
+                    <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
+                </div>
             </div>
 
-            <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search">
-                <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
-                <span class="sq-share-look-banner__body">
-                    <strong data-translate="intentHub.captureTitle">Partager un look</strong>
-                    <span data-translate="intentHub.captureBodyShort">Capture d'écran depuis Instagram, TikTok, Facebook ou Snapchat → partage avec l'app Skedisy. On te propose des salons adaptés.</span>
-                </span>
-                <i class="fas fa-chevron-right sq-share-look-banner__chevron" aria-hidden="true"></i>
-            </a>
-
-            <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
+            <div class="sq-home-landing__visual desktop-only" aria-hidden="false">
+                <div class="sq-photo-frame">
+                    <img src="images/client/experience-salon.png" alt="Expérience salon beauté afro Skedisy" width="600" height="750" loading="lazy">
+                </div>
+                <div class="sq-device-frame" aria-hidden="true">
+                    <img src="images/client/app-menu.png" alt="App Skedisy — menu principal" width="280" height="560" loading="lazy">
+                </div>
+            </div>
         </div>
     </section>
 
@@ -165,20 +179,22 @@
         </div>
     </section>
 
-    <!-- Story marketing (visuels — après la zone produit) -->
-    <section class="sq-hero sq-hero--story">
+    <!-- Story marketing (CTA — visuels déjà dans sq-home-landing sur desktop) -->
+    <section class="sq-hero sq-hero--story sq-hero--story-compact">
         <div class="sq-hero-grid">
             <div class="sq-hero-copy">
-                <p class="sq-kicker" data-translate="client.marketingEyebrow">Skedisy</p>
-                <h2 class="sq-display sq-display--story" data-translate="client.marketingHeadline">L'app où les salons coiffure afro d'IDF rencontrent leurs clientes</h2>
-                <p class="sq-lead" data-translate="client.marketingSubheadline">Salons de quartier, cheveux texturés, prestations qui vous comprennent. Visible sur le web, réservable en quelques taps.</p>
+                <div class="sq-hero-copy__dup mobile-only">
+                    <p class="sq-kicker" data-translate="client.marketingEyebrow">Skedisy</p>
+                    <h2 class="sq-display sq-display--story" data-translate="client.marketingHeadline">L'app où les salons coiffure afro d'IDF rencontrent leurs clientes</h2>
+                    <p class="sq-lead" data-translate="client.marketingSubheadline">Salons de quartier, cheveux texturés, prestations qui vous comprennent. Visible sur le web, réservable en quelques taps.</p>
+                </div>
                 <div class="sq-cta-row">
                     <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
                     <a href="/recherche" class="sq-btn sq-btn-ghost" data-translate="client.browseSalons">Parcourir les prestations</a>
                 </div>
                 <p class="sq-note" data-translate="client.heroAppNote">La réservation des créneaux se fait sur l'app Skedisy (gratuite).</p>
             </div>
-            <div class="sq-hero-visual">
+            <div class="sq-hero-visual mobile-only">
                 <div class="sq-photo-frame">
                     <img src="images/client/experience-salon.png" alt="Expérience salon beauté afro Skedisy" width="600" height="750" loading="lazy">
                 </div>
