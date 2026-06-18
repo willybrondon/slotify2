@@ -675,6 +675,17 @@ body.sq-capture-mode .btn-upload:hover {
   text-align: left;
 }
 
+.sq-home-landing__intro.desktop-only .sq-home-headline {
+  font-size: clamp(1.85rem, 3.2vw, 2.65rem);
+  line-height: 1.12;
+  margin-bottom: 0.65rem;
+}
+
+.sq-home-landing__intro.desktop-only .sq-home-essence {
+  margin-bottom: 0;
+  max-width: 36rem;
+}
+
 .sq-home-landing__intro .sq-kicker {
   margin-bottom: 0.65rem;
 }
@@ -709,20 +720,14 @@ body.sq-capture-mode .btn-upload:hover {
 
 @media (min-width: 1024px) {
   .sq-home-landing__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
-    gap: 2rem 3rem;
-    align-items: start;
-    padding-right: 220px;
+    display: block;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
   }
 
   .sq-home-landing__left {
-    max-width: 520px;
-  }
-
-  .sq-home-landing__visual {
-    position: sticky;
-    top: 5.5rem;
+    max-width: 100%;
   }
 
   .sq-home-landing .sq-search-hero-wrap {
@@ -736,16 +741,13 @@ body.sq-capture-mode .btn-upload:hover {
     max-width: 100%;
   }
 
-  .sq-hero--story-compact .sq-hero-grid {
-    grid-template-columns: 1fr;
-    max-width: 520px;
-    padding-right: 220px;
-    margin-left: 0;
-    margin-right: auto;
+  .sq-home-landing .sq-share-look-banner--below-search .sq-share-look-banner__body span {
+    display: none;
   }
 
-  .sq-hero--story-compact .sq-hero-visual {
-    display: none;
+  .sq-home-landing .sq-share-look-banner--below-search {
+    padding: 0.75rem 1rem;
+    gap: 0.65rem;
   }
 }
 

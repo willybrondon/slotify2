@@ -405,7 +405,7 @@ final Map<String, String> frCH = {
   "txtAppFeatures": "Fonctionnalités de l'application",
   "txtFeature1": "• Salons coiffure afro en Île-de-France — par quartier et par prestation",
   "txtFeature2": "• Prestations nommées : tresses, locks, tissages, cheveux naturels",
-  "txtFeature3": "• Concierge IA : selfie → reco prestation et salon adaptés",
+  "txtFeature3": "• Partager un look : capture → salons adaptés en IDF",
   "txtFeature4": "• Durée et tarif indicatif avant de réserver",
   "txtFeature5": "• Historique et prochains rendez-vous",
   "txtFeature6": "• Avis sur les salons et l'équipe",
@@ -418,13 +418,13 @@ final Map<String, String> frCH = {
   "txtWelcomeTagline": "Les salons coiffure afro en IDF, une app pour toutes.",
   "txtShareAppMessage":
       "Découvre Skedisy — réserve ta coiffure en Île-de-France : https://skedisy.com",
-  "txtAiConciergeTitle": "Concierge beauté IA",
+  "txtAiConciergeTitle": "Partager un look",
   "txtAiConciergeSubtitle":
-      "Un selfie, une reco adaptée à ton style — tresses, locks, naturel en IDF.",
-  "txtAiConciergeCta": "Essayer →",
-  "txtAiConciergeHeroTitle": "Recommandations personnalisées",
+      "Capture, selfie ou photo — on trouve les salons coiffure afro adaptés en IDF.",
+  "txtAiConciergeCta": "Partager un look →",
+  "txtAiConciergeHeroTitle": "Partager un look",
   "txtAiConciergeHeroBody":
-      "Envoie un selfie : l'IA analyse ton look et te propose les prestations et salons coiffure afro adaptés en Île-de-France.",
+      "Envoie une capture, un selfie ou une photo : on identifie le style et on te propose des salons coiffure afro en Île-de-France.",
   "txtAiConciergeUploadTitle": "Ajoute ton selfie",
   "txtAiConciergeUploadHint": "Appuie sur le bouton ci-dessous",
   "txtAiConciergeAnalyze": "Analyser mes cheveux",
@@ -508,9 +508,9 @@ final Map<String, String> frCH = {
   "txtIntentCaptureTitle": "Partager un look",
   "txtIntentCaptureBody":
       "Capture d'écran sur Instagram, TikTok, Facebook ou Snapchat → Partager → Skedisy. On te propose des salons adaptés à ton look.",
-  "txtIntentConciergeTitle": "Concierge IA",
+  "txtIntentConciergeTitle": "Partager un look",
   "txtIntentConciergeBody":
-      "Selfie + ton profil capillaire → prestations et salons près de toi.",
+      "Capture d'écran, selfie ou photo → on te propose des salons adaptés à ton look.",
   "txtIntentSearchTitle": "Chercher un salon",
   "txtIntentSearchSalonHint": "Nom du salon",
   "txtIntentSearchServiceHint": "Tresses, locks, tissage…",

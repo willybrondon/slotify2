@@ -7,74 +7,60 @@ $font-prime : "Inter", sans-serif,
 sans-serif;
 $font-second : "Inter", sans-serif;
 
-// Modern Light Color Palette
-$prime: #F0F4F8;
-$second: rgba(147, 51, 234, 0.08);
-$third: #4C1D95;
-$fourth: #F8FAFC;
-$dark: #1E1B4B;
-$darkGray: #000000;
+// Skedisy — 4 couleurs : blanc, noir, terracotta, gris clair
+$prime: #f2f2f2;
+$second: rgba(196, 92, 38, 0.08);
+$third: #111111;
+$fourth: #ffffff;
+$dark: #111111;
+$darkGray: #111111;
+
 $light: #ffffff;
-$gray: #E5E7EB;
-$gray2: #F3F4F6;
-$lightGray: #F9FAFB;
-$lightBlue: #F0F9FF;
+$gray: #f2f2f2;
+$gray2: #f2f2f2;
+$lightGray: #f2f2f2;
+$lightBlue: #f2f2f2;
 $transparent: transparent;
 
-// Skedisy brand (icons / accents)
 $sk-brand: #c45c26;
 $sk-brand-hover: #a84d1f;
+$sk-brand-light: #fdf6f0;
 $icon-accent: $sk-brand;
-$theme: #000000;
-$themeBlue: #7C3AED;
-$themeLight: rgba(147, 51, 234, 0.12);
-$themesky: rgba(124, 58, 237, 0.08);
-$button: #EC4899;
+$theme: #111111;
+$themeBlue: $sk-brand;
+$themeLight: rgba(196, 92, 38, 0.12);
+$themesky: rgba(196, 92, 38, 0.08);
+$button: #111111;
 
-//success
-$success: #10B981;
-$success-light: #D1FAE5;
-$soLight: rgba(16, 185, 129, 0.12);
+$success: $sk-brand;
+$success-light: $sk-brand-light;
+$soLight: rgba(196, 92, 38, 0.12);
 
-//blue
-$blue: #3B82F6;
-$blue-light: #DBEAFE;
+$blue: $gray;
+$blue-light: $gray2;
 
-//red
-$danger: #EF4444;
-$danger-light: #FEE2E2;
+$danger: $sk-brand;
+$danger-light: $gray;
 
-//yellow
-$warning: #F59E0B;
-$warning-light: #FEF3C7;
+$warning: $sk-brand;
+$warning-light: $sk-brand-light;
 
-// Additional modern colors
-$purple: #8B5CF6;
-$purple-light: #EDE9FE;
-$emerald: #10B981;
-$emerald-light: #D1FAE5;
-$rose: #F43F5E;
-$rose-light: #FFE4E6;
-$indigo: #6366F1;
-$indigo-light: #E0E7FF;
-
-// Unique Organic Color Palette - Never Before Used
-$cosmic-purple: #8B5CF6;
-$cosmic-purple-light: #EDE9FE;
-$aurora-green: #10B981;
-$aurora-green-light: #D1FAE5;
-$neon-pink: #EC4899;
-$neon-pink-light: #FCE7F3;
-$ocean-blue: #06B6D4;
-$ocean-blue-light: #CFFAFE;
-$sunset-orange: #F97316;
-$sunset-orange-light: #FED7AA;
-$mystic-indigo: #6366F1;
-$mystic-indigo-light: #E0E7FF;
-$coral-rose: #F43F5E;
-$coral-rose-light: #FFE4E6;
-$emerald-teal: #14B8A6;
-$emerald-teal-light: #CCFBF1;
+$cosmic-purple: $sk-brand;
+$cosmic-purple-light: $sk-brand-light;
+$aurora-green: $sk-brand;
+$aurora-green-light: $sk-brand-light;
+$neon-pink: $sk-brand;
+$neon-pink-light: $sk-brand-light;
+$ocean-blue: $gray;
+$ocean-blue-light: $gray2;
+$sunset-orange: $sk-brand;
+$sunset-orange-light: $sk-brand-light;
+$mystic-indigo: $sk-brand;
+$mystic-indigo-light: $sk-brand-light;
+$coral-rose: $sk-brand;
+$coral-rose-light: $sk-brand-light;
+$emerald-teal: $sk-brand;
+$emerald-teal-light: $sk-brand-light;
 
 $themeAll : ("prime":$prime,
   "second":$second,

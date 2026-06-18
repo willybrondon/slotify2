@@ -248,12 +248,12 @@ class SlotManagerScreen extends StatelessWidget {
                                   ),
                                   activeDayStyle: DayStyle(
                                     dayNumStyle: TextStyle(
-                                      color: AppColors.primaryTextColor,
+                                      color: AppColors.brandTerracotta,
                                       fontFamily:
                                           AppFontFamily.sfProDisplayBold,
                                     ),
                                     dayStrStyle: TextStyle(
-                                      color: AppColors.primaryTextColor,
+                                      color: AppColors.brandTerracotta,
                                       fontFamily:
                                           AppFontFamily.sfProDisplayBold,
                                     ),
@@ -262,6 +262,10 @@ class SlotManagerScreen extends StatelessWidget {
                                         Radius.circular(8),
                                       ),
                                       color: AppColors.dateSelect,
+                                      border: Border.all(
+                                        color: AppColors.brandTerracotta
+                                            .withOpacity(0.35),
+                                      ),
                                     ),
                                   ),
                                   inactiveDayStyle: DayStyle(
@@ -653,13 +657,17 @@ class SlotManagerScreen extends StatelessWidget {
                                         height: 30,
                                         width: 50,
                                         decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? isSlotBooked
-                                                  ? AppColors.greenButton
-                                                  : AppColors.primaryAppColor
-                                              : isSlotTimePassed || isSlotBooked
-                                                  ? AppColors.redButton
-                                                  : AppColors.greenButton,
+                                          color: isSlotTimePassed || isSlotBooked
+                                              ? AppColors.slotUnavailableBg
+                                              : AppColors.slotAvailableBg,
+                                          border: Border.all(
+                                            color: isSelected &&
+                                                    !isSlotBooked &&
+                                                    !isSlotTimePassed
+                                                ? AppColors.slotSelectedBorder
+                                                : Colors.transparent,
+                                            width: 1.5,
+                                          ),
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
@@ -679,10 +687,10 @@ class SlotManagerScreen extends StatelessWidget {
                                                       isSlotTimePassed
                                                   ? TextDecoration.lineThrough
                                                   : TextDecoration.none,
-                                              color: isSelected
-                                                  ? isSlotBooked
-                                                      ? AppColors.slotText
-                                                      : AppColors.whiteColor
+                                              color: isSelected &&
+                                                      !isSlotBooked &&
+                                                      !isSlotTimePassed
+                                                  ? AppColors.slotSelectedText
                                                   : AppColors.slotText,
                                             ),
                                           ),

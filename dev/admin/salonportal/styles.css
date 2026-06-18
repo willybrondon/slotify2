@@ -4,6 +4,9 @@
     --sk-brand-hover: #a84d1f;
     --sk-brand-light: rgba(196, 92, 38, 0.08);
     --sk-brand-softer: rgba(196, 92, 38, 0.14);
+    --sk-brand-bg: #fdf6f0;
+    --sk-gray-light: #f2f2f2;
+    --sk-gray-muted: #9a9a9a;
     --sk-black: #111111;
     --sk-white: #ffffff;
 
@@ -31,7 +34,11 @@
     --sk-hero-overlay-top: rgba(0, 0, 0, 0.45);
     --sk-hero-overlay-bottom: rgba(0, 0, 0, 0.75);
     --sk-shadow: rgba(0, 0, 0, 0.08);
-    --sk-star: var(--sk-black);
+    --sk-star: var(--sk-brand);
+    --sk-slot-available: var(--sk-gray-light);
+    --sk-slot-unavailable: var(--sk-gray-light);
+    --sk-slot-selected-border: var(--sk-brand);
+    --sk-date-active-bg: var(--sk-brand-bg);
 }
 
 /* Reset and Base Styles */

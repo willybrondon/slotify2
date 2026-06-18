@@ -126,16 +126,19 @@ class ReScheduleSelectDateView extends StatelessWidget {
                         ),
                         activeDayStyle: DayStyle(
                           dayNumStyle: TextStyle(
-                            color: AppColors.primaryAppColor,
+                            color: AppColors.brandTerracotta,
                             fontFamily: AppFontFamily.sfProDisplayBold,
                           ),
                           dayStrStyle: TextStyle(
-                            color: AppColors.primaryAppColor,
+                            color: AppColors.brandTerracotta,
                             fontFamily: AppFontFamily.sfProDisplayBold,
                           ),
                           decoration: BoxDecoration(
                             borderRadius: const BorderRadius.all(Radius.circular(8)),
                             color: AppColors.dateSelect,
+                            border: Border.all(
+                              color: AppColors.brandTerracotta.withOpacity(0.35),
+                            ),
                           ),
                         ),
                         inactiveDayStyle: DayStyle(
@@ -373,13 +376,17 @@ Widget buildSlotCategory(String category, List<String> slots, String selectedDat
                                 height: 30,
                                 width: 50,
                                 decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? isSlotBooked
-                                          ? AppColors.greenButton
-                                          : AppColors.primaryAppColor
-                                      : isSlotTimePassed || isSlotBooked
-                                          ? AppColors.redButton
-                                          : AppColors.greenButton,
+                                  color: isSlotTimePassed || isSlotBooked
+                                      ? AppColors.slotUnavailableBg
+                                      : AppColors.slotAvailableBg,
+                                  border: Border.all(
+                                    color: isSelected &&
+                                            !isSlotBooked &&
+                                            !isSlotTimePassed
+                                        ? AppColors.slotSelectedBorder
+                                        : Colors.transparent,
+                                    width: 1.5,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Center(
@@ -392,10 +399,10 @@ Widget buildSlotCategory(String category, List<String> slots, String selectedDat
                                       fontSize: 14,
                                       decoration:
                                           isSlotBooked || isSlotTimePassed ? TextDecoration.lineThrough : TextDecoration.none,
-                                      color: isSelected
-                                          ? isSlotBooked
-                                              ? AppColors.textSlot
-                                              : AppColors.whiteColor
+                                      color: isSelected &&
+                                              !isSlotBooked &&
+                                              !isSlotTimePassed
+                                          ? AppColors.slotSelectedText
                                           : AppColors.textSlot,
                                       decorationColor: AppColors.textSlot,
                                     ),

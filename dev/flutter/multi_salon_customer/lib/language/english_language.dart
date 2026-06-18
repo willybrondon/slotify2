@@ -397,7 +397,7 @@ final Map<String, String> enUS = {
   "txtAppFeatures": "App Features",
   "txtFeature1": "• Afro hair salons in Île-de-France — by area and service",
   "txtFeature2": "• Named services: braids, locks, weaves, natural hair",
-  "txtFeature3": "• AI Concierge: selfie → matched service and salon",
+  "txtFeature3": "• Share a look: screenshot → matched Afro salons in IDF",
   "txtFeature4": "• Clear duration and indicative price before booking",
   "txtFeature5": "• Appointment history and upcoming bookings",
   "txtFeature6": "• Reviews for salons and stylists",
@@ -410,13 +410,13 @@ final Map<String, String> enUS = {
   "txtWelcomeTagline": "Afro hair salons in IDF — an app for everyone.",
   "txtShareAppMessage":
       "Discover Skedisy — book your hairstyle in Île-de-France: https://skedisy.com",
-  "txtAiConciergeTitle": "AI Beauty Concierge",
+  "txtAiConciergeTitle": "Share a look",
   "txtAiConciergeSubtitle":
-      "One selfie, recommendations for your style — braids, locks, natural looks in IDF.",
-  "txtAiConciergeCta": "Try now →",
-  "txtAiConciergeHeroTitle": "Personalized recommendations",
+      "Screenshot, selfie or photo — we match Afro hair salons in IDF.",
+  "txtAiConciergeCta": "Share a look →",
+  "txtAiConciergeHeroTitle": "Share a look",
   "txtAiConciergeHeroBody":
-      "Send a selfie: AI analyzes your look and suggests Afro hair salons and services in Île-de-France.",
+      "Send a screenshot, selfie or photo: we identify the style and suggest Afro hair salons in Île-de-France.",
   "txtAiConciergeUploadTitle": "Add your selfie",
   "txtAiConciergeUploadHint": "Tap the button below",
   "txtAiConciergeAnalyze": "Analyze my hair",
@@ -500,9 +500,9 @@ final Map<String, String> enUS = {
   "txtIntentCaptureTitle": "Share a look",
   "txtIntentCaptureBody":
       "Screenshot on Instagram, TikTok, Facebook or Snapchat → Share → Skedisy. We suggest salons that match your look.",
-  "txtIntentConciergeTitle": "AI concierge",
+  "txtIntentConciergeTitle": "Share a look",
   "txtIntentConciergeBody":
-      "Selfie + your hair profile → personalized services and salons near you.",
+      "Screenshot, selfie or photo → we suggest salons that match your look.",
   "txtIntentSearchTitle": "Search salons",
   "txtIntentSearchSalonHint": "Salon name",
   "txtIntentSearchServiceHint": "Braids, locks, weave…",

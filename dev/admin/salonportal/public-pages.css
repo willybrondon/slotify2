@@ -1986,12 +1986,12 @@ body.sk-public-page .main-wrapper {
 }
 
 .sq-cal-day--active {
-    background: #f2f6ff;
-    border-color: var(--sk-primary, #111);
+    background: var(--sk-date-active-bg, #fdf6f0);
+    border-color: var(--sk-brand, #c45c26);
 }
 
 .sq-cal-day--active .sq-cal-day__num {
-    color: var(--sk-primary, #111);
+    color: var(--sk-brand, #c45c26);
 }
 
 .sq-cal-day--disabled {
@@ -2033,7 +2033,7 @@ body.sk-public-page .main-wrapper {
     padding: 10px 8px;
     border: 1px solid transparent;
     border-radius: 8px;
-    background: #c8e6c9;
+    background: var(--sk-slot-available, #f2f2f2);
     color: #484e60;
     cursor: pointer;
     font-family: inherit;
@@ -2047,13 +2047,13 @@ body.sk-public-page .main-wrapper {
 }
 
 .sq-slot-btn--available {
-    background: #c8e6c9;
+    background: var(--sk-slot-available, #f2f2f2);
 }
 
 .sq-slot-btn--past,
 .sq-slot-btn--booked,
 .sq-slot-btn--busy {
-    background: #ffcdd2;
+    background: var(--sk-slot-unavailable, #f2f2f2);
     color: #484e60;
     cursor: not-allowed;
     opacity: 1;
@@ -2066,9 +2066,9 @@ body.sk-public-page .main-wrapper {
 }
 
 .sq-slot-btn--picked {
-    background: var(--sk-text, #111);
-    color: var(--sk-inverse, #fff);
-    border-color: var(--sk-text, #111);
+    background: var(--sk-slot-available, #f2f2f2);
+    color: var(--sk-brand, #c45c26);
+    border-color: var(--sk-slot-selected-border, #c45c26);
 }
 
 .sq-slot-btn--picked .sq-slot-btn__label {

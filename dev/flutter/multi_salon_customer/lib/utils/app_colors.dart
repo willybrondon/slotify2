@@ -1,139 +1,155 @@
 import 'package:flutter/material.dart';
 
-/// Palette Skedisy : noir, blanc, terracotta (#C45C26) — alignée salonportal web.
+/// Palette Skedisy — 4 couleurs : blanc, noir, terracotta, gris clair.
+/// Alignée salonportal web (`--sk-*`). Ne pas dupliquer les hex ailleurs.
 class AppColors {
+  // —— Brand core ——
   static const Color brandTerracotta = Color(0xFFC45C26);
   static const Color brandTerracottaHover = Color(0xFFA84D1F);
+  static const Color brandTerracottaLight = Color(0xFFFDF6F0);
+  static const Color brandTerracottaSoft = Color(0xFFF5E8DE);
   static const Color brandBlack = Color(0xFF111111);
   static const Color brandWhite = Color(0xFFFFFFFF);
-  static const Color shareLookPageBg = Color(0xFFFDF6F0);
+  static const Color brandGrayLight = Color(0xFFF2F2F2);
+  static const Color brandGrayMuted = Color(0xFF9A9A9A);
 
+  static const Color shareLookPageBg = brandTerracottaLight;
+
+  // —— Semantic (UI) ——
   static Color iconAccent = brandTerracotta;
-
   static Color primaryAppColor = brandBlack;
   static Color primaryTextColor = brandBlack;
   static Color appText = brandBlack;
-  static Color appointmentBg = const Color(0xff2C302E);
   static Color backGround = brandWhite;
   static Color whiteColor = brandWhite;
-  static Color lineColor = const Color(0xffEFEFEF);
-  static Color indicatorColor = const Color(0xffD9D9D9);
-  static Color yellow2 = const Color(0xffFFFCF2);
-  static Color green2 = const Color(0xffF7FEF7);
-  static Color profileTitle = const Color(0xffABABAB);
-  static Color currency = const Color(0xff0A4C09);
-  static Color currencyGrey = const Color(0xffA5A5A5);
-  static Color yellow = brandTerracotta;
-  static Color detailBg = const Color(0xffF7F8FF);
-  static Color category = const Color(0xff1C2822);
-  static Color categoryService = const Color(0xff1F2F23);
-  static Color currencyBg = const Color(0xffF2F5F5);
-  static Color serviceBgBorder = const Color(0xffF0F0F0);
-  static Color paymentText = const Color(0xff52556A);
-  static Color switchBox = const Color(0xffEFF1F9);
-  static Color categoryBottom = const Color(0xffF7FCFE);
-  static Color roundBg = const Color(0xffF5F8F5);
-  static Color dialogBg = const Color(0xffF9FBFF);
-  static Color captionDialog = const Color(0xff6A6A6A);
-  static Color stepper = const Color(0xffA5ADB3);
-  static Color amountGrey = const Color(0xff939393);
-  static Color productBg = const Color(0xffF0F5F7);
-  static Color border = const Color(0xffFAFAFA);
-  static Color bgTime = const Color(0xffF9FAFA);
-  static Color bgCircle = const Color(0xffE9EBEB);
-  static Color serviceBorder = const Color(0xffF2F2F2);
-  static Color termsDialog = const Color(0xff8C8C8C);
-  static Color grey = const Color(0xff9A9A9A);
-  static Color service = const Color(0xff919191);
-  static Color tabUnSelect = const Color(0xffF8F8F8);
-  static Color email = const Color(0xffA1A1A1);
-  static Color roundBorder = const Color(0xffC0C0C0);
-  static Color subTitle = const Color(0xff646665);
-  static Color textFiledBg = const Color(0xffF2F2F2);
-  static Color toastBg = const Color(0xffE6E6E6);
-  static Color toastText = const Color(0xff3B433D);
-  static Color red = const Color(0xffFFF2F5);
-  static Color blue = const Color(0xffF7F9FD);
-  static Color bottom = const Color(0xffEFF3F5);
-  static Color bottomIcon = const Color(0xff929296);
-  static Color dateSelect = const Color(0xffF2F6FF);
-  static Color slotSelect = const Color(0xffFAF9FF);
   static Color blackColor = brandBlack;
   static Color blackColor1 = brandBlack;
-  static Color review = const Color(0xff101C4A);
-  static Color purple = const Color(0xffF2EBFF);
-  static Color purpleText = const Color(0xff2E367F);
-  static Color slotText = const Color(0xff898989);
-  static Color buttonDialog = const Color(0xff04B300);
-  static Color cancelReason = const Color(0xff828282);
-  static Color selectSize = const Color(0xffF9F9F9);
-  static Color cancelButton = const Color(0xffF70934);
-  static Color lightRedColor = const Color(0xffFFF6F6);
-  static Color redButton = const Color(0xffFFCDD2); // More visible red for unavailable slots
-  static Color greenButton = const Color(0xffC8E6C9); // More visible green for available slots
-  static Color textSlot = const Color(0xff484E60);
-  static Color greyText = const Color(0xffB0B0B0);
-  static Color descriptionText = const Color(0xff9B9B9B);
-  static Color transparent = Colors.transparent;
-  static Color bgColor = const Color(0xffA7AEC1).withOpacity(0.1);
-  static Color oceanBlue = const Color(0xffD8F2F6);
-  static Color yellowColor = const Color(0xffFFBB0D);
-  static Color orangeBg = const Color(0xffFFF6EB);
-  static Color orange = brandTerracotta;
-  static Color yellow1 = const Color(0xffFFFAE7);
-  static Color yellow3 = const Color(0xffFFC632);
-  static Color sellerYellow = const Color(0xff8E610A);
-  static Color ratingYellow = const Color(0xffE8AF1B);
-  static Color quantityGrey = const Color(0xff8F8F8F);
-  static Color sellerBg = const Color(0xffFFE6B7);
-  static Color darkGrey = const Color(0xff757575);
-  static Color darkGrey3 = const Color(0xff8E8E8E);
-  static Color darkGrey5 = const Color(0xff9F9F9F);
-  static Color textFieldBg = const Color(0xffF9F9F9);
-  static Color stepperGrey = const Color(0xff959595);
-  static Color greyColor = const Color(0xff9e9e9e);
-  static Color buttonText = const Color(0xff757272);
-  static Color greyColor2 = const Color(0xff4F4F4F);
-  static Color profileIconBg = const Color(0xffF4F4F4);
-  static Color bgStepper = const Color(0xff8D9AA5);
-  static Color locationText = const Color(0xff48484C);
-  static Color greyColor3 = const Color(0xffCBCBCB);
   static Color buttonColor = brandBlack;
   static Color directionBox = brandBlack;
   static Color callBox = brandBlack;
-  static Color greenColor = const Color(0xff2EB62C);
-  static Color greenBox = const Color(0xffEFFEEE);
-  static Color greenBg = const Color(0xffEBF7ED);
-  static Color greenText = const Color(0xff0B9B2A);
-  static Color redBg = const Color(0xffFFEEF0);
-  static Color redText = const Color(0xffFB0E2B);
-  static Color greenColorBg = const Color(0xffE0FDDF);
-  static Color paymentSheetBg = const Color(0xffF0F5F7);
-  static Color currencyBoxBg = const Color(0xffF1F3F3);
-  static Color currencyRed = const Color(0xffFF6767);
-  static Color ratingBlack = const Color(0xff323232);
-  static Color reviewBg = const Color(0xffF6F8FD);
-  static Color orderBg = const Color(0xffF9F6ED);
-  static Color brandColor = const Color(0xffC7C7C7);
-  static Color qtyColor = const Color(0xff575757);
-  static Color orderColorBg = const Color(0xffD1D1D1);
-  static Color arrowColor = const Color(0xffB8B8B8);
-  static Color divider = const Color(0xffEBEBEB);
-  static Color confirmBookingBg = const Color(0xffF1F4FF);
-  static Color paymentDes = const Color(0xffFEFFFC);
-  static Color paymentDes1 = const Color(0xffF7FFE2);
-  static Color couponBox = const Color(0xff81C4A6);
-  static Color dateBox = const Color(0xffCFFFD6);
+
+  /// Créneaux réservation : fond gris clair, sélection = bordure terracotta.
+  static Color slotAvailableBg = brandGrayLight;
+  static Color slotUnavailableBg = brandGrayLight;
+  static Color slotSelectedBorder = brandTerracotta;
+  static Color slotSelectedText = brandTerracotta;
+
+  /// Date sélectionnée dans le calendrier.
+  static Color dateSelect = brandTerracottaLight;
+
+  static Color appointmentBg = const Color(0xff2C302E);
+  static Color lineColor = const Color(0xffEFEFEF);
+  static Color indicatorColor = const Color(0xffD9D9D9);
+  static Color yellow2 = brandTerracottaLight;
+  static Color green2 = brandTerracottaLight;
+  static Color profileTitle = brandGrayMuted;
+  static Color currency = brandBlack;
+  static Color currencyGrey = const Color(0xffA5A5A5);
+  static Color yellow = brandTerracotta;
+  static Color detailBg = brandGrayLight;
+  static Color category = brandBlack;
+  static Color categoryService = brandBlack;
+  static Color currencyBg = brandGrayLight;
+  static Color serviceBgBorder = const Color(0xffF0F0F0);
+  static Color paymentText = const Color(0xff52556A);
+  static Color switchBox = brandGrayLight;
+  static Color categoryBottom = brandWhite;
+  static Color roundBg = brandGrayLight;
+  static Color dialogBg = brandWhite;
+  static Color captionDialog = brandGrayMuted;
+  static Color stepper = brandGrayMuted;
+  static Color amountGrey = brandGrayMuted;
+  static Color productBg = brandGrayLight;
+  static Color border = const Color(0xffFAFAFA);
+  static Color bgTime = brandGrayLight;
+  static Color bgCircle = const Color(0xffE9EBEB);
+  static Color serviceBorder = brandGrayLight;
+  static Color termsDialog = brandGrayMuted;
+  static Color grey = brandGrayMuted;
+  static Color service = brandGrayMuted;
+  static Color tabUnSelect = brandGrayLight;
+  static Color email = brandGrayMuted;
+  static Color roundBorder = const Color(0xffC0C0C0);
+  static Color subTitle = const Color(0xff646665);
+  static Color textFiledBg = brandGrayLight;
+  static Color toastBg = brandGrayLight;
+  static Color toastText = brandBlack;
+  static Color red = brandTerracottaLight;
+  static Color blue = brandGrayLight;
+  static Color bottom = brandGrayLight;
+  static Color bottomIcon = brandGrayMuted;
+  static Color slotSelect = brandTerracottaLight;
+  static Color review = brandBlack;
+  static Color purple = brandTerracottaLight;
+  static Color purpleText = brandBlack;
+  static Color slotText = const Color(0xff484E60);
+  static Color buttonDialog = brandTerracotta;
+  static Color cancelReason = brandGrayMuted;
+  static Color selectSize = brandGrayLight;
+  static Color cancelButton = brandTerracotta;
+  static Color lightRedColor = brandTerracottaLight;
+  static Color redButton = brandGrayLight;
+  static Color greenButton = brandGrayLight;
+  static Color textSlot = const Color(0xff484E60);
+  static Color greyText = brandGrayMuted;
+  static Color descriptionText = brandGrayMuted;
+  static Color transparent = Colors.transparent;
+  static Color bgColor = brandGrayLight.withOpacity(0.5);
+  static Color oceanBlue = brandGrayLight;
+  static Color yellowColor = brandTerracotta;
+  static Color orangeBg = brandTerracottaLight;
+  static Color orange = brandTerracotta;
+  static Color yellow1 = brandTerracottaLight;
+  static Color yellow3 = brandTerracotta;
+  static Color sellerYellow = brandTerracotta;
+  static Color ratingYellow = brandTerracotta;
+  static Color quantityGrey = brandGrayMuted;
+  static Color sellerBg = brandTerracottaLight;
+  static Color darkGrey = brandGrayMuted;
+  static Color darkGrey3 = brandGrayMuted;
+  static Color darkGrey5 = brandGrayMuted;
+  static Color textFieldBg = brandGrayLight;
+  static Color stepperGrey = brandGrayMuted;
+  static Color greyColor = brandGrayMuted;
+  static Color buttonText = brandGrayMuted;
+  static Color greyColor2 = const Color(0xff4F4F4F);
+  static Color profileIconBg = brandGrayLight;
+  static Color bgStepper = brandGrayMuted;
+  static Color locationText = const Color(0xff48484C);
+  static Color greyColor3 = const Color(0xffCBCBCB);
+  static Color greenColor = brandTerracotta;
+  static Color greenBox = brandTerracottaLight;
+  static Color greenBg = brandTerracottaLight;
+  static Color greenText = brandTerracotta;
+  static Color redBg = brandTerracottaLight;
+  static Color redText = brandTerracotta;
+  static Color greenColorBg = brandTerracottaLight;
+  static Color paymentSheetBg = brandGrayLight;
+  static Color currencyBoxBg = brandGrayLight;
+  static Color currencyRed = brandTerracotta;
+  static Color ratingBlack = brandBlack;
+  static Color reviewBg = brandGrayLight;
+  static Color orderBg = brandTerracottaLight;
+  static Color brandColor = brandGrayMuted;
+  static Color qtyColor = brandGrayMuted;
+  static Color orderColorBg = brandGrayLight;
+  static Color arrowColor = brandGrayMuted;
+  static Color divider = brandGrayLight;
+  static Color confirmBookingBg = brandTerracottaLight;
+  static Color paymentDes = brandWhite;
+  static Color paymentDes1 = brandTerracottaLight;
+  static Color couponBox = brandTerracottaSoft;
+  static Color dateBox = brandTerracottaLight;
 
   static List<Color> colorList = [
-    const Color(0xffE6DDF8),
-    const Color(0xffF9FEF4),
-    const Color(0xffE4EDF9),
-    const Color(0xffFEF4F4),
-    const Color(0xffF8E8DD),
-    const Color(0xffF9E4E4),
-    const Color(0xffF9FEF4),
-    const Color(0xffFBE7F4),
-    const Color(0xffF4FBFE),
+    brandTerracottaLight,
+    brandGrayLight,
+    brandWhite,
+    brandTerracottaSoft,
+    brandGrayLight,
+    brandTerracottaLight,
+    brandWhite,
+    brandTerracottaLight,
+    brandGrayLight,
   ];
 }
