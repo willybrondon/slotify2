@@ -113,6 +113,82 @@ class AiConciergeController extends GetxController {
     update([Constant.idProgressView]);
   }
 
+  bool _isVideoPath(String path) {
+    final p = path.toLowerCase();
+    return p.endsWith('.mp4') ||
+        p.endsWith('.mov') ||
+        p.endsWith('.webm') ||
+        p.endsWith('.3gp') ||
+        p.endsWith('.m4v');
+  }
+
+  Future<void> _applyPickedMedia(XFile file) async {
+    if (_isVideoPath(file.path)) {
+      video = file;
+      isVideoMedia = true;
+      image = null;
+      selectImageFile = null;
+    } else {
+      image = file;
+      selectImageFile = File(file.path);
+      isVideoMedia = false;
+      video = null;
+    }
+    captureMode = true;
+    update([Constant.idProgressView]);
+  }
+
+  /// Screenshot / gallery — image or screen recording (share look page)
+  Future<void> onPickScreenshot() async {
+    try {
+      final media = await picker.pickMedia();
+      if (media != null) {
+        await _applyPickedMedia(media);
+      }
+    } catch (e) {
+      log('Error picking screenshot media: $e');
+      Utils.showToast(Get.context!, 'txtCaptureMediaReadError'.tr);
+    }
+  }
+
+  /// Front-camera selfie (share look page)
+  Future<void> onPickSelfie() async {
+    try {
+      final picked = await picker.pickImage(
+        source: ImageSource.camera,
+        preferredCameraDevice: CameraDevice.front,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
+      if (picked != null) {
+        await _applyPickedMedia(picked);
+      }
+    } catch (e) {
+      log('Error taking selfie: $e');
+      Utils.showToast(Get.context!, 'txtCaptureMediaReadError'.tr);
+    }
+  }
+
+  /// Rear-camera photo (share look page)
+  Future<void> onPickPhoto() async {
+    try {
+      final picked = await picker.pickImage(
+        source: ImageSource.camera,
+        preferredCameraDevice: CameraDevice.rear,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
+      if (picked != null) {
+        await _applyPickedMedia(picked);
+      }
+    } catch (e) {
+      log('Error taking photo: $e');
+      Utils.showToast(Get.context!, 'txtCaptureMediaReadError'.tr);
+    }
+  }
+
   /// Pick video from gallery (screen recording, shared clip)
   Future<void> onPickVideo() async {
     try {

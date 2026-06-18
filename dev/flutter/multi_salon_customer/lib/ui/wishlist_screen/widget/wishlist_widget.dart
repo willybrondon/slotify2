@@ -150,11 +150,14 @@ class WishlistSalonItemView extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
+                          final fav =
+                              logic.getFavouriteSalonModel?.favourite?[index];
+                          final salonId = fav?.salonId ?? fav?.id;
+                          if (salonId == null || salonId.isEmpty) return;
                           Get.toNamed(
                             AppRoutes.branchDetail,
                             arguments: [
-                              logic
-                                  .getFavouriteSalonModel?.favourite?[index].id,
+                              salonId,
                               city,
                               latitude,
                               longitude,
@@ -204,13 +207,14 @@ class WishlistSalonItemView extends StatelessWidget {
                                   ),
                                   GestureDetector(
                                     onTap: () {
+                                      final fav = logic
+                                          .getFavouriteSalonModel
+                                          ?.favourite?[index];
                                       logic.onClickSalonLikeButton(
                                         userId: Constant.storage
                                                 .read<String>('userId') ??
                                             "",
-                                        salonId: logic.getFavouriteSalonModel
-                                                ?.favourite?[index].id ??
-                                            "",
+                                        salonId: fav?.salonId ?? fav?.id ?? "",
                                         latitudes: latitude.toString(),
                                         longitudes: longitude.toString(),
                                       );

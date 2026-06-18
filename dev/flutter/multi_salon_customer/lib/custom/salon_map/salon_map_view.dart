@@ -32,6 +32,9 @@ class SalonMapView extends StatefulWidget {
 class _SalonMapViewState extends State<SalonMapView> {
   final MapController _mapController = MapController();
 
+  static const double _mapMarkerSize = 36;
+  static const double _mapMarkerThumb = 32;
+
   @override
   void initState() {
     super.initState();
@@ -270,25 +273,25 @@ class _SalonMapViewState extends State<SalonMapView> {
     final mapMarkers = widget.markers.map((m) {
       return Marker(
         point: LatLng(m.latitude, m.longitude),
-        width: 48,
-        height: 48,
+        width: _mapMarkerSize,
+        height: _mapMarkerSize,
         child: GestureDetector(
           onTap: () => _showSalonSheet(m),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.whiteColor, width: 2),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.whiteColor, width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.blackColor.withOpacity(0.22),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
+                  color: AppColors.blackColor.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
                 ),
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: _salonThumb(m.salon, size: 44),
+              borderRadius: BorderRadius.circular(6),
+              child: _salonThumb(m.salon, size: _mapMarkerThumb),
             ),
           ),
         ),

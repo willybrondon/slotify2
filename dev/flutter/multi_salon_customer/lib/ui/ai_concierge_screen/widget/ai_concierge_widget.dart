@@ -6,9 +6,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
+import 'package:salon_2/services/hair_profile_service.dart';
 import 'package:salon_2/ui/ai_concierge_screen/controller/ai_concierge_controller.dart';
 import 'package:salon_2/ui/ai_concierge_screen/model/ai_concierge_model.dart';
 import 'package:salon_2/utils/app_colors.dart';
+import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -161,6 +163,536 @@ class _CaptureVideoPreviewState extends State<_CaptureVideoPreview> {
   }
 }
 
+class _ShareLookHairProfileStrip extends StatelessWidget {
+  const _ShareLookHairProfileStrip();
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = HairProfileService.instance.load();
+
+    if (!profile.isComplete) {
+      return GestureDetector(
+        onTap: () => Get.toNamed(AppRoutes.hairProfile),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.brandTerracotta.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.brandTerracotta.withOpacity(0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.spa_outlined, color: AppColors.brandTerracotta, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'txtHairProfileIncomplete'.tr,
+                  style: TextStyle(
+                    fontFamily: AppFontFamily.sfProDisplayRegular,
+                    fontSize: 13,
+                    color: AppColors.brandBlack,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios,
+                  size: 14, color: AppColors.brandTerracotta),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final summary = [
+      if (profile.hairType != null) profile.hairType!.tr,
+      if (profile.styleInterest != null) profile.styleInterest!.tr,
+    ].join(' · ');
+
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoutes.hairProfile),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.lineColor),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.check_circle, color: AppColors.brandTerracotta, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '${'txtHairProfileSummary'.tr}: $summary',
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayRegular,
+                  fontSize: 13,
+                  color: AppColors.brandBlack,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              'txtHairProfileEdit'.tr,
+              style: TextStyle(
+                fontFamily: AppFontFamily.sfProDisplayBold,
+                fontSize: 12,
+                color: AppColors.brandTerracotta,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ShareLookUploadButton extends StatelessWidget {
+  const _ShareLookUploadButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.primary = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool primary;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = primary ? AppColors.whiteColor : AppColors.brandBlack;
+    final iconColor = primary ? AppColors.whiteColor : AppColors.brandTerracotta;
+
+    return Material(
+      color: primary ? AppColors.brandTerracotta : AppColors.whiteColor,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: primary
+                  ? AppColors.brandTerracotta
+                  : AppColors.brandTerracotta.withOpacity(0.28),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: iconColor, size: 26),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: fg,
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ShareLookTrustPill extends StatelessWidget {
+  const _ShareLookTrustPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.whiteColor,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.brandTerracotta.withOpacity(0.25)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.4,
+          color: AppColors.brandTerracotta,
+        ),
+      ),
+    );
+  }
+}
+
+/// Share-look page aligned with web mobile `partager-un-look.html`
+class ShareLookCaptureView extends StatelessWidget {
+  const ShareLookCaptureView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<AiConciergeController>(
+      id: Constant.idProgressView,
+      builder: (logic) {
+        final showFullHero = !(logic.fromShare && logic.hasCaptureMedia);
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (showFullHero) ...[
+                Text(
+                  'txtShareLookKicker'.tr,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.8,
+                    color: AppColors.brandTerracotta,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'txtIntentCaptureTitle'.tr,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.brandBlack,
+                    height: 1.15,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'txtShareLookLead'.tr,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: AppColors.grey,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    _socialGlyph('IG'),
+                    const SizedBox(width: 18),
+                    _socialGlyph('TT'),
+                    const SizedBox(width: 18),
+                    _socialGlyph('FB'),
+                    const SizedBox(width: 18),
+                    _socialGlyph('SC'),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'txtShareLookTrustLine'.tr,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF5C3D2E),
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          _ShareLookTrustPill(label: 'txtShareLookPillTresses'.tr),
+                          _ShareLookTrustPill(label: 'txtShareLookPillLocks'.tr),
+                          _ShareLookTrustPill(label: 'txtShareLookPillWigs'.tr),
+                          _ShareLookTrustPill(label: 'txtShareLookPillMen'.tr),
+                          _ShareLookTrustPill(label: 'txtShareLookPillBeauty'.tr),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ] else ...[
+                Text(
+                  _captureHeroTitle(logic),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.brandBlack,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _captureHeroBody(logic),
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.45,
+                    color: AppColors.grey,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              const _ShareLookHairProfileStrip(),
+              const SizedBox(height: 16),
+
+              if (logic.sharedLink != null && logic.sharedLink!.isNotEmpty)
+                _buildLinkHintBanner(logic),
+
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF5C3D2E).withOpacity(0.08),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'txtCapturePrivacy'.tr,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.45,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _ShareLookUploadButton(
+                      icon: Icons.smartphone_outlined,
+                      label: 'txtShareLookBtnScreenshot'.tr,
+                      onTap: logic.onPickScreenshot,
+                    ),
+                    const SizedBox(height: 10),
+                    _ShareLookUploadButton(
+                      icon: Icons.face_outlined,
+                      label: 'txtShareLookBtnSelfie'.tr,
+                      onTap: logic.onPickSelfie,
+                    ),
+                    const SizedBox(height: 10),
+                    _ShareLookUploadButton(
+                      icon: Icons.photo_camera_outlined,
+                      label: 'txtShareLookBtnPhoto'.tr,
+                      onTap: logic.onPickPhoto,
+                      primary: true,
+                    ),
+                    const SizedBox(height: 16),
+                    _ShareLookUploadArea(logic: logic),
+                    if (logic.hasCaptureMedia) ...[
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: logic.isLoading.value
+                              ? null
+                              : () async {
+                                  final userId =
+                                      Constant.storage.read<String>('userId');
+                                  await logic.onAnalyzeSelfieApiCall(
+                                    userId: userId,
+                                    latitude: latitude?.toString(),
+                                    longitude: longitude?.toString(),
+                                    city: city,
+                                  );
+                                },
+                          icon: logic.isLoading.value
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppColors.whiteColor,
+                                    ),
+                                  ),
+                                )
+                              : Icon(Icons.auto_awesome,
+                                  color: AppColors.whiteColor),
+                          label: Text(
+                            logic.isLoading.value
+                                ? 'txtAiConciergeAnalyzing'.tr
+                                : 'txtCaptureBookLook'.tr,
+                            style: TextStyle(
+                              color: AppColors.whiteColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.brandTerracotta,
+                            disabledBackgroundColor:
+                                AppColors.brandTerracotta.withOpacity(0.6),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _socialGlyph(String label) {
+    return Text(
+      label,
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w700,
+        color: AppColors.brandTerracotta.withOpacity(0.85),
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+}
+
+class _ShareLookUploadArea extends StatelessWidget {
+  const _ShareLookUploadArea({required this.logic});
+
+  final AiConciergeController logic;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.whiteColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.brandTerracotta.withOpacity(0.45),
+          width: 1.5,
+        ),
+      ),
+      child: logic.hasCaptureMedia
+          ? _buildPreview()
+          : _buildPlaceholder(),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+      child: Column(
+        children: [
+          Text(
+            'txtShareLookUploadKicker'.tr,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.6,
+              color: AppColors.brandTerracotta,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Icon(Icons.collections_outlined,
+              size: 52, color: AppColors.brandTerracotta.withOpacity(0.75)),
+          const SizedBox(height: 14),
+          Text(
+            'txtShareLookUploadTitle'.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppColors.brandBlack,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'txtShareLookUploadLead'.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.45,
+              color: AppColors.grey,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'txtShareLookUploadHint'.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.grey.withOpacity(0.9),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'txtCaptureScreenRecordSteps'.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              height: 1.4,
+              color: AppColors.brandTerracotta.withOpacity(0.9),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreview() {
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+          child: SizedBox(
+            height: Get.height * 0.32,
+            width: double.infinity,
+            child: logic.isVideoMedia && logic.video != null
+                ? _CaptureVideoPreview(path: logic.video!.path)
+                : Image.file(
+                    logic.selectImageFile!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+          ),
+        ),
+        TextButton.icon(
+          onPressed: logic.clearImage,
+          icon: Icon(Icons.close, color: AppColors.brandTerracotta, size: 18),
+          label: Text(
+            'txtShareLookRemoveMedia'.tr,
+            style: TextStyle(
+              color: AppColors.brandTerracotta,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Main view for image selection and analysis
 class AiConciergeMainView extends StatelessWidget {
   const AiConciergeMainView({super.key});
@@ -170,6 +702,10 @@ class AiConciergeMainView extends StatelessWidget {
     return GetBuilder<AiConciergeController>(
       id: Constant.idProgressView,
       builder: (logic) {
+        if (logic.captureMode) {
+          return const ShareLookCaptureView();
+        }
+
         final capture = logic.captureMode;
         return SingleChildScrollView(
           child: Column(
@@ -553,6 +1089,7 @@ class AiConciergeResultsView extends StatelessWidget {
           Builder(
             builder: (context) {
               final controller = Get.find<AiConciergeController>();
+              final capture = controller.captureMode;
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -564,9 +1101,21 @@ class AiConciergeResultsView extends StatelessWidget {
                           controller.clearImage();
                         },
                         icon: const Icon(Icons.refresh),
-                        label: Text("txtAnalyzeAnother".tr),
+                        label: Text(
+                          capture
+                              ? 'txtShareLookAnalyzeAnother'.tr
+                              : 'txtAnalyzeAnother'.tr,
+                        ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: capture
+                              ? BorderSide(
+                                  color: AppColors.brandTerracotta.withOpacity(0.5),
+                                )
+                              : null,
+                          foregroundColor: capture
+                              ? AppColors.brandTerracotta
+                              : null,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -581,11 +1130,15 @@ class AiConciergeResultsView extends StatelessWidget {
                         },
                         icon: Icon(Icons.home, color: AppColors.whiteColor),
                         label: Text(
-                          "Back to Home",
+                          capture
+                              ? 'txtShareLookBackHome'.tr
+                              : 'Back to Home',
                           style: TextStyle(color: AppColors.whiteColor),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryAppColor,
+                          backgroundColor: capture
+                              ? AppColors.brandTerracotta
+                              : AppColors.primaryAppColor,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -606,6 +1159,7 @@ class AiConciergeResultsView extends StatelessWidget {
   }
 
   Widget _buildAnalysisSection(BeautyAnalysis analysis) {
+    final capture = Get.find<AiConciergeController>().captureMode;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       padding: const EdgeInsets.all(20),
@@ -623,13 +1177,29 @@ class AiConciergeResultsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Beauty Analysis",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.iconAccent,
-            ),
+          Row(
+            children: [
+              Icon(
+                Icons.insights_outlined,
+                color: capture
+                    ? AppColors.brandTerracotta
+                    : AppColors.iconAccent,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                capture
+                    ? 'txtShareLookAnalysisTitle'.tr
+                    : 'Beauty Analysis',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: capture
+                      ? AppColors.brandBlack
+                      : AppColors.iconAccent,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
 
@@ -976,18 +1546,35 @@ class AiConciergeResultsView extends StatelessWidget {
   }
 
   Widget _buildSalonsSection(List<SalonItem> salons) {
+    final capture = Get.find<AiConciergeController>().captureMode;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "txtAiConciergeRecommendedSalons".tr,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.iconAccent,
-            ),
+          Row(
+            children: [
+              Icon(
+                Icons.storefront_outlined,
+                color: capture
+                    ? AppColors.brandTerracotta
+                    : AppColors.iconAccent,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                capture
+                    ? 'txtShareLookSalonsTitle'.tr
+                    : 'txtAiConciergeRecommendedSalons'.tr,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: capture
+                      ? AppColors.brandBlack
+                      : AppColors.iconAccent,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           ...salons.map((salon) => InkWell(

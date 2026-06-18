@@ -38,7 +38,7 @@ class BranchDetailController extends GetxController
 
   /// Optional: "At Salon" | "At Home" — applied on booking screen when user taps Book Now
   String? deepLinkVenuePreference;
-  dynamic args = Get.arguments;
+  dynamic args;
   late List<bool> isBranchSelected = List.generate(
       (getSalonDetailCategory?.salon?.serviceIds?.length ?? 0),
       (index) => false);
@@ -78,6 +78,14 @@ class BranchDetailController extends GetxController
   }
 
   getDataFromArgs() {
+    args = Get.arguments;
+    salonId = null;
+    localCity = null;
+    localLatitude = null;
+    localLongitude = null;
+    deepLinkServiceId = null;
+    deepLinkVenuePreference = null;
+
     if (args != null) {
       if (args[0] != null) {
         salonId = args[0];
@@ -240,6 +248,7 @@ class BranchDetailController extends GetxController
       required double longitude}) async {
     try {
       isLoading(true);
+      getSalonDetailCategory = null;
       update([Constant.idProgressView, Constant.idServiceList]);
 
       final queryParameters = {

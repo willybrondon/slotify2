@@ -4,6 +4,9 @@ import 'package:salon_2/ui/category_salons_discover/controller/category_salons_c
 class CategorySalonsBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<CategorySalonsController>(() => CategorySalonsController());
+    if (Get.isRegistered<CategorySalonsController>()) {
+      Get.delete<CategorySalonsController>(force: true);
+    }
+    Get.put(CategorySalonsController());
   }
 }

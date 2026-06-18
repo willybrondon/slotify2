@@ -448,7 +448,31 @@ final Map<String, String> frCH = {
   "txtCaptureLinkHint":
       "Pour un lien, enregistre l'écran pendant la vidéo (TikTok, Instagram, Snapchat…) puis Partager → Skedisy.",
   "txtCapturePrivacy":
-      "Skedisy analyse uniquement ta photo de coiffure. Aucun accès à tes comptes sociaux.",
+      "Skedisy analyse uniquement ta photo ou vidéo. Aucun accès à tes comptes sociaux.",
+  "txtShareLookKicker": "Île-de-France · Trouve ton look",
+  "txtShareLookLead":
+      "Envoie une capture d'écran, un selfie ou une photo du style qui t'inspire. Skedisy analyse ton look et te propose des salons coiffure afro adaptés en IDF.",
+  "txtShareLookTrustLine":
+      "Salons experts coiffure afro — ouvert à toutes les clientes.",
+  "txtShareLookPillTresses": "Tresses",
+  "txtShareLookPillLocks": "Locks",
+  "txtShareLookPillWigs": "Perruques",
+  "txtShareLookPillMen": "Homme",
+  "txtShareLookPillBeauty": "Esthétique",
+  "txtShareLookBtnScreenshot": "Capture d'écran",
+  "txtShareLookBtnSelfie": "Selfie",
+  "txtShareLookBtnPhoto": "Prendre une photo",
+  "txtShareLookUploadKicker": "Île-de-France · Ton look",
+  "txtShareLookUploadTitle": "Envoie ton look",
+  "txtShareLookUploadLead":
+      "Capture depuis les réseaux, selfie ou photo — on identifie le style et on te propose jusqu'à 4 salons coiffure afro en Île-de-France.",
+  "txtShareLookUploadHint":
+      "JPG, PNG ou vidéo d'écran · max. 10 Mo (photo) / 50 Mo (vidéo)",
+  "txtShareLookRemoveMedia": "Supprimer",
+  "txtShareLookBackHome": "Retour à l'accueil",
+  "txtShareLookAnalysisTitle": "Analyse de ton look",
+  "txtShareLookSalonsTitle": "Salons recommandés",
+  "txtShareLookAnalyzeAnother": "Nouveau look",
   "txtCapturePasteLink": "Coller un lien",
   "txtCaptureImageError": "Impossible de charger l'image partagée.",
   "txtCaptureResultFound": "On a trouvé ce style. Réserve-le ici.",

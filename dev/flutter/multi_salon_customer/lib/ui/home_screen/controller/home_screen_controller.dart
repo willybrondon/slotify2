@@ -648,7 +648,8 @@ class HomeScreenController extends GetxController {
   }) {
     hideIntentSuggestions();
     intentQueryFocusNode.unfocus();
-    if (id == null || name == null) return;
+    final categoryId = id?.toString().trim();
+    if (categoryId == null || categoryId.isEmpty || name == null) return;
     intentQueryController.text = name;
     publicSearchActive = false;
     publicSearchCategoryId = null;
@@ -657,7 +658,11 @@ class HomeScreenController extends GetxController {
     update([Constant.idHomeSearchResults, Constant.idProgressView]);
     Get.toNamed(
       AppRoutes.categorySalons,
-      arguments: [id, name, if (image != null && image.isNotEmpty) image],
+      arguments: [
+        categoryId,
+        name,
+        if (image != null && image.isNotEmpty) image,
+      ],
     );
   }
 

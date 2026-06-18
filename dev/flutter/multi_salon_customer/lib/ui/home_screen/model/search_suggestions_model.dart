@@ -48,10 +48,10 @@ class SuggestCategory {
   }
 
   SuggestCategory.fromJson(dynamic json) {
-    _id = json['_id'];
-    _name = json['name'];
-    _image = json['image'];
-    _url = json['url'];
+    _id = json['_id']?.toString();
+    _name = json['name']?.toString();
+    _image = json['image']?.toString();
+    _url = json['url']?.toString();
   }
 
   String? _id;

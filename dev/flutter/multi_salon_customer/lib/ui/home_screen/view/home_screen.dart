@@ -50,41 +50,63 @@ class HomeScreen extends StatelessWidget {
         body: GetBuilder<HomeScreenController>(
           id: Constant.idProgressView,
           builder: (logic) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 12, 15, 8),
-                  child: const HomeScreenIntentHub(),
-                ),
-                Expanded(
-                  child: GetBuilder<HomeScreenController>(
-                    id: Constant.idHomeSearchResults,
-                    builder: (searchLogic) {
-                      final hasResults = searchLogic.publicSearchActive ||
-                          searchLogic.publicSearchLoading;
+            return GetBuilder<HomeScreenController>(
+              id: Constant.idIntentSearch,
+              builder: (searchLogic) {
+                final showSuggestions = searchLogic.showIntentSuggestions &&
+                    (searchLogic.intentQueryFocusNode.hasFocus ||
+                        searchLogic.loadingIntentSuggestions);
 
-                      if (!hasResults) {
-                        return const SizedBox.shrink();
-                      }
-
-                      return RefreshIndicator(
-                        onRefresh: () => searchLogic.onRefresh(),
-                        color: AppColors.primaryAppColor,
-                        child: ListView(
-                          padding: EdgeInsets.only(
-                            bottom:
-                                MediaQuery.of(context).padding.bottom + 80,
-                          ),
-                          children: const [
-                            HomeSearchResultsSection(),
-                          ],
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 12, 15, 8),
+                      child: HomeScreenIntentHub(
+                        showShareLook: !showSuggestions,
+                      ),
+                    ),
+                    if (showSuggestions)
+                      Expanded(
+                        child: ColoredBox(
+                          color: AppColors.whiteColor,
+                          child: const HomeIntentSuggestionsPanel(),
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+                      )
+                    else
+                      Expanded(
+                        child: GetBuilder<HomeScreenController>(
+                          id: Constant.idHomeSearchResults,
+                          builder: (resultsLogic) {
+                            final hasResults =
+                                resultsLogic.publicSearchActive ||
+                                    resultsLogic.publicSearchLoading;
+
+                            if (!hasResults) {
+                              return const SizedBox.shrink();
+                            }
+
+                            return RefreshIndicator(
+                              onRefresh: () => resultsLogic.onRefresh(),
+                              color: AppColors.primaryAppColor,
+                              child: ListView(
+                                padding: EdgeInsets.only(
+                                  bottom: MediaQuery.of(context)
+                                          .padding
+                                          .bottom +
+                                      80,
+                                ),
+                                children: const [
+                                  HomeSearchResultsSection(),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                );
+              },
             );
           },
         ),

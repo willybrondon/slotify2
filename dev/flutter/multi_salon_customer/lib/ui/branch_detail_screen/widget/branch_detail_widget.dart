@@ -17,6 +17,17 @@ import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 
+List<Widget> _terracottaRatingStars(num rating, {double size = 16}) {
+  final filled = rating.round().clamp(0, 5);
+  return List.generate(5, (i) {
+    return Icon(
+      i < filled ? Icons.star : Icons.star_border,
+      size: size,
+      color: AppColors.brandTerracotta,
+    );
+  });
+}
+
 // QR Code Dialog
 void _showQRCodeDialog(BuildContext context, BranchDetailController logic) {
   showDialog(
@@ -420,7 +431,7 @@ class BranchDetailDataView extends StatelessWidget {
                       AppAsset.icStarFilled,
                       height: 18,
                       width: 18,
-                      color: AppColors.brandBlack,
+                      color: AppColors.brandTerracotta,
                     ).paddingOnly(right: 12),
                     RichText(
                       text: TextSpan(
@@ -446,99 +457,6 @@ class BranchDetailDataView extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Enhanced action buttons with better design
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          logic.launchMaps();
-                        },
-                        child: Container(
-                          height: 52,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: AppColors.appText,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.blackColor.withOpacity(0.15),
-                                offset: const Offset(0, 4),
-                                blurRadius: 12,
-                                spreadRadius: 0,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                AppAsset.icDirection,
-                                height: 24,
-                                width: 24,
-                                color: AppColors.whiteColor,
-                              ).paddingOnly(right: 12),
-                              Text(
-                                "txtDirection".tr,
-                                style: TextStyle(
-                                  color: AppColors.whiteColor,
-                                  fontFamily: AppFontFamily.heeBo600,
-                                  fontSize: 17,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          logic.makingPhoneCall();
-                        },
-                        child: Container(
-                          height: 52,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: AppColors.appText,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.blackColor.withOpacity(0.15),
-                                offset: const Offset(0, 4),
-                                blurRadius: 12,
-                                spreadRadius: 0,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                AppAsset.icCall,
-                                height: 24,
-                                width: 24,
-                                color: AppColors.whiteColor,
-                              ).paddingOnly(right: 12),
-                              Text(
-                                "txtCallSalon".tr,
-                                style: TextStyle(
-                                  color: AppColors.whiteColor,
-                                  fontFamily: AppFontFamily.heeBo600,
-                                  fontSize: 17,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                     ),
                   ],
@@ -1422,71 +1340,41 @@ class BranchDetailTabBarReviewView extends StatelessWidget {
                       child: Column(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "${logic.getSalonDetailCategory?.reviews?[index].userId?.fname} ${logic.getSalonDetailCategory?.reviews?[index].userId?.lname}",
-                                style: TextStyle(
-                                  fontFamily: AppFontFamily.heeBo700,
-                                  fontSize: 18,
-                                  color: AppColors.appText,
+                              Expanded(
+                                child: Text(
+                                  "${logic.getSalonDetailCategory?.reviews?[index].userId?.fname} ${logic.getSalonDetailCategory?.reviews?[index].userId?.lname}",
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.heeBo700,
+                                    fontSize: 18,
+                                    color: AppColors.appText,
+                                  ),
                                 ),
                               ),
-                              Container(
-                                width: Get.width * 0.14,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 5,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(6),
-                                  color: AppColors.oceanBlue.withOpacity(0.30),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      (logic
-                                                      .getSalonDetailCategory
-                                                      ?.reviews?[index]
-                                                      .rating ??
-                                                  0) >=
-                                              4
-                                          ? AppAsset.icGreenStar
-                                          : AppAsset.icRedStar,
-                                      height: 15,
-                                      width: 15,
-                                      color: (logic
-                                                      .getSalonDetailCategory
-                                                      ?.reviews?[index]
-                                                      .rating ??
-                                                  0) >=
-                                              4
-                                          ? AppColors.blackColor
-                                          : null,
-                                      colorBlendMode: (logic
-                                                      .getSalonDetailCategory
-                                                      ?.reviews?[index]
-                                                      .rating ??
-                                                  0) >=
-                                              4
-                                          ? BlendMode.srcIn
-                                          : null,
+                              const SizedBox(width: 8),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ..._terracottaRatingStars(
+                                    logic.getSalonDetailCategory?.reviews?[index]
+                                            .rating ??
+                                        0,
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    "${logic.getSalonDetailCategory?.reviews?[index].rating}",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayBold,
+                                      fontSize: 15,
+                                      color: AppColors.brandTerracotta,
                                     ),
-                                    SizedBox(width: Get.width * 0.02),
-                                    Text(
-                                      "${logic.getSalonDetailCategory?.reviews?[index].rating}",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontFamily:
-                                            AppFontFamily.sfProDisplayBold,
-                                        fontSize: 15,
-                                        color: AppColors.blackColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

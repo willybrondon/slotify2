@@ -31,8 +31,8 @@ class CategorySalonsController extends GetxController {
     super.onInit();
     final args = Get.arguments;
     if (args is List && args.length >= 2) {
-      categoryId = args[0]?.toString() ?? '';
-      categoryName = args[1]?.toString() ?? '';
+      categoryId = args[0]?.toString().trim() ?? '';
+      categoryName = args[1]?.toString().trim() ?? '';
       if (args.length >= 3) {
         final img = args[2]?.toString();
         if (img != null && img.trim().isNotEmpty) {

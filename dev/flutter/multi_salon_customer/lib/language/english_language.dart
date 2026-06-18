@@ -440,7 +440,31 @@ final Map<String, String> enUS = {
   "txtCaptureLinkHint":
       "For a link, screen-record the video (TikTok, Instagram, Snapchat…) then Share → Skedisy.",
   "txtCapturePrivacy":
-      "Skedisy only analyzes your hairstyle photo. We never access your social accounts.",
+      "Skedisy only analyzes your photo or video. We never access your social accounts.",
+  "txtShareLookKicker": "Île-de-France · Find your look",
+  "txtShareLookLead":
+      "Send a screenshot, selfie or photo of the style you want. Skedisy analyzes your look and suggests matching Afro hair salons in IDF.",
+  "txtShareLookTrustLine":
+      "Expert Afro hair salons — open to all clients.",
+  "txtShareLookPillTresses": "Braids",
+  "txtShareLookPillLocks": "Locks",
+  "txtShareLookPillWigs": "Wigs",
+  "txtShareLookPillMen": "Men",
+  "txtShareLookPillBeauty": "Beauty",
+  "txtShareLookBtnScreenshot": "Screenshot",
+  "txtShareLookBtnSelfie": "Selfie",
+  "txtShareLookBtnPhoto": "Take a photo",
+  "txtShareLookUploadKicker": "Île-de-France · Your look",
+  "txtShareLookUploadTitle": "Send your look",
+  "txtShareLookUploadLead":
+      "Screenshot from social, selfie or photo — we identify the style and suggest up to 4 Afro hair salons in Île-de-France.",
+  "txtShareLookUploadHint":
+      "JPG, PNG or screen video · max. 10 MB (photo) / 50 MB (video)",
+  "txtShareLookRemoveMedia": "Remove",
+  "txtShareLookBackHome": "Back to home",
+  "txtShareLookAnalysisTitle": "Your look analysis",
+  "txtShareLookSalonsTitle": "Recommended salons",
+  "txtShareLookAnalyzeAnother": "New look",
   "txtCapturePasteLink": "Paste a link",
   "txtCaptureImageError": "Could not load the shared image.",
   "txtCaptureResultFound": "We found this style. Book it here.",

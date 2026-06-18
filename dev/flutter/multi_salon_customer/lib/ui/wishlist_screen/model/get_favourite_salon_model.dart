@@ -58,6 +58,7 @@ String favouriteToJson(Favourite data) => json.encode(data.toJson());
 class Favourite {
   Favourite({
     String? id,
+    String? salonId,
     String? createdAt,
     String? salonName,
     String? mainImage,
@@ -68,6 +69,7 @@ class Favourite {
     num? distance,
   }) {
     _id = id;
+    _salonId = salonId;
     _createdAt = createdAt;
     _salonName = salonName;
     _mainImage = mainImage;
@@ -79,7 +81,8 @@ class Favourite {
   }
 
   Favourite.fromJson(dynamic json) {
-    _id = json['_id'];
+    _id = json['_id']?.toString();
+    _salonId = json['salonId']?.toString();
     _createdAt = json['createdAt'];
     _salonName = json['salonName'];
     _mainImage = json['mainImage'];
@@ -90,6 +93,7 @@ class Favourite {
     _distance = json['distance'];
   }
   String? _id;
+  String? _salonId;
   String? _createdAt;
   String? _salonName;
   String? _mainImage;
@@ -100,6 +104,7 @@ class Favourite {
   num? _distance;
   Favourite copyWith({
     String? id,
+    String? salonId,
     String? createdAt,
     String? salonName,
     String? mainImage,
@@ -111,6 +116,7 @@ class Favourite {
   }) =>
       Favourite(
         id: id ?? _id,
+        salonId: salonId ?? _salonId,
         createdAt: createdAt ?? _createdAt,
         salonName: salonName ?? _salonName,
         mainImage: mainImage ?? _mainImage,
@@ -121,6 +127,7 @@ class Favourite {
         distance: distance ?? _distance,
       );
   String? get id => _id;
+  String? get salonId => _salonId;
   String? get createdAt => _createdAt;
   String? get salonName => _salonName;
   String? get mainImage => _mainImage;
@@ -133,6 +140,7 @@ class Favourite {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['_id'] = _id;
+    map['salonId'] = _salonId;
     map['createdAt'] = _createdAt;
     map['salonName'] = _salonName;
     map['mainImage'] = _mainImage;
