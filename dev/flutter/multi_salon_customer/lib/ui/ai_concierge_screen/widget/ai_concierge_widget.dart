@@ -180,10 +180,13 @@ class AiConciergeMainView extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: capture
-                      ? const Color(0xFF1A1A1A)
-                      : AppColors.whiteColor,
+                  color: AppColors.whiteColor,
                   borderRadius: BorderRadius.circular(16),
+                  border: capture
+                      ? Border.all(
+                          color: AppColors.brandTerracotta.withOpacity(0.2),
+                        )
+                      : null,
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.blackColor.withOpacity(0.05),
@@ -210,9 +213,7 @@ class AiConciergeMainView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: logic.captureMode
-                            ? AppColors.brandWhite
-                            : AppColors.primaryTextColor,
+                        color: AppColors.primaryTextColor,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -221,9 +222,7 @@ class AiConciergeMainView extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
-                        color: capture
-                            ? AppColors.whiteColor.withOpacity(0.72)
-                            : AppColors.grey,
+                        color: AppColors.grey,
                       ),
                     ),
                   ],
@@ -244,9 +243,7 @@ class AiConciergeMainView extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: capture
-                        ? AppColors.whiteColor.withOpacity(0.55)
-                        : AppColors.grey.withOpacity(0.9),
+                    color: AppColors.grey.withOpacity(0.9),
                   ),
                 ),
               ),

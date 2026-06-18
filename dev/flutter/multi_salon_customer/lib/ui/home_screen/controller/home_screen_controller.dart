@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -23,6 +24,7 @@ import 'package:salon_2/ui/home_screen/model/get_all_salon_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_new_product_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_trending_product_model.dart';
 import 'package:salon_2/ui/product_screen/model/get_product_category_model.dart';
+import 'package:salon_2/ui/home_screen/model/public_search_salon_model.dart';
 import 'package:salon_2/ui/home_screen/model/search_suggestions_model.dart';
 import 'package:salon_2/ui/search_screen/model/get_all_service_model.dart';
 import 'package:salon_2/ui/home_screen/model/get_service_base_salon_model.dart';
@@ -94,6 +96,19 @@ class HomeScreenController extends GetxController {
   SearchSuggestionsModel? searchSuggestions;
   bool showIntentSuggestions = false;
   bool loadingIntentSuggestions = false;
+
+  List<PublicSearchSalon> publicSearchSalons = [];
+  List<PublicSearchSalon> publicSearchSalonsRaw = [];
+  int publicSearchTotalReviews = 0;
+  String? publicSearchCity;
+  String? publicSearchCategoryId;
+  String? publicSearchCategoryName;
+  bool publicSearchActive = false;
+  bool publicSearchLoading = false;
+  bool publicSearchMapView = false;
+  bool showPublicSearchFilters = false;
+  double publicSearchMinRating = 0;
+  String publicSearchSort = 'distance';
 
   // CartScreenController cartScreenController = Get.put(CartScreenController());
 
@@ -192,7 +207,288 @@ class HomeScreenController extends GetxController {
       intentLocationController.text = city!.trim();
     }
 
+    await refreshLocationAndSync();
+
     super.onInit();
+  }
+
+  static const _locationStorageKey = 'skedisy-location-label';
+
+  String get locationLabel {
+    if (city != null && city!.trim().isNotEmpty) return city!.trim();
+    if (intentLocationController.text.trim().isNotEmpty) {
+      return intentLocationController.text.trim();
+    }
+    return '';
+  }
+
+  Future<void> refreshLocationAndSync({bool forceGps = false}) async {
+    try {
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.denied ||
+          perm == LocationPermission.deniedForever) {
+        final saved = Constant.storage.read<String>(_locationStorageKey);
+        if (saved != null && saved.trim().isNotEmpty) {
+          city = saved.trim();
+          intentLocationController.text = saved.trim();
+        }
+        update([Constant.idIntentSearch]);
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      latitude = pos.latitude;
+      longitude = pos.longitude;
+      position = pos;
+
+      try {
+        final placemarks = await placemarkFromCoordinates(
+          pos.latitude,
+          pos.longitude,
+        );
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          final resolved = (p.locality ??
+                  p.subAdministrativeArea ??
+                  p.administrativeArea ??
+                  '')
+              .trim();
+          if (resolved.isNotEmpty) {
+            city = resolved;
+            intentLocationController.text = resolved;
+            Constant.storage.write(_locationStorageKey, resolved);
+          } else if (forceGps) {
+            final near = 'txtNearYou'.tr;
+            city = near;
+            intentLocationController.text = near;
+            Constant.storage.write(_locationStorageKey, near);
+          }
+        }
+      } catch (e) {
+        log('Reverse geocode failed :: $e');
+      }
+
+      update([Constant.idIntentSearch, Constant.idHomeSearchResults]);
+    } catch (e) {
+      log('refreshLocationAndSync :: $e');
+      final saved = Constant.storage.read<String>(_locationStorageKey);
+      if (saved != null && saved.trim().isNotEmpty) {
+        city = saved.trim();
+        intentLocationController.text = saved.trim();
+        update([Constant.idIntentSearch]);
+      }
+    }
+  }
+
+  void setPublicSearchLocation(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return;
+    city = trimmed;
+    intentLocationController.text = trimmed;
+    Constant.storage.write(_locationStorageKey, trimmed);
+    update([Constant.idIntentSearch, Constant.idHomeSearchResults]);
+    if (publicSearchActive) {
+      onPublicSearchSalonsApiCall();
+    }
+  }
+
+  void setPublicSearchMapView(bool value) {
+    publicSearchMapView = value;
+    update([Constant.idHomeSearchResults]);
+  }
+
+  void togglePublicSearchFilters() {
+    showPublicSearchFilters = !showPublicSearchFilters;
+    update([Constant.idHomeSearchResults]);
+  }
+
+  void setPublicSearchMinRating(double value) {
+    publicSearchMinRating = value;
+    update([Constant.idHomeSearchResults]);
+    if (publicSearchCategoryId != null) {
+      _applyPublicSearchClientFilters();
+    } else {
+      onPublicSearchSalonsApiCall();
+    }
+  }
+
+  void setPublicSearchSort(String value) {
+    publicSearchSort = value;
+    update([Constant.idHomeSearchResults]);
+    if (publicSearchCategoryId != null) {
+      _applyPublicSearchClientFilters();
+    } else {
+      onPublicSearchSalonsApiCall();
+    }
+  }
+
+  void _clearCategoryBrowse() {
+    publicSearchCategoryId = null;
+    publicSearchCategoryName = null;
+    publicSearchSalonsRaw = [];
+  }
+
+  void _applyPublicSearchClientFilters() {
+    var list = List<PublicSearchSalon>.from(publicSearchSalonsRaw);
+    if (publicSearchMinRating > 0) {
+      list = list.where((s) => s.review >= publicSearchMinRating).toList();
+    }
+    if (publicSearchSort == 'rating') {
+      list.sort((a, b) => b.review.compareTo(a.review));
+    } else if (publicSearchSort == 'reviews') {
+      list.sort((a, b) => b.reviewCount.compareTo(a.reviewCount));
+    } else {
+      list.sort((a, b) {
+        final da = a.distance ?? double.infinity;
+        final db = b.distance ?? double.infinity;
+        return da.compareTo(db);
+      });
+    }
+    publicSearchSalons = list;
+    publicSearchTotalReviews =
+        list.fold<int>(0, (sum, s) => sum + s.reviewCount);
+    update([Constant.idHomeSearchResults, Constant.idProgressView]);
+  }
+
+  String formatPublicSearchStats() {
+    final count = publicSearchSalons.length;
+    final isFr = Get.locale?.languageCode == 'fr';
+    final salonWord = isFr
+        ? (count > 1 ? 'salons' : 'salon')
+        : (count == 1 ? 'salon' : 'salons');
+    final reviewWord = isFr ? 'avis' : (publicSearchTotalReviews == 1 ? 'review' : 'reviews');
+    return '$count $salonWord · $publicSearchTotalReviews $reviewWord';
+  }
+
+  Future<void> onPublicSearchSalonsApiCall() async {
+    _clearCategoryBrowse();
+    final query = intentQueryController.text.trim();
+    final location = locationLabel;
+
+    if (query.isEmpty && location.isEmpty) {
+      publicSearchActive = false;
+      publicSearchSalons = [];
+      update([Constant.idHomeSearchResults, Constant.idProgressView]);
+      return;
+    }
+
+    try {
+      publicSearchLoading = true;
+      publicSearchActive = true;
+      update([Constant.idHomeSearchResults, Constant.idProgressView]);
+
+      final languageCode = Get.locale?.languageCode ?? 'fr';
+      final params = <String, String>{
+        'language': languageCode,
+        if (query.isNotEmpty) 'q': query,
+        if (location.isNotEmpty && location != 'txtNearYou'.tr) 'location': location,
+        if (latitude != null) 'latitude': latitude.toString(),
+        if (longitude != null) 'longitude': longitude.toString(),
+        if (publicSearchMinRating > 0) 'minRating': publicSearchMinRating.toString(),
+        'sort': publicSearchSort,
+      };
+
+      final url = Uri.parse(
+        ApiConstant.BASE_URL + ApiConstant.searchSalonsPublic,
+      ).replace(queryParameters: params);
+
+      final response = await http.get(
+        url,
+        headers: {
+          'key': ApiConstant.SECRET_KEY,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final parsed = publicSearchSalonsResponseFromJson(response.body);
+        publicSearchSalons = parsed.salons;
+        publicSearchSalonsRaw = [];
+        publicSearchTotalReviews = parsed.totalReviews;
+        publicSearchCity = parsed.searchCity;
+      } else {
+        publicSearchSalons = [];
+        publicSearchTotalReviews = 0;
+        publicSearchCity = null;
+      }
+    } catch (e) {
+      log('onPublicSearchSalonsApiCall :: $e');
+      publicSearchSalons = [];
+    } finally {
+      publicSearchLoading = false;
+      update([Constant.idHomeSearchResults, Constant.idProgressView]);
+    }
+  }
+
+  Future<void> onPublicSalonsByCategoryApiCall(
+    String categoryId, {
+    String? categoryName,
+    String? search,
+  }) async {
+    try {
+      publicSearchLoading = true;
+      publicSearchActive = true;
+      publicSearchCategoryId = categoryId;
+      publicSearchCategoryName = categoryName;
+      update([Constant.idHomeSearchResults, Constant.idProgressView]);
+
+      final languageCode = Get.locale?.languageCode ?? 'fr';
+      final params = <String, String>{
+        'categoryId': categoryId,
+        'language': languageCode,
+        'limit': '50',
+        if (search != null && search.trim().isNotEmpty) 'search': search.trim(),
+        if (latitude != null) 'latitude': latitude.toString(),
+        if (longitude != null) 'longitude': longitude.toString(),
+      };
+
+      final url = Uri.parse(
+        ApiConstant.BASE_URL + ApiConstant.salonsByCategory,
+      ).replace(queryParameters: params);
+
+      final response = await http.get(
+        url,
+        headers: {
+          'key': ApiConstant.SECRET_KEY,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        if (data['status'] == true) {
+          final salonsJson = data['salons'] as List<dynamic>? ?? [];
+          publicSearchSalonsRaw = salonsJson
+              .map((s) => PublicSearchSalon.fromJson(s as Map<String, dynamic>))
+              .toList();
+          publicSearchTotalReviews =
+              (data['totalReviews'] as num?)?.toInt() ?? 0;
+          publicSearchCity = data['searchCity'] as String?;
+          final cat = data['category'] as Map<String, dynamic>?;
+          if (cat != null && (cat['name'] as String?)?.isNotEmpty == true) {
+            publicSearchCategoryName = cat['name'] as String;
+          }
+          _applyPublicSearchClientFilters();
+          return;
+        }
+      }
+      publicSearchSalonsRaw = [];
+      publicSearchSalons = [];
+      publicSearchTotalReviews = 0;
+      publicSearchCity = null;
+    } catch (e) {
+      log('onPublicSalonsByCategoryApiCall :: $e');
+      publicSearchSalonsRaw = [];
+      publicSearchSalons = [];
+    } finally {
+      publicSearchLoading = false;
+      update([Constant.idHomeSearchResults, Constant.idProgressView]);
+    }
   }
 
   void _maybePromptHairProfile() {
@@ -312,32 +608,26 @@ class HomeScreenController extends GetxController {
 
   Future<void> submitIntentSearch() async {
     final query = intentQueryController.text.trim();
-    final location = intentLocationController.text.trim().isNotEmpty
-        ? intentLocationController.text.trim()
-        : (city ?? '').trim();
+    final location = locationLabel;
 
-    if (query.isEmpty && location.isEmpty) return;
+    if (query.isEmpty && location.isEmpty) {
+      publicSearchMapView = true;
+      await onPublicSearchSalonsApiCall();
+      return;
+    }
 
     hideIntentSuggestions();
     intentQueryFocusNode.unfocus();
 
-    searchEditingController.text = query;
-    if (location.isNotEmpty) {
-      city = location;
-    }
+    await onPublicSearchSalonsApiCall();
+  }
 
-    await Get.toNamed(AppRoutes.search);
-
-    if (query.isNotEmpty) {
-      await printLatestValue(query);
-    } else if (location.isNotEmpty) {
-      await onGetAllSalonApiCall(
-        latitude: latitude ?? 0.0,
-        longitude: longitude ?? 0.0,
-        userId: Constant.storage.read<String>('userId') ?? "",
-        search: location,
-      );
-      update([Constant.idSearchService, Constant.idProgressView]);
+  Future<void> openPublicSearchMap() async {
+    publicSearchMapView = true;
+    if (!publicSearchActive) {
+      await onPublicSearchSalonsApiCall();
+    } else {
+      update([Constant.idHomeSearchResults]);
     }
   }
 
@@ -351,7 +641,8 @@ class HomeScreenController extends GetxController {
     hideIntentSuggestions();
     intentQueryFocusNode.unfocus();
     if (id == null || name == null) return;
-    Get.toNamed(AppRoutes.categoryDetail, arguments: [id, name]);
+    intentQueryController.text = name;
+    onPublicSalonsByCategoryApiCall(id, categoryName: name);
   }
 
   void onExpertPagination() async {
@@ -379,6 +670,7 @@ class HomeScreenController extends GetxController {
     isNewProductSaved = [];
     isSalonSaved = [];
 
+    await refreshLocationAndSync();
     await onGetTrendingProductApiCall();
     await onGetNewProductApiCall();
     await onGetAllSalonApiCall(
@@ -404,6 +696,16 @@ class HomeScreenController extends GetxController {
     await onGetAllExpertApiCall(
         start: startExpert.toString(), limit: limitExpert.toString());
     await onGetAllServiceApiCall(city: city ?? "");
+    if (publicSearchActive) {
+      if (publicSearchCategoryId != null) {
+        await onPublicSalonsByCategoryApiCall(
+          publicSearchCategoryId!,
+          categoryName: publicSearchCategoryName,
+        );
+      } else {
+        await onPublicSearchSalonsApiCall();
+      }
+    }
     update([
       Constant.idProgressView,
       Constant.idSearchService,

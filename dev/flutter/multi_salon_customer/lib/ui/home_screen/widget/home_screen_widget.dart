@@ -220,9 +220,7 @@ class _HomeLocationChip extends StatelessWidget {
     ).then((_) {
       final value = controller.text.trim();
       if (value.isEmpty) return;
-      logic.intentLocationController.text = value;
-      city = value;
-      logic.update([Constant.idIntentSearch, Constant.idProgressView]);
+      logic.setPublicSearchLocation(value);
     });
   }
 }
@@ -376,15 +374,70 @@ class HomeScreenIntentHub extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _IntentSearchBar(),
-        SizedBox(height: 10),
-        Divider(height: 1, thickness: 1, color: Color(0xFFE8E8E8)),
-        SizedBox(height: 10),
-        _IntentShareLookCard(),
+        Text(
+          'txtIntentHubTitle'.tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 22,
+            height: 1.15,
+            color: AppColors.blackColor,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'txtIntentHubEssence'.tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayMedium,
+            fontSize: 13,
+            height: 1.35,
+            color: AppColors.primaryAppColor,
+          ),
+        ),
+        const SizedBox(height: 10),
+        const _HomeSearchMapRow(),
+        const SizedBox(height: 10),
+        const _IntentSearchBar(),
+        const SizedBox(height: 10),
+        const Divider(height: 1, thickness: 1, color: Color(0xFFE8E8E8)),
+        const SizedBox(height: 10),
+        const _IntentShareLookCard(),
       ],
+    );
+  }
+}
+
+class _HomeSearchMapRow extends StatelessWidget {
+  const _HomeSearchMapRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: GetBuilder<HomeScreenController>(
+        id: Constant.idHomeSearchResults,
+        builder: (logic) {
+          return TextButton.icon(
+            onPressed: logic.openPublicSearchMap,
+            icon: Icon(Icons.map_outlined, size: 18, color: AppColors.iconAccent),
+            label: Text(
+              'txtViewMap'.tr,
+              style: TextStyle(
+                fontFamily: AppFontFamily.sfProDisplayMedium,
+                fontSize: 13,
+                color: AppColors.iconAccent,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -397,10 +450,10 @@ class _IntentShareLookCard extends StatelessWidget {
     return _IntentDoorCard(
       icon: Icons.ios_share_rounded,
       title: 'txtIntentCaptureTitle'.tr,
-      body: 'txtIntentCaptureBody'.tr,
+      body: '',
       accent: AppColors.primaryAppColor,
       filled: true,
-      compact: false,
+      compact: true,
       onTap: () => Get.toNamed(
         AppRoutes.aiConcierge,
         arguments: <String, dynamic>{'captureMode': true},
@@ -430,12 +483,12 @@ class _IntentSearchBar extends StatelessWidget {
       builder: (logic) {
         final categories = _filterByQuery(
           logic.searchSuggestions?.categories,
-          (c) => c.name,
+          (c) => c.name ?? '',
           logic.intentQueryController.text,
         ).take(5).toList();
         final services = _filterByQuery(
           logic.searchSuggestions?.services,
-          (s) => s.name,
+          (s) => s.name ?? '',
           logic.intentQueryController.text,
         ).take(10).toList();
         final showPanel = logic.showIntentSuggestions &&
@@ -719,18 +772,20 @@ class _IntentDoorCard extends StatelessWidget {
                       color: titleColor,
                     ),
                   ),
-                  SizedBox(height: compact ? 2 : 4),
-                  Text(
-                    body,
-                    maxLines: compact ? 3 : null,
-                    overflow: compact ? TextOverflow.ellipsis : null,
-                    style: TextStyle(
-                      fontFamily: AppFontFamily.sfProDisplayRegular,
-                      fontSize: compact ? 11.5 : 12.5,
-                      height: 1.35,
-                      color: bodyColor,
+                  if (body.trim().isNotEmpty) ...[
+                    SizedBox(height: compact ? 2 : 4),
+                    Text(
+                      body,
+                      maxLines: compact ? 3 : null,
+                      overflow: compact ? TextOverflow.ellipsis : null,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplayRegular,
+                        fontSize: compact ? 11.5 : 12.5,
+                        height: 1.35,
+                        color: bodyColor,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

@@ -467,7 +467,20 @@ final Map<String, String> frCH = {
   "txtCaptureMediaReadError": "Impossible de lire le fichier. Réessaie.",
   "txtCaptureScreenRecordSteps":
       "Sur TikTok ou Instagram : lis la vidéo → enregistre l'écran → Partager → Skedisy.",
-  "txtIntentHubTitle": "Réserve ta coiffure en IDF",
+  "txtIntentHubTitle": "Réserve ta beauté afro en IDF",
+  "txtIntentHubEssence":
+      "Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.",
+  "txtNearYou": "Près de vous",
+  "txtFilter": "Filtrer",
+  "txtFilterAll": "Tous",
+  "txtFilterRating": "Note minimum",
+  "txtFilterSort": "Trier par",
+  "txtSortDistance": "Distance",
+  "txtSortRating": "Note",
+  "txtSortReviews": "Avis",
+  "txtSearchInCityTpl": "Salons trouvés dans __CITY__",
+  "txtCategorySalonsTitle": "Salons afro — __CAT__",
+  "txtCategoryServiceSearchHint": "Filtrer les prestations…",
   "txtIntentCaptureTitle": "Partager un look",
   "txtIntentCaptureBody":
       "Capture d'écran sur Instagram, TikTok, Facebook ou Snapchat → Partager → Skedisy. On te propose des salons adaptés à ton look.",

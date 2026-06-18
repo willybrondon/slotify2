@@ -183,37 +183,47 @@ class CategoryDetailScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                Get.toNamed(AppRoutes.search);
-                              },
-                              child: Container(
-                                height: 55,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: AppColors.whiteColor,
-                                    boxShadow: Constant.boxShadow),
-                                child: Row(
-                                  children: [
-                                    Image.asset(
-                                      AppAsset.icSearch,
-                                      height: 23,
-                                      width: 23,
-                                    ).paddingOnly(left: 10, right: 10),
-                                    Text(
-                                      "txtSearchServices".tr,
-                                      style: TextStyle(
-                                          color: AppColors.darkGrey
-                                              .withOpacity(0.7),
-                                          fontSize: 13.8,
-                                          fontFamily:
-                                              AppFontFamily.sfProDisplayMedium),
-                                    ),
-                                  ],
+                            Container(
+                              height: 55,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: AppColors.whiteColor,
+                                boxShadow: Constant.boxShadow,
+                              ),
+                              child: TextField(
+                                controller: logic.categoryDetailEditingController,
+                                onChanged: (_) =>
+                                    logic.update([Constant.idServiceList]),
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.sfProDisplayMedium,
+                                  fontSize: 13.8,
+                                  color: AppColors.blackColor,
                                 ),
-                              ).paddingOnly(top: 10),
-                            ),
+                                decoration: InputDecoration(
+                                  prefixIcon: Padding(
+                                    padding: const EdgeInsets.all(14),
+                                    child: Image.asset(
+                                      AppAsset.icSearch,
+                                      height: 21,
+                                      width: 21,
+                                      color: AppColors.darkGrey,
+                                    ),
+                                  ),
+                                  hintText: 'txtCategoryServiceSearchHint'.tr,
+                                  hintStyle: TextStyle(
+                                    color: AppColors.darkGrey.withOpacity(0.7),
+                                    fontSize: 13.8,
+                                    fontFamily:
+                                        AppFontFamily.sfProDisplayMedium,
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                ),
+                              ),
+                            ).paddingOnly(top: 10),
                             SizedBox(height: Get.height * 0.02),
                             Text(
                               "txtServices".tr,
@@ -227,9 +237,8 @@ class CategoryDetailScreen extends StatelessWidget {
                             GetBuilder<CategoryDetailController>(
                               id: Constant.idServiceList,
                               builder: (logic) {
-                                return logic.getServiceCategory?.services
-                                            ?.isEmpty ??
-                                        true
+                                final filtered = logic.filteredServices;
+                                return filtered.isEmpty
                                     ? Center(
                                         child: Column(
                                           children: [
@@ -253,36 +262,36 @@ class CategoryDetailScreen extends StatelessWidget {
                                       )
                                     : AnimationLimiter(
                                         child: ListView.separated(
-                                          itemCount: logic.getServiceCategory
-                                                  ?.services?.length ??
-                                              0,
+                                          itemCount: filtered.length,
                                           shrinkWrap: true,
                                           padding: EdgeInsets.zero,
                                           physics:
                                               const NeverScrollableScrollPhysics(),
                                           itemBuilder: (context, index) {
+                                            final service = filtered[index];
+                                            final origIndex =
+                                                logic.serviceIndexOf(service);
+                                            if (origIndex < 0) {
+                                              return const SizedBox.shrink();
+                                            }
                                             return AnimationConfiguration
                                                 .staggeredGrid(
                                               position: index,
                                               duration: const Duration(
                                                   milliseconds: 800),
-                                              columnCount: logic
-                                                      .getServiceCategory
-                                                      ?.services
-                                                      ?.length ??
-                                                  0,
+                                              columnCount: filtered.length,
                                               child: SlideAnimation(
                                                 child: FadeInAnimation(
                                                   child: GestureDetector(
                                                     onTap: () {
                                                       if (logic.isCategorySelected[
-                                                              index] ==
+                                                              origIndex] ==
                                                           true) {
                                                         logic.onCheckBoxClick(
-                                                            false, index);
+                                                            false, origIndex);
                                                       } else {
                                                         logic.onCheckBoxClick(
-                                                            true, index);
+                                                            true, origIndex);
                                                       }
                                                     },
                                                     child: Container(
@@ -339,7 +348,7 @@ class CategoryDetailScreen extends StatelessWidget {
                                                                   child:
                                                                       CachedNetworkImage(
                                                                     imageUrl:
-                                                                        "${logic.getServiceCategory?.services?[index].image}",
+                                                                        service.image ?? "",
                                                                     fit: BoxFit
                                                                         .cover,
                                                                     placeholder:
@@ -376,11 +385,7 @@ class CategoryDetailScreen extends StatelessWidget {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    logic
-                                                                            .getServiceCategory
-                                                                            ?.services?[index]
-                                                                            .name ??
-                                                                        "",
+                                                                    service.name ?? "",
                                                                     style: TextStyle(
                                                                         fontFamily:
                                                                             AppFontFamily
@@ -391,7 +396,7 @@ class CategoryDetailScreen extends StatelessWidget {
                                                                             .primaryTextColor),
                                                                   ),
                                                                   Text(
-                                                                    "${logic.getServiceCategory?.services?[index].duration ?? 0} ${"txtMinutes".tr}",
+                                                                    "${service.duration ?? 0} ${"txtMinutes".tr}",
                                                                     style: TextStyle(
                                                                         fontFamily:
                                                                             AppFontFamily
@@ -409,17 +414,17 @@ class CategoryDetailScreen extends StatelessWidget {
                                                           GestureDetector(
                                                             onTap: () {
                                                               if (logic.isCategorySelected[
-                                                                      index] ==
+                                                                      origIndex] ==
                                                                   true) {
                                                                 logic
                                                                     .onCheckBoxClick(
                                                                         false,
-                                                                        index);
+                                                                        origIndex);
                                                               } else {
                                                                 logic
                                                                     .onCheckBoxClick(
                                                                         true,
-                                                                        index);
+                                                                        origIndex);
                                                               }
                                                             },
                                                             child: Container(
@@ -441,7 +446,7 @@ class CategoryDetailScreen extends StatelessWidget {
                                                                             0.5)),
                                                               ),
                                                               child: logic.isCategorySelected[
-                                                                      index]
+                                                                      origIndex]
                                                                   ? Image.asset(
                                                                       AppAsset
                                                                           .icCheck,

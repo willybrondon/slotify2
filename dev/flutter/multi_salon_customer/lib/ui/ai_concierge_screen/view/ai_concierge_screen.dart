@@ -16,10 +16,10 @@ class AiConciergeScreen extends StatelessWidget {
         final capture = logic.captureMode;
         return Scaffold(
           backgroundColor:
-              capture ? AppColors.brandBlack : AppColors.backGround,
+              capture ? AppColors.shareLookPageBg : AppColors.backGround,
           appBar: AppBar(
             backgroundColor:
-                capture ? AppColors.brandBlack : AppColors.whiteColor,
+                capture ? AppColors.shareLookPageBg : AppColors.whiteColor,
             elevation: 0,
             iconTheme: IconThemeData(
               color: capture
@@ -36,7 +36,7 @@ class AiConciergeScreen extends StatelessWidget {
                   : "txtAiConciergeTitle".tr,
               style: TextStyle(
                 color: capture
-                    ? AppColors.brandWhite
+                    ? AppColors.brandBlack
                     : AppColors.primaryTextColor,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,

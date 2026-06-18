@@ -74,6 +74,8 @@ class ApiConstant {
 
   /// Public search suggestions (top categories + services)
   static const searchSuggestions = "api/public/search-suggestions?";
+  static const searchSalonsPublic = "api/public/search-salons?";
+  static const salonsByCategory = "api/public/salons-by-category?";
 
   /// ---------- Salon ---------- ///
   static const getAllSalon = "user/salon/getAll?";

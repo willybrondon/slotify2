@@ -459,7 +459,20 @@ final Map<String, String> enUS = {
   "txtCaptureMediaReadError": "Failed to read media. Please try again.",
   "txtCaptureScreenRecordSteps":
       "On TikTok or Instagram: play the video → screen record → Share → Skedisy.",
-  "txtIntentHubTitle": "Book your hairstyle in IDF",
+  "txtIntentHubTitle": "Book your Afro beauty in IDF",
+  "txtIntentHubEssence":
+      "Braids, locks, weaves, care — expert Afro hair salons, for every client.",
+  "txtNearYou": "Near you",
+  "txtFilter": "Filter",
+  "txtFilterAll": "All",
+  "txtFilterRating": "Minimum rating",
+  "txtFilterSort": "Sort by",
+  "txtSortDistance": "Distance",
+  "txtSortRating": "Rating",
+  "txtSortReviews": "Reviews",
+  "txtSearchInCityTpl": "Salons found in __CITY__",
+  "txtCategorySalonsTitle": "Afro salons — __CAT__",
+  "txtCategoryServiceSearchHint": "Filter services…",
   "txtIntentCaptureTitle": "Share a look",
   "txtIntentCaptureBody":
       "Screenshot on Instagram, TikTok, Facebook or Snapchat → Share → Skedisy. We suggest salons that match your look.",

@@ -87,7 +87,7 @@ class _SalonMapViewState extends State<SalonMapView> {
     return Container(
       width: size,
       height: size,
-      color: AppColors.primaryAppColor,
+      color: AppColors.brandBlack,
       alignment: Alignment.center,
       child: Text(
         initials,
@@ -270,27 +270,25 @@ class _SalonMapViewState extends State<SalonMapView> {
     final mapMarkers = widget.markers.map((m) {
       return Marker(
         point: LatLng(m.latitude, m.longitude),
-        width: 44,
-        height: 44,
+        width: 48,
+        height: 48,
         child: GestureDetector(
           onTap: () => _showSalonSheet(m),
           child: Container(
             decoration: BoxDecoration(
-              color: AppColors.primaryAppColor,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(color: AppColors.whiteColor, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.blackColor.withOpacity(0.2),
+                  color: AppColors.blackColor.withOpacity(0.22),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.storefront,
-              color: Colors.white,
-              size: 22,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: _salonThumb(m.salon, size: 44),
             ),
           ),
         ),

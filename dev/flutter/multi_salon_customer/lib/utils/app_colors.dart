@@ -6,6 +6,7 @@ class AppColors {
   static const Color brandTerracottaHover = Color(0xFFA84D1F);
   static const Color brandBlack = Color(0xFF111111);
   static const Color brandWhite = Color(0xFFFFFFFF);
+  static const Color shareLookPageBg = Color(0xFFFDF6F0);
 
   static Color iconAccent = brandTerracotta;
 

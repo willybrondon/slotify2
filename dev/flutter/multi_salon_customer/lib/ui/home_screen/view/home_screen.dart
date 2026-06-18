@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/dialog/exit_dialog.dart';
 import 'package:salon_2/main.dart';
+import 'package:salon_2/ui/home_screen/widget/home_search_results_widget.dart';
 import 'package:salon_2/ui/home_screen/widget/home_screen_widget.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/utils/app_colors.dart';
@@ -64,10 +65,9 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         const HomeScreenIntentHub()
                             .paddingOnly(left: 15, right: 15, bottom: 12),
+                        const HomeSearchResultsSection(),
                         const HomeScreenHairProfileStrip()
                             .paddingOnly(left: 15, right: 15, bottom: 15),
-                        const HomeScreenMapViewLink()
-                            .paddingOnly(left: 15, right: 15),
                       ],
                     ),
                   ],

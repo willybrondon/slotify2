@@ -29,6 +29,20 @@ class CategoryDetailController extends GetxController {
   GetServiceModel? getServiceCategory;
   RxBool isLoading = false.obs;
 
+  List<Services> get filteredServices {
+    final services = getServiceCategory?.services ?? <Services>[];
+    final q = categoryDetailEditingController.text.trim().toLowerCase();
+    if (q.isEmpty) return services;
+    return services
+        .where((s) => (s.name ?? '').toLowerCase().contains(q))
+        .toList();
+  }
+
+  int serviceIndexOf(Services service) {
+    final list = getServiceCategory?.services ?? <Services>[];
+    return list.indexWhere((s) => s.id == service.id);
+  }
+
   @override
   void onInit() async {
     log("Enter in category detail controller");
