@@ -370,7 +370,10 @@ class HomeScreenController extends GetxController {
     final query = intentQueryController.text.trim();
     final location = locationLabel;
 
-    if (query.isEmpty && location.isEmpty) {
+    if (query.isEmpty &&
+        location.isEmpty &&
+        latitude == null &&
+        longitude == null) {
       publicSearchActive = false;
       publicSearchSalons = [];
       update([Constant.idHomeSearchResults, Constant.idProgressView]);
@@ -611,18 +614,19 @@ class HomeScreenController extends GetxController {
     final location = locationLabel;
 
     if (query.isEmpty && location.isEmpty) {
-      publicSearchMapView = true;
-      await onPublicSearchSalonsApiCall();
       return;
     }
 
     hideIntentSuggestions();
     intentQueryFocusNode.unfocus();
 
+    publicSearchMapView = false;
     await onPublicSearchSalonsApiCall();
   }
 
   Future<void> openPublicSearchMap() async {
+    hideIntentSuggestions();
+    intentQueryFocusNode.unfocus();
     publicSearchMapView = true;
     if (!publicSearchActive) {
       await onPublicSearchSalonsApiCall();
@@ -637,7 +641,11 @@ class HomeScreenController extends GetxController {
     submitIntentSearch();
   }
 
-  void onIntentCategorySuggestionTap(String? id, String? name) {
+  void onIntentCategorySuggestionTap(
+    String? id,
+    String? name, {
+    String? image,
+  }) {
     hideIntentSuggestions();
     intentQueryFocusNode.unfocus();
     if (id == null || name == null) return;
@@ -647,7 +655,10 @@ class HomeScreenController extends GetxController {
     publicSearchCategoryName = null;
     publicSearchSalons = [];
     update([Constant.idHomeSearchResults, Constant.idProgressView]);
-    Get.toNamed(AppRoutes.categorySalons, arguments: [id, name]);
+    Get.toNamed(
+      AppRoutes.categorySalons,
+      arguments: [id, name, if (image != null && image.isNotEmpty) image],
+    );
   }
 
   void onExpertPagination() async {

@@ -28,12 +28,7 @@ class HomeSearchResultsSection extends StatelessWidget {
         }
 
         return Padding(
-          padding: EdgeInsets.fromLTRB(
-            15,
-            8,
-            15,
-            24 + MediaQuery.of(context).padding.bottom + 68,
-          ),
+          padding: const EdgeInsets.fromLTRB(15, 0, 15, 8),
           child: PublicSalonBrowseView(
             loading: logic.publicSearchLoading,
             salons: logic.publicSearchSalons,

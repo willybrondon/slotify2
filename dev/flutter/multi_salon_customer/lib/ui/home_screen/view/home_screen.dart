@@ -50,32 +50,41 @@ class HomeScreen extends StatelessWidget {
         body: GetBuilder<HomeScreenController>(
           id: Constant.idProgressView,
           builder: (logic) {
-            return RefreshIndicator(
-              onRefresh: () {
-                return logic.onRefresh();
-              },
-              color: AppColors.primaryAppColor,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom + 88,
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(15, 12, 15, 8),
+                  child: const HomeScreenIntentHub(),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: Get.height * 0.02),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const HomeScreenIntentHub()
-                            .paddingOnly(left: 15, right: 15, bottom: 12),
-                        const HomeSearchResultsSection(),
-                        const HomeScreenHairProfileStrip()
-                            .paddingOnly(left: 15, right: 15, bottom: 15),
-                      ],
-                    ),
-                  ],
+                Expanded(
+                  child: GetBuilder<HomeScreenController>(
+                    id: Constant.idHomeSearchResults,
+                    builder: (searchLogic) {
+                      final hasResults = searchLogic.publicSearchActive ||
+                          searchLogic.publicSearchLoading;
+
+                      if (!hasResults) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return RefreshIndicator(
+                        onRefresh: () => searchLogic.onRefresh(),
+                        color: AppColors.primaryAppColor,
+                        child: ListView(
+                          padding: EdgeInsets.only(
+                            bottom:
+                                MediaQuery.of(context).padding.bottom + 80,
+                          ),
+                          children: const [
+                            HomeSearchResultsSection(),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
+              ],
             );
           },
         ),

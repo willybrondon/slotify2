@@ -33,6 +33,12 @@ class CategorySalonsController extends GetxController {
     if (args is List && args.length >= 2) {
       categoryId = args[0]?.toString() ?? '';
       categoryName = args[1]?.toString() ?? '';
+      if (args.length >= 3) {
+        final img = args[2]?.toString();
+        if (img != null && img.trim().isNotEmpty) {
+          categoryImage = img.trim();
+        }
+      }
     }
     loadSalons();
   }
@@ -74,7 +80,8 @@ class CategorySalonsController extends GetxController {
     _applyClientFilters();
   }
 
-  void onSearchChanged(String _) {
+  void onSearchSubmitted(String value) {
+    searchController.text = value;
     loadSalons();
   }
 

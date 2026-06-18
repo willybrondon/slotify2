@@ -21,7 +21,9 @@ class CategorySalonsScreen extends StatelessWidget {
           appBar: AppBar(
             automaticallyImplyLeading: false,
             flexibleSpace: AppBarCustom(
-              title: logic.categoryName,
+              title: logic.categoryName.isNotEmpty
+                  ? logic.categoryName
+                  : 'txtCategory'.tr,
               method: InkWell(
                 overlayColor: WidgetStatePropertyAll(AppColors.transparent),
                 onTap: Get.back,
@@ -66,10 +68,10 @@ class CategorySalonsScreen extends StatelessWidget {
                     color: AppColors.blackColor,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(
                   controller: logic.searchController,
-                  onChanged: logic.onSearchChanged,
+                  onSubmitted: (_) => logic.loadSalons(),
                   decoration: InputDecoration(
                     hintText: 'txtIntentSearchSalonHint'.tr,
                     prefixIcon: Icon(Icons.search, color: AppColors.iconAccent),
