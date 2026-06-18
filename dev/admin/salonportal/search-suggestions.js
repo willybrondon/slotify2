@@ -40,6 +40,29 @@
         let services = [];
         let loaded = false;
         let loading = false;
+        let savedScrollY = 0;
+        let pageLocked = false;
+
+        function lockPagePosition() {
+            if (pageLocked || document.body.classList.contains("menu-open")) return;
+            savedScrollY = window.scrollY || window.pageYOffset || 0;
+            document.body.classList.add("sq-search-focus-active");
+            document.body.style.top = `-${savedScrollY}px`;
+            pageLocked = true;
+        }
+
+        function unlockPagePosition() {
+            if (!pageLocked || document.body.classList.contains("menu-open")) return;
+            document.body.classList.remove("sq-search-focus-active");
+            document.body.style.top = "";
+            pageLocked = false;
+            window.scrollTo(0, savedScrollY);
+        }
+
+        function restoreScrollPosition() {
+            window.scrollTo(0, savedScrollY);
+            requestAnimationFrame(() => window.scrollTo(0, savedScrollY));
+        }
 
         function renderLists() {
             const query = queryInput.value;
@@ -99,9 +122,11 @@
         }
 
         function openPanel() {
+            lockPagePosition();
             ensureLoaded().then(() => {
                 panel.hidden = false;
                 renderLists();
+                restoreScrollPosition();
             });
         }
 
@@ -109,8 +134,19 @@
             panel.hidden = true;
         }
 
-        queryInput.addEventListener("focus", openPanel);
-        queryInput.addEventListener("click", openPanel);
+        function closePanelAndUnlock() {
+            closePanel();
+            unlockPagePosition();
+        }
+
+        queryInput.addEventListener("focus", () => {
+            savedScrollY = window.scrollY || window.pageYOffset || 0;
+            openPanel();
+        });
+        queryInput.addEventListener("click", () => {
+            savedScrollY = window.scrollY || window.pageYOffset || 0;
+            openPanel();
+        });
         queryInput.addEventListener("input", () => {
             if (!panel.hidden || loaded) renderLists();
         });
@@ -124,12 +160,20 @@
             queryInput.focus();
         });
 
+        queryInput.addEventListener("blur", () => {
+            window.setTimeout(() => {
+                if (!form.contains(document.activeElement)) {
+                    closePanelAndUnlock();
+                }
+            }, 120);
+        });
+
         document.addEventListener("click", (e) => {
-            if (!form.contains(e.target)) closePanel();
+            if (!form.contains(e.target)) closePanelAndUnlock();
         });
 
         form.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") closePanel();
+            if (e.key === "Escape") closePanelAndUnlock();
         });
     }
 

@@ -653,6 +653,8 @@ body.sq-capture-mode .btn-upload:hover {
 .sq-home-landing {
   padding: 6.5rem 0 1.5rem;
   background: linear-gradient(180deg, var(--sk-brand-light) 0%, var(--sk-white) 55%, var(--sk-white) 100%);
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .sq-home-landing__grid {
@@ -1331,7 +1333,7 @@ body.sq-capture-mode .btn-upload:hover {
 
 .sq-search-bar-unified:focus-within {
   border-color: var(--sk-brand);
-  box-shadow: 0 0 0 3px rgba(196, 92, 38, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(196, 92, 38, 0.35);
 }
 
 .sq-search-bar-unified__submit {
@@ -1430,8 +1432,11 @@ body.sq-capture-mode .btn-upload:hover {
 .sq-search-suggestions {
   position: absolute;
   top: calc(100% + 6px);
-  left: -0.65rem;
-  right: -0.35rem;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   z-index: 50;
   background: var(--sk-white);
   border: 1px solid var(--sk-border);
@@ -1439,7 +1444,10 @@ body.sq-capture-mode .btn-upload:hover {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
   padding: 0.65rem 0.5rem 0.75rem;
   max-height: min(420px, 60vh);
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sq-search-suggestions__section + .sq-search-suggestions__section {
@@ -1912,6 +1920,22 @@ body.sq-capture-mode .btn-upload:hover {
   .sq-search-suggestions {
     left: 0;
     right: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .sq-search-bar-unified--home,
+  .sq-search-bar-unified--full {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .sq-search-bar-unified__query-wrap {
+    overflow: visible;
+  }
+
+  .sq-search-bar-unified__input--query {
+    font-size: 16px;
   }
 }
 
@@ -1945,6 +1969,7 @@ body.sq-capture-mode .btn-upload:hover {
 /* ——— Squire-style search hero (location chip + full-width search) ——— */
 .sq-search-hero-wrap {
   max-width: 100%;
+  overflow-x: hidden;
 }
 
 @media (min-width: 769px) {
@@ -1958,6 +1983,23 @@ body.sq-capture-mode .btn-upload:hover {
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.sq-home-landing__left,
+.sq-home-landing__grid {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body.sq-search-focus-active {
+  position: fixed;
+  width: 100%;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .sq-search-hero-toolbar {

@@ -55,6 +55,9 @@ body {
     line-height: 1.6;
     color: var(--sk-black);
     overflow-x: hidden;
+    overscroll-behavior-x: none;
+    max-width: 100%;
+    touch-action: pan-y pinch-zoom;
 }
 
 body.menu-open {
@@ -68,6 +71,9 @@ body.menu-open {
 
 html {
     overflow-x: hidden;
+    overscroll-behavior-x: none;
+    max-width: 100%;
+    scrollbar-gutter: stable;
 }
 
 .container {
