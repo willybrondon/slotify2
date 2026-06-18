@@ -1927,10 +1927,14 @@ body.sq-capture-mode .btn-upload:hover {
   .sq-search-bar-unified--home,
   .sq-search-bar-unified--full {
     max-width: 100%;
-    overflow-x: clip;
+    overflow: visible;
   }
 
   .sq-search-bar-unified__query-wrap {
+    overflow: visible;
+  }
+
+  .sq-search-bar-unified__group--query {
     overflow: visible;
   }
 
@@ -1998,8 +2002,26 @@ body.sq-search-focus-active {
   width: 100%;
   left: 0;
   right: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
   overscroll-behavior: none;
+}
+
+body.sq-search-focus-active .sq-home-landing,
+body.sq-search-focus-active .sq-home-landing__grid,
+body.sq-search-focus-active .sq-home-landing__left,
+body.sq-search-focus-active .sq-search-hero-wrap,
+body.sq-search-focus-active .sq-search-hero,
+body.sq-search-focus-active .sq-search-bar-unified {
+  overflow: visible;
+}
+
+body.sq-search-focus-active .sq-search-bar-unified {
+  z-index: 100040;
+}
+
+body.sq-search-focus-active .sq-search-suggestions {
+  z-index: 100050;
 }
 
 .sq-search-hero-toolbar {

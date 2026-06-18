@@ -642,7 +642,12 @@ class HomeScreenController extends GetxController {
     intentQueryFocusNode.unfocus();
     if (id == null || name == null) return;
     intentQueryController.text = name;
-    onPublicSalonsByCategoryApiCall(id, categoryName: name);
+    publicSearchActive = false;
+    publicSearchCategoryId = null;
+    publicSearchCategoryName = null;
+    publicSearchSalons = [];
+    update([Constant.idHomeSearchResults, Constant.idProgressView]);
+    Get.toNamed(AppRoutes.categorySalons, arguments: [id, name]);
   }
 
   void onExpertPagination() async {

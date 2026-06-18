@@ -42,6 +42,7 @@
         let loading = false;
         let savedScrollY = 0;
         let pageLocked = false;
+        let ignoreNextDocClick = false;
 
         function lockPagePosition() {
             if (pageLocked || document.body.classList.contains("menu-open")) return;
@@ -93,7 +94,7 @@
                       .join("")
                 : `<li class="sq-search-suggestions__empty">${escapeHtml(t("intentHub.suggestNoServices"))}</li>`;
 
-            panel.hidden = !visibleCategories.length && !visibleServices.length;
+            panel.hidden = false;
         }
 
         async function ensureLoaded() {
@@ -122,11 +123,15 @@
         }
 
         function openPanel() {
+            ignoreNextDocClick = true;
             lockPagePosition();
             ensureLoaded().then(() => {
                 panel.hidden = false;
                 renderLists();
                 restoreScrollPosition();
+                window.setTimeout(() => {
+                    ignoreNextDocClick = false;
+                }, 0);
             });
         }
 
@@ -169,6 +174,7 @@
         });
 
         document.addEventListener("click", (e) => {
+            if (ignoreNextDocClick) return;
             if (!form.contains(e.target)) closePanelAndUnlock();
         });
 

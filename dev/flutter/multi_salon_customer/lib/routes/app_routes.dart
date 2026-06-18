@@ -12,6 +12,7 @@ class AppRoutes {
   static const String branchDetail = '/branchDetail';
   static const String selectBranch = '/selectBranch';
   static const String categoryDetail = '/categoryDetail';
+  static const String categorySalons = '/categorySalons';
   static const String confirmBooking = '/confirmBooking';
   static const String booking = '/booking';
   static const String bookingInformation = '/bookingInformation';

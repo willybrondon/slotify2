@@ -63,7 +63,6 @@ class HomeScreenTopView extends StatelessWidget {
               ],
             ),
           ),
-          const _HomeLocationChip(),
           const SizedBox(width: 8),
           GestureDetector(
             onTap: () {
@@ -107,7 +106,6 @@ class _HomeLocationChip extends StatelessWidget {
           onTap: () => _showLocationEditor(context, logic),
           borderRadius: BorderRadius.circular(999),
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 118),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: AppColors.whiteColor,
@@ -150,6 +148,11 @@ class _HomeLocationChip extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 18,
+                  color: AppColors.iconAccent.withOpacity(0.8),
                 ),
               ],
             ),
@@ -397,47 +400,49 @@ class HomeScreenIntentHub extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        const _HomeSearchMapRow(),
+        const _HomeSearchHeroToolbar(),
         const SizedBox(height: 10),
         const _IntentSearchBar(),
-        const SizedBox(height: 10),
-        const Divider(height: 1, thickness: 1, color: Color(0xFFE8E8E8)),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         const _IntentShareLookCard(),
       ],
     );
   }
 }
 
-class _HomeSearchMapRow extends StatelessWidget {
-  const _HomeSearchMapRow();
+class _HomeSearchHeroToolbar extends StatelessWidget {
+  const _HomeSearchHeroToolbar();
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: GetBuilder<HomeScreenController>(
-        id: Constant.idHomeSearchResults,
-        builder: (logic) {
-          return TextButton.icon(
-            onPressed: logic.openPublicSearchMap,
-            icon: Icon(Icons.map_outlined, size: 18, color: AppColors.iconAccent),
-            label: Text(
-              'txtViewMap'.tr,
-              style: TextStyle(
-                fontFamily: AppFontFamily.sfProDisplayMedium,
-                fontSize: 13,
-                color: AppColors.iconAccent,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Expanded(child: _HomeLocationChip()),
+        const SizedBox(width: 8),
+        GetBuilder<HomeScreenController>(
+          id: Constant.idHomeSearchResults,
+          builder: (logic) {
+            return TextButton.icon(
+              onPressed: logic.openPublicSearchMap,
+              icon: Icon(Icons.map_outlined, size: 18, color: AppColors.iconAccent),
+              label: Text(
+                'txtViewMap'.tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayMedium,
+                  fontSize: 13,
+                  color: AppColors.iconAccent,
+                ),
               ),
-            ),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          );
-        },
-      ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
@@ -450,7 +455,7 @@ class _IntentShareLookCard extends StatelessWidget {
     return _IntentDoorCard(
       icon: Icons.ios_share_rounded,
       title: 'txtIntentCaptureTitle'.tr,
-      body: '',
+      body: 'txtIntentCaptureBody'.tr,
       accent: AppColors.primaryAppColor,
       filled: true,
       compact: true,
@@ -720,7 +725,6 @@ class _IntentDoorCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: compact ? double.infinity : null,
         padding: EdgeInsets.all(compact ? 12 : 16),
         decoration: BoxDecoration(
           color: filled ? accent : AppColors.whiteColor,

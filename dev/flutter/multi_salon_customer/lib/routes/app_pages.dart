@@ -23,6 +23,8 @@ import 'package:salon_2/ui/cart_screen/binding/cart_screen_binding.dart';
 import 'package:salon_2/ui/cart_screen/view/cart_screen.dart';
 import 'package:salon_2/ui/category_details/binding/category_detail_binding.dart';
 import 'package:salon_2/ui/category_details/view/category_detail_screen.dart';
+import 'package:salon_2/ui/category_salons_discover/binding/category_salons_binding.dart';
+import 'package:salon_2/ui/category_salons_discover/view/category_salons_screen.dart';
 import 'package:salon_2/ui/category_wise_product_screen/binding/category_wise_product_binding.dart';
 import 'package:salon_2/ui/category_wise_product_screen/view/category_wise_product_screen.dart';
 import 'package:salon_2/ui/complain_screen/binding/raise_complain_binding.dart';
@@ -180,6 +182,11 @@ class AppPages {
       name: AppRoutes.categoryDetail,
       page: () => CategoryDetailScreen(),
       binding: CategoryDetailBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.categorySalons,
+      page: () => const CategorySalonsScreen(),
+      binding: CategorySalonsBinding(),
     ),
     GetPage(
       name: AppRoutes.confirmBooking,

@@ -23,101 +23,149 @@ class HomeSearchResultsSection extends StatelessWidget {
         if (!logic.publicSearchActive && !logic.publicSearchLoading) {
           return const SizedBox.shrink();
         }
-
-        final mapMarkers = salonMarkersFromData(
-          logic.publicSearchSalons.map((s) => s.toDatum()).toList(),
-        );
+        if (logic.publicSearchCategoryId != null) {
+          return const SizedBox.shrink();
+        }
 
         return Padding(
-          padding: const EdgeInsets.fromLTRB(15, 8, 15, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (logic.publicSearchLoading)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else ...[
-                if (logic.publicSearchCategoryName != null &&
-                    logic.publicSearchCategoryName!.trim().isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Text(
-                      'txtCategorySalonsTitle'
-                          .tr
-                          .replaceAll('__CAT__', logic.publicSearchCategoryName!),
-                      style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplayBold,
-                        fontSize: 17,
-                        color: AppColors.blackColor,
-                      ),
-                    ),
-                  ),
-                Text(
-                  logic.formatPublicSearchStats(),
-                  style: TextStyle(
-                    fontFamily: AppFontFamily.sfProDisplayBold,
-                    fontSize: 15,
-                    color: AppColors.blackColor,
-                  ),
-                ),
-                if (logic.publicSearchCity != null &&
-                    logic.publicSearchCity!.trim().isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      'txtSearchInCityTpl'
-                          .tr
-                          .replaceAll('__CITY__', logic.publicSearchCity!),
-                      style: TextStyle(
-                        fontFamily: AppFontFamily.sfProDisplayRegular,
-                        fontSize: 13,
-                        color: AppColors.grey,
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 12),
-                _Toolbar(logic: logic),
-                if (logic.showPublicSearchFilters) ...[
-                  const SizedBox(height: 10),
-                  _FilterPanel(logic: logic),
-                ],
-                const SizedBox(height: 12),
-                if (logic.publicSearchMapView) ...[
-                  SizedBox(
-                    height: 280,
-                    child: SalonMapView(
-                      markers: mapMarkers,
-                      userLatitude: latitude,
-                      userLongitude: longitude,
-                      onSalonTap: (m) => _openSalon(m.id),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-                if (logic.publicSearchSalons.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 32),
-                    child: Center(
-                      child: Text(
-                        'desNoDataFoundSearch'.tr,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: AppFontFamily.sfProDisplayMedium,
-                          fontSize: 15,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  _SalonGrid(salons: logic.publicSearchSalons),
-              ],
-            ],
+          padding: EdgeInsets.fromLTRB(
+            15,
+            8,
+            15,
+            24 + MediaQuery.of(context).padding.bottom + 68,
+          ),
+          child: PublicSalonBrowseView(
+            loading: logic.publicSearchLoading,
+            salons: logic.publicSearchSalons,
+            statsLabel: logic.formatPublicSearchStats(),
+            searchCity: logic.publicSearchCity,
+            mapView: logic.publicSearchMapView,
+            showFilters: logic.showPublicSearchFilters,
+            minRating: logic.publicSearchMinRating,
+            sort: logic.publicSearchSort,
+            onToggleFilters: logic.togglePublicSearchFilters,
+            onMapViewChanged: logic.setPublicSearchMapView,
+            onMinRatingChanged: logic.setPublicSearchMinRating,
+            onSortChanged: logic.setPublicSearchSort,
           ),
         );
       },
+    );
+  }
+}
+
+class PublicSalonBrowseView extends StatelessWidget {
+  const PublicSalonBrowseView({
+    super.key,
+    required this.loading,
+    required this.salons,
+    required this.statsLabel,
+    required this.mapView,
+    required this.showFilters,
+    required this.minRating,
+    required this.sort,
+    required this.onToggleFilters,
+    required this.onMapViewChanged,
+    required this.onMinRatingChanged,
+    required this.onSortChanged,
+    this.searchCity,
+  });
+
+  final bool loading;
+  final List<PublicSearchSalon> salons;
+  final String statsLabel;
+  final String? searchCity;
+  final bool mapView;
+  final bool showFilters;
+  final double minRating;
+  final String sort;
+  final VoidCallback onToggleFilters;
+  final ValueChanged<bool> onMapViewChanged;
+  final ValueChanged<double> onMinRatingChanged;
+  final ValueChanged<String> onSortChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final mapMarkers = salonMarkersFromData(
+      salons.map((s) => s.toDatum()).toList(),
+    );
+
+    if (loading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          statsLabel,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 15,
+            color: AppColors.blackColor,
+          ),
+        ),
+        if (searchCity != null && searchCity!.trim().isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              'txtSearchInCityTpl'.tr.replaceAll('__CITY__', searchCity!),
+              style: TextStyle(
+                fontFamily: AppFontFamily.sfProDisplayRegular,
+                fontSize: 13,
+                color: AppColors.grey,
+              ),
+            ),
+          ),
+        const SizedBox(height: 12),
+        PublicSalonToolbar(
+          mapView: mapView,
+          onToggleFilters: onToggleFilters,
+          onMapViewChanged: onMapViewChanged,
+        ),
+        if (showFilters) ...[
+          const SizedBox(height: 10),
+          PublicSalonFilterPanel(
+            minRating: minRating,
+            sort: sort,
+            onMinRatingChanged: onMinRatingChanged,
+            onSortChanged: onSortChanged,
+          ),
+        ],
+        const SizedBox(height: 12),
+        if (mapView) ...[
+          SizedBox(
+            height: 280,
+            child: SalonMapView(
+              markers: mapMarkers,
+              userLatitude: latitude,
+              userLongitude: longitude,
+              onSalonTap: (m) => _openSalon(m.id),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (salons.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32),
+            child: Center(
+              child: Text(
+                'desNoDataFoundSearch'.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayMedium,
+                  fontSize: 15,
+                  color: AppColors.grey,
+                ),
+              ),
+            ),
+          )
+        else
+          PublicSalonGrid(salons: salons),
+      ],
     );
   }
 
@@ -131,17 +179,24 @@ class HomeSearchResultsSection extends StatelessWidget {
   }
 }
 
-class _Toolbar extends StatelessWidget {
-  const _Toolbar({required this.logic});
+class PublicSalonToolbar extends StatelessWidget {
+  const PublicSalonToolbar({
+    super.key,
+    required this.mapView,
+    required this.onToggleFilters,
+    required this.onMapViewChanged,
+  });
 
-  final HomeScreenController logic;
+  final bool mapView;
+  final VoidCallback onToggleFilters;
+  final ValueChanged<bool> onMapViewChanged;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         OutlinedButton.icon(
-          onPressed: logic.togglePublicSearchFilters,
+          onPressed: onToggleFilters,
           icon: const Icon(Icons.tune, size: 18),
           label: Text('txtFilter'.tr),
           style: OutlinedButton.styleFrom(
@@ -155,24 +210,25 @@ class _Toolbar extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        _ViewToggle(
+        PublicSalonViewToggle(
           label: 'txtViewList'.tr,
-          active: !logic.publicSearchMapView,
-          onTap: () => logic.setPublicSearchMapView(false),
+          active: !mapView,
+          onTap: () => onMapViewChanged(false),
         ),
         const SizedBox(width: 6),
-        _ViewToggle(
+        PublicSalonViewToggle(
           label: 'txtViewMap'.tr,
-          active: logic.publicSearchMapView,
-          onTap: () => logic.setPublicSearchMapView(true),
+          active: mapView,
+          onTap: () => onMapViewChanged(true),
         ),
       ],
     );
   }
 }
 
-class _ViewToggle extends StatelessWidget {
-  const _ViewToggle({
+class PublicSalonViewToggle extends StatelessWidget {
+  const PublicSalonViewToggle({
+    super.key,
     required this.label,
     required this.active,
     required this.onTap,
@@ -211,10 +267,19 @@ class _ViewToggle extends StatelessWidget {
   }
 }
 
-class _FilterPanel extends StatelessWidget {
-  const _FilterPanel({required this.logic});
+class PublicSalonFilterPanel extends StatelessWidget {
+  const PublicSalonFilterPanel({
+    super.key,
+    required this.minRating,
+    required this.sort,
+    required this.onMinRatingChanged,
+    required this.onSortChanged,
+  });
 
-  final HomeScreenController logic;
+  final double minRating;
+  final String sort;
+  final ValueChanged<double> onMinRatingChanged;
+  final ValueChanged<String> onSortChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -242,20 +307,20 @@ class _FilterPanel extends StatelessWidget {
           Wrap(
             spacing: 8,
             children: [
-              _FilterChip(
+              PublicSalonFilterChip(
                 label: 'txtFilterAll'.tr,
-                active: logic.publicSearchMinRating == 0,
-                onTap: () => logic.setPublicSearchMinRating(0),
+                active: minRating == 0,
+                onTap: () => onMinRatingChanged(0),
               ),
-              _FilterChip(
+              PublicSalonFilterChip(
                 label: '4+ ★',
-                active: logic.publicSearchMinRating == 4,
-                onTap: () => logic.setPublicSearchMinRating(4),
+                active: minRating == 4,
+                onTap: () => onMinRatingChanged(4),
               ),
-              _FilterChip(
+              PublicSalonFilterChip(
                 label: '4.5+ ★',
-                active: logic.publicSearchMinRating == 4.5,
-                onTap: () => logic.setPublicSearchMinRating(4.5),
+                active: minRating == 4.5,
+                onTap: () => onMinRatingChanged(4.5),
               ),
             ],
           ),
@@ -273,20 +338,20 @@ class _FilterPanel extends StatelessWidget {
           Wrap(
             spacing: 8,
             children: [
-              _FilterChip(
+              PublicSalonFilterChip(
                 label: 'txtSortDistance'.tr,
-                active: logic.publicSearchSort == 'distance',
-                onTap: () => logic.setPublicSearchSort('distance'),
+                active: sort == 'distance',
+                onTap: () => onSortChanged('distance'),
               ),
-              _FilterChip(
+              PublicSalonFilterChip(
                 label: 'txtSortRating'.tr,
-                active: logic.publicSearchSort == 'rating',
-                onTap: () => logic.setPublicSearchSort('rating'),
+                active: sort == 'rating',
+                onTap: () => onSortChanged('rating'),
               ),
-              _FilterChip(
+              PublicSalonFilterChip(
                 label: 'txtSortReviews'.tr,
-                active: logic.publicSearchSort == 'reviews',
-                onTap: () => logic.setPublicSearchSort('reviews'),
+                active: sort == 'reviews',
+                onTap: () => onSortChanged('reviews'),
               ),
             ],
           ),
@@ -296,8 +361,9 @@ class _FilterPanel extends StatelessWidget {
   }
 }
 
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
+class PublicSalonFilterChip extends StatelessWidget {
+  const PublicSalonFilterChip({
+    super.key,
     required this.label,
     required this.active,
     required this.onTap,
@@ -336,8 +402,8 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _SalonGrid extends StatelessWidget {
-  const _SalonGrid({required this.salons});
+class PublicSalonGrid extends StatelessWidget {
+  const PublicSalonGrid({super.key, required this.salons});
 
   final List<PublicSearchSalon> salons;
 
@@ -354,14 +420,14 @@ class _SalonGrid extends StatelessWidget {
       ),
       itemCount: salons.length,
       itemBuilder: (context, index) {
-        return _SalonCard(salon: salons[index]);
+        return PublicSalonCard(salon: salons[index]);
       },
     );
   }
 }
 
-class _SalonCard extends StatelessWidget {
-  const _SalonCard({required this.salon});
+class PublicSalonCard extends StatelessWidget {
+  const PublicSalonCard({super.key, required this.salon});
 
   final PublicSearchSalon salon;
 
