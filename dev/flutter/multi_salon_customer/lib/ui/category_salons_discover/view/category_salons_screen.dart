@@ -42,31 +42,9 @@ class CategorySalonsScreen extends StatelessWidget {
                 24 + MediaQuery.of(context).padding.bottom,
               ),
               children: [
-                if (logic.categoryImage != null &&
-                    logic.categoryImage!.trim().isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: CachedNetworkImage(
-                        imageUrl: logic.categoryImage!,
-                        fit: BoxFit.cover,
-                        errorWidget: (_, __, ___) => const SizedBox.shrink(),
-                      ),
-                    ),
-                  ),
-                if (logic.categoryImage != null &&
-                    logic.categoryImage!.trim().isNotEmpty)
-                  const SizedBox(height: 12),
-                Text(
-                  'txtCategorySalonsTitle'
-                      .tr
-                      .replaceAll('__CAT__', logic.categoryName),
-                  style: TextStyle(
-                    fontFamily: AppFontFamily.sfProDisplayBold,
-                    fontSize: 20,
-                    color: AppColors.blackColor,
-                  ),
+                _CategoryDiscoverHead(
+                  categoryName: logic.categoryName,
+                  categoryImage: logic.categoryImage,
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -115,6 +93,103 @@ class CategorySalonsScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _CategoryDiscoverHead extends StatelessWidget {
+  const _CategoryDiscoverHead({
+    required this.categoryName,
+    this.categoryImage,
+  });
+
+  final String categoryName;
+  final String? categoryImage;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = categoryImage != null && categoryImage!.trim().isNotEmpty;
+    final title = 'txtCategorySalonsTitle'
+        .tr
+        .replaceAll('__CAT__', categoryName);
+    final lead = 'txtCategorySalonsLead'
+        .tr
+        .replaceAll('__CAT__', categoryName);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (hasImage)
+          Container(
+            width: 88,
+            height: 88,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.grey.withOpacity(0.2)),
+              color: AppColors.brandGrayLight,
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: CachedNetworkImage(
+              imageUrl: categoryImage!,
+              fit: BoxFit.cover,
+              errorWidget: (_, __, ___) => _CategoryImageFallback(
+                label: categoryName,
+              ),
+            ),
+          ),
+        if (hasImage) const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                  fontSize: 18,
+                  height: 1.25,
+                  color: AppColors.blackColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                lead,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayRegular,
+                  fontSize: 14,
+                  height: 1.45,
+                  color: AppColors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CategoryImageFallback extends StatelessWidget {
+  const _CategoryImageFallback({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final initial =
+        label.trim().isNotEmpty ? label.trim()[0].toUpperCase() : '?';
+    return ColoredBox(
+      color: AppColors.brandGrayLight,
+      child: Center(
+        child: Text(
+          initial,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 24,
+            color: AppColors.grey,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -42,9 +42,14 @@ class BookingInformationController extends GetxController {
   }
 
   launchMaps() async {
-    var googleUrl = Uri.parse(
-        "https://www.google.com/maps/dir/?api=1&destination=${getBookingInformationCategory?.booking?.salonId?.locationCoordinates?.latitude},${getBookingInformationCategory?.booking?.salonId?.locationCoordinates?.longitude}");
-    await launchUrl(googleUrl);
+    final lat = getBookingInformationCategory
+        ?.booking?.salonId?.locationCoordinates?.latitude;
+    final lng = getBookingInformationCategory
+        ?.booking?.salonId?.locationCoordinates?.longitude;
+    if (lat == null || lng == null) return;
+    final googleUrl = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+    await launchUrl(googleUrl, mode: LaunchMode.externalApplication);
   }
 
   onGetBookingInformationApiCall({required String bookingId}) async {

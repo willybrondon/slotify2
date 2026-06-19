@@ -1219,6 +1219,26 @@ class BookingScreen extends StatelessWidget {
                             fontFamily: AppFontFamily.sfProDisplayMedium,
                             color: AppColors.darkGrey3,
                           ),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            color: AppColors.brandTerracottaLight,
+                          ),
+                        ),
+                        disabledDayStyle: DayStyle(
+                          dayNumStyle: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
+                            color: AppColors.brandGrayMuted,
+                          ),
+                          dayStrStyle: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
+                            color: AppColors.brandGrayMuted,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            color: AppColors.brandGrayLight,
+                          ),
                         ),
                       ),
                     ),
@@ -1517,7 +1537,7 @@ class BookingScreen extends StatelessWidget {
                                               !isSlotTimePassed
                                           ? AppColors.slotSelectedBorder
                                           : Colors.transparent,
-                                      width: 1.5,
+                                      width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),

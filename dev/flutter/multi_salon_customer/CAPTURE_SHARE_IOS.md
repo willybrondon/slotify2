@@ -1,38 +1,35 @@
 # iOS — Partager vers Skedisy (Share Extension)
 
-Android fonctionne après build. **iOS nécessite une étape Xcode** pour ajouter la Share Extension.
+Android : fonctionne via les intent-filters `SEND` dans `AndroidManifest.xml`.
 
-## Prérequis
+**iOS** : la Share Extension est intégrée dans `Runner.xcodeproj` (target `Share Extension`).
 
-- App Group `group.com.skedisy.customer` activé sur [Apple Developer](https://developer.apple.com) pour l’app **et** l’extension
-- Fichiers déjà dans le repo : `ios/Share Extension/`
+## Prérequis Apple Developer (une fois)
 
-## Étapes Xcode (une fois)
-
-1. Ouvrir `ios/Runner.xcworkspace` dans Xcode
-2. **File → New → Target → Share Extension**
-   - Product Name : `Share Extension`
-   - Bundle ID : `com.skedisy.customer.ShareExtension`
-3. Supprimer le `ShareViewController.swift` généré par Xcode
-4. Glisser les fichiers du dossier `ios/Share Extension/` dans le target **Share Extension**
-5. Target **Share Extension** → **Signing & Capabilities** → **App Groups** → cocher `group.com.skedisy.customer`
-6. Target **Runner** → vérifier le même App Group
-7. Build & run sur appareil réel
+1. App Group `group.com.skedisy.customer` activé pour :
+   - `com.skedisy.customer` (app)
+   - `com.skedisy.customer.ShareExtension` (extension)
+2. Après clone / mise à jour iOS :
+   ```bash
+   cd ios && pod install
+   ```
+3. Ouvrir `ios/Runner.xcworkspace` (pas `.xcodeproj`)
+4. Build sur **appareil réel** (le partage système ne s’affiche pas toujours sur simulateur)
 
 ## Test — capture d’écran
 
-1. Capture d’écran dans Photos ou Instagram
+1. Capture dans Photos ou depuis une app
 2. **Partager** → **Skedisy**
-3. L’app s’ouvre sur « Réserver ce look » avec analyse automatique
+3. L’app s’ouvre sur « Partager un look » avec analyse automatique
 
-## Test — enregistrement d’écran (TikTok, Instagram, Snapchat, Facebook)
+## Test — vidéo (TikTok, Instagram, etc.)
 
-Les apps sociales ne permettent souvent **pas** de partager une vidéo directement. Le flux recommandé :
+1. Enregistre l’écran pendant la vidéo
+2. Ouvre la vidéo dans **Photos** → **Partager** → **Skedisy**
 
-1. Ouvre la vidéo (TikTok, Reels, Story Snapchat, etc.)
-2. **Enregistre l’écran** (iOS : Centre de contrôle → Enregistrement d’écran)
-3. Arrête l’enregistrement → la vidéo est dans **Photos**
-4. Ouvre la vidéo dans Photos → **Partager** → **Skedisy**
-5. Skedisy extrait la coiffure et propose des salons afro en IDF
+> Skedisy n’accède qu’au fichier partagé, pas à vos comptes sociaux.
 
-> Skedisy analyse uniquement le fichier que tu partages. Aucun accès à tes comptes sociaux.
+## Dépannage
+
+- **Skedisy absent de la liste** : vérifier que l’extension est embarquée (Build Phases → Embed Foundation Extensions) et que l’App Group est identique sur les deux targets.
+- **No such module `receive_sharing_intent`** : `pod install`, puis placer « Embed Foundation Extensions » **au-dessus** de « Thin Binary » dans Runner → Build Phases.

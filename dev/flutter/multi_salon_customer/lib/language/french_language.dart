@@ -504,6 +504,8 @@ final Map<String, String> frFR = {
   "txtSortReviews": "Avis",
   "txtSearchInCityTpl": "Salons trouvés dans __CITY__",
   "txtCategorySalonsTitle": "Salons afro — __CAT__",
+  "txtCategorySalonsLead":
+      "Trouvez un salon afro en Île-de-France pour __CAT__.",
   "txtCategoryServiceSearchHint": "Filtrer les prestations…",
   "txtIntentCaptureTitle": "Partager un look",
   "txtIntentCaptureBody":

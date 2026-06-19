@@ -429,102 +429,38 @@ class BookingInformationScreen extends StatelessWidget {
                                 ),
                               ],
                             ).paddingOnly(bottom: 10),
-                            Row(
-                              children: [
-                                Image.asset(
-                                  AppAsset.icLocation,
-                                  height: 20,
-                                  width: 20,
-                                ).paddingOnly(right: 8),
-                                SizedBox(
-                                  width: Get.width * 0.8,
-                                  child: Text(
-                                    "${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.addressLine1}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.landMark}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.city}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.state}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.country}",
-                                    style: TextStyle(
-                                      color: AppColors.locationText,
-                                      fontFamily: AppFontFamily.sfProDisplay,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ).paddingOnly(bottom: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      logic.launchMaps();
-                                    },
-                                    child: Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(13),
-                                        color: AppColors.directionBox,
-                                        boxShadow: Constant.boxShadow,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Image.asset(
-                                            AppAsset.icDirectionFilled,
-                                            height: 22,
-                                            width: 22,
-                                          ).paddingOnly(right: 12),
-                                          Text(
-                                            "txtDirection".tr,
-                                            style: TextStyle(
-                                              color: AppColors.whiteColor,
-                                              fontFamily: AppFontFamily.sfProDisplayBold,
-                                              fontSize: 16.5,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 13),
-                                GetBuilder<BookingInformationController>(
-                                  builder: (logic) {
-                                    return Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          logic.makingPhoneCall();
-                                        },
-                                        child: Container(
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(13),
-                                            color: AppColors.callBox,
-                                            boxShadow: Constant.boxShadow,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Image.asset(
-                                                AppAsset.icCallFilled,
-                                                height: 22,
-                                                width: 22,
-                                              ).paddingOnly(right: 12),
-                                              Text(
-                                                "txtCall".tr,
-                                                style: TextStyle(
-                                                  color: AppColors.whiteColor,
-                                                  fontFamily: AppFontFamily.sfProDisplayBold,
-                                                  fontSize: 16.5,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                            InkWell(
+                              onTap: logic.launchMaps,
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Image.asset(
+                                      AppAsset.icLocation,
+                                      height: 20,
+                                      width: 20,
+                                      color: AppColors.brandTerracotta,
+                                    ).paddingOnly(right: 8),
+                                    Expanded(
+                                      child: Text(
+                                        "${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.addressLine1}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.landMark}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.city}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.state}, ${logic.getBookingInformationCategory?.booking?.salonId?.addressDetails?.country}",
+                                        style: TextStyle(
+                                          color: AppColors.brandTerracotta,
+                                          fontFamily: AppFontFamily.sfProDisplay,
+                                          fontSize: 14,
+                                          height: 1.4,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor:
+                                              AppColors.brandTerracotta,
                                         ),
                                       ),
-                                    );
-                                  },
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ).paddingOnly(bottom: 10, top: 10),
+                              ),
+                            ).paddingOnly(bottom: 10),
                           ],
                         ),
                       ).paddingOnly(left: 13, right: 13, top: 8, bottom: 10),

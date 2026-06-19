@@ -14,6 +14,7 @@ import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:video_player/video_player.dart';
 
 String _captureHeroTitle(AiConciergeController logic) {
@@ -384,13 +385,11 @@ class ShareLookCaptureView extends StatelessWidget {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    _socialGlyph('IG'),
+                    _socialBrandIcon(FontAwesomeIcons.instagram),
                     const SizedBox(width: 18),
-                    _socialGlyph('TT'),
+                    _socialBrandIcon(FontAwesomeIcons.tiktok),
                     const SizedBox(width: 18),
-                    _socialGlyph('FB'),
-                    const SizedBox(width: 18),
-                    _socialGlyph('SC'),
+                    _socialBrandIcon(FontAwesomeIcons.facebook),
                   ],
                 ),
                 const SizedBox(height: 22),
@@ -561,15 +560,11 @@ class ShareLookCaptureView extends StatelessWidget {
     );
   }
 
-  Widget _socialGlyph(String label) {
-    return Text(
-      label,
-      style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: AppColors.brandTerracotta.withOpacity(0.85),
-        letterSpacing: 0.5,
-      ),
+  Widget _socialBrandIcon(IconData icon) {
+    return FaIcon(
+      icon,
+      size: 26,
+      color: AppColors.brandTerracotta.withOpacity(0.9),
     );
   }
 }

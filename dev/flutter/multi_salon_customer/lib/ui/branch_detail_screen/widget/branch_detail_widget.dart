@@ -359,30 +359,39 @@ class BranchDetailDataView extends StatelessWidget {
                   ],
                 ),
               ),
-              // Address section - simple row
+              // Address — tap opens Google Maps
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.asset(
-                      AppAsset.icLocation,
-                      height: 18,
-                      width: 18,
-                      color: AppColors.grey,
-                    ).paddingOnly(right: 12),
-                    Expanded(
-                      child: Text(
-                        "${logic.getSalonDetailCategory?.salon?.addressDetails?.addressLine1}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.landMark}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.city}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.state}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.country}",
-                        style: TextStyle(
-                          color: AppColors.termsDialog,
-                          fontFamily: AppFontFamily.heeBo600,
-                          fontSize: 14,
-                          height: 1.4,
+                child: InkWell(
+                  onTap: logic.launchMaps,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          AppAsset.icLocation,
+                          height: 18,
+                          width: 18,
+                          color: AppColors.brandTerracotta,
+                        ).paddingOnly(right: 12),
+                        Expanded(
+                          child: Text(
+                            "${logic.getSalonDetailCategory?.salon?.addressDetails?.addressLine1}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.landMark}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.city}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.state}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.country}",
+                            style: TextStyle(
+                              color: AppColors.brandTerracotta,
+                              fontFamily: AppFontFamily.heeBo600,
+                              fontSize: 14,
+                              height: 1.4,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.brandTerracotta,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
               // Distance section - simple row
@@ -391,7 +400,7 @@ class BranchDetailDataView extends StatelessWidget {
                 child: Row(
                   children: [
                     Image.asset(
-                      AppAsset.icDirection,
+                      AppAsset.icNearBy,
                       height: 18,
                       width: 18,
                       color: AppColors.grey,

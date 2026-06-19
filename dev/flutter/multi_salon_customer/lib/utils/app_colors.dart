@@ -28,8 +28,8 @@ class AppColors {
   static Color directionBox = brandBlack;
   static Color callBox = brandBlack;
 
-  /// Créneaux réservation : fond gris clair, sélection = bordure terracotta.
-  static Color slotAvailableBg = brandGrayLight;
+  /// Créneaux réservation : indisponible gris clair, disponible terracotta light, sélection = bordure terracotta foncé.
+  static Color slotAvailableBg = brandTerracottaLight;
   static Color slotUnavailableBg = brandGrayLight;
   static Color slotSelectedBorder = brandTerracotta;
   static Color slotSelectedText = brandTerracotta;

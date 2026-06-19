@@ -175,9 +175,14 @@ class BranchDetailController extends GetxController
   }
 
   launchMaps() async {
-    var googleUrl = Uri.parse(
-        "https://www.google.com/maps/dir/?api=1&destination=${getSalonDetailCategory?.salon?.locationCoordinates?.latitude},${getSalonDetailCategory?.salon?.locationCoordinates?.longitude}");
-    await launchUrl(googleUrl);
+    final lat =
+        getSalonDetailCategory?.salon?.locationCoordinates?.latitude;
+    final lng =
+        getSalonDetailCategory?.salon?.locationCoordinates?.longitude;
+    if (lat == null || lng == null) return;
+    final googleUrl = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+    await launchUrl(googleUrl, mode: LaunchMode.externalApplication);
   }
 
   onCheckBoxClick(value, int index) {
