@@ -18,7 +18,7 @@ tar czvf mobile_pp.tgz \
 base64 -i mobile_pp.tgz | pbcopy
 ```
 
-> Le nom affiché dans le portail Apple est celui utilisé par Xcode (`PROVISIONING_PROFILE_SPECIFIER`), pas forcément le nom du fichier `.mobileprovision`.
+> Le **Name** dans le profil peut différer du nom du fichier `.mobileprovision`. La CI matche aussi par **bundle ID** (`com.skedisy.customer`, `*ShareExtension*`, `com.skedisy.expert`).
 
 ## Entitlements app (`Runner/Runner.entitlements`)
 

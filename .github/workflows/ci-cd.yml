@@ -366,41 +366,84 @@ jobs:
       - name: Verify iOS provisioning profiles
         run: |
           set -e
-          find_profile() {
-            local expected="$1"
-            for f in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
-              NAME=$(security cms -D -i "$f" 2>/dev/null | plutil -extract Name raw -o - - 2>/dev/null || true)
-              if [ "$NAME" = "$expected" ]; then
-                echo "$f"
-                return 0
+          shopt -s nullglob
+          PROFILE_DIR=~/Library/MobileDevice/Provisioning\ Profiles
+          PROFILES=("$PROFILE_DIR"/*.mobileprovision)
+          
+          list_all_profiles() {
+            echo "=== Installed provisioning profiles ==="
+            if [ ${#PROFILES[@]} -eq 0 ]; then
+              echo "  (none — check BUILD_PROVISION_PROFILE_BASE64 secret / tarball)"
+              return
+            fi
+            local f PLIST NAME APP_ID
+            for f in "${PROFILES[@]}"; do
+              PLIST=$(security cms -D -i "$f" 2>/dev/null || true)
+              NAME=$(echo "$PLIST" | plutil -extract Name raw -o - - 2>/dev/null || echo "?")
+              APP_ID=$(echo "$PLIST" | plutil -extract Entitlements.application-identifier raw -o - - 2>/dev/null || echo "?")
+              echo "  Name: $NAME | AppID: $APP_ID"
+            done
+          }
+          
+          profile_app_id() {
+            security cms -D -i "$1" 2>/dev/null | plutil -extract Entitlements.application-identifier raw -o - - 2>/dev/null || true
+          }
+          
+          profile_name() {
+            security cms -D -i "$1" 2>/dev/null | plutil -extract Name raw -o - - 2>/dev/null || true
+          }
+          
+          if [ "${{ matrix.app }}" = "customer" ]; then
+            MAIN=""
+            SHARE=""
+            for f in "${PROFILES[@]}"; do
+              APP_ID=$(profile_app_id "$f")
+              NAME=$(profile_name "$f")
+              if echo "$APP_ID" | grep -qi "ShareExtension" || [ "$NAME" = "appstoreskedisycustomershare" ]; then
+                SHARE="$f"
+                echo "Share Extension profile: $NAME ($APP_ID)"
+              elif echo "$APP_ID" | grep -q "com.skedisy.customer"; then
+                MAIN="$f"
+                echo "Customer app profile: $NAME ($APP_ID)"
               fi
             done
-            return 1
-          }
-
-          if [ "${{ matrix.app }}" = "customer" ]; then
-            MAIN=$(find_profile "appstoreskedisycustomer") || {
-              echo "::error::Missing profile appstoreskedisycustomer in BUILD_PROVISION_PROFILE_BASE64"
+            if [ -z "$MAIN" ]; then
+              echo "::error::Missing customer app profile (bundle com.skedisy.customer)"
+              list_all_profiles
               exit 1
-            }
-            SHARE=$(find_profile "appstoreskedisycustomershare") || {
-              echo "::error::Missing profile appstoreskedisycustomershare in BUILD_PROVISION_PROFILE_BASE64"
+            fi
+            if [ -z "$SHARE" ]; then
+              echo "::error::Missing Share Extension profile (bundle *ShareExtension* or name appstoreskedisycustomershare)"
+              list_all_profiles
               exit 1
-            }
+            fi
             ENT=$(security cms -D -i "$MAIN")
             echo "$ENT" | grep -q "com.apple.security.application-groups" || {
-              echo "::error::appstoreskedisycustomer missing App Groups entitlement"
+              echo "::error::Customer profile missing App Groups entitlement"
               exit 1
             }
-            echo "Customer profiles OK: $MAIN"
-            echo "Share Extension profile OK: $SHARE"
+            echo "Customer profiles OK"
           fi
-
+          
           if [ "${{ matrix.app }}" = "expert" ]; then
-            find_profile "appstoreskedisyexpert" || {
-              echo "::error::Missing profile appstoreskedisyexpert in BUILD_PROVISION_PROFILE_BASE64"
+            EXPERT=""
+            for f in "${PROFILES[@]}"; do
+              APP_ID=$(profile_app_id "$f")
+              NAME=$(profile_name "$f")
+              if echo "$APP_ID" | grep -q "RunnerTests"; then
+                continue
+              fi
+              if [ "$NAME" = "appstoreskedisyexpert" ] || echo "$APP_ID" | grep -qE "com\.skedisy\.expert|com\.multisalon\.experts"; then
+                EXPERT="$f"
+                echo "Expert profile: $NAME ($APP_ID)"
+                break
+              fi
+            done
+            if [ -z "$EXPERT" ]; then
+              echo "::error::Missing expert profile (name appstoreskedisyexpert or bundle com.skedisy.expert / com.multisalon.experts)"
+              list_all_profiles
               exit 1
-            }
+            fi
             echo "Expert profile OK"
           fi
 
