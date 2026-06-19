@@ -2,7 +2,7 @@
 
 Android : fonctionne via les intent-filters `SEND` dans `AndroidManifest.xml`.
 
-**iOS (CI `dev`)** : Share Extension embarquée dans l’IPA (`PlugIns/Share Extension.appex`). Profils requis : `appstoreskedisycustomer` + `appstoreskedisycustomershare` (voir `ios/IOS_CI_SIGNING.md`).
+**iOS (CI `dev`)** : Share Extension embarquée dans l’IPA (`PlugIns/Share Extension.appex`). Profils requis : `appstore-skedisy-customer` + `appstore-skedisy-customer-share` (voir `ios/IOS_CI_SIGNING.md`).
 
 ## Prérequis Apple Developer (une fois)
 
