@@ -1,4 +1,4 @@
-final Map<String, String> frCH = {
+final Map<String, String> frFR = {
   "txtSalonShot": "Coup de salon",
   "txtLogIn": "Se connecter",
   "txtEnterID": "Entrez ID",
@@ -68,6 +68,7 @@ final Map<String, String> frCH = {
   "txtCheckIn": "Enregistrement",
   "txtCheckOut": "Vérifier",
   "txtCancel": "Annuler",
+  "txtConfirm": "Confirmer",
   "txtCheckInOrder": "Voulez-vous vérifier cette commande maintenant ?",
   "txtCheckOutOrder": "Voulez-vous consulter cette commande maintenant.",
   "txtCancelOrderDialog": "Voulez-vous annuler la commande maintenant.",
@@ -91,7 +92,7 @@ final Map<String, String> frCH = {
   "txtWallet": "Portefeuille",
   "txtOrderAttendance": "Mes revenus, résumé de la commande, fréquentation",
   "txtSetting": "Paramètre",
-  "txtAppLanguage": "Langage de l'application",
+  "txtAppLanguage": "Langue de l'application",
   "txtAboutApp": "À propos de l'application",
   "txtRateUs": "Notez-nous, partage",
   "txtHelp": "Aide",
@@ -157,7 +158,7 @@ final Map<String, String> frCH = {
   "desSlotBooked": "Ce créneau est réservé",
   "desPreviousSlot": "Vous ne pouvez pas réserver des créneaux précédents",
   "desExit": "Êtes-vous sûr de vouloir quitter ?",
-  "txtCancelledBy": "AnnuléPar",
+  "txtCancelledBy": "Annulé par",
   "txtHistory": "Histoire",
   "txtBookingCompleted": "Réservation terminée",
   "txtWithdrawalPending": "Retrait en attente",
@@ -207,4 +208,5 @@ final Map<String, String> frCH = {
   "txtVersion": "Version",
   "txtLegalInformation": "Informations légales",
   "txtRateShare": "Noter et partager",
+  "desLoginFailed": "Échec de la connexion : @error",
 };

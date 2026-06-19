@@ -747,7 +747,7 @@ class HomeScreenController extends GetxController {
 
     if (favouriteProductModel?.status == true) {
       if (favouriteProductModel?.isFavourite == true) {
-        Utils.showToast(Get.context!, "Product saved successfully");
+        Utils.showToast(Get.context!, "desProductSavedSuccess".tr);
 
         int? index = getTrendingProductModel?.data
             ?.indexWhere((element) => element.id == productId);
@@ -781,7 +781,7 @@ class HomeScreenController extends GetxController {
 
     if (favouriteProductModel?.status == true) {
       if (favouriteProductModel?.isFavourite == true) {
-        Utils.showToast(Get.context!, "Product saved successfully");
+        Utils.showToast(Get.context!, "desProductSavedSuccess".tr);
 
         int? index = getNewProductModel?.data
             ?.indexWhere((element) => element.id == productId);
@@ -817,7 +817,7 @@ class HomeScreenController extends GetxController {
 
     if (favouriteSalonModel?.status == true) {
       if (favouriteSalonModel?.isFavourite == true) {
-        Utils.showToast(Get.context!, "Salon favourite successfully");
+        Utils.showToast(Get.context!, "desSalonFavouriteSuccess".tr);
 
         int? index = getAllSalonCategory?.data
             ?.indexWhere((element) => element.id == salonId);
@@ -1073,7 +1073,7 @@ class HomeScreenController extends GetxController {
       update([Constant.idProgressView]);
 
       // Get current language code (default to 'en')
-      final languageCode = Get.locale?.languageCode ?? 'en';
+      final languageCode = Get.locale?.languageCode ?? 'fr';
 
       final queryParameters = {"language": languageCode};
       String queryString = Uri(queryParameters: queryParameters).query;
@@ -1173,7 +1173,7 @@ class HomeScreenController extends GetxController {
       ]);
 
       // Get current language code (default to 'en')
-      final languageCode = Get.locale?.languageCode ?? 'en';
+      final languageCode = Get.locale?.languageCode ?? 'fr';
 
       final queryParameters = {
         "search": search ?? "",
@@ -1656,7 +1656,7 @@ class HomeScreenController extends GetxController {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error sharing salon link :: $e");
-      Utils.showToast(Get.context!, "Error sharing salon link");
+      Utils.showToast(Get.context!, "desErrorSharingLink".tr);
     }
   }
 }

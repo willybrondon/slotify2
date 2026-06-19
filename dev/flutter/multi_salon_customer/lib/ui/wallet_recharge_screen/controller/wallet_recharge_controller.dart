@@ -198,7 +198,7 @@ class WalletRechargeController extends GetxController {
   // Handle continue to payment screen
   Future<void> handleContinue() async {
     if (!validateAmount()) {
-      Utils.showToast(Get.context!, "Please enter a valid amount");
+      Utils.showToast(Get.context!, "desPleaseEnterValidAmount".tr);
       return;
     }
     
@@ -208,7 +208,7 @@ class WalletRechargeController extends GetxController {
     }
     
     if (amount.isEmpty || double.tryParse(amount) == null || double.parse(amount) <= 0) {
-      Utils.showToast(Get.context!, "Please enter a valid amount");
+      Utils.showToast(Get.context!, "desPleaseEnterValidAmount".tr);
       return;
     }
     

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
     <link rel="stylesheet" href="intent-hub.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <script src="language.js" defer></script>
@@ -78,21 +79,22 @@
         <a href="#" class="floating-download-btn floating-download-btn--customer" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a>
     </div>
 
-    <!-- Accueil desktop : colonne gauche (intro + recherche) · visuels à droite -->
+    <!-- Accueil desktop : intro centrée · recherche à gauche · carte avant QR -->
     <section class="sq-home-landing" id="sqHomeLanding">
-        <div class="sq-home-landing__grid">
-            <div class="sq-home-landing__left">
-                <header class="sq-home-landing__intro desktop-only">
-                    <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta beauté afro en IDF.</h1>
-                    <p class="sq-home-essence" data-translate="homeProduct.essence">Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.</p>
-                </header>
+        <div class="sq-home-landing__grid container">
+            <header class="sq-home-landing__intro sq-home-landing__intro--center desktop-only">
+                <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta beauté afro en IDF.</h1>
+                <p class="sq-home-essence" data-translate="homeProduct.essence">Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.</p>
+            </header>
 
-                <div class="sq-home-landing__intro sq-home-landing__intro--mobile mobile-only">
-                    <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta beauté afro en IDF.</h1>
-                    <p class="sq-home-essence" data-translate="homeProduct.essence">Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.</p>
-                </div>
+            <div class="sq-home-landing__body">
+                <div class="sq-home-landing__left">
+                    <div class="sq-home-landing__intro sq-home-landing__intro--mobile mobile-only">
+                        <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta beauté afro en IDF.</h1>
+                        <p class="sq-home-essence" data-translate="homeProduct.essence">Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.</p>
+                    </div>
 
-                <div class="sq-search-hero-wrap" id="sqIntentHub">
+                    <div class="sq-search-hero-wrap" id="sqIntentHub">
                     <div class="sq-search-hero">
                         <div class="sq-search-hero-toolbar">
                             <div class="sq-location-chip-wrap">
@@ -151,6 +153,15 @@
 
                     <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
                 </div>
+                </div>
+
+                <aside class="sq-home-landing__map desktop-only" aria-label="Carte des salons">
+                    <div id="homeSalonMap" class="sq-home-landing__map-el"></div>
+                    <a href="/recherche?view=map" class="sq-home-map-panel__link" id="homeMapPanelLink">
+                        <i class="fas fa-map" aria-hidden="true"></i>
+                        <span data-translate="homeProduct.viewMap">Voir la carte</span>
+                    </a>
+                </aside>
             </div>
         </div>
     </section>
@@ -497,6 +508,9 @@
     <script src="script.js"></script>
     <script src="search-suggestions.js"></script>
     <script src="location-chip.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="salon-map-ui.js"></script>
+    <script src="home-map.js"></script>
     <script src="home-discovery.js"></script>
     <script src="hair-profile.js"></script>
 </body>

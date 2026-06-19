@@ -53,7 +53,7 @@ class CategoryWiseProductController extends GetxController {
 
     if (homeScreenController.favouriteProductModel?.status == true) {
       if (homeScreenController.favouriteProductModel?.isFavourite == true) {
-        Utils.showToast(Get.context!, "Product saved successfully");
+        Utils.showToast(Get.context!, "desProductSavedSuccess".tr);
 
         int? index = getCategoryWiseProductModel?.data?.indexWhere((element) => element.id == productId);
         if (index != null) {

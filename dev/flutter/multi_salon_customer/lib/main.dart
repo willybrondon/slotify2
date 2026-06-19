@@ -347,14 +347,14 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
         ),
-        locale: const Locale("fr"),
+        locale: const Locale(Constant.languageDefault, Constant.countryCodeDefault),
         translations: AppLanguages(),
         initialRoute: AppRoutes.initial,
         getPages: AppPages.list,
         title: "Salon",
         defaultTransition: Transition.fade,
         fallbackLocale:
-            const Locale(Constant.languageEn, Constant.countryCodeEn),
+            const Locale(Constant.languageDefault, Constant.countryCodeDefault),
         transitionDuration: const Duration(milliseconds: 200),
       ),
     );

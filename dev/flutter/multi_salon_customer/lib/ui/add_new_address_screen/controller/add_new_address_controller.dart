@@ -114,7 +114,7 @@ class AddNewAddressController extends GetxController {
         );
 
         if (updateAddressModel?.status == true) {
-          Utils.showToast(Get.context!, "Address updated successfully");
+          Utils.showToast(Get.context!, "desAddressUpdated".tr);
           Get.back();
         } else {
           Utils.showToast(Get.context!, updateAddressModel?.message ?? "");
@@ -132,14 +132,14 @@ class AddNewAddressController extends GetxController {
         );
 
         if (createAddressModel?.status == true) {
-          Utils.showToast(Get.context!, "Address created successfully");
+          Utils.showToast(Get.context!, "desAddressCreated".tr);
           Get.back();
         } else {
           Utils.showToast(Get.context!, createAddressModel?.message ?? "");
         }
       }
     } else {
-      Utils.showToast(Get.context!, "Please enter all details");
+      Utils.showToast(Get.context!, "desPleaseEnterAllDetails".tr);
     }
   }
 

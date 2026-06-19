@@ -47,12 +47,14 @@
     }
 
     function updateViewMapLink(location) {
-        const link = document.getElementById('homeViewMapLink');
-        if (!link) return;
         const params = new URLSearchParams();
         params.set('view', 'map');
         if (location) params.set('location', location);
-        link.href = '/recherche?' + params.toString();
+        const href = '/recherche?' + params.toString();
+        const link = document.getElementById('homeViewMapLink');
+        if (link) link.href = href;
+        const panelLink = document.getElementById('homeMapPanelLink');
+        if (panelLink) panelLink.href = href;
     }
 
     function closePopover() {

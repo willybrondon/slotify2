@@ -72,7 +72,7 @@ class ProductReviewController extends GetxController {
 
   onSubmitClick() async {
     if (selectedStarIndex == -1) {
-      Utils.showToast(Get.context!, "Please select a star to submit review.");
+      Utils.showToast(Get.context!, "desPleaseSelectStarReview".tr);
     } else {
       await onPostProductReviewApiCall(
         userId: Constant.storage.read<String>('userId') ?? "",

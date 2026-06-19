@@ -66,7 +66,7 @@ class OrderDetailController extends GetxController {
     Get.back();
 
     if ((cancelOrderAmount ?? 0) > (purchasedTimeTotal ?? 0)) {
-      Utils.showToast(Get.context!, "Order cancellation is not allowed for this product 😕");
+      Utils.showToast(Get.context!, "desOrderCancelNotAllowed".tr);
     } else {
       await onCancelOrderApiCall(
         userId: Constant.storage.read<String>('userId') ?? "",
@@ -76,7 +76,7 @@ class OrderDetailController extends GetxController {
       );
 
       if (cancelOrderModel?.status == true) {
-        Utils.showToast(Get.context!, "Order cancelled successfully");
+        Utils.showToast(Get.context!, "desOrderCancelledSuccess".tr);
         Get.back();
       } else {
         Utils.showToast(Get.context!, cancelOrderModel?.message ?? "");

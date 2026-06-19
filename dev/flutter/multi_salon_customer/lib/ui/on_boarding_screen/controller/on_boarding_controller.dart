@@ -8,17 +8,17 @@ class OnBoardingController extends GetxController {
   PageController pageController = PageController(initialPage: 0);
   int currentPage = 0;
 
-  List title = [
-    'All Men Care Product Available Here',
-    'All Female Care Product Available Here',
-    'Beauty Made Simple Wellness Made Essential',
-  ];
+  List<String> get title => [
+        'txtOnBoardTitle1'.tr,
+        'txtOnBoardTitle2'.tr,
+        'txtOnBoardTitle3'.tr,
+      ];
 
-  List subTitle = [
-    'All Men Care Product Available Here',
-    'All Female Care Product Available Here',
-    'Beauty Made Simple Wellness Made Essential',
-  ];
+  List<String> get subTitle => [
+        'txtOnBoardSubtitle1'.tr,
+        'txtOnBoardSubtitle2'.tr,
+        'txtOnBoardSubtitle3'.tr,
+      ];
 
   List image = [
     AppAsset.imImage1,

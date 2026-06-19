@@ -378,7 +378,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
         }
       } else {
         log("Get All Booking - Failed with status code: ${response.statusCode}");
-        Utils.showToast(Get.context!, "Failed to load bookings. Please try again.");
+        Utils.showToast(Get.context!, "desFailedLoadBookings".tr);
       }
     } on AppException catch (exception) {
       log("App Exception in Get All Booking: ${exception.message}");
@@ -389,14 +389,14 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
           "Network connection error. Please check your internet connection.");
     } on HandshakeException catch (e) {
       log("SSL Handshake error in Get All Booking: $e");
-      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+      Utils.showToast(Get.context!, "desSslConnectionError".tr);
     } on TimeoutException catch (e) {
       log("Timeout error in Get All Booking: $e");
       Utils.showToast(Get.context!,
           "Request timeout. Please check your connection and try again.");
     } catch (e) {
       log("Error call Get All Booking Api :: $e");
-      Utils.showToast(Get.context!, "Connection error. Please try again.");
+      Utils.showToast(Get.context!, "desConnectionError".tr);
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
@@ -434,7 +434,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
         cancelBookingCategory = CancelBookingModel.fromJson(jsonResponse);
       } else {
         log("Cancel Booking - Failed with status code: ${response.statusCode}");
-        Utils.showToast(Get.context!, "Failed to cancel booking. Please try again.");
+        Utils.showToast(Get.context!, "desFailedCancelBooking".tr);
       }
     } on AppException catch (exception) {
       log("App Exception in Cancel Booking: ${exception.message}");
@@ -445,14 +445,14 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
           "Network connection error. Please check your internet connection.");
     } on HandshakeException catch (e) {
       log("SSL Handshake error in Cancel Booking: $e");
-      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+      Utils.showToast(Get.context!, "desSslConnectionError".tr);
     } on TimeoutException catch (e) {
       log("Timeout error in Cancel Booking: $e");
       Utils.showToast(Get.context!,
           "Request timeout. Please check your connection and try again.");
     } catch (e) {
       log("Error call Cancel Booking Status Api :: $e");
-      Utils.showToast(Get.context!, "Connection error. Please try again.");
+      Utils.showToast(Get.context!, "desConnectionError".tr);
     } finally {
       isLoading(false);
       isLoading1(false);
@@ -490,7 +490,7 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
         userSubmitReviewCategory = UserSubmitReviewModel.fromJson(jsonResponse);
       } else {
         log("User Submit Review - Failed with status code: ${response.statusCode}");
-        Utils.showToast(Get.context!, "Failed to submit review. Please try again.");
+        Utils.showToast(Get.context!, "desFailedSubmitReview".tr);
       }
     } on AppException catch (exception) {
       log("App Exception in User Submit Review: ${exception.message}");
@@ -501,14 +501,14 @@ class BookingDetailScreenController extends GetxController with GetSingleTickerP
           "Network connection error. Please check your internet connection.");
     } on HandshakeException catch (e) {
       log("SSL Handshake error in User Submit Review: $e");
-      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+      Utils.showToast(Get.context!, "desSslConnectionError".tr);
     } on TimeoutException catch (e) {
       log("Timeout error in User Submit Review: $e");
       Utils.showToast(Get.context!,
           "Request timeout. Please check your connection and try again.");
     } catch (e) {
       log("Error call User Submit Review Api :: $e");
-      Utils.showToast(Get.context!, "Connection error. Please try again.");
+      Utils.showToast(Get.context!, "desConnectionError".tr);
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);

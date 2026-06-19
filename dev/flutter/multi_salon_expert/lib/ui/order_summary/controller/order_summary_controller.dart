@@ -60,8 +60,8 @@ class OrderSummaryController extends GetxController with GetTickerProviderStateM
           dialogRoundedCornersRadius: 16,
         ),
         actionBarSettings: PickerActionBarSettings(
-          confirmWidget: Text("Confirm", style: TextStyle(color: AppColors.primaryAppColor)),
-          cancelWidget: Text("Cancel", style: TextStyle(color: AppColors.primaryAppColor)),
+          confirmWidget: Text('txtConfirm'.tr, style: TextStyle(color: AppColors.primaryAppColor)),
+          cancelWidget: Text('txtCancel'.tr, style: TextStyle(color: AppColors.primaryAppColor)),
         ),
       ),
       initialDate: DateTime.now(),

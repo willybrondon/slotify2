@@ -453,7 +453,7 @@ class BookingScreenController extends GetxController {
               getExpertServiceBaseSalonCategory?.data == null ||
               selectExpert >=
                   (getExpertServiceBaseSalonCategory!.data!.length)) {
-            Utils.showToast(Get.context!, "Please select an expert first");
+            Utils.showToast(Get.context!, "desPleaseSelectExpert".tr);
             // Go back to previous step
             stepCount--;
             currentStep -= 1;
@@ -510,7 +510,7 @@ class BookingScreenController extends GetxController {
 
       if (expertIdToUse.isEmpty) {
         log("Error: No expert ID found. selectExpert: $selectExpert, expertDetail: $expertDetail");
-        Utils.showToast(Get.context!, "Please select an expert first");
+        Utils.showToast(Get.context!, "desPleaseSelectExpert".tr);
         // Go back to previous step
         stepCount--;
         currentStep -= 1;
@@ -1415,7 +1415,7 @@ class BookingScreenController extends GetxController {
       return false;
     } catch (e) {
       log("Error call Validate Coupon Api :: $e");
-      Utils.showToast(Get.context!, "Error validating coupon");
+      Utils.showToast(Get.context!, "desErrorValidatingCoupon".tr);
       return false;
     } finally {
       isLoading(false);
@@ -1473,7 +1473,7 @@ class BookingScreenController extends GetxController {
     String couponCode = couponCodeController.text.trim().toUpperCase();
 
     if (couponCode.isEmpty) {
-      Utils.showToast(Get.context!, "Please enter a coupon code");
+      Utils.showToast(Get.context!, "desEnterCouponCode".tr);
       return;
     }
 
@@ -1549,7 +1549,7 @@ class BookingScreenController extends GetxController {
       }
 
       if (selectedCouponId != null && selectedCouponId!.isNotEmpty) {
-        Utils.showToast(Get.context!, "Coupon applied successfully!");
+        Utils.showToast(Get.context!, "desCouponApplied".tr);
       } else {
         log("onApplyManualCouponCode - ⚠️ Coupon applied but ID not found - booking may fail");
       }

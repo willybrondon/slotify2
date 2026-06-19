@@ -1130,9 +1130,7 @@ class AiConciergeResultsView extends StatelessWidget {
                         },
                         icon: Icon(Icons.home, color: AppColors.whiteColor),
                         label: Text(
-                          capture
-                              ? 'txtShareLookBackHome'.tr
-                              : 'Back to Home',
+                          'txtShareLookBackHome'.tr,
                           style: TextStyle(color: AppColors.whiteColor),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -1190,7 +1188,7 @@ class AiConciergeResultsView extends StatelessWidget {
               Text(
                 capture
                     ? 'txtShareLookAnalysisTitle'.tr
-                    : 'Beauty Analysis',
+                    : 'txtBeautyAnalysis'.tr,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -1221,14 +1219,14 @@ class AiConciergeResultsView extends StatelessWidget {
   Widget _buildSkinAnalysis(SkinAnalysis skin) {
     return _buildAnalysisCard(
       icon: Icons.face,
-      title: "Skin Analysis",
+      title: 'txtSkinAnalysis'.tr,
       items: {
-        "Type": skin.type ?? "N/A",
-        "Tone": skin.tone ?? "N/A",
-        "Undertone": skin.undertone ?? "N/A",
-        "Condition": skin.condition ?? "N/A",
+        'txtAnalysisLabelType'.tr: skin.type ?? 'txtNotAvailable'.tr,
+        'txtAnalysisLabelTone'.tr: skin.tone ?? 'txtNotAvailable'.tr,
+        'txtAnalysisLabelUndertone'.tr: skin.undertone ?? 'txtNotAvailable'.tr,
+        'txtAnalysisLabelCondition'.tr: skin.condition ?? 'txtNotAvailable'.tr,
         if (skin.concerns != null && skin.concerns!.isNotEmpty)
-          "Concerns": skin.concerns!.join(", "),
+          'txtAnalysisLabelConcerns'.tr: skin.concerns!.join(', '),
       },
       color: Colors.pink,
     );
@@ -1237,13 +1235,13 @@ class AiConciergeResultsView extends StatelessWidget {
   Widget _buildHairAnalysis(HairAnalysis hair) {
     return _buildAnalysisCard(
       icon: Icons.content_cut,
-      title: "Hair Analysis",
+      title: 'txtHairAnalysis'.tr,
       items: {
-        "Type": hair.type ?? "N/A",
-        "Texture": hair.texture ?? "N/A",
-        "Color": hair.color ?? "N/A",
-        "Condition": hair.condition ?? "N/A",
-        if (hair.length != null) "Length": hair.length!,
+        'txtAnalysisLabelType'.tr: hair.type ?? 'txtNotAvailable'.tr,
+        'txtAnalysisLabelTexture'.tr: hair.texture ?? 'txtNotAvailable'.tr,
+        'txtAnalysisLabelColor'.tr: hair.color ?? 'txtNotAvailable'.tr,
+        'txtAnalysisLabelCondition'.tr: hair.condition ?? 'txtNotAvailable'.tr,
+        if (hair.length != null) 'txtAnalysisLabelLength'.tr: hair.length!,
       },
       color: Colors.brown,
     );
@@ -1252,12 +1250,13 @@ class AiConciergeResultsView extends StatelessWidget {
   Widget _buildFaceAnalysis(FaceAnalysis face) {
     return _buildAnalysisCard(
       icon: Icons.face,
-      title: "Facial Features",
+      title: 'txtFacialFeatures'.tr,
       items: {
-        "Face Shape": face.shape ?? "N/A",
-        "Eye Shape": face.eyeShape ?? "N/A",
-        "Lip Shape": face.lipShape ?? "N/A",
-        if (face.eyebrowShape != null) "Eyebrow": face.eyebrowShape!,
+        'txtAnalysisLabelFaceShape'.tr: face.shape ?? 'txtNotAvailable'.tr,
+        'txtAnalysisLabelEyeShape'.tr: face.eyeShape ?? 'txtNotAvailable'.tr,
+        'txtAnalysisLabelLipShape'.tr: face.lipShape ?? 'txtNotAvailable'.tr,
+        if (face.eyebrowShape != null)
+          'txtAnalysisLabelEyebrow'.tr: face.eyebrowShape!,
       },
       color: Colors.blue,
     );

@@ -195,11 +195,11 @@ class _MyAppState extends State<MyApp> {
       },
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        locale: const Locale("fr"),
+        locale: const Locale(Constant.languageDefault, Constant.countryCodeDefault),
         translations: AppLanguages(),
         defaultTransition: Transition.fade,
         fallbackLocale:
-            const Locale(Constant.languageEn, Constant.countryCodeEn),
+            const Locale(Constant.languageDefault, Constant.countryCodeDefault),
         transitionDuration: const Duration(milliseconds: 200),
         initialRoute: AppRoutes.initial,
         getPages: AppPages.list,

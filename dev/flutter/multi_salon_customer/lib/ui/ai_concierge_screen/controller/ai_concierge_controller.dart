@@ -226,7 +226,7 @@ class AiConciergeController extends GetxController {
       }
     } catch (e) {
       log("Error picking image: $e");
-      Utils.showToast(Get.context!, "Failed to pick image");
+      Utils.showToast(Get.context!, 'desFailedPickImage'.tr);
     }
   }
 
@@ -247,7 +247,7 @@ class AiConciergeController extends GetxController {
       }
     } catch (e) {
       log("Error picking image from camera: $e");
-      Utils.showToast(Get.context!, "Failed to take photo");
+      Utils.showToast(Get.context!, 'desFailedTakePhoto'.tr);
     }
   }
 
@@ -444,7 +444,7 @@ class AiConciergeController extends GetxController {
           jsonResponse = jsonDecode(res.body);
         } catch (parseError) {
           log("Analyze Selfie JSON parse error: $parseError, body: ${res.body}");
-          Utils.showToast(Get.context!, "Invalid server response. Please try again.");
+          Utils.showToast(Get.context!, 'desInvalidServerResponse'.tr);
           return;
         }
         try {
@@ -453,7 +453,7 @@ class AiConciergeController extends GetxController {
           log("Analyze Selfie model parse error: $modelError");
           final msg = jsonResponse is Map && jsonResponse['message'] != null
               ? jsonResponse['message'].toString()
-              : "Failed to analyze image. Please try again.";
+              : 'desFailedAnalyzeImage'.tr;
           Utils.showToast(Get.context!, msg);
           return;
         }
@@ -504,7 +504,7 @@ class AiConciergeController extends GetxController {
           ? "Network error. Please check your connection and try again."
           : errStr.contains('timed out')
               ? "Request timed out. Please try again."
-              : "Failed to analyze image. Please try again.";
+              : 'desFailedAnalyzeImage'.tr;
       Utils.showToast(Get.context!, msg);
     } finally {
       isLoading(false);

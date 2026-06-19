@@ -48,6 +48,7 @@ final Map<String, String> enUS = {
   "txtCheckIn": "Check In",
   "txtCheckOut": "Check Out",
   "txtCancel": "Cancel",
+  "txtConfirm": "Confirm",
   "txtCheckInAppointment": "User Already Checked",
   "txtCheckInFirst": "Please Check In First",
   "txtEnterSpecificReason": "Enter Cancellation Reason",
@@ -157,7 +158,7 @@ final Map<String, String> enUS = {
   "desSlotBooked": "This slot is booked",
   "desPreviousSlot": "You cannot book previous slots",
   "desExit": "Are you sure You want to Exit ?",
-  "txtCancelledBy": "CancelledBy",
+  "txtCancelledBy": "Cancelled by",
   "txtHistory": "History",
   "txtBookingCompleted": "Booking Completed",
   "txtWithdrawalPending": "Withdrawal Pending",
@@ -205,4 +206,5 @@ final Map<String, String> enUS = {
   "txtVersion": "Version",
   "txtLegalInformation": "Legal information",
   "txtRateShare": "Rate & share",
+  "desLoginFailed": "Login failed: @error",
 };

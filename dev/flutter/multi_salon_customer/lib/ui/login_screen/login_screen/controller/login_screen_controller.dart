@@ -94,7 +94,7 @@ class LoginScreenController extends GetxController {
       verifyPhone();
       onVerification();
     } else {
-      Utils.showToast(Get.context!, "Please Enter Mobile Number");
+      Utils.showToast(Get.context!, "txtEnterMobileNumber".tr);
     }
     update([Constant.idCheckMobile]);
   }
@@ -291,7 +291,7 @@ class LoginScreenController extends GetxController {
         dev.log("Login successful: ${loginCategory?.status}");
       } else {
         dev.log("Login failed with status code: ${response.statusCode}");
-        Utils.showToast(Get.context!, "Login failed. Please try again.");
+        Utils.showToast(Get.context!, "desLoginFailed".tr);
       }
     } on AppException catch (exception) {
       dev.log("App Exception: ${exception.message}");
@@ -302,14 +302,14 @@ class LoginScreenController extends GetxController {
           "Network connection error. Please check your internet connection.");
     } on HandshakeException catch (e) {
       dev.log("SSL Handshake error: $e");
-      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+      Utils.showToast(Get.context!, "desSslConnectionError".tr);
     } on TimeoutException catch (e) {
       dev.log("Timeout error: $e");
       Utils.showToast(Get.context!,
           "Request timeout. Please check your connection and try again.");
     } catch (e) {
       dev.log("Error call Login Api :: $e");
-      Utils.showToast(Get.context!, 'Connection error. Please try again.');
+      Utils.showToast(Get.context!, 'desConnectionError'.tr);
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idBookingAndLogin]);

@@ -282,7 +282,7 @@ class PaymentScreenController extends GetxController {
     // Validate that a payment method is selected for wallet recharge
     if (isWalletAdd == true &&
         (selectedPayment == null || selectedPayment!.isEmpty)) {
-      Utils.showToast(Get.context!, "Please select a payment method");
+      Utils.showToast(Get.context!, "desPleaseSelectPaymentMethod".tr);
       return;
     }
 

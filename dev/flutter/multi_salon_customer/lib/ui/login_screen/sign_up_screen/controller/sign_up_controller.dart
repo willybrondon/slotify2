@@ -417,7 +417,7 @@ class SignUpController extends GetxController {
           VerifyMobileModel(status: false, error: exception.message);
     } catch (e) {
       dev.log("Error call Verify Mobile For Signup Api :: $e");
-      Utils.showToast(Get.context!, 'Error verifying mobile number: $e');
+      Utils.showToast(Get.context!, 'desErrorVerifyingMobile'.tr);
       verifyMobileCategory =
           VerifyMobileModel(status: false, error: e.toString());
     } finally {

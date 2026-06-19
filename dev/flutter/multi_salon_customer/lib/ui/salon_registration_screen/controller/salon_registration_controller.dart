@@ -44,7 +44,7 @@ class SalonRegistrationController extends GetxController {
 
   onClickRegister() async {
     if (Constant.storage.read("salonRequestSent") == true) {
-      Utils.showToast(Get.context!, "Already sent request for salon registration");
+      Utils.showToast(Get.context!, "desSalonRegistrationSent".tr);
     } else {
       if (nameController.text.isEmpty ||
           emailController.text.isEmpty ||
@@ -53,7 +53,7 @@ class SalonRegistrationController extends GetxController {
           aboutController.text.isEmpty ||
           expertController.text.isEmpty ||
           (selectImageFile?.path.isEmpty ?? false)) {
-        Utils.showToast(Get.context!, "Please fill up all fields");
+        Utils.showToast(Get.context!, "desFillAllFields".tr);
       } else {
         FocusScopeNode currentFocus = FocusScope.of(Get.context!);
         if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {

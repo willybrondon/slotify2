@@ -393,7 +393,7 @@ class LoginScreen extends StatelessWidget {
 
                         if (logic.loginCategory!.status == true) {
                           Utils.showToast(
-                              Get.context!, "User Login SuccessFully..!");
+                              Get.context!, "desUserLoginSuccess".tr);
                           Constant.storage.write('isLogIn', true);
                           Constant.storage.write('isMobile', true);
                           Constant.storage

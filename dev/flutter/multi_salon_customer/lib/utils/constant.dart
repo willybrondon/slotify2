@@ -16,8 +16,12 @@ class Constant {
   /// <<===================>> ****** App Configs ****** <<===================>>
 
   static String appName = 'txtSalon'.tr;
-  static const languageEn = "fr";
-  static const countryCodeEn = "FR";
+  static const languageDefault = 'fr';
+  static const countryCodeDefault = 'FR';
+  /// @deprecated Use [languageDefault]
+  static const languageEn = languageDefault;
+  /// @deprecated Use [countryCodeDefault]
+  static const countryCodeEn = countryCodeDefault;
 
   /// ===================>> STRIPE
   static const stripeUrl = "https://api.stripe.com/v1/payment_intents";

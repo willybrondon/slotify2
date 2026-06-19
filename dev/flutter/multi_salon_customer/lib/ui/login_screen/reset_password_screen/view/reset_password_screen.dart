@@ -187,7 +187,7 @@ class ResetPasswordScreen extends StatelessWidget {
                           }
 
                           if (logic.emailId == null || logic.emailId!.isEmpty) {
-                            Utils.showToast(Get.context!, "Email is required. Please go back and try again.");
+                            Utils.showToast(Get.context!, "desEmailRequired".tr);
                             return;
                           }
                           if (logic.passwordController.text.isNotEmpty && logic.confirmPasswordController.text.isNotEmpty) {

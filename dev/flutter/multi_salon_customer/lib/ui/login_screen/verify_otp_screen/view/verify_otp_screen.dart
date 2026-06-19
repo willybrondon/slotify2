@@ -178,7 +178,7 @@ class VerifyOtpScreen extends StatelessWidget {
                               Utils.showToast(Get.context!, logic.verifyOtpCategory?.message ?? "");
                             }
                           } else {
-                            Utils.showToast(Get.context!, "Please Enter Otp");
+                            Utils.showToast(Get.context!, "desPleaseEnterOtp".tr);
                           }
                         },
                       ).paddingOnly(left: 15, right: 15, top: 55);

@@ -93,4 +93,14 @@ class AppColors {
   static Color detailGrey = brandGrayMuted;
   static Color textFieldBg = brandGrayLight;
   static Color idTextColor = brandGrayMuted;
+  static Color lineColor = const Color(0xffEFEFEF);
+  static Color selectSize = brandGrayLight;
+  static Color currencyGrey = const Color(0xffA5A5A5);
+  static Color greenBg = brandTerracottaLight;
+  static Color redBg = brandTerracottaLight;
+  static Color greenText = brandTerracotta;
+  static Color redText = brandTerracotta;
+  static Color inactivateDate = brandGrayMuted;
+  static Color checkInBooking = brandBlack;
+  static Color cancelBooking = brandTerracotta;
 }

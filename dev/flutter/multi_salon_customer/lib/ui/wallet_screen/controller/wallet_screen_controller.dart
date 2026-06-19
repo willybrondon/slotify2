@@ -102,7 +102,7 @@ class WalletScreenController extends GetxController {
     log("Wallet Recharge - Is From Booking: $isFromBooking");
     
     if (rechargeAmount.isEmpty || rechargeAmount == "0" || rechargeAmount == "0.0") {
-      Utils.showToast(Get.context!, "Please select a valid amount to recharge");
+      Utils.showToast(Get.context!, "desPleaseSelectRechargeAmount".tr);
       return;
     }
 

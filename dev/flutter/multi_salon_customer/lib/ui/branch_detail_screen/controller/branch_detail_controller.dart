@@ -384,7 +384,7 @@ class BranchDetailController extends GetxController
       }
     } catch (e) {
       log("Error sharing salon link :: $e");
-      Utils.showToast(Get.context!, "Error sharing salon link");
+      Utils.showToast(Get.context!, "desErrorSharingLink".tr);
     }
   }
 
@@ -398,7 +398,7 @@ class BranchDetailController extends GetxController
 
       if (salonShareUrl != null && salonShareUrl!.isNotEmpty) {
         await Clipboard.setData(ClipboardData(text: salonShareUrl!));
-        Utils.showToast(Get.context!, "Link copied to clipboard!");
+        Utils.showToast(Get.context!, "desLinkCopied".tr);
         log("Copy Salon Link - Copied: $salonShareUrl");
       } else {
         Utils.showToast(
@@ -407,7 +407,7 @@ class BranchDetailController extends GetxController
       }
     } catch (e) {
       log("Error copying salon link :: $e");
-      Utils.showToast(Get.context!, "Error copying salon link");
+      Utils.showToast(Get.context!, "desErrorCopyingLink".tr);
     }
   }
 

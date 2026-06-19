@@ -1,422 +1,242 @@
-import 'dart:developer';
-
-import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/dialog/progress_dialog.dart';
-import 'package:salon_2/main.dart';
-import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
-import 'package:salon_2/utils/utils.dart';
 
 class LoginScreen extends StatelessWidget {
+  LoginScreen({super.key});
+
   final LoginScreenController loginScreenController =
       Get.find<LoginScreenController>();
 
-  LoginScreen({super.key});
+  InputDecoration _fieldDecoration(String hint) {
+    return InputDecoration(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      fillColor: AppColors.brandGrayLight,
+      filled: true,
+      hintStyle: TextStyle(
+        color: AppColors.brandGrayMuted,
+        fontSize: 14,
+        fontFamily: AppFontFamily.sfProDisplayRegular,
+      ),
+      hintText: hint,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.lineColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.brandTerracotta, width: 1.5),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      backgroundColor: AppColors.brandWhite,
+      resizeToAvoidBottomInset: true,
       body: GetBuilder<LoginScreenController>(
         id: Constant.idProgressView,
         builder: (logic) {
           logic.isFirstTap = true;
           return ProgressDialog(
             inAsyncCall: logic.isLoading.value,
-            child: Stack(
-              children: [
-                SizedBox(
-                    width: Get.width,
-                    height: Get.height,
-                    child: Image.asset(AppAsset.imLogin, fit: BoxFit.cover)),
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: BlurryContainer(
-                      height: Get.height * 0.75,
-                      padding: const EdgeInsets.only(
-                          left: 16, right: 16, bottom: 30),
-                      blur: 6,
-                      elevation: 0,
-                      color: Colors.white12,
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Center(
-                              child: Text(
-                                "txtLogIn".tr,
-                                style: TextStyle(
-                                  fontFamily: AppFontFamily.sfProDisplayBold,
-                                  fontSize: 30,
-                                  color: AppColors.whiteColor,
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 36),
+                    Center(
+                      child: Image.asset(
+                        AppAsset.icLogo,
+                        height: 88,
+                        width: 88,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'txtLogIn'.tr,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplayBold,
+                        fontSize: 28,
+                        color: AppColors.brandBlack,
+                        height: 1.15,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'txtEnterID'.tr,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplayRegular,
+                        fontSize: 15,
+                        color: AppColors.brandGrayMuted,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'txtEnterID'.tr,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplayBold,
+                        fontSize: 14,
+                        color: AppColors.brandBlack,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: loginScreenController.emailController,
+                      cursorColor: AppColors.brandTerracotta,
+                      keyboardType: TextInputType.emailAddress,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontFamily: AppFontFamily.sfProDisplayMedium,
+                        color: AppColors.brandBlack,
+                      ),
+                      decoration: _fieldDecoration('txtEnterID'.tr),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'txtPassword'.tr,
+                      style: TextStyle(
+                        fontFamily: AppFontFamily.sfProDisplayBold,
+                        fontSize: 14,
+                        color: AppColors.brandBlack,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    GetBuilder<LoginScreenController>(
+                      id: Constant.idPasswordVisible,
+                      builder: (pwLogic) {
+                        return TextFormField(
+                          controller: loginScreenController.pwController,
+                          obscureText: !pwLogic.isPasswordVisible,
+                          cursorColor: AppColors.brandTerracotta,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: AppFontFamily.sfProDisplayMedium,
+                            color: AppColors.brandBlack,
+                          ),
+                          decoration: _fieldDecoration('txtPassword'.tr).copyWith(
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                pwLogic.isPasswordVisible
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: AppColors.brandGrayMuted,
+                                size: 22,
+                              ),
+                              onPressed: pwLogic.onPasswordVisibility,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    GetBuilder<LoginScreenController>(
+                      builder: (checkLogic) {
+                        return GestureDetector(
+                          onTap: () {
+                            checkLogic.isCheck = !checkLogic.isCheck;
+                            checkLogic.update();
+                          },
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 22,
+                                width: 22,
+                                margin: const EdgeInsets.only(top: 2),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: checkLogic.isCheck
+                                        ? AppColors.brandTerracotta
+                                        : AppColors.roundBorder,
+                                    width: 1.5,
+                                  ),
+                                  color: checkLogic.isCheck
+                                      ? AppColors.brandTerracotta
+                                      : AppColors.brandWhite,
                                 ),
+                                child: checkLogic.isCheck
+                                    ? const Icon(
+                                        Icons.check,
+                                        size: 16,
+                                        color: Colors.white,
+                                      )
+                                    : null,
                               ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Text(
-                              "txtEnterID".tr,
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold,
-                                fontSize: 16,
-                                color: AppColors.whiteColor,
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(top: 5),
-                              decoration: BoxDecoration(
-                                boxShadow: Constant.boxShadow,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: TextFormField(
-                                controller:
-                                    loginScreenController.emailController,
-                                cursorColor: AppColors.primaryAppColor,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: AppFontFamily.sfProDisplayBold,
-                                  color: AppColors.primaryTextColor,
-                                ),
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  contentPadding:
-                                      const EdgeInsets.only(top: 12, left: 10),
-                                  fillColor: AppColors.whiteColor,
-                                  filled: true,
-                                  hintStyle: TextStyle(
-                                    color: AppColors.greyColor,
-                                    fontSize: 13.8,
-                                    fontFamily:
-                                        AppFontFamily.sfProDisplayMedium,
-                                  ),
-                                  hintText: "txtEnterID".tr,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                        color: AppColors.primaryAppColor,
-                                        width: 2),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Text(
-                              "txtPassword".tr,
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.sfProDisplayBold,
-                                fontSize: 16,
-                                color: AppColors.whiteColor,
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(top: 5),
-                              decoration: BoxDecoration(
-                                boxShadow: Constant.boxShadow,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: TextFormField(
-                                controller: loginScreenController.pwController,
-                                cursorColor: AppColors.primaryAppColor,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: AppFontFamily.sfProDisplayBold,
-                                  color: AppColors.primaryTextColor,
-                                ),
-                                decoration: InputDecoration(
-                                  contentPadding:
-                                      const EdgeInsets.only(top: 12, left: 10),
-                                  fillColor: AppColors.whiteColor,
-                                  filled: true,
-                                  hintStyle: TextStyle(
-                                    color: AppColors.greyColor,
-                                    fontSize: 13.8,
-                                    fontFamily:
-                                        AppFontFamily.sfProDisplayMedium,
-                                  ),
-                                  hintText: "txtPassword".tr,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                        color: AppColors.primaryAppColor,
-                                        width: 2),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            GetBuilder<LoginScreenController>(
-                              builder: (logic) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    logic.isCheck = !logic.isCheck;
-                                    logic.update();
-                                  },
-                                  child: Container(
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          height: 25,
-                                          width: 25,
-                                          padding: const EdgeInsets.all(7),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                            border: Border.all(
-                                                color: AppColors.whiteColor),
-                                            color: AppColors.primaryAppColor
-                                                .withOpacity(0.1),
-                                          ),
-                                          child: logic.isCheck
-                                              ? Image.asset(
-                                                  AppAsset.icCheck,
-                                                  color: AppColors.whiteColor,
-                                                )
-                                              : const SizedBox(),
-                                        ).paddingOnly(right: 10),
-                                        Expanded(
-                                          child: FittedBox(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                text: 'desTerms'.tr,
-                                                style: TextStyle(
-                                                  color: AppColors.whiteColor,
-                                                  fontFamily: AppFontFamily
-                                                      .sfProDisplay,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 13,
-                                                ),
-                                                children: <TextSpan>[
-                                                  TextSpan(
-                                                    text: 'desPolicy'.tr,
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color:
-                                                          AppColors.whiteColor,
-                                                      decoration: TextDecoration
-                                                          .underline,
-                                                      fontFamily: AppFontFamily
-                                                          .sfProDisplay,
-                                                      fontSize: 13,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ).paddingOnly(left: 15, top: 8, bottom: 8),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 30),
-                            // Demo Login button commented out
-                            /*
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      FocusScopeNode currentFocus =
-                                          FocusScope.of(context);
-                                      currentFocus.focusedChild?.unfocus();
-
-                                      await logic.onLoginApiCall(
-                                        email: "john.doe@gmail.com",
-                                        password: "john123",
-                                        fcmToken: fcmToken ?? "",
-                                      );
-
-                                      if (logic.loginCategory?.status == true) {
-                                        logic.isLogin = true;
-                                        Constant.storage
-                                            .write('isLogIn', logic.isLogin);
-                                        Constant.storage.write('expertId',
-                                            logic.loginCategory?.expert?.id);
-                                        Constant.storage.write('emailId',
-                                            logic.emailController.text);
-                                        Constant.storage.write('password',
-                                            logic.pwController.text);
-
-                                        log("Is login check :: ${Constant.storage.read("isLogIn")}");
-                                        log("Expert Id :: ${Constant.storage.read("expertId")}");
-                                        log("Email Id :: ${Constant.storage.read("emailId")}");
-                                        log("Password :: ${Constant.storage.read("password")}");
-
-                                        await logic.onGetExpertApiCall(
-                                            expertId: Constant.storage
-                                                .read<String>("expertId")
-                                                .toString());
-
-                                        if (logic.getExpertCategory?.status ==
-                                            true) {
-                                          earning = loginScreenController
-                                              .getExpertCategory?.data?.earning
-                                              ?.toStringAsFixed(2);
-                                          Constant.storage
-                                              .write('isDemoLogin', true);
-                                          Constant.storage.write(
-                                              'fName',
-                                              logic.loginCategory?.expert?.fname
-                                                  .toString());
-                                          Constant.storage.write(
-                                              'lName',
-                                              logic.loginCategory?.expert?.lname
-                                                  .toString());
-                                          Constant.storage.write(
-                                              'uniqueID',
-                                              logic.loginCategory?.expert
-                                                  ?.uniqueId
-                                                  .toString());
-                                          Constant.storage.write(
-                                              'hostImage',
-                                              logic.loginCategory?.expert
-                                                  ?.image);
-                                          Constant.storage.write(
-                                              'paymentType',
-                                              logic.loginCategory?.expert
-                                                  ?.paymentType);
-                                          Constant.storage.write(
-                                              "salonId",
-                                              logic.getExpertCategory?.data
-                                                  ?.salonId?.id);
-
-                                          log("First Name :: ${Constant.storage.read("fName")}");
-                                          log("Last Name :: ${Constant.storage.read("lName")}");
-                                          log("Payment Type :: ${Constant.storage.read("paymentType")}");
-                                          log("Host Image :: ${Constant.storage.read("hostImage")}");
-
-                                          Get.offAndToNamed(AppRoutes.bottom);
-                                        } else {
-                                          Utils.showToast(Get.context!,
-                                              "${logic.getExpertCategory?.message}");
-                                        }
-                                      } else {
-                                        Utils.showToast(Get.context!,
-                                            "${logic.loginCategory?.message}");
-                                      }
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 20, right: 8),
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryAppColor,
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          "Demo Login",
-                                          style: TextStyle(
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplay,
-                                            fontSize: 16,
-                                            color: AppColors.whiteColor,
-                                          ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: 'desTerms'.tr,
+                                    style: TextStyle(
+                                      color: AppColors.brandBlack,
+                                      fontFamily:
+                                          AppFontFamily.sfProDisplayRegular,
+                                      fontSize: 13,
+                                      height: 1.4,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: 'desPolicy'.tr,
+                                        style: TextStyle(
+                                          color: AppColors.brandTerracotta,
+                                          fontWeight: FontWeight.w600,
+                                          decoration: TextDecoration.underline,
+                                          fontFamily:
+                                              AppFontFamily.sfProDisplayMedium,
+                                          fontSize: 13,
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      FocusScopeNode currentFocus =
-                                          FocusScope.of(context);
-                                      currentFocus.focusedChild?.unfocus();
-
-                                      logic.onContinueClick();
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 20, left: 8),
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryAppColor,
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          "txtLogIn".tr,
-                                          style: TextStyle(
-                                            fontFamily:
-                                                AppFontFamily.sfProDisplay,
-                                            fontSize: 16,
-                                            color: AppColors.whiteColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            */
-                            // Centered Login button
-                            Center(
-                              child: GestureDetector(
-                                onTap: () async {
-                                  FocusScopeNode currentFocus =
-                                      FocusScope.of(context);
-                                  currentFocus.focusedChild?.unfocus();
-
-                                  logic.onContinueClick();
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(top: 20),
-                                  height: 50,
-                                  width: Get.width * 0.8,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryAppColor,
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      "txtLogIn".tr,
-                                      style: TextStyle(
-                                        fontFamily: AppFontFamily.sfProDisplay,
-                                        fontSize: 16,
-                                        color: AppColors.whiteColor,
-                                      ),
-                                    ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          logic.onContinueClick();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.brandBlack,
+                          foregroundColor: AppColors.brandWhite,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'txtLogIn'.tr,
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.sfProDisplayBold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 32),
+                  ],
                 ),
-              ],
+              ),
             ),
           );
         },

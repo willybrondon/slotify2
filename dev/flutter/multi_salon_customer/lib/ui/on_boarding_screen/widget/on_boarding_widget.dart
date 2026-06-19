@@ -28,6 +28,7 @@ class OnBoardingView extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return OnboardingItemView(
                       title: logic.title[index],
+                      subtitle: logic.subTitle[index],
                       image: logic.image[index],
                     );
                   },
@@ -68,11 +69,13 @@ class OnBoardingView extends StatelessWidget {
 
 class OnboardingItemView extends StatelessWidget {
   final String title;
+  final String subtitle;
   final String image;
 
   const OnboardingItemView({
     super.key,
     required this.title,
+    required this.subtitle,
     required this.image,
   });
 
@@ -105,7 +108,7 @@ class OnboardingItemView extends StatelessWidget {
               textAlign: TextAlign.center,
             ).paddingAll(20),
             Text(
-              "Transform Your Look, Transform Your Life, Your Ultimate Desire Awaits Here.",
+              subtitle,
               style: TextStyle(
                 color: AppColors.termsDialog,
                 fontFamily: AppFontFamily.heeBo500,

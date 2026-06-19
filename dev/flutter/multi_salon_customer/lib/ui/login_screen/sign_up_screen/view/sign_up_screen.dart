@@ -209,9 +209,9 @@ class SignUpScreen extends StatelessWidget {
                             ],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter mobile number';
+                                return 'desPleaseEnterMobile'.tr;
                               } else if (!logic.isMobileValid(value)) {
-                                return 'Please enter a valid mobile number (10-15 digits)';
+                                return 'desPleaseEnterMobileValid'.tr;
                               }
                               return null;
                             },

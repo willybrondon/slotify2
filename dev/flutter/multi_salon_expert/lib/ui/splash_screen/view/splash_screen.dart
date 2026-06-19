@@ -30,12 +30,38 @@ class _SplashScreenState extends State<SplashScreen> {
   FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
   bool notificationVisit = false;
 
+  bool _hasNavigated = false;
+
+  bool _isSessionAuthError(String message, {int? statusCode}) {
+    if (statusCode == 401 || statusCode == 403) return true;
+    final m = message.toLowerCase();
+    return m.contains('unauthorized') ||
+        m.contains('session expired') ||
+        m.contains('token expired') ||
+        m.contains('jwt expired') ||
+        m.contains('forbidden') ||
+        m.contains('not authorized');
+  }
+
+  void _navigateFromSplash({required bool toLogin, String? toast}) {
+    if (_hasNavigated) return;
+    _hasNavigated = true;
+    if (toast != null && toast.isNotEmpty) {
+      Utils.showToast(Get.context!, toast);
+    }
+    Get.offAllNamed(toLogin ? AppRoutes.login : AppRoutes.bottom);
+  }
+
   @override
   void initState() {
-    // Add a timeout to ensure the app doesn't get stuck
-    Future.delayed(const Duration(seconds: 15), () {
-      log("Splash screen timeout - forcing navigation to login");
-      Get.offAllNamed(AppRoutes.login);
+    super.initState();
+
+    // Fallback si le splash reste bloqué (réseau lent) — ne pas déconnecter.
+    Future.delayed(const Duration(seconds: 20), () {
+      if (_hasNavigated) return;
+      log("Splash screen timeout — fallback navigation");
+      final loggedIn = Constant.storage.read<bool>('isLogIn') == true;
+      _navigateFromSplash(toLogin: !loggedIn);
     });
 
     Future.delayed(const Duration(seconds: 3), () async {
@@ -98,50 +124,53 @@ class _SplashScreenState extends State<SplashScreen> {
                 log("salon Id df:: ${loginScreenController.getExpertCategory?.data?.salonId.toString()}");
 
                 log("Navigating to bottom bar...");
-                Get.offAllNamed(AppRoutes.bottom);
+                _navigateFromSplash(toLogin: false);
               } else {
                 log("Expert API failed: ${loginScreenController.getExpertCategory?.message}");
-                // Only logout if it's a clear authentication error, not network issues
-                String errorMessage =
+                final errorMessage =
                     loginScreenController.getExpertCategory?.message ?? "";
-                if (errorMessage.toLowerCase().contains('unauthorized') ||
-                    errorMessage.toLowerCase().contains('invalid') ||
-                    errorMessage.toLowerCase().contains('expired') ||
-                    errorMessage.toLowerCase().contains('forbidden')) {
+                if (_isSessionAuthError(errorMessage)) {
                   log("Authentication error detected, logging out user");
-                  Utils.showToast(
-                      Get.context!, "Session expired. Please login again.");
-                  // Clear login state
                   Constant.storage.write('isLogIn', false);
-                  Get.offAllNamed(AppRoutes.login);
+                  _navigateFromSplash(
+                    toLogin: true,
+                    toast: "Session expired. Please login again.",
+                  );
                 } else {
                   log("Network or temporary error, keeping user logged in");
-                  // For network errors or temporary issues, keep user logged in
-                  // and navigate to main screen
-                  Get.offAllNamed(AppRoutes.bottom);
+                  _navigateFromSplash(toLogin: false);
                 }
               }
             } else {
               log("User not logged in, navigating to login...");
-              Get.offAllNamed(AppRoutes.login);
+              _navigateFromSplash(toLogin: true);
             }
           }
         } else {
           log("Setting API failed: ${splashScreenController.settingCategory?.message}");
-          Utils.showToast(
-              Get.context!,
-              splashScreenController.settingCategory?.message ??
-                  "Failed to load settings");
-          // Navigate to login even if setting API fails
-          Get.offAllNamed(AppRoutes.login);
+          final loggedIn = Constant.storage.read<bool>('isLogIn') == true;
+          if (loggedIn) {
+            log("Settings API failed but session kept — opening app");
+            _navigateFromSplash(toLogin: false);
+          } else {
+            Utils.showToast(
+                Get.context!,
+                splashScreenController.settingCategory?.message ??
+                    "Failed to load settings");
+            _navigateFromSplash(toLogin: true);
+          }
         }
       } catch (e) {
         log("Error in splash screen initialization: $e");
-        // Navigate to login on any error
-        Get.offAllNamed(AppRoutes.login);
+        final loggedIn = Constant.storage.read<bool>('isLogIn') == true;
+        if (loggedIn) {
+          log("Splash error but session kept — opening app");
+          _navigateFromSplash(toLogin: false);
+        } else {
+          _navigateFromSplash(toLogin: true);
+        }
       }
     });
-    super.initState();
   }
 
   initFirebase() async {

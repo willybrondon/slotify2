@@ -2162,7 +2162,7 @@ class BookingScreen extends StatelessWidget {
                                   child: TextField(
                                     controller: logic.couponCodeController,
                                     decoration: InputDecoration(
-                                      hintText: "Enter coupon code",
+                                      hintText: 'txtEnterCouponCode'.tr,
                                       hintStyle: TextStyle(
                                         fontSize: 14,
                                         color: AppColors.currencyGrey,
@@ -2208,7 +2208,7 @@ class BookingScreen extends StatelessWidget {
                                 fontSize: 14,
                                 buttonText: logic.manualCouponCode != null
                                     ? "Applied"
-                                    : "Apply",
+                                    : 'txtApply'.tr,
                                 onTap: () {
                                   if (logic.manualCouponCode == null) {
                                     logic.onApplyManualCouponCode();
@@ -2355,7 +2355,7 @@ class BookingScreen extends StatelessWidget {
                                               ),
                                               child: RichText(
                                                 text: TextSpan(
-                                                  text: 'Offer Validity  ',
+                                                  text: '${'txtOfferValidity'.tr}  ',
                                                   style: TextStyle(
                                                     fontSize: 10,
                                                     color: AppColors

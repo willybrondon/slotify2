@@ -120,7 +120,7 @@ class SignInController extends GetxController {
               // Utils.showToast(Get.context!,
               //     ">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
               // log(">>>>>>>>>>>>>${loginScreenController.loginCategory?.user?.id}");
-              Utils.showToast(Get.context!, "Login SuccessFully..!");
+              Utils.showToast(Get.context!, "desLoginSuccess".tr);
               Constant.storage.write('isLogIn', true);
               Constant.storage.write(
                   'userId', loginScreenController.loginCategory?.user?.id);
@@ -220,7 +220,7 @@ class SignInController extends GetxController {
         dev.log("Check User successful: ${checkUserCategory?.status}");
       } else {
         dev.log("Check User failed with status code: ${response.statusCode}");
-        Utils.showToast(Get.context!, "Check user failed. Please try again.");
+        Utils.showToast(Get.context!, "desCheckUserFailed".tr);
       }
     } on AppException catch (exception) {
       dev.log("App Exception in Check User: ${exception.message}");
@@ -231,14 +231,14 @@ class SignInController extends GetxController {
           "Network connection error. Please check your internet connection.");
     } on HandshakeException catch (e) {
       dev.log("SSL Handshake error in Check User: $e");
-      Utils.showToast(Get.context!, "SSL connection error. Please try again.");
+      Utils.showToast(Get.context!, "desSslConnectionError".tr);
     } on TimeoutException catch (e) {
       dev.log("Timeout error in Check User: $e");
       Utils.showToast(Get.context!,
           "Request timeout. Please check your connection and try again.");
     } catch (e) {
       dev.log("Error call Check User Api :: $e");
-      Utils.showToast(Get.context!, 'Connection error. Please try again.');
+      Utils.showToast(Get.context!, 'desConnectionError'.tr);
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
@@ -285,7 +285,7 @@ class SignInController extends GetxController {
           if (loginScreenController.loginCategory?.status == true) {
             dev.log(
                 "isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
-            Utils.showToast(Get.context!, "User Login SuccessFully..!");
+            Utils.showToast(Get.context!, "desUserLoginSuccess".tr);
 
             await Constant.storage.write('isGoogle', true);
             await Constant.storage
@@ -537,7 +537,7 @@ class SignInController extends GetxController {
         if (loginScreenController.loginCategory?.status == true) {
           dev.log(
               "isLogin :: ${loginScreenController.loginCategory?.user?.isUpdate}");
-          Utils.showToast(Get.context!, "Successfully signed in with Apple!");
+          Utils.showToast(Get.context!, "desAppleSignInSuccess".tr);
 
           await Constant.storage.write('isApple', true);
           await Constant.storage
@@ -631,7 +631,7 @@ class SignInController extends GetxController {
         dev.log('Success signing in with Apple');
         return user;
       } else {
-        Utils.showToast(Get.context!, "Apple sign in failed");
+        Utils.showToast(Get.context!, "desAppleSignInFailed".tr);
         dev.log('Apple sign in failed - no user');
         return null;
       }
@@ -640,7 +640,7 @@ class SignInController extends GetxController {
       dev.log('Error details: $e');
 
       if (e.code == AuthorizationErrorCode.canceled) {
-        Utils.showToast(Get.context!, "Sign in cancelled");
+        Utils.showToast(Get.context!, "desSignInCancelled".tr);
       } else if (e.code == AuthorizationErrorCode.failed) {
         Utils.showToast(Get.context!,
             "Sign in failed. Please ensure Sign in with Apple is enabled in Settings.");

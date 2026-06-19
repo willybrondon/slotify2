@@ -166,7 +166,7 @@ class LoginScreenController extends GetxController {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Login Api :: $e");
-      Utils.showToast(Get.context!, 'Login failed: $e');
+      Utils.showToast(Get.context!, 'desLoginFailed'.trParams({'error': '$e'}));
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
@@ -197,7 +197,7 @@ class LoginScreenController extends GetxController {
       log("Get Expert StatusCode :: ${response.statusCode}");
       log("Get Expert Body :: ${response.body}");
 
-      if (response.statusCode == 200) {
+      if (response.body.isNotEmpty) {
         final jsonResponse = jsonDecode(response.body);
         getExpertCategory = GetProfileModel.fromJson(jsonResponse);
       }

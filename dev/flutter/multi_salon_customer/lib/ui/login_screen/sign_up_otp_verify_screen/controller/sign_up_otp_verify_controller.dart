@@ -80,7 +80,7 @@ class SignUpOtpVerifyController extends GetxController {
           if (loginScreenController.loginCategory?.status == true) {
             isLoading(true);
             update([Constant.idProgressView]);
-            Utils.showToast(Get.context!, "User Login SuccessFully..!");
+            Utils.showToast(Get.context!, "desUserLoginSuccess".tr);
             Constant.storage.write('isLogIn', true);
             Constant.storage
                 .write('userId', loginScreenController.loginCategory?.user?.id);
@@ -175,7 +175,7 @@ class SignUpOtpVerifyController extends GetxController {
           Utils.showToast(Get.context!, signUpOtpVerifyCategory?.message ?? "");
         }
       } else {
-        Utils.showToast(Get.context!, "Please Enter Otp");
+        Utils.showToast(Get.context!, "desPleaseEnterOtp".tr);
       }
     } catch (e) {
       dev.log("Error On Click Continue in Sign Up :: $e");

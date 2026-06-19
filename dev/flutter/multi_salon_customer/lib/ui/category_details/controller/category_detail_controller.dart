@@ -105,7 +105,7 @@ class CategoryDetailController extends GetxController {
       update([Constant.idProgressView, Constant.idServiceList]);
 
       // Get current language code (default to 'en')
-      final languageCode = Get.locale?.languageCode ?? 'en';
+      final languageCode = Get.locale?.languageCode ?? 'fr';
 
       final queryParameters = {
         "categoryId": categoryId,

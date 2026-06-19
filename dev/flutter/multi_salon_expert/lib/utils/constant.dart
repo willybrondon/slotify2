@@ -4,8 +4,12 @@ import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 
 class Constant {
-  static const languageEn = "fr";
-  static const countryCodeEn = "FR";
+  static const languageDefault = 'fr';
+  static const countryCodeDefault = 'FR';
+  /// @deprecated Use [languageDefault]
+  static const languageEn = languageDefault;
+  /// @deprecated Use [countryCodeDefault]
+  static const countryCodeEn = countryCodeDefault;
 
   /// Add App Store Id
   static String appStoreId = ' ';

@@ -252,16 +252,16 @@ class GuestLoginController extends GetxController with WidgetsBindingObserver {
               Get.context!, jsonResponse['message']?.toString() ?? '');
         }
       } else {
-        Utils.showToast(Get.context!, 'Connection error. Please try again.');
+        Utils.showToast(Get.context!, 'desConnectionError'.tr);
       }
     } on SocketException {
       Utils.showToast(
           Get.context!, 'Network error. Check your internet connection.');
     } on TimeoutException {
-      Utils.showToast(Get.context!, 'Request timed out.');
+      Utils.showToast(Get.context!, 'desRequestTimeout'.tr);
     } catch (e) {
       dev.log('guest sendOtp: $e');
-      Utils.showToast(Get.context!, 'Something went wrong.');
+      Utils.showToast(Get.context!, 'desSomethingWentWrong'.tr);
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
@@ -378,16 +378,16 @@ class GuestLoginController extends GetxController with WidgetsBindingObserver {
               Get.context!, loginCategory?.message ?? 'Verification failed');
         }
       } else {
-        Utils.showToast(Get.context!, 'Connection error. Please try again.');
+        Utils.showToast(Get.context!, 'desConnectionError'.tr);
       }
     } on SocketException {
       Utils.showToast(
           Get.context!, 'Network error. Check your internet connection.');
     } on TimeoutException {
-      Utils.showToast(Get.context!, 'Request timed out.');
+      Utils.showToast(Get.context!, 'desRequestTimeout'.tr);
     } catch (e) {
       dev.log('guest verify: $e');
-      Utils.showToast(Get.context!, 'Something went wrong.');
+      Utils.showToast(Get.context!, 'desSomethingWentWrong'.tr);
     } finally {
       isLoading(false);
       update([Constant.idProgressView]);
