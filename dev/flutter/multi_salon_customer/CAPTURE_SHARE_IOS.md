@@ -2,7 +2,7 @@
 
 Android : fonctionne via les intent-filters `SEND` dans `AndroidManifest.xml`.
 
-**iOS** : la Share Extension est intégrée dans `Runner.xcodeproj` (target `Share Extension`).
+**iOS (CI `dev`)** : Share Extension embarquée dans l’IPA (`PlugIns/Share Extension.appex`). Profils requis dans `BUILD_PROVISION_PROFILE_BASE64` : `appstore-skedisy-customer` + `appstore-skedisy-customer-share` (voir `ios/IOS_CI_SIGNING.md`).
 
 ## Prérequis Apple Developer (une fois)
 

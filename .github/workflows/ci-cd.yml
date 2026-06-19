@@ -363,21 +363,45 @@ jobs:
           done
        
 
-      - name: Verify customer provisioning profile
-        if: matrix.app == 'customer'
+      - name: Verify iOS provisioning profiles
         run: |
-          PROFILE=""
-          for f in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
-            NAME=$(security cms -D -i "$f" 2>/dev/null | plutil -extract Name raw -o - - 2>/dev/null || true)
-            if [ "$NAME" = "appstore-skedisy-customer" ]; then
-              PROFILE="$f"
-              break
-            fi
-          done
-          if [ -z "$PROFILE" ]; then
-            echo "::warning::Profile appstore-skedisy-customer not found — check BUILD_PROVISION_PROFILE_BASE64 secret."
-          else
-            echo "Found profile: $PROFILE"
+          set -e
+          find_profile() {
+            local expected="$1"
+            for f in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
+              NAME=$(security cms -D -i "$f" 2>/dev/null | plutil -extract Name raw -o - - 2>/dev/null || true)
+              if [ "$NAME" = "$expected" ]; then
+                echo "$f"
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          if [ "${{ matrix.app }}" = "customer" ]; then
+            MAIN=$(find_profile "appstore-skedisy-customer") || {
+              echo "::error::Missing profile appstore-skedisy-customer in BUILD_PROVISION_PROFILE_BASE64"
+              exit 1
+            }
+            SHARE=$(find_profile "appstore-skedisy-customer-share") || {
+              echo "::error::Missing profile appstore-skedisy-customer-share in BUILD_PROVISION_PROFILE_BASE64"
+              exit 1
+            }
+            ENT=$(security cms -D -i "$MAIN")
+            echo "$ENT" | grep -q "com.apple.security.application-groups" || {
+              echo "::error::appstore-skedisy-customer missing App Groups entitlement"
+              exit 1
+            }
+            echo "Customer profiles OK: $MAIN"
+            echo "Share Extension profile OK: $SHARE"
+          fi
+
+          if [ "${{ matrix.app }}" = "expert" ]; then
+            find_profile "appstore-skedisy-expert" || {
+              echo "::error::Missing profile appstore-skedisy-expert in BUILD_PROVISION_PROFILE_BASE64"
+              exit 1
+            }
+            echo "Expert profile OK"
           fi
 
       - name: install pod ios for testting
@@ -401,6 +425,15 @@ jobs:
           DEVELOPMENT_TEAM=7B755FRMAM \
           APS_ENVIRONMENT=production \
           clean archive
+          if [ "${{ matrix.app }}" = "customer" ]; then
+            PLUGINS="$RUNNER_TEMP/Runner.xcarchive/Products/Applications/Runner.app/PlugIns"
+            ls -la "$PLUGINS" || true
+            test -d "$PLUGINS/Share Extension.appex" || {
+              echo "::error::Share Extension.appex missing from archive — Partager vers Skedisy will not work"
+              exit 1
+            }
+            echo "Share Extension embedded in IPA archive."
+          fi
 
       - name: export ipa
         env:
