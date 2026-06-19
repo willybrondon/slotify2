@@ -2,19 +2,23 @@
 
 ## Profils attendus dans `BUILD_PROVISION_PROFILE_BASE64`
 
+Les noms **exacts** sur Apple Developer (sans tirets) :
+
 | Nom du profil | Bundle ID | Cible |
 |---------------|-----------|--------|
-| `appstore-skedisy-customer` | `com.skedisy.customer` | App Runner |
-| `appstore-skedisy-customer-share` | `com.skedisy.customer.ShareExtension` | Share Extension (Partager → Skedisy) |
-| `appstore-skedisy-expert` | (expert) | App expert (même tarball CI) |
+| `appstoreskedisycustomer` | `com.skedisy.customer` | App Runner |
+| `appstoreskedisycustomershare` | `com.skedisy.customer.ShareExtension` | Share Extension (Partager → Skedisy) |
+| `appstoreskedisyexpert` | (expert) | App expert (même tarball CI) |
 
 ```bash
 tar czvf mobile_pp.tgz \
-  appstore-skedisy-customer.mobileprovision \
-  appstore-skedisy-customer-share.mobileprovision \
-  appstore-skedisy-expert.mobileprovision
+  appstoreskedisycustomer.mobileprovision \
+  appstoreskedisycustomershare.mobileprovision \
+  appstoreskedisyexpert.mobileprovision
 base64 -i mobile_pp.tgz | pbcopy
 ```
+
+> Le nom affiché dans le portail Apple est celui utilisé par Xcode (`PROVISIONING_PROFILE_SPECIFIER`), pas forcément le nom du fichier `.mobileprovision`.
 
 ## Entitlements app (`Runner/Runner.entitlements`)
 
@@ -25,7 +29,7 @@ base64 -i mobile_pp.tgz | pbcopy
 ## Xcode — Share Extension
 
 - Target **Share Extension** embarquée dans Runner (`Embed Foundation Extensions`, avant Thin Binary)
-- Release : `PROVISIONING_PROFILE_SPECIFIER` = `appstore-skedisy-customer-share`
+- Release : `PROVISIONING_PROFILE_SPECIFIER` = `appstoreskedisycustomershare`
 
 ```bash
 cd ios && pod install

@@ -379,17 +379,17 @@ jobs:
           }
 
           if [ "${{ matrix.app }}" = "customer" ]; then
-            MAIN=$(find_profile "appstore-skedisy-customer") || {
-              echo "::error::Missing profile appstore-skedisy-customer in BUILD_PROVISION_PROFILE_BASE64"
+            MAIN=$(find_profile "appstoreskedisycustomer") || {
+              echo "::error::Missing profile appstoreskedisycustomer in BUILD_PROVISION_PROFILE_BASE64"
               exit 1
             }
-            SHARE=$(find_profile "appstore-skedisy-customer-share") || {
-              echo "::error::Missing profile appstore-skedisy-customer-share in BUILD_PROVISION_PROFILE_BASE64"
+            SHARE=$(find_profile "appstoreskedisycustomershare") || {
+              echo "::error::Missing profile appstoreskedisycustomershare in BUILD_PROVISION_PROFILE_BASE64"
               exit 1
             }
             ENT=$(security cms -D -i "$MAIN")
             echo "$ENT" | grep -q "com.apple.security.application-groups" || {
-              echo "::error::appstore-skedisy-customer missing App Groups entitlement"
+              echo "::error::appstoreskedisycustomer missing App Groups entitlement"
               exit 1
             }
             echo "Customer profiles OK: $MAIN"
@@ -397,8 +397,8 @@ jobs:
           fi
 
           if [ "${{ matrix.app }}" = "expert" ]; then
-            find_profile "appstore-skedisy-expert" || {
-              echo "::error::Missing profile appstore-skedisy-expert in BUILD_PROVISION_PROFILE_BASE64"
+            find_profile "appstoreskedisyexpert" || {
+              echo "::error::Missing profile appstoreskedisyexpert in BUILD_PROVISION_PROFILE_BASE64"
               exit 1
             }
             echo "Expert profile OK"
