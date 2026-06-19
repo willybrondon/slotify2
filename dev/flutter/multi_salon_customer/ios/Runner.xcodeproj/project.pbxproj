@@ -242,7 +242,6 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
-				A2B3C4D501234567890AB0C /* Embed Foundation Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				C5AE6304F86B694CA41B43B1 /* [CP] Embed Pods Frameworks */,
 				9B46DFC2F2A4898FAB7BC505 /* [CP] Copy Pods Resources */,
@@ -250,7 +249,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				A2B3C4D501234567890AB0F /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -848,6 +846,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.skedisy.customer.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "appstore-skedisy-customer-share";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -879,6 +878,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.skedisy.customer.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "appstore-skedisy-customer-share";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -910,6 +910,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.skedisy.customer.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "appstore-skedisy-customer-share";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

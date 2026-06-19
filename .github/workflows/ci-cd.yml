@@ -145,6 +145,17 @@ jobs:
         distribution: 'zulu'
         java-version: ${{ env.JAVA_VERSION }}
 
+    - name: Cache Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: gradle-${{ runner.os }}-${{ matrix.environment }}-${{ matrix.app }}-${{ hashFiles(format('{0}/flutter/multi_salon_{1}/android/**/gradle-wrapper.properties', matrix.environment, matrix.app)) }}
+        restore-keys: |
+          gradle-${{ runner.os }}-${{ matrix.environment }}-${{ matrix.app }}-
+          gradle-${{ runner.os }}-
+
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
@@ -201,7 +212,12 @@ jobs:
     - name: clean gradlew (Android)
       run: |
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android"
-        ./gradlew clean
+        for attempt in 1 2 3; do
+          ./gradlew clean --no-daemon && exit 0
+          echo "Gradle clean failed (attempt $attempt), retrying in 15s..."
+          sleep 15
+        done
+        exit 1
 
     - name: Setup Android Keystore
       run: |
@@ -347,7 +363,24 @@ jobs:
           done
        
 
-      - name: install pod ios for testting 
+      - name: Verify customer provisioning profile
+        if: matrix.app == 'customer'
+        run: |
+          PROFILE=""
+          for f in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
+            NAME=$(security cms -D -i "$f" 2>/dev/null | plutil -extract Name raw -o - - 2>/dev/null || true)
+            if [ "$NAME" = "appstore-skedisy-customer" ]; then
+              PROFILE="$f"
+              break
+            fi
+          done
+          if [ -z "$PROFILE" ]; then
+            echo "::warning::Profile appstore-skedisy-customer not found — check BUILD_PROVISION_PROFILE_BASE64 secret."
+          else
+            echo "Found profile: $PROFILE"
+          fi
+
+      - name: install pod ios for testting
         run: |
           cd "dev/flutter/multi_salon_${{ matrix.app }}/ios"
           rm -rf ~/Library/Developer/Xcode/DerivedData
