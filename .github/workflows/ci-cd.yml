@@ -389,9 +389,10 @@ jobs:
             }
             ENT=$(security cms -D -i "$MAIN")
             echo "$ENT" | grep -q "com.apple.security.application-groups" || {
-              echo "::error::appstore-skedisy-customer missing App Groups entitlement"
+              echo "::error::appstore-skedisy-customer missing App Groups — regenerate profile after linking group.com.skedisy.customer"
               exit 1
             }
+            echo "App Groups OK in appstore-skedisy-customer"
             echo "Customer profiles OK: $MAIN"
             echo "Share Extension profile OK: $SHARE"
           fi

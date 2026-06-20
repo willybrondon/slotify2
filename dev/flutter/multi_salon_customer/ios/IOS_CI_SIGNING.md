@@ -16,6 +16,8 @@ tar czvf mobile_pp.tgz \
 base64 -i mobile_pp.tgz | pbcopy
 ```
 
+**Important :** après avoir activé **App Groups** sur l’App ID `com.skedisy.customer`, il faut **supprimer l’ancien profil** et en **créer un nouveau** nommé `appstore-skedisy-customer`, puis retélécharger le `.mobileprovision`. Un profil créé avant l’activation de la capability ne contient pas App Groups.
+
 ## Entitlements app (`Runner/Runner.entitlements`)
 
 - `aps-environment` (production)
