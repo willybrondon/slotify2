@@ -16,7 +16,18 @@ tar czvf mobile_pp.tgz \
 base64 -i mobile_pp.tgz | pbcopy
 ```
 
-**Important :** après avoir activé **App Groups** sur l’App ID `com.skedisy.customer`, il faut **supprimer l’ancien profil** et en **créer un nouveau** nommé `appstore-skedisy-customer`, puis retélécharger le `.mobileprovision`. Un profil créé avant l’activation de la capability ne contient pas App Groups.
+**Important :** après avoir activé **App Groups** sur les App ID `com.skedisy.customer` et `com.skedisy.customer.ShareExtension`, il faut **supprimer les anciens profils** et en **créer de nouveaux** nommés `appstore-skedisy-customer` et `appstore-skedisy-customer-share`, puis retélécharger les `.mobileprovision`. Un profil créé avant l’activation de la capability ne contient pas App Groups.
+
+## Export IPA (`exportOptions-customer.plist`)
+
+Le plist d’export doit référencer **les deux** profils (sinon `EXPORT FAILED` sur Share Extension) :
+
+| Bundle ID | Profil |
+|-----------|--------|
+| `com.skedisy.customer` | `appstore-skedisy-customer` |
+| `com.skedisy.customer.ShareExtension` | `appstore-skedisy-customer-share` |
+
+Fichier versionné : `ios/exportOptions-customer.plist` (`method` = `app-store-connect`).
 
 ## Entitlements app (`Runner/Runner.entitlements`)
 
