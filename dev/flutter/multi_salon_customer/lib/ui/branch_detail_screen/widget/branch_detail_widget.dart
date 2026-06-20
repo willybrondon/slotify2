@@ -144,8 +144,15 @@ class BranchDetailTopView extends StatelessWidget {
     return GetBuilder<BranchDetailController>(
       id: Constant.idProgressView,
       builder: (logic) {
-        final imageUrl =
-            logic.getSalonDetailCategory?.salon?.mainImage?.trim() ?? '';
+        final imageUrl = () {
+          final main = logic.getSalonDetailCategory?.salon?.mainImage?.trim() ?? '';
+          if (main.isNotEmpty) return main;
+          final gallery = logic.getSalonDetailCategory?.salon?.image;
+          if (gallery != null && gallery.isNotEmpty) {
+            return gallery.firstWhere((u) => u.trim().isNotEmpty, orElse: () => '');
+          }
+          return '';
+        }();
 
         return Stack(
           fit: StackFit.expand,
@@ -378,7 +385,9 @@ class BranchDetailDataView extends StatelessWidget {
                         ).paddingOnly(right: 12),
                         Expanded(
                           child: Text(
-                            "${logic.getSalonDetailCategory?.salon?.addressDetails?.addressLine1}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.landMark}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.city}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.state}, ${logic.getSalonDetailCategory?.salon?.addressDetails?.country}",
+                            logic.getSalonDetailCategory?.salon?.addressDetails
+                                    ?.formatted ??
+                                '',
                             style: TextStyle(
                               color: AppColors.brandTerracotta,
                               fontFamily: AppFontFamily.heeBo600,

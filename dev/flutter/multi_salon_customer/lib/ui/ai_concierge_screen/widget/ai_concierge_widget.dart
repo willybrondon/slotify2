@@ -1490,19 +1490,28 @@ class AiConciergeResultsView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (service.image != null && service.image!.isNotEmpty)
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: CachedNetworkImage(
-                              imageUrl: service.image!,
-                              height: 60,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Container(
-                                color: AppColors.lineColor,
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: AppColors.lineColor,
-                                child: const Icon(Icons.image),
+                          Container(
+                            height: 56,
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: AppColors.lineColor.withOpacity(0.35),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CachedNetworkImage(
+                                imageUrl: service.image!,
+                                height: 56,
+                                width: double.infinity,
+                                fit: BoxFit.contain,
+                                placeholder: (context, url) => Container(
+                                  color: AppColors.lineColor,
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  color: AppColors.lineColor,
+                                  child: const Icon(Icons.image, size: 20),
+                                ),
                               ),
                             ),
                           )
@@ -1592,7 +1601,13 @@ class AiConciergeResultsView extends StatelessWidget {
                           "AI Concierge (App): Clicked salon: ${salon.name}, ID: ${salon.id}, Navigating to salon detail for booking");
                       Get.toNamed(
                         AppRoutes.branchDetail,
-                        arguments: [salon.id],
+                        arguments: [
+                          salon.id,
+                          city,
+                          latitude,
+                          longitude,
+                          salon.matchedService?.id,
+                        ],
                       );
                     } else {
                       print(

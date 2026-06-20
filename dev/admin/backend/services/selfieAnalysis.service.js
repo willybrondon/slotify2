@@ -26,7 +26,7 @@ const AFRO_CATEGORY_KEYWORDS = {
   ],
   locks: ['lock', 'locks', 'dread', 'retwist', 'starter loc', 'faux lock', 'entretien lock', 'dépose lock'],
   perruques: ['perruque', 'wig', 'lace', 'closure', 'couture', 'extension', 'frontal'],
-  homme: ['fade', 'barbe', 'beard', 'coupe homme', 'skin fade', 'barber', 'rasage', 'contour', 'nattes homme'],
+  homme: ['fade', 'barbe', 'beard', 'coupe homme', 'skin fade', 'barber', 'rasage', 'contour', 'nattes homme', 'homme'],
   esthetique: [
     'ongle', 'manucure', 'pédicure', 'maquillage', 'makeup', 'cil', 'sourcil', 'épilation',
     'soin visage', 'nettoyage', 'gel', 'nail', 'microblading'
@@ -114,9 +114,23 @@ class SelfieAnalysisService {
 
     Object.entries(AFRO_CATEGORY_KEYWORDS).forEach(([cat, words]) => {
       words.forEach((w) => {
-        if ([...terms].some((t) => t.includes(w) || w.includes(t))) terms.add(cat);
+        if ([...terms].some((t) => this.termMatchesKeyword(t, w))) terms.add(cat);
       });
     });
+
+    // Do not infer "homme" from generic braid keywords (e.g. "nattes" alone)
+    if (terms.has('homme')) {
+      const hasMaleSignal = [...terms].some(
+        (t) =>
+          t.includes('homme') ||
+          t.includes('barbe') ||
+          t.includes('beard') ||
+          t.includes('barber') ||
+          t.includes('fade') ||
+          t.includes('rasage')
+      );
+      if (!hasMaleSignal) terms.delete('homme');
+    }
 
     if (terms.size === 0) {
       ['coiffure afro', 'tresses', 'salon'].forEach((t) => terms.add(t));
@@ -158,11 +172,82 @@ class SelfieAnalysisService {
 
   isLookCapture(context = {}) {
     return (
-      context.captureMode === true ||
-      context.captureMode === 'true' ||
       context.mediaType === 'video' ||
       context.mediaType === 'look'
     );
+  }
+
+  termMatchesKeyword(term, keyword) {
+    if (!term || !keyword) return false;
+    if (term === keyword) return true;
+    // Prefer matching full keyword inside term (e.g. "box braids" in "box braids long")
+    if (keyword.length >= 4 && term.includes(keyword)) return true;
+    // Avoid "nattes" matching "nattes homme" via substring on keyword
+    if (term.length >= 4 && keyword.includes(term) && term.length >= keyword.length * 0.55) {
+      return true;
+    }
+    return false;
+  }
+
+  inferSubjectPresentation(analysis) {
+    const fromAi = analysis?.subjectPresentation?.apparentGender;
+    if (fromAi === 'female' || fromAi === 'male') return fromAi;
+
+    const blob = this.normalizeText(
+      [
+        analysis?.beautyProfile?.assessment,
+        ...(analysis?.recommendedNeeds?.serviceKeywords || []),
+        ...(analysis?.recommendedNeeds?.primaryCategories || []),
+      ].join(' ')
+    );
+
+    const femaleSignals = ['femme', 'woman', 'female', 'girl', 'madame', 'elle', 'braids woman'];
+    const maleSignals = ['homme', 'man', 'male', 'boy', 'monsieur', 'il', 'barber', 'fade', 'barbe'];
+
+    const female = femaleSignals.some((s) => blob.includes(s));
+    const male = maleSignals.some((s) => blob.includes(s));
+    if (female && !male) return 'female';
+    if (male && !female) return 'male';
+    return 'unknown';
+  }
+
+  isMaleTargetedServiceName(name) {
+    const n = this.normalizeText(name);
+    return (
+      n.includes('homme') ||
+      n.includes(' barbe') ||
+      n.startsWith('barbe') ||
+      n.includes('beard') ||
+      n.includes('barber') ||
+      n.includes('fade') ||
+      n.includes('rasage') ||
+      n.includes('nattes homme')
+    );
+  }
+
+  isFemaleTargetedServiceName(name) {
+    const n = this.normalizeText(name);
+    return (
+      n.includes('femme') ||
+      n.includes('woman') ||
+      n.includes('madame') ||
+      (n.includes('nattes') && !n.includes('homme')) ||
+      (n.includes('tresse') && !n.includes('homme')) ||
+      n.includes('knotless') ||
+      n.includes('box braid')
+    );
+  }
+
+  filterServicesByPresentation(services, analysis) {
+    const presentation = this.inferSubjectPresentation(analysis);
+    if (presentation === 'unknown') return services;
+
+    return services.filter((service) => {
+      const name = service.name || '';
+      if (presentation === 'female' && this.isMaleTargetedServiceName(name)) return false;
+      if (presentation === 'male' && this.isFemaleTargetedServiceName(name)) return false;
+      return true;
+    });
   }
 
   buildSelfieAnalysisPrompt(context = {}) {
@@ -176,6 +261,7 @@ ${hairProfileBlock}
 2. Hair (priority): type (straight, wavy, curly, coily), texture, color, condition, length, protective-style needs
 3. Face: shape, eyes, lips, brows
 4. recommendedNeeds: what to book at an Afro salon in IDF (categories + service keywords in French/English, e.g. knotless, box braids, retwist, lace front, fade, soin visage)
+5. subjectPresentation: who is in the photo — apparentGender must be "female", "male", or "unknown" (use visible cues: hairstyle context, facial features; if woman with braids → female, never recommend barber/homme)
 ${context.occasion ? `\nClient occasion / goal: ${context.occasion}` : ''}
 
 Return ONLY valid JSON (no markdown):
@@ -183,6 +269,7 @@ Return ONLY valid JSON (no markdown):
   "skin": { "type": "", "tone": "", "undertone": "", "concerns": [], "condition": "", "texture": "" },
   "hair": { "type": "", "texture": "", "color": "", "condition": "", "length": "" },
   "face": { "shape": "", "eyeShape": "", "lipShape": "", "eyebrowShape": "" },
+  "subjectPresentation": { "apparentGender": "female|male|unknown", "confidence": "high|medium|low" },
   "beautyProfile": {
     "ageEstimate": "",
     "assessment": "",
@@ -205,6 +292,7 @@ The client shared ${fromVideo ? 'a screen recording (frame) from TikTok, Instagr
 Your job: identify the HAIRSTYLE / LOOK shown and match it to real Afro salon services in IDF — not a generic selfie analysis.
 
 Focus on: braid type (knotless, box braids, cornrows…), locs, wig/lace, color, length, fade/barber, protective style, glam.
+Identify the subject's apparent gender (female/male/unknown) — recommendations must match (no barber/homme for women with braids).
 Categories on Skedisy: Tresses, Locks, Perruques, Homme (barber), Esthétique.
 ${hairProfileBlock}
 ${context.occasion ? `Client goal: ${context.occasion}\n` : ''}
@@ -215,6 +303,7 @@ Return ONLY valid JSON (no markdown):
   "skin": { "type": "", "tone": "", "undertone": "", "concerns": [], "condition": "", "texture": "" },
   "hair": { "type": "", "texture": "", "color": "", "condition": "", "length": "" },
   "face": { "shape": "", "eyeShape": "", "lipShape": "", "eyebrowShape": "" },
+  "subjectPresentation": { "apparentGender": "female|male|unknown", "confidence": "high|medium|low" },
   "beautyProfile": {
     "ageEstimate": "",
     "assessment": "Describe the shared look in French",
@@ -279,12 +368,11 @@ Return ONLY valid JSON (no markdown):
         try {
           // Try different model names in order of preference (use valid models that support image analysis)
           const modelNames = [
-            'gemini-2.5-flash',      // Latest flash model (if available)
-            'gemini-1.5-flash',      // Widely available, fast, supports images
-            'gemini-1.5-pro',        // Higher quality
-            'gemini-1.5-flash-8b',   // Lighter variant
-            'gemini-pro-vision',     // Legacy vision model
-            'gemini-1.0-pro-vision'  // Fallback vision model
+            'gemini-2.0-flash',
+            'gemini-1.5-pro',
+            'gemini-2.5-flash',
+            'gemini-1.5-flash',
+            'gemini-1.5-flash-8b',
           ];
           
           let model = null;
@@ -292,7 +380,10 @@ Return ONLY valid JSON (no markdown):
           
           for (const modelName of modelNames) {
             try {
-              model = genAI.getGenerativeModel({ model: modelName });
+              model = genAI.getGenerativeModel({
+                model: modelName,
+                generationConfig: { temperature: 0.25, topP: 0.9, maxOutputTokens: 2048 },
+              });
               const result = await model.generateContent([
                 analysisPrompt,
                 {
@@ -525,6 +616,9 @@ Return ONLY valid JSON (no markdown):
         summary: analysis.beautyProfile.assessment || '',
       };
     }
+    if (!analysis.subjectPresentation) {
+      analysis.subjectPresentation = { apparentGender: 'unknown', confidence: 'low' };
+    }
     return analysis;
   }
 
@@ -557,8 +651,10 @@ Return ONLY valid JSON (no markdown):
           status: true,
         })
           .populate('categoryId')
-          .limit(15);
+          .limit(20);
       }
+
+      services = this.filterServicesByPresentation(services, analysis);
 
       // Add service URL/slug to each service for web linking
       // Services should link to their category page, not a service-specific page
@@ -719,6 +815,15 @@ Return ONLY valid JSON (no markdown):
       if (analysis?.hair) {
         const hairType = this.normalizeText(analysis.hair.type);
         const normName = this.normalizeText(serviceName);
+        const presentation = this.inferSubjectPresentation(analysis);
+
+        if (presentation === 'female' && this.isMaleTargetedServiceName(serviceName)) {
+          score -= 40;
+        }
+        if (presentation === 'male' && this.isFemaleTargetedServiceName(serviceName) && !normName.includes('homme')) {
+          score -= 25;
+        }
+
         if (
           (hairType === 'coily' || hairType === 'curly') &&
           (normName.includes('tresse') ||
@@ -921,7 +1026,16 @@ Return ONLY valid JSON (no markdown):
           _id: salon._id,
           id: salon._id.toString(),
           name: salon.name || '',
-          mainImage: salon.mainImage || (salon.image?.[0] ?? ''),
+          mainImage:
+            salon.mainImage ||
+            salon.heroImage ||
+            (Array.isArray(salon.image) ? salon.image.find((img) => img && String(img).trim()) : '') ||
+            '',
+          image:
+            salon.mainImage ||
+            salon.heroImage ||
+            (Array.isArray(salon.image) ? salon.image.find((img) => img && String(img).trim()) : '') ||
+            '',
           review: salon.review || 0,
           reviewCount: salon.reviewCount || 0,
           addressDetails,

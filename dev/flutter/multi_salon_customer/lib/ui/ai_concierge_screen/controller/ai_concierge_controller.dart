@@ -61,7 +61,8 @@ class AiConciergeController extends GetxController {
 
   Future<void> _loadSharedVideo(String path, {bool autoAnalyze = false}) async {
     try {
-      video = XFile(path);
+      final normalized = _normalizeSharePath(path);
+      video = XFile(normalized);
       isVideoMedia = true;
       image = null;
       selectImageFile = null;
@@ -79,8 +80,9 @@ class AiConciergeController extends GetxController {
 
   Future<void> _loadSharedImage(String path, {bool autoAnalyze = false}) async {
     try {
-      image = XFile(path);
-      selectImageFile = File(path);
+      final normalized = _normalizeSharePath(path);
+      image = XFile(normalized);
+      selectImageFile = File(normalized);
       isVideoMedia = false;
       video = null;
       update([Constant.idProgressView]);
@@ -111,6 +113,14 @@ class AiConciergeController extends GetxController {
       captureMode = true;
     }
     update([Constant.idProgressView]);
+  }
+
+  String _normalizeSharePath(String path) {
+    final trimmed = path.trim();
+    if (trimmed.startsWith('file://')) {
+      return Uri.parse(trimmed).toFilePath(windows: false);
+    }
+    return trimmed;
   }
 
   bool _isVideoPath(String path) {
@@ -419,8 +429,8 @@ class AiConciergeController extends GetxController {
           requestBody["occasion"] = hairProfile.bookingGoal!.tr;
         }
       }
-      if (captureMode) {
-        requestBody["captureMode"] = "true";
+      if (fromShare) {
+        requestBody["mediaType"] = "look";
       }
       if (isVideoMedia) {
         requestBody["mediaType"] = "video";

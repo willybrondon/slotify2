@@ -33,9 +33,11 @@ open class RSIShareViewController: SLComposeServiceViewController {
         saveAndRedirect(message: contentText)
     }
 
+    private var didRedirect = false
+
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        guard !didRedirect else { return }
         if let content = extensionContext!.inputItems[0] as? NSExtensionItem {
             if let contents = content.attachments {
                 for (index, attachment) in (contents).enumerated() {
@@ -172,6 +174,8 @@ open class RSIShareViewController: SLComposeServiceViewController {
     }
 
     private func saveAndRedirect(message: String? = nil) {
+        guard !didRedirect else { return }
+        didRedirect = true
         let userDefaults = UserDefaults(suiteName: appGroupId)
         userDefaults?.set(toData(data: sharedMedia), forKey: kUserDefaultsKey)
         userDefaults?.set(message, forKey: kUserDefaultsMessageKey)
@@ -181,27 +185,23 @@ open class RSIShareViewController: SLComposeServiceViewController {
 
     private func redirectToHostApp() {
         loadIds()
-        let url = URL(string: "\(kSchemePrefix)-\(hostAppBundleIdentifier):share")
-        var responder = self as UIResponder?
-
-        if #available(iOS 18.0, *) {
-            while responder != nil {
-                if let application = responder as? UIApplication {
-                    application.open(url!, options: [:], completionHandler: nil)
-                }
-                responder = responder?.next
-            }
-        } else {
-            let selectorOpenURL = sel_registerName("openURL:")
-            while responder != nil {
-                if responder?.responds(to: selectorOpenURL) == true {
-                    _ = responder?.perform(selectorOpenURL, with: url)
-                }
-                responder = responder?.next
-            }
+        guard let url = URL(string: "\(kSchemePrefix)-\(hostAppBundleIdentifier):share") else {
+            extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+            return
         }
 
-        extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
+        // Share extensions cannot use UIApplication.shared — walk the responder chain.
+        let selectorOpenURL = sel_registerName("openURL:")
+        var responder: UIResponder? = self
+        while let current = responder {
+            if current.responds(to: selectorOpenURL) {
+                _ = current.perform(selectorOpenURL, with: url)
+                break
+            }
+            responder = current.next
+        }
+
+        extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
 
     private func dismissWithError() {

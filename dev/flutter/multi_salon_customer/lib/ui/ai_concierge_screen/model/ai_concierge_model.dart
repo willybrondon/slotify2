@@ -489,22 +489,41 @@ class SalonItem {
     }
 
     name = json['name']?.toString();
-    image = json['mainImage']?.toString() ?? json['image']?.toString();
+    final rawImage = json['mainImage']?.toString() ?? json['image']?.toString();
+    image = (rawImage != null && rawImage.isNotEmpty) ? rawImage : null;
+    if (image == null && json['image'] is List && (json['image'] as List).isNotEmpty) {
+      for (final item in json['image']) {
+        final url = item?.toString().trim() ?? '';
+        if (url.isNotEmpty) {
+          image = url;
+          break;
+        }
+      }
+    }
     review = json['review'] != null
         ? (json['review'] is num
             ? json['review'].toDouble()
             : double.tryParse(json['review'].toString()) ?? 0.0)
         : null;
 
-    // Handle address - can be string or object
-    if (json['addressDetails'] != null) {
-      if (json['addressDetails'] is Map) {
-        address = json['addressDetails']['addressLine1']?.toString() ??
-            json['addressDetails']['address']?.toString() ??
-            "";
-      } else {
-        address = json['addressDetails'].toString();
-      }
+    // Handle address — prefer preformatted string from API
+    final rawAddress = json['address']?.toString().trim();
+    if (rawAddress != null && rawAddress.isNotEmpty && rawAddress.toLowerCase() != 'null') {
+      address = rawAddress;
+    } else if (json['addressDetails'] is Map) {
+      final details = json['addressDetails'] as Map;
+      final parts = [
+        details['addressLine1'],
+        details['landMark'],
+        details['city'],
+        details['state'],
+        details['country'],
+      ]
+          .map((p) => p?.toString().trim())
+          .where((p) => p != null && p.isNotEmpty && p.toLowerCase() != 'null')
+          .cast<String>()
+          .toList();
+      address = parts.isNotEmpty ? parts.join(', ') : null;
     } else if (json['address'] != null) {
       address = json['address'].toString();
     } else {

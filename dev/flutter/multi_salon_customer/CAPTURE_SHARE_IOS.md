@@ -9,7 +9,8 @@ Android : fonctionne via les intent-filters `SEND` dans `AndroidManifest.xml`.
 1. App Group `group.com.skedisy.customer` activé pour :
    - `com.skedisy.customer` (app)
    - `com.skedisy.customer.ShareExtension` (extension)
-2. Après clone / mise à jour iOS :
+2. **URL scheme** dans `Runner/Info.plist` : `ShareMedia-com.skedisy.customer` (obligatoire pour rouvrir l’app après partage)
+3. Après clone / mise à jour iOS :
    ```bash
    cd ios && pod install
    ```

@@ -220,7 +220,7 @@ class Salon {
         locationCoordinates:
             json["locationCoordinates"] == null ? null : LocationCoordinates.fromJson(json["locationCoordinates"]),
         isBestSeller: json["isBestSeller"],
-        id: json["_id"],
+        id: json["_id"]?.toString(),
         name: json["name"],
         email: json["email"],
         mobile: json["mobile"],
@@ -285,12 +285,20 @@ class AddressDetails {
   });
 
   factory AddressDetails.fromJson(Map<String, dynamic> json) => AddressDetails(
-        addressLine1: json["addressLine1"],
-        landMark: json["landMark"],
-        city: json["city"],
-        state: json["state"],
-        country: json["country"],
+        addressLine1: json["addressLine1"]?.toString(),
+        landMark: json["landMark"]?.toString(),
+        city: json["city"]?.toString(),
+        state: json["state"]?.toString(),
+        country: json["country"]?.toString(),
       );
+
+  String get formatted {
+    final parts = [addressLine1, landMark, city, state, country]
+        .where((p) => p != null && p.trim().isNotEmpty && p.toLowerCase() != 'null')
+        .map((p) => p.trim())
+        .toList();
+    return parts.join(', ');
+  }
 
   Map<String, dynamic> toJson() => {
         "addressLine1": addressLine1,
