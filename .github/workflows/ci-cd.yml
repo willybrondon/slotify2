@@ -404,7 +404,6 @@ jobs:
             }
             echo "Expert profile OK"
           fi
-
       - name: install pod ios for testting
         run: |
           cd "dev/flutter/multi_salon_${{ matrix.app }}/ios"
