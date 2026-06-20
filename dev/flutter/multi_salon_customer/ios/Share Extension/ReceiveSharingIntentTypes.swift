@@ -8,6 +8,7 @@ let kSchemePrefix = "ShareMedia"
 let kUserDefaultsKey = "ShareKey"
 let kUserDefaultsMessageKey = "ShareMessageKey"
 let kAppGroupIdKey = "AppGroupId"
+let kHostAppBundleIdentifierKey = "HostAppBundleIdentifier"
 
 class SharedMediaFile: Codable {
     var path: String

@@ -99,11 +99,22 @@ open class RSIShareViewController: SLComposeServiceViewController {
 
     private func loadIds() {
         let shareExtensionAppBundleIdentifier = Bundle.main.bundleIdentifier!
-        let lastIndexOfPoint = shareExtensionAppBundleIdentifier.lastIndex(of: ".")
-        hostAppBundleIdentifier = String(shareExtensionAppBundleIdentifier[..<lastIndexOfPoint!])
-        let defaultAppGroupId = "group.\(hostAppBundleIdentifier)"
+
+        if let hostId = Bundle.main.object(forInfoDictionaryKey: kHostAppBundleIdentifierKey) as? String,
+           !hostId.isEmpty {
+            hostAppBundleIdentifier = hostId
+        } else if shareExtensionAppBundleIdentifier.hasSuffix(".ShareExtension") {
+            hostAppBundleIdentifier = String(
+                shareExtensionAppBundleIdentifier.dropLast(".ShareExtension".count)
+            )
+        } else if let lastIndexOfPoint = shareExtensionAppBundleIdentifier.lastIndex(of: ".") {
+            hostAppBundleIdentifier = String(shareExtensionAppBundleIdentifier[..<lastIndexOfPoint])
+        } else {
+            hostAppBundleIdentifier = shareExtensionAppBundleIdentifier
+        }
+
         let customAppGroupId = Bundle.main.object(forInfoDictionaryKey: kAppGroupIdKey) as? String
-        appGroupId = customAppGroupId ?? defaultAppGroupId
+        appGroupId = customAppGroupId ?? "group.\(hostAppBundleIdentifier)"
     }
 
     private func handleMedia(forLiteral item: String, type: SharedMediaType, index: Int, content: NSExtensionItem) {
@@ -190,18 +201,48 @@ open class RSIShareViewController: SLComposeServiceViewController {
             return
         }
 
-        // Share extensions cannot use UIApplication.shared — walk the responder chain.
-        let selectorOpenURL = sel_registerName("openURL:")
+        let complete: () -> Void = { [weak self] in
+            self?.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+        }
+
+        if let context = extensionContext {
+            context.open(url, completionHandler: { success in
+                if success {
+                    complete()
+                } else {
+                    self.openHostAppViaResponderChain(url)
+                    complete()
+                }
+            })
+            return
+        }
+
+        openHostAppViaResponderChain(url)
+        complete()
+    }
+
+    private func openHostAppViaResponderChain(_ url: URL) {
         var responder: UIResponder? = self
+
+        if #available(iOS 18.0, *) {
+            while responder != nil {
+                if let application = responder as? UIApplication {
+                    application.open(url, options: [:], completionHandler: nil)
+                    return
+                }
+                responder = responder?.next
+            }
+        }
+
+        let selectorOpenURL = sel_registerName("openURL:")
+        responder = self
         while let current = responder {
             if current.responds(to: selectorOpenURL) {
                 _ = current.perform(selectorOpenURL, with: url)
-                break
+                return
             }
             responder = current.next
         }
-
-        extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
 
     private func dismissWithError() {
@@ -247,6 +288,12 @@ open class RSIShareViewController: SLComposeServiceViewController {
     }
 
     private func copyFile(at srcURL: URL, to dstURL: URL) -> Bool {
+        let access = srcURL.startAccessingSecurityScopedResource()
+        defer {
+            if access {
+                srcURL.stopAccessingSecurityScopedResource()
+            }
+        }
         do {
             if FileManager.default.fileExists(atPath: dstURL.path) {
                 try FileManager.default.removeItem(at: dstURL)

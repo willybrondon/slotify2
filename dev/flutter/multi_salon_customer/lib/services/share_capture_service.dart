@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:salon_2/main.dart' as app;
@@ -10,6 +11,7 @@ import 'package:salon_2/routes/app_routes.dart';
 class ShareCaptureService {
   static StreamSubscription<List<SharedMediaFile>>? _mediaSub;
   static bool _initialized = false;
+  static String? _lastHandledKey;
 
   static void init() {
     if (_initialized) return;
@@ -21,16 +23,28 @@ class ShareCaptureService {
       log('ShareCapture media stream error: $e');
     });
 
-    ReceiveSharingIntent.instance.getInitialMedia().then((files) {
-      if (files.isNotEmpty) _onMedia(files);
-    }, onError: (e) {
-      log('ShareCapture initial media error: $e');
-    });
+    _pollInitialMedia();
+  }
+
+  static void _pollInitialMedia() {
+    for (final delayMs in [0, 400, 1000, 2000]) {
+      Future.delayed(Duration(milliseconds: delayMs), () async {
+        try {
+          final files = await ReceiveSharingIntent.instance.getInitialMedia();
+          if (files.isNotEmpty) {
+            _onMedia(files);
+          }
+        } catch (e) {
+          log('ShareCapture initial media error: $e');
+        }
+      });
+    }
   }
 
   static void dispose() {
     _mediaSub?.cancel();
     _initialized = false;
+    _lastHandledKey = null;
   }
 
   static bool _isVideoPath(String path) {
@@ -46,6 +60,11 @@ class ShareCaptureService {
 
   static void _onMedia(List<SharedMediaFile> files) {
     if (files.isEmpty) return;
+
+    final dedupeKey = '${files.first.type}:${files.first.path}';
+    if (_lastHandledKey == dedupeKey) return;
+    _lastHandledKey = dedupeKey;
+
     final file = files.first;
 
     if (file.type == SharedMediaType.image) {
@@ -105,15 +124,41 @@ class ShareCaptureService {
     required bool autoAnalyze,
   }) {
     app.markCaptureNavigated();
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      _navigate(
-        sharedImagePath,
-        sharedVideoPath,
-        sharedLink,
-        fromShare,
-        autoAnalyze,
-      );
-    });
+    _navigateWhenReady(
+      sharedImagePath,
+      sharedVideoPath,
+      sharedLink,
+      fromShare,
+      autoAnalyze,
+    );
+  }
+
+  static void _navigateWhenReady(
+    String? sharedImagePath,
+    String? sharedVideoPath,
+    String? sharedLink,
+    bool fromShare,
+    bool autoAnalyze,
+  ) {
+    var attempts = 0;
+
+    void tryNavigate() {
+      attempts++;
+      final hasContext = Get.key.currentContext != null;
+      if (hasContext || attempts >= 40) {
+        _navigate(
+          sharedImagePath,
+          sharedVideoPath,
+          sharedLink,
+          fromShare,
+          autoAnalyze,
+        );
+        return;
+      }
+      SchedulerBinding.instance.addPostFrameCallback((_) => tryNavigate());
+    }
+
+    SchedulerBinding.instance.addPostFrameCallback((_) => tryNavigate());
   }
 
   static void _navigate(
