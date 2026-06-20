@@ -292,13 +292,11 @@ class AddressDetails {
         country: json["country"]?.toString(),
       );
 
-  String get formatted {
-    final parts = [addressLine1, landMark, city, state, country]
-        .where((p) => p != null && p.trim().isNotEmpty && p.toLowerCase() != 'null')
-        .map((p) => p.trim())
-        .toList();
-    return parts.join(', ');
-  }
+  String get formatted => [addressLine1, landMark, city, state, country]
+      .whereType<String>()
+      .map((p) => p.trim())
+      .where((p) => p.isNotEmpty && p.toLowerCase() != 'null')
+      .join(', ');
 
   Map<String, dynamic> toJson() => {
         "addressLine1": addressLine1,

@@ -442,6 +442,7 @@ jobs:
 
       - name: build archive
         run: |
+          set -euo pipefail
           cd "dev/flutter/multi_salon_${{ matrix.app }}/ios"
           xcodebuild -workspace Runner.xcworkspace -scheme "Runner" \
           -archivePath $RUNNER_TEMP/Runner.xcarchive \
@@ -450,12 +451,13 @@ jobs:
           -destination generic/platform=iOS \
           DEVELOPMENT_TEAM=7B755FRMAM \
           APS_ENVIRONMENT=production \
-          clean archive
+          clean archive 2>&1 | tee "$RUNNER_TEMP/xcodebuild-archive.log"
           if [ "${{ matrix.app }}" = "customer" ]; then
             PLUGINS="$RUNNER_TEMP/Runner.xcarchive/Products/Applications/Runner.app/PlugIns"
             ls -la "$PLUGINS" || true
             test -d "$PLUGINS/Share Extension.appex" || {
               echo "::error::Share Extension.appex missing from archive — Partager vers Skedisy will not work"
+              tail -80 "$RUNNER_TEMP/xcodebuild-archive.log" || true
               exit 1
             }
             echo "Share Extension embedded in IPA archive."
@@ -463,6 +465,7 @@ jobs:
 
       - name: export ipa
         run: |
+          set -euo pipefail
           ls -l $RUNNER_TEMP/Runner.xcarchive
           ls -l $RUNNER_TEMP/Runner.xcarchive/Products/Applications/
           EXPORT_OPTS_PATH="dev/flutter/multi_salon_${{ matrix.app }}/ios/exportOptions-${{ matrix.app }}.plist"
@@ -479,7 +482,7 @@ jobs:
               exit 1
             fi
           fi
-          xcodebuild -exportArchive -archivePath $RUNNER_TEMP/Runner.xcarchive -exportOptionsPlist "$EXPORT_OPTS_PATH" -exportPath $RUNNER_TEMP/build
+          xcodebuild -exportArchive -archivePath $RUNNER_TEMP/Runner.xcarchive -exportOptionsPlist "$EXPORT_OPTS_PATH" -exportPath $RUNNER_TEMP/build 2>&1 | tee "$RUNNER_TEMP/xcodebuild-export.log"
 
           ls -l $RUNNER_TEMP/build
 

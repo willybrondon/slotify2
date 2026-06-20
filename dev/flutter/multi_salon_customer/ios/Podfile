@@ -48,6 +48,7 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['SWIFT_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
     end
   end
 
@@ -57,5 +58,28 @@ post_install do |installer|
     text = File.read(file)
     text.gsub!(/var isSuccess: Bool \{\n\s*if case \.success = self \{ true \}\n\}/, "var isSuccess: Bool {\n    if case .success = self { return true }\n    return false\n}")
     File.write(file, text)
+  end
+
+  # Xcode 16.4 + sign_in_with_apple < 7: ASAuthorizationError.credentialImport / credentialExport
+  [
+    File.expand_path('.symlinks/plugins/sign_in_with_apple/ios/Classes/SignInWithAppleError.swift', __dir__),
+  ].concat(Dir.glob(File.join(Dir.home, '.pub-cache/hosted/pub.dev/sign_in_with_apple-*/ios/Classes/SignInWithAppleError.swift')))
+   .uniq.each do |apple_error_file|
+    next unless File.exist?(apple_error_file)
+    text = File.read(apple_error_file)
+    next if text.include?('.credentialImport') || text.include?('@unknown default')
+
+    patched = text.sub(
+      /case \.notInteractive:\n(\s+)return ([^\n]+)\n(\s+)\}/m
+    ) do
+      indent = Regexp.last_match(1)
+      return_val = Regexp.last_match(2)
+      close_indent = Regexp.last_match(3)
+      "case .notInteractive:\n#{indent}return #{return_val}\n#{indent}case .credentialImport:\n#{indent}return #{return_val}\n#{indent}case .credentialExport:\n#{indent}return #{return_val}\n#{indent}@unknown default:\n#{indent}return #{return_val}\n#{close_indent}}"
+    end
+    if patched != text
+      File.write(apple_error_file, patched)
+      puts "Patched SignInWithAppleError.swift at #{apple_error_file}"
+    end
   end
 end
