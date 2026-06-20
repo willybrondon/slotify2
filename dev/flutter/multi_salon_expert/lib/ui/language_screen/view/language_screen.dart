@@ -35,14 +35,15 @@ class LanguageScreen extends StatelessWidget {
           return ListView.separated(
             shrinkWrap: true,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            itemCount: Constant.countryList.length,
+            itemCount: languages.length,
             itemBuilder: (context, index) {
+              final language = languages[index];
               return GetBuilder<LanguageController>(
                 id: Constant.idChangeLanguage,
                 builder: (logic) {
                   return InkWell(
                     onTap: () {
-                      logic.onChangeLanguage(languages[index], index);
+                      logic.onChangeLanguage(language, index);
                       logic.onLanguageSave();
                     },
                     child: Row(
@@ -62,10 +63,10 @@ class LanguageScreen extends StatelessWidget {
                                 ),
                               ),
                               clipBehavior: Clip.hardEdge,
-                              child: Image.asset(Constant.countryList[index]["image"]),
+                              child: Image.asset(language.image),
                             ).paddingOnly(right: 8),
                             Text(
-                              Constant.countryList[index]["country"],
+                              language.language,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: AppColors.blackColor,
@@ -77,7 +78,7 @@ class LanguageScreen extends StatelessWidget {
                         logic.checkedValue != index
                             ? GestureDetector(
                                 onTap: () {
-                                  logic.onChangeLanguage(languages[index], index);
+                                  logic.onChangeLanguage(language, index);
                                   logic.onLanguageSave();
                                 },
                                 child: Container(
@@ -93,7 +94,7 @@ class LanguageScreen extends StatelessWidget {
                               )
                             : GestureDetector(
                                 onTap: () {
-                                  logic.onChangeLanguage(languages[index], index);
+                                  logic.onChangeLanguage(language, index);
                                   logic.onLanguageSave();
                                 },
                                 child: Container(

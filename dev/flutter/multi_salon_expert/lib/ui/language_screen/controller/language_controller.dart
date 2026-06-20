@@ -6,7 +6,7 @@ import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/preference.dart';
 
 class LanguageController extends GetxController {
-  int checkedValue = Constant.storage.read<int>('checkedValue') ?? 3;
+  int checkedValue = 0;
   LanguageModel? languagesChosenValue;
 
   String? prefLanguageCode;
@@ -19,11 +19,32 @@ class LanguageController extends GetxController {
   }
 
   getLanguageData() {
-    prefLanguageCode = Preference.shared.getString(Preference.selectedLanguage) ?? 'en';
-    prefCountryCode = Preference.shared.getString(Preference.selectedCountryCode) ?? 'US';
-    languagesChosenValue = languages
-        .where((element) => (element.languageCode == prefLanguageCode && element.countryCode == prefCountryCode))
-        .toList()[0];
+    prefLanguageCode = Preference.shared.getString(Preference.selectedLanguage) ?? 'fr';
+    prefCountryCode = Preference.shared.getString(Preference.selectedCountryCode) ?? 'FR';
+    final matchingLanguages = languages
+        .where(
+          (element) =>
+              element.languageCode == prefLanguageCode &&
+              element.countryCode == prefCountryCode,
+        )
+        .toList();
+    if (matchingLanguages.isNotEmpty) {
+      languagesChosenValue = matchingLanguages[0];
+      checkedValue = languages.indexWhere(
+        (l) =>
+            l.languageCode == prefLanguageCode &&
+            l.countryCode == prefCountryCode,
+      );
+      if (checkedValue < 0) checkedValue = 0;
+    } else {
+      final defaultIndex = languages.indexWhere(
+        (l) => l.languageCode == 'fr' && l.countryCode == 'FR',
+      );
+      languagesChosenValue =
+          defaultIndex >= 0 ? languages[defaultIndex] : languages.first;
+      checkedValue = defaultIndex >= 0 ? defaultIndex : 0;
+    }
+    Constant.storage.write('checkedValue', checkedValue);
     update([Constant.idChangeLanguage]);
   }
 

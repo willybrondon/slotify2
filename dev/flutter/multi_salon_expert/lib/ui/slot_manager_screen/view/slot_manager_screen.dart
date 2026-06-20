@@ -294,9 +294,9 @@ class SlotManagerScreen extends StatelessWidget {
                                     padding: const EdgeInsets.all(13),
                                     margin: const EdgeInsets.only(
                                         left: 12, right: 12, bottom: 12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "txtHolidayMode".tr,
@@ -306,65 +306,40 @@ class SlotManagerScreen extends StatelessWidget {
                                             fontSize: 17,
                                           ),
                                         ),
-                                        Row(
-                                          children: [
-                                            Image.asset(AppAsset.icHoliday,
-                                                    height: 22)
-                                                .paddingOnly(right: 8),
-                                            SizedBox(
-                                              width: Get.width * 0.62,
-                                              child: Text(
-                                                "desNotAvailableWork".tr,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      AppFontFamily.heeBo600,
-                                                  color:
-                                                      AppColors.primaryAppColor,
-                                                  fontSize: 16,
-                                                ),
+                                        GetBuilder<SlotManagerController>(
+                                          id: Constant.idSwitchOn,
+                                          builder: (logic) {
+                                            return SizedBox(
+                                              height: 30,
+                                              child: Switch(
+                                                value: logic.isSwitchOn,
+                                                activeColor:
+                                                    AppColors.greenColor,
+                                                activeTrackColor:
+                                                    AppColors.whiteColor,
+                                                inactiveThumbColor:
+                                                    AppColors.redColor,
+                                                inactiveTrackColor:
+                                                    AppColors.whiteColor,
+                                                trackOutlineColor:
+                                                    WidgetStatePropertyAll(
+                                                        AppColors.grey
+                                                            .withOpacity(0.15)),
+                                                trackColor:
+                                                    WidgetStatePropertyAll(
+                                                        AppColors.switchBox),
+                                                onChanged: (value) {
+                                                  if (logic.comparedList
+                                                          .length !=
+                                                      logic.getBookingModel
+                                                          ?.timeSlots
+                                                          ?.length) {
+                                                    logic.onSwitch(value);
+                                                  }
+                                                },
                                               ),
-                                            ),
-                                            const Spacer(),
-                                            GetBuilder<SlotManagerController>(
-                                              id: Constant.idSwitchOn,
-                                              builder: (logic) {
-                                                return SizedBox(
-                                                  height: 30,
-                                                  child: Switch(
-                                                    value: logic.isSwitchOn,
-                                                    activeColor:
-                                                        AppColors.greenColor,
-                                                    activeTrackColor:
-                                                        AppColors.whiteColor,
-                                                    inactiveThumbColor:
-                                                        AppColors.redColor,
-                                                    inactiveTrackColor:
-                                                        AppColors.whiteColor,
-                                                    trackOutlineColor:
-                                                        WidgetStatePropertyAll(
-                                                            AppColors.grey
-                                                                .withOpacity(
-                                                                    0.15)),
-                                                    trackColor:
-                                                        WidgetStatePropertyAll(
-                                                            AppColors
-                                                                .switchBox),
-                                                    onChanged: (value) {
-                                                      if (logic.comparedList
-                                                              .length !=
-                                                          logic
-                                                              .getBookingModel
-                                                              ?.timeSlots
-                                                              ?.length) {
-                                                        logic.onSwitch(value);
-                                                      }
-                                                    },
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ],
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),
@@ -407,46 +382,6 @@ class SlotManagerScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  height: 18,
-                                  width: 28,
-                                  margin: const EdgeInsets.only(right: 5),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.redButton,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                ),
-                                Text(
-                                  "txtNotAvailable".tr,
-                                  style: TextStyle(
-                                    fontFamily: AppFontFamily.sfProDisplay,
-                                    color: AppColors.blackColor,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                Container(
-                                  height: 18,
-                                  width: 28,
-                                  margin:
-                                      const EdgeInsets.only(right: 5, left: 10),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.greenButton,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                ),
-                                Text(
-                                  "txtAvailable".tr,
-                                  style: TextStyle(
-                                    fontFamily: AppFontFamily.sfProDisplay,
-                                    color: AppColors.blackColor,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ).paddingOnly(right: 15),
                             logic.isLoading.value
                                 ? Shimmers.slotManagementShimmer()
                                 : logic.getBookingModel?.status == true
@@ -600,12 +535,15 @@ class SlotManagerScreen extends StatelessWidget {
                             List<String>? timeSlots =
                                 logic.getBookingModel?.timeSlots;
 
-                            bool isSlotBooked = timeSlots != null &&
+                            bool isSlotOccupied = timeSlots != null &&
                                 timeSlots.contains(slots[index]);
 
                             bool isSlotTimePassed = currentDate
                                     .isAfter(slotDateTime) &&
                                 currentTimeWithDate.isAfter(slotTimeWithDate);
+
+                            final bool isUnavailable =
+                                isSlotTimePassed || isSlotOccupied;
                             logic.isFirstTap = true;
 
                             return AnimationConfiguration.staggeredGrid(
@@ -617,7 +555,7 @@ class SlotManagerScreen extends StatelessWidget {
                                   child: GestureDetector(
                                     onTap: () {
                                       if (logic.currentIndex == false) {
-                                        if (isSlotBooked) {
+                                        if (isSlotOccupied) {
                                           if (logic.isFirstTap) {
                                             logic.isFirstTap = false;
                                             Future.delayed(
@@ -657,16 +595,18 @@ class SlotManagerScreen extends StatelessWidget {
                                         height: 30,
                                         width: 50,
                                         decoration: BoxDecoration(
-                                          color: isSlotTimePassed || isSlotBooked
+                                          color: isUnavailable
                                               ? AppColors.slotUnavailableBg
                                               : AppColors.slotAvailableBg,
                                           border: Border.all(
-                                            color: isSelected &&
-                                                    !isSlotBooked &&
-                                                    !isSlotTimePassed
-                                                ? AppColors.slotSelectedBorder
-                                                : Colors.transparent,
-                                            width: 1.5,
+                                            color: isUnavailable
+                                                ? Colors.transparent
+                                                : isSelected
+                                                    ? AppColors
+                                                        .brandTerracottaHover
+                                                    : AppColors
+                                                        .slotSelectedBorder,
+                                            width: isSelected ? 2 : 1.5,
                                           ),
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -675,23 +615,22 @@ class SlotManagerScreen extends StatelessWidget {
                                           child: Text(
                                             slots[index],
                                             style: TextStyle(
-                                              fontFamily: isSlotBooked ||
-                                                      isSlotTimePassed
+                                              fontFamily: isUnavailable
                                                   ? AppFontFamily
                                                       .sfProDisplayRegular
                                                   : AppFontFamily.sfProDisplay,
                                               fontSize: 14,
                                               decorationColor:
-                                                  AppColors.slotText,
-                                              decoration: isSlotBooked ||
-                                                      isSlotTimePassed
+                                                  AppColors.brandGrayMuted,
+                                              decoration: isUnavailable
                                                   ? TextDecoration.lineThrough
                                                   : TextDecoration.none,
-                                              color: isSelected &&
-                                                      !isSlotBooked &&
-                                                      !isSlotTimePassed
-                                                  ? AppColors.slotSelectedText
-                                                  : AppColors.slotText,
+                                              color: isUnavailable
+                                                  ? AppColors.brandGrayMuted
+                                                  : isSelected
+                                                      ? AppColors
+                                                          .slotSelectedText
+                                                      : AppColors.slotText,
                                             ),
                                           ),
                                         ),

@@ -234,7 +234,7 @@ class SlotManagerController extends GetxController {
     } else {
       selectedSlotsList.add(slot);
     }
-    update([Constant.idUpdateSlots0]);
+    update([Constant.idUpdateSlots, Constant.idUpdateSlots0]);
   }
 
   checkSlot() {

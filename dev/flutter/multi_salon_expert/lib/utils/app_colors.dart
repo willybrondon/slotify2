@@ -60,7 +60,7 @@ class AppColors {
   static Color countBooking = brandBlack;
   static Color available = brandGrayLight;
   static Color slotText = const Color(0xff484E60);
-  static Color slotAvailableBg = brandGrayLight;
+  static Color slotAvailableBg = brandTerracottaLight;
   static Color slotUnavailableBg = brandGrayLight;
   static Color slotSelectedBorder = brandTerracotta;
   static Color slotSelectedText = brandTerracotta;
