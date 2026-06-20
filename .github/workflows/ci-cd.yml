@@ -473,10 +473,11 @@ jobs:
           echo "Using export options:"
           plutil -p "$EXPORT_OPTS_PATH"
           if [ "${{ matrix.app }}" = "customer" ]; then
-            plutil -extract provisioningProfiles.com.skedisy.customer.ShareExtension raw "$EXPORT_OPTS_PATH" >/dev/null || {
-              echo "::error::exportOptions-customer.plist must map com.skedisy.customer.ShareExtension to appstore-skedisy-customer-share"
+            SHARE_PROFILE=$(/usr/libexec/PlistBuddy -c 'Print :provisioningProfiles:com.skedisy.customer.ShareExtension' "$EXPORT_OPTS_PATH" 2>/dev/null || true)
+            if [ "$SHARE_PROFILE" != "appstore-skedisy-customer-share" ]; then
+              echo "::error::exportOptions-customer.plist must map com.skedisy.customer.ShareExtension to appstore-skedisy-customer-share (got: $SHARE_PROFILE)"
               exit 1
-            }
+            fi
           fi
           xcodebuild -exportArchive -archivePath $RUNNER_TEMP/Runner.xcarchive -exportOptionsPlist "$EXPORT_OPTS_PATH" -exportPath $RUNNER_TEMP/build
 
