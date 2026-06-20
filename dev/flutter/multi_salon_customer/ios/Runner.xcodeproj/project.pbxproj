@@ -18,6 +18,8 @@
 		CE35FF613DC46C1DCD199E9C /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFE2268B439F318975321DAB /* Pods_RunnerTests.framework */; };
 		E9AFDFA9FDB11BC2E43437C1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B176F439638D2AB02439544D /* Pods_Runner.framework */; };
 		A2B3C4D501234567890AB05 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B3C4D501234567890AB01 /* ShareViewController.swift */; };
+		A2B3C4D501234567890AB15 /* RSIShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B3C4D501234567890AB14 /* RSIShareViewController.swift */; };
+		A2B3C4D501234567890AB17 /* ReceiveSharingIntentTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B3C4D501234567890AB16 /* ReceiveSharingIntentTypes.swift */; };
 		A2B3C4D501234567890AB0D /* Share Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A2B3C4D501234567890AB04 /* Share Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -88,6 +90,8 @@
 		D516108A16895DEDE0A568C3 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		F035BBBA9A38B800E13DE358 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
 		A2B3C4D501234567890AB01 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		A2B3C4D501234567890AB14 /* RSIShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSIShareViewController.swift; sourceTree = "<group>"; };
+		A2B3C4D501234567890AB16 /* ReceiveSharingIntentTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveSharingIntentTypes.swift; sourceTree = "<group>"; };
 		A2B3C4D501234567890AB02 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A2B3C4D501234567890AB03 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		A2B3C4D501234567890AB04 /* Share Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Share Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -204,6 +208,8 @@
 			isa = PBXGroup;
 			children = (
 				A2B3C4D501234567890AB01 /* ShareViewController.swift */,
+				A2B3C4D501234567890AB14 /* RSIShareViewController.swift */,
+				A2B3C4D501234567890AB16 /* ReceiveSharingIntentTypes.swift */,
 				A2B3C4D501234567890AB02 /* Info.plist */,
 				A2B3C4D501234567890AB03 /* ShareExtension.entitlements */,
 			);
@@ -480,6 +486,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2B3C4D501234567890AB17 /* ReceiveSharingIntentTypes.swift in Sources */,
+				A2B3C4D501234567890AB15 /* RSIShareViewController.swift in Sources */,
 				A2B3C4D501234567890AB05 /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

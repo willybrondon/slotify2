@@ -36,9 +36,10 @@ target 'Runner' do
     inherit! :search_paths
   end
 
+  # Extension must not link receive_sharing_intent (Flutter plugin uses addApplicationDelegate).
+  # RSIShareViewController is compiled directly into the Share Extension target instead.
   target 'Share Extension' do
     inherit! :search_paths
-    pod 'receive_sharing_intent', :path => File.join('.symlinks', 'plugins', 'receive_sharing_intent', 'ios')
   end
 end
 

@@ -32,4 +32,4 @@ Android : fonctionne via les intent-filters `SEND` dans `AndroidManifest.xml`.
 ## Dépannage
 
 - **Skedisy absent de la liste** : vérifier que l’extension est embarquée (Build Phases → Embed Foundation Extensions) et que l’App Group est identique sur les deux targets.
-- **No such module `receive_sharing_intent`** : `pod install`, puis placer « Embed Foundation Extensions » **au-dessus** de « Thin Binary » dans Runner → Build Phases.
+- **No such module `receive_sharing_intent`** : l’extension n’importe plus le pod Flutter ; les sources `RSIShareViewController.swift` et `ReceiveSharingIntentTypes.swift` sont compilées directement dans le target Share Extension. Vérifier aussi que « Embed Foundation Extensions » est **au-dessus** de « Thin Binary ».
