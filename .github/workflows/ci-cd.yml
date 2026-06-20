@@ -278,16 +278,19 @@ jobs:
   
 # iOS App Build and Deploy just to rerun
   build_with_signing_ios_app:
-    runs-on: macos-latest
+    # App Store (depuis avril 2026) exige iOS 26 SDK → Xcode 26+ (ITMS-90725)
+    runs-on: macos-26
     strategy:
       matrix:
         app: [customer, expert]
         environment: [dev]
     steps:
-      # this was more debug as was curious what came pre-installed oky
-      # GitHub shares this online, e.g. https://github.com/actions/runner-images/blob/macOS-12/20230224.1/images/macos/macos-12-Readme.md
-      - name: check Xcode version
-        run: /usr/bin/xcodebuild -version
+      - name: Select Xcode 26 (iOS 26 SDK)
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.5.app
+          xcodebuild -version
+          echo "Installed iOS SDKs:"
+          xcodebuild -showsdks | grep -i iphoneos || true
 
       - name: checkout repository
         uses: actions/checkout@v4
@@ -437,7 +440,6 @@ jobs:
           pod cache clean --all
           rm -rf Podfile.lock Pods
           pod deintegrate
-          sudo gem install cocoapods -v 1.5.0
           pod install --repo-update
 
       - name: build archive

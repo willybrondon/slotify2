@@ -1,5 +1,13 @@
 # iOS CI — profils de provisioning (Skedisy Customer)
 
+## Xcode / SDK App Store (depuis avril 2026)
+
+Apple refuse les builds avec l’ancien SDK (**ITMS-90725**). Il faut **Xcode 26+** et le **SDK iOS 26+**.
+
+Le job CI `build_with_signing_ios_app` utilise le runner **`macos-26`** et sélectionne **`Xcode_26.5.app`**.
+
+Build local : installer Xcode 26 depuis le Mac App Store, puis `xcodebuild -version` doit afficher SDK 26.x.
+
 ## Profils attendus dans `BUILD_PROVISION_PROFILE_BASE64`
 
 | Nom du profil | Bundle ID | Cible |
