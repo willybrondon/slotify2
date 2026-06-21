@@ -36,7 +36,9 @@
 				<integer>1</integer>
 				<key>NSExtensionActivationSupportsText</key>
 				<true/>
-				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
+                <key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
+				<integer>1</integer>
+				<key>NSExtensionActivationSupportsFileWithMaxCount</key>
 				<integer>1</integer>
 			</dict>
 		</dict>

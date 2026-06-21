@@ -287,9 +287,9 @@ Future<void> main() async {
     runApp(const MyApp());
   } catch (e) {
     log("Error in main initialization: $e");
-    // Still run the app even if some initialization fails
     WidgetsFlutterBinding.ensureInitialized();
     await GetStorage.init();
+    ShareCaptureService.init();
     runApp(const MyApp());
   }
 }
@@ -304,7 +304,26 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ShareCaptureService.onAppResumed();
+    }
+  }
+
   @override
   void didChangeDependencies() {
     getLocale().then((locale) {

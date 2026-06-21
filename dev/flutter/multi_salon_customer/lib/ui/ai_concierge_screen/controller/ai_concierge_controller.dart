@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:salon_2/utils/share_path_util.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -61,7 +62,12 @@ class AiConciergeController extends GetxController {
 
   Future<void> _loadSharedVideo(String path, {bool autoAnalyze = false}) async {
     try {
-      final normalized = _normalizeSharePath(path);
+      final normalized = await waitForShareFile(path);
+      if (normalized == null) {
+        log('Share video not found (raw: $path)');
+        Utils.showToast(Get.context!, 'txtCaptureVideoError'.tr);
+        return;
+      }
       video = XFile(normalized);
       isVideoMedia = true;
       image = null;
@@ -80,9 +86,15 @@ class AiConciergeController extends GetxController {
 
   Future<void> _loadSharedImage(String path, {bool autoAnalyze = false}) async {
     try {
-      final normalized = _normalizeSharePath(path);
+      final normalized = await waitForShareFile(path);
+      if (normalized == null) {
+        log('Share image not found at: $path');
+        Utils.showToast(Get.context!, 'txtCaptureImageError'.tr);
+        return;
+      }
+      final file = File(normalized);
       image = XFile(normalized);
-      selectImageFile = File(normalized);
+      selectImageFile = file;
       isVideoMedia = false;
       video = null;
       update([Constant.idProgressView]);
@@ -113,14 +125,6 @@ class AiConciergeController extends GetxController {
       captureMode = true;
     }
     update([Constant.idProgressView]);
-  }
-
-  String _normalizeSharePath(String path) {
-    final trimmed = path.trim();
-    if (trimmed.startsWith('file://')) {
-      return Uri.parse(trimmed).toFilePath(windows: false);
-    }
-    return trimmed;
   }
 
   bool _isVideoPath(String path) {
