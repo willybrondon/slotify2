@@ -1,0 +1,3 @@
+Date (JJ/MM/AAAA),N° facture,Client (salon / tiers),Description,HT (€),TVA 20% (€),TTC (€),Mode paiement,Encaissé (Oui/Non),Date encaissement,Notes
+01/04/2026,F-2026-001,Salon exemple,Commission plateforme T1,,, ,Virement,Non,,
+01/04/2026,F-2026-002,Salon exemple,Abonnement pro mensuel,,, ,Stripe,Oui,05/04/2026,

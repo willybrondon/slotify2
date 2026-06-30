@@ -188,6 +188,7 @@ class Salon {
   DateTime? createdAt;
   DateTime? updatedAt;
   double? distance;
+  PaymentOptions? paymentOptions;
 
   Salon({
     this.addressDetails,
@@ -213,6 +214,7 @@ class Salon {
     this.createdAt,
     this.updatedAt,
     this.distance,
+    this.paymentOptions,
   });
 
   factory Salon.fromJson(Map<String, dynamic> json) => Salon(
@@ -240,6 +242,9 @@ class Salon {
         createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
         updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
         distance: json["distance"]?.toDouble(),
+        paymentOptions: json["paymentOptions"] == null
+            ? null
+            : PaymentOptions.fromJson(json["paymentOptions"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -266,6 +271,27 @@ class Salon {
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
         "distance": distance,
+        "paymentOptions": paymentOptions?.toJson(),
+      };
+}
+
+class PaymentOptions {
+  bool? acceptCash;
+  bool? acceptStripe;
+  bool? stripeConnectReady;
+
+  PaymentOptions({this.acceptCash, this.acceptStripe, this.stripeConnectReady});
+
+  factory PaymentOptions.fromJson(Map<String, dynamic> json) => PaymentOptions(
+        acceptCash: json["acceptCash"],
+        acceptStripe: json["acceptStripe"],
+        stripeConnectReady: json["stripeConnectReady"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "acceptCash": acceptCash,
+        "acceptStripe": acceptStripe,
+        "stripeConnectReady": stripeConnectReady,
       };
 }
 

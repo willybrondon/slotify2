@@ -673,6 +673,8 @@ class MtnMomoService {
           final showFirstBookingCashback =
               bookingScreenController!.createBookingCategory?.firstBookingCashback ==
                   true;
+          final bookingStatus =
+              bookingScreenController!.createBookingCategory?.data?.status;
           bookingScreenController!.isLoading(false);
           bookingScreenController!.update([Constant.idProgressView]);
 
@@ -688,6 +690,7 @@ class MtnMomoService {
               backgroundColor: AppColors.transparent,
               child: SuccessDialog(
                 showFirstBookingCashback: showFirstBookingCashback,
+                bookingStatus: bookingStatus,
               ),
             ),
           );

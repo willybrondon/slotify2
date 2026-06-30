@@ -1,0 +1,3 @@
+Date Stripe (UTC),ID transaction Stripe,Type (charge/payout/refund/fee),Description,Email client,Montant brut (€),Frais Stripe (€),Net encaissé (€),Devise,N° facture liée,Rapproché (Oui/Non),Écart (€),Notes
+2026-04-05,ch_xxxxxxxxxxxxx,charge,Abonnement pro Salon X,salon@example.com,59.00,1.47,57.53,eur,F-2026-002,Oui,0,
+2026-04-05,ch_yyyyyyyyyyyyy,charge,Commission réservation,salon2@example.com,12.50,0.39,12.11,eur,,Non,,

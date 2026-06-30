@@ -51,6 +51,12 @@ exports.create = async (req, res) => {
     salon.mobile = req.body.mobile;
     salon.password = req.body.password;
     salon.platformFee = req.body.platformFee;
+    salon.minWalletBalance =
+      req.body.minWalletBalance !== undefined && req.body.minWalletBalance !== ""
+        ? parseFloat(req.body.minWalletBalance)
+        : 0;
+    salon.wallet = 0;
+    salon.paymentMethods = { acceptCash: true, acceptStripe: false };
     salon.locationCoordinates = {
       latitude: req.body.latitude,
       longitude: req.body.longitude,
@@ -133,6 +139,11 @@ exports.update = async (req, res) => {
       longitude: req.body.longitude ? req.body.longitude : salon.locationCoordinates.longitude,
     };
     salon.platformFee = req.body.platformFee ? req.body.platformFee : salon.platformFee;
+    if (req.body.minWalletBalance !== undefined && req.body.minWalletBalance !== "") {
+      salon.minWalletBalance = parseFloat(req.body.minWalletBalance);
+    } else if (req.body.minWalletBalance === "" || req.body.minWalletBalance === null) {
+      salon.minWalletBalance = null;
+    }
     salon.password = req.body.password ? req.body.password : salon.password;
     if (req.files.mainImage) {
       const image = salon?.mainImage.split("storage");

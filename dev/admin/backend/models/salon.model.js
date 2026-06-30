@@ -32,6 +32,8 @@ const salonSchema = new mongoose.Schema(
     about: { type: String, default: "" },
 
     platformFee: { type: Number, default: 0 },
+    /** Override global minSalonWalletBalance; null = use platform default */
+    minWalletBalance: { type: Number, default: null },
     earning: { type: Number, default: 0 },
     wallet: { type: Number, default: 0 }, // Salon wallet balance for prepayment
 
@@ -58,6 +60,24 @@ const salonSchema = new mongoose.Schema(
       features: [{ type: String, default: "" }], // Array of feature highlights
     },
     isBestSeller: { type: Boolean, default: false },
+
+    /** Auto-confirm new bookings (Planity/Fresha-style). false = expert must confirm pending */
+    autoConfirmBookings: { type: Boolean, default: true },
+
+    /** Salon-level payment preferences for customer bookings */
+    paymentMethods: {
+      acceptCash: { type: Boolean, default: true },
+      acceptStripe: { type: Boolean, default: false },
+    },
+
+    /** Stripe Connect Express account — payouts go to salon; Skedisy keeps application fee */
+    stripeConnect: {
+      accountId: { type: String, default: "" },
+      onboardingComplete: { type: Boolean, default: false },
+      chargesEnabled: { type: Boolean, default: false },
+      payoutsEnabled: { type: Boolean, default: false },
+      detailsSubmitted: { type: Boolean, default: false },
+    },
 
     serviceIds: [
       {

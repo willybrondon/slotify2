@@ -89,6 +89,7 @@ class ApiConstant {
   /// ---------- Booking ---------- ///
   static const getBooking = "user/booking/getBookingBasedDate?";
   static const createBooking = "user/booking/newBooking";
+  static const stripePaymentIntent = "user/booking/stripe-payment-intent";
   static const checkBooking = "user/booking/checkSlots";
   static const getAllBooking = "user/booking/getBookings?";
   static const cancelBooking = "user/booking/cancelBooking";

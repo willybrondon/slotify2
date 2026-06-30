@@ -18,6 +18,21 @@ import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
+String _statusLabel(String? status) {
+  switch (status) {
+    case "pending":
+      return "txtPending".tr;
+    case "confirm":
+      return "txtConfirmed".tr;
+    case "completed":
+      return "txtCompleted".tr;
+    case "cancel":
+      return "txtCancelled".tr;
+    default:
+      return status ?? "";
+  }
+}
+
 class BookingInformationScreen extends StatelessWidget {
   BookingInformationScreen({super.key});
 
@@ -241,16 +256,17 @@ class BookingInformationScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(7),
                                     color: logic.getBookingInformationCategory?.booking?.status == "cancel"
                                         ? AppColors.lightRedColor
-                                        : AppColors.green2,
+                                        : logic.getBookingInformationCategory?.booking?.status == "pending"
+                                            ? AppColors.yellow1
+                                            : AppColors.green2,
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
                                     child: Text(
-                                      logic.getBookingInformationCategory?.booking?.status == "pending"
-                                          ? "Pending"
-                                          : logic.getBookingInformationCategory?.booking?.status == "completed"
-                                              ? "Completed"
-                                              : "Cancelled",
+                                      _statusLabel(logic
+                                          .getBookingInformationCategory
+                                          ?.booking
+                                          ?.status),
                                       style: TextStyle(
                                         fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 11,

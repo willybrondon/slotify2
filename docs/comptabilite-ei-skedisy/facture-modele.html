@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Facture F-AAAA-001 — Skedisy</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #1a1a1a;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 24px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    h1 { font-size: 28px; margin: 0 0 8px; color: #0d6b4f; }
+    .meta { color: #555; margin-bottom: 32px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .box {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fafafa;
+    }
+    .box h2 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #666;
+      margin: 0 0 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th { background: #f0f7f4; font-weight: 600; }
+    .num { text-align: right; }
+    .totals {
+      margin-left: auto;
+      width: 280px;
+    }
+    .totals td { border: none; padding: 6px 0; }
+    .totals tr:last-child td {
+      font-weight: 700;
+      font-size: 16px;
+      border-top: 2px solid #0d6b4f;
+      padding-top: 12px;
+    }
+    .legal {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid #ddd;
+      font-size: 11px;
+      color: #555;
+    }
+    @media print {
+      body { margin: 0; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>FACTURE</h1>
+  <p class="meta">
+    <strong>N° F-2026-001</strong> &nbsp;|&nbsp;
+    Date d'émission : <strong>01/04/2026</strong> &nbsp;|&nbsp;
+    Date de prestation : <strong>31/03/2026</strong>
+  </p>
+
+  <div class="grid">
+    <div class="box">
+      <h2>Émetteur</h2>
+      <p>
+        <strong>[Prénom NOM]</strong><br />
+        Entrepreneur individuel — Skedisy<br />
+        [Adresse complète]<br />
+        [Code postal] [Ville], France<br />
+        SIRET : <strong>[000 000 000 00000]</strong><br />
+        N° TVA intracommunautaire : <strong>FR[XX][SIREN]</strong><br />
+        Email : contact@skedisy.com
+      </p>
+    </div>
+    <div class="box">
+      <h2>Client</h2>
+      <p>
+        <strong>[Raison sociale du salon]</strong><br />
+        [Adresse du salon]<br />
+        [Code postal] [Ville]<br />
+        SIRET client : <strong>[si professionnel]</strong><br />
+        Email : [email@salon.com]
+      </p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Désignation</th>
+        <th class="num">Qté</th>
+        <th class="num">P.U. HT</th>
+        <th class="num">TVA</th>
+        <th class="num">Total HT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Commission plateforme Skedisy — mise en relation et réservations (T1 2026)</td>
+        <td class="num">1</td>
+        <td class="num">100,00 €</td>
+        <td class="num">20 %</td>
+        <td class="num">100,00 €</td>
+      </tr>
+      <!-- Ajouter des lignes si besoin -->
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr>
+      <td>Total HT</td>
+      <td class="num">100,00 €</td>
+    </tr>
+    <tr>
+      <td>TVA 20 %</td>
+      <td class="num">20,00 €</td>
+    </tr>
+    <tr>
+      <td>Total TTC</td>
+      <td class="num">120,00 €</td>
+    </tr>
+  </table>
+
+  <p>
+    <strong>Conditions de paiement :</strong> paiement à réception, par virement ou carte (Stripe).<br />
+    <strong>IBAN :</strong> [FR76 XXXX XXXX XXXX XXXX XXXX XXX] — <strong>BIC :</strong> [XXXXXXXX]
+  </p>
+
+  <div class="legal">
+    <p>
+      En cas de retard de paiement, une pénalité de 3 fois le taux d'intérêt légal sera appliquée,
+      ainsi qu'une indemnité forfaitaire de 40 € pour frais de recouvrement (clients professionnels).
+      Pas d'escompte pour paiement anticipé.
+    </p>
+    <p>
+      TVA acquittée sur les débits. Régime : réel simplifié BIC — réel simplifié TVA.
+      Exercice clos au 31 décembre.
+    </p>
+  </div>
+
+</body>
+</html>

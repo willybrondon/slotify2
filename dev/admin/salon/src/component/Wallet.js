@@ -16,7 +16,7 @@ const Wallet = () => {
     const navigate = useNavigate();
     const { setting } = useSelector((state) => state.setting);
     const { admin } = useSelector((state) => state.auth);
-    const { walletBalance, isSkeleton } = useSelector((state) => state.withDraw);
+    const { walletBalance, isSkeleton, effectiveMinWalletBalance } = useSelector((state) => state.withDraw);
     const { currency } = useSelector((state) => state.setting);
     const [searchParams] = useSearchParams();
     
@@ -340,7 +340,8 @@ const Wallet = () => {
         }
     };
 
-    const minSalonWalletBalance = settingsData?.minSalonWalletBalance || 0;
+    const minSalonWalletBalance =
+        effectiveMinWalletBalance ?? settingsData?.minSalonWalletBalance ?? 0;
     const isBalanceInsufficient = walletBalance < minSalonWalletBalance;
     const deficit = minSalonWalletBalance - walletBalance;
 

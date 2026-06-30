@@ -52,6 +52,11 @@ class SlotManagerController extends GetxController {
   String? breakEndTime;
   String? salonID;
 
+  String? operationalStatus;
+  int? occupancyRate;
+  List<dynamic> dayBookingEvents = [];
+  List<dynamic> dayScheduleEvents = [];
+
   @override
   void onInit() async {
     log("salon Id :: ${Constant.storage.read<String>("salonId").toString()}");
@@ -356,6 +361,11 @@ class SlotManagerController extends GetxController {
         final jsonResponse = jsonDecode(response.body);
         getBookingModel = GetBookingModel.fromJson(jsonResponse);
       }
+      await onExpertDayScheduleApiCall(
+        selectedDate: selectedDate,
+        expertId: expertId,
+        salonId: salonId,
+      );
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
@@ -364,6 +374,41 @@ class SlotManagerController extends GetxController {
     } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idUpdateSlots, Constant.idUpdateSlots0]);
+    }
+  }
+
+  Future<void> onExpertDayScheduleApiCall({
+    required String selectedDate,
+    required String expertId,
+    required String salonId,
+  }) async {
+    try {
+      final queryParameters = {
+        "date": selectedDate,
+        "expertId": expertId,
+        "salonId": salonId,
+      };
+      final queryString = Uri(queryParameters: queryParameters).query;
+      final url =
+          Uri.parse(ApiConstant.BASE_URL + ApiConstant.expertDaySchedule + queryString);
+      final headers = {"key": ApiConstant.SECRET_KEY};
+      final response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse["status"] == true && jsonResponse["data"] != null) {
+          final data = jsonResponse["data"];
+          operationalStatus = data["expert"]?["operationalStatus"]?.toString();
+          occupancyRate = data["expert"]?["occupancyRate"] is int
+              ? data["expert"]["occupancyRate"]
+              : int.tryParse("${data["expert"]?["occupancyRate"]}");
+          dayBookingEvents = (data["bookings"] as List?) ?? [];
+          dayScheduleEvents = (data["events"] as List?) ?? [];
+        }
+      }
+    } catch (e) {
+      log("Expert day schedule error :: $e");
+    } finally {
+      update([Constant.idUpdateSlots0]);
     }
   }
 }

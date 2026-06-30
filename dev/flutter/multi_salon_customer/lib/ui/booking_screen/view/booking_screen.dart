@@ -1781,7 +1781,7 @@ class BookingScreen extends StatelessWidget {
             //     : const SizedBox(),
 
             /// Stripe Payment
-            splashController.settingCategory?.setting?.isStripePay == true
+            logic.salonAcceptsStripe()
                 ? GetBuilder<BookingScreenController>(
                     id: Constant.idStep3,
                     builder: (logic) {
@@ -2060,7 +2060,7 @@ class BookingScreen extends StatelessWidget {
             //             : const SizedBox(),
 
             /// Cash After Service Payment
-            splashController.settingCategory?.setting?.cashAfterService == true
+            logic.salonAcceptsCash()
                 ? GetBuilder<BookingScreenController>(
                     id: Constant.idStep3,
                     builder: (logic) {

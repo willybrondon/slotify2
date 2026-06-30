@@ -11,15 +11,29 @@ import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 
 class SuccessDialog extends StatelessWidget {
-  SuccessDialog({super.key, this.showFirstBookingCashback = false});
+  SuccessDialog({
+    super.key,
+    this.showFirstBookingCashback = false,
+    this.bookingStatus,
+  });
 
   /// When true, shows marketing cashback copy (first non-cancelled booking only; set from API).
   final bool showFirstBookingCashback;
+  final String? bookingStatus;
 
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
 
   @override
   Widget build(BuildContext context) {
+    final isConfirmed = bookingStatus == "confirm";
+    final titleKey =
+        isConfirmed ? "txtConfirmed".tr : "txtBookingSuccessful".tr;
+    final messageKey = isConfirmed
+        ? "txtBookingConfirmedMessage".tr
+        : bookingStatus == "pending"
+            ? "txtBookingPendingMessage".tr
+            : "desSuccessfullyBooked".tr;
+
     return Container(
       constraints: const BoxConstraints(maxWidth: 300, maxHeight: 520),
       width: 300,
@@ -37,7 +51,7 @@ class SuccessDialog extends StatelessWidget {
             width: 90,
           ).paddingOnly(top: 10, bottom: 20),
           Text(
-            "txtBookingSuccessful".tr,
+            titleKey,
             style: TextStyle(
               fontFamily: AppFontFamily.sfProDisplayBold,
               color: AppColors.categoryService,
@@ -47,7 +61,7 @@ class SuccessDialog extends StatelessWidget {
           SizedBox(
             width: Get.width * 0.6,
             child: Text(
-              "desSuccessfullyBooked".tr,
+              messageKey,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: AppFontFamily.sfProDisplayRegular,

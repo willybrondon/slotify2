@@ -158,6 +158,11 @@ final Map<String, String> frFR = {
   "txtSubmit": "Soumettre",
   "txtSearchBooking": "Rechercher une réservation",
   "txtPending": "En attente",
+  "txtConfirmed": "Confirmée",
+  "txtBookingConfirmedMessage":
+      "Votre réservation est confirmée. Présentez-vous au salon à l'heure prévue.",
+  "txtBookingPendingMessage":
+      "Votre réservation est en attente de validation par le salon. Vous serez notifiée une fois confirmée.",
   "txtForgotPassword": "Mot de passe oublié?",
   "txtCheckMail": "Veuillez vérifier votre boîte aux lettres",
   "txtResetPassword": "Réinitialiser",

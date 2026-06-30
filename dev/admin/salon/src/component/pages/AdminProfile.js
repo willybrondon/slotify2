@@ -19,6 +19,7 @@ import Male from "../../../src/assets/images/male.png";
 import { ExInput, Textarea } from "../extras/Input";
 import ToggleSwitch from "../extras/ToggleSwitch";
 import { SKEDISY_SALON_PORTAL_COPY as portalCopy } from "../../constants/skedisyPortalCopy";
+import SalonPaymentSettings from "./SalonPaymentSettings";
 
 export const AdminProfile = () => {
   const dispatch = useDispatch();
@@ -41,6 +42,7 @@ export const AdminProfile = () => {
   const [latitude, setLatitude] = useState();
   const [longitude, setLongitude] = useState();
   const [about, setAbout] = useState();
+  const [autoConfirmBookings, setAutoConfirmBookings] = useState(true);
   const [valuePropositionTitle, setValuePropositionTitle] = useState();
   const [valuePropositionDescription, setValuePropositionDescription] = useState();
   const [valuePropositionFeatures, setValuePropositionFeatures] = useState();
@@ -102,6 +104,7 @@ export const AdminProfile = () => {
       setPlatformFee(data?.platformFee);
       setImagePath(data?.mainImage);
       setAbout(data?.about);
+      setAutoConfirmBookings(data?.autoConfirmBookings !== false);
       setHeroImagePath(data?.heroImage);
       setValuePropositionTitle(data?.valueProposition?.title || "");
       setValuePropositionDescription(data?.valueProposition?.description || "");
@@ -177,6 +180,7 @@ export const AdminProfile = () => {
       formData.append("longitude", longitude);
       formData.append("mobile", mobile);
       formData.append("about", about);
+      formData.append("autoConfirmBookings", autoConfirmBookings ? "true" : "false");
       if (valuePropositionTitle) {
         formData.append("valuePropositionTitle", valuePropositionTitle);
       }
@@ -443,6 +447,23 @@ export const AdminProfile = () => {
                     />
                   </div>
                 </div>
+                <div className="row mt-2">
+                  <div className="col-12">
+                    <div className="d-flex justify-content-between align-items-center p-3 rounded" style={{ backgroundColor: "#f8f9fa" }}>
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{portalCopy.autoConfirmBookingsLabel}</div>
+                        <p style={{ fontSize: "12px", color: "#666", marginBottom: 0 }}>
+                          {portalCopy.autoConfirmBookingsHint}
+                        </p>
+                      </div>
+                      <ToggleSwitch
+                        value={autoConfirmBookings}
+                        onClick={() => setAutoConfirmBookings(!autoConfirmBookings)}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <SalonPaymentSettings />
                 <div className="row mt-3">
                   <div className="col-12">
                     <h5 style={{ marginBottom: "20px", color: "#1c2b20" }}>Web Page Settings</h5>

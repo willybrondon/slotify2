@@ -6,6 +6,7 @@ const initialState = {
     withDraw: [],
     walletHistory:[],
     walletBalance: 0,
+    effectiveMinWalletBalance: 0,
     isLoading: false,
     isSkeleton: false,
     total: null,
@@ -80,6 +81,7 @@ const withDrawSlice = createSlice({
             state.walletHistory = action.payload.data;
             state.total = action?.payload?.total;
             state.walletBalance = action?.payload?.walletBalance || 0;
+            state.effectiveMinWalletBalance = action?.payload?.effectiveMinWalletBalance ?? 0;
             state.isSkeleton = false;
         })
 

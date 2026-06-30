@@ -63,6 +63,7 @@ import ExpertRequest from "../tables/WithDrawal/ExpertRequest";
 import UserOrderHistory from "../tables/User/UserOrderHistory";
 import SalonOrder from "../tables/salon/SalonOrder";
 import Coupon from "../tables/coupon/Coupon";
+import AdminTeamCalendar from "../tables/calendar/AdminTeamCalendar";
 
 const Admin = () => {
   const location = useLocation();
@@ -89,6 +90,7 @@ const Admin = () => {
         <div className="adminStart">
           <Routes>
             <Route path="/adminDashboard" element={<DashBoard />} />
+            <Route path="/teamCalendar" element={<AdminTeamCalendar />} />
             <Route path="/bookingTable" element={<Booking />} />
             <Route path="/adminProfile" element={<AdminProfile />} />
             <Route path="/allExperts" element={<Expert />} />

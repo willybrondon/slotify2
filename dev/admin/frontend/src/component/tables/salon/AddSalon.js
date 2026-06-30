@@ -32,6 +32,7 @@ const AddSalon = () => {
   const [imagePath, setImagePath] = useState();
   const [mobile, setMobile] = useState();
   const [platformFee, setPlatformFee] = useState();
+  const [minWalletBalance, setMinWalletBalance] = useState("");
   const [latitude, setLatitude] = useState();
   const [longitude, setLongitude] = useState();
   const [password, setPassword] = useState();
@@ -67,6 +68,9 @@ const AddSalon = () => {
       setLongitude(state?.row?.locationCoordinates?.longitude);
       setMobile(state?.row?.mobile);
       setPlatformFee(state?.row?.platformFee);
+      setMinWalletBalance(
+        state?.row?.minWalletBalance != null ? String(state.row.minWalletBalance) : ""
+      );
       setImagePath(state?.row?.mainImage);
       setImages(state?.row?.image);
       setAbout(state?.row?.about);
@@ -159,6 +163,7 @@ const AddSalon = () => {
       formData.append("latitude", latitude);
       formData.append("longitude", longitude);
       formData.append("platformFee", platformFee);
+      formData.append("minWalletBalance", minWalletBalance);
       formData.append("mobile", mobile);
       formData.append("password", password);
       formData.append("about", about);
@@ -334,6 +339,18 @@ const AddSalon = () => {
                       });
                     }
                   }}
+                />
+              </div>
+
+              <div className="col-12 col-md-6 col-lg-4">
+                <ExInput
+                  type={`number`}
+                  id={`minWalletBalance`}
+                  name={`minWalletBalance`}
+                  value={minWalletBalance}
+                  label={f.minWalletBalance}
+                  placeholder={f.minWalletBalanceHint}
+                  onChange={(e) => setMinWalletBalance(e.target.value)}
                 />
               </div>
 

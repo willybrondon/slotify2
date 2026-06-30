@@ -42,6 +42,7 @@ import WalletHistory from "../WalletHistory";
 import Wallet from "../Wallet";
 import OrderDetails from "../tables/order/OrderDetails";
 import Attribute from "../tables/attributes/Attribute";
+import TeamCalendar from "../tables/calendar/TeamCalendar";
 
 
 
@@ -72,6 +73,7 @@ const Admin = () => {
         <div className="adminStart">
           <Routes>
             <Route path="/salonDashboard" element={<DashBoard />} />
+            <Route path="/teamCalendar" element={<TeamCalendar />} />
             <Route path="/bookingTable" element={<Booking />} />
             <Route path="/profile" element={<AdminProfile />} />
             <Route path="/allExperts" element={<Expert />} />

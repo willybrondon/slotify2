@@ -130,6 +130,8 @@ class RazorPayService {
         final showFirstBookingCashback =
             bookingScreenController.createBookingCategory?.firstBookingCashback ==
                 true;
+        final bookingStatus =
+            bookingScreenController.createBookingCategory?.data?.status;
         bookingScreenController.finalTaxRupee = 0.0;
         bookingScreenController.withOutTaxRupee = 0.0;
         bookingScreenController.totalPrice = 0.0;
@@ -226,6 +228,7 @@ class RazorPayService {
             backgroundColor: AppColors.transparent,
             child: SuccessDialog(
               showFirstBookingCashback: showFirstBookingCashback,
+              bookingStatus: bookingStatus,
             ),
           ),
         );

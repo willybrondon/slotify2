@@ -409,6 +409,10 @@ const Sidebar = () => {
           subName: n.monthlyReport,
           subPath: "/admin/monthlyReport",
         },
+        {
+          subName: n.teamCalendar,
+          subPath: "/admin/teamCalendar",
+        },
       ],
     },
   ];

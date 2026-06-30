@@ -66,6 +66,11 @@ exports.update = async (req, res) => {
     if (req.body.reservationNotificationEmails !== undefined) {
       setting.reservationNotificationEmails = String(req.body.reservationNotificationEmails).trim();
     }
+    if (req.body.autoConfirmBookings !== undefined) {
+      setting.autoConfirmBookings =
+        req.body.autoConfirmBookings === true ||
+        req.body.autoConfirmBookings === "true";
+    }
 
     await setting.save();
     updateSettingFile(setting);
@@ -112,6 +117,9 @@ exports.handleSwitch = async (req, res) => {
     }
     if (type == 8) {
       setting.isMtnMomo = !setting.isMtnMomo;
+    }
+    if (type == 9) {
+      setting.autoConfirmBookings = !setting.autoConfirmBookings;
     }
 
     await setting.save();

@@ -122,6 +122,11 @@ exports.update = async (req, res) => {
 
     salon.mobile = req.body.mobile ? req.body.mobile : salon.mobile;
     salon.about = req.body.about ? req.body.about : salon.about;
+    if (req.body.autoConfirmBookings !== undefined) {
+      salon.autoConfirmBookings =
+        req.body.autoConfirmBookings === true ||
+        req.body.autoConfirmBookings === "true";
+    }
     salon.locationCoordinates = {
       latitude: req.body.latitude ? req.body.latitude : salon.locationCoordinates.latitude,
       longitude: req.body.longitude ? req.body.longitude : salon.locationCoordinates.longitude,
@@ -570,12 +575,18 @@ exports.fetchSalonWalletHistory = async (req, res) => {
       return res.status(200).json({ status: false, message: "Oops ! Salon not found!" });
     }
 
+    const setting = await Setting.findOne().select("minSalonWalletBalance");
+    const { resolveMinWalletBalance } = require("../../services/salonBookingWallet.service");
+    const effectiveMinWalletBalance = resolveMinWalletBalance(salon, setting || {});
+
     return res.status(200).json({
       status: true,
       message: "Success",
       total: total,
       data: data,
       walletBalance: salon.wallet || 0,
+      effectiveMinWalletBalance,
+      salonMinWalletBalance: salon.minWalletBalance,
     });
   } catch (error) {
     console.log(error);

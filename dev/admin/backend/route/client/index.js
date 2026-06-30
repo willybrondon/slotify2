@@ -29,6 +29,7 @@ const expertWithdrawRequest = require("./expertWithdrawRequest.route");
 const couponRoute = require("./coupon.route");
 const aiConciergeRoute = require("./aiConcierge.route");
 const guestBooking = require("./guestBooking.route");
+const teamSchedule = require("./teamSchedule.route");
 
 route.use("/order", order);
 route.use("/cart", cart);
@@ -57,3 +58,4 @@ route.use("/expertWithdrawRequest", expertWithdrawRequest);
 route.use("/coupon", couponRoute);
 route.use("/aiConcierge", aiConciergeRoute);
 route.use("/guest", guestBooking);
+route.use("/teamSchedule", teamSchedule);

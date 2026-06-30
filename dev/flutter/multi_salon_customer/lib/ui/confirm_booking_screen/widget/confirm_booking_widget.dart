@@ -31,7 +31,7 @@ class ConfirmBookingPaymentView extends StatelessWidget {
             width: 200,
           ).paddingOnly(top: Get.height * 0.075, bottom: 15),
           Text(
-            "Booking Confirmed",
+            "txtConfirmed".tr,
             style: TextStyle(
               color: AppColors.primaryAppColor,
               fontSize: 24,
@@ -39,7 +39,7 @@ class ConfirmBookingPaymentView extends StatelessWidget {
             ),
           ).paddingOnly(top: 10),
           Text(
-            "Your booking is confirm with expertname at 09:00 PM.",
+            "txtBookingConfirmedMessage".tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.bgStepper,
@@ -369,7 +369,7 @@ class ConfirmBookingBottomView extends StatelessWidget {
       fontFamily: AppFontFamily.heeBo700,
       fontSize: 17,
       radius: 10,
-      buttonText: "Back to home page",
+      buttonText: "txtShareLookBackHome".tr,
       onTap: () {
         Get.offAllNamed(AppRoutes.bottom);
       },

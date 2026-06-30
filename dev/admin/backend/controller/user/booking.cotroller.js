@@ -347,38 +347,43 @@ exports.newBooking = async (req, res, next) => {
 
     // Get user language preference (from request or default to 'en')
     const userLanguage = getLanguage(req);
-    
-    // Check salon wallet balance before allowing booking
+
+    const paymentType = (req.body.paymentType || "").toString().trim();
+
+    const {
+      resolveSalonCommissionPercent,
+      computeRequiredSalonWalletBalance,
+      shouldDebitSalonWalletForCommission,
+    } = require("../../services/salonBookingWallet.service");
+    const { salonPaymentOptions } = require("../../services/stripeConnect.service");
+
     const setting = await Setting.findOne().sort({ createdAt: -1 });
-    const minSalonWalletBalance = setting?.minSalonWalletBalance || 0;
     const minUserWalletBalance = setting?.minUserWalletBalance || 0;
     const salonWalletBalance = salon.wallet || 0;
     const userWalletBalance = user.amount || 0;
 
-    // Get commission percentages from settings (or fall back to salon.platformFee for backward compatibility)
-    const salonCommissionPercent = setting?.salonCommissionCharges || salon.platformFee || 0;
+    const salonCommissionPercent = resolveSalonCommissionPercent(salon, setting);
     const customerCommissionPercent = setting?.customerCommissionCharges || 0;
 
-    // Calculate expected commission for this booking (will be calculated again later, but need early check)
     const services = req.body.serviceId.split(",").map(s => s.trim());
     const servicesDataForCheck = await Service.find({ _id: { $in: services } });
-    // Convert service IDs to strings for proper comparison
     const serviceIdStrings = services.map(id => id.toString());
     const matchedServicesForCheck = salon.serviceIds.filter((service) => {
-      // Convert ObjectId to string and check if it's in the requested services array
       return service.id && service.id._id && serviceIdStrings.includes(service.id._id.toString());
     });
     let totalServicePriceForCheck = 0;
     matchedServicesForCheck.forEach((service) => {
       totalServicePriceForCheck += parseInt(service.price);
     });
-    
-    // Calculate platform fee (commission that will be deducted from salon)
-    const expectedPlatformFee = (salonCommissionPercent * totalServicePriceForCheck) / 100;
-    const requiredBalance = minSalonWalletBalance + expectedPlatformFee;
 
-    // Check if salon has sufficient wallet balance
-    if (salonWalletBalance < requiredBalance) {
+    const requiredBalance = computeRequiredSalonWalletBalance({
+      salon,
+      setting,
+      servicePriceWithoutTax: totalServicePriceForCheck,
+      paymentType,
+    });
+
+    if (requiredBalance > 0 && salonWalletBalance < requiredBalance) {
       // Send SMS and Email notification to salon owner about insufficient wallet balance
       // Use setImmediate to send notifications asynchronously without blocking the response
       // Note: Salon owner messages use user's language (or default to 'en')
@@ -497,8 +502,21 @@ exports.newBooking = async (req, res, next) => {
 
     // Only check customer wallet balance when payment is via WALLET.
     // For Stripe, MTN MoMo, Cash on service - skip wallet check (customer pays externally).
-    const paymentType = (req.body.paymentType || "").toString().trim();
     const isWalletPayment = !["Stripe", "MTN MoMo", "cashAfterService"].includes(paymentType);
+
+    const salonPay = salonPaymentOptions(salon);
+    if (paymentType === "cashAfterService" && !salonPay.acceptCash) {
+      return res.status(200).send({
+        status: false,
+        message: "This salon does not accept cash payment.",
+      });
+    }
+    if (paymentType === "Stripe" && !salonPay.acceptStripe) {
+      return res.status(200).send({
+        status: false,
+        message: "This salon does not accept online card payment.",
+      });
+    }
 
     // Calculate commission that will be deducted from customer wallet
     // Use customerCommissionPercent from settings (or 0 if not set)
@@ -673,6 +691,10 @@ exports.newBooking = async (req, res, next) => {
     }
 
     booking = new Booking();
+
+    const globalAutoConfirm = global.settingJSON?.autoConfirmBookings !== false;
+    const salonAutoConfirm = salon.autoConfirmBookings !== false;
+    booking.status = globalAutoConfirm && salonAutoConfirm ? "confirm" : "pending";
 
     booking.userId = user._id;
     booking.expertId = expert._id;
@@ -875,11 +897,10 @@ exports.newBooking = async (req, res, next) => {
     // Save booking first to get a valid _id
     await booking.save();
 
-    // Deduct platform commission from salon wallet
-    // platformFee is already calculated above (line 413), reuse it
+    // Deduct platform commission from salon wallet (cash / wallet / MTN — not Stripe Connect)
     const commissionAmount = parseFloat(platformFee.toFixed(2));
-    
-    if (commissionAmount > 0) {
+
+    if (commissionAmount > 0 && shouldDebitSalonWalletForCommission(paymentType, salon)) {
       // Deduct commission from salon wallet
       salon.wallet = (salon.wallet || 0) - commissionAmount;
       await salon.save();

@@ -258,7 +258,7 @@ class PendingBookingScreen extends StatelessWidget {
                                                                                 ),
                                                                               ),
                                                                               Text(
-                                                                                'Work in Progress',
+                                                                                "txtConfirmed".tr,
                                                                                 style: TextStyle(
                                                                                     fontSize: 11,
                                                                                     fontFamily: AppFontFamily.sfProDisplayMedium,

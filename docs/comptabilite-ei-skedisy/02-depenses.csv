@@ -1,0 +1,5 @@
+Date (JJ/MM/AAAA),Fournisseur,Catégorie,Description,HT (€),TVA déductible (€),TTC (€),Payé par (compte pro),Justificatif (lien fichier),Notes
+05/04/2026,OVH / Scaleway,Hébergement,Serveur backend avril,,, ,Compte pro,, 
+05/04/2026,Google Workspace,SaaS / outils,Email pro,,, ,Compte pro,,
+05/04/2026,Apple Developer,Stores,Abonnement annuel iOS,,, ,Compte pro,,
+05/04/2026,Stripe,Frais bancaires,Commissions paiement,,, ,Compte pro,Récupérer facture Stripe Dashboard,

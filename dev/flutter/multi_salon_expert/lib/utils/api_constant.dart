@@ -44,6 +44,7 @@ class ApiConstant {
   // ---------- update ---------- //
   static const updateProfile = "user/expert/updateProfile?";
   static const expertBusySlots = "user/expert/busyExpert?";
+  static const expertDaySchedule = "user/teamSchedule/expertDay?";
 
   // ---------- Payment Type ---------- //
   static const updatePaymentStatus =

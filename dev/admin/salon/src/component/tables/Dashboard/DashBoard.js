@@ -408,6 +408,36 @@ const DashBoard = () => {
                     </div>
                 </div>
             </div>
+            <div className="row mb-3">
+                <div className="col-12">
+                    <div
+                        className="d-flex justify-content-between align-items-center p-3 rounded cursor-pointer"
+                        style={{
+                            backgroundColor: "#f0f7f4",
+                            border: "1px solid #d4e8de",
+                            cursor: "pointer",
+                        }}
+                        onClick={() => navigate("/salonpanel/teamCalendar")}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                navigate("/salonpanel/teamCalendar");
+                            }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                    >
+                        <div>
+                            <div style={{ fontWeight: 700, fontSize: "16px" }}>
+                                {d.teamCalendarCta}
+                            </div>
+                            <div style={{ fontSize: "13px", opacity: 0.7 }}>
+                                {d.teamCalendarHint}
+                            </div>
+                        </div>
+                        <span style={{ fontSize: "22px" }}>→</span>
+                    </div>
+                </div>
+            </div>
             <div className="mainDashbox">
                 <div className="row">
                     <div className="col-lg-3 col-sm-6 col-12">

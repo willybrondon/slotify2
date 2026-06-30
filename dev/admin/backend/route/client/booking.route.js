@@ -2,11 +2,14 @@ const express = require("express");
 const route = express.Router();
 const bookingController = require("../../controller/user/booking.cotroller");
 const bookingForExpertController = require("../../controller/user/bookingForExpert.controller");
+const stripeBookingController = require("../../controller/user/stripeBooking.controller");
 const checkAccessWithSecretKey = require("../../middleware/checkAccess");
 
 route.get("/getBookingBasedDate", checkAccessWithSecretKey(), bookingController.getBookingBasedDate);
 
 route.post("/newBooking", checkAccessWithSecretKey(), bookingController.newBooking);
+
+route.post("/stripe-payment-intent", checkAccessWithSecretKey(), stripeBookingController.createBookingStripePaymentIntent);
 
 route.get("/checkSlots", checkAccessWithSecretKey(), bookingController.checkSlots);
 

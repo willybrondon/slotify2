@@ -176,6 +176,54 @@ class SlotManagerScreen extends StatelessWidget {
                                 fontSize: 20,
                               ),
                             ).paddingOnly(left: 13),
+                            if (logic.operationalStatus != null)
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(13, 8, 13, 0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.holidayBg,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: _operationalColor(
+                                            logic.operationalStatus),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        "${"txtOperationalStatus".tr}: ${_operationalLabel(logic.operationalStatus)}${logic.occupancyRate != null ? " · ${logic.occupancyRate}%" : ""}",
+                                        style: TextStyle(
+                                          fontFamily: AppFontFamily.heeBo500,
+                                          fontSize: 14,
+                                          color: AppColors.primaryTextColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (logic.dayScheduleEvents.isNotEmpty)
+                              _buildDayTimeline(logic.dayScheduleEvents)
+                            else if (!logic.isLoading.value)
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(13, 8, 13, 0),
+                                child: Text(
+                                  "txtNoDayEvents".tr,
+                                  style: TextStyle(
+                                    fontFamily: AppFontFamily.heeBo400,
+                                    fontSize: 13,
+                                    color: AppColors.service,
+                                  ),
+                                ),
+                              ),
                             Container(
                               height: 150,
                               width: Get.width,
@@ -650,4 +698,167 @@ class SlotManagerScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Color _operationalColor(String? status) {
+  switch (status) {
+    case "available":
+      return AppColors.greenColor;
+    case "busy":
+      return AppColors.redColor;
+    case "break":
+      return Colors.orange;
+    case "blocked":
+      return Colors.grey;
+    default:
+      return AppColors.grey;
+  }
+}
+
+String _operationalLabel(String? status) {
+  switch (status) {
+    case "available":
+      return "txtStatusAvailable".tr;
+    case "busy":
+      return "txtStatusBusy".tr;
+    case "break":
+      return "txtStatusBreak".tr;
+    case "blocked":
+      return "txtStatusBlocked".tr;
+    case "off":
+      return "txtStatusOff".tr;
+    default:
+      return status ?? "";
+  }
+}
+
+Widget _buildDayTimeline(List<dynamic> events) {
+  final visible = events
+      .where((e) => e is Map && (e["type"] == "booking" || e["type"] == "busy" || e["type"] == "break"))
+      .toList();
+  if (visible.isEmpty) return const SizedBox.shrink();
+
+  String formatTime(dynamic value) {
+    if (value == null) return "";
+    try {
+      final dt = DateTime.parse(value.toString()).toLocal();
+      return DateFormat('HH:mm').format(dt);
+    } catch (_) {
+      return "";
+    }
+  }
+
+  String labelForType(String? type) {
+    switch (type) {
+      case "booking":
+        return "txtTimelineBooking".tr;
+      case "busy":
+        return "txtTimelineBusy".tr;
+      case "break":
+        return "txtTimelineBreak".tr;
+      default:
+        return "txtTimelineFree".tr;
+    }
+  }
+
+  Color colorForType(String? type) {
+    switch (type) {
+      case "booking":
+        return AppColors.primaryAppColor;
+      case "busy":
+        return AppColors.redColor;
+      case "break":
+        return Colors.orange;
+      default:
+        return AppColors.greenColor;
+    }
+  }
+
+  return Container(
+    margin: const EdgeInsets.fromLTRB(13, 10, 13, 0),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: AppColors.whiteColor,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: AppColors.grey.withOpacity(0.12)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "txtDaySchedule".tr,
+          style: TextStyle(
+            fontFamily: AppFontFamily.sfProDisplayBold,
+            fontSize: 15,
+            color: AppColors.primaryTextColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...visible.take(8).map((event) {
+          final map = event as Map;
+          final type = map["type"]?.toString();
+          final start = formatTime(map["start"]);
+          final end = formatTime(map["end"]);
+          final title = map["title"]?.toString() ?? labelForType(type);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: colorForType(type),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.heeBo600,
+                          fontSize: 14,
+                          color: AppColors.primaryTextColor,
+                        ),
+                      ),
+                      Text(
+                        start.isNotEmpty && end.isNotEmpty ? "$start – $end" : start,
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.heeBo400,
+                          fontSize: 12,
+                          color: AppColors.service,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (type == "booking" && map["status"] == "confirm")
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.greenColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      "txtConfirm".tr,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.greenColor,
+                        fontFamily: AppFontFamily.heeBo500,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }),
+      ],
+    ),
+  );
 }

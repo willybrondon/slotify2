@@ -203,6 +203,8 @@ exports.publicValidateCoupon = async (req, res) => {
 exports.publicCreateStripePaymentIntent = async (req, res) => {
   try {
     const amount = parseFloat(req.body?.amount);
+    const withoutTax = parseFloat(req.body?.withoutTax);
+    const salonId = req.body?.salonId;
     const email = (req.body?.email || "").trim();
 
     if (Number.isNaN(amount) || amount <= 0) {
@@ -212,6 +214,29 @@ exports.publicCreateStripePaymentIntent = async (req, res) => {
     const settings = getPaymentSettings();
     if (!settings.isStripePay || !settings.stripePublishableKey) {
       return res.status(200).json({ status: false, message: "Stripe is not available." });
+    }
+
+    if (salonId) {
+      const Salon = require("../../models/salon.model");
+      const { salonPaymentOptions, createBookingPaymentIntent } = require("../../services/stripeConnect.service");
+      const salon = await Salon.findById(salonId);
+      if (!salon) {
+        return res.status(200).json({ status: false, message: "Salon not found." });
+      }
+      if (!salonPaymentOptions(salon).acceptStripe) {
+        return res.status(200).json({ status: false, message: "Online card payment not available for this salon." });
+      }
+      const result = await createBookingPaymentIntent({
+        salon,
+        amount,
+        withoutTax: Number.isNaN(withoutTax) ? amount : withoutTax,
+        metadata: { userId: String(req.body?.userId || ""), source: "skedisy_web_booking" },
+      });
+      return res.status(200).json({
+        status: true,
+        clientSecret: result.clientSecret,
+        publishableKey: result.publishableKey,
+      });
     }
 
     const secretKey = (global.settingJSON?.stripeSecretKey || "").trim();

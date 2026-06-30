@@ -20,6 +20,8 @@ const product = require("./product.route");
 const order = require("./order.route");
 const withdrawMethod = require("./withdrawMethod.route");
 const withdrawRequest = require("./withdrawRequestcontroller");
+const teamSchedule = require("./teamSchedule.route");
+const stripeConnect = require("./stripeConnect.route");
 
 route.use("/", salon);
 route.use("/product", product);
@@ -31,6 +33,8 @@ route.use("/review", salonMiddleware, review);
 route.use("/dashboard", dashboard);
 route.use("/service", service);
 route.use("/booking", salonMiddleware, booking);
+route.use("/teamSchedule", salonMiddleware, teamSchedule);
+route.use("/stripeConnect", salonMiddleware, stripeConnect);
 route.use("/settlement", salonMiddleware, settlement);
 route.use("/attendance", salonMiddleware, attendance);
 route.use("/salonClose", salonMiddleware, salonClose);

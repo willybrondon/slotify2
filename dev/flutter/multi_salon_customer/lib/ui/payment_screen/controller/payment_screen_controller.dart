@@ -344,9 +344,11 @@ class PaymentScreenController extends GetxController {
             paymentType: "direct_payment",
             serviceId: bookingData?['serviceId'] ?? "",
             expertId: bookingData?['expertId'] ?? "",
+            salonId: bookingData?['salonId']?.toString() ?? "",
+            withoutTax: (bookingData?['withoutTax'] ?? bookingData?['withOutTaxRupee'] ?? 0.0).toDouble(),
             date: bookingData?['date'] ?? "",
             time: bookingData?['time'] ?? "",
-            rupee: paymentAmount, // Use updated amount with coupon discount
+            rupee: paymentAmount,
             userId: Constant.storage.read<String>('userId') ?? "",
           );
         }
@@ -934,6 +936,8 @@ class PaymentScreenController extends GetxController {
             final showFirstBookingCashback =
                 bookingScreenController!.createBookingCategory?.firstBookingCashback ==
                     true;
+            final bookingStatus =
+                bookingScreenController!.createBookingCategory?.data?.status;
 
             // Clear prices only (data from navigation arguments will be set when user navigates to booking screen again)
             bookingScreenController!.finalTaxRupee = 0.0;
@@ -1087,7 +1091,8 @@ class PaymentScreenController extends GetxController {
               Dialog(
                 backgroundColor: AppColors.transparent,
                 child: SuccessDialog(
-                    showFirstBookingCashback: showFirstBookingCashback),
+                    showFirstBookingCashback: showFirstBookingCashback,
+                    bookingStatus: bookingStatus),
               ),
             );
 
@@ -1307,6 +1312,8 @@ class PaymentScreenController extends GetxController {
             final showFirstBookingCashback =
                 bookingScreenController!.createBookingCategory?.firstBookingCashback ==
                     true;
+            final bookingStatus =
+                bookingScreenController!.createBookingCategory?.data?.status;
 
             // Clear prices only (data from navigation arguments will be set when user navigates to booking screen again)
             bookingScreenController!.finalTaxRupee = 0.0;
@@ -1460,7 +1467,8 @@ class PaymentScreenController extends GetxController {
               Dialog(
                 backgroundColor: AppColors.transparent,
                 child: SuccessDialog(
-                    showFirstBookingCashback: showFirstBookingCashback),
+                    showFirstBookingCashback: showFirstBookingCashback,
+                    bookingStatus: bookingStatus),
               ),
             );
 

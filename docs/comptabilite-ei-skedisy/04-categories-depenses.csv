@@ -1,0 +1,14 @@
+Catégorie,Exemples Skedisy,Déductible (Oui/Non),Notes
+Hébergement,OVH Scaleway AWS VPS backend,Oui,Conserver facture au nom de l'EI
+Domaine & DNS,skedisy.com OVH Cloudflare,Oui,
+Stores & apps,Apple Google Play Developer,Oui,
+SaaS / outils,Notion Figma GitHub Cursor IA API,Oui,Vérifier TVA sur facture UE/hors UE
+Frais bancaires,Stripe frais virement,Oui,
+Publicité,Meta Google Ads TikTok,Oui,
+Télécom / internet,Forfait pro partie dédiée,Oui,Prorata si usage mixte perso/pro
+Déplacements pro,Train métro client salon IDF,Oui,Note de frais + justificatif
+Comptable / juridique,Expert-comptable avocat,Oui,
+Assurance pro,RC Pro si souscrite,Oui,
+Matériel informatique,Ordinateur écran,Oui,Amortissement si > 500 € — voir comptable
+Formation pro,Formation liée à l'activité,Oui,
+Non déductible,Repas perso amendes,Oui/Non,Ne pas mélanger

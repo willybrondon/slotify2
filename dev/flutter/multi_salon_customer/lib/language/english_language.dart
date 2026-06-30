@@ -177,6 +177,11 @@ final Map<String, String> enUS = {
   "txtSubmit": "Submit",
   "txtSearchBooking": "Search Booking",
   "txtPending": "Pending",
+  "txtConfirmed": "Confirmed",
+  "txtBookingConfirmedMessage":
+      "Your booking is confirmed. Please arrive at the salon at your scheduled time.",
+  "txtBookingPendingMessage":
+      "Your booking is pending salon confirmation. You will be notified once it is validated.",
   "txtCancelled": "Cancelled",
   "txtCompleted": "Completed",
   "txtCancelAppointment": "Cancel Appointment",

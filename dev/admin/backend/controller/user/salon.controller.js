@@ -579,6 +579,10 @@ exports.salonData = async (req, res) => {
     });
 
     // Ensure all required fields are present in the response
+    const { salonPaymentOptions } = require("../../services/stripeConnect.service");
+    salonResponse.paymentOptions = salonPaymentOptions(salon);
+    delete salonResponse.stripeConnect;
+
     const responseData = {
       status: true,
       message: "Success",

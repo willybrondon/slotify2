@@ -849,6 +849,18 @@ const Setting = (props) => {
                         />
                       </div>
                     </div>
+                    <div className="settingBoxHeader d-flex justify-content-between mt-3">
+                      <div>
+                        <h5 className="mb-1">{ui.settings.autoConfirmBookings}</h5>
+                        <p className="mb-0 text-muted" style={{ fontSize: "13px" }}>
+                          {ui.settings.autoConfirmBookingsHint}
+                        </p>
+                      </div>
+                      <ToggleSwitch
+                        onClick={() => handleSettingSwitch(setting?._id, 9)}
+                        value={setting?.autoConfirmBookings !== false}
+                      />
+                    </div>
                     <div className="col-12">
                       <div className="inputData text  flex-row justify-content-start text-start">
                         <label htmlFor="privacyPolicyLink" className="ms-2 order-1">

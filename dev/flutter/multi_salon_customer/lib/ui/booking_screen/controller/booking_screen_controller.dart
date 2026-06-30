@@ -76,6 +76,21 @@ class BookingScreenController extends GetxController {
   // Import the salon detail model and controller
   GetSalonDetailModel? getSalonDetailCategory;
 
+  bool salonAcceptsStripe() {
+    final globalStripe =
+        splashController.settingCategory?.setting?.isStripePay == true;
+    return globalStripe &&
+        getSalonDetailCategory?.salon?.paymentOptions?.acceptStripe == true;
+  }
+
+  bool salonAcceptsCash() {
+    final globalCash =
+        splashController.settingCategory?.setting?.cashAfterService != false;
+    final salonCash =
+        getSalonDetailCategory?.salon?.paymentOptions?.acceptCash != false;
+    return globalCash && salonCash;
+  }
+
   num? rating;
   int? roundedRating;
   int? filledStars;
@@ -1785,6 +1800,7 @@ class BookingScreenController extends GetxController {
               child: SuccessDialog(
                 showFirstBookingCashback:
                     createBookingCategory?.firstBookingCashback == true,
+                bookingStatus: createBookingCategory?.data?.status,
               ),
             ),
           );

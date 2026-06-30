@@ -1,0 +1,49 @@
+MENTIONS OBLIGATOIRES — FACTURE EI SKEDISY (B2B salons)
+=========================================================
+
+À personnaliser une fois (émetteur) :
+- Prénom NOM — Entrepreneur individuel
+- Dénomination commerciale : Skedisy
+- Adresse du siège
+- SIRET (14 chiffres)
+- N° TVA intracommunautaire : FR + clé + SIREN (9 chiffres)
+- Email / téléphone pro
+
+À remplir sur chaque facture :
+- Numéro unique et chronologique : F-AAAA-001, F-AAAA-002…
+- Date d'émission
+- Date de la prestation (ou période : ex. « T1 2026 »)
+- Identité du client professionnel (nom salon, adresse, SIRET si connu)
+- Désignation précise : ex. « Commission plateforme Skedisy », « Abonnement pro mensuel »
+- Quantité, prix unitaire HT, taux TVA, montants HT / TVA / TTC
+- Conditions et délais de paiement
+- Pénalités de retard + indemnité 40 € (obligatoire factures B2B)
+
+LIBELLÉS SKEDISY COURANTS
+-------------------------
+- Commission plateforme Skedisy — réservations [période]
+- Abonnement professionnel Skedisy — [mois année]
+- Frais de mise en relation Skedisy — [période]
+
+TVA
+---
+Régime : réel simplifié TVA, taux 20 % sur prestations B2B France.
+Mention pied de page : « TVA acquittée sur les débits. »
+
+CALCUL RAPIDE (TTC connu, ex. paiement Stripe)
+-----------------------------------------------
+HT = TTC / 1,20
+TVA = TTC - HT
+
+Exemple : 59,00 € TTC → HT 49,17 € | TVA 9,83 €
+
+NUMÉRO TVA INTRACOMMUNAUTAIRE
+-----------------------------
+Format : FR + 2 chiffres (clé) + SIREN (9 chiffres)
+Obtenir / vérifier sur : https://www.impots.gouv.fr (espace pro)
+
+CONSERVATION
+------------
+- PDF signé électroniquement ou export HTML → PDF
+- Dossier : Factures émises/AAAA/
+- Copier la ligne dans l'onglet Recettes du tableur compta
