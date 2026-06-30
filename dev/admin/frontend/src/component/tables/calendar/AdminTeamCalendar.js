@@ -3,9 +3,9 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useDispatch, useSelector } from "react-redux";
-import Title from "../extras/Title";
-import { fetchAdminTeamSchedule } from "../../redux/slice/teamScheduleSlice";
-import { getAllSalons } from "../../redux/slice/salonSlice";
+import Title from "../../extras/Title";
+import { fetchAdminTeamSchedule } from "../../../redux/slice/teamScheduleSlice";
+import { getAllSalons } from "../../../redux/slice/salonSlice";
 import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import "./TeamCalendar.css";
 
