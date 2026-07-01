@@ -853,10 +853,12 @@ button {
 }
 
 .mk-btn {
-  background-color: $second;
+  background-color: $sk-brand;
   color: $light;
   border-color: transparent;
-  padding: 10px 0;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 600;
 }
 
 /* ============= Login CSS (Skedisy portail) ============= */
@@ -1112,7 +1114,7 @@ thead {
 /* ============= Pagination CSS ============= */
 
 .pagination {
-  background-color: #FDFFFC;
+  background-color: #fdf6f0;
   padding: 20px;
   // color: #949494;
   // cursor: pointer;
@@ -1309,14 +1311,18 @@ thead {
 /* ============= Button CSS ============= */
 
 button.themeButton {
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 16px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  background-color: $sk-brand !important;
+  border-color: $sk-brand !important;
+  color: $light !important;
+  box-shadow: 0 4px 14px rgba(196, 92, 38, 0.22);
 
   @include maxMediaQuery($sm) {
     font-size: 12px;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 8px 14px;
   }
 }
 

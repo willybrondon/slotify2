@@ -9,6 +9,7 @@ import AuthRoute from "./util/authRoute";
 import "../src/assets/scss/custom/custom.css";
 import "../src/assets/scss/default/default.css";
 import "../src/assets/scss/style/style.css";
+import "../src/assets/scss/sq-pro-ui.css";
 import "../src/assets/scss/dateRange.css";
 import { setOldAdmin } from "./redux/slice/authSlice";
 import { setToken, SetDevKey } from "./util/setAuth";

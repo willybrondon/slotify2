@@ -5,8 +5,8 @@ body {
 
 .mainAdminGrid {
   /* ============= Sidebar CSS ============= */
-  background-color: #FDFFFC;
-  box-shadow: 0 0 1px #f1f3f0;
+  background: radial-gradient(ellipse at top, #fffaf7 0%, #fdf6f0 48%, #f8ebe0 100%);
+  box-shadow: 0 0 1px rgba(196, 92, 38, 0.08);
   /*Small Size*/
   /* ============= Dashboard CSS ============= */
 }

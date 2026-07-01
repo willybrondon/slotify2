@@ -1025,7 +1025,7 @@ thead th:first-child > div {
 
 /* ============= Pagination CSS ============= */
 .pagination {
-  background-color: #FDFFFC;
+  background-color: #fdf6f0;
   padding: 20px;
 }
 @media screen and (max-width: 768px) {

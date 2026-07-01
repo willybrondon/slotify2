@@ -1,0 +1,243 @@
+/* Skedisy Pro — Squire-inspired UI for salon panel & admin */
+
+:root {
+  --sq-brand: #c45c26;
+  --sq-brand-hover: #a84d1f;
+  --sq-brand-light: #fdf6f0;
+  --sq-brand-soft: rgba(196, 92, 38, 0.12);
+  --sq-ink: #111111;
+  --sq-muted: #7c4a2e;
+  --sq-radius: 12px;
+  --sq-radius-pill: 999px;
+  --sq-shadow: 0 10px 40px rgba(92, 61, 46, 0.08);
+}
+
+.mainAdminGrid .adminStart {
+  position: relative;
+  z-index: 1;
+}
+
+/* ——— Buttons ——— */
+.mainAdminGrid .btn,
+.mainAdminGrid button.themeButton,
+.mainAdminGrid .mk-btn,
+.mainAdminGrid .show-more-btn {
+  border-radius: var(--sq-radius-pill);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.mainAdminGrid .btn:active,
+.mainAdminGrid button.themeButton:active {
+  transform: translateY(1px);
+}
+
+.mainAdminGrid .btn-primary,
+.mainAdminGrid .bg-theme,
+.mainAdminGrid button.themeButton,
+.mainAdminGrid .mk-btn {
+  background: var(--sq-brand) !important;
+  border-color: var(--sq-brand) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(196, 92, 38, 0.22);
+}
+
+.mainAdminGrid .btn-primary:hover,
+.mainAdminGrid .bg-theme:hover,
+.mainAdminGrid button.themeButton:hover,
+.mainAdminGrid .mk-btn:hover {
+  background: var(--sq-brand-hover) !important;
+  border-color: var(--sq-brand-hover) !important;
+  color: #fff !important;
+}
+
+.mainAdminGrid .btn-outline-primary,
+.mainAdminGrid .btn-outline-secondary,
+.mainAdminGrid .btn-light {
+  border-radius: var(--sq-radius-pill);
+}
+
+.mainAdminGrid .btn-outline-primary {
+  border-color: rgba(196, 92, 38, 0.45) !important;
+  color: var(--sq-brand) !important;
+}
+
+.mainAdminGrid .btn-outline-primary:hover {
+  background: var(--sq-brand-light) !important;
+}
+
+.mainAdminGrid .btn-secondary,
+.mainAdminGrid .btn-dark {
+  border-radius: var(--sq-radius-pill);
+}
+
+/* ——— Forms ——— */
+.mainAdminGrid .form-control,
+.mainAdminGrid .form-select,
+.mainAdminGrid .inputData input,
+.mainAdminGrid .inputData select,
+.mainAdminGrid .inputData textarea {
+  border-radius: 10px !important;
+  border-color: rgba(196, 92, 38, 0.2) !important;
+}
+
+.mainAdminGrid .form-control:focus,
+.mainAdminGrid .form-select:focus,
+.mainAdminGrid .inputData input:focus {
+  border-color: var(--sq-brand) !important;
+  box-shadow: 0 0 0 3px var(--sq-brand-soft) !important;
+}
+
+/* ——— Cards & tables ——— */
+.mainAdminGrid .dashBox,
+.mainAdminGrid .table-container,
+.mainAdminGrid .settingBoxOuter,
+.mainAdminGrid .adminProfileBox,
+.mainAdminGrid .primeBox,
+.mainAdminGrid .card {
+  border-radius: var(--sq-radius) !important;
+  border: 1px solid rgba(196, 92, 38, 0.1) !important;
+  box-shadow: var(--sq-shadow);
+}
+
+.mainAdminGrid .table-container table thead {
+  background: var(--sq-brand-light) !important;
+}
+
+.mainAdminGrid .table-container table thead th {
+  color: var(--sq-muted) !important;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(196, 92, 38, 0.12) !important;
+}
+
+/* ——— Sidebar ——— */
+.mainAdminGrid .mainSidebar .navigation .mainMenu > li > .activeMenu {
+  background: var(--sq-brand-light) !important;
+  border-radius: 10px;
+  color: var(--sq-brand) !important;
+}
+
+.mainAdminGrid .mainSidebar .navigation .mainMenu > li > a:hover {
+  background: rgba(196, 92, 38, 0.06) !important;
+  border-radius: 10px;
+}
+
+.mainAdminGrid .mainSidebar .navigation .mainMenu > li > .activeMenu > div span {
+  color: var(--sq-brand) !important;
+  font-weight: 600;
+}
+
+/* ——— Navbar ——— */
+.mainAdminGrid .mainAdmin .mainNavbar {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(196, 92, 38, 0.1);
+  border-radius: 0 0 var(--sq-radius) var(--sq-radius);
+}
+
+/* ——— Badges & text ——— */
+.mainAdminGrid .text-theme {
+  color: var(--sq-brand) !important;
+}
+
+.mainAdminGrid .badge.bg-success,
+.mainAdminGrid .bg-success {
+  background-color: var(--sq-brand) !important;
+}
+
+/* ——— Calendar resize handle ——— */
+.sq-planning-page .rbc-addons-dnd-resizable {
+  position: relative;
+}
+
+.sq-planning-page .rbc-addons-dnd-resize-ns-anchor {
+  cursor: ns-resize;
+}
+
+.sq-planning-page .rbc-event.rbc-addons-dnd-resizable {
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+/* ——— Booking detail ——— */
+.sq-booking-detail {
+  width: min(560px, 100%);
+}
+
+.sq-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sq-detail-item {
+  background: #fffaf7;
+  border: 1px solid rgba(196, 92, 38, 0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sq-detail-item span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--sq-muted);
+}
+
+.sq-detail-item strong {
+  color: var(--sq-ink);
+  font-size: 14px;
+}
+
+.sq-detail-services {
+  margin-top: 4px;
+}
+
+.sq-detail-services__label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--sq-muted);
+  margin-bottom: 6px;
+}
+
+.sq-detail-services ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--sq-ink);
+}
+
+.sq-status--confirm {
+  color: var(--sq-brand);
+}
+
+.sq-status--pending {
+  color: #0891b2;
+}
+
+.sq-detail-hint {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(196, 92, 38, 0.2);
+}
+
+.sq-detail-cancel textarea {
+  border-radius: 10px;
+  border-color: rgba(196, 92, 38, 0.2);
+  font-size: 14px;
+}
+
+.sq-detail-cancel .btn-outline-danger {
+  border-radius: var(--sq-radius-pill);
+  font-weight: 600;
+}
+
+@media (max-width: 576px) {
+  .sq-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -15,6 +15,67 @@ export const fetchAdminTeamSchedule = createAsyncThunk(
   }
 );
 
+export const searchAdminPlanningClients = createAsyncThunk(
+  "adminTeamSchedule/searchClients",
+  async (search) => {
+    return apiInstanceFetch.get(
+      `admin/teamSchedule/clients?search=${encodeURIComponent(search || "")}`
+    );
+  }
+);
+
+export const createAdminPlanningBooking = createAsyncThunk(
+  "adminTeamSchedule/createBooking",
+  async (payload) => {
+    return apiInstanceFetch.post("admin/teamSchedule/booking", payload);
+  }
+);
+
+export const rescheduleAdminPlanningBooking = createAsyncThunk(
+  "adminTeamSchedule/rescheduleBooking",
+  async (payload) => {
+    return apiInstanceFetch.post("admin/teamSchedule/booking/reschedule", payload);
+  }
+);
+
+export const resizeAdminPlanningBooking = createAsyncThunk(
+  "adminTeamSchedule/resizeBooking",
+  async (payload) => {
+    return apiInstanceFetch.post("admin/teamSchedule/booking/resize", payload);
+  }
+);
+
+export const fetchAdminPlanningBookingDetail = createAsyncThunk(
+  "adminTeamSchedule/bookingDetail",
+  async ({ salonId, bookingId }) => {
+    return apiInstanceFetch.get(
+      `admin/teamSchedule/booking/detail?salonId=${salonId}&bookingId=${bookingId}`
+    );
+  }
+);
+
+export const cancelAdminPlanningBooking = createAsyncThunk(
+  "adminTeamSchedule/cancelBooking",
+  async ({ salonId, bookingId, reason }) => {
+    return apiInstanceFetch.post("admin/teamSchedule/booking/cancel", {
+      salonId,
+      bookingId,
+      reason,
+    });
+  }
+);
+
+export const updateAdminPlanningBookingServices = createAsyncThunk(
+  "adminTeamSchedule/updateServices",
+  async ({ salonId, bookingId, serviceIds }) => {
+    return apiInstanceFetch.post("admin/teamSchedule/booking/services", {
+      salonId,
+      bookingId,
+      serviceIds,
+    });
+  }
+);
+
 const adminTeamScheduleSlice = createSlice({
   name: "adminTeamSchedule",
   initialState,

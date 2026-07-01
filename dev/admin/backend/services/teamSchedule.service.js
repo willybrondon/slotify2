@@ -5,6 +5,45 @@ const BusyExpert = require("../models/busyExpert.model");
 const Holiday = require("../models/salonClose.model");
 
 const SLOT_FALLBACK_MINUTES = 15;
+const WEEKDAYS_EN = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+function getEnglishDayName(dateStr) {
+  const dayIndex = moment(dateStr, "YYYY-MM-DD", true).day();
+  return WEEKDAYS_EN[dayIndex] || moment(dateStr, "YYYY-MM-DD").locale("en").format("dddd");
+}
+
+function normalizeTimeString(timeStr) {
+  if (!timeStr) return null;
+  const trimmed = String(timeStr).trim();
+  const parsed = moment(trimmed, ["hh:mm A", "h:mm A", "HH:mm", "H:mm"], true);
+  if (!parsed.isValid()) return null;
+  return parsed.format("hh:mm A");
+}
+
+function getCalendarBounds(salonTime) {
+  const fallback = { minHour: 8, minMinute: 0, maxHour: 21, maxMinute: 0, slotMinutes: SLOT_FALLBACK_MINUTES };
+  if (!salonTime?.openTime || !salonTime?.closedTime) return fallback;
+
+  const open = moment(salonTime.openTime, ["hh:mm A", "h:mm A", "HH:mm"], true);
+  const close = moment(salonTime.closedTime, ["hh:mm A", "h:mm A", "HH:mm"], true);
+  if (!open.isValid() || !close.isValid()) return fallback;
+
+  return {
+    minHour: open.hour(),
+    minMinute: open.minute(),
+    maxHour: close.hour(),
+    maxMinute: close.minute(),
+    slotMinutes: salonTime.time || SLOT_FALLBACK_MINUTES,
+  };
+}
 
 function generateTimeSlots(startTime, endTime, slotSize) {
   const slots = [];
@@ -31,7 +70,9 @@ function getSalonSlotsForDay(salonTime) {
 }
 
 function slotToDateTime(dateStr, timeStr, durationMinutes = SLOT_FALLBACK_MINUTES) {
-  const start = moment(`${dateStr} ${timeStr}`, "YYYY-MM-DD hh:mm A");
+  const normalized = normalizeTimeString(timeStr);
+  if (!normalized) return null;
+  const start = moment(`${dateStr} ${normalized}`, "YYYY-MM-DD hh:mm A");
   if (!start.isValid()) return null;
   return {
     start: start.toDate(),
@@ -130,6 +171,7 @@ async function buildExpertDaySchedule(expert, salon, dateStr, { holiday, salonTi
       expertId: expert._id.toString(),
       resourceId: expert._id.toString(),
       title: "Indisponible",
+      timeSlots: [slot],
       start: range?.start,
       end: range?.end,
     };
@@ -203,8 +245,9 @@ async function buildExpertDaySchedule(expert, salon, dateStr, { holiday, salonTi
 }
 
 async function getTeamScheduleForSalon(salon, dateStr) {
-  const dayOfWeek = moment(dateStr, "YYYY-MM-DD").format("dddd");
+  const dayOfWeek = getEnglishDayName(dateStr);
   const salonTime = salon.salonTime?.find((t) => t.day === dayOfWeek) || null;
+  const calendarBounds = getCalendarBounds(salonTime);
 
   const holiday = await Holiday.findOne({ date: dateStr, salonId: salon._id });
 
@@ -269,6 +312,7 @@ async function getTeamScheduleForSalon(salon, dateStr) {
     isSalonOpen: salonOpen,
     isHoliday: !!holiday,
     salonTime,
+    calendarBounds,
     resources,
     experts: expertSchedules,
     events,
@@ -292,18 +336,39 @@ async function getTeamScheduleRange(salon, startDate, endDate) {
   }
   const schedules = await Promise.all(days.map((d) => getTeamScheduleForSalon(salon, d)));
   const events = schedules.flatMap((s) => s.events);
-  const resources = schedules[0]?.resources || [];
+  const resourcesMap = new Map();
+  schedules.forEach((daySchedule) => {
+    (daySchedule.resources || []).forEach((resource) => {
+      resourcesMap.set(resource.resourceId, resource);
+    });
+  });
+  const resources = Array.from(resourcesMap.values());
+  const focusDay = schedules.find((s) => s.date === startDate) || schedules[0];
   return {
     startDate,
     endDate,
+    date: startDate,
+    isSalonOpen: schedules.some((s) => s.isSalonOpen),
+    isHoliday: schedules.some((s) => s.isHoliday),
+    salonTime: focusDay?.salonTime || null,
+    calendarBounds: focusDay?.calendarBounds || getCalendarBounds(null),
     resources,
     events,
     days: schedules,
+    stats: focusDay?.stats || {
+      totalExperts: resources.length,
+      availableCount: 0,
+      busyCount: 0,
+      offCount: 0,
+    },
   };
 }
 
 module.exports = {
   generateTimeSlots,
+  getEnglishDayName,
+  normalizeTimeString,
+  getCalendarBounds,
   getSalonSlotsForDay,
   computeOperationalStatus,
   buildExpertDaySchedule,

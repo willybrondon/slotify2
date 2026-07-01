@@ -1,0 +1,200 @@
+.sq-planning-page .card-sq {
+  background: #fff;
+  border: 1px solid rgba(196, 92, 38, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(92, 61, 46, 0.06);
+}
+
+.sq-planning-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.sq-planning-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sq-planning-toolbar__label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7c4a2e;
+}
+
+.sq-segmented {
+  display: inline-flex;
+  padding: 4px;
+  background: #fdf6f0;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 92, 38, 0.15);
+}
+
+.sq-segmented button {
+  border: none;
+  background: transparent;
+  color: #7c4a2e;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sq-segmented button.is-active {
+  background: #c45c26;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(196, 92, 38, 0.25);
+}
+
+.sq-btn-primary {
+  background: #c45c26 !important;
+  border-color: #c45c26 !important;
+  color: #fff !important;
+}
+
+.sq-btn-outline {
+  border-color: rgba(196, 92, 38, 0.35) !important;
+  color: #c45c26 !important;
+}
+
+.sq-planning-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.45);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.sq-planning-modal {
+  width: min(520px, 100%);
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(92, 61, 46, 0.18);
+  border: 1px solid rgba(196, 92, 38, 0.12);
+}
+
+.sq-planning-modal__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 20px 0;
+}
+
+.sq-planning-modal__kicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #c45c26;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.sq-planning-modal__header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111;
+}
+
+.sq-planning-modal__meta {
+  margin: 6px 0 0;
+  color: #7c4a2e;
+  font-size: 14px;
+}
+
+.sq-planning-modal__body {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sq-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #444;
+}
+
+.sq-field input {
+  border: 1px solid rgba(196, 92, 38, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.sq-client-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(196, 92, 38, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sq-client-results button {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: #fffaf7;
+  padding: 10px 12px;
+}
+
+.sq-client-results button:hover {
+  background: #fdf6f0;
+}
+
+.sq-service-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sq-service-pill {
+  border: 1px solid rgba(196, 92, 38, 0.25);
+  background: #fff;
+  color: #7c4a2e;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.sq-service-pill.is-active {
+  background: #c45c26;
+  border-color: #c45c26;
+  color: #fff;
+}
+
+.sq-planning-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sq-planning-page .rbc-header {
+  padding: 10px 6px;
+  font-weight: 600;
+  color: #7c4a2e;
+}
+
+.sq-planning-page .rbc-time-header-content .rbc-row-resource {
+  min-height: 52px;
+  font-weight: 600;
+}
+
+.sq-planning-page .rbc-today {
+  background: rgba(196, 92, 38, 0.04);
+}
+
+.sq-planning-page .rbc-current-time-indicator {
+  background-color: #c45c26;
+}

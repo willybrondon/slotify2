@@ -75,8 +75,8 @@
 }
 
 .legend-swatch.legend-free {
-  background: #e8f5e9;
-  border: 1px dashed #86efac;
+  background: #fdf6f0;
+  border: 1px dashed rgba(196, 92, 38, 0.35);
 }
 
 .rbc-time-header-content .rbc-row-resource {

@@ -15,6 +15,76 @@ export const fetchTeamSchedule = createAsyncThunk(
   }
 );
 
+export const setExpertBusySlots = createAsyncThunk(
+  "teamSchedule/setBusy",
+  async ({ expertId, date, time }) => {
+    return apiInstanceFetch.post("salon/teamSchedule/busy", { expertId, date, time });
+  }
+);
+
+export const removeExpertBusySlots = createAsyncThunk(
+  "teamSchedule/removeBusy",
+  async ({ expertId, date, time }) => {
+    return apiInstanceFetch.post("salon/teamSchedule/busy/remove", { expertId, date, time });
+  }
+);
+
+export const searchPlanningClients = createAsyncThunk(
+  "teamSchedule/searchClients",
+  async (search) => {
+    return apiInstanceFetch.get(
+      `salon/teamSchedule/clients?search=${encodeURIComponent(search || "")}`
+    );
+  }
+);
+
+export const createPlanningBooking = createAsyncThunk(
+  "teamSchedule/createBooking",
+  async (payload) => {
+    return apiInstanceFetch.post("salon/teamSchedule/booking", payload);
+  }
+);
+
+export const reschedulePlanningBooking = createAsyncThunk(
+  "teamSchedule/rescheduleBooking",
+  async (payload) => {
+    return apiInstanceFetch.post("salon/teamSchedule/booking/reschedule", payload);
+  }
+);
+
+export const resizePlanningBooking = createAsyncThunk(
+  "teamSchedule/resizeBooking",
+  async (payload) => {
+    return apiInstanceFetch.post("salon/teamSchedule/booking/resize", payload);
+  }
+);
+
+export const fetchPlanningBookingDetail = createAsyncThunk(
+  "teamSchedule/bookingDetail",
+  async (bookingId) => {
+    return apiInstanceFetch.get(
+      `salon/teamSchedule/booking/detail?bookingId=${bookingId}`
+    );
+  }
+);
+
+export const cancelPlanningBooking = createAsyncThunk(
+  "teamSchedule/cancelBooking",
+  async ({ bookingId, reason }) => {
+    return apiInstanceFetch.post("salon/teamSchedule/booking/cancel", { bookingId, reason });
+  }
+);
+
+export const updatePlanningBookingServices = createAsyncThunk(
+  "teamSchedule/updateServices",
+  async ({ bookingId, serviceIds }) => {
+    return apiInstanceFetch.post("salon/teamSchedule/booking/services", {
+      bookingId,
+      serviceIds,
+    });
+  }
+);
+
 const teamScheduleSlice = createSlice({
   name: "teamSchedule",
   initialState,

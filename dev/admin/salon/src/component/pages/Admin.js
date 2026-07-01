@@ -74,7 +74,7 @@ const Admin = () => {
         <div className="adminStart">
           <Routes>
             <Route path="/salonDashboard" element={<DashBoard />} />
-            <Route path="/teamCalendar" element={<TeamCalendar />} />
+            <Route path="teamCalendar" element={<TeamCalendar />} />
             <Route path="/paymentSettings" element={<PaymentSettingsPage />} />
             <Route path="/bookingTable" element={<Booking />} />
             <Route path="/profile" element={<AdminProfile />} />
