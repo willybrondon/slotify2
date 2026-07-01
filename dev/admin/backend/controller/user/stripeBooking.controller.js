@@ -54,7 +54,9 @@ exports.createBookingStripePaymentIntent = async (req, res) => {
       clientSecret: result.clientSecret,
       paymentIntentId: result.paymentIntentId,
       publishableKey: result.publishableKey,
-      applicationFeeAmount: result.applicationFeeAmount,
+      applicationFeeAmount: 0,
+      connectedAccountId: result.connectedAccountId,
+      salonName: result.salonName,
     });
   } catch (error) {
     console.error("[createBookingStripePaymentIntent]", error);

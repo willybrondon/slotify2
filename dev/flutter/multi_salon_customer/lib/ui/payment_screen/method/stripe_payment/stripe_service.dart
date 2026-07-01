@@ -38,6 +38,7 @@ class StripeService {
   static late String paymentTypes;
   static late String salonIds;
   static late double withoutTaxAmount;
+  static late String merchantDisplayName;
   Function(Map<String, dynamic>)? onComplete;
 
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
@@ -73,6 +74,7 @@ class StripeService {
     String? userId,
     String? salonId,
     double? withoutTax,
+    String? salonName,
     String? paymentType,
     Function(Map<String, dynamic>)? onComplete,
   }) async {
@@ -126,6 +128,9 @@ class StripeService {
     userIds = userId ?? "";
     salonIds = salonId ?? bookingScreenController.salonId?.toString() ?? "";
     withoutTaxAmount = withoutTax ?? totalAmountWithOutTaxs;
+    merchantDisplayName = (salonName?.trim().isNotEmpty == true)
+        ? salonName!.trim()
+        : Constant.appName;
     paymentTypes = paymentType ?? "";
   }
 
@@ -220,6 +225,7 @@ class StripeService {
 
       String clientSecret;
       if (paymentTypes == "wallet_recharge") {
+        // Platform (admin) Stripe — wallet top-up only, not salon bookings
         Map<String, dynamic> body = {
           'amount': stripeAmount.toString(),
           'currency': currency,
@@ -241,12 +247,17 @@ class StripeService {
         StripePayModel res = StripePayModel.fromJson(jsonDecode(response.body));
         clientSecret = res.clientSecret ?? "";
       } else {
+        // Salon Stripe Connect — PaymentIntent on the connected account
         final connectResponse = await _createConnectPaymentIntent(
           amount: rupees > 0 ? rupees : amountDouble,
           withoutTax: withoutTaxAmount > 0 ? withoutTaxAmount : amountDouble,
         );
         clientSecret = connectResponse?["clientSecret"]?.toString() ?? "";
         final pk = connectResponse?["publishableKey"]?.toString();
+        final connectSalonName = connectResponse?["salonName"]?.toString();
+        if (connectSalonName != null && connectSalonName.isNotEmpty) {
+          merchantDisplayName = connectSalonName;
+        }
         if (pk != null && pk.isNotEmpty) {
           Stripe.publishableKey = pk;
           await Stripe.instance.applySettings();
@@ -284,7 +295,7 @@ class StripeService {
           googlePay: PaymentSheetGooglePay(
               merchantCountryCode: Constant.stripeMerchantCountryCode,
               testEnv: isTests),
-          merchantDisplayName: Constant.appName,
+          merchantDisplayName: merchantDisplayName,
           customerId: userId.toString(),
           billingDetails: BillingDetails(name: userName, email: userEmail),
         );

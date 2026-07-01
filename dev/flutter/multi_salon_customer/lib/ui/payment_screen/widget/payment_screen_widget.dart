@@ -126,6 +126,10 @@ class PaymentMethodView extends StatelessWidget {
 
     final isStripeEnabled =
         splashController.settingCategory?.setting?.isStripePay ?? false;
+    final isSalonBookingStripe =
+        logic.bookingData?['salonAcceptsStripe'] == true;
+    final showBookingStripe = isSalonBookingStripe;
+    final showWalletStripe = isStripeEnabled;
     final isMtnMomoEnabled =
         splashController.settingCategory?.setting?.isMtnMomo ?? false;
     final isRazorPayEnabled =
@@ -190,7 +194,7 @@ class PaymentMethodView extends StatelessWidget {
           // Show ALL available payment methods for wallet recharge
           // User will choose between Stripe and MTN MoMo
           // We NEVER show "cash on service" for wallet recharge
-          if (isStripeEnabled) const PaymentStripeView(),
+          if (showWalletStripe) const PaymentStripeView(),
           if (isMtnMomoEnabled) ...[
             const PaymentMtnMomoView(),
             const MtnMomoPhoneNumberInput(),
@@ -242,7 +246,7 @@ class PaymentMethodView extends StatelessWidget {
       return Column(
         children: [
           const PaymentTitleView(),
-          if (isStripeEnabled) const PaymentStripeView(),
+          if (showWalletStripe) const PaymentStripeView(),
           if (isMtnMomoEnabled) ...[
             const PaymentMtnMomoView(),
             const MtnMomoPhoneNumberInput(),
@@ -257,7 +261,7 @@ class PaymentMethodView extends StatelessWidget {
       return Column(
         children: [
           const PaymentTitleView(),
-          if (isStripeEnabled) const PaymentStripeView(),
+          if (showWalletStripe) const PaymentStripeView(),
           if (isMtnMomoEnabled) ...[
             const PaymentMtnMomoView(),
             const MtnMomoPhoneNumberInput(),
@@ -277,7 +281,7 @@ class PaymentMethodView extends StatelessWidget {
         if (logic.isWalletAdd == false) ...[
           // Only show booking payment methods if this is NOT a wallet recharge
           if (logic.selectedPayment == "wallet") const PaymentMyWalletView(),
-          if (logic.selectedPayment == "Stripe" && isStripeEnabled)
+          if (logic.selectedPayment == "Stripe" && showBookingStripe)
             const PaymentStripeView(),
           if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) ...[
             const PaymentMtnMomoView(),
@@ -301,7 +305,7 @@ class PaymentMethodView extends StatelessWidget {
           if ((logic.selectedPayment == null || logic.selectedPayment == "") &&
               logic.isWalletAdd == false) ...[
             const PaymentMyWalletView(),
-            if (isStripeEnabled) const PaymentStripeView(),
+            if (showBookingStripe) const PaymentStripeView(),
             if (isMtnMomoEnabled) const PaymentMtnMomoView(),
             if (isRazorPayEnabled) const PaymentRazorPayView(),
             if (isFlutterWaveEnabled) const PaymentFlutterWaveView(),
@@ -317,7 +321,7 @@ class PaymentMethodView extends StatelessWidget {
               return Column(
                 children: [
                   const PaymentTitleView(),
-                  if (isStripeEnabled) const PaymentStripeView(),
+                  if (showWalletStripe) const PaymentStripeView(),
                   if (isMtnMomoEnabled) ...[
                     const PaymentMtnMomoView(),
                     const MtnMomoPhoneNumberInput(),

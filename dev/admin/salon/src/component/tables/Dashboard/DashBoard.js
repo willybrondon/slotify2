@@ -24,6 +24,7 @@ import { ExInput } from "../../extras/Input";
 import { getUpComingOrders } from "../../../redux/slice/orderSlice";
 import Pagination from "../../extras/Pagination";
 import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
+import { fetchStripeConnectStatus } from "../../../redux/slice/stripeConnectSlice";
 
 const DashBoard = () => {
     const d = ui.dashboard;
@@ -32,6 +33,7 @@ const DashBoard = () => {
     const { upComingOrders } = useSelector((state) => state.order);
     const { futureBooking } = useSelector((state) => state.booking);
     const { setting } = useSelector((state) => state.setting);
+    const { status: stripeStatus } = useSelector((state) => state.stripeConnect);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const dispatch = useDispatch();
@@ -54,6 +56,7 @@ const DashBoard = () => {
             dispatch(topExperts(payload));
             dispatch(getDashData(payload));
             dispatch(upcomingBookings(1));
+            dispatch(fetchStripeConnectStatus());
         }
     }, [dispatch, startDate, endDate, token]);
 
@@ -438,6 +441,39 @@ const DashBoard = () => {
                     </div>
                 </div>
             </div>
+            {stripeStatus?.platformStripeEnabled !== false &&
+              stripeStatus?.options?.acceptStripe !== true && (
+                <div className="row mb-3">
+                    <div className="col-12">
+                        <div
+                            className="d-flex justify-content-between align-items-center p-3 rounded"
+                            style={{
+                                backgroundColor: "#f0f4ff",
+                                border: "1px solid #d6e0ff",
+                                cursor: "pointer",
+                            }}
+                            onClick={() => navigate("/salonpanel/paymentSettings")}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    navigate("/salonpanel/paymentSettings");
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                        >
+                            <div>
+                                <div style={{ fontWeight: 700, fontSize: "16px" }}>
+                                    {d.paymentSettingsCta}
+                                </div>
+                                <div style={{ fontSize: "13px", opacity: 0.7 }}>
+                                    {d.paymentSettingsHint}
+                                </div>
+                            </div>
+                            <span style={{ fontSize: "22px" }}>→</span>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="mainDashbox">
                 <div className="row">
                     <div className="col-lg-3 col-sm-6 col-12">

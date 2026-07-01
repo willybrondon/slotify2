@@ -380,7 +380,6 @@ exports.newBooking = async (req, res, next) => {
       salon,
       setting,
       servicePriceWithoutTax: totalServicePriceForCheck,
-      paymentType,
     });
 
     if (requiredBalance > 0 && salonWalletBalance < requiredBalance) {
@@ -900,7 +899,7 @@ exports.newBooking = async (req, res, next) => {
     // Deduct platform commission from salon wallet (cash / wallet / MTN — not Stripe Connect)
     const commissionAmount = parseFloat(platformFee.toFixed(2));
 
-    if (commissionAmount > 0 && shouldDebitSalonWalletForCommission(paymentType, salon)) {
+    if (commissionAmount > 0 && shouldDebitSalonWalletForCommission()) {
       // Deduct commission from salon wallet
       salon.wallet = (salon.wallet || 0) - commissionAmount;
       await salon.save();

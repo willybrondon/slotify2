@@ -43,6 +43,7 @@ import Wallet from "../Wallet";
 import OrderDetails from "../tables/order/OrderDetails";
 import Attribute from "../tables/attributes/Attribute";
 import TeamCalendar from "../tables/calendar/TeamCalendar";
+import PaymentSettingsPage from "./PaymentSettingsPage";
 
 
 
@@ -74,6 +75,7 @@ const Admin = () => {
           <Routes>
             <Route path="/salonDashboard" element={<DashBoard />} />
             <Route path="/teamCalendar" element={<TeamCalendar />} />
+            <Route path="/paymentSettings" element={<PaymentSettingsPage />} />
             <Route path="/bookingTable" element={<Booking />} />
             <Route path="/profile" element={<AdminProfile />} />
             <Route path="/allExperts" element={<Expert />} />

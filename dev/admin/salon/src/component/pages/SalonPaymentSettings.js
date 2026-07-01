@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import ToggleSwitch from "../extras/ToggleSwitch";
 import Button from "../extras/Button";
 import { SKEDISY_SALON_PORTAL_COPY as portalCopy } from "../../constants/skedisyPortalCopy";
@@ -12,20 +13,25 @@ import {
 
 const SalonPaymentSettings = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { status, isLoading } = useSelector((state) => state.stripeConnect);
 
   useEffect(() => {
     dispatch(fetchStripeConnectStatus());
     const params = new URLSearchParams(window.location.search);
     if (params.get("stripe") === "return" || params.get("stripe") === "refresh") {
-      dispatch(refreshStripeConnect());
+      dispatch(refreshStripeConnect()).then(() => {
+        navigate("/salonpanel/paymentSettings", { replace: true });
+      });
     }
-  }, [dispatch]);
+  }, [dispatch, navigate]);
 
   const acceptCash = status?.paymentMethods?.acceptCash !== false;
-  const acceptStripe = status?.paymentMethods?.acceptStripe === true;
-  const platformStripe = status?.platformStripeEnabled !== false;
+  const acceptStripePref = status?.paymentMethods?.acceptStripe === true;
+  const platformStripe = status?.platformStripeEnabled === true;
   const stripeReady = status?.options?.acceptStripe === true;
+  const chargesEnabled = status?.stripeConnect?.chargesEnabled === true;
+  const payoutsEnabled = status?.stripeConnect?.payoutsEnabled === true;
 
   const stripeStatusLabel = stripeReady
     ? portalCopy.stripeConnectReady
@@ -37,7 +43,7 @@ const SalonPaymentSettings = () => {
     dispatch(
       updateSalonPaymentMethods({
         acceptCash: !acceptCash,
-        acceptStripe,
+        acceptStripe: acceptStripePref,
       })
     );
   };
@@ -47,17 +53,31 @@ const SalonPaymentSettings = () => {
     dispatch(
       updateSalonPaymentMethods({
         acceptCash,
-        acceptStripe: !acceptStripe,
+        acceptStripe: !acceptStripePref,
       })
     );
   };
 
   const handleStripeOnboard = async () => {
-    const result = await dispatch(startStripeOnboarding()).unwrap();
-    if (result?.url) {
-      window.location.href = result.url;
+    try {
+      const result = await dispatch(startStripeOnboarding()).unwrap();
+      if (result?.url) {
+        window.location.href = result.url;
+      }
+    } catch (e) {
+      console.error("[Stripe onboarding]", e);
     }
   };
+
+  if (isLoading && !status) {
+    return (
+      <div className="row mt-3">
+        <div className="col-12">
+          <p style={{ color: "#666" }}>Chargement des paramètres de paiement…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="row mt-3">
@@ -66,6 +86,18 @@ const SalonPaymentSettings = () => {
           {portalCopy.paymentSettingsTitle}
         </h5>
       </div>
+
+      {!platformStripe && (
+        <div className="col-12 mb-3">
+          <div
+            className="p-3 rounded"
+            style={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", color: "#9a3412" }}
+          >
+            {portalCopy.stripeConnectPlatformOff}
+          </div>
+        </div>
+      )}
+
       <div className="col-12 mb-2">
         <div
           className="d-flex justify-content-between align-items-center p-3 rounded"
@@ -80,6 +112,7 @@ const SalonPaymentSettings = () => {
           <ToggleSwitch value={acceptCash} onClick={handleCashToggle} />
         </div>
       </div>
+
       <div className="col-12 mb-2">
         <div
           className="d-flex justify-content-between align-items-center p-3 rounded"
@@ -92,14 +125,18 @@ const SalonPaymentSettings = () => {
             </p>
           </div>
           <ToggleSwitch
-            value={acceptStripe}
+            value={acceptStripePref}
             onClick={handleStripeToggle}
             disabled={!platformStripe}
           />
         </div>
       </div>
-      {acceptStripe && platformStripe && (
+
+      {acceptStripePref && platformStripe && (
         <div className="col-12">
+          <p style={{ fontSize: "12px", color: "#666", marginBottom: 8 }}>
+            {portalCopy.paymentAdminStripeNote}
+          </p>
           <div
             className="p-3 rounded"
             style={{ backgroundColor: "#f0f4ff", border: "1px solid #d6e0ff" }}
@@ -107,7 +144,26 @@ const SalonPaymentSettings = () => {
             <div style={{ fontWeight: 600, marginBottom: 6 }}>
               {portalCopy.stripeConnectTitle}
             </div>
-            <p style={{ fontSize: "13px", marginBottom: 12 }}>{stripeStatusLabel}</p>
+            <p style={{ fontSize: "13px", marginBottom: 8 }}>
+              <strong>{stripeStatusLabel}</strong>
+            </p>
+            {!stripeReady && (
+              <ul style={{ fontSize: "13px", paddingLeft: "1.2rem", marginBottom: 12 }}>
+                <li>{portalCopy.stripeConnectStep1}</li>
+                <li>{portalCopy.stripeConnectStep2}</li>
+                <li>{portalCopy.stripeConnectStep3}</li>
+              </ul>
+            )}
+            {status?.stripeConnect?.accountId && !chargesEnabled && (
+              <p style={{ fontSize: "12px", color: "#b45309", marginBottom: 8 }}>
+                {portalCopy.stripeConnectChargesOff}
+              </p>
+            )}
+            {status?.stripeConnect?.accountId && chargesEnabled && !payoutsEnabled && (
+              <p style={{ fontSize: "12px", color: "#b45309", marginBottom: 8 }}>
+                {portalCopy.stripeConnectPayoutsOff}
+              </p>
+            )}
             <Button
               text={portalCopy.stripeConnectButton}
               className="text-white"
@@ -116,13 +172,6 @@ const SalonPaymentSettings = () => {
               disabled={isLoading}
             />
           </div>
-        </div>
-      )}
-      {acceptStripe && !platformStripe && (
-        <div className="col-12">
-          <p style={{ fontSize: "13px", color: "#b45309" }}>
-            {portalCopy.stripeConnectPlatformOff}
-          </p>
         </div>
       )}
     </div>

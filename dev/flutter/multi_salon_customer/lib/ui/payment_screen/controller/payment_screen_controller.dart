@@ -299,6 +299,19 @@ class PaymentScreenController extends GetxController {
     // } else
     if (selectedPayment == "Stripe") {
       log("it's Stripe");
+      if (isWalletAdd != true) {
+        final salonStripeOk = bookingData?['salonAcceptsStripe'] == true;
+        if (!salonStripeOk) {
+          Utils.showToast(
+            Get.context!,
+            "Ce salon n'accepte pas encore le paiement carte en ligne.",
+          );
+          isLoading(false);
+          update([Constant.idProgressView]);
+          return;
+        }
+      }
+
       isLoading(true);
       update([Constant.idProgressView]);
 
@@ -345,6 +358,7 @@ class PaymentScreenController extends GetxController {
             serviceId: bookingData?['serviceId'] ?? "",
             expertId: bookingData?['expertId'] ?? "",
             salonId: bookingData?['salonId']?.toString() ?? "",
+            salonName: bookingData?['salonName']?.toString() ?? "",
             withoutTax: (bookingData?['withoutTax'] ?? bookingData?['withOutTaxRupee'] ?? 0.0).toDouble(),
             date: bookingData?['date'] ?? "",
             time: bookingData?['time'] ?? "",

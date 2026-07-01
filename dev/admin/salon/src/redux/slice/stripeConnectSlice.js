@@ -53,6 +53,15 @@ const stripeConnectSlice = createSlice({
         Success("Modes de paiement mis à jour.");
       }
     });
+    builder.addCase(startStripeOnboarding.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(startStripeOnboarding.fulfilled, (state) => {
+      state.isLoading = false;
+    });
+    builder.addCase(startStripeOnboarding.rejected, (state) => {
+      state.isLoading = false;
+    });
     builder.addCase(refreshStripeConnect.fulfilled, (state, action) => {
       if (action.payload?.status) {
         state.status = {

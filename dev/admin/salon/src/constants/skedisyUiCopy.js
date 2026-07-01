@@ -29,6 +29,7 @@ export const SKEDISY_SALON_UI = {
     salonTime: "Horaires salon",
     salonHoliday: "Fermetures / congés",
     teamCalendar: "Planning équipe",
+    paymentSettings: "Paiements Stripe",
     logout: "Déconnexion",
   },
   dashboard: {
@@ -47,6 +48,9 @@ export const SKEDISY_SALON_UI = {
     todayBookings: "Réservations du jour",
     teamCalendarCta: "Voir le planning équipe",
     teamCalendarHint: "RDV, créneaux libres et indisponibilités en temps réel",
+    paymentSettingsCta: "Configurer les paiements (espèces / Stripe)",
+    paymentSettingsHint:
+      "Recevez les paiements carte directement sur votre compte Stripe Connect",
     showMore: "Voir plus",
     fallbackUser: "Cliente",
     price: "Prix :",
@@ -237,7 +241,7 @@ export const SKEDISY_SALON_UI = {
     minBalance: "Solde minimum requis",
     instructionsTitle: "Recharger le portefeuille",
     instructions:
-      "Créditez votre portefeuille pour couvrir les frais de réservation et les commissions. Les clientes réservent sur l'app — votre salon doit garder un solde suffisant.",
+      "Rechargez ce portefeuille (paiement via Stripe Skedisy, comme le portefeuille cliente) pour couvrir la commission Skedisy à chaque réservation. Le paiement carte des clientes arrive à 100 % sur votre Stripe Connect — la commission n'y est pas prélevée.",
     enterAmount: "Montant à recharger",
     quickAmount: "Montants rapides",
     amountPlaceholder: "Saisir le montant",
@@ -270,7 +274,7 @@ export const SKEDISY_SALON_UI = {
     balanceRule:
       "Le solde doit couvrir le minimum + les frais de commission pour les nouvelles réservations.",
     rechargeBody1:
-      "Choisissez un montant et un mode de paiement (Stripe ou MTN MoMo). Après validation, le montant est crédité sur votre portefeuille.",
+      "Recharge via Stripe Skedisy (portefeuille commission). Choisissez un montant — le solde est crédité ici après validation.",
     rechargeBody2:
       "Consultez l'historique dans « Historique portefeuille » (recharges, commissions, remboursements).",
     amountErrorLabel: "Montant invalide",

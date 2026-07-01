@@ -50,17 +50,27 @@ export const SKEDISY_SALON_PORTAL_COPY = {
   autoConfirmBookingsHint:
     "Les nouvelles réservations clientes sont confirmées immédiatement (comme Planity). Désactivez pour valider manuellement.",
   paymentSettingsTitle: "Modes de paiement clientes",
+  paymentSettingsPageTitle: "Paiements & Stripe Connect",
+  paymentSettingsPageIntro:
+    "Espèces et/ou carte pour vos clientes. La carte est encaissée à 100 % sur votre Stripe Connect. La commission Skedisy est prélevée sur votre portefeuille salon (page Portefeuille), pas sur le paiement cliente.",
   paymentCashLabel: "Paiement en espèces (sur place)",
   paymentCashHint: "Le client paie au salon après la prestation.",
   paymentStripeLabel: "Paiement en ligne (Stripe)",
   paymentStripeHint:
-    "Les fonds sont versés sur votre compte Stripe. Skedisy prélève uniquement sa commission.",
+    "La cliente paie 100 % sur votre compte Stripe Connect. Aucune commission n'est déduite de ce paiement.",
+  paymentAdminStripeNote:
+    "Commission Skedisy : prélevée sur le portefeuille salon (rechargez-le via Stripe Skedisy sur la page Portefeuille — même principe que le portefeuille cliente).",
   stripeConnectTitle: "Compte Stripe Connect",
   stripeConnectReady: "Compte actif — paiements carte acceptés",
   stripeConnectPending: "Configuration incomplète",
   stripeConnectDisabled: "Stripe non connecté",
   stripeConnectButton: "Configurer / mettre à jour Stripe",
   stripeConnectPlatformOff: "Stripe Connect n'est pas activé par Skedisy. Contactez le support.",
+  stripeConnectStep1: "1. Activez « Paiement en ligne (Stripe) » ci-dessus",
+  stripeConnectStep2: "2. Cliquez sur le bouton pour compléter votre dossier Stripe",
+  stripeConnectStep3: "3. Une fois validé, vos clientes pourront payer par carte dans l'app",
+  stripeConnectChargesOff: "Paiements carte en attente de validation Stripe",
+  stripeConnectPayoutsOff: "Virements bancaires en attente de validation Stripe",
   mobileLabel: "Téléphone",
   mobileRequired: "Le téléphone est requis.",
   latitudeLabel: "Latitude",

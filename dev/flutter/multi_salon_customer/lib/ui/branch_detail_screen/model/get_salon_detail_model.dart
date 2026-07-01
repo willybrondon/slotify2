@@ -278,20 +278,32 @@ class Salon {
 class PaymentOptions {
   bool? acceptCash;
   bool? acceptStripe;
+  bool? stripePreference;
   bool? stripeConnectReady;
+  String? salonName;
 
-  PaymentOptions({this.acceptCash, this.acceptStripe, this.stripeConnectReady});
+  PaymentOptions({
+    this.acceptCash,
+    this.acceptStripe,
+    this.stripePreference,
+    this.stripeConnectReady,
+    this.salonName,
+  });
 
   factory PaymentOptions.fromJson(Map<String, dynamic> json) => PaymentOptions(
         acceptCash: json["acceptCash"],
         acceptStripe: json["acceptStripe"],
+        stripePreference: json["stripePreference"],
         stripeConnectReady: json["stripeConnectReady"],
+        salonName: json["salonName"],
       );
 
   Map<String, dynamic> toJson() => {
         "acceptCash": acceptCash,
         "acceptStripe": acceptStripe,
+        "stripePreference": stripePreference,
         "stripeConnectReady": stripeConnectReady,
+        "salonName": salonName,
       };
 }
 

@@ -45,13 +45,19 @@ function salonStripeReady(salon) {
 function salonPaymentOptions(salon) {
   const globalStripe = !!global.settingJSON?.isStripePay;
   const acceptCash = salon?.paymentMethods?.acceptCash !== false;
-  const acceptStripe = globalStripe && salonStripeReady(salon);
+  const stripePreference = salon?.paymentMethods?.acceptStripe === true;
+  const connectReady = salonStripeReady(salon);
+  const acceptStripe = globalStripe && connectReady;
   return {
     acceptCash,
+    /** Visible to customers — only when Connect onboarding is complete */
     acceptStripe,
-    stripeConnectReady: acceptStripe,
+    /** Salon opted in to card payments (may still need Stripe onboarding) */
+    stripePreference,
+    stripeConnectReady: connectReady,
     stripeOnboardingComplete: !!salon?.stripeConnect?.onboardingComplete,
     stripeChargesEnabled: !!salon?.stripeConnect?.chargesEnabled,
+    salonName: salon?.name || "",
   };
 }
 
@@ -70,15 +76,50 @@ async function syncConnectAccountStatus(salon) {
   return salon;
 }
 
+function resolveStripeCountry(salon) {
+  const raw = (salon?.addressDetails?.country || "FR").trim();
+  const key = raw.toLowerCase();
+  const map = {
+    fr: "FR",
+    france: "FR",
+    cm: "CM",
+    cameroon: "CM",
+    cameroun: "CM",
+    be: "BE",
+    belgium: "BE",
+    belgique: "BE",
+    ch: "CH",
+    switzerland: "CH",
+    suisse: "CH",
+    de: "DE",
+    germany: "DE",
+    allemagne: "DE",
+    gb: "GB",
+    uk: "GB",
+    "united kingdom": "GB",
+    "royaume-uni": "GB",
+    us: "US",
+    usa: "US",
+    "united states": "US",
+    "états-unis": "US",
+  };
+  if (key.length === 2 && /^[a-z]{2}$/i.test(key)) {
+    return key.toUpperCase();
+  }
+  return map[key] || "FR";
+}
+
 async function ensureConnectAccount(salon) {
   const stripeClient = getPlatformStripe();
   if (salon.stripeConnect?.accountId) {
     return syncConnectAccountStatus(salon);
   }
 
+  const country = resolveStripeCountry(salon);
+
   const account = await stripeClient.accounts.create({
     type: "express",
-    country: (salon.addressDetails?.country || "FR").slice(0, 2).toUpperCase() || "FR",
+    country,
     email: salon.email,
     business_type: "individual",
     capabilities: {
@@ -121,32 +162,33 @@ async function createBookingPaymentIntent({ salon, amount, withoutTax, metadata 
 
   const stripeClient = getPlatformStripe();
   const { amount: stripeAmount, currency } = toStripeAmount(amount);
-  const applicationFeeAmount = computeApplicationFeeCents(withoutTax, salon);
 
-  if (applicationFeeAmount >= stripeAmount) {
-    throw new Error("Commission amount exceeds payment total.");
-  }
-
-  const paymentIntent = await stripeClient.paymentIntents.create({
-    amount: stripeAmount,
-    currency,
-    application_fee_amount: applicationFeeAmount,
-    transfer_data: {
-      destination: salon.stripeConnect.accountId,
+  // Full amount to salon — Skedisy commission is debited from salon.wallet after booking
+  const paymentIntent = await stripeClient.paymentIntents.create(
+    {
+      amount: stripeAmount,
+      currency,
+      automatic_payment_methods: { enabled: true },
+      description: salon.name ? `Réservation ${salon.name}` : "Réservation Skedisy",
+      metadata: {
+        source: "skedisy_booking",
+        salonId: salon._id.toString(),
+        salonName: salon.name || "",
+        withoutTax: String(withoutTax ?? ""),
+        ...metadata,
+      },
     },
-    automatic_payment_methods: { enabled: true },
-    metadata: {
-      source: "skedisy_booking",
-      salonId: salon._id.toString(),
-      ...metadata,
-    },
-  });
+    {
+      stripeAccount: salon.stripeConnect.accountId,
+    }
+  );
 
   return {
     clientSecret: paymentIntent.client_secret,
     paymentIntentId: paymentIntent.id,
-    applicationFeeAmount,
     publishableKey: (global.settingJSON?.stripePublishableKey || "").trim(),
+    connectedAccountId: salon.stripeConnect.accountId,
+    salonName: salon.name || "",
   };
 }
 

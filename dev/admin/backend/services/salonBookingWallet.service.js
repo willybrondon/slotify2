@@ -1,5 +1,3 @@
-const { salonStripeReady } = require("./stripeConnect.service");
-
 /** Commission % — per-salon `platformFee` first, then global setting */
 function resolveSalonCommissionPercent(salon, setting) {
   if (salon?.platformFee != null && salon.platformFee !== "") {
@@ -26,39 +24,28 @@ function resolveMinWalletBalance(salon, setting) {
   return Number.isNaN(globalMin) ? 0 : Math.max(0, globalMin);
 }
 
-function commissionCollectedViaStripeConnect(paymentType, salon) {
-  return paymentType === "Stripe" && salonStripeReady(salon);
-}
-
-/** Stripe Connect collects Skedisy fee on the card flow — no prepaid salon wallet */
-function shouldCheckSalonWalletPrepay(paymentType, salon) {
-  return !commissionCollectedViaStripeConnect(paymentType, salon);
-}
-
 function computeExpectedPlatformFee(salon, setting, servicePriceWithoutTax) {
   const commissionPercent = resolveSalonCommissionPercent(salon, setting);
   const base = parseFloat(servicePriceWithoutTax) || 0;
   return (commissionPercent * base) / 100;
 }
 
-function computeRequiredSalonWalletBalance({ salon, setting, servicePriceWithoutTax, paymentType }) {
-  if (!shouldCheckSalonWalletPrepay(paymentType, salon)) {
-    return 0;
-  }
+/**
+ * Skedisy commission is always prepaid from salon.wallet (never deducted from client card payment).
+ */
+function computeRequiredSalonWalletBalance({ salon, setting, servicePriceWithoutTax }) {
   const minBalance = resolveMinWalletBalance(salon, setting);
   const expectedPlatformFee = computeExpectedPlatformFee(salon, setting, servicePriceWithoutTax);
   return minBalance + expectedPlatformFee;
 }
 
-function shouldDebitSalonWalletForCommission(paymentType, salon) {
-  return !commissionCollectedViaStripeConnect(paymentType, salon);
+function shouldDebitSalonWalletForCommission() {
+  return true;
 }
 
 module.exports = {
   resolveSalonCommissionPercent,
   resolveMinWalletBalance,
-  commissionCollectedViaStripeConnect,
-  shouldCheckSalonWalletPrepay,
   computeExpectedPlatformFee,
   computeRequiredSalonWalletBalance,
   shouldDebitSalonWalletForCommission,

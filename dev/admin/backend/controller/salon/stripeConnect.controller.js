@@ -110,8 +110,8 @@ exports.createOnboardingLink = async (req, res) => {
 
     const base = resolveBaseUrl();
     const onboardingUrl = await createConnectAccountLink(salon, {
-      refreshUrl: `${base}/salonpanel/profile?stripe=refresh`,
-      returnUrl: `${base}/salonpanel/profile?stripe=return`,
+      refreshUrl: `${base}/salonpanel/paymentSettings?stripe=refresh`,
+      returnUrl: `${base}/salonpanel/paymentSettings?stripe=return`,
     });
 
     return res.status(200).send({

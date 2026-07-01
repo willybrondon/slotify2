@@ -190,6 +190,9 @@ GEMINI_API_KEY=$GEMINI_API_KEY
 OLLAMA_HOST=$OLLAMA_HOST
 OLLAMA_MODEL=$OLLAMA_MODEL
 
+# Stripe Connect webhook (signing secret from Stripe Dashboard → Webhooks)
+STRIPE_CONNECT_WEBHOOK_SECRET=$STRIPE_CONNECT_WEBHOOK_SECRET
+
 #Server URL
 baseURL = https://$app_domain/ #https://${public_ip}:5000/
 

@@ -236,37 +236,15 @@ exports.publicCreateStripePaymentIntent = async (req, res) => {
         status: true,
         clientSecret: result.clientSecret,
         publishableKey: result.publishableKey,
+        connectedAccountId: result.connectedAccountId,
+        salonName: result.salonName,
       });
     }
 
-    const secretKey = (global.settingJSON?.stripeSecretKey || "").trim();
-    if (!secretKey) {
-      return res.status(200).json({ status: false, message: "Stripe is not configured." });
-    }
-
-    const stripeClient = stripe(secretKey);
-    const currency = settings.currencyName || "eur";
-    const stripeAmount = Math.round(amount * 100);
-
-    if (stripeAmount < 50) {
-      return res.status(200).json({ status: false, message: "Amount too low for card payment." });
-    }
-
-    const paymentIntent = await stripeClient.paymentIntents.create({
-      amount: stripeAmount,
-      currency,
-      automatic_payment_methods: { enabled: true },
-      receipt_email: email || undefined,
-      metadata: {
-        source: "skedisy_web_booking",
-        userId: String(req.body?.userId || ""),
-      },
-    });
-
+    // Web booking without salonId: card payments require the salon's Connect account
     return res.status(200).json({
-      status: true,
-      clientSecret: paymentIntent.client_secret,
-      publishableKey: settings.stripePublishableKey,
+      status: false,
+      message: "Salon requis pour le paiement carte (Stripe Connect).",
     });
   } catch (error) {
     console.error("[publicCreateStripePaymentIntent]", error);

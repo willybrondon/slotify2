@@ -18,6 +18,13 @@ require("./middleware/mongodb");
 const fs = require("fs");
 
 var logger = require("morgan");
+
+app.post(
+  "/stripe/connect/webhook",
+  express.raw({ type: "application/json" }),
+  require("./controller/stripeConnectWebhook.controller").handleConnectWebhook
+);
+
 app.use(express.json());
 app.use(cors());
 app.use(logger("dev"));

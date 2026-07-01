@@ -1823,6 +1823,8 @@ class BookingScreenController extends GetxController {
                 ? Constant.storage.read<String>('expertDetail').toString()
                 : Constant.storage.read<String>('expertId').toString(),
             'salonId': salonId.toString(),
+            'salonName': salonName ?? getSalonDetailCategory?.salon?.name ?? "",
+            'salonAcceptsStripe': salonAcceptsStripe(),
             'date': formattedDate.toString(),
             'time': slotsString.toString(),
             'amount': totalPrice,
@@ -1936,6 +1938,8 @@ class BookingScreenController extends GetxController {
                 ? Constant.storage.read<String>('expertDetail').toString()
                 : Constant.storage.read<String>('expertId').toString(),
             'salonId': salonId.toString(),
+            'salonName': salonName ?? getSalonDetailCategory?.salon?.name ?? "",
+            'salonAcceptsStripe': salonAcceptsStripe(),
             'date': formattedDate.toString(),
             'time': slotsString.toString(),
             'amount': totalPrice, // Use recalculated totalPrice with discount

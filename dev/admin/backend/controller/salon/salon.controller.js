@@ -706,8 +706,8 @@ exports.createStripeCheckoutSession = async (req, res) => {
           price_data: {
             currency: currency,
             product_data: {
-              name: "Salon Wallet Recharge",
-              description: `Recharge wallet for ${salon.name}`,
+              name: "Recharge portefeuille commission Skedisy",
+              description: `Crédit portefeuille salon ${salon.name} (Stripe plateforme Skedisy)`,
             },
             unit_amount: amountInSmallestUnit,
           },
