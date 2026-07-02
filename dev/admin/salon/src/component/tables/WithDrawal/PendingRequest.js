@@ -3,7 +3,7 @@ import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import { useEffect, useState } from "react";
 import Table from "../../extras/Table";
 import { useDispatch, useSelector } from "react-redux";
-import { acceptWithDraw, getExpertWithDraw, rejectedWithDraw } from "../../../redux/slice/withDrawSlice";
+import { acceptExpertWithDraw, getExpertWithDraw, rejectExpertWithDraw } from "../../../redux/slice/withDrawSlice";
 import { toast } from "react-toastify";
 import Button from "../../extras/Button";
 import Pagination from "../../extras/Pagination";
@@ -27,7 +27,7 @@ const PendingRequest = ({ status, startDate, endDate }) => {
             start: page, limit: rowsPerPage, status: status, startDate: startDate === "ALL" ? "All" : startDate, endDate: endDate === "ALL" ? "All" : endDate
         }
         dispatch(getExpertWithDraw(payload))
-    }, [startDate, endDate])
+    }, [page, rowsPerPage, status, startDate, endDate, dispatch])
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -44,7 +44,7 @@ const PendingRequest = ({ status, startDate, endDate }) => {
             const yes = data?.isConfirmed;
             console.log("yes", yes);
             if (yes) {
-                dispatch(acceptWithDraw(id))
+                dispatch(acceptExpertWithDraw(id))
                     .then((res) => {
                         console.log("ressssssss", res)
                         if (res?.payload?.status) {
@@ -68,7 +68,7 @@ const PendingRequest = ({ status, startDate, endDate }) => {
             id: rejectedId,
             reason: reason
         }
-        dispatch(rejectedWithDraw(payload))
+        dispatch(rejectExpertWithDraw(payload))
             .then((res) => {
                 console.log("resssssss", res)
                 if (res?.payload?.status) {

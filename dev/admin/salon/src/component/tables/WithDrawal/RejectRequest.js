@@ -2,7 +2,7 @@ import { col } from "../../../constants/tableHeaders";
 import { useEffect, useState } from "react";
 import Table from "../../extras/Table";
 import { useDispatch, useSelector } from "react-redux";
-import { acceptWithDraw, getExpertWithDraw, rejectedWithDraw } from "../../../redux/slice/withDrawSlice";
+import { getExpertWithDraw } from "../../../redux/slice/withDrawSlice";
 import { toast } from "react-toastify";
 import Button from "../../extras/Button";
 import Pagination from "../../extras/Pagination";

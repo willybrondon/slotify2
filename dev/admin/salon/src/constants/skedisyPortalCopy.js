@@ -1,11 +1,10 @@
 /** Aligné AUTHENTICITE_SKEDISY — portail salon (salonpanel). */
 export const SKEDISY_SALON_PORTAL_COPY = {
-  kicker: "Île-de-France · Beauté afro",
-  welcome: "Espace salon Skedisy",
+  kicker: "Skedisy",
+  welcome: "Espace salon",
   loginTitle: "Connexion",
-  loginSubtitle:
-    "Agenda et prestations nommées (tresses, locks, perruques, homme, esthétique) — pensé pour les salons afro en IDF.",
-  loginHint: "Email et mot de passe de votre compte salon.",
+  loginSubtitle: "Accédez à votre espace professionnel.",
+  loginHint: "",
   signUpTitle: "Créer l'accès",
   signUpSubtitle: "Code d'invitation requis pour activer votre salon.",
   signUpHint: "Email, mot de passe et code fourni par Skedisy.",

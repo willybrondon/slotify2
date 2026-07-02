@@ -2,6 +2,7 @@ const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const SalonSettlement = require("../../models/salonSettlement.model");
 const ExpertSettlement = require("../../models/expertSettlement.model");
+const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
 const Setting = require("../../models/setting.model");
 const moment = require("moment");
 const fs = require("fs");
@@ -478,7 +479,159 @@ exports.bonusPenalty = async (req, res) => {
   }
 };
 
+exports.getExpertSettlementBySalon = async (req, res) => {
+  try {
+    const salonId = req.query.salonId;
+    if (!salonId) {
+      return res.status(200).send({ status: false, message: "salonId requis." });
+    }
+
+    const salon = await Salon.findById(salonId);
+    if (!salon) {
+      return res.status(200).send({ status: false, message: "Salon not exist" });
+    }
+
+    let dateFilter;
+    const startDate = req.query.startDate || "ALL";
+    const endDate = req.query.endDate || "ALL";
+    if (startDate != "ALL" && endDate != "ALL") {
+      dateFilter = {
+        date: { $gte: startDate, $lte: endDate },
+      };
+    }
+
+    const settlement = await ExpertSettlement.aggregate([
+      { $match: { salonId: salon._id, ...dateFilter } },
+      {
+        $lookup: {
+          from: "experts",
+          localField: "expertId",
+          foreignField: "_id",
+          pipeline: [{ $project: { fname: 1, lname: 1, _id: 1, image: 1 } }],
+          as: "expert",
+        },
+      },
+      { $unwind: "$expert" },
+      { $sort: { createdAt: 1 } },
+    ]);
+
+    return res.status(200).json({
+      status: true,
+      message: "Settlement found",
+      total: settlement.length,
+      settlement,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};
+
+exports.expertPayment = async (req, res) => {
+  try {
+    const salonId = req.query.salonId;
+    if (!req.query.settlementId || !salonId) {
+      return res.status(200).send({ status: false, message: "settlementId et salonId requis." });
+    }
+
+    const settlement = await ExpertSettlement.findById(req.query.settlementId);
+    if (!settlement || String(settlement.salonId) !== String(salonId)) {
+      return res.status(200).send({ status: false, message: "settlement not found" });
+    }
+
+    if (settlement.statusOfTransaction === 1) {
+      return res.status(200).send({ status: false, message: "Settlement already paid." });
+    }
+
+    const expert = await Expert.findById(settlement.expertId);
+    if (!expert) {
+      return res.status(200).send({ status: false, message: "expert not found" });
+    }
+
+    const payAmount = parseFloat(settlement.finalAmount) || 0;
+    if (payAmount <= 0) {
+      return res.status(200).send({ status: false, message: "Invalid settlement amount." });
+    }
+
+    if ((expert.earning || 0) < payAmount) {
+      return res.status(200).send({ status: false, message: "Solde expert insuffisant pour ce règlement." });
+    }
+
+    const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
+    const uniqueId = await generateUniqueIdentifier();
+
+    settlement.statusOfTransaction = 1;
+    settlement.paymentDate = moment().format("YYYY-MM-DD");
+
+    await Promise.all([
+      settlement.save(),
+      Expert.updateOne({ _id: expert._id }, { $inc: { earning: -payAmount } }),
+      SalonExpertWalletHistory.create({
+        uniqueId,
+        expert: expert._id,
+        salon: salonId,
+        amount: payAmount,
+        type: 4,
+        payoutStatus: 2,
+        date: moment().format("YYYY-MM-DD"),
+        time: moment().format("HH:mm a"),
+      }),
+    ]);
+
+    return res.status(200).json({
+      status: true,
+      message: "Expert paid Successfully",
+      settlement,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};
+
+exports.expertBonusPenalty = async (req, res) => {
+  try {
+    const salonId = req.query.salonId;
+    if (!req.query.settlementId || req.body.bonus === undefined || !salonId) {
+      return res.status(200).send({ status: false, message: "settlementId, salonId et bonus requis." });
+    }
+
+    const settlement = await ExpertSettlement.findById(req.query.settlementId);
+    if (!settlement || String(settlement.salonId) !== String(salonId)) {
+      return res.status(200).send({ status: false, message: "settlement not found" });
+    }
+
+    settlement.bonus = parseInt(req.body.bonus, 10);
+    settlement.finalAmount = settlement.expertEarning + parseInt(req.body.bonus, 10);
+
+    if (settlement.finalAmount < settlement.expertEarning) {
+      return res.status(200).json({
+        status: false,
+        message: "You Can not give penalty more than amount paid",
+      });
+    }
+
+    await settlement.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Bonus/Penalty updated Successfully",
+      settlement,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: false, error: error.message || "Internal Server Error" });
+  }
+};
+
 exports.salonPayment = async (req, res) => {
+  return res.status(200).json({
+    status: false,
+    message: "Les paiements salon ne sont plus gérés depuis l'admin.",
+  });
+};
+
+exports.salonPayment_LEGACY = async (req, res) => {
   try {
     if (!req.query.settlementId) {
       return res.status(200).send({ status: false, message: "Oops ! Invalid details!!" });

@@ -276,6 +276,14 @@ export const Salon = () => {
           >
             <Earning />
           </button>
+          <button
+            className="py-1 ms-2"
+            style={{ backgroundColor: "#E8F5E9", borderRadius: "8px", fontSize: "11px", padding: "4px 8px" }}
+            onClick={() => handleExpertPayments(row)}
+            title={ui.labels.expertPayments}
+          >
+            Pros
+          </button>
         </span>
       ),
     },
@@ -357,6 +365,15 @@ export const Salon = () => {
     navigate("/admin/salon/income", {
       state: {
         row,
+      },
+    });
+  };
+
+  const handleExpertPayments = (row) => {
+    navigate("/admin/salon/expertPayments", {
+      state: {
+        salonId: row?._id,
+        salonName: row?.name,
       },
     });
   };

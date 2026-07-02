@@ -320,8 +320,8 @@ const Sidebar = () => {
     //   onClick: handleOnClick,
     // },
     {
-      name: n.withdraw,
-      path: "/salonpanel/withdrawMoney",
+      name: n.expertWithdrawRequests,
+      path: "/salonpanel/expertWithdrawRequest",
       navSVG: (
         <WithdrawMoney height={20} width={20} />
       ),

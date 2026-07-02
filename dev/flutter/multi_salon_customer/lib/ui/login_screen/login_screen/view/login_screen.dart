@@ -43,150 +43,146 @@ class LoginScreen extends StatelessWidget {
     ),
   );
 
+  InputDecoration _phoneFieldDecoration() {
+    return InputDecoration(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      fillColor: AppColors.brandGrayLight,
+      filled: true,
+      hintStyle: TextStyle(
+        color: AppColors.brandGrayMuted,
+        fontSize: 14,
+        fontFamily: AppFontFamily.sfProDisplayRegular,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: AppColors.brandTerracotta, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      border: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: AppColors.lineColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
+
   loginScreen() {
     return Scaffold(
-      backgroundColor: AppColors.backGround,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100 + statusBarHeight!),
-        child: Container(
-          padding: EdgeInsets.only(top: statusBarHeight!),
-          height: 100 + statusBarHeight!,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: AppColors.primaryAppColor,
-          ),
+      backgroundColor: AppColors.brandWhite,
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                "${"txtHello".tr}, ${"txtGuest".tr}👋",
-                style: TextStyle(
-                    fontFamily: AppFontFamily.sfProDisplay,
-                    fontSize: 18,
-                    color: AppColors.whiteColor),
+              const SizedBox(height: 36),
+              Center(
+                child: Image.asset(
+                  AppAsset.icLogo,
+                  height: 88,
+                  width: 88,
+                ),
               ),
+              const SizedBox(height: 32),
               Text(
-                "txtWelcomeService".tr,
+                "txtMobileNumberVerification".tr,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontFamily: AppFontFamily.sfProDisplayRegular,
-                    fontSize: 13,
-                    color: AppColors.whiteColor),
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                  fontSize: 26,
+                  color: AppColors.brandBlack,
+                  height: 1.15,
+                ),
               ),
-            ],
-          ).paddingOnly(left: 18, bottom: 13),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Image.asset(
-                AppAsset.imMobile,
-                height: 300,
-                width: 300,
-              ).paddingOnly(top: 20),
-            ),
-            Center(
-              child: Text("txtMobileNumberVerification".tr,
-                  style: TextStyle(
-                      fontFamily: AppFontFamily.sfProDisplayBold,
-                      color: AppColors.primaryTextColor,
-                      fontSize: 21.5)),
-            ),
-            Center(
-              child: Text(
+              const SizedBox(height: 8),
+              Text(
                 "desUnderRequirement".tr,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: AppFontFamily.sfProDisplayRegular,
-                  color: AppColors.email,
-                  fontSize: 16,
+                  fontSize: 15,
+                  color: AppColors.brandGrayMuted,
+                  height: 1.4,
                 ),
               ),
-            ),
-            Text(
-              "txtEnterMobileNumber".tr,
-              style: TextStyle(
-                fontFamily: AppFontFamily.sfProDisplayRegular,
-                color: AppColors.darkGrey3,
-                fontSize: 15,
+              const SizedBox(height: 32),
+              Text(
+                "txtEnterMobileNumber".tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.sfProDisplayBold,
+                  fontSize: 14,
+                  color: AppColors.brandBlack,
+                ),
               ),
-            ).paddingOnly(top: 30, left: 20, bottom: 5),
-            IntlPhoneField(
-              flagsButtonPadding: const EdgeInsets.all(8),
-              dropdownIconPosition: IconPosition.trailing,
-              controller: loginScreenController.mobileEditingController,
-              obscureText: false,
-              style: TextStyle(
-                color: AppColors.primaryTextColor,
-                fontSize: 15,
-                fontFamily: AppFontFamily.sfProDisplayMedium,
-              ),
-              cursorColor: AppColors.primaryTextColor,
-              dropdownTextStyle: TextStyle(
-                color: AppColors.primaryTextColor,
-                fontSize: 15,
-                fontFamily: AppFontFamily.sfProDisplayMedium,
-              ),
-              keyboardType: TextInputType.number,
-              showCountryFlag: false,
-              decoration: InputDecoration(
-                hintStyle: TextStyle(
-                  color: AppColors.darkGrey.withOpacity(0.7),
-                  fontSize: 13.8,
+              const SizedBox(height: 8),
+              IntlPhoneField(
+                flagsButtonPadding: const EdgeInsets.all(8),
+                dropdownIconPosition: IconPosition.trailing,
+                controller: loginScreenController.mobileEditingController,
+                obscureText: false,
+                style: TextStyle(
+                  color: AppColors.brandBlack,
+                  fontSize: 15,
                   fontFamily: AppFontFamily.sfProDisplayMedium,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.transparent),
-                  borderRadius: BorderRadius.circular(8),
+                cursorColor: AppColors.brandTerracotta,
+                dropdownTextStyle: TextStyle(
+                  color: AppColors.brandBlack,
+                  fontSize: 15,
+                  fontFamily: AppFontFamily.sfProDisplayMedium,
                 ),
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: AppColors.bgColor,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                keyboardType: TextInputType.number,
+                showCountryFlag: false,
+                decoration: _phoneFieldDecoration(),
+                initialCountryCode: countryCode ?? "IN",
+                onCountryChanged: (value) {
+                  dev.log("message :: ${value.code}");
+                  countryCode = value.code;
+                  getDialCode();
+                },
+                onChanged: (phone) {
+                  dev.log("Phone :: ${phone.completeNumber}");
+                },
               ),
-              initialCountryCode: countryCode ?? "IN",
-              onCountryChanged: (value) {
-                dev.log("message :: ${value.code}");
-                countryCode = value.code;
-
-                getDialCode();
-              },
-              onChanged: (phone) {
-                dev.log("Phone :: ${phone.completeNumber}");
-              },
-            ).paddingOnly(left: 15, right: 15, bottom: 15),
-            GetBuilder<LoginScreenController>(
-              id: Constant.idCheckMobile,
-              builder: (logic) {
-                return AppButton(
-                  height: 55,
-                  width: Get.width,
-                  fontFamily: AppFontFamily.sfProDisplayBold,
-                  color: AppColors.whiteColor,
-                  fontSize: 18,
-                  buttonColor: AppColors.primaryAppColor,
-                  buttonText: "txtVerification".tr,
-                  onTap: () {
-                    logic.onCheckMobile();
-                    logic.timer?.isActive != true
-                        ? logic.secondsRemaining == 0
-                            ? logic.resetTimer()
-                            : logic.startTimer()
-                        : null;
-                  },
-                ).paddingAll(10);
-              },
-            ),
-          ],
+              const SizedBox(height: 8),
+              GetBuilder<LoginScreenController>(
+                id: Constant.idCheckMobile,
+                builder: (logic) {
+                  return SizedBox(
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        logic.onCheckMobile();
+                        logic.timer?.isActive != true
+                            ? logic.secondsRemaining == 0
+                                ? logic.resetTimer()
+                                : logic.startTimer()
+                            : null;
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.brandBlack,
+                        foregroundColor: AppColors.brandWhite,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        "txtVerification".tr,
+                        style: TextStyle(
+                          fontFamily: AppFontFamily.sfProDisplayBold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );

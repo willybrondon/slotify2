@@ -47,20 +47,15 @@ export const withDrawDelete = createAsyncThunk(
 );
 
 export const getExpertWithDraw = createAsyncThunk("admin/getExpertWithDraw", async (payload) => {
-    return apiInstanceFetch.get(`admin/expertWithdrawRequest/withdrawRequestOfExpertByAdmin?start=${payload.start}&limit=${payload.limit}&status=${payload.status}&startDate=${payload.startDate}&endDate=${payload.endDate}`);
+    const salonPart = payload.salonId ? `salonId=${payload.salonId}&` : "";
+    return apiInstanceFetch.get(
+        `admin/expertWithdrawRequest/withdrawRequestOfExpertByAdmin?${salonPart}start=${payload.start}&limit=${payload.limit}&status=${payload.status}&startDate=${payload.startDate}&endDate=${payload.endDate}`
+    );
 });
 export const getSalonWithDraw = createAsyncThunk("admin/getSalonWithDraw", async (payload) => {
     return apiInstanceFetch.get(`admin/salonWithdrawRequest/retriveSalonWithdRequest?start=${payload.start}&limit=${payload.limit}&status=${payload.status}&startDate=${payload.startDate}&endDate=${payload.endDate}`);
 });
 
-export const acceptWithDraw = createAsyncThunk(
-    "admin/acceptWithDraw/status",
-    async (id) => {
-        return apiInstance.patch(
-            `admin/expertWithdrawRequest/withdrawRequestApproved?requestId=${id}`
-        );
-    }
-);
 export const acceptSalonWithDraw = createAsyncThunk(
     "admin/acceptSalonWithDraw/status",
     async (id) => {
@@ -77,11 +72,23 @@ export const rejectSalonWithDraw = createAsyncThunk(
         );
     }
 );
+
+export const acceptWithDraw = createAsyncThunk(
+    "admin/acceptWithDraw/status",
+    async (payload) => {
+        const id = typeof payload === "object" ? payload.id : payload;
+        const salonId = typeof payload === "object" ? payload.salonId : "";
+        return apiInstance.patch(
+            `admin/expertWithdrawRequest/withdrawRequestApproved?requestId=${id}&salonId=${salonId}`
+        );
+    }
+);
+
 export const rejectedWithDraw = createAsyncThunk(
     "admin/rejectedWithDraw/status",
     async (payload) => {
         return apiInstance.patch(
-            `admin/expertWithdrawRequest/withdrawRequestDecline?requestId=${payload?.id}&reason=${payload?.reason}`
+            `admin/expertWithdrawRequest/withdrawRequestDecline?requestId=${payload?.id}&salonId=${payload?.salonId || ""}&reason=${encodeURIComponent(payload?.reason || "")}`
         );
     }
 );
@@ -112,6 +119,7 @@ const withDrawSlice = createSlice({
         builder.addCase(getExpertWithDraw.fulfilled, (state, action) => {
             state.isLoading = false;
             state.expertWithDraw = action.payload.request;
+            state.total = action.payload.total;
         });
 
         builder.addCase(getExpertWithDraw.rejected, (state, action) => {

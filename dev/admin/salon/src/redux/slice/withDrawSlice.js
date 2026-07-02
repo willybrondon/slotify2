@@ -4,6 +4,7 @@ import { Success } from "../../component/api/toastServices";
 
 const initialState = {
     withDraw: [],
+    expertWithDraw: [],
     walletHistory:[],
     walletBalance: 0,
     effectiveMinWalletBalance: 0,
@@ -12,6 +13,30 @@ const initialState = {
     total: null,
     history: []
 }
+
+export const getExpertWithDraw = createAsyncThunk("salon/getExpertWithDraw", async (payload) => {
+    return apiInstanceFetch.get(
+        `salon/expertWithdrawRequest/withdrawRequestOfExpertBySalon?start=${payload.start}&limit=${payload.limit}&status=${payload.status}&startDate=${payload.startDate}&endDate=${payload.endDate}`
+    );
+});
+
+export const acceptExpertWithDraw = createAsyncThunk(
+    "salon/acceptExpertWithDraw/status",
+    async (id) => {
+        return apiInstance.patch(
+            `salon/expertWithdrawRequest/withdrawRequestApproved?requestId=${id}`
+        );
+    }
+);
+
+export const rejectExpertWithDraw = createAsyncThunk(
+    "salon/rejectExpertWithDraw/status",
+    async (payload) => {
+        return apiInstance.patch(
+            `salon/expertWithdrawRequest/withdrawRequestDecline?requestId=${payload?.id}&reason=${encodeURIComponent(payload?.reason || "")}`
+        );
+    }
+);
 
 export const getWithDrawMethod = createAsyncThunk("user/getWithDrawMethod", async (payload) => {
 
@@ -101,6 +126,18 @@ const withDrawSlice = createSlice({
         builder.addCase(depositToWallet.rejected, (state, action) => {
             state.isLoading = false;
         })
+
+        builder.addCase(getExpertWithDraw.pending, (state) => {
+            state.isLoading = true;
+        });
+        builder.addCase(getExpertWithDraw.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.expertWithDraw = action.payload?.request || [];
+            state.total = action.payload?.total;
+        });
+        builder.addCase(getExpertWithDraw.rejected, (state) => {
+            state.isLoading = false;
+        });
     }
 
 })

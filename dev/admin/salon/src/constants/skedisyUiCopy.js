@@ -30,6 +30,8 @@ export const SKEDISY_SALON_UI = {
     salonHoliday: "Fermetures / congés",
     teamCalendar: "Planning équipe",
     paymentSettings: "Paiements Stripe",
+    expertWithdrawRequests: "Retraits pros",
+    expertEarnings: "Gains des pros",
     logout: "Déconnexion",
   },
   dashboard: {
@@ -513,6 +515,7 @@ export const SKEDISY_SALON_UI = {
   alert: {
     title: "Confirmer l'action ?",
     text: "Cette action est définitive.",
+    approveWithdraw: "Valider ce retrait après avoir effectué le virement ?",
     logout: "Se déconnecter",
   },
   toast: {

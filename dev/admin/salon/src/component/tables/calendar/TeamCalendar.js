@@ -15,7 +15,7 @@ import {
   setExpertBusySlots,
 } from "../../../redux/slice/teamScheduleSlice";
 import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
-import { warning } from "../../../util/Alert";
+import { confirmAction, warning } from "../../../util/Alert";
 import PlanningBookingModal from "./PlanningBookingModal";
 import PlanningBookingDetailModal from "./PlanningBookingDetailModal";
 import "./TeamCalendar.css";
@@ -58,6 +58,7 @@ function eventStyleGetter(event) {
   let opacity = 0.92;
   let color = "#fff";
   let border = "none";
+  let className = `sq-event sq-event--${event.type || "booking"}`;
 
   if (event.type === "free") {
     backgroundColor = STATUS_COLORS.free;
@@ -75,6 +76,7 @@ function eventStyleGetter(event) {
   }
 
   return {
+    className,
     style: {
       backgroundColor,
       opacity,
@@ -114,7 +116,7 @@ function normalizeSchedule(schedule, focusDate) {
 }
 
 function formatSlotTime(date) {
-  return moment(date).format("hh:mm A");
+  return moment(date).locale("en").format("hh:mm A");
 }
 
 const TeamCalendar = () => {
@@ -166,6 +168,7 @@ const TeamCalendar = () => {
       .filter((e) => showFreeSlots || e.type !== "free")
       .map((e) => ({
         ...e,
+        resourceId: e.resourceId || e.expertId,
         start: new Date(e.start),
         end: new Date(e.end),
         title:
@@ -183,21 +186,26 @@ const TeamCalendar = () => {
     }));
   }, [schedule]);
 
+  const openBookingSlot = (expertId, start) => {
+    if (!expertId) return;
+    setBookingSlot({
+      expertId,
+      expertName: resourceTitleById[expertId],
+      date: dateStr,
+      startTime: formatSlotTime(start),
+    });
+  };
+
   const handleSelectSlot = async ({ start, resourceId }) => {
     if (!resourceId || view !== "day") return;
-    const slotLabel = formatSlotTime(start);
 
     if (plannerMode === "booking") {
-      setBookingSlot({
-        expertId: resourceId,
-        expertName: resourceTitleById[resourceId],
-        date: dateStr,
-        startTime: slotLabel,
-      });
+      openBookingSlot(resourceId, start);
       return;
     }
 
-    const confirm = await warning(
+    const slotLabel = formatSlotTime(start);
+    const confirm = await confirmAction(
       `Bloquer le créneau ${slotLabel} pour ce professionnel ?`
     );
     if (!confirm?.isConfirmed) return;
@@ -217,13 +225,44 @@ const TeamCalendar = () => {
   };
 
   const handleSelectEvent = async (event) => {
+    if (event.type === "free") {
+      if (view !== "day") return;
+      const expertId = event.resourceId || event.expertId;
+      const start = event.start;
+
+      if (plannerMode === "booking") {
+        openBookingSlot(expertId, start);
+        return;
+      }
+
+      const slotLabel = event.timeSlots?.[0] || formatSlotTime(start);
+      const confirm = await confirmAction(
+        `Bloquer le créneau ${slotLabel} pour ce professionnel ?`
+      );
+      if (!confirm?.isConfirmed) return;
+
+      try {
+        await dispatch(
+          setExpertBusySlots({
+            expertId,
+            date: dateStr,
+            time: slotLabel,
+          })
+        ).unwrap();
+        loadSchedule();
+      } catch (error) {
+        console.error(error);
+      }
+      return;
+    }
+
     if (event.type === "booking" && event.id) {
       setDetailBookingId(event.id);
       return;
     }
 
     if (event.type === "busy" && event.expertId) {
-      const confirm = await warning("Débloquer ce créneau indisponible ?");
+      const confirm = await confirmAction("Débloquer ce créneau indisponible ?");
       if (!confirm?.isConfirmed) return;
       const slotLabel = event.timeSlots?.[0] || formatSlotTime(event.start);
       try {
@@ -242,9 +281,12 @@ const TeamCalendar = () => {
   };
 
   const handleEventDrop = async ({ event, start, resourceId }) => {
-    if (event.type !== "booking" || !event.id) return;
+    if (event.type !== "booking" || !event.id || view !== "day") {
+      loadSchedule();
+      return;
+    }
 
-    const confirm = await warning("Déplacer ce rendez-vous ?");
+    const confirm = await confirmAction("Déplacer ce rendez-vous ?");
     if (!confirm?.isConfirmed) {
       loadSchedule();
       return;
@@ -252,12 +294,13 @@ const TeamCalendar = () => {
 
     const targetDate = moment(start).format("YYYY-MM-DD");
     const startTime = formatSlotTime(start);
+    const targetExpertId = resourceId || event.resourceId || event.expertId;
 
     try {
       await dispatch(
         reschedulePlanningBooking({
           bookingId: event.id,
-          expertId: resourceId || event.expertId,
+          expertId: targetExpertId,
           date: targetDate,
           startTime,
         })
@@ -324,7 +367,7 @@ const TeamCalendar = () => {
           </div>
         </div>
         <div className="sq-planning-toolbar__right d-flex flex-wrap align-items-center gap-3">
-          <label className="d-flex align-items-center gap-2 mb-0 small">
+          <label className="sq-check-label">
             <input
               type="checkbox"
               checked={showFreeSlots}
@@ -361,8 +404,14 @@ const TeamCalendar = () => {
       )}
 
       {!isLoading && schedule && hasExperts && !calendarEvents.length && (
-        <div className="team-calendar-empty alert alert-light border mb-3">
-          Aucun créneau pour cette date. Cliquez sur un créneau libre pour créer un RDV ou bloquer.
+        <div className="team-calendar-empty alert alert-light border sq-planning-alert mb-3">
+          Aucun créneau pour cette date. Passez en vue <strong>Jour</strong>, mode <strong>Créer RDV</strong>, puis cliquez sur un créneau libre.
+        </div>
+      )}
+
+      {!isLoading && schedule && hasExperts && view !== "day" && (
+        <div className="alert alert-info sq-planning-alert mb-3">
+          La création et le déplacement de RDV fonctionnent en vue <strong>Jour</strong>.
         </div>
       )}
 
@@ -386,11 +435,11 @@ const TeamCalendar = () => {
         ))}
       </div>
 
-      <div className="legend mb-2 d-flex flex-wrap gap-3 small">
+      <div className="sq-planning-legend">
         <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.confirm }} /> Confirmé</span>
         <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.pending }} /> En attente</span>
         <span><i className="legend-swatch" style={{ background: STATUS_COLORS.busy }} /> Indisponible</span>
-        <span><i className="legend-swatch legend-free" /> Libre · glisser / redimensionner les RDV</span>
+        <span><i className="legend-swatch legend-free" /> Libre</span>
       </div>
 
       {hasExperts && (
@@ -418,12 +467,12 @@ const TeamCalendar = () => {
             selectable={view === "day"}
             onSelectSlot={handleSelectSlot}
             onSelectEvent={handleSelectEvent}
-            draggableAccessor={(event) => event.type === "booking"}
+            draggableAccessor={(event) => view === "day" && event.type === "booking"}
             resizable={view === "day"}
-            resizableAccessor={(event) => event.type === "booking"}
+            resizableAccessor={(event) => view === "day" && event.type === "booking"}
             onEventDrop={handleEventDrop}
             onEventResize={handleEventResize}
-            style={{ height: 720 }}
+            className="sq-calendar-body"
             popup
             tooltipAccessor={(event) => event.title}
           />

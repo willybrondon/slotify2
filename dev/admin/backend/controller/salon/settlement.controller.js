@@ -2,6 +2,7 @@ const Salon = require("../../models/salon.model");
 const Expert = require("../../models/expert.model");
 const SalonSettlement = require("../../models/salonSettlement.model");
 const ExpertSettlement = require("../../models/expertSettlement.model");
+const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
 
 const moment = require("moment");
 const admin = require("../../firebase");
@@ -159,23 +160,60 @@ exports.expertPayment = async (req, res) => {
       return res.status(200).send({ status: false, message: "settlement not found" });
     }
 
-    const expert = await Expert.findById(settlement.expertId);
+    if (String(settlement.salonId) !== String(req.salon._id)) {
+      return res.status(200).send({ status: false, message: "Settlement not found for this salon." });
+    }
 
+    if (settlement.statusOfTransaction === 1) {
+      return res.status(200).send({ status: false, message: "Settlement already paid." });
+    }
+
+    const expert = await Expert.findById(settlement.expertId);
     if (!expert) {
       return res.status(200).send({ status: false, message: "expert not found" });
     }
 
+    const payAmount = parseFloat(settlement.finalAmount) || 0;
+    if (payAmount <= 0) {
+      return res.status(200).send({ status: false, message: "Invalid settlement amount." });
+    }
+
+    if ((expert.earning || 0) < payAmount) {
+      return res.status(200).send({
+        status: false,
+        message: "Solde expert insuffisant pour ce règlement.",
+      });
+    }
+
+    const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
+    const uniqueId = await generateUniqueIdentifier();
+
     settlement.statusOfTransaction = 1;
     settlement.paymentDate = moment().format("YYYY-MM-DD");
-    payload = {
+
+    await Promise.all([
+      settlement.save(),
+      Expert.updateOne({ _id: expert._id }, { $inc: { earning: -payAmount } }),
+      SalonExpertWalletHistory.create({
+        uniqueId,
+        expert: expert._id,
+        salon: req.salon._id,
+        amount: payAmount,
+        type: 4,
+        payoutStatus: 2,
+        date: moment().format("YYYY-MM-DD"),
+        time: moment().format("HH:mm a"),
+      }),
+    ]);
+
+    const payload = {
       token: expert.fcmToken,
       notification: {
-        body: `Your received payment. check it in app`,
-        title: "Payment alert 💲",
+        body: `Votre salon vous a réglé ${payAmount}. Consultez l'app.`,
+        title: "Paiement reçu 💲",
       },
     };
 
-    await settlement.save();
     const adminPromise = await admin;
     if (expert && expert.fcmToken !== null) {
       adminPromise

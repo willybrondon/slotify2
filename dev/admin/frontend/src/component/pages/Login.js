@@ -38,76 +38,63 @@ const Login = (props) => {
   };
 
   return (
-    <>
-      <div className="mainLoginPage">
-        <div className="loginDiv" style={{ width: "100%" }}>
-          <div className="loginPage m-auto">
-            <div className="loginTitle mb-3 d-flex">
-              <img src={logo} style={{ width: "50px" }} alt="Skedisy" />
+    <div className="mainLoginPage sk-portal-pro">
+      <div className="loginDiv">
+        <div className="loginPage m-auto sk-portal-card">
+          <div className="sk-portal-logo">
+            <img src={logo} alt="Skedisy" />
+          </div>
+          <h1 className="sk-portal-login-title">{copy.loginTitle}</h1>
+          <p className="sk-portal-subtitle">{copy.loginSubtitle}</p>
+          <div>
+            <div className="col-12">
+              <ExInput
+                type="text"
+                id="email"
+                name="email"
+                label={copy.email}
+                value={email}
+                placeholder={copy.email}
+                errorMessage={error.email && error.email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError({
+                    ...error,
+                    email: !e.target.value ? copy.errEmail : "",
+                  });
+                }}
+              />
             </div>
-            <p className="sk-portal-kicker mb-1">{copy.kicker}</p>
-            <div className="fw-bold text-theme me-auto my-auto welComeTitle">
-              {copy.welcome}
+            <div className="col-12">
+              <ExInput
+                type="password"
+                id="password"
+                name="password"
+                value={password}
+                label={copy.password}
+                placeholder={copy.password}
+                errorMessage={error.password && error.password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError({
+                    ...error,
+                    password: !e.target.value ? copy.errPassword : "",
+                  });
+                }}
+              />
             </div>
-            <h1 className="sk-portal-login-title">{copy.loginTitle}</h1>
-            <p className="sk-portal-subtitle">{copy.loginSubtitle}</p>
-            <h6 className="fw-bold text-theme me-auto my-auto fs-15 py-2 title">
-              {copy.loginHint}
-            </h6>
-            <div>
-              <div className="col-12">
-                <ExInput
-                  type="text"
-                  id="email"
-                  name="email"
-                  label={copy.email}
-                  value={email}
-                  placeholder={copy.email}
-                  errorMessage={error.email && error.email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setError({
-                      ...error,
-                      email: !e.target.value ? copy.errEmail : "",
-                    });
-                  }}
-                />
-              </div>
-              <div className="col-12">
-                <ExInput
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={password}
-                  label={copy.password}
-                  placeholder={copy.password}
-                  errorMessage={error.password && error.password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError({
-                      ...error,
-                      password: !e.target.value ? copy.errPassword : "",
-                    });
-                  }}
-                />
-              </div>
-              <div className="loginButton d-flex gx-2 justify-content-center">
-                <Button
-                  type="submit"
-                  className="bg-theme text-light cursor m10-top col-6 mx-2"
-                  text={copy.submitLogin}
-                  onClick={submit}
-                  style={{ borderRadius: "30px" }}
-                />
-              </div>
+            <div className="loginButton d-flex justify-content-center">
+              <Button
+                type="submit"
+                className="bg-theme text-light cursor sk-portal-submit"
+                text={copy.submitLogin}
+                onClick={submit}
+              />
             </div>
-            <p className="sk-portal-footer mt-3 mb-0">
-              <a href="https://skedisy.com">{copy.footerLink}</a>
-            </p>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

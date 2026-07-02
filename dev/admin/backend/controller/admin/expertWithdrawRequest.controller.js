@@ -1,21 +1,24 @@
 const Expert = require("../../models/expert.model");
+const Salon = require("../../models/salon.model");
 const ExpertWithdrawRequest = require("../../models/withdrawRequest.model");
-const SalonExpertWalletHistory = require("../../models/salonExpertWalletHistory.model");
 
-const moment = require("moment");
+async function getSalonExpertIds(salonId) {
+  return Expert.find({ salonId, isDelete: false }).distinct("_id");
+}
 
-const admin = require("../../firebase");
+function resolveSalonId(req) {
+  return req.query.salonId || req.body?.salonId;
+}
 
-//retrive expert's withdraw request
 exports.withdrawRequestOfExpertByAdmin = async (req, res) => {
   try {
+    const salonId = resolveSalonId(req);
     if (!req.query.status) {
-      return res.status(200).json({ status: false, message: "Oops! Invalid details!" });
+      return res.status(200).json({ status: false, message: "status requis." });
     }
 
     const start = req.query.start ? parseInt(req.query.start) : 0;
     const limit = req.query.limit ? parseInt(req.query.limit) : 20;
-
     const startDate = req.query.startDate || "All";
     const endDate = req.query.endDate || "All";
 
@@ -29,30 +32,39 @@ exports.withdrawRequestOfExpertByAdmin = async (req, res) => {
       const formateStartDate = new Date(startDate);
       const formateEndDate = new Date(endDate);
       formateEndDate.setHours(23, 59, 59, 999);
-
       dateFilterQuery = {
-        createdAt: {
-          $gte: formateStartDate,
-          $lte: formateEndDate,
-        },
+        createdAt: { $gte: formateStartDate, $lte: formateEndDate },
       };
     }
 
-    const [total, request] = await Promise.all([
-      ExpertWithdrawRequest.countDocuments({
-        expert: { $ne: null },
-        type: 2,
-        ...dateFilterQuery,
-        ...statusQuery,
-      }),
+    let baseQuery = {
+      type: 2,
+      ...dateFilterQuery,
+      ...statusQuery,
+    };
 
-      ExpertWithdrawRequest.find({
-        expert: { $ne: null },
-        type: 2,
-        ...dateFilterQuery,
-        ...statusQuery,
-      })
-        .populate("expert", "fname lname image")
+    if (salonId) {
+      const salon = await Salon.findById(salonId);
+      if (!salon) {
+        return res.status(200).json({ status: false, message: "Salon introuvable." });
+      }
+      const expertIds = await getSalonExpertIds(salonId);
+      if (!expertIds.length) {
+        return res.status(200).json({
+          status: true,
+          message: "Withdrawal request fetch successfully!",
+          total: 0,
+          request: [],
+        });
+      }
+      baseQuery.expert = { $in: expertIds };
+    }
+
+    const [total, request] = await Promise.all([
+      ExpertWithdrawRequest.countDocuments(baseQuery),
+      ExpertWithdrawRequest.find(baseQuery)
+        .populate("expert", "fname lname image salonId")
+        .populate("salon", "name")
         .skip(start * limit)
         .limit(limit)
         .sort({ createdAt: -1 }),
@@ -61,8 +73,8 @@ exports.withdrawRequestOfExpertByAdmin = async (req, res) => {
     return res.status(200).json({
       status: true,
       message: "Withdrawal request fetch successfully!",
-      total: total,
-      request: request,
+      total,
+      request,
     });
   } catch (error) {
     console.log(error);
@@ -70,188 +82,16 @@ exports.withdrawRequestOfExpertByAdmin = async (req, res) => {
   }
 };
 
-//expert's withdraw request accept and paid
 exports.withdrawRequestApproved = async (req, res) => {
-  try {
-    if (!req.query.requestId) {
-      return res.status(200).json({ status: false, message: "Oops ! Invalid details." });
-    }
-
-    const request = await ExpertWithdrawRequest.findById(req.query.requestId);
-
-    if (!request) {
-      return res.status(200).json({ status: false, message: "Withdrawal Request does not found!" });
-    }
-
-    if (request.status == 2) {
-      return res.status(200).json({ status: false, message: "Withdrawal request already accepted by the admin." });
-    }
-
-    if (request.status == 3) {
-      return res.status(200).json({ status: false, message: "Withdrawal request already declined by the admin." });
-    }
-
-    const expert = await Expert.findOne({ _id: request.expert });
-    if (!expert) {
-      return res.status(200).json({ status: false, message: "Expert does not found." });
-    }
-
-    if (expert.isBlock) {
-      return res.status(200).json({ status: false, message: "Your account is currently blocked. Please contact the administrator for further assistance." });
-    }
-
-    if (expert.earning <= 0 || expert.earning < request.amount) {
-      return res.status(200).json({
-        status: false,
-        message: "Insufficient balance in expert's wallet for the requested withdrawal amount.",
-      });
-    }
-
-    request.status = 2;
-    request.paymentDate = moment().format("YYYY-MM-DD");
-
-    res.status(200).json({
-      status: true,
-      message: "Withdrawal request approved and payment successfully processed.",
-      data: request,
-    });
-
-    await Promise.all([
-      request.save(),
-      Expert.updateOne({ _id: expert._id, earning: { $gt: 0 } }, { $inc: { earning: -request.amount } }),
-      SalonExpertWalletHistory.findOneAndUpdate(
-        { expert: expert._id, type: 2, payoutStatus: 1 },
-        {
-          $set: {
-            payoutStatus: 2,
-            date: moment().format("YYYY-MM-DD"),
-            time: moment().format("HH:mm a"),
-          },
-        },
-        {
-          upsert: true,
-          new: true,
-        }
-      ),
-    ]);
-
-    if (expert.fcmToken && !expert.isBlock && expert.fcmToken !== null) {
-      const adminInstance = await admin;
-
-      const notificationPayload = {
-        token: expert.fcmToken,
-        notification: {
-          title: "💸 Withdrawal Request Approved 💸",
-          body: `Your withdrawal request of ${request?.amount} has been approved and processed successfully on ${moment(request.paymentDate).format("YYYY-MM-DD")}.`,
-        },
-        data: {
-          type: "WITHDRAWAL_APPROVED",
-        },
-      };
-
-      adminInstance
-        .messaging()
-        .send(notificationPayload)
-        .then((response) => {
-          console.log("Notification sent to expert successfully:", response);
-        })
-        .catch((error) => {
-          console.error("Error sending notification to expert:", error);
-        });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status({ status: false, message: error.message || "Internal Server Error" });
-  }
+  return res.status(200).json({
+    status: false,
+    message: "Seul le salon peut valider les demandes de retrait des pros.",
+  });
 };
 
-//expert's withdraw request declined
 exports.withdrawRequestDecline = async (req, res) => {
-  try {
-    if (!req.query.requestId || !req.query.reason) {
-      return res.status(200).json({ status: false, message: "Invalid request. Please provide a valid withdrawal request ID and reason for decline." });
-    }
-
-    const reason = req.query.reason.trim();
-    const request = await ExpertWithdrawRequest.findById(req.query.requestId);
-    if (!request) {
-      return res.status(200).json({ status: false, message: "Withdrawal Request does not found!" });
-    }
-
-    if (request.status == 2) {
-      return res.status(200).json({ status: false, message: "Withdrawal request already accepted by the admin." });
-    }
-
-    if (request.status == 3) {
-      return res.status(200).json({ status: false, message: "Withdrawal request already declined by the admin." });
-    }
-
-    const expert = await Expert.findOne({ _id: request.expert });
-    if (!expert) {
-      return res.status(200).json({ status: false, message: "Expert does not found." });
-    }
-
-    if (expert.isBlock) {
-      return res.status(200).json({ status: false, message: "Your account is currently blocked. Please contact the administrator for further assistance." });
-    }
-
-    request.status = 3;
-    request.reason = reason;
-    request.paymentDate = moment().format("YYYY-MM-DD"); //decline date
-    await request.save();
-
-    res.status(200).json({
-      status: true,
-      message: "Withdrawal request has been declined by the admin.",
-      data: request,
-    });
-
-    await Promise.all([
-      SalonExpertWalletHistory.findOneAndDelete({ salon: null, expert: expert._id, type: 2, payoutStatus: 1 }),
-      //ExpertWithdrawRequest.findOneAndDelete({ salon: null, expert: expert._id, type: 2, status: 1 }),
-    ]);
-
-    // await SalonExpertWalletHistory.findOneAndUpdate(
-    //   { salon: null, expert: expert._id, type: 2, payoutStatus: 1 },
-    //   {
-    //     $set: {
-    //       payoutStatus: 3,
-    //       date: moment().format("YYYY-MM-DD"),
-    //       time: moment().format("HH:mm a"),
-    //     },
-    //   },
-    //   {
-    //     upsert: true,
-    //     new: true,
-    //   }
-    // );
-
-    if (expert.fcmToken && !expert.isBlock && expert.fcmToken !== null) {
-      const adminInstance = await admin;
-
-      const notificationPayload = {
-        token: expert.fcmToken,
-        notification: {
-          title: "🚫 Withdrawal Request Declined 🚫",
-          body: `Your withdrawal request of ${request?.amount} has been declined. Please contact support for further details.`,
-        },
-        data: {
-          type: "WITHDRAWAL_DECLINED",
-        },
-      };
-
-      adminInstance
-        .messaging()
-        .send(notificationPayload)
-        .then((response) => {
-          console.log("Notification sent to expert successfully:", response);
-        })
-        .catch((error) => {
-          console.error("Error sending notification to expert:", error);
-        });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status({ status: false, message: error.message || "Internal Server Error" });
-  }
+  return res.status(200).json({
+    status: false,
+    message: "Seul le salon peut refuser les demandes de retrait des pros.",
+  });
 };

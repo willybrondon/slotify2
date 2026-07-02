@@ -688,7 +688,7 @@ const DashBoard = () => {
                                       setting?.currencySymbol
                                     : 0
                             }
-                            onClick={() => navigate("/salonpanel/staffEarning")}
+                            onClick={() => navigate("/salonpanel/salonEarning")}
                         />
                     </div>
                 </div>

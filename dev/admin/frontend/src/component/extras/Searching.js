@@ -37,22 +37,19 @@ const Searching = (props) => {
 
   return (
     <>
-      <div className="col-7 ms-auto">
+      <div className="col-7 ms-auto sq-search-row">
         <div className="inputData d-flex">
           <input
             type="search"
             id="search"
             placeholder={ui.common.searchPlaceholder}
             className="bg-none m0-top"
-            style={{ fontWeight: "500", height: "48px" }}
+            style={{ fontWeight: "500" }}
             onChange={
               button ? (e) => setSearch(e.target.value) : (e) => handleSearch(e)
             }
           />
-          <div
-            className="bg-theme p15-x midBox searchIcon"
-            style={{ height: "48px" }}
-          >
+          <div className="bg-theme p15-x midBox searchIcon">
             <svg
               width="30"
               height="30"

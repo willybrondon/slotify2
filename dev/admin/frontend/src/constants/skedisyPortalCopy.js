@@ -1,11 +1,10 @@
 /** Aligné AUTHENTICITE_SKEDISY — console admin Skedisy. */
 export const SKEDISY_ADMIN_PORTAL_COPY = {
-  kicker: "Skedisy · Administration",
-  welcome: "Console admin",
+  kicker: "Skedisy",
+  welcome: "Administration",
   loginTitle: "Connexion",
-  loginSubtitle:
-    "Gestion de la plateforme — salons afro en Île-de-France uniquement.",
-  loginHint: "Accès réservé à l'équipe Skedisy.",
+  loginSubtitle: "Identifiants administrateur.",
+  loginHint: "",
   signUpTitle: "Créer l'accès",
   signUpSubtitle: "Inscription administrateur avec code.",
   signUpHint: "Email, mot de passe et code.",

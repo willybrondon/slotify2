@@ -8,6 +8,9 @@ route.get("/allSalon", checkAccessWithSecretKey(), admin, settlementController.a
 route.get("/particularSalon", checkAccessWithSecretKey(), admin, settlementController.ParticularSalonSettlement);
 route.get("/particularExpert", checkAccessWithSecretKey(), admin, settlementController.getParticularExpertSettlement);
 route.get("/allExpert", checkAccessWithSecretKey(), admin, settlementController.getExpertSettlement);
+route.get("/expertBySalon", checkAccessWithSecretKey(), admin, settlementController.getExpertSettlementBySalon);
+route.put("/expertPayment", checkAccessWithSecretKey(), admin, settlementController.expertPayment);
+route.put("/expertBonusPenalty", checkAccessWithSecretKey(), admin, settlementController.expertBonusPenalty);
 route.put("/salonPayment", checkAccessWithSecretKey(), admin, settlementController.salonPayment);
 route.put("/salonBonusPenalty", checkAccessWithSecretKey(), admin, settlementController.bonusPenalty);
 route.get("/salonSettlementInfo", checkAccessWithSecretKey(), admin, settlementController.salonSettlementInfo);

@@ -12,7 +12,7 @@ import {
   salonReviewDelete,
   getSalonShareLink,
 } from "../../../redux/slice/salonSlice";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Table from "../../extras/Table";
 import { Rating } from "react-simple-star-rating";
 import {  warning } from "../../../util/Alert";
@@ -32,6 +32,7 @@ const SalonProfile = () => {
   const loader = useSelector(isLoading);
 
   const state = useLocation();
+  const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -506,6 +507,21 @@ const SalonProfile = () => {
                       >
                         <i className="fa-solid fa-copy me-2"></i>
                         Copy Link
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-success"
+                        style={{ height: "40px", marginBottom: "0" }}
+                        onClick={() =>
+                          navigate("/admin/salon/expertPayments", {
+                            state: {
+                              salonId: state?.state?.id,
+                              salonName: salonDetail?.name,
+                            },
+                          })
+                        }
+                      >
+                        {ui.labels.expertPayments}
                       </button>
                     </div>
                   )}

@@ -31,11 +31,29 @@ const STATUS_COLORS = {
   free: "#fdf6f0",
 };
 
+const OPERATIONAL_LABELS = {
+  available: "Disponible",
+  busy: "Occupé",
+  off: "Hors service",
+  break: "Pause",
+  blocked: "Bloqué",
+};
+
+const OPERATIONAL_COLORS = {
+  available: "#c45c26",
+  busy: "#ef4444",
+  off: "#9ca3af",
+  break: "#f59e0b",
+  blocked: "#64748b",
+};
+
 function eventStyleGetter(event) {
   let backgroundColor = "#c45c26";
   let color = "#fff";
   let border = "none";
   let opacity = 0.92;
+  const className = `sq-event sq-event--${event.type || "booking"}`;
+
   if (event.type === "free") {
     backgroundColor = STATUS_COLORS.free;
     color = "#7c4a2e";
@@ -48,7 +66,20 @@ function eventStyleGetter(event) {
   } else if (event.type === "booking") {
     backgroundColor = STATUS_COLORS.booking[event.status] || STATUS_COLORS.booking.confirm;
   }
-  return { style: { backgroundColor, opacity, color, border, borderRadius: "8px", fontSize: "12px" } };
+
+  return {
+    className,
+    style: {
+      backgroundColor,
+      opacity,
+      color,
+      border,
+      borderRadius: "8px",
+      fontSize: "12px",
+      padding: "2px 6px",
+      boxShadow: event.type === "booking" ? "0 2px 8px rgba(196, 92, 38, 0.2)" : "none",
+    },
+  };
 }
 
 function normalizeSchedule(schedule, focusDate) {
@@ -62,13 +93,14 @@ function normalizeSchedule(schedule, focusDate) {
       resources: schedule.resources?.length ? schedule.resources : focusDay?.resources || [],
       stats: focusDay?.stats || schedule.stats,
       calendarBounds: focusDay?.calendarBounds || schedule.calendarBounds,
+      isHoliday: focusDay?.isHoliday ?? schedule.isHoliday,
     };
   }
   return schedule;
 }
 
 function formatSlotTime(date) {
-  return moment(date).format("hh:mm A");
+  return moment(date).locale("en").format("hh:mm A");
 }
 
 const AdminTeamCalendar = () => {
@@ -125,11 +157,12 @@ const AdminTeamCalendar = () => {
       .filter((e) => showFreeSlots || e.type !== "free")
       .map((e) => ({
         ...e,
+        resourceId: e.resourceId || e.expertId,
         start: new Date(e.start),
         end: new Date(e.end),
         title: e.type === "booking" ? `${e.title} (${e.status === "confirm" ? "Confirmé" : e.status})` : e.title,
       }))
-      .filter((e) => !Number.isNaN(e.start?.getTime()));
+      .filter((e) => !Number.isNaN(e.start?.getTime()) && !Number.isNaN(e.end?.getTime()));
   }, [schedule, showFreeSlots]);
 
   const resources = useMemo(
@@ -211,21 +244,94 @@ const AdminTeamCalendar = () => {
       <Title name={ui.pages.teamCalendar} />
 
       <div className="sq-planning-toolbar card-sq mb-3">
-        <div className="d-flex flex-wrap align-items-center gap-3">
-          <label className="mb-0 small fw-semibold">Salon</label>
-          <select className="form-select w-auto" value={selectedSalon} onChange={(e) => setSelectedSalon(e.target.value)}>
+        <div className="sq-planning-toolbar__left d-flex flex-wrap align-items-center gap-3">
+          <span className="sq-planning-toolbar__label">Salon</span>
+          <select
+            className="form-select w-auto"
+            value={selectedSalon}
+            onChange={(e) => setSelectedSalon(e.target.value)}
+          >
             {(salon || []).map((s) => (
-              <option key={s._id} value={s._id}>{s.name}</option>
+              <option key={s._id} value={s._id}>
+                {s.name}
+              </option>
             ))}
           </select>
         </div>
-        <div className="d-flex flex-wrap align-items-center gap-3">
-          <label className="d-flex align-items-center gap-2 mb-0 small">
-            <input type="checkbox" checked={showFreeSlots} onChange={(e) => setShowFreeSlots(e.target.checked)} />
+        <div className="sq-planning-toolbar__right d-flex flex-wrap align-items-center gap-3">
+          <label className="sq-check-label">
+            <input
+              type="checkbox"
+              checked={showFreeSlots}
+              onChange={(e) => setShowFreeSlots(e.target.checked)}
+            />
             Créneaux libres
           </label>
-          <button type="button" className="btn btn-sm sq-btn-outline" onClick={loadSchedule}>Actualiser</button>
+          <button type="button" className="btn btn-sm sq-btn-outline" onClick={loadSchedule}>
+            Actualiser
+          </button>
         </div>
+      </div>
+
+      {schedule && hasExperts && (
+        <div className="team-calendar-stats row g-2 mb-3">
+          {[
+            ["Pros", schedule.stats?.totalExperts ?? 0, ""],
+            ["Disponibles", schedule.stats?.availableCount ?? 0, "stat-available"],
+            ["Occupés", schedule.stats?.busyCount ?? 0, "stat-busy"],
+            ["Hors service", schedule.stats?.offCount ?? 0, "stat-off"],
+          ].map(([label, value, cls]) => (
+            <div key={label} className="col-md-3 col-6">
+              <div className={`stat-card ${cls}`}>
+                <span className="stat-label">{label}</span>
+                <strong>{value}</strong>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {schedule?.isHoliday && (
+        <span className="badge bg-warning text-dark mb-2">Salon fermé (congé)</span>
+      )}
+
+      {!isLoading && schedule && hasExperts && !calendarEvents.length && (
+        <div className="team-calendar-empty alert alert-light border sq-planning-alert mb-3">
+          Aucun créneau pour cette date. Vue <strong>Jour</strong> puis cliquez sur un créneau libre.
+        </div>
+      )}
+
+      {!isLoading && schedule && hasExperts && view !== "day" && (
+        <div className="alert alert-info sq-planning-alert mb-3">
+          La création et le déplacement de RDV fonctionnent en vue <strong>Jour</strong>.
+        </div>
+      )}
+
+      <div className="team-expert-status row g-2 mb-3">
+        {(schedule?.resources || []).map((r) => (
+          <div key={r.resourceId} className="col-md-4 col-lg-3">
+            <div className="expert-status-chip">
+              <span
+                className="status-dot"
+                style={{
+                  backgroundColor: OPERATIONAL_COLORS[r.operationalStatus] || "#9ca3af",
+                }}
+              />
+              <span className="expert-name">{r.resourceTitle}</span>
+              <span className="status-text">
+                {OPERATIONAL_LABELS[r.operationalStatus] || r.operationalStatus}
+                {r.occupancyRate != null ? ` · ${r.occupancyRate}%` : ""}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="sq-planning-legend">
+        <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.confirm }} /> Confirmé</span>
+        <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.pending }} /> En attente</span>
+        <span><i className="legend-swatch" style={{ background: STATUS_COLORS.busy }} /> Indisponible</span>
+        <span><i className="legend-swatch legend-free" /> Libre</span>
       </div>
 
       {hasExperts && (
@@ -234,6 +340,8 @@ const AdminTeamCalendar = () => {
             localizer={localizer}
             culture="fr"
             events={calendarEvents}
+            startAccessor="start"
+            endAccessor="end"
             resources={view === "day" ? resources : undefined}
             resourceIdAccessor="resourceId"
             resourceTitleAccessor="resourceTitle"
@@ -251,13 +359,14 @@ const AdminTeamCalendar = () => {
             selectable={view === "day"}
             onSelectSlot={handleSelectSlot}
             onSelectEvent={handleSelectEvent}
-            draggableAccessor={(event) => event.type === "booking"}
+            draggableAccessor={(event) => view === "day" && event.type === "booking"}
             resizable={view === "day"}
-            resizableAccessor={(event) => event.type === "booking"}
+            resizableAccessor={(event) => view === "day" && event.type === "booking"}
             onEventDrop={handleEventDrop}
             onEventResize={handleEventResize}
-            style={{ height: 720 }}
+            className="sq-calendar-body"
             popup
+            tooltipAccessor={(event) => event.title}
           />
         </div>
       )}

@@ -11,7 +11,7 @@ import moment from "moment";
 
 
 
-const AcceptRequest = ({ status, startDate, endDate }) => {
+const AcceptRequest = ({ status, startDate, endDate, salonId, showSalon = false }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const { expertWithDraw, total } = useSelector((state) => state.withDraw);
@@ -22,8 +22,9 @@ const AcceptRequest = ({ status, startDate, endDate }) => {
         const payload = {
             start: page, limit: rowsPerPage, status: status, startDate: startDate === "ALL" ? "All" : startDate, endDate: endDate === "ALL" ? "All" : endDate
         }
+        if (salonId) payload.salonId = salonId;
         dispatch(getExpertWithDraw(payload))
-    }, [startDate, endDate])
+    }, [salonId, page, rowsPerPage, status, startDate, endDate, dispatch])
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -60,6 +61,14 @@ const AcceptRequest = ({ status, startDate, endDate }) => {
                 </>
             )
         },
+        ...(showSalon
+            ? [
+                {
+                    Header: col.salonName,
+                    Cell: ({ row }) => <div>{row?.salon?.name || "-"}</div>,
+                },
+            ]
+            : []),
         {
             Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (

@@ -23,7 +23,8 @@ import ExpertProfile from "../tables/expert/ExpertProfile";
 import { useDispatch, useSelector } from "react-redux";
 import UpcomingBooking from "../tables/booking/UpcomingBooking";
 import StaffEarning from "../tables/StaffEarning";
-import SalonPayout from "../tables/SalonPayout";
+import SalonExpertPayments from "../tables/salon/SalonExpertPayments";
+import ExpertRequest from "../tables/WithDrawal/ExpertRequest";
 import Attendance from "../tables/Attendance";
 import AttendanceTable from "../tables/AttendanceTable";
 import UserProfile from "../tables/User/UserProfile";
@@ -58,8 +59,6 @@ import RejectedProduct from "../tables/ProductCategory/RejectedProduct";
 import Recharge from "../tables/Recharge";
 import Order from "../tables/order/Order";
 import OrderDetails from "../tables/order/OrderDetails";
-import WithDrawal from "../tables/WithDrawal/WithDrawal";
-import ExpertRequest from "../tables/WithDrawal/ExpertRequest";
 import UserOrderHistory from "../tables/User/UserOrderHistory";
 import SalonOrder from "../tables/salon/SalonOrder";
 import Coupon from "../tables/coupon/Coupon";
@@ -114,9 +113,8 @@ const Admin = () => {
             />
             <Route path="/staffEarning" element={<StaffEarning />} />
             <Route path="/recharge" element={<Recharge />} />
-            <Route path="/withdrawRequest" element={<WithDrawal />} />
-            <Route path="/expertRequest" element={<ExpertRequest />} />
-            <Route path="/salonPayment" element={<SalonPayout />} />
+            <Route path="/salon/expertPayments" element={<SalonExpertPayments />} />
+            <Route path="/expertWithdrawHistory" element={<ExpertRequest />} />
             <Route path="/holiday" element={<Holiday />} />
             <Route path="/futureBooking" element={<UpcomingBooking />} />
             <Route path="/attendance" element={<Attendance />} />

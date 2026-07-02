@@ -27,6 +27,35 @@ export const yearlyPaymentHistory = createAsyncThunk("admin/payment/yearWisePaym
     return apiInstanceFetch.get(`admin/payment/yearWisePayment?year=${year}`);
 })
 
+export const getExpertEarningBySalon = createAsyncThunk(
+    "admin/settlement/expertBySalon",
+    async (payload) => {
+        return apiInstanceFetch.get(
+            `admin/settlement/expertBySalon?salonId=${payload.salonId}&startDate=${payload.startDate}&endDate=${payload.endDate}`
+        );
+    }
+);
+
+export const paymentExpertBySalon = createAsyncThunk(
+    "admin/settlement/expertPayment",
+    async (payload) => {
+        return apiInstance.put(
+            `admin/settlement/expertPayment?settlementId=${payload.settlementId}&salonId=${payload.salonId}`,
+            payload.data || {}
+        );
+    }
+);
+
+export const bonusPenaltyExpertBySalon = createAsyncThunk(
+    "admin/settlement/expertBonusPenalty",
+    async (payload) => {
+        return apiInstance.put(
+            `admin/settlement/expertBonusPenalty?settlementId=${payload.settlementId}&salonId=${payload.salonId}`,
+            payload.data
+        );
+    }
+);
+
 const payoutSlice = createSlice({
     name: "payoutSlice",
     initialState,
@@ -90,6 +119,31 @@ const payoutSlice = createSlice({
         builder.addCase(yearlyPaymentHistory.rejected, (state, action) => {
             state.isSkeleton = false;
         })
+
+        builder.addCase(getExpertEarningBySalon.pending, (state) => {
+            state.isSkeleton = true;
+        });
+        builder.addCase(getExpertEarningBySalon.fulfilled, (state, action) => {
+            state.payout = action?.payload?.settlement || [];
+            state.isSkeleton = false;
+        });
+        builder.addCase(getExpertEarningBySalon.rejected, (state) => {
+            state.isSkeleton = false;
+        });
+
+        builder.addCase(paymentExpertBySalon.fulfilled, (state, action) => {
+            if (action?.payload?.status && action?.payload?.settlement) {
+                const idx = state.payout.findIndex((s) => s._id === action.payload.settlement._id);
+                if (idx !== -1) state.payout[idx] = { ...state.payout[idx], ...action.payload.settlement };
+            }
+        });
+
+        builder.addCase(bonusPenaltyExpertBySalon.fulfilled, (state, action) => {
+            if (action?.payload?.status && action?.payload?.settlement) {
+                const idx = state.payout.findIndex((s) => s._id === action.payload.settlement._id);
+                if (idx !== -1) state.payout[idx] = { ...state.payout[idx], ...action.payload.settlement };
+            }
+        });
     }
 })
 

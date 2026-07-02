@@ -56,12 +56,13 @@ exports.withdrawRequestByExpert = async (req, res) => {
 
     res.status(200).json({
       status: true,
-      message: "Withdrawal request has been successfully submitted to the administrator.",
+      message: "Votre demande de retrait a été envoyée à votre salon.",
     });
 
     const request = new ExpertWithdrawRequest();
 
     request.expert = expert._id;
+    request.salon = expert.salonId || null;
     request.amount = requestedAmount;
     request.type = 2;
     request.status = 1;
@@ -74,6 +75,7 @@ exports.withdrawRequestByExpert = async (req, res) => {
         uniqueId: uniqueId,
         amount: request.amount,
         expert: expert._id,
+        salon: expert.salonId || null,
         payoutStatus: 1,
         type: 2,
         date: moment().format("YYYY-MM-DD"),

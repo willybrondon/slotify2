@@ -197,4 +197,190 @@
 
 .sq-planning-page .rbc-current-time-indicator {
   background-color: #c45c26;
+  height: 2px;
+}
+
+/* ——— react-big-calendar toolbar (compact Squire) ——— */
+.sq-planning-page .rbc-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 0 2px;
+}
+
+.sq-planning-page .rbc-toolbar-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  text-transform: capitalize;
+  flex: 1 1 auto;
+  text-align: center;
+  order: 0;
+}
+
+.sq-planning-page .rbc-toolbar .rbc-btn-group {
+  display: inline-flex;
+  gap: 3px;
+  background: #fdf6f0;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 92, 38, 0.12);
+}
+
+.sq-planning-page .rbc-toolbar button {
+  border: none !important;
+  background: transparent !important;
+  color: #7c4a2e !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  min-height: 30px;
+  line-height: 1.2;
+}
+
+.sq-planning-page .rbc-toolbar button:hover,
+.sq-planning-page .rbc-toolbar button:focus {
+  background: rgba(196, 92, 38, 0.08) !important;
+  outline: none;
+}
+
+.sq-planning-page .rbc-toolbar button.rbc-active {
+  background: #c45c26 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(196, 92, 38, 0.22) !important;
+}
+
+/* ——— Calendar grid ——— */
+.sq-planning-page .rbc-time-view,
+.sq-planning-page .rbc-month-view,
+.sq-planning-page .rbc-agenda-view {
+  border: 1px solid rgba(196, 92, 38, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.sq-planning-page .rbc-time-content {
+  border-top: 1px solid rgba(196, 92, 38, 0.08);
+}
+
+.sq-planning-page .rbc-timeslot-group {
+  border-bottom: 1px solid rgba(196, 92, 38, 0.06);
+  min-height: 28px;
+}
+
+.sq-planning-page .rbc-time-gutter .rbc-label {
+  font-size: 11px;
+  color: #9a9a9a;
+  padding: 4px 8px;
+  font-weight: 500;
+}
+
+.sq-planning-page .rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid rgba(196, 92, 38, 0.04);
+}
+
+.sq-planning-page .rbc-event {
+  border: none !important;
+  font-weight: 600;
+}
+
+.sq-planning-page .rbc-event-label {
+  font-size: 10px;
+}
+
+.sq-planning-page .rbc-off-range-bg {
+  background: #fafafa;
+}
+
+.sq-planning-page .rbc-agenda-table {
+  font-size: 13px;
+}
+
+.sq-planning-page .rbc-agenda-table thead th {
+  background: #fdf6f0;
+  color: #7c4a2e;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 12px;
+}
+
+/* ——— Responsive calendar height ——— */
+.sq-calendar-body {
+  height: min(720px, calc(100dvh - 340px)) !important;
+  min-height: 420px;
+}
+
+@media (max-width: 768px) {
+  .sq-planning-toolbar {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .sq-segmented button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .sq-calendar-body {
+    height: min(560px, calc(100dvh - 280px)) !important;
+    min-height: 360px;
+  }
+
+  .sq-planning-page .rbc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sq-planning-page .rbc-toolbar-label {
+    order: -1;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  .sq-planning-page .rbc-toolbar .rbc-btn-group {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+/* ——— Toolbar controls ——— */
+.sq-planning-page .sq-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+  margin: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sq-planning-page .sq-check-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #c45c26;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sq-planning-page .sq-planning-toolbar .form-select {
+  min-height: 34px;
+  font-size: 13px;
+  padding: 4px 32px 4px 12px;
+  max-width: 220px;
+}
+
+.sq-planning-alert {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
 }

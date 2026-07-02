@@ -1,7 +1,7 @@
 import { col } from "../../../constants/tableHeaders";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { acceptWithDraw, getExpertWithDraw, rejectedWithDraw } from "../../../redux/slice/withDrawSlice";
+import { getExpertWithDraw } from "../../../redux/slice/withDrawSlice";
 import Table from "../../extras/Table";
 import { toast } from "react-toastify";
 import Button from "../../extras/Button";

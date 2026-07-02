@@ -10,7 +10,7 @@ import Pagination from "../../extras/Pagination";
 import { AcceptWarning, warning } from "../../../util/Alert";
 import moment from "moment";
 
-const PendingRequest = ({ status, startDate, endDate }) => {
+const PendingRequest = ({ status, startDate, endDate, salonId, readOnly = false, showSalon = false }) => {
     const dispatch = useDispatch();
     const [page, setPage] = useState(0);
     const { setting } = useSelector((state) => state.setting)
@@ -27,8 +27,9 @@ const PendingRequest = ({ status, startDate, endDate }) => {
         const payload = {
             start: page, limit: rowsPerPage, status: status, startDate: startDate === "ALL" ? "All" : startDate, endDate: endDate === "ALL" ? "All" : endDate
         }
+        if (salonId) payload.salonId = salonId;
         dispatch(getExpertWithDraw(payload))
-    }, [startDate, endDate])
+    }, [salonId, page, rowsPerPage, status, startDate, endDate, dispatch])
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -46,11 +47,12 @@ const PendingRequest = ({ status, startDate, endDate }) => {
         
 
             if (yes) {
-                dispatch(acceptWithDraw(id))
+                dispatch(acceptWithDraw({ id, salonId }))
                     .then((res) => {
                         if (res?.payload?.status) {
                             toast.success(res?.payload?.message)
                             const payload = {
+                                salonId,
                                 start: page, limit: rowsPerPage, status: status, startDate: startDate === "ALL" ? "All" : startDate, endDate: endDate === "ALL" ? "All" : endDate
                             }
                             dispatch(getExpertWithDraw(payload))
@@ -69,6 +71,7 @@ const PendingRequest = ({ status, startDate, endDate }) => {
 
         const payload = {
             id: rejectedId,
+            salonId,
             reason: reason
         }
         dispatch(rejectedWithDraw(payload))
@@ -76,6 +79,7 @@ const PendingRequest = ({ status, startDate, endDate }) => {
                 if (res?.payload?.status) {
                     toast.success(res?.payload?.message)
                     const payload = {
+                        salonId,
                         start: page, limit: rowsPerPage, status: status, startDate: startDate === "ALL" ? "All" : startDate, endDate: endDate === "ALL" ? "All" : endDate
                     }
                     dispatch(getExpertWithDraw(payload))
@@ -111,6 +115,14 @@ const PendingRequest = ({ status, startDate, endDate }) => {
                 </>
             )
         },
+        ...(showSalon
+            ? [
+                {
+                    Header: col.salonName,
+                    Cell: ({ row }) => <div>{row?.salon?.name || "-"}</div>,
+                },
+            ]
+            : []),
         {
             Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (
@@ -145,6 +157,9 @@ const PendingRequest = ({ status, startDate, endDate }) => {
             ),
             width: "50px",
         },
+        ...(readOnly
+            ? []
+            : [
         {
             Header: col.accept,
             body: "",
@@ -170,6 +185,7 @@ const PendingRequest = ({ status, startDate, endDate }) => {
                 </>
             ),
         },
+            ]),
     ]
     return (
         <>

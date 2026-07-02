@@ -8,7 +8,7 @@ import Button from "../../extras/Button";
 import Pagination from "../../extras/Pagination";
 import moment from "moment";
 
-const RejectRequest = ({ status, startDate, endDate }) => {
+const RejectRequest = ({ status, startDate, endDate, salonId, showSalon = false }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const { setting } = useSelector((state) => state.setting)
@@ -20,8 +20,9 @@ const RejectRequest = ({ status, startDate, endDate }) => {
         const payload = {
             start: page, limit: rowsPerPage, status: status, startDate: startDate === "ALL" ? "All" : startDate, endDate: endDate === "ALL" ? "All" : endDate
         }
+        if (salonId) payload.salonId = salonId;
         dispatch(getExpertWithDraw(payload))
-    }, [startDate, endDate])
+    }, [salonId, page, rowsPerPage, status, startDate, endDate, dispatch])
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -43,8 +44,8 @@ const RejectRequest = ({ status, startDate, endDate }) => {
             Header: col.expertImage,
             Cell: ({ row }) => (
                 <>
-                    <img src={row?.salon?.mainImage} alt="expert" width="80" height="80" style={{ objectFit: "contain", cursor: "pointer" }} onClick={(e) => {
-                        handleOpenImgae(row?.expert?.mainImage)
+                    <img src={row?.expert?.image} alt="expert" width="80" height="80" style={{ objectFit: "contain", cursor: "pointer" }} onClick={() => {
+                        handleOpenImgae(row?.expert?.image)
                     }} />
                 </>
             )
@@ -57,6 +58,14 @@ const RejectRequest = ({ status, startDate, endDate }) => {
                 </>
             )
         },
+        ...(showSalon
+            ? [
+                {
+                    Header: col.salonName,
+                    Cell: ({ row }) => <div>{row?.salon?.name || "-"}</div>,
+                },
+            ]
+            : []),
         {
             Header: `${col.amount} (${setting?.currencySymbol})`,
             Cell: ({ row }) => (
@@ -72,6 +81,10 @@ const RejectRequest = ({ status, startDate, endDate }) => {
                     <div>{row?.paymentDate ? row?.paymentDate : "-"}</div>
                 </>
             )
+        },
+        {
+            Header: col.reason,
+            Cell: ({ row }) => <div>{row?.reason || "-"}</div>,
         },
     ]
     return (

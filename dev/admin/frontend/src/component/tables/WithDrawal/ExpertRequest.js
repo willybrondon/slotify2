@@ -14,8 +14,9 @@ const ExpertRequest = () => {
     return (
         <div className="mainSetting">
             <div className="row">
-                <Title name={ui.labels.expertWithdrawRequest} className="mt-4" />
+                <Title name={ui.labels.expertWithdrawHistory} className="mt-4" />
             </div>
+            <p className="text-muted">Consultation seule — les salons valident les retraits de leurs pros.</p>
             <div className="d-flex justify-content-between">
                 <div
                     className="my-2"
@@ -34,7 +35,7 @@ const ExpertRequest = () => {
                             setStatus("1")
                         }}
                     >
-                        Pending
+                        En attente
                     </button>
                     <button
                         type="button"
@@ -44,10 +45,9 @@ const ExpertRequest = () => {
                             setType("accepted")
                             setStatus("2")
                         }
-
                         }
                     >
-                        Accepted
+                        Validées
                     </button>
                     <button
                         type="button"
@@ -58,7 +58,7 @@ const ExpertRequest = () => {
                             setStatus("3")
                         }}
                     >
-                        Declline
+                        Refusées
                     </button>
                 </div>
                 <Analytics
@@ -72,17 +72,17 @@ const ExpertRequest = () => {
            
             {
                 type === "pending" && (
-                    <PendingRequest status={status} startDate={startDate} endDate={endDate}/>
+                    <PendingRequest readOnly showSalon status={status} startDate={startDate} endDate={endDate}/>
                 )
             }
             {
                 type === "accepted" && (
-                    <AcceptRequest status={status} startDate={startDate} endDate={endDate} />
+                    <AcceptRequest showSalon status={status} startDate={startDate} endDate={endDate} />
                 )
             }
             {
                 type === "declined" && (
-                    <RejectRequest status={status} startDate={startDate} endDate={endDate} />
+                    <RejectRequest showSalon status={status} startDate={startDate} endDate={endDate} />
                 )
             }
            

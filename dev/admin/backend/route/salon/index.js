@@ -22,6 +22,7 @@ const withdrawMethod = require("./withdrawMethod.route");
 const withdrawRequest = require("./withdrawRequestcontroller");
 const teamSchedule = require("./teamSchedule.route");
 const stripeConnect = require("./stripeConnect.route");
+const expertWithdrawRequest = require("./expertWithdrawRequest.route");
 
 route.use("/", salon);
 route.use("/product", product);
@@ -42,5 +43,6 @@ route.use("/expert", salonMiddleware, expert);
 route.use("/order", salonMiddleware, order);
 route.use("/withdrawMethod", salonMiddleware, withdrawMethod);
 route.use("/withdrawRequest", salonMiddleware, withdrawRequest);
+route.use("/expertWithdrawRequest", expertWithdrawRequest);
 
 module.exports = route;
