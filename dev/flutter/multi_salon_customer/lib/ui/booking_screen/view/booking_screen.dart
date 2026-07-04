@@ -1595,7 +1595,8 @@ class BookingScreen extends StatelessWidget {
                 color: AppColors.primaryTextColor,
               ),
             ).paddingOnly(bottom: 13),
-            GetBuilder<BookingScreenController>(
+            splashController.settingCategory?.setting?.isWalletPay == true
+                ? GetBuilder<BookingScreenController>(
               id: Constant.idStep3,
               builder: (logic) {
                 return InkWell(
@@ -1690,7 +1691,8 @@ class BookingScreen extends StatelessWidget {
                   ),
                 );
               },
-            ).paddingOnly(bottom: 15),
+            ).paddingOnly(bottom: 15)
+                : const SizedBox(),
 
             // Razorpay Payment Method - COMMENTED OUT as requested
             // splashController.settingCategory?.setting?.isRazorPay == true

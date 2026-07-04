@@ -351,7 +351,7 @@ const Product = () => {
         { name: "REJECTED", value: "Rejected" },
     ]
     return (
-        <div className="mainCategory">
+        <div className="mainCategory sq-table-page">
             <Title name={ui.pages.product} />
             <div className="row ">
                 <div className="mt-2 col-2">

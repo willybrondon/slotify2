@@ -19,6 +19,7 @@ import Table from "../../extras/Table";
 import { getWithDraw, statusWithDraw, withDrawDelete } from "../../../redux/slice/withDrawSlice";
 import { openDialog } from "../../../redux/slice/dialogueSlice";
 import WithDrawDialogue from "../WithDrawDialogue";
+import SqSegmentTabs from "../../extras/SqSegmentTabs";
 import { ReactComponent as Edit } from "../../../../src/assets/icon/edit.svg";
 import { ReactComponent as Delete } from "../../../../src/assets/icon/delete.svg";
 import { toast } from "react-toastify";
@@ -275,7 +276,7 @@ const Setting = (props) => {
     {
       Header: col.image,
       Cell: ({ row }) => (
-        <img src={row?.image} alt={"image"} width="50px" height="50px" />
+        <img src={row?.image} alt="" className="sq-tbl-img" />
       ),
     },
     {
@@ -326,65 +327,44 @@ const Setting = (props) => {
     {
       Header: col.action,
       Cell: ({ row }) => (
-        <>
-          <span>
+        <span className="sq-tbl-actions">
             <button
-              className="py-1 me-2"
-              style={{ backgroundColor: "#CFF3FF", borderRadius: "8px" }}
+              type="button"
+              className="sq-tbl-btn sq-tbl-btn--edit"
+              aria-label="Modifier"
               onClick={() => {
                 dispatch(openDialog({ type: "withdraw", data: row }));
               }}
             >
               <Edit />
             </button>
-          </span>
-          <span>
             <button
-              className="py-1 me-2"
-              style={{ backgroundColor: "#CFF3FF", borderRadius: "8px" }}
+              type="button"
+              className="sq-tbl-btn sq-tbl-btn--delete"
+              aria-label="Supprimer"
               onClick={() => {
-                handleDelete(row?._id)
+                handleDelete(row?._id);
               }}
             >
               <Delete />
             </button>
           </span>
-        </>
       ),
     },
   ];
 
   return (
-    <div className="mainSetting">
-      <div
-        className="my-2"
-        style={{
-          width: "350px",
-          border: "1px solid #1c2b20",
-          padding: "8px 20px",
-          borderRadius: "40px",
-        }}
-      >
-        <button
-          type="button"
-          className={`${type === "setting" ? "activeBtn" : "disabledBtn"}`}
-          onClick={() => setType("setting")}
-        >{ui.settings.tabSettings}</button>
-        <button
-          type="button"
-          className={`${type === "paymentSetting" ? "activeBtn" : "disabledBtn"}`}
-          onClick={() => setType("paymentSetting")}
-        >
-          {ui.settings.tabPayments}
-        </button>
-        <button
-          type="button"
-          className={`${type === "withdraw" ? "activeBtn" : "disabledBtn"
-            } ms-1`}
-          onClick={() => setType("withdraw")}
-        >
-          {ui.settings.tabWithdraw}
-        </button>
+    <div className="mainSetting sq-page-scroll">
+      <div className="sq-settings-tabs-wrap">
+        <SqSegmentTabs
+          tabs={[
+            { id: "setting", label: ui.settings.tabSettings },
+            { id: "paymentSetting", label: ui.settings.tabPayments },
+            { id: "withdraw", label: ui.settings.tabWithdraw },
+          ]}
+          value={type}
+          onChange={setType}
+        />
       </div>
 
       {
@@ -395,14 +375,44 @@ const Setting = (props) => {
                 <div className="formFooter">
                   <Button
                     type={`submit`}
-                    className={`text-light m10-left fw-bold`}
+                    className={`text-light m10-left fw-bold sq-btn-save`}
                     text="Enregistrer"
-                    style={{ backgroundColor: "#1ebc1e" }}
                     onClick={onsubmit}
                   />
                 </div>
               </div>
               <div className="row">
+                <div className="col-12 col-md-6 mt-3">
+                  <div className="settingBoxOuter">
+                    <div className="settingBoxHeader">
+                      <h4>{ui.settings.walletSection}</h4>
+                    </div>
+                    <div className="settingBoxHeader d-flex justify-content-between mt-3">
+                      <div>
+                        <h5 className="mb-1">{ui.settings.walletPayActive}</h5>
+                        <p className="mb-0 text-muted" style={{ fontSize: "13px" }}>
+                          {ui.settings.walletPayHint}
+                        </p>
+                      </div>
+                      <ToggleSwitch
+                        onClick={() => handleSettingSwitch(setting?._id, 10)}
+                        value={setting?.isWalletPay === true}
+                      />
+                    </div>
+                    <div className="settingBoxHeader d-flex justify-content-between mt-3">
+                      <div>
+                        <h5 className="mb-1">{ui.settings.salonWalletRechargeActive}</h5>
+                        <p className="mb-0 text-muted" style={{ fontSize: "13px" }}>
+                          {ui.settings.salonWalletRechargeHint}
+                        </p>
+                      </div>
+                      <ToggleSwitch
+                        onClick={() => handleSettingSwitch(setting?._id, 11)}
+                        value={setting?.isSalonWalletRecharge === true}
+                      />
+                    </div>
+                  </div>
+                </div>
                 <div className="col-12 col-md-6 mt-3 ">
                   <div className="settingBoxOuter">
                     <div className="settingBoxHeader">
@@ -828,9 +838,8 @@ const Setting = (props) => {
                 <div className="formFooter">
                   <Button
                     type={`submit`}
-                    className={`text-light m10-left fw-bold`}
+                    className={`text-light m10-left fw-bold sq-btn-save`}
                     text="Enregistrer"
-                    style={{ backgroundColor: "#1ebc1e" }}
                     onClick={onsubmit}
                   />
                 </div>
@@ -1369,9 +1378,8 @@ const Setting = (props) => {
                       </div>
                       <Button
                         type={`submit`}
-                        className={`text-light d-flex justify-end fw-bold`}
+                        className={`text-light d-flex justify-end fw-bold sq-btn-save`}
                         text="Enregistrer"
-                        style={{ backgroundColor: "#1ebc1e" }}
                         onClick={onsubmit}
                       />
                     </div>

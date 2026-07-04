@@ -60,6 +60,7 @@ class Setting {
     num? tax,
     bool? isRazorPay,
     bool? isStripePay,
+    bool? isWalletPay,
     String? razorPayId,
     String? razorSecretKey,
     String? stripePublishableKey,
@@ -98,6 +99,7 @@ class Setting {
     _tax = tax;
     _isRazorPay = isRazorPay;
     _isStripePay = isStripePay;
+    _isWalletPay = isWalletPay;
     _razorPayId = razorPayId;
     _razorSecretKey = razorSecretKey;
     _stripePublishableKey = stripePublishableKey;
@@ -138,6 +140,7 @@ class Setting {
     _tax = json['tax'];
     _isRazorPay = json['isRazorPay'];
     _isStripePay = json['isStripePay'];
+    _isWalletPay = json['isWalletPay'];
     _razorPayId = json['razorPayId'];
     _razorSecretKey = json['razorSecretKey'];
     _stripePublishableKey = json['stripePublishableKey'];
@@ -176,6 +179,7 @@ class Setting {
   num? _tax;
   bool? _isRazorPay;
   bool? _isStripePay;
+  bool? _isWalletPay;
   String? _razorPayId;
   String? _razorSecretKey;
   String? _stripePublishableKey;
@@ -214,6 +218,7 @@ class Setting {
     num? tax,
     bool? isRazorPay,
     bool? isStripePay,
+    bool? isWalletPay,
     String? razorPayId,
     String? razorSecretKey,
     String? stripePublishableKey,
@@ -245,6 +250,7 @@ class Setting {
         tax: tax ?? _tax,
         isRazorPay: isRazorPay ?? _isRazorPay,
         isStripePay: isStripePay ?? _isStripePay,
+        isWalletPay: isWalletPay ?? _isWalletPay,
         razorPayId: razorPayId ?? _razorPayId,
         razorSecretKey: razorSecretKey ?? _razorSecretKey,
         stripePublishableKey: stripePublishableKey ?? _stripePublishableKey,
@@ -283,6 +289,7 @@ class Setting {
   num? get tax => _tax;
   bool? get isRazorPay => _isRazorPay;
   bool? get isStripePay => _isStripePay;
+  bool? get isWalletPay => _isWalletPay;
   String? get razorPayId => _razorPayId;
   String? get razorSecretKey => _razorSecretKey;
   String? get stripePublishableKey => _stripePublishableKey;
@@ -323,6 +330,7 @@ class Setting {
     map['tax'] = _tax;
     map['isRazorPay'] = _isRazorPay;
     map['isStripePay'] = _isStripePay;
+    map['isWalletPay'] = _isWalletPay;
     map['razorPayId'] = _razorPayId;
     map['razorSecretKey'] = _razorSecretKey;
     map['stripePublishableKey'] = _stripePublishableKey;

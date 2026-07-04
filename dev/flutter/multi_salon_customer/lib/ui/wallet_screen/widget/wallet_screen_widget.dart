@@ -8,6 +8,7 @@ import 'package:salon_2/custom/bottom_sheet/payment_bottom_sheet.dart';
 import 'package:salon_2/custom/order_detail/order_detail_title.dart';
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/ui/wallet_screen/controller/wallet_screen_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
@@ -91,67 +92,75 @@ class WalletButtonView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final splashController = Get.find<SplashController>();
+    final isWalletPayEnabled =
+        splashController.settingCategory?.setting?.isWalletPay == true;
+
     return Row(
       children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              try {
-                final walletController = Get.find<WalletScreenController>();
-                // Pass booking context if we came from booking
-                Get.toNamed(
-                  AppRoutes.walletRecharge,
-                  arguments: walletController.isFromBooking
-                      ? {
-                          'amount': walletController.deficitAmount ?? walletController.amount,
-                          'isFromBooking': true,
+        if (isWalletPayEnabled)
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                try {
+                  final walletController = Get.find<WalletScreenController>();
+                  // Pass booking context if we came from booking
+                  Get.toNamed(
+                    AppRoutes.walletRecharge,
+                    arguments: walletController.isFromBooking
+                        ? {
+                            'amount': walletController.deficitAmount ??
+                                walletController.amount,
+                            'isFromBooking': true,
+                          }
+                        : walletController.amount,
+                  )?.then(
+                    (value) async {
+                      // Refresh wallet after returning from recharge (especially if payment was successful)
+                      try {
+                        await walletController.onGetWalletHistoryApiCall(
+                          userId:
+                              Constant.storage.read<String>('userId') ?? "",
+                          month: DateFormat('yyyy-MM').format(DateTime.now()),
+                        );
+
+                        // If from booking and user chose to continue, return to booking
+                        if (walletController.isFromBooking &&
+                            value == 'continue_booking') {
+                          Get.back(result: 'continue_booking');
                         }
-                      : walletController.amount,
-                )?.then(
-                  (value) async {
-                    // Refresh wallet after returning from recharge (especially if payment was successful)
-                    try {
-                      await walletController.onGetWalletHistoryApiCall(
-                        userId: Constant.storage.read<String>('userId') ?? "",
-                        month: DateFormat('yyyy-MM').format(DateTime.now()),
-                      );
-                      
-                      // If from booking and user chose to continue, return to booking
-                      if (walletController.isFromBooking && value == 'continue_booking') {
-                        Get.back(result: 'continue_booking');
+                        walletController.update([Constant.idProgressView]);
+                      } catch (e) {
+                        log("Error refreshing wallet: $e");
                       }
-                      walletController.update([Constant.idProgressView]);
-                    } catch (e) {
-                      log("Error refreshing wallet: $e");
-                    }
-                  },
-                );
-              } catch (e) {
-                log("Error navigating to wallet recharge: $e");
-                Utils.showToast(
-                    Get.context!, "Error: Unable to open recharge screen");
-              }
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: AppColors.redText,
-              ),
-              height: 48,
-              child: Center(
-                child: Text(
-                  "txtAddAmount".tr,
-                  style: TextStyle(
-                    color: AppColors.whiteColor,
-                    fontFamily: AppFontFamily.heeBo700,
-                    fontSize: 16,
+                    },
+                  );
+                } catch (e) {
+                  log("Error navigating to wallet recharge: $e");
+                  Utils.showToast(
+                      Get.context!, "Error: Unable to open recharge screen");
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: AppColors.redText,
+                ),
+                height: 48,
+                child: Center(
+                  child: Text(
+                    "txtAddAmount".tr,
+                    style: TextStyle(
+                      color: AppColors.whiteColor,
+                      fontFamily: AppFontFamily.heeBo700,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 10),
+        if (isWalletPayEnabled) const SizedBox(width: 10),
         Expanded(
           child: GetBuilder<WalletScreenController>(
               id: Constant.idProgressView,

@@ -68,10 +68,11 @@ const Attribute = () => {
     {
       Header: col.action,
       Cell: ({ row }) => (
-        <span>
+        <span className="sq-tbl-actions">
           <button
-            className="py-1 me-2"
-            style={{ backgroundColor: "#CFF3FF", borderRadius: "8px" }}
+            type="button"
+            className="sq-tbl-btn sq-tbl-btn--edit"
+            aria-label="Modifier"
             onClick={() => {
               dispatch(openDialog({ type: "attribute", data: row }));
             }}
@@ -83,16 +84,18 @@ const Attribute = () => {
     },
   ];
   return (
-    <div className="mainCategory">
+    <div className="mainCategory sq-table-page">
       <Title name={ui.pages.attribute} />
-      <Button
-        className={`bg-button p-10 text-black m20-bottom`}
-        text={`Add Attribute`}
-        bIcon={`fa-solid fa-user-plus`}
-        onClick={() => {
-          dispatch(openDialog({ type: "attribute" }));
-        }}
-      />
+      <div className="sq-page-toolbar">
+        <Button
+          className="sq-btn-add"
+          text={ui.labels.addAttribute}
+          bIcon="fa-solid fa-plus"
+          onClick={() => {
+            dispatch(openDialog({ type: "attribute" }));
+          }}
+        />
+      </div>
       <div>
         <Table
           data={data}

@@ -20,6 +20,7 @@ const ProductDialogue = () => {
     const { s } = useLocation();
     const navigate = useNavigate();
     const { productCategory, attribute } = useSelector((s) => s.product);
+    const { admin } = useSelector((s) => s.auth);
     const [mongoId, setMongoId] = useState()
     const [productCode, setProductcode] = useState("")
     const [productName, setProductName] = useState("")
@@ -29,6 +30,7 @@ const ProductDialogue = () => {
     const [price, setPrice] = useState("")
     const [mrp, setMrp] = useState("")
     const [shippingCharges, setShippingCharges] = useState("")
+    const [quantity, setQuantity] = useState("0")
     const [category, setCategory] = useState("")
       const [image, setImage] = useState([]);
     const [mainImagePath, setMainImagePath] = useState("");
@@ -74,10 +76,15 @@ const ProductDialogue = () => {
             setPrice(state?.row?.price || "");
             setMrp(state?.row?.mrp || "");
             setShippingCharges(state?.row?.shippingCharges || "");
+            setQuantity(
+              state?.row?.quantity !== undefined && state?.row?.quantity !== null
+                ? String(state.row.quantity)
+                : "0"
+            );
             setCategory(state?.row?.category?._id || "");
-            setImage(state?.row?.images);
-            setMainImage(state?.row?.mainImage);
-            setMainImagePath(state?.row?.mainImage);
+            setImage(state?.row?.images || []);
+            setMainImage([]);
+            setMainImagePath(state?.row?.mainImage || "");
             setMongoId(state?.row?._id);
 
             // Initialize personNames state based on the attribute array and state data
@@ -141,11 +148,11 @@ const ProductDialogue = () => {
             error.shippingCharges = ui.dialog.shippingRequired;
             isValid = false;
         }
-        if (!mainImage) {
+        if (!mainImage && !mainImagePath) {
             error.mainImage = ui.dialog.mainImageRequired;
             isValid = false;
         }
-        if (!image) {
+        if (!image || image.length === 0) {
             error.images = ui.dialog.imagesRequired;
             isValid = false;
         }
@@ -188,15 +195,25 @@ const ProductDialogue = () => {
         formData.append("price", price);
         formData.append("mrp", mrp);
         formData.append("shippingCharges", shippingCharges);
-        formData.append("mainImage", mainImage);
+        formData.append("quantity", quantity || "0");
+        if (mainImage instanceof File) {
+            formData.append("mainImage", mainImage);
+        }
         for (let i = 0; i < image?.length; i++) {
-            formData.append("images", image[i]);
+            if (image[i] instanceof File) {
+                formData.append("images", image[i]);
+            }
         }
         const filterData = personNames?.filter((data) => data?.value?.length > 0);
         formData.append("attributes", JSON.stringify(filterData));
         if (validate()) {
             if (mongoId) {
-                const payload = { formData, productId: mongoId, salonId: state?.row?.salon?._id, productCode: productCode };
+                const payload = {
+                    formData,
+                    productId: mongoId,
+                    salonId: state?.row?.salon?._id || admin?._id,
+                    productCode: productCode,
+                };
                 dispatch(updateProductCategory(payload))
                     .then((res) => {
                         if (res?.payload?.status) {
@@ -486,6 +503,18 @@ const ProductDialogue = () => {
                                         <p style={{ color: "red", fontSize: "15px" }}>{error.shippingCharges}</p>
                                     )
                                 }
+                            </div>
+                            <div className="col-12 ">
+                                <ExInput
+                                    type="number"
+                                    id="quantity"
+                                    name="quantity"
+                                    min="0"
+                                    value={quantity}
+                                    label={ui.productsPage.quantity}
+                                    placeholder="0"
+                                    onChange={(e) => setQuantity(e.target.value)}
+                                />
                             </div>
                             <div className="col-12">
                                 <div className="inputData text  flex-row justify-content-start text-start">

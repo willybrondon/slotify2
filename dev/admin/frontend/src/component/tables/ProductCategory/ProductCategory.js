@@ -114,7 +114,7 @@ const ProductCategory = () => {
     },
   ];
   return (
-    <div className="mainCategory">
+    <div className="mainCategory sq-table-page">
       <Title name={ui.labels.productCategory} />
       <Button
         className={`bg-button p-10 text-black m20-bottom`}

@@ -121,6 +121,12 @@ exports.handleSwitch = async (req, res) => {
     if (type == 9) {
       setting.autoConfirmBookings = !setting.autoConfirmBookings;
     }
+    if (type == 10) {
+      setting.isWalletPay = !setting.isWalletPay;
+    }
+    if (type == 11) {
+      setting.isSalonWalletRecharge = !setting.isSalonWalletRecharge;
+    }
 
     await setting.save();
     updateSettingFile(setting);

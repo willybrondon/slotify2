@@ -14,6 +14,11 @@ const settingSchema = new mongoose.Schema(
     stripePublishableKey: { type: String, default: "" },
     stripeSecretKey: { type: String, default: "" },
 
+    /** Show wallet payment on customer app (booking / products) */
+    isWalletPay: { type: Boolean, default: false },
+    /** Allow salon owners to recharge wallet via Stripe / MTN MoMo */
+    isSalonWalletRecharge: { type: Boolean, default: false },
+
     isZitopay: { type: Boolean, default: false },
     zitopayApiKey: { type: String, default: "" },
     zitopaySecretKey: { type: String, default: "" },

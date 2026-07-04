@@ -20,14 +20,14 @@ export const getAllAttributes = createAsyncThunk(
 export const attributeAdd = createAsyncThunk(
   "salon/attributes/create",
   async (payload) => {
-    return apiInstance.post("salon/attributes/create", payload);
+    return apiInstanceFetch.post("salon/attributes/create", payload);
   }
 );
 
 export const attributeUpdate = createAsyncThunk(
   "salon/attributes/update",
   async (data) => {
-    return apiInstance.patch(
+    return apiInstanceFetch.patch(
       `salon/attributes/update?attributesId=${data?.id}`,
       { name: data.name, value: data.value }
     );

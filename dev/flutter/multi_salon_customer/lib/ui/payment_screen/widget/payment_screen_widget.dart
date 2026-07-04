@@ -136,6 +136,8 @@ class PaymentMethodView extends StatelessWidget {
         splashController.settingCategory?.setting?.isRazorPay ?? false;
     final isFlutterWaveEnabled =
         splashController.settingCategory?.setting?.isFlutterWave ?? false;
+    final isWalletPayEnabled =
+        splashController.settingCategory?.setting?.isWalletPay == true;
 
     // Check if this is wallet recharge - explicitly check for true
     // Only show wallet recharge payment methods (Stripe, MTN MoMo) when isWalletAdd is explicitly true
@@ -153,6 +155,32 @@ class PaymentMethodView extends StatelessWidget {
     // For wallet recharge, user MUST choose between Stripe and MTN MoMo (not cash on service)
     // We IGNORE selectedPayment completely - use isWalletAdd flag only
     if (isWalletRecharge) {
+      if (!isWalletPayEnabled) {
+        return Column(
+          children: [
+            const PaymentTitleView(),
+            Container(
+              width: Get.width,
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(top: 16),
+              decoration: BoxDecoration(
+                color: AppColors.redText.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.redText, width: 1),
+              ),
+              child: Text(
+                "Wallet recharge is not available",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppColors.redText,
+                  fontFamily: AppFontFamily.heeBo700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ).paddingAll(15);
+      }
       // Return ALL available wallet recharge methods (Stripe and MTN MoMo)
       // User must choose one - we don't pre-select anything
       return Column(
@@ -280,7 +308,8 @@ class PaymentMethodView extends StatelessWidget {
         // If isWalletAdd is null or true, we should NOT show booking methods
         if (logic.isWalletAdd == false) ...[
           // Only show booking payment methods if this is NOT a wallet recharge
-          if (logic.selectedPayment == "wallet") const PaymentMyWalletView(),
+          if (logic.selectedPayment == "wallet" && isWalletPayEnabled)
+            const PaymentMyWalletView(),
           if (logic.selectedPayment == "Stripe" && showBookingStripe)
             const PaymentStripeView(),
           if (logic.selectedPayment == "MTN MoMo" && isMtnMomoEnabled) ...[
@@ -304,7 +333,7 @@ class PaymentMethodView extends StatelessWidget {
           // Must be explicitly false, not null or true
           if ((logic.selectedPayment == null || logic.selectedPayment == "") &&
               logic.isWalletAdd == false) ...[
-            const PaymentMyWalletView(),
+            if (isWalletPayEnabled) const PaymentMyWalletView(),
             if (showBookingStripe) const PaymentStripeView(),
             if (isMtnMomoEnabled) const PaymentMtnMomoView(),
             if (isRazorPayEnabled) const PaymentRazorPayView(),

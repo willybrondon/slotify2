@@ -21,19 +21,14 @@ import CategoryDialogue from "./CategoryDialogue";
 import { ReactComponent as Edit } from "../../../../src/assets/icon/edit.svg";
 
 const Category = () => {
+  const dispatch = useDispatch();
   const { category, total } = useSelector((state) => state.category);
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
   const [data, setData] = useState([]);
-;
+
   useEffect(() => {
     dispatch(getAllCategory());
-  }, []);
-
-  useEffect(() => {
-    setData(category);
-  }, [category]);
-
-  const dispatch = useDispatch();
+  }, [dispatch]);
 
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
@@ -74,11 +69,9 @@ const Category = () => {
         <div className="userProfile">
           <img
             src={row?.image}
-            alt="image"
-            className="cursor-pointer"
-            style={{ height: "70px", width: "70px", overflow: "hidden" }}
+            alt=""
+            className="sq-tbl-img cursor-pointer"
             onClick={() => openImage(row?.image)}
-            height={`100%`}
           />
         </div>
       ),
@@ -98,10 +91,11 @@ const Category = () => {
     {
       Header: col.action,
       Cell: ({ row }) => (
-        <span>
+        <span className="sq-tbl-actions">
           <button
-            className="py-1 me-2"
-            style={{ backgroundColor: "#CFF3FF", borderRadius: "8px" }}
+            type="button"
+            className="sq-tbl-btn sq-tbl-btn--edit"
+            aria-label="Modifier"
             onClick={() => {
               dispatch(openDialog({ type: "category", data: row }));
             }}
@@ -109,8 +103,9 @@ const Category = () => {
             <Edit />
           </button>
           <button
-            className="py-1"
-            style={{ backgroundColor: "#FFF1F1", borderRadius: "8px" }}
+            type="button"
+            className="sq-tbl-btn sq-tbl-btn--delete"
+            aria-label="Supprimer"
             onClick={() => handleDelete(row?._id)}
           >
             <Delete />
@@ -133,16 +128,18 @@ const Category = () => {
       .catch((err) => console.log(err));
   };
   return (
-    <div className="mainCategory">
+    <div className="mainCategory sq-table-page">
       <Title name={ui.nav.category} />
-      <Button
-        className={`bg-button p-10 text-black m20-bottom`}
-        text={ui.labels.addCategory}
-        bIcon={`fa-solid fa-user-plus`}
-        onClick={() => {
-          dispatch(openDialog({ type: "category" }));
-        }}
-      />
+      <div className="sq-page-toolbar">
+        <Button
+          className={`sq-btn-add`}
+          text={ui.labels.addCategory}
+          bIcon={`fa-solid fa-plus`}
+          onClick={() => {
+            dispatch(openDialog({ type: "category" }));
+          }}
+        />
+      </div>
       <div>
         <Table
           data={data}

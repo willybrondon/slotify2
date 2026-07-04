@@ -84,11 +84,9 @@ const Service = () => {
         <div className="userProfile">
           <img
             src={row?.image}
-            alt="image"
-            className="cursor-pointer"
-            style={{ height: "70px", width: "70px", overflow: "hidden" }}
+            alt=""
+            className="sq-tbl-img cursor-pointer"
             onClick={() => openImage(row?.image)}
-            height={`100%`}
           />
         </div>
       ),
@@ -122,17 +120,19 @@ const Service = () => {
     {
       Header: col.action,
       Cell: ({ row }) => (
-        <span>
+        <span className="sq-tbl-actions">
           <button
-            className="py-1 me-2"
-            style={{ backgroundColor: "#CFF3FF", borderRadius: "8px" }}
+            type="button"
+            className="sq-tbl-btn sq-tbl-btn--edit"
+            aria-label="Modifier"
             onClick={() => dispatch(openDialog({ type: "service", data: row }))}
           >
             <Edit />
           </button>
           <button
-            className="py-1"
-            style={{ backgroundColor: "#FFF1F1", borderRadius: "8px" }}
+            type="button"
+            className="sq-tbl-btn sq-tbl-btn--delete"
+            aria-label="Supprimer"
             onClick={() => handleDelete(row._id)}
           >
             <Delete />
@@ -161,20 +161,20 @@ const Service = () => {
   };
 
   return (
-    <div className="mainCategory">
+    <div className="mainCategory sq-table-page">
       <Title name={ui.pages.services} />
-      <div className="row">
-        <div className="col-3">
+      <div className="row align-items-center mb-2">
+        <div className="col-auto">
           <Button
-            className={`bg-button p-10 text-black m10-bottom `}
-            bIcon={`fa-solid fa-user-plus`}
-            text="Add service"
+            className="sq-btn-add"
+            bIcon="fa-solid fa-plus"
+            text={ui.labels.addService}
             onClick={() => {
               dispatch(openDialog({ type: "service" }));
             }}
           />
         </div>
-        <div className="col-lg-5 col-md-7 col-8  ms-auto">
+        <div className="col-lg-5 col-md-7 col-12 ms-lg-auto">
           <Searching
             type={`server`}
             data={service}

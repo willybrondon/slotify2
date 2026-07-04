@@ -398,6 +398,23 @@ export const SKEDISY_SALON_UI = {
     removeBtn: "Retirer",
   },
 
+  productsPage: {
+    listTitle: "Votre catalogue",
+    listHint: "Gérez prix, stock et disponibilité en ligne",
+    stock: "Stock",
+    lowStock: "Stock faible",
+    inStock: "En stock",
+    outOfStock: "Rupture",
+    statusPending: "En attente",
+    statusApproved: "En ligne",
+    statusRejected: "Refusé",
+    edit: "Modifier",
+    details: "Détail",
+    cities: "Villes",
+    pendingEditHint: "Modification possible après validation admin",
+    quantity: "Quantité en stock",
+  },
+
   form: {
     productCode: "Code produit (6 chiffres)",
     productName: "Nom du produit",
@@ -406,6 +423,7 @@ export const SKEDISY_SALON_UI = {
     price: "Prix",
     mrp: "Prix public (MRP)",
     shippingCharges: "Frais de livraison",
+    quantity: "Stock (quantité)",
     mainImage: "Photo principale",
     serviceName: "Nom de la prestation",
     serviceCharge: "Tarif prestation",
@@ -602,6 +620,9 @@ export const SKEDISY_SALON_UI = {
     attributeAdded: "Attribut ajouté.",
     attributeUpdated: "Attribut mis à jour.",
     citiesUpdated: "Villes mises à jour.",
+    productAdded: "Produit enregistré.",
+    productUpdated: "Produit mis à jour.",
+    stockUpdated: "Stock mis à jour.",
   },
   pages: {
     experts: "Équipe",

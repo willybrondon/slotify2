@@ -503,6 +503,13 @@ exports.newBooking = async (req, res, next) => {
     // For Stripe, MTN MoMo, Cash on service - skip wallet check (customer pays externally).
     const isWalletPayment = !["Stripe", "MTN MoMo", "cashAfterService"].includes(paymentType);
 
+    if (isWalletPayment && global.settingJSON?.isWalletPay !== true) {
+      return res.status(200).send({
+        status: false,
+        message: "Wallet payment is not available.",
+      });
+    }
+
     const salonPay = salonPaymentOptions(salon);
     if (paymentType === "cashAfterService" && !salonPay.acceptCash) {
       return res.status(200).send({

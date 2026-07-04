@@ -35,12 +35,13 @@ const Wallet = () => {
     // Both currency and setting come from salon/getCurrency (which includes payment flags)
     // Priority: currency > setting
     const settingsData = currency || setting || {};
+    const salonWalletRechargeEnabled = settingsData?.isSalonWalletRecharge === true;
     
     const availablePaymentMethods = [];
-    if (settingsData?.isStripePay) {
+    if (salonWalletRechargeEnabled && settingsData?.isStripePay) {
         availablePaymentMethods.push({ value: "Stripe", label: "Stripe" });
     }
-    if (settingsData?.isMtnMomo) {
+    if (salonWalletRechargeEnabled && settingsData?.isMtnMomo) {
         availablePaymentMethods.push({ value: "MTN MoMo", label: "MTN Mobile Money" });
     }
 
@@ -436,7 +437,7 @@ const Wallet = () => {
                             </div>
                         )}
 
-                        {/* Wallet Recharge Instructions */}
+                        {salonWalletRechargeEnabled && (
                         <div className="row mt-4">
                             <div className="inputData mt-4 col-md-11">
                                 <label className="styleForTitle fw-bold" style={{ color: "#1C2B20", fontSize: "24px" }}>
@@ -450,9 +451,11 @@ const Wallet = () => {
                                 </div>
                             </div>
                         </div>
+                        )}
                     </div>
 
                     {/* Right Column - Recharge Form */}
+                    {salonWalletRechargeEnabled && (
                     <div className="col-md-6">
                         <div className="inputData mt-2">
                             <label className="styleForTitle" htmlFor="rechargeAmount">
@@ -703,6 +706,7 @@ const Wallet = () => {
                             </small>
                         </div>
                     </div>
+                    )}
                 </div>
             </div>
         </>

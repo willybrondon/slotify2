@@ -439,7 +439,7 @@ exports.isActive = async (req, res) => {
 
 exports.getCurrency = async (req, res) => {
   try {
-    const setting = await Setting.findOne().select("currencyName currencySymbol isStripePay isRazorPay isFlutterWave isMtnMomo minSalonWalletBalance");
+    const setting = await Setting.findOne().select("currencyName currencySymbol isStripePay isRazorPay isFlutterWave isMtnMomo minSalonWalletBalance isSalonWalletRecharge");
     if (!setting) {
       return res.status(200).send({ status: false, message: "currency Not Found" });
     }
@@ -676,6 +676,9 @@ exports.createStripeCheckoutSession = async (req, res) => {
 
     // Get Stripe settings
     const setting = await Setting.findOne().sort({ createdAt: -1 });
+    if (!setting?.isSalonWalletRecharge) {
+      return res.status(200).json({ status: false, message: "Salon wallet recharge is disabled." });
+    }
     if (!setting || !setting.isStripePay || !setting.stripeSecretKey) {
       return res.status(200).json({ status: false, message: "Stripe is not configured or enabled." });
     }
@@ -891,6 +894,9 @@ exports.createMTNMomoPaymentRequest = async (req, res) => {
 
     // Get MTN MoMo settings
     const setting = await Setting.findOne().sort({ createdAt: -1 });
+    if (!setting?.isSalonWalletRecharge) {
+      return res.status(200).json({ status: false, message: "Salon wallet recharge is disabled." });
+    }
     
     // Check each requirement and provide specific error messages
     if (!setting) {

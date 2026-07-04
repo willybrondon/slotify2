@@ -125,7 +125,7 @@ const ProductCityDialogue = () => {
       Promise.all(promises)
         .then(() => {
           dispatch(closeDialog());
-          dispatch(getProducts());
+          dispatch(getProducts({ start: 0, limit: 10 }));
         })
         .catch((error) => {
           console.error("Error updating product:", error);

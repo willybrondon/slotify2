@@ -44,7 +44,7 @@ class BookingScreenController extends GetxController {
   int selectExpert = -1;
   bool checkValue = false;
   bool isFirstTap = false;
-  String selectedPayment = "wallet";
+  String selectedPayment = "cashAfterService";
   List<String> morningSlots = [];
   List<String> afternoonSlots = [];
   List<String> eveningSlots = [];
@@ -89,6 +89,25 @@ class BookingScreenController extends GetxController {
     final salonCash =
         getSalonDetailCategory?.salon?.paymentOptions?.acceptCash != false;
     return globalCash && salonCash;
+  }
+
+  bool isWalletPayEnabled() {
+    return splashController.settingCategory?.setting?.isWalletPay == true;
+  }
+
+  void setDefaultPaymentMethod() {
+    if (isWalletPayEnabled()) {
+      selectedPayment = "wallet";
+    } else if (salonAcceptsCash()) {
+      selectedPayment = "cashAfterService";
+    } else if (salonAcceptsStripe()) {
+      selectedPayment = "Stripe";
+    } else if (splashController.settingCategory?.setting?.isMtnMomo == true) {
+      selectedPayment = "MTN MoMo";
+    } else {
+      selectedPayment = "cashAfterService";
+    }
+    update([Constant.idStep3, Constant.idConfirm]);
   }
 
   num? rating;
@@ -206,6 +225,8 @@ class BookingScreenController extends GetxController {
     log("Stripe Publishable Key:Stripe.publishableKey ${Stripe.publishableKey}");
 
     await Stripe.instance.applySettings();
+
+    setDefaultPaymentMethod();
 
     // Ensure loading states are cleared when venue step is ready (fixes stuck loading on iOS/Android)
     isLoading1(false);
@@ -668,6 +689,7 @@ class BookingScreenController extends GetxController {
         }
 
         update([Constant.idProgressView, Constant.idConfirm]);
+        setDefaultPaymentMethod();
       }
     } catch (e) {
       log("Error fetching salon details: $e");

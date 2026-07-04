@@ -83,6 +83,11 @@ exports.createProduct = async (req, res) => {
 
       product.salon = salon._id;
       product.brand = req.body.brand;
+      product.mrp = req.body.mrp;
+      product.quantity =
+        req.body.quantity !== undefined && req.body.quantity !== ""
+          ? Number(req.body.quantity)
+          : 0;
       product.createStatus = "Pending";
       product.shippingCharges = req.body.shippingCharges;
       product.productCode = req.body.productCode;
@@ -164,6 +169,12 @@ exports.createProduct = async (req, res) => {
       product.category = category._id;
 
       product.salon = salon._id;
+      product.brand = req.body.brand;
+      product.mrp = req.body.mrp;
+      product.quantity =
+        req.body.quantity !== undefined && req.body.quantity !== ""
+          ? Number(req.body.quantity)
+          : 0;
       product.createStatus = "Approved";
       product.shippingCharges = req.body.shippingCharges;
       product.productCode = req.body.productCode;
@@ -259,14 +270,17 @@ exports.updateProductBySalon = async (req, res) => {
       return res.status(200).json({ status: false, message: "salon does not found." });
     }
 
-    if (product.createStatus !== "Approved") {
-      if (req.files) deleteFiles(req.files);
-      return res.status(200).json({ status: false, message: "Product approval is pending." });
-    }
-
     if (!product) {
       if (req.files) deleteFiles(req.files);
       return res.status(200).json({ status: false, message: "No product Was found." });
+    }
+
+    if (product.createStatus === "Rejected") {
+      if (req.files) deleteFiles(req.files);
+      return res.status(200).json({
+        status: false,
+        message: "Ce produit a été refusé. Créez une nouvelle fiche produit.",
+      });
     }
 
     if (req?.body?.category) {
@@ -283,6 +297,10 @@ exports.updateProductBySalon = async (req, res) => {
     product.price = req.body.price ? req.body.price : product.price;
     product.mrp = req.body.mrp ? req.body.mrp : product.mrp;
     product.shippingCharges = req.body.shippingCharges ? req.body.shippingCharges : product.shippingCharges;
+    if (req.body.quantity !== undefined && req.body.quantity !== "") {
+      product.quantity = Number(req.body.quantity);
+      product.isOutOfStock = Number(req.body.quantity) <= 0;
+    }
     product.category = req.body.category ? category._id : product.category;
     product.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
     product.updateStatus = "Approved";

@@ -20,7 +20,7 @@ export const getAllAttributes = createAsyncThunk(
 export const attributeAdd = createAsyncThunk(
   "admin/attributes/create",
   async (payload) => {
-    return apiInstance.post("admin/attributes/create", payload);
+    return apiInstanceFetch.post("admin/attributes/create", payload);
   }
 );
 
@@ -34,10 +34,10 @@ export const productCategoryStatus = createAsyncThunk(
 );
 export const attributeUpdate = createAsyncThunk(
   "admin/attributes/update",
-  async ( data ) => {
-    return apiInstance.patch(
+  async (data) => {
+    return apiInstanceFetch.patch(
       `admin/attributes/update?attributesId=${data?.id}`,
-      data
+      { name: data.name, value: data.value }
     );
   }
 );
@@ -66,15 +66,40 @@ const attributeSlice = createSlice({
     });
 
     builder.addCase(attributeAdd.fulfilled, (state, action) => {
-      if (action.payload.status) {
-        state?.productCategory?.unshift(action?.payload?.data);
-        state.total += 1;
-        Success(ui.toast.productCategoryAdded);
+      if (action.payload?.status) {
+        const created = action.payload?.attributes || action.payload?.data;
+        if (created) {
+          state.attributes.unshift(created);
+        }
+        state.total = (state.total || 0) + 1;
+        Success(ui.toast.attributeAdded);
       }
       state.isLoading = false;
     });
 
-    builder.addCase(attributeAdd.rejected, (state, action) => {
+    builder.addCase(attributeAdd.rejected, (state) => {
+      state.isLoading = false;
+    });
+
+    builder.addCase(attributeUpdate.pending, (state) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(attributeUpdate.fulfilled, (state, action) => {
+      if (action.payload?.status) {
+        const updated = action.payload?.attributes || action.payload?.data;
+        if (updated?._id) {
+          const idx = state.attributes.findIndex((a) => a._id === updated._id);
+          if (idx !== -1) {
+            state.attributes[idx] = updated;
+          }
+        }
+        Success(ui.toast.attributeUpdated);
+      }
+      state.isLoading = false;
+    });
+
+    builder.addCase(attributeUpdate.rejected, (state) => {
       state.isLoading = false;
     });
   },

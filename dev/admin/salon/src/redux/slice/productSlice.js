@@ -81,10 +81,11 @@ export const updateProductCategory = createAsyncThunk(
     }
 );
 export const updateOutOfStockProduct = createAsyncThunk(
-    "expert/updateOutOfStockProduct",
+    "salon/updateOutOfStockProduct",
     async (id) => {
-        return apiInstance.patch(
+        return apiInstanceFetch.patch(
             `salon/product/isOutOfStock?productId=${id}`,
+            {}
         );
     }
 );
@@ -129,11 +130,11 @@ export const monthlyState = createAsyncThunk("salon/booking/monthlyState", async
 });
 
 export const allowCity = createAsyncThunk("salon/product/allowCityForProduct", async (payload) => {
-    return apiInstance.patch("salon/product/allowCityForProduct", payload)
+    return apiInstanceFetch.patch("salon/product/allowCityForProduct", payload)
 })
 
 export const blockCity = createAsyncThunk("salon/product/blockCityForProduct", async (payload) => {
-    return apiInstance.patch("salon/product/blockCityForProduct", payload)
+    return apiInstanceFetch.patch("salon/product/blockCityForProduct", payload)
 })
 
 const productSlice = createSlice({
@@ -146,8 +147,8 @@ const productSlice = createSlice({
         });
 
         builder.addCase(getProducts.fulfilled, (state, action) => {
-            state.product = action?.payload?.products;
-            state.total = action?.payload?.total
+            state.product = action?.payload?.products || [];
+            state.total = action?.payload?.totalProducts ?? action?.payload?.total ?? 0;
             state.isSkeleton = false;
         });
 
@@ -323,6 +324,38 @@ const productSlice = createSlice({
         builder.addCase(blockCity.rejected, (state, action) => {
             state.isLoading = false;
         })
+
+        builder.addCase(productCategoryAdd.fulfilled, (state, action) => {
+            state.isLoading = false;
+            if (action?.payload?.status) {
+                Success(ui.toast.productAdded);
+            }
+        });
+
+        builder.addCase(productCategoryAdd.rejected, (state) => {
+            state.isLoading = false;
+        });
+
+        builder.addCase(updateProductCategory.fulfilled, (state, action) => {
+            state.isLoading = false;
+            if (action?.payload?.status) {
+                Success(ui.toast.productUpdated);
+            }
+        });
+
+        builder.addCase(updateProductCategory.rejected, (state) => {
+            state.isLoading = false;
+        });
+
+        builder.addCase(updateOutOfStockProduct.fulfilled, (state, action) => {
+            if (action?.payload?.status && action?.payload?.data) {
+                const updated = action.payload.data;
+                const idx = state.product.findIndex((p) => p._id === updated._id);
+                if (idx !== -1) {
+                    state.product[idx] = { ...state.product[idx], ...updated };
+                }
+            }
+        });
     },
 });
 export default productSlice.reducer;
