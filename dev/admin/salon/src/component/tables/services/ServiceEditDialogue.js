@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Button from "../../extras/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
 import Multiselect from "multiselect-react-dropdown";
 import { ExInput } from "../../extras/Input";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import {
   allowCity,
   blockCity,
@@ -33,200 +35,168 @@ const ServiceEditDialogue = () => {
 
   useEffect(() => {
     if (city?.data) {
-      const formattedCities = city.data.map((cityData) => ({
-        name: cityData.city,
-        id: cityData.city,
-        country: cityData.country,
-      }));
-      setCityOptions(formattedCities);
+      setCityOptions(
+        city.data.map((cityData) => ({
+          name: cityData.city,
+          id: cityData.city,
+          country: cityData.country,
+        }))
+      );
     }
   }, [city]);
 
   useEffect(() => {
     if (dialogueData) {
-      const formattedSelectedCities = dialogueData?.cities?.map(city => ({
-        name: city.city,
-        id: city.city,
-        country: city.country
-      })) || [];
+      const formattedSelectedCities =
+        dialogueData?.cities?.map((c) => ({
+          name: c.city,
+          id: c.city,
+          country: c.country,
+        })) || [];
       setFormData({
         name: dialogueData?.name || "",
         price: dialogueData?.price || "",
         duration: dialogueData?.duration || "",
-        selectedCities: formattedSelectedCities
+        selectedCities: formattedSelectedCities,
       });
-    }
-  }, [dialogueData]);
-
-  useEffect(() => {
-    if (dialogueData?.cities) {
-      const currentAllowedCities = dialogueData.cities.map(city => ({
-        name: city.city,
-        id: city.city,
-        country: city.country
-      }));
       setCitiesToBlock([]);
     }
   }, [dialogueData]);
 
-  function onSelect(selectedList, selectedItem) {
-    setFormData({
-      ...formData,
-      selectedCities: selectedList,
-    });
-  }
-
-  function onRemove(selectedList, removedItem) {
-    setFormData({
-      ...formData,
-      selectedCities: selectedList,
-    });
-  }
-
-  function onSelectBlock(selectedList, selectedItem) {
-    setCitiesToBlock(selectedList);
-  }
-
-  function onRemoveBlock(selectedList, removedItem) {
-    setCitiesToBlock(selectedList);
-  }
-
   const handleSubmit = async () => {
     const existingCities = dialogueData?.cities || [];
-    
-    const newCities = formData.selectedCities.filter(selectedCity => 
-      !existingCities.some(existingCity => 
-        existingCity.city === selectedCity.name && 
-        existingCity.country === selectedCity.country
-      )
+
+    const newCities = formData.selectedCities.filter(
+      (selectedCity) =>
+        !existingCities.some(
+          (existingCity) =>
+            existingCity.city === selectedCity.name &&
+            existingCity.country === selectedCity.country
+        )
     );
-    
-    const citiesToRemove = citiesToBlock.map(city => ({
-      city: city.name,
-      country: city.country
+
+    const citiesToRemove = citiesToBlock.map((c) => ({
+      city: c.name,
+      country: c.country,
     }));
 
     const promises = [];
 
     if (newCities.length > 0) {
-      const allowPayload = {
-        salonId: admin?._id,
-        serviceId: dialogueData?._id,
-        allowCities: newCities.map((city) => ({
-          city: city.name,
-          country: city.country
-        })),
-      };
-      promises.push(dispatch(allowCity(allowPayload)));
+      promises.push(
+        dispatch(
+          allowCity({
+            salonId: admin?._id,
+            serviceId: dialogueData?._id,
+            allowCities: newCities.map((c) => ({
+              city: c.name,
+              country: c.country,
+            })),
+          })
+        )
+      );
     }
 
     if (citiesToRemove.length > 0) {
-      const blockPayload = {
-        salonId: admin?._id,
-        serviceId: dialogueData?._id,
-        blockCities: citiesToRemove,
-      };
-      promises.push(dispatch(blockCity(blockPayload)));
+      promises.push(
+        dispatch(
+          blockCity({
+            salonId: admin?._id,
+            serviceId: dialogueData?._id,
+            blockCities: citiesToRemove,
+          })
+        )
+      );
     }
 
     if (promises.length > 0) {
-      Promise.all(promises)
-        .then(() => {
-          dispatch(closeDialog());
-          dispatch(getParticularSalonService());
-        })
-        .catch((error) => {
-          console.error("Error updating service:", error);
-        });
+      Promise.all(promises).then(() => {
+        dispatch(closeDialog());
+        dispatch(getParticularSalonService());
+      });
     } else {
       dispatch(closeDialog());
     }
   };
 
-  return (
-    <div className="dialog">
-      <div className="" style={{ width: "1200px" }}>
-        <div className="row justify-content-center">
-          <div className="col-xl-5 col-md-8 col-11">
-            <div className="mainDiaogBox">
-              <div className="row justify-content-between align-items-center formHead">
-                <div className="col-8">
-                  <h2 className="text-theme m0" style={{ fontSize: "1.5rem" }}>Manage Service Cities</h2>
-                </div>
-                <div className="col-4">
-                  <div
-                    className="closeButton"
-                    onClick={() => dispatch(closeDialog())}
-                  >
-                    <i className="ri-close-line"></i>
-                  </div>
-                </div>
-              </div>
+  return createPortal(
+    <div className="dialog sq-dialog-pro" role="presentation" onClick={() => dispatch(closeDialog())}>
+      <div
+        className="sq-dialog-pro__sheet"
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mainDiaogBox sq-dialog-pro__box">
+          <div className="row justify-content-between align-items-center formHead">
+            <div className="col-9">
+              <p className="sq-dialog-pro__kicker mb-1">{ui.servicesPage.manageCities}</p>
+              <h2 className="text-theme m0 sq-dialog-pro__title">{formData.name}</h2>
+            </div>
+            <div className="col-auto">
+              <button
+                type="button"
+                className="closeButton"
+                aria-label="Fermer"
+                onClick={() => dispatch(closeDialog())}
+              >
+                <i className="ri-close-line" />
+              </button>
+            </div>
+          </div>
 
-              <div className="row align-items-start formBody">
-                <div className="col-12 mb-3">
-                  <ExInput
-                    type="text"
-                    value={formData.name}
-                    label="Service Name"
-                    readOnly={true}
-                  />
-                </div>
-                <div className="col-12 mb-3">
-                  <div className="inputData text flex-row justify-content-start text-start">
-                    <label className="mb-2">Allow Cities</label>
-                  </div>
-                  <Multiselect
-                    options={cityOptions}
-                    selectedValues={formData.selectedCities}
-                    onSelect={onSelect}
-                    onRemove={onRemove}
-                    displayValue="name"
-                    hideOnClickOutside={false}
-                  />
-                </div>
-
-                <div className="col-12 mb-3">
-                  <div className="inputData text flex-row justify-content-start text-start">
-                    <label className="mb-2">Block Cities</label>
-                  </div>
-                  <Multiselect
-                    options={dialogueData?.cities?.map(city => ({
-                      name: city.city,
-                      id: city.city,
-                      country: city.country
-                    })) || []}
-                    selectedValues={citiesToBlock}
-                    onSelect={onSelectBlock}
-                    onRemove={onRemoveBlock}
-                    displayValue="name"
-                    hideOnClickOutside={false}
-                  />
-                </div>
-
-                <div className="row formFooter mt-4">
-                  <div className="col-12 text-end m0">
-                    <Button
-                      className="bg-gray text-light"
-                      text="Annuler"
-                      type="button"
-                      onClick={() => dispatch(closeDialog())}
-                    />
-                    <Button
-                      type="submit"
-                      className="text-white m10-left"
-                      style={{ backgroundColor: "#1ebc1e" }}
-                      text="Update"
-                      onClick={handleSubmit}
-                    />
-                  </div>
-                </div>
-              </div>
+          <div className="row align-items-start formBody">
+            <div className="col-12 mb-3">
+              <ExInput type="text" value={formData.name} label={ui.form.serviceName} readOnly />
+            </div>
+            <div className="col-12 mb-3">
+              <label className="sq-dialog-pro__label">{ui.servicesPage.allowCities}</label>
+              <Multiselect
+                options={cityOptions}
+                selectedValues={formData.selectedCities}
+                onSelect={(list) => setFormData({ ...formData, selectedCities: list })}
+                onRemove={(list) => setFormData({ ...formData, selectedCities: list })}
+                displayValue="name"
+                hideOnClickOutside={false}
+              />
+            </div>
+            <div className="col-12 mb-3">
+              <label className="sq-dialog-pro__label">{ui.servicesPage.blockCities}</label>
+              <Multiselect
+                options={
+                  dialogueData?.cities?.map((c) => ({
+                    name: c.city,
+                    id: c.city,
+                    country: c.country,
+                  })) || []
+                }
+                selectedValues={citiesToBlock}
+                onSelect={setCitiesToBlock}
+                onRemove={setCitiesToBlock}
+                displayValue="name"
+                hideOnClickOutside={false}
+              />
+            </div>
+            <div className="col-12 d-flex flex-wrap justify-content-end gap-2 formFooter mt-2">
+              <Button
+                className="bg-gray text-light"
+                text="Annuler"
+                type="button"
+                onClick={() => dispatch(closeDialog())}
+              />
+              <Button
+                type="button"
+                className="text-white"
+                style={{ backgroundColor: "#c45c26" }}
+                text="Enregistrer"
+                onClick={handleSubmit}
+              />
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

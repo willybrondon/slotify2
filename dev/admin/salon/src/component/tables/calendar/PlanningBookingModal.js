@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { getParticularSalonService } from "../../../redux/slice/serviceSlice";
@@ -10,7 +11,7 @@ import { Success } from "../../api/toastServices";
 
 const PlanningBookingModal = ({ slot, onClose, onSuccess }) => {
   const dispatch = useDispatch();
-  const { particularService } = useSelector((state) => state.serviceSlice);
+  const particularService = useSelector((state) => state.service?.particularService);
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
   const [mobile, setMobile] = useState("");
@@ -41,8 +42,9 @@ const PlanningBookingModal = ({ slot, onClose, onSuccess }) => {
   }, [clientSearch, dispatch]);
 
   const services = useMemo(() => {
-    const raw = particularService?.serviceIds || particularService || [];
-    return Array.isArray(raw) ? raw : [];
+    const raw = particularService?.serviceIds ?? particularService;
+    if (Array.isArray(raw)) return raw;
+    return [];
   }, [particularService]);
 
   const toggleService = (serviceId) => {
@@ -90,7 +92,7 @@ const PlanningBookingModal = ({ slot, onClose, onSuccess }) => {
 
   if (!slot) return null;
 
-  return (
+  return createPortal(
     <div className="sq-planning-modal-backdrop" onClick={onClose} role="presentation">
       <div
         className="sq-planning-modal"
@@ -193,7 +195,8 @@ const PlanningBookingModal = ({ slot, onClose, onSuccess }) => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

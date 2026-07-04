@@ -48,11 +48,8 @@ export const SKEDISY_SALON_UI = {
     topExperts: "Meilleurs pros",
     viewAll: "Tout voir",
     todayBookings: "Réservations du jour",
-    teamCalendarCta: "Voir le planning équipe",
-    teamCalendarHint: "RDV, créneaux libres et indisponibilités en temps réel",
-    paymentSettingsCta: "Configurer les paiements (espèces / Stripe)",
-    paymentSettingsHint:
-      "Recevez les paiements carte directement sur votre compte Stripe Connect",
+    teamCalendarCta: "Planning équipe",
+    paymentSettingsCta: "Paiements",
     showMore: "Voir plus",
     fallbackUser: "Cliente",
     price: "Prix :",
@@ -237,6 +234,30 @@ export const SKEDISY_SALON_UI = {
     rangeTo: "au",
     selectDate: "Choisir une date",
   },
+  statusTabs: {
+    pending: "En attente",
+    accepted: "Acceptées",
+    declined: "Refusées",
+  },
+  complaints: {
+    sourceLabel: "Source",
+    clientTab: "Clientes",
+    expertTab: "Experts",
+    statusLabel: "Statut",
+    all: "Toutes",
+    pending: "En attente",
+    solved: "Résolues",
+    info: "Détail",
+  },
+  orderStatus: {
+    filterLabel: "Statut commande",
+    all: "Toutes",
+    pending: "En attente",
+    confirmed: "Confirmée",
+    outOfDelivery: "En livraison",
+    delivered: "Livrée",
+    cancelled: "Annulée",
+  },
   wallet: {
     title: "Portefeuille",
     balance: "Solde portefeuille",
@@ -362,6 +383,19 @@ export const SKEDISY_SALON_UI = {
     ifscRequired: "Le code banque est requis.",
     upiRequired: "L'identifiant UPI est requis.",
     durationRequired: "La durée est requise.",
+  },
+
+  servicesPage: {
+    catalogTitle: "Catalogue Skedisy",
+    catalogHint: "Sélectionnez une prestation à ajouter",
+    salonListTitle: "Vos prestations",
+    salonListHint: "Modifier le tarif ou retirer du salon",
+    minutes: "min",
+    manageCities: "Villes autorisées",
+    allowCities: "Ajouter des villes",
+    blockCities: "Bloquer des villes",
+    removeConfirm: "Retirer cette prestation de votre salon ?",
+    removeBtn: "Retirer",
   },
 
   form: {
@@ -516,6 +550,11 @@ export const SKEDISY_SALON_UI = {
     title: "Confirmer l'action ?",
     text: "Cette action est définitive.",
     approveWithdraw: "Valider ce retrait après avoir effectué le virement ?",
+    logoutTitle: "Se déconnecter ?",
+    logoutText:
+      "Vous allez quitter votre espace salon. Assurez-vous d'avoir enregistré vos modifications.",
+    logoutConfirm: "Se déconnecter",
+    logoutCancel: "Rester connecté",
     logout: "Se déconnecter",
   },
   toast: {
@@ -560,6 +599,8 @@ export const SKEDISY_SALON_UI = {
     taxUpdated: "Taxe mise à jour.",
     taxStatus: "Statut taxe mis à jour.",
     productCategoryAdded: "Catégorie produit ajoutée.",
+    attributeAdded: "Attribut ajouté.",
+    attributeUpdated: "Attribut mis à jour.",
     citiesUpdated: "Villes mises à jour.",
   },
   pages: {

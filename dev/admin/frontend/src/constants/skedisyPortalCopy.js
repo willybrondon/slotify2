@@ -19,7 +19,7 @@ export const SKEDISY_ADMIN_PORTAL_COPY = {
   errConfirmPassword: "La confirmation est requise.",
   errPasswordMismatch: "Les mots de passe ne correspondent pas.",
   errCode: "Le code est requis.",
-  footerLink: "skedisy.com",
+  footerLink: "Découvrir skedisy.com",
   updateCodeTitle: "Mettre à jour le code",
   updateCodeSubtitle: "Nouveau code administrateur.",
   updateCodeHint: "Email, mot de passe et nouveau code.",

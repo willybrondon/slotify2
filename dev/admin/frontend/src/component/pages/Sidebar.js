@@ -4,7 +4,7 @@ import Navigator from "../extras/Navigator";
 import $ from "jquery";
 import { useEffect, useState } from "react";
 import { logout } from "../../redux/slice/authSlice";
-import { warning } from "../../util/Alert";
+import { confirmLogout } from "../../util/Alert";
 import { closeDialog } from "../../redux/slice/dialogueSlice";
 import logo from "../../assets/images/logo2.png";
 import { projectName } from "../../util/config";
@@ -19,7 +19,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const data = warning(ui.alert.logout);
+    const data = confirmLogout();
     data
       .then((logouts) => {
         const yes = logouts.isConfirmed;
@@ -28,7 +28,7 @@ const Sidebar = () => {
           navigate("/admin");
         }
       })
-      .catch((err) => console.log(err));
+      .catch(() => {});
   };
 
   const handleOnClick = () => {

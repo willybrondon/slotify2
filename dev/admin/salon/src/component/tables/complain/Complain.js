@@ -23,7 +23,8 @@ import noImage from "../../../assets/images/noImage.png";
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Analytics from "../../extras/Analytics";
+import PageComplainFilters from "../../extras/PageComplainFilters";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import ComplainDialog from "./ComplainDialog";
 
 const Complain = () => {
@@ -45,6 +46,10 @@ const Complain = () => {
   useEffect(() => {
     dispatch(getComplains(payload));
   }, [page, rowsPerPage, type, person]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [type, person]);
 
   useEffect(() => {
     setData(complain);
@@ -139,12 +144,12 @@ const Complain = () => {
               className="text-white not-allowed  p10-x p4-y fs-12 br-5"
               style={{ backgroundColor: "#ff7512" }}
             >
-              Pending
+              {ui.complaints.pending}
             </button>
           )}
           {row?.type == 1 && (
             <button className="bg-danger not-allowed text-light p10-x p4-y fs-12 br-5">
-              Solved
+              {ui.complaints.solved}
             </button>
           )}
         </span>
@@ -160,7 +165,7 @@ const Complain = () => {
               dispatch(openDialog({ type: "complain", data: row }))
             }
           >
-            Info
+            {ui.complaints.info}
           </button>
         </span>
       ),
@@ -240,12 +245,12 @@ const Complain = () => {
               className="text-white p10-x p4-y fs-12 br-5"
               style={{ backgroundColor: "#ff7512" }}
             >
-              Pending
+              {ui.complaints.pending}
             </button>
           )}
           {row?.type == 1 && (
             <button className="bg-danger text-light p10-x p4-y fs-12 br-5">
-              Solved
+              {ui.complaints.solved}
             </button>
           )}
         </span>
@@ -261,73 +266,24 @@ const Complain = () => {
               dispatch(openDialog({ type: "complain", data: row }))
             }
           >
-            Info
+            {ui.complaints.info}
           </button>
         </span>
       ),
     },
   ];
 
-  const complainType = [
-    { name: "PENDING", value: 0 },
-    { name: "SOLVED", value: 1 },
-  ];
-
   return (
     <div className="mainCategory">
-      <Title name="Réclamations" />
+      <Title name={ui.nav.complaints} />
 
-      <div className="row mb-2">
-        <div className="d-flex col-10 mt-auto mb-0">
-          <div
-            className="my-2"
-            style={{
-              width: "329px",
-              border: "1px solid #1c2b20",
-              padding: "4px",
-              borderRadius: "40px",
-            }}
-          >
-            <button
-              type="button"
-              className={`${person === 1 ? "activeBtn" : "disabledBtn"}`}
-              onClick={() => setPerson(1)}
-            >
-              User complain
-            </button>
-            <button
-              type="button"
-              className={`${person === 0 ? "activeBtn" : "disabledBtn"} ms-1`}
-              onClick={() => setPerson(0)}
-            >
-              Expert complain
-            </button>
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="inputData">
-            <label className="styleForTitle" htmlFor="bookingType">
-              Complain type
-            </label>
-            <select
-              name="bookingType"
-              className="rounded-2 fw-bold"
-              id="bookingType"
-              value={type}
-              onChange={(e) => {
-                setType(e.target.value);
-              }}
-            >
-              <option value={2} selected>
-                ALL
-              </option>
-              {complainType?.map((data) => {
-                return <option value={data?.value}>{data?.name}</option>;
-              })}
-            </select>
-          </div>
-        </div>
-      </div>
+      <PageComplainFilters
+        person={person}
+        setPerson={setPerson}
+        type={type}
+        setType={setType}
+      />
+
       <div>
         <Table
           data={data}

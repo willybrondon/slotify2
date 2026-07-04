@@ -4,7 +4,7 @@ import Navigator from "../extras/Navigator";
 import $ from "jquery";
 import { useEffect, useState } from "react";
 import { logout } from "../../redux/slice/authSlice";
-import { warning } from "../../util/Alert";
+import { confirmLogout } from "../../util/Alert";
 import { closeDialog } from "../../redux/slice/dialogueSlice";
 import logo from "../../assets/images/logo2.png";
 import { ReactComponent as Services } from "../../assets/images/services.svg"
@@ -19,17 +19,16 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const data = warning(ui.alert.logout);
+    const data = confirmLogout();
     data
       .then((logouts) => {
         const yes = logouts.isConfirmed;
-        console.log("yes", yes);
         if (yes) {
           dispatch(logout());
           navigate("/salonpanel");
         }
       })
-      .catch((err) => console.log(err));
+      .catch(() => {});
   };
 
   const handleOnClick = () => {
@@ -207,7 +206,13 @@ const Sidebar = () => {
       name: n.products,
       path: "/salonpanel/productsTable",
       navSVG: (
-        <Category height={20} width={20} />
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M7 4V2C7 1.44772 7.44772 1 8 1H16C16.5523 1 17 1.44772 17 2V4H20C20.5523 4 21 4.44772 21 5C21 5.55228 20.5523 6 20 6H19V19C19 20.6569 17.6569 22 16 22H8C6.34315 22 5 20.6569 5 19V6H4C3.44772 6 3 5.55228 3 5C3 4.44772 3.44772 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19C7 19.5523 7.44772 20 8 20H16C16.5523 20 17 19.5523 17 19V6H7Z"
+            fill="#818185"
+          />
+          <path d="M10 10H14V18H10V10Z" fill="#818185" />
+        </svg>
       ),
       onClick: handleOnClick,
     },
@@ -215,7 +220,12 @@ const Sidebar = () => {
       name: n.attributes,
       path: "/salonpanel/attribute",
       navSVG: (
-        <Category height={20} width={20} />
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M20.59 13.41L11 3H4V10L13.59 19.59C14.37 20.37 15.63 20.37 16.41 19.59L20.59 15.41C21.37 14.63 21.37 13.37 20.59 12.59V13.41ZM6.5 5.5C7.32843 5.5 8 6.17157 8 7C8 7.82843 7.32843 8.5 6.5 8.5C5.67157 8.5 5 7.82843 5 7C5 6.17157 5.67157 5.5 6.5 5.5Z"
+            fill="#818185"
+          />
+        </svg>
       ),
       onClick: handleOnClick,
     },

@@ -8,7 +8,6 @@ import {
   getAllAttributes,
 } from "../../../redux/slice/attributeSlice";
 import { closeDialog } from "../../../redux/slice/dialogueSlice";
-import { toast } from "react-toastify";
 
 const AttributeDialogue = () => {
   const dispatch = useDispatch();
@@ -51,24 +50,18 @@ const AttributeDialogue = () => {
     };
 
     if (mongoId) {
-      dispatch(attributeUpdate(data1)).then((res) => {
-        if (res?.payload?.status) {
-          dispatch(getAllAttributes());
-          toast.success(res?.payload?.message);
-        } else {
-          toast.error(res?.payload?.message);
-        }
-      });
+      const res = await dispatch(attributeUpdate(data1));
+      if (res?.payload?.status) {
+        dispatch(getAllAttributes());
+        dispatch(closeDialog());
+      }
     } else {
-      dispatch(attributeAdd(data)).then((res) => {
-        if (res?.payload?.status) {
-          dispatch(getAllAttributes());
-        } else {
-          toast.error(res?.payload?.message);
-        }
-      });
+      const res = await dispatch(attributeAdd(data));
+      if (res?.payload?.status) {
+        dispatch(getAllAttributes());
+        dispatch(closeDialog());
+      }
     }
-    dispatch(closeDialog());
   };
 
   const addDetailToList = (e) => {
@@ -96,7 +89,7 @@ const AttributeDialogue = () => {
             <div className="mainDiaogBox">
               <div className="row justify-content-between align-items-center formHead">
                 <div className="col-8">
-                  <h2 className="text-theme m0">Attribute dialog</h2>
+                  <h2 className="text-theme m0">{ui.dialog.attributeDialog}</h2>
                 </div>
                 <div className="col-4">
                   <div

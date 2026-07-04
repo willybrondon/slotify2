@@ -550,6 +550,11 @@ export const SKEDISY_ADMIN_UI = {
     title: "Confirmer l'action ?",
     text: "Cette action est définitive.",
     logout: "Se déconnecter",
+    logoutTitle: "Se déconnecter ?",
+    logoutText:
+      "Vous allez quitter l'administration Skedisy. Assurez-vous d'avoir enregistré vos modifications.",
+    logoutConfirm: "Se déconnecter",
+    logoutCancel: "Rester connecté",
     approveWithdraw: "Valider cette demande de retrait ?",
     approveProduct: "Valider cette demande produit ?",
     rejectRequest: "Refuser cette demande ?",

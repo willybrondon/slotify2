@@ -41,11 +41,14 @@ const cancelTokenSource = axios.CancelToken.source();
 apiInstance.interceptors.request.use(
   function (config) {
     config.cancelToken = cancelTokenSource.token;
-    config.baseURL = resolveApiBase();
     config.headers.Authorization = getTokenData();
     config.headers.key = resolveApiKey();
     if (config.url) {
-      config.url = config.url.replace(/^\//, "");
+      const path = String(config.url)
+        .replace(/^\//, "")
+        .replace(/^salonpanel\//, "");
+      config.url = buildApiUrl(path);
+      config.baseURL = "";
     }
     return config;
   },

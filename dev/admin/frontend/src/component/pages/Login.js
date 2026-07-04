@@ -42,9 +42,15 @@ const Login = (props) => {
       <div className="loginDiv">
         <div className="loginPage m-auto sk-portal-card">
           <div className="sk-portal-logo">
-            <img src={logo} alt="Skedisy" />
+            <a
+              href="https://skedisy.com"
+              style={{ textDecoration: "none", display: "inline-block" }}
+            >
+              <img src={logo} alt="Skedisy" />
+            </a>
           </div>
           <h1 className="sk-portal-login-title">{copy.loginTitle}</h1>
+          <p className="sk-portal-badge">{copy.welcome}</p>
           <p className="sk-portal-subtitle">{copy.loginSubtitle}</p>
           <div>
             <div className="col-12">
@@ -92,6 +98,11 @@ const Login = (props) => {
               />
             </div>
           </div>
+          <p className="sk-portal-footer text-center mb-0">
+            <a href="https://skedisy.com" target="_blank" rel="noreferrer">
+              {copy.footerLink}
+            </a>
+          </p>
         </div>
       </div>
     </div>

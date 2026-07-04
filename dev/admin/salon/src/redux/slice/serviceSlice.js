@@ -25,7 +25,7 @@ export const addService = createAsyncThunk("salon/service", async (payload) => {
 export const updateService = createAsyncThunk(
   "salon/addServices",
   async (payload) => {
-    return apiInstance.patch(`salon/addServices`, payload.data);
+    return apiInstanceFetch.patch(`salon/addServices`, payload.data);
   }
 );
 
@@ -39,21 +39,21 @@ export const getParticularSalonService = createAsyncThunk(
 export const deleteService = createAsyncThunk(
   "salon/removeService",
   async (id) => {
-    return apiInstance.patch(`salon/removeService?serviceId=${id}`);
+    return apiInstanceFetch.patch(`salon/removeService?serviceId=${id}`);
   }
 );
 
 export const allowCity = createAsyncThunk(
   "salon/service/allowCityForSalonService",
   async (payload) => {
-    return apiInstance.patch(`salon/service/allowCityForSalonService`, payload);
+    return apiInstanceFetch.patch(`salon/service/allowCityForSalonService`, payload);
   }
 );
 
 export const blockCity = createAsyncThunk(
   "salon/service/blockCityForSalonService",
   async (payload) => {
-    return apiInstance.patch(`salon/service/blockCityForSalonService`, payload);
+    return apiInstanceFetch.patch(`salon/service/blockCityForSalonService`, payload);
   }
 );
 

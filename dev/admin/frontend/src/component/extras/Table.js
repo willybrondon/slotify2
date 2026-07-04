@@ -41,8 +41,9 @@ function Table(props) {
   };
 
   return (
-    <div className="mainTable" id={id}>
-      <table width="100%" className={`primeTable  ${className}`}>
+    <div className="sq-table-shell">
+      <div className="mainTable sq-table-hscroll" id={id}>
+        <table width="100%" className={`primeTable sq-pro-table ${className || ""}`}>
         {roleSkeleton ? (
           <>
             <thead>
@@ -87,12 +88,12 @@ function Table(props) {
                 {mapData?.map((res, i) => {
                   return (
                     <th
-                      className={`text-uppercase ${res.thClass}`}
+                      className={`${res.thClass || ""}`}
                       key={i}
                       width={res.width}
                       onClick={res?.thClick}
                     >
-                      {`${" "}${res.Header}`}
+                      {res.Header}
                       {res?.sorting?.type === "server" && (
                         <i
                           className="ri-expand-up-down-fill deg90 ms-1"
@@ -149,6 +150,7 @@ function Table(props) {
           </>
         )}
       </table>
+      </div>
     </div>
   );
 }

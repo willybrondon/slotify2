@@ -83,15 +83,12 @@ const Analytics = (props) => {
     (String(analyticsStartDate).toUpperCase() === "ALL" &&
       String(analyticsStartEnd).toUpperCase() === "ALL")
       ? a.all
-      : `${moment(analyticsStartDate).format("YYYY-MM-DD")} ${a.rangeTo} ${moment(
+      : `${moment(analyticsStartDate).format("DD/MM/YY")} ${a.rangeTo} ${moment(
           analyticsStartEnd
-        ).format("YYYY-MM-DD")}`;
+        ).format("DD/MM/YY")}`;
 
   return (
-    <div
-      className="d-flex my-2"
-      style={{ width: "285px", justifyContent: direction }}
-    >
+    <div className="sq-analytics-picker" style={{ justifyContent: direction }}>
       <DateRangePicker
         initialSettings={{ ranges }}
         onCallback={handleCallback}
@@ -103,24 +100,8 @@ const Analytics = (props) => {
           color={color}
           readOnly
           onClick={handleInputClick}
-          className={`daterange float-right mr-4 text-center ${bgcolor} ${color}`}
+          className={`daterange sq-date-input float-right mr-4 text-center ${bgcolor} ${color}`}
           value={displayValue}
-          style={{
-            width: "85%",
-            fontWeight: 600,
-            cursor: "pointer",
-            border: "1px solid white",
-            display: "flex",
-            justifyContent: "center",
-            fontSize: "14px",
-            padding: "10px",
-            borderRadius: "6px",
-            height: "48px !important",
-            color: "#000",
-            background: "white",
-            boxShadow:
-              "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
-          }}
         />
       </DateRangePicker>
     </div>

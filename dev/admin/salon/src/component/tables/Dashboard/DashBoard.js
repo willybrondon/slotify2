@@ -391,16 +391,13 @@ const DashBoard = () => {
         <div className="mainDashboard">
             <div className="dashBoardHead">
                 <h3 className="m3-bottom text-start">{d.welcome} 👋</h3>
-                <div className="row mb-0">
-                    <div className="col-3 mb-0 d-flex align-items-center">
-                        <Title
-                            name={d.title}
-                            display={"none"}
-                            bottom={"0"}
-                        />
-                    </div>
-
-                    <div className="col-9 mb-0 d-flex justify-content-end">
+                <div className="sq-dash-head-row">
+                    <Title
+                        name={d.title}
+                        display={"none"}
+                        bottom={"0"}
+                    />
+                    <div className="sq-dash-date-wrap">
                         <Analytics
                             analyticsStartDate={startDate}
                             analyticsStartEnd={endDate}
@@ -413,67 +410,27 @@ const DashBoard = () => {
             </div>
             <div className="row mb-3">
                 <div className="col-12">
-                    <div
-                        className="d-flex justify-content-between align-items-center p-3 rounded cursor-pointer"
-                        style={{
-                            backgroundColor: "#f0f7f4",
-                            border: "1px solid #d4e8de",
-                            cursor: "pointer",
-                        }}
-                        onClick={() => navigate("/salonpanel/teamCalendar")}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                                navigate("/salonpanel/teamCalendar");
-                            }
-                        }}
-                        role="button"
-                        tabIndex={0}
-                    >
-                        <div>
-                            <div style={{ fontWeight: 700, fontSize: "16px" }}>
-                                {d.teamCalendarCta}
-                            </div>
-                            <div style={{ fontSize: "13px", opacity: 0.7 }}>
-                                {d.teamCalendarHint}
-                            </div>
-                        </div>
-                        <span style={{ fontSize: "22px" }}>→</span>
+                    <div className="sq-dash-quick-actions">
+                        <button
+                            type="button"
+                            className="sq-dash-quick-btn"
+                            onClick={() => navigate("/salonpanel/teamCalendar")}
+                        >
+                            {d.teamCalendarCta}
+                        </button>
+                        {stripeStatus?.platformStripeEnabled !== false &&
+                          stripeStatus?.options?.acceptStripe !== true && (
+                            <button
+                                type="button"
+                                className="sq-dash-quick-btn"
+                                onClick={() => navigate("/salonpanel/paymentSettings")}
+                            >
+                                {d.paymentSettingsCta}
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
-            {stripeStatus?.platformStripeEnabled !== false &&
-              stripeStatus?.options?.acceptStripe !== true && (
-                <div className="row mb-3">
-                    <div className="col-12">
-                        <div
-                            className="d-flex justify-content-between align-items-center p-3 rounded"
-                            style={{
-                                backgroundColor: "#f0f4ff",
-                                border: "1px solid #d6e0ff",
-                                cursor: "pointer",
-                            }}
-                            onClick={() => navigate("/salonpanel/paymentSettings")}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                    navigate("/salonpanel/paymentSettings");
-                                }
-                            }}
-                            role="button"
-                            tabIndex={0}
-                        >
-                            <div>
-                                <div style={{ fontWeight: 700, fontSize: "16px" }}>
-                                    {d.paymentSettingsCta}
-                                </div>
-                                <div style={{ fontSize: "13px", opacity: 0.7 }}>
-                                    {d.paymentSettingsHint}
-                                </div>
-                            </div>
-                            <span style={{ fontSize: "22px" }}>→</span>
-                        </div>
-                    </div>
-                </div>
-            )}
             <div className="mainDashbox">
                 <div className="row">
                     <div className="col-lg-3 col-sm-6 col-12">

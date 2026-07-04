@@ -8,6 +8,8 @@ import Pagination from "../../extras/Pagination";
 import { useNavigate } from "react-router-dom";
 import { openDialog } from "../../../redux/slice/dialogueSlice";
 import EditOrder from "./EditOrder";
+import PageOrderStatusFilters from "../../extras/PageOrderStatusFilters";
+import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 
 import { ReactComponent as Delievered } from "../../../assets/images/deliever.svg"
 import { ReactComponent as Cancel } from "../../../assets/images/cancel.svg"
@@ -17,13 +19,6 @@ const Order = () => {
     const { order } = useSelector((state) => state.order)
     const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
 
-    const orderType = [
-        { name: "Pending", value: "Pending" },
-        { name: "Confirmed", value: "Confirmed" },
-        { name: "Out Of Delivery", value: "Out Of Delivery" },
-        { name: "Delivered ", value: "Delivered" },
-        { name: "Cancelled ", value: "Cancelled" },
-    ];
     const dispatch = useDispatch();
     const [data, setData] = useState([]);
     const [page, setPage] = useState(0)
@@ -37,6 +32,10 @@ const Order = () => {
         }
         dispatch(getOrders(payload))
     }, [type, page, rowsPerPage]);
+
+    useEffect(() => {
+        setPage(0);
+    }, [type]);
 
     const groupedOrders = order?.reduce((acc, order) => {
         console.log("1234", order)
@@ -249,38 +248,16 @@ const Order = () => {
 
     return (
         <div className="mainExpert">
-            <Title name="Commandes" />
-            <div className="col-2">
-                <div className="inputData">
-                    <label className="styleForTitle" htmlFor="orderType">
-                        Order type
-                    </label>
-                    <select
-                        name="orderType"
-                        className="rounded-2 fw-bold"
-                        id="orderType"
-                        value={type}
-                        onChange={(e) => {
-                            setType(e.target.value);
-                        }}
-                    >
-                        <option value="All" selected>
-                            All
-                        </option>
-                        {orderType?.map((data) => {
-                            return <option value={data?.value}>{data?.name}</option>;
-                        })}
-                    </select>
-                </div>
-            </div>
+            <Title name={ui.nav.orders} />
+            <PageOrderStatusFilters type={type} setType={setType} />
 
             <div>
-                <div className="tableMain">
+                <div className="tableMain sq-table-hscroll">
                     <div className="primeMain">
                         <table
                             width="100%"
                             border
-                            className="primeTable text-center"
+                            className="primeTable sq-pro-table text-center"
                             style={{ maxHeight: "680px" }}
                         >
                             <thead

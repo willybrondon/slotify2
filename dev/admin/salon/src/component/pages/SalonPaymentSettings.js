@@ -133,7 +133,7 @@ const SalonPaymentSettings = () => {
       </div>
 
       {acceptStripePref && platformStripe && (
-        <div className="col-12">
+        <div className="col-12 sq-stripe-connect-block">
           <p style={{ fontSize: "12px", color: "#666", marginBottom: 8 }}>
             {portalCopy.paymentAdminStripeNote}
           </p>
@@ -166,7 +166,7 @@ const SalonPaymentSettings = () => {
             )}
             <Button
               text={portalCopy.stripeConnectButton}
-              className="text-white"
+              className="text-white sq-stripe-connect-btn"
               style={{ backgroundColor: "#635bff" }}
               onClick={handleStripeOnboard}
               disabled={isLoading}

@@ -145,6 +145,17 @@ const TeamCalendar = () => {
     loadSchedule();
   }, [loadSchedule]);
 
+  useEffect(() => {
+    const mainAdmin = document.querySelector(".mainAdmin");
+    const adminStart = document.querySelector(".adminStart");
+    mainAdmin?.classList.add("sq-planning-active");
+    adminStart?.classList.add("sq-planning-active");
+    return () => {
+      mainAdmin?.classList.remove("sq-planning-active");
+      adminStart?.classList.remove("sq-planning-active");
+    };
+  }, []);
+
   const calendarBounds = useMemo(() => {
     const bounds = schedule?.calendarBounds;
     return {
@@ -344,106 +355,47 @@ const TeamCalendar = () => {
 
   return (
     <div className="team-calendar-page sq-planning-page">
-      <Title name={ui.pages.teamCalendar || "Planning équipe"} />
+      <div className="sq-planning-top">
+        <Title name={ui.pages.teamCalendar || "Planning équipe"} />
 
-      <div className="sq-planning-toolbar card-sq mb-3">
-        <div className="sq-planning-toolbar__left">
-          <span className="sq-planning-toolbar__label">Mode</span>
-          <div className="sq-segmented">
-            <button
-              type="button"
-              className={plannerMode === "booking" ? "is-active" : ""}
-              onClick={() => setPlannerMode("booking")}
-            >
-              Créer RDV
-            </button>
-            <button
-              type="button"
-              className={plannerMode === "block" ? "is-active" : ""}
-              onClick={() => setPlannerMode("block")}
-            >
-              Bloquer
-            </button>
-          </div>
-        </div>
-        <div className="sq-planning-toolbar__right d-flex flex-wrap align-items-center gap-3">
-          <label className="sq-check-label">
-            <input
-              type="checkbox"
-              checked={showFreeSlots}
-              onChange={(e) => setShowFreeSlots(e.target.checked)}
-            />
-            Créneaux libres
-          </label>
-          <button type="button" className="btn btn-sm sq-btn-outline" onClick={loadSchedule}>
-            Actualiser
-          </button>
-        </div>
-      </div>
-
-      {schedule && hasExperts && (
-        <div className="team-calendar-stats row g-3 mb-3">
-          {[
-            ["Pros", schedule.stats?.totalExperts ?? 0, ""],
-            ["Disponibles", schedule.stats?.availableCount ?? 0, "stat-available"],
-            ["Occupés", schedule.stats?.busyCount ?? 0, "stat-busy"],
-            ["Hors service", schedule.stats?.offCount ?? 0, "stat-off"],
-          ].map(([label, value, cls]) => (
-            <div key={label} className="col-md-3 col-6">
-              <div className={`stat-card ${cls}`}>
-                <span className="stat-label">{label}</span>
-                <strong>{value}</strong>
-              </div>
+        <div className="sq-planning-toolbar card-sq mb-0">
+          <div className="sq-planning-toolbar__left">
+            <span className="sq-planning-toolbar__label">Mode</span>
+            <div className="sq-segmented">
+              <button
+                type="button"
+                className={plannerMode === "booking" ? "is-active" : ""}
+                onClick={() => setPlannerMode("booking")}
+              >
+                Créer RDV
+              </button>
+              <button
+                type="button"
+                className={plannerMode === "block" ? "is-active" : ""}
+                onClick={() => setPlannerMode("block")}
+              >
+                Bloquer
+              </button>
             </div>
-          ))}
-        </div>
-      )}
-
-      {schedule?.isHoliday && (
-        <span className="badge bg-warning text-dark mb-2">Salon fermé (congé)</span>
-      )}
-
-      {!isLoading && schedule && hasExperts && !calendarEvents.length && (
-        <div className="team-calendar-empty alert alert-light border sq-planning-alert mb-3">
-          Aucun créneau pour cette date. Passez en vue <strong>Jour</strong>, mode <strong>Créer RDV</strong>, puis cliquez sur un créneau libre.
-        </div>
-      )}
-
-      {!isLoading && schedule && hasExperts && view !== "day" && (
-        <div className="alert alert-info sq-planning-alert mb-3">
-          La création et le déplacement de RDV fonctionnent en vue <strong>Jour</strong>.
-        </div>
-      )}
-
-      <div className="team-expert-status row g-2 mb-3">
-        {(schedule?.resources || []).map((r) => (
-          <div key={r.resourceId} className="col-md-4 col-lg-3">
-            <div className="expert-status-chip">
-              <span
-                className="status-dot"
-                style={{
-                  backgroundColor: OPERATIONAL_COLORS[r.operationalStatus] || "#9ca3af",
-                }}
+          </div>
+          <div className="sq-planning-toolbar__right d-flex flex-wrap align-items-center gap-3">
+            <label className="sq-check-label">
+              <input
+                type="checkbox"
+                checked={showFreeSlots}
+                onChange={(e) => setShowFreeSlots(e.target.checked)}
               />
-              <span className="expert-name">{r.resourceTitle}</span>
-              <span className="status-text">
-                {OPERATIONAL_LABELS[r.operationalStatus] || r.operationalStatus}
-                {r.occupancyRate != null ? ` · ${r.occupancyRate}%` : ""}
-              </span>
-            </div>
+              Créneaux libres
+            </label>
+            <button type="button" className="btn btn-sm sq-btn-outline" onClick={loadSchedule}>
+              Actualiser
+            </button>
           </div>
-        ))}
-      </div>
-
-      <div className="sq-planning-legend">
-        <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.confirm }} /> Confirmé</span>
-        <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.pending }} /> En attente</span>
-        <span><i className="legend-swatch" style={{ background: STATUS_COLORS.busy }} /> Indisponible</span>
-        <span><i className="legend-swatch legend-free" /> Libre</span>
+        </div>
       </div>
 
       {hasExperts && (
-        <div className={`team-calendar-wrap card-sq ${isLoading ? "is-loading" : ""}`}>
+        <div className={`sq-planning-calendar-zone team-calendar-wrap card-sq ${isLoading ? "is-loading" : ""}`}>
           <DnDCalendar
             localizer={localizer}
             culture="fr"
@@ -478,6 +430,69 @@ const TeamCalendar = () => {
           />
         </div>
       )}
+
+      <div className="sq-planning-meta">
+        {schedule && hasExperts && (
+          <div className="team-calendar-stats row g-2 mb-2">
+            {[
+              ["Pros", schedule.stats?.totalExperts ?? 0, ""],
+              ["Disponibles", schedule.stats?.availableCount ?? 0, "stat-available"],
+              ["Occupés", schedule.stats?.busyCount ?? 0, "stat-busy"],
+              ["Hors service", schedule.stats?.offCount ?? 0, "stat-off"],
+            ].map(([label, value, cls]) => (
+              <div key={label} className="col-3 col-md-3">
+                <div className={`stat-card ${cls}`}>
+                  <span className="stat-label">{label}</span>
+                  <strong>{value}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {schedule?.isHoliday && (
+          <span className="badge bg-warning text-dark mb-2">Salon fermé (congé)</span>
+        )}
+
+        {!isLoading && schedule && hasExperts && !calendarEvents.length && (
+          <div className="team-calendar-empty alert alert-light border sq-planning-alert mb-2">
+            Aucun créneau pour cette date. Vue <strong>Jour</strong> → cliquez sur un créneau libre.
+          </div>
+        )}
+
+        {!isLoading && schedule && hasExperts && view !== "day" && (
+          <div className="alert alert-info sq-planning-alert mb-2">
+            Création et déplacement de RDV en vue <strong>Jour</strong> uniquement.
+          </div>
+        )}
+
+        <div className="team-expert-status row g-2 mb-2 sq-planning-meta-chips">
+          {(schedule?.resources || []).map((r) => (
+            <div key={r.resourceId} className="col-md-4 col-lg-3">
+              <div className="expert-status-chip">
+                <span
+                  className="status-dot"
+                  style={{
+                    backgroundColor: OPERATIONAL_COLORS[r.operationalStatus] || "#9ca3af",
+                  }}
+                />
+                <span className="expert-name">{r.resourceTitle}</span>
+                <span className="status-text">
+                  {OPERATIONAL_LABELS[r.operationalStatus] || r.operationalStatus}
+                  {r.occupancyRate != null ? ` · ${r.occupancyRate}%` : ""}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="sq-planning-legend sq-planning-meta-legend">
+          <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.confirm }} /> Confirmé</span>
+          <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.pending }} /> En attente</span>
+          <span><i className="legend-swatch" style={{ background: STATUS_COLORS.busy }} /> Indisponible</span>
+          <span><i className="legend-swatch legend-free" /> Libre</span>
+        </div>
+      </div>
 
       {bookingSlot && (
         <PlanningBookingModal

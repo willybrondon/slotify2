@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,7 +20,7 @@ const STATUS_LABELS = {
 
 const PlanningBookingDetailModal = ({ bookingId, onClose, onUpdated }) => {
   const dispatch = useDispatch();
-  const { particularService } = useSelector((state) => state.serviceSlice);
+  const particularService = useSelector((state) => state.service?.particularService);
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingServices, setEditingServices] = useState(false);
@@ -52,7 +53,7 @@ const PlanningBookingDetailModal = ({ bookingId, onClose, onUpdated }) => {
   const expertServiceIds = (expert?.serviceId || []).map((id) => String(id));
 
   const availableServices = useMemo(() => {
-    const raw = particularService?.serviceIds || particularService || [];
+    const raw = particularService?.serviceIds ?? particularService;
     const list = Array.isArray(raw) ? raw : [];
     return list.filter((entry) => {
       const service = entry?.id || entry;
@@ -113,7 +114,7 @@ const PlanningBookingDetailModal = ({ bookingId, onClose, onUpdated }) => {
 
   if (!bookingId) return null;
 
-  return (
+  return createPortal(
     <div className="sq-planning-modal-backdrop" onClick={onClose} role="presentation">
       <div
         className="sq-planning-modal sq-booking-detail"
@@ -279,7 +280,8 @@ const PlanningBookingDetailModal = ({ bookingId, onClose, onUpdated }) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
