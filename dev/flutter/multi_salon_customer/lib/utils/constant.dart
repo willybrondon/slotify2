@@ -73,6 +73,7 @@ class Constant {
   static var idCheckMobile = 'idCheckMobile';
   static var idBookingAndLogin = 'idBookingAndLogin';
   static var idProgressView = 'idProgressView';
+  static var idSettingsRefresh = 'idSettingsRefresh';
   static var idRemember = 'idRemember';
   static var idExpertDetail = 'idExpertDetail';
   static var idUserReview = 'idUserReview';

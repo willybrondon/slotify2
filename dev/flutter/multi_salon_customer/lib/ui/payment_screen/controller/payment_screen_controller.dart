@@ -73,13 +73,10 @@ class PaymentScreenController extends GetxController {
     mtnMomoPhoneController.text = registeredPhone;
     useRegisteredPhoneForMtnMomo = true;
 
-    // Ensure SplashController is initialized and settings are loaded
+    // Ensure SplashController is initialized and settings are up to date
     try {
       final splashController = Get.find<SplashController>();
-      if (splashController.settingCategory == null) {
-        log("Payment Screen - Settings not loaded, loading now...");
-        await splashController.onSettingApiCall();
-      }
+      await splashController.refreshSettings();
     } catch (e) {
       log("Payment Screen - SplashController not found, initializing...");
       try {

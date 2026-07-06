@@ -34,12 +34,65 @@
     bookingFromExpert: false,
     /** Retour depuis l’étape expert pour ajouter des prestations. */
     returnToExpertStep: false,
+    walletBalance: 0,
   };
 
-  const payCfg = cfg.payment || {};
-  if (payCfg.cashAfterService === false && payCfg.isStripePay) {
-    state.paymentMethod = "Stripe";
+  const payCfg = { ...(cfg.payment || {}) };
+
+  async function refreshPaymentSettings() {
+    try {
+      const params = new URLSearchParams();
+      if (state.userId) params.set("userId", String(state.userId));
+      const qs = params.toString();
+      const res = await fetch(
+        `/api/public/booking/payment-settings${qs ? `?${qs}` : ""}`
+      );
+      const data = await res.json();
+      if (data.status && data.settings) {
+        Object.assign(payCfg, data.settings);
+        if (data.walletBalance != null) {
+          state.walletBalance = Number(data.walletBalance) || 0;
+        }
+        syncDefaultPaymentMethod();
+        return true;
+      }
+    } catch (e) {
+      console.warn("[salon-booking] payment settings refresh failed", e);
+    }
+    return false;
   }
+
+  function getAvailablePaymentMethods() {
+    const list = [];
+    if (payCfg.cashAfterService !== false && cfg.salonAcceptsCash !== false) {
+      list.push({ value: "cashAfterService", label: cfg.copy.payAtSalon });
+    }
+    if (
+      payCfg.isStripePay &&
+      payCfg.stripePublishableKey &&
+      cfg.salonAcceptsStripe !== false
+    ) {
+      list.push({ value: "Stripe", label: cfg.copy.payWithStripe });
+    }
+    if (payCfg.isWalletPay) {
+      const bal = Number(state.walletBalance) || 0;
+      const tpl = cfg.copy.payWithWalletBalance || cfg.copy.payWithWallet || "Wallet";
+      const label = tpl.includes("__BALANCE__")
+        ? tpl.replace("__BALANCE__", `${cfg.currency}${bal.toFixed(2)}`)
+        : tpl;
+      list.push({ value: "wallet", label });
+    }
+    return list;
+  }
+
+  function syncDefaultPaymentMethod() {
+    const available = getAvailablePaymentMethods();
+    if (!available.some((m) => m.value === state.paymentMethod)) {
+      state.paymentMethod = available[0]?.value || "cashAfterService";
+    }
+  }
+
+  syncDefaultPaymentMethod();
 
   function t(key) {
     return cfg.copy[key] || key;
@@ -1179,6 +1232,7 @@
       state.userId = String(webUser.id);
       state.email = webUser.email || "";
       state.mobile = webUser.mobile || "";
+      state.walletBalance = Number(webUser.amount) || 0;
       const displayName =
         [webUser.fname, webUser.lname].filter(Boolean).join(" ").trim() ||
         webUser.email;
@@ -1196,7 +1250,7 @@
     `;
       document.getElementById("btnToPayment").onclick = async () => {
         await loadCouponsForUser(state.userId);
-        renderStepPayment();
+        await renderStepPayment();
       };
       document.getElementById("btnAuthSwitch").onclick = () => {
         clearWebUser();
@@ -1271,16 +1325,24 @@
         return;
       }
       state.userId = userId;
+      state.walletBalance = Number(vd.user?.amount) || 0;
       await loadCouponsForUser(userId);
-      renderStepPayment();
+      await renderStepPayment();
     };
   }
 
-  function renderStepPayment() {
+  async function renderStepPayment() {
     hideBookingStickyBar();
+    await refreshPaymentSettings();
     const totals = calcTotals(getSelectedServices());
-    const showCash = payCfg.cashAfterService !== false;
-    const showStripe = payCfg.isStripePay && payCfg.stripePublishableKey;
+    const methods = getAvailablePaymentMethods();
+    const showStripe = methods.some((m) => m.value === "Stripe");
+    const paymentOptionsHtml = methods
+      .map(
+        (m) =>
+          `<label class="sq-payment-option"><input type="radio" name="payMethod" value="${escapeHtml(m.value)}" ${state.paymentMethod === m.value ? "checked" : ""}> <span>${escapeHtml(m.label)}</span></label>`
+      )
+      .join("");
 
     const couponList =
       state.availableCoupons.length > 0
@@ -1312,8 +1374,7 @@
       </div>
       <p class="sq-booking-step__label">${escapeHtml(cfg.copy.selectPayment)}</p>
       <div class="sq-payment-methods">
-        ${showCash ? `<label class="sq-payment-option"><input type="radio" name="payMethod" value="cashAfterService" ${state.paymentMethod === "cashAfterService" ? "checked" : ""}> <span>${escapeHtml(cfg.copy.payAtSalon)}</span></label>` : ""}
-        ${showStripe ? `<label class="sq-payment-option"><input type="radio" name="payMethod" value="Stripe" ${state.paymentMethod === "Stripe" ? "checked" : ""}> <span>${escapeHtml(cfg.copy.payWithStripe)}</span></label>` : ""}
+        ${paymentOptionsHtml || `<p class="sq-booking-step__hint">${escapeHtml(t("stripeUnavailable"))}</p>`}
       </div>
       <div id="sq-stripe-wrap" class="sq-stripe-wrap${state.paymentMethod === "Stripe" ? "" : " sq-stripe-wrap--hidden"}">
         <p class="sq-stripe-hint">${escapeHtml(cfg.copy.stripeSecure)}</p>
@@ -1365,6 +1426,19 @@
       let result;
       if (state.paymentMethod === "Stripe") {
         result = await confirmStripePayment(userId);
+      } else if (state.paymentMethod === "wallet") {
+        const totalsNow = calcTotals(getSelectedServices());
+        if (state.walletBalance < totalsNow.total) {
+          showBookingNotice(
+            "error",
+            cfg.copy.walletInsufficient || t("walletInsufficient"),
+            () => renderStepPayment()
+          );
+          btn.disabled = false;
+          btn.textContent = cfg.copy.confirmBooking;
+          return;
+        }
+        result = await createBooking(userId);
       } else {
         result = await createBooking(userId);
       }
@@ -1420,6 +1494,7 @@
       state.userId = String(webUser.id);
       state.email = webUser.email || "";
       state.mobile = webUser.mobile || "";
+      state.walletBalance = Number(webUser.amount) || 0;
     } else {
       state.userId = null;
     }
@@ -1482,4 +1557,13 @@
   });
 
   tryResumeBooking();
+
+  document.addEventListener("visibilitychange", () => {
+    if (
+      document.visibilityState === "visible" &&
+      stepsEl.querySelector('input[name="payMethod"]')
+    ) {
+      void renderStepPayment();
+    }
+  });
 })();

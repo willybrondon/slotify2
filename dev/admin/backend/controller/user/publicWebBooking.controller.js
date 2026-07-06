@@ -98,7 +98,14 @@ exports.publicGuestVerifyOtp = async (req, res) => {
 
 exports.publicPaymentSettings = async (req, res) => {
   try {
-    return res.status(200).json({ status: true, settings: getPaymentSettings() });
+    const settings = getPaymentSettings();
+    let walletBalance = null;
+    const userId = (req.query.userId || "").trim();
+    if (userId && settings.isWalletPay && mongoose.Types.ObjectId.isValid(userId)) {
+      const user = await User.findById(userId).select("amount");
+      if (user) walletBalance = Number(user.amount) || 0;
+    }
+    return res.status(200).json({ status: true, settings, walletBalance });
   } catch (error) {
     console.error("[publicPaymentSettings]", error);
     return res.status(500).json({ status: false, message: error.message });
@@ -263,6 +270,7 @@ function getPaymentSettings() {
   const s = global.settingJSON || {};
   return {
     isStripePay: !!s.isStripePay,
+    isWalletPay: !!s.isWalletPay,
     cashAfterService: s.cashAfterService !== false,
     stripePublishableKey: (s.stripePublishableKey || "").trim(),
     currencyName: (s.currencyName || "eur").toLowerCase(),

@@ -26,6 +26,7 @@
         lname: user.lname || "",
         email: user.email || "",
         mobile: user.mobile || "",
+        amount: Number(user.amount) || 0,
       })
     );
   }

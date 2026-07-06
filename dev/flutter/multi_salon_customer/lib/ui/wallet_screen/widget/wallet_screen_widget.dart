@@ -93,12 +93,16 @@ class WalletButtonView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final splashController = Get.find<SplashController>();
-    final isWalletPayEnabled =
-        splashController.settingCategory?.setting?.isWalletPay == true;
 
-    return Row(
-      children: [
-        if (isWalletPayEnabled)
+    return GetBuilder<SplashController>(
+      id: Constant.idSettingsRefresh,
+      builder: (_) {
+        final isWalletPayEnabled =
+            splashController.settingCategory?.setting?.isWalletPay == true;
+
+        return Row(
+          children: [
+            if (isWalletPayEnabled)
           Expanded(
             child: GestureDetector(
               onTap: () {
@@ -198,6 +202,8 @@ class WalletButtonView extends StatelessWidget {
         ),
       ],
     ).paddingOnly(left: 12, right: 12, bottom: 12);
+      },
+    );
   }
 }
 

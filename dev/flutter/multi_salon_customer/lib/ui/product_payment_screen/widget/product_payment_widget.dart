@@ -41,19 +41,23 @@ class ProductPaymentMethodView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final splashController = Get.find<SplashController>();
-    final isWalletPayEnabled =
-        splashController.settingCategory?.setting?.isWalletPay == true;
+    return GetBuilder<SplashController>(
+      id: Constant.idSettingsRefresh,
+      builder: (splashController) {
+        final isWalletPayEnabled =
+            splashController.settingCategory?.setting?.isWalletPay == true;
 
-    return GetBuilder<ProductPaymentController>(
-      id: Constant.idProgressView,
-      builder: (logic) {
-        return Column(
-          children: [
-            const ProductPaymentTitleView(),
-            if (isWalletPayEnabled) ProductPaymentMyWalletView(),
-          ],
-        ).paddingAll(15);
+        return GetBuilder<ProductPaymentController>(
+          id: Constant.idProgressView,
+          builder: (logic) {
+            return Column(
+              children: [
+                const ProductPaymentTitleView(),
+                if (isWalletPayEnabled) ProductPaymentMyWalletView(),
+              ],
+            ).paddingAll(15);
+          },
+        );
       },
     );
   }

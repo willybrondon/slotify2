@@ -575,9 +575,11 @@ exports.fetchSalonWalletHistory = async (req, res) => {
       return res.status(200).json({ status: false, message: "Oops ! Salon not found!" });
     }
 
-    const setting = await Setting.findOne().select("minSalonWalletBalance");
-    const { resolveMinWalletBalance } = require("../../services/salonBookingWallet.service");
-    const effectiveMinWalletBalance = resolveMinWalletBalance(salon, setting || {});
+    const setting = await Setting.findOne().select("minSalonWalletBalance isSalonWalletRecharge");
+    const { resolveMinWalletBalance, isSalonWalletCommissionEnabled } = require("../../services/salonBookingWallet.service");
+    const effectiveMinWalletBalance = isSalonWalletCommissionEnabled(setting || {})
+      ? resolveMinWalletBalance(salon, setting || {})
+      : 0;
 
     return res.status(200).json({
       status: true,

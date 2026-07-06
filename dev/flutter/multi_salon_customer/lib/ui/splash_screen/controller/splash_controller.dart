@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:salon_2/main.dart';
+import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
 import 'package:salon_2/ui/splash_screen/model/get_country_model.dart';
 import 'package:salon_2/ui/splash_screen/model/setting_model.dart';
 import 'package:salon_2/utils/api_constant.dart';
@@ -22,35 +23,74 @@ class SplashController extends GetxController {
     await onGetCountryApiCall();
     getDialCode();
     await onSettingApiCall();
-
-    currencyName = settingCategory?.setting?.currencyName;
-    currency = settingCategory?.setting?.currencySymbol;
-    tnc = settingCategory?.setting?.tnc;
-    privacyPolicyLink = settingCategory?.setting?.privacyPolicyLink;
-    flutterWaveKey = settingCategory?.setting?.flutterWaveKey;
-    razorPayId = settingCategory?.setting?.razorPayId;
-    stripePublishableKey = settingCategory?.setting?.stripePublishableKey;
-    stripeSecretKey = settingCategory?.setting?.stripeSecretKey;
-    isStripePay = settingCategory?.setting?.isStripePay;
-    isRazorPay = settingCategory?.setting?.isRazorPay;
-    isFlutterWave = settingCategory?.setting?.isFlutterWave;
-    adminCommissionCharges = settingCategory?.setting?.adminCommissionCharges;
-    cancelOrderCharges = settingCategory?.setting?.cancelOrderCharges;
-
-    log("Currency Name :: $currencyName");
-    log("Currency :: $currency");
-    log("T&C :: $tnc");
-    log("Privacy Policy Link :: $privacyPolicyLink");
-    log("Flutter Wave Key :: $flutterWaveKey");
-    log("Razor Pay Id :: $razorPayId");
-    log("Stripe Publishable Key :: $stripePublishableKey");
-    log("Stripe Secret Key :: $stripeSecretKey");
-    log("Is StripePay :: $isStripePay");
-    log("Is RazorPay :: $isRazorPay");
-    log("is FlutterWave :: $isFlutterWave");
-    log("Admin Commission Charges :: $adminCommissionCharges");
-    log("Cancel Order Charges :: $cancelOrderCharges");
     super.onInit();
+  }
+
+  void syncGlobalsFromSettings() {
+    final setting = settingCategory?.setting;
+    if (setting == null) return;
+
+    currencyName = setting.currencyName;
+    currency = setting.currencySymbol;
+    tnc = setting.tnc;
+    privacyPolicyLink = setting.privacyPolicyLink;
+    flutterWaveKey = setting.flutterWaveKey;
+    razorPayId = setting.razorPayId;
+    stripePublishableKey = setting.stripePublishableKey;
+    stripeSecretKey = setting.stripeSecretKey;
+    isStripePay = setting.isStripePay;
+    isRazorPay = setting.isRazorPay;
+    isFlutterWave = setting.isFlutterWave;
+    isWalletPay = setting.isWalletPay;
+    adminCommissionCharges = setting.adminCommissionCharges;
+    cancelOrderCharges = setting.cancelOrderCharges;
+
+    log("Settings synced — Stripe: $isStripePay, Wallet: $isWalletPay, MTN: ${setting.isMtnMomo}");
+  }
+
+  void _notifyDependentControllers() {
+    if (Get.isRegistered<BookingScreenController>()) {
+      Get.find<BookingScreenController>()
+          .syncPaymentMethodsAfterSettingsRefresh();
+    }
+  }
+
+  /// Fetch latest platform settings (payment toggles, currency, etc.).
+  Future<bool> refreshSettings({bool showLoading = false}) async {
+    try {
+      if (showLoading) {
+        isLoading(true);
+        update([Constant.idProgressView, Constant.idSettingsRefresh]);
+      }
+
+      final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.setting);
+      final headers = {
+        "key": ApiConstant.SECRET_KEY,
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        settingCategory = SettingModel.fromJson(jsonResponse);
+        syncGlobalsFromSettings();
+        update();
+        update([Constant.idProgressView, Constant.idSettingsRefresh]);
+        _notifyDependentControllers();
+        return settingCategory?.status == true;
+      }
+    } on AppException catch (exception) {
+      log("Error refresh settings: ${exception.message}");
+    } catch (e) {
+      log("Error refresh settings: $e");
+    } finally {
+      if (showLoading) {
+        isLoading(false);
+        update([Constant.idProgressView, Constant.idSettingsRefresh]);
+      }
+    }
+    return false;
   }
 
   onGetCountryApiCall() async {
@@ -96,7 +136,7 @@ class SplashController extends GetxController {
   onSettingApiCall() async {
     try {
       isLoading(true);
-      update([Constant.idProgressView]);
+      update([Constant.idProgressView, Constant.idSettingsRefresh]);
 
       final url = Uri.parse(ApiConstant.BASE_URL + ApiConstant.setting);
 
@@ -117,9 +157,9 @@ class SplashController extends GetxController {
         final jsonResponse = jsonDecode(response.body);
         settingCategory = SettingModel.fromJson(jsonResponse);
         log("Settings loaded successfully. Status: ${settingCategory?.status}");
-        // Update to trigger rebuilds in widgets listening to SplashController
-        update(); // Update all listeners
-        update([Constant.idProgressView]); // Also update specific ID listeners
+        syncGlobalsFromSettings();
+        update();
+        update([Constant.idProgressView, Constant.idSettingsRefresh]);
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);
@@ -127,8 +167,8 @@ class SplashController extends GetxController {
       log("Error call Setting Api :: $e");
     } finally {
       isLoading(false);
-      update(); // Update all listeners
-      update([Constant.idProgressView]); // Also update specific ID listeners
+      update();
+      update([Constant.idProgressView, Constant.idSettingsRefresh]);
     }
   }
 }

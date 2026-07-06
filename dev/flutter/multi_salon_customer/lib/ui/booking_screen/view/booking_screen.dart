@@ -1581,7 +1581,10 @@ class BookingScreen extends StatelessWidget {
   }
 
   payment() {
-    return GetBuilder<BookingScreenController>(
+    return GetBuilder<SplashController>(
+      id: Constant.idSettingsRefresh,
+      builder: (splashLogic) {
+        return GetBuilder<BookingScreenController>(
       id: Constant.idProgressView,
       builder: (logic) {
         return Column(
@@ -1595,7 +1598,7 @@ class BookingScreen extends StatelessWidget {
                 color: AppColors.primaryTextColor,
               ),
             ).paddingOnly(bottom: 13),
-            splashController.settingCategory?.setting?.isWalletPay == true
+            splashLogic.settingCategory?.setting?.isWalletPay == true
                 ? GetBuilder<BookingScreenController>(
               id: Constant.idStep3,
               builder: (logic) {
@@ -1874,7 +1877,7 @@ class BookingScreen extends StatelessWidget {
                 : const SizedBox(),
 
             /// MTN MoMo Payment
-            splashController.settingCategory?.setting?.isMtnMomo == true
+            splashLogic.settingCategory?.setting?.isMtnMomo == true
                 ? GetBuilder<BookingScreenController>(
                     id: Constant.idStep3,
                     builder: (logic) {
@@ -2485,6 +2488,8 @@ class BookingScreen extends StatelessWidget {
             SizedBox(height: Get.height * 0.15),
           ],
         );
+      },
+    );
       },
     );
   }

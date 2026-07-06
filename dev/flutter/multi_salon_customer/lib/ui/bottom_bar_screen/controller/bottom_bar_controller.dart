@@ -10,6 +10,7 @@ import 'package:salon_2/ui/notification_screen/controller/notification_controlle
 import 'package:salon_2/ui/notification_screen/view/notification_screen.dart';
 import 'package:salon_2/ui/product_screen/view/product_screen.dart';
 import 'package:salon_2/ui/profile_screen/view/profile_screen.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/constant.dart';
 
 class BottomBarController extends GetxController {
@@ -33,7 +34,15 @@ class BottomBarController extends GetxController {
     const ProfileScreen(),
   ];
 
-  onClick(value) {
+  onClick(value) async {
+    try {
+      if (Get.isRegistered<SplashController>()) {
+        await Get.find<SplashController>().refreshSettings();
+      }
+    } catch (e) {
+      log("BottomBar - Settings refresh failed: $e");
+    }
+
     // Home tab (index 0) - reload home screen data if needed
     if (value == 0) {
       try {

@@ -416,7 +416,7 @@ const Wallet = () => {
                         <img src={withDrawBanner} alt="Wallet Banner" height={200} className="rounded-4" style={{ width: "100%", position: "relative" }} />
 
                         {/* Minimum Balance Info */}
-                        {minSalonWalletBalance > 0 && (
+                        {salonWalletRechargeEnabled && minSalonWalletBalance > 0 && (
                             <div className="mt-4">
                                 <div className={`alert ${isBalanceInsufficient ? "alert-warning" : "alert-info"}`} role="alert">
                                     <strong>{w.minBalance} :</strong> {currency?.currencySymbol || setting?.currencySymbol || settingsData?.currencySymbol || ""} {minSalonWalletBalance.toFixed(2)}

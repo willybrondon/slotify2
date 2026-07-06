@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:salon_2/main.dart';
 import 'package:salon_2/ui/profile_screen/model/profile_model.dart';
 import 'package:salon_2/ui/profile_screen/model/raise_complain_model.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/services/app_exception/app_exception.dart';
@@ -27,6 +28,9 @@ class ProfileScreenController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    if (Get.isRegistered<SplashController>()) {
+      await Get.find<SplashController>().refreshSettings();
+    }
     log("loginnnnnnn :: ${Constant.storage.read<bool>('isLogIn')}");
     Constant.storage.read<bool>('isLogIn') ?? false == true ? await onGetUserApiCall() : const Text("");
     Constant.storage.write('userImage', getUserCategory?.user?.image);

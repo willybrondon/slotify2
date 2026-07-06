@@ -942,6 +942,8 @@ exports.serveSalonWebPage = async (req, res) => {
     const returnPath =
       `/salon/${salonSlugWithId}` + (pageLang !== "fr" ? `?lang=${pageLang}` : "");
     const clientAuth = authUrls(baseURL, returnPath, pageLang);
+    const { salonPaymentOptions } = require("../../services/stripeConnect.service");
+    const salonPayOpts = salonPaymentOptions(salon);
 
     const footerHtml = skedisyFooterHtml(baseURL, copy);
     const idfBanner = idfBannerHtml(copy);
@@ -1239,6 +1241,9 @@ exports.serveSalonWebPage = async (req, res) => {
                 confirmBooking: ${JSON.stringify(copy.confirmBooking)},
                 payAtSalon: ${JSON.stringify(copy.payAtSalon)},
                 payWithStripe: ${JSON.stringify(copy.payWithStripe)},
+                payWithWallet: ${JSON.stringify(copy.payWithWallet)},
+                payWithWalletBalance: ${JSON.stringify(copy.payWithWalletBalance)},
+                walletInsufficient: ${JSON.stringify(copy.walletInsufficient)},
                 couponCode: ${JSON.stringify(copy.couponCode)},
                 applyCoupon: ${JSON.stringify(copy.applyCoupon)},
                 removeCoupon: ${JSON.stringify(copy.removeCoupon)},
@@ -1313,8 +1318,11 @@ exports.serveSalonWebPage = async (req, res) => {
                 login: ${JSON.stringify(clientAuth.login)},
                 signup: ${JSON.stringify(clientAuth.signup)}
             },
+            salonAcceptsStripe: ${!!salonPayOpts.acceptStripe},
+            salonAcceptsCash: ${salonPayOpts.acceptCash !== false},
             payment: {
                 isStripePay: ${!!global.settingJSON?.isStripePay},
+                isWalletPay: ${!!global.settingJSON?.isWalletPay},
                 cashAfterService: ${global.settingJSON?.cashAfterService !== false},
                 stripePublishableKey: ${JSON.stringify((global.settingJSON?.stripePublishableKey || "").trim())},
                 currencyName: ${JSON.stringify((global.settingJSON?.currencyName || "eur").toLowerCase())}

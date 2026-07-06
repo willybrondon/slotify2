@@ -100,6 +100,10 @@ const COPY = {
     confirmBooking: "Confirmer la réservation",
     payAtSalon: "Paiement au salon",
     payWithStripe: "Payer par carte (Stripe)",
+    payWithWallet: "Mon portefeuille",
+    payWithWalletBalance: "Mon portefeuille (__BALANCE__)",
+    walletInsufficient:
+      "Solde portefeuille insuffisant. Rechargez via l'app Skedisy ou choisissez un autre mode de paiement.",
     paymentTitle: "Paiement",
     couponCode: "Code promo",
     applyCoupon: "Appliquer",
@@ -283,6 +287,10 @@ const COPY = {
     confirmBooking: "Confirm booking",
     payAtSalon: "Pay at the salon",
     payWithStripe: "Pay by card (Stripe)",
+    payWithWallet: "My wallet",
+    payWithWalletBalance: "My wallet (__BALANCE__)",
+    walletInsufficient:
+      "Insufficient wallet balance. Top up in the Skedisy app or choose another payment method.",
     paymentTitle: "Payment",
     couponCode: "Promo code",
     applyCoupon: "Apply",

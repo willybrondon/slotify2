@@ -4,12 +4,39 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_2/custom/bottom_bar/salomon_bottom_bar.dart';
 import 'package:salon_2/ui/bottom_bar_screen/controller/bottom_bar_controller.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 
-class BottomBarScreen extends StatelessWidget {
+class BottomBarScreen extends StatefulWidget {
   const BottomBarScreen({super.key});
+
+  @override
+  State<BottomBarScreen> createState() => _BottomBarScreenState();
+}
+
+class _BottomBarScreenState extends State<BottomBarScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        Get.isRegistered<SplashController>()) {
+      Get.find<SplashController>().refreshSettings();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

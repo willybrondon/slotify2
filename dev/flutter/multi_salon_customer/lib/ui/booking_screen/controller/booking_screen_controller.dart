@@ -110,6 +110,26 @@ class BookingScreenController extends GetxController {
     update([Constant.idStep3, Constant.idConfirm]);
   }
 
+  void syncPaymentMethodsAfterSettingsRefresh() {
+    final walletEnabled = isWalletPayEnabled();
+    final stripeEnabled = salonAcceptsStripe();
+    final mtnEnabled =
+        splashController.settingCategory?.setting?.isMtnMomo == true;
+    final cashEnabled = salonAcceptsCash();
+
+    final current = selectedPayment;
+    final currentStillValid = (current == "wallet" && walletEnabled) ||
+        (current == "Stripe" && stripeEnabled) ||
+        (current == "MTN MoMo" && mtnEnabled) ||
+        (current == "cashAfterService" && cashEnabled);
+
+    if (!currentStillValid) {
+      setDefaultPaymentMethod();
+    } else {
+      update([Constant.idStep3, Constant.idConfirm]);
+    }
+  }
+
   num? rating;
   int? roundedRating;
   int? filledStars;
@@ -180,6 +200,8 @@ class BookingScreenController extends GetxController {
     // Reset loading state to prevent infinite loading on second booking
     isLoading1(false);
     isLoading(false);
+
+    await splashController.refreshSettings();
 
     await getDataFromArgs();
     await onGetExpertServiceBasedSalonApiCall(
@@ -465,6 +487,13 @@ class BookingScreenController extends GetxController {
 
       stepCount++;
       currentStep += 1;
+
+      final paymentStepIndex = Constant().stepper().length - 1;
+      if (currentStep == paymentStepIndex) {
+        splashController.refreshSettings().then((_) {
+          syncPaymentMethodsAfterSettingsRefresh();
+        });
+      }
 
       // For Top Experts: Handle the new step flow
       if (expertDetail != null) {

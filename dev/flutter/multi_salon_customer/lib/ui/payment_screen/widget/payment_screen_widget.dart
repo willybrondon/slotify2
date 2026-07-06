@@ -72,6 +72,7 @@ class PaymentMethodView extends StatelessWidget {
         // Also listen to SplashController updates to rebuild when settings are loaded
         // Use GetBuilder without ID to listen to all updates
         return GetBuilder<SplashController>(
+          id: Constant.idSettingsRefresh,
           builder: (splashLogic) {
             return _buildPaymentMethods(logic, splashLogic);
           },
@@ -94,8 +95,7 @@ class PaymentMethodView extends StatelessWidget {
       log("Payment Screen - Settings not loaded, loading now...");
       // Try to load settings asynchronously
       Future.microtask(() async {
-        await splashController.onSettingApiCall();
-        // Trigger rebuild after settings are loaded
+        await splashController.refreshSettings();
         logic.update([Constant.idSelectPaymentMethod]);
       });
       // Return loading widget

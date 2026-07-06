@@ -24,6 +24,12 @@ function resolveMinWalletBalance(salon, setting) {
   return Number.isNaN(globalMin) ? 0 : Math.max(0, globalMin);
 }
 
+/** When false, salons can accept bookings without prepaid wallet / commission debit (launch mode). */
+function isSalonWalletCommissionEnabled(setting) {
+  const s = setting || global.settingJSON || {};
+  return s.isSalonWalletRecharge === true;
+}
+
 function computeExpectedPlatformFee(salon, setting, servicePriceWithoutTax) {
   const commissionPercent = resolveSalonCommissionPercent(salon, setting);
   const base = parseFloat(servicePriceWithoutTax) || 0;
@@ -34,16 +40,18 @@ function computeExpectedPlatformFee(salon, setting, servicePriceWithoutTax) {
  * Skedisy commission is always prepaid from salon.wallet (never deducted from client card payment).
  */
 function computeRequiredSalonWalletBalance({ salon, setting, servicePriceWithoutTax }) {
+  if (!isSalonWalletCommissionEnabled(setting)) return 0;
   const minBalance = resolveMinWalletBalance(salon, setting);
   const expectedPlatformFee = computeExpectedPlatformFee(salon, setting, servicePriceWithoutTax);
   return minBalance + expectedPlatformFee;
 }
 
-function shouldDebitSalonWalletForCommission() {
-  return true;
+function shouldDebitSalonWalletForCommission(setting) {
+  return isSalonWalletCommissionEnabled(setting);
 }
 
 module.exports = {
+  isSalonWalletCommissionEnabled,
   resolveSalonCommissionPercent,
   resolveMinWalletBalance,
   computeExpectedPlatformFee,

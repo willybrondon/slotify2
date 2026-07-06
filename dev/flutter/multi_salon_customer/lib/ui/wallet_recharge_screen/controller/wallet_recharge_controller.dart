@@ -99,21 +99,19 @@ class WalletRechargeController extends GetxController {
         }
       }
 
-      // Ensure settings are loaded (otherwise payment methods will look empty)
-      if (splashController?.settingCategory == null) {
-        isSettingsLoading = true;
-        update();
-        Future.microtask(() async {
-          try {
-            await splashController?.onSettingApiCall();
-          } catch (e) {
-            log("Error loading settings in WalletRechargeController: $e");
-          } finally {
-            isSettingsLoading = false;
-            update();
-          }
-        });
-      }
+      // Always fetch latest settings so admin toggles apply immediately
+      isSettingsLoading = true;
+      update();
+      Future.microtask(() async {
+        try {
+          await splashController?.refreshSettings();
+        } catch (e) {
+          log("Error loading settings in WalletRechargeController: $e");
+        } finally {
+          isSettingsLoading = false;
+          update();
+        }
+      });
     } catch (e) {
       log("Error in WalletRechargeController onInit: $e");
     }
@@ -129,6 +127,10 @@ class WalletRechargeController extends GetxController {
   // Get available payment methods
   List<Map<String, String>> getAvailablePaymentMethods() {
     List<Map<String, String>> methods = [];
+
+    if (splashController?.settingCategory?.setting?.isWalletPay != true) {
+      return methods;
+    }
     
     if (splashController?.settingCategory?.setting?.isStripePay ?? false) {
       methods.add({"value": "Stripe", "label": "Stripe"});

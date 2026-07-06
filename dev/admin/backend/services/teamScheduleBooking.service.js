@@ -20,6 +20,7 @@ const {
   computeRequiredSalonWalletBalance,
   resolveMinWalletBalance,
   shouldDebitSalonWalletForCommission,
+  isSalonWalletCommissionEnabled,
 } = require("./salonBookingWallet.service");
 
 const SLOT_MINUTES = 15;
@@ -199,7 +200,7 @@ async function createPlanningBooking(salon, body) {
     setting,
     servicePriceWithoutTax: withoutTax,
   });
-  if ((salon.wallet || 0) < requiredWallet) {
+  if (isSalonWalletCommissionEnabled(setting) && (salon.wallet || 0) < requiredWallet) {
     throw new Error("Solde portefeuille salon insuffisant pour la commission");
   }
 
@@ -247,7 +248,7 @@ async function createPlanningBooking(salon, body) {
     coupon: {},
   });
 
-  if (platformFee > 0 && shouldDebitSalonWalletForCommission()) {
+  if (platformFee > 0 && shouldDebitSalonWalletForCommission(setting)) {
     salon.wallet = (salon.wallet || 0) - platformFee;
     await salon.save();
     await SalonExpertWalletHistory.create({
@@ -409,8 +410,8 @@ function applyBookingFinancials(booking, expert, salon, withoutTax, setting) {
   return { platformFee };
 }
 
-async function adjustSalonCommissionWallet(salon, booking, oldFee, newFee) {
-  if (!shouldDebitSalonWalletForCommission()) return;
+async function adjustSalonCommissionWallet(salon, booking, oldFee, newFee, setting) {
+  if (!shouldDebitSalonWalletForCommission(setting || global.settingJSON)) return;
 
   const previous = parseFloat(oldFee) || 0;
   const next = parseFloat(newFee) || 0;
@@ -511,9 +512,11 @@ async function updatePlanningBookingServices(salon, body) {
     setting,
     servicePriceWithoutTax: withoutTax,
   });
-  const projectedWallet = (salon.wallet || 0) - Math.max(0, platformFee - oldPlatformFee);
-  if (projectedWallet < resolveMinWalletBalance(salon, setting)) {
-    throw new Error("Solde portefeuille salon insuffisant après modification");
+  if (isSalonWalletCommissionEnabled(setting)) {
+    const projectedWallet = (salon.wallet || 0) - Math.max(0, platformFee - oldPlatformFee);
+    if (projectedWallet < requiredWallet) {
+      throw new Error("Solde portefeuille salon insuffisant après modification");
+    }
   }
 
   booking.serviceId = serviceObjectIds;
@@ -521,7 +524,7 @@ async function updatePlanningBookingServices(salon, body) {
   booking.time = timeArray;
   await booking.save();
 
-  await adjustSalonCommissionWallet(salon, booking, oldPlatformFee, platformFee);
+  await adjustSalonCommissionWallet(salon, booking, oldPlatformFee, platformFee, setting);
   await createUniqueStrings(booking, expert._id, booking.date, timeArray);
 
   return booking;

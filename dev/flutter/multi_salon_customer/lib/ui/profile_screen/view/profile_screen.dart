@@ -12,6 +12,7 @@ import 'package:salon_2/ui/edit_profile_screen/controller/edit_profile_controlle
 import 'package:salon_2/ui/login_screen/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/login_screen/sign_in_screen/view/sign_in_screen.dart';
 import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_asset.dart';
@@ -349,12 +350,20 @@ class ProfileScreen extends StatelessWidget {
             );
           },
         ),
-        profileMenu(
-          leadingImage: AppAsset.icWallet,
-          title: "txtMyWallet".tr,
-          subtitle: "txtMyWalletTransactionHistory".tr,
-          onTap: () {
-            Get.toNamed(AppRoutes.wallet);
+        GetBuilder<SplashController>(
+          id: Constant.idSettingsRefresh,
+          builder: (splashLogic) {
+            if (splashLogic.settingCategory?.setting?.isWalletPay != true) {
+              return const SizedBox.shrink();
+            }
+            return profileMenu(
+              leadingImage: AppAsset.icWallet,
+              title: "txtMyWallet".tr,
+              subtitle: "txtMyWalletTransactionHistory".tr,
+              onTap: () {
+                Get.toNamed(AppRoutes.wallet);
+              },
+            );
           },
         ),
         profileMenu(

@@ -49,6 +49,7 @@ String? stripeSecretKey;
 bool? isStripePay;
 bool? isRazorPay;
 bool? isFlutterWave;
+bool? isWalletPay;
 
 num? adminCommissionCharges;
 num? cancelOrderCharges;
