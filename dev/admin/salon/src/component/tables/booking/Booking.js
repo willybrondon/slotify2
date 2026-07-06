@@ -8,7 +8,7 @@
 import React from "react";
 import Title from "../../extras/Title";
 import Searching from "../../extras/Searching";
-import { getAllBookings } from "../../../redux/slice/bookingSlice";
+import { getAllBookings, acceptPendingBooking } from "../../../redux/slice/bookingSlice";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Table from "../../extras/Table";
@@ -209,19 +209,24 @@ const Booking = () => {
           >
             {st.cancel}
           </button>
-        ) : (
-          <div className="d-flex justify-content-center">
-            <span>
-              <button
-                className=" text-white m5-right p12-x p4-y fs-12 br-5 "
-                style={{ backgroundColor: "#ff7512" }}
-                onClick={() => handleCancel(row._id)}
-              >
-                {st.pending}
-              </button>
-            </span>
+        ) : row?.status === "pending" ? (
+          <div className="d-flex justify-content-center gap-1 flex-wrap">
+            <button
+              className="text-white m5-right p12-x p4-y fs-12 br-5"
+              style={{ backgroundColor: "#28a745", cursor: "pointer", border: "none" }}
+              onClick={() => handleAccept(row._id)}
+            >
+              {ui.booking.acceptPending}
+            </button>
+            <button
+              className="text-white m5-right p12-x p4-y fs-12 br-5"
+              style={{ backgroundColor: "#ff7512", cursor: "pointer", border: "none" }}
+              onClick={() => handleCancel(row)}
+            >
+              {st.cancel}
+            </button>
           </div>
-        ),
+        ) : (
     },
     {
       Header: col.firstSlot,
@@ -235,16 +240,30 @@ const Booking = () => {
   ];
 
   const handleCancel = (row) => {
-
     dispatch(openDialog({ type: "cancelBooking", data: row }));
   };
 
+  const handleAccept = async (bookingId) => {
+    const result = await dispatch(acceptPendingBooking({ bookingId }));
+    if (result?.payload?.status) {
+      dispatch(
+        getAllBookings({
+          start: page,
+          limit: rowsPerPage,
+          type,
+          startDate,
+          endDate,
+        })
+      );
+    }
+  };
+
   const bookingType = [
-    // { name: "ALL", value: "ALL" },
-    { name: "Pending", value: "pending" },
-    { name: "Confirm", value: "confirm" },
-    { name: "Completed", value: "completed" },
-    { name: "Cancelled", value: "cancel" },
+    { name: ui.booking.filterUpcoming, value: "upcoming" },
+    { name: ui.booking.filterAwaitingApproval, value: "pending" },
+    { name: ui.booking.filterConfirmed, value: "confirm" },
+    { name: ui.booking.filterCompleted, value: "completed" },
+    { name: ui.booking.filterCancelled, value: "cancel" },
   ];
 
   const handleOpenDialogue = (row) => {

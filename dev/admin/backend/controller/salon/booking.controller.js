@@ -8,6 +8,12 @@ const Notification = require("../../models/notification.model");
 
 const admin = require("../../firebase");
 const moment = require("moment");
+const {
+  isSalonListTypeValid,
+  getSalonListStatusFilter,
+  buildExpertBookingNotification,
+  buildUserBookingConfirmedNotification,
+} = require("../../services/bookingStatus.service");
 
 exports.getAll = async (req, res) => {
   try {
@@ -22,12 +28,12 @@ exports.getAll = async (req, res) => {
 
     let statusFilter = {};
     const type = req?.query?.type || "ALL";
-    if (type && type !== "ALL" && type !== "cancel" && type !== "confirm" && type !== "completed" && type !== "pending") {
+    if (!isSalonListTypeValid(type)) {
       return res.status(200).send({ status: false, message: "Invalid Booking Type" });
     }
 
     if (type && type !== "ALL") {
-      statusFilter = { status: type };
+      statusFilter = getSalonListStatusFilter(type);
     }
     const startDate = req.query.startDate || "ALL";
     const endDate = req.query.endDate || "ALL";
@@ -206,12 +212,12 @@ exports.getExpertBookings = async (req, res) => {
 
     let statusFilter = {};
     const type = req?.query?.type || "ALL";
-    if (type && type !== "ALL" && type !== "cancel" && type !== "confirm" && type !== "completed" && type !== "pending") {
+    if (!isSalonListTypeValid(type)) {
       return res.status(200).send({ status: false, message: "Invalid Booking Type" });
     }
 
     if (type && type !== "ALL") {
-      statusFilter = { status: type };
+      statusFilter = getSalonListStatusFilter(type);
     }
     const startDate = req.query.startDate || "ALL";
     const endDate = req.query.endDate || "ALL";
@@ -590,6 +596,78 @@ exports.monthlyState = async (req, res) => {
   } catch (error) {
     console.error(error);
     throw error;
+  }
+};
+
+exports.acceptPendingBooking = async (req, res) => {
+  try {
+    if (!req?.body?.bookingId) {
+      return res.status(200).send({ status: false, message: "Invalid details" });
+    }
+
+    const salon = await Salon.findById(req.salon._id);
+    if (!salon) {
+      return res.status(200).send({ status: false, message: "Salon not exist" });
+    }
+
+    const booking = await Booking.findOne({ _id: req.body.bookingId, salonId: salon._id });
+    if (!booking) {
+      return res.status(200).send({ status: false, message: "Booking not found" });
+    }
+
+    if (booking.status !== "pending") {
+      return res.status(200).send({ status: false, message: "Only pending bookings can be confirmed" });
+    }
+
+    booking.status = "confirm";
+    await booking.save();
+
+    const [user, expert] = await Promise.all([User.findById(booking.userId), Expert.findById(booking.expertId)]);
+
+    const userNotif = buildUserBookingConfirmedNotification(booking);
+    const expertNotif = buildExpertBookingNotification(booking);
+
+    if (user?.fcmToken) {
+      const adminPromise = await admin;
+      adminPromise.messaging().send({
+        token: user.fcmToken,
+        notification: { title: userNotif.title, body: userNotif.body },
+      }).catch((e) => console.log("[Salon accept booking] user FCM:", e.message));
+    }
+
+    if (expert?.fcmToken) {
+      const adminPromise = await admin;
+      adminPromise.messaging().send({
+        token: expert.fcmToken,
+        notification: { title: expertNotif.title, body: expertNotif.body },
+      }).catch((e) => console.log("[Salon accept booking] expert FCM:", e.message));
+    }
+
+    await Promise.all([
+      user
+        ? Notification.create({
+            userId: user._id,
+            title: userNotif.title,
+            message: userNotif.body,
+            notificationType: 0,
+            date: new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
+          })
+        : Promise.resolve(),
+      expert
+        ? Notification.create({
+            expertId: expert._id,
+            title: expertNotif.title,
+            message: expertNotif.body,
+            notificationType: 1,
+            date: new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
+          })
+        : Promise.resolve(),
+    ]);
+
+    return res.status(200).send({ status: true, message: "Booking confirmed", booking });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ status: false, message: error.message || "Internal Server Error" });
   }
 };
 

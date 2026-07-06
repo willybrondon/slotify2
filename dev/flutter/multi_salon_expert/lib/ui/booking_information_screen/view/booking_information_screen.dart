@@ -253,10 +253,12 @@ class BookingInformationScreen extends StatelessWidget {
                                     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
                                     child: Text(
                                       logic.getBookingInformationCategory?.booking?.status == "pending"
-                                          ? "Pending"
-                                          : logic.getBookingInformationCategory?.booking?.status == "completed"
-                                              ? "Completed"
-                                              : "Cancelled",
+                                          ? "txtAwaitingSalonApproval".tr
+                                          : logic.getBookingInformationCategory?.booking?.status == "confirm"
+                                              ? "txtConfirmed".tr
+                                              : logic.getBookingInformationCategory?.booking?.status == "completed"
+                                                  ? "txtCompleted".tr
+                                                  : "txtCancelled".tr,
                                       style: TextStyle(
                                         fontFamily: AppFontFamily.sfProDisplay,
                                         fontSize: 11,

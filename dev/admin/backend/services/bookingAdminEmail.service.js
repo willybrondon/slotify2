@@ -1,6 +1,6 @@
 /**
  * Admin email: new booking notification + secure accept/reject links.
- * Reject mirrors expert cancel (refund, UString cleanup). Accept records approval + notifies expert (status stays pending for day-of check-in).
+ * Reject mirrors expert cancel (refund, UString cleanup). Accept confirms pending bookings when applicable.
  */
 const crypto = require("crypto");
 const moment = require("moment");
@@ -273,6 +273,9 @@ async function processEmailAction(token, action) {
     booking.adminEmailApprovedAt = new Date();
     booking.adminEmailActionToken = "";
     booking.adminEmailActionTokenExpires = undefined;
+    if (booking.status === "pending") {
+      booking.status = "confirm";
+    }
     await booking.save();
 
     const expert = await Expert.findById(booking.expertId);

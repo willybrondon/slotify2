@@ -10,6 +10,7 @@ route.get("/getExpertBookings", checkAccessWithSecretKey(), bookingController.ge
 route.get("/dailyBookingStats", checkAccessWithSecretKey(),salon, bookingController.dailyBookings);
 route.get("/monthlyState", checkAccessWithSecretKey(),salon, bookingController.monthlyState);
 route.get("/upcoming", checkAccessWithSecretKey(),salon, bookingController.upcomingBookings);
+route.put("/acceptPendingBooking", checkAccessWithSecretKey(), salon, bookingController.acceptPendingBooking);
 route.put("/cancelBooking", checkAccessWithSecretKey(), bookingController.cancelBooking);
 
 module.exports = route;

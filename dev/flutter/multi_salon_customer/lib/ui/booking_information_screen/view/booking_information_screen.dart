@@ -21,7 +21,7 @@ import 'package:salon_2/utils/utils.dart';
 String _statusLabel(String? status) {
   switch (status) {
     case "pending":
-      return "txtPending".tr;
+      return "txtAwaitingSalonApproval".tr;
     case "confirm":
       return "txtConfirmed".tr;
     case "completed":

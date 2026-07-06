@@ -14,15 +14,13 @@ const mongoose = require("mongoose");
 const admin = require("../../firebase");
 const UString = require("../../models/uniqueString.model");
 
+const {
+  getBookingListStatusFilter,
+  buildExpertBookingNotification,
+} = require("../../services/bookingStatus.service");
+
 function getStatusFilter(status) {
-  switch (status) {
-    case "pending":
-      return { status: { $in: ["pending", "confirm"] } };
-    case "ALL":
-      return {};
-    default:
-      return { status };
-  }
+  return getBookingListStatusFilter(status);
 }
 
 exports.bookingForExpert = async (req, res) => {
@@ -33,7 +31,7 @@ exports.bookingForExpert = async (req, res) => {
 
     const status = req.query.status.trim().toString();
 
-    if (status && status !== "cancel" && status !== "completed" && status !== "pending") {
+    if (status && status !== "cancel" && status !== "completed" && status !== "pending" && status !== "upcoming") {
       return res.status(200).send({ status: false, message: "Invalid Booking Type" });
     }
 
@@ -327,20 +325,29 @@ exports.cancelConfirmBooking = async (req, res) => {
     }
 
     if (status == "confirm") {
+      if (booking.status === "pending") {
+        return res.status(200).send({
+          status: false,
+          message: "Ce rendez-vous doit être validé par le salon. L'expert ne peut pas l'accepter.",
+        });
+      }
+      if (booking.checkInTime) {
+        return res.status(200).send({ status: false, message: "Client already checked in" });
+      }
       if (booking.date != date) {
         return res.status(200).send({ status: false, message: "CheckIn only On booked date" });
-      } else {
-        booking.checkInTime = moment().format("hh:mm A");
-        booking.status = "confirm";
-
-        payload = {
-          token: user.fcmToken,
-          notification: {
-            body: `Your Booking with Id ${booking.bookingId} is Starting Soon`,
-            title: "Booking Confirm",
-          },
-        };
       }
+
+      booking.checkInTime = moment().format("hh:mm A");
+      booking.status = "confirm";
+
+      payload = {
+        token: user.fcmToken,
+        notification: {
+          body: `Your Booking with Id ${booking.bookingId} is Starting Soon`,
+          title: "Booking Check-In",
+        },
+      };
     }
 
     if (status == "cancel") {
@@ -348,7 +355,7 @@ exports.cancelConfirmBooking = async (req, res) => {
         return res.status(200).send({ status: false, message: "Add details to cancel Booking" });
       }
 
-      if (booking.status == "confirm") {
+      if (booking.checkInTime) {
         return res.status(200).send({ status: false, message: "User is already checked In" });
       }
 
@@ -373,7 +380,6 @@ exports.cancelConfirmBooking = async (req, res) => {
 
       await Promise.all([
         booking.save(),
-        notification.save(),
         User.updateOne(
           { _id: user._id, amount: { $gt: 0 } },
           {
@@ -387,9 +393,14 @@ exports.cancelConfirmBooking = async (req, res) => {
       ]);
     }
 
+    if (!payload) {
+      return res.status(200).send({ status: false, message: "Unable to update booking" });
+    }
+
     res.status(200).send({
       status: true,
-      message: `Booking ${status} Successfully by expert`,
+      message: status === "confirm" ? "Check-in successful" : `Booking ${status} Successfully by expert`,
+      booking,
     });
 
     notification.userId = user._id;
@@ -399,7 +410,11 @@ exports.cancelConfirmBooking = async (req, res) => {
     notification.message = status == "confirm" ? payload.notification.body : payload.notification.body + " Reason : " + booking.cancel.reason;
     notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
 
-    await Promise.all([booking.save(), notification.save(), UString.deleteMany({ bookingId: booking._id })]);
+    await Promise.all([booking.save(), notification.save()]);
+
+    if (status === "cancel") {
+      await UString.deleteMany({ bookingId: booking._id });
+    }
 
     if (user && user.fcmToken !== null) {
       adminPromise

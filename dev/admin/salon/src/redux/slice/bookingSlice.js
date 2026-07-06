@@ -44,6 +44,13 @@ export const cancelBooking = createAsyncThunk(
   }
 );
 
+export const acceptPendingBooking = createAsyncThunk(
+  "salon/booking/acceptPendingBooking",
+  async (payload) => {
+    return apiInstanceFetch.put(`salon/booking/acceptPendingBooking`, payload);
+  }
+);
+
 export const getAllBookingsCalendar = createAsyncThunk(
   "user/booking/calenderView",
   async (payload) => {
@@ -133,6 +140,22 @@ const bookingSlice = createSlice({
     });
 
     builder.addCase(cancelBooking.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+
+    builder.addCase(acceptPendingBooking.fulfilled, (state, action) => {
+      if (action.payload?.status && state.booking) {
+        const bookingIndex = state.booking.findIndex(
+          (booking) => booking?._id === action.payload.booking?._id
+        );
+        if (bookingIndex !== -1) {
+          state.booking[bookingIndex] = {
+            ...state.booking[bookingIndex],
+            ...action.payload.booking,
+          };
+        }
+        Success(ui.toast.bookingConfirmed);
+      }
       state.isLoading = false;
     });
   },

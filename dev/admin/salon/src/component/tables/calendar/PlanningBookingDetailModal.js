@@ -12,7 +12,7 @@ import { Success } from "../../api/toastServices";
 import { warning } from "../../../util/Alert";
 
 const STATUS_LABELS = {
-  pending: "En attente",
+  pending: "À valider",
   confirm: "Confirmé",
   completed: "Terminé",
   cancel: "Annulé",

@@ -488,7 +488,7 @@ const TeamCalendar = () => {
 
         <div className="sq-planning-legend sq-planning-meta-legend">
           <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.confirm }} /> Confirmé</span>
-          <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.pending }} /> En attente</span>
+          <span><i className="legend-swatch" style={{ background: STATUS_COLORS.booking.pending }} /> À valider</span>
           <span><i className="legend-swatch" style={{ background: STATUS_COLORS.busy }} /> Indisponible</span>
           <span><i className="legend-swatch legend-free" /> Libre</span>
         </div>

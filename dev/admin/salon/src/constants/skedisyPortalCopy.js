@@ -47,7 +47,7 @@ export const SKEDISY_SALON_PORTAL_COPY = {
   profileTitleSuffix: " — Profil",
   autoConfirmBookingsLabel: "Confirmation automatique des réservations",
   autoConfirmBookingsHint:
-    "Les nouvelles réservations clientes sont confirmées immédiatement (comme Planity). Désactivez pour valider manuellement.",
+    "Les réservations clientes sont confirmées immédiatement (comme Planity). L'expert n'a pas à les accepter. Désactivez uniquement si vous validez manuellement depuis ce panel.",
   paymentSettingsTitle: "Modes de paiement clientes",
   paymentSettingsPageTitle: "Paiements & Stripe Connect",
   paymentSettingsPageIntro:

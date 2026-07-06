@@ -22,6 +22,7 @@ const {
   shouldDebitSalonWalletForCommission,
   isSalonWalletCommissionEnabled,
 } = require("./salonBookingWallet.service");
+const { resolveInitialBookingStatus } = require("./bookingStatus.service");
 
 const SLOT_MINUTES = 15;
 
@@ -218,8 +219,7 @@ async function createPlanningBooking(salon, body) {
     (((withoutTax - platformFee) * expert.commission) / 100).toFixed(2)
   );
 
-  const globalAutoConfirm = setting.autoConfirmBookings !== false;
-  const salonAutoConfirm = salon.autoConfirmBookings !== false;
+  const initialStatus = resolveInitialBookingStatus(setting, salon);
 
   const booking = await Booking.create({
     userId: user._id,
@@ -232,7 +232,7 @@ async function createPlanningBooking(salon, body) {
     duration: totalDuration,
     atPlace: 1,
     address: "",
-    status: globalAutoConfirm && salonAutoConfirm ? "confirm" : "pending",
+    status: initialStatus,
     withoutTax,
     tax: taxAmount,
     amount,

@@ -176,7 +176,9 @@ final Map<String, String> enUS = {
   "txtEnterYourReview": "Enter Your Review (Optional)",
   "txtSubmit": "Submit",
   "txtSearchBooking": "Search Booking",
-  "txtPending": "Pending",
+  "txtPending": "Upcoming",
+  "txtUpcoming": "Upcoming",
+  "txtAwaitingSalonApproval": "Awaiting salon approval",
   "txtConfirmed": "Confirmed",
   "txtBookingConfirmedMessage":
       "Your booking is confirmed. Please arrive at the salon at your scheduled time.",

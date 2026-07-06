@@ -436,7 +436,7 @@ export const SKEDISY_ADMIN_UI = {
     maintenanceMode: "Mode maintenance",
     autoConfirmBookings: "Confirmation auto des réservations",
     autoConfirmBookingsHint:
-      "Les nouvelles réservations sont confirmées automatiquement (style Planity).",
+      "Confirmation immédiate à la réservation (style Planity). L'expert n'accepte pas les RDV. Désactivez seulement pour une validation manuelle par le salon.",
     stripeActive: "Paiement Stripe (activer / désactiver)",
     razorActive: "Paiement Razorpay",
     flutterActive: "Paiement Flutterwave",

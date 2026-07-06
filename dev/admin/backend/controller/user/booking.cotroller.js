@@ -22,6 +22,11 @@ const admin = require("../../firebase");
 const moment = require("moment");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
 const { sendAdminNewBookingEmail, sendAdminCustomerCancelledBookingEmail } = require("../../services/bookingAdminEmail.service");
+const {
+  resolveInitialBookingStatus,
+  getBookingListStatusFilter,
+  buildExpertBookingNotification,
+} = require("../../services/bookingStatus.service");
 
 // Initialize SendGrid if API key is available
 if (process.env.SENDGRID_API_KEY) {
@@ -698,9 +703,7 @@ exports.newBooking = async (req, res, next) => {
 
     booking = new Booking();
 
-    const globalAutoConfirm = global.settingJSON?.autoConfirmBookings !== false;
-    const salonAutoConfirm = salon.autoConfirmBookings !== false;
-    booking.status = globalAutoConfirm && salonAutoConfirm ? "confirm" : "pending";
+    booking.status = resolveInitialBookingStatus(global.settingJSON, salon);
 
     booking.userId = user._id;
     booking.expertId = expert._id;
@@ -1063,12 +1066,13 @@ exports.newBooking = async (req, res, next) => {
 
     if (expert && expert.fcmToken !== null) {
       const adminPromise = await admin;
+      const expertNotif = buildExpertBookingNotification(booking);
 
       const payload = {
         token: expert.fcmToken,
         notification: {
-          body: `Your Booking Is Confirm On ${booking.date} At ${booking.startTime}.`,
-          title: "New Booking Request.",
+          body: expertNotif.body,
+          title: expertNotif.title,
         },
       };
 
@@ -1080,9 +1084,9 @@ exports.newBooking = async (req, res, next) => {
 
           const notification = new Notification();
           notification.expertId = expert._id;
-          notification.title = "New Booking Request";
+          notification.title = expertNotif.title;
           notification.image = req.file ? process.env.baseURL + req.file.path : "";
-          notification.message = `Your Booking Is Confirm On ${booking.date} At ${booking.startTime}.`;
+          notification.message = expertNotif.body;
           notification.notificationType = 1;
           notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
           await notification.save();
@@ -1540,14 +1544,7 @@ exports.bookingInfo = async (req, res) => {
 };
 
 function getStatusFilter(status) {
-  switch (status) {
-    case "pending":
-      return { status: { $in: ["pending", "confirm"] } };
-    case "ALL":
-      return {};
-    default:
-      return { status };
-  }
+  return getBookingListStatusFilter(status);
 }
 
 async function generateUniqueBookingId() {

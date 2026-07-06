@@ -2,6 +2,8 @@
 
 import 'dart:developer';
 
+import 'package:intl/intl.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,49 @@ import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
+
+bool _isAppointmentToday(String? dateStr) {
+  if (dateStr == null || dateStr.isEmpty) return false;
+  try {
+    final appointment = DateFormat('yyyy-MM-dd').parse(dateStr);
+    final now = DateTime.now();
+    return appointment.year == now.year && appointment.month == now.month && appointment.day == now.day;
+  } catch (_) {
+    return false;
+  }
+}
+
+void _openCheckInDialog(BookingScreenController logic, int index) {
+  Get.dialog(
+    GetBuilder<BookingScreenController>(
+      id: Constant.idProgressView,
+      builder: (dialogLogic) {
+        return ProgressDialog(
+          inAsyncCall: dialogLogic.isLoading1.value,
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            shadowColor: AppColors.transparent,
+            surfaceTintColor: AppColors.transparent,
+            child: CheckInDialog(
+              id: logic.getPending[index].bookingId ?? "",
+              bookingId: logic.getPending[index].id ?? '',
+              serviceImage: logic.getPending[index].service?.first.image ?? "",
+              serviceName: logic.getPending[index].service?.first.name ?? "",
+              subCategoryName: logic.getPending[index].category?.first.name ?? "",
+              rupee: logic.getPending[index].withoutTax.toString(),
+              expertImage: logic.getPending[index].expert?.image ?? "",
+              expertName:
+                  "${logic.getPending[index].expert?.fname} ${logic.getPending[index].expert?.lname}",
+              date: logic.getPending[index].date.toString(),
+              time: logic.getPending[index].time?[0] ?? "",
+              index: index,
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
 
 class PendingOrder extends StatelessWidget {
   PendingOrder({super.key});
@@ -349,8 +394,63 @@ class PendingOrder extends StatelessWidget {
                                                       builder: (logic) {
                                                         return Container(
                                                           margin: const EdgeInsets.only(top: 20),
-                                                          child: logic.getPending[index].status == "confirm"
-                                                              ? Row(
+                                                          child: logic.getPending[index].status == "pending"
+                                                              ? Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                                  children: [
+                                                                    Text(
+                                                                      "txtExpertAwaitingSalonHint".tr,
+                                                                      textAlign: TextAlign.center,
+                                                                      style: TextStyle(
+                                                                        fontFamily: AppFontFamily.heeBo500,
+                                                                        fontSize: 13,
+                                                                        color: AppColors.service,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(height: 12),
+                                                                    AppButton(
+                                                                      height: 42,
+                                                                      textColor: AppColors.whiteColor,
+                                                                      buttonColor: AppColors.cancelBooking,
+                                                                      buttonText: "txtCancel".tr,
+                                                                      fontFamily: AppFontFamily.heeBo600,
+                                                                      fontSize: 15,
+                                                                      borderRadius: 10,
+                                                                      onTap: () {
+                                                                        Get.dialog(
+                                                                          GetBuilder<BookingScreenController>(
+                                                                            id: Constant.idProgressView,
+                                                                            builder: (dialogLogic) {
+                                                                              return ProgressDialog(
+                                                                                inAsyncCall: dialogLogic.isLoading1.value,
+                                                                                child: Dialog(
+                                                                                  backgroundColor: Colors.transparent,
+                                                                                  shadowColor: AppColors.transparent,
+                                                                                  surfaceTintColor: AppColors.transparent,
+                                                                                  child: CancelOrderDialog(
+                                                                                    id: logic.getPending[index].bookingId ?? "",
+                                                                                    bookingId: logic.getPending[index].id ?? "",
+                                                                                    serviceImage: logic.getPending[index].service?.first.image ?? "",
+                                                                                    serviceName: logic.getPending[index].service?.first.name ?? "",
+                                                                                    subCategoryName: logic.getPending[index].category?.first.name ?? "",
+                                                                                    rupee: logic.getPending[index].withoutTax.toString(),
+                                                                                    expertImage: logic.getPending[index].expert?.image ?? "",
+                                                                                    expertName:
+                                                                                        "${logic.getPending[index].expert?.fname} ${logic.getPending[index].expert?.lname}",
+                                                                                    index: index,
+                                                                                    date: logic.getPending[index].date ?? "",
+                                                                                    time: logic.getPending[index].time?[0] ?? "",
+                                                                                  ),
+                                                                                ),
+                                                                              );
+                                                                            },
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    ),
+                                                                  ],
+                                                                )
+                                                              : Row(
                                                                   children: [
                                                                     Expanded(
                                                                       child: GetBuilder<BookingScreenController>(
@@ -366,6 +466,13 @@ class PendingOrder extends StatelessWidget {
                                                                             iconColor: AppColors.buttonText,
                                                                             textColor: AppColors.buttonText,
                                                                             borderRadius: 10,
+                                                                            onTap: () {
+                                                                              if (_isAppointmentToday(logic.getPending[index].date)) {
+                                                                                _openCheckInDialog(logic, index);
+                                                                              } else {
+                                                                                Utils.showToast(Get.context!, "txtCheckInOnlyOnDate".tr);
+                                                                              }
+                                                                            },
                                                                           );
                                                                         },
                                                                       ),
@@ -427,145 +534,6 @@ class PendingOrder extends StatelessWidget {
                                                                                                   "",
                                                                                           userName:
                                                                                               "${logic.getPending[index].user?.fname} ${logic.getPending[index].user?.lname}",
-                                                                                        ),
-                                                                                      ),
-                                                                                    );
-                                                                                  },
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          );
-                                                                        },
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                )
-                                                              : Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child: GetBuilder<BookingScreenController>(
-                                                                        id: Constant.idCheckIn,
-                                                                        builder: (logic) {
-                                                                          return AppButton(
-                                                                            height: 42,
-                                                                            buttonColor: AppColors.checkInBooking,
-                                                                            buttonText: "txtCheckIn".tr,
-                                                                            textColor: AppColors.whiteColor,
-                                                                            fontFamily: AppFontFamily.heeBo600,
-                                                                            fontSize: 15,
-                                                                            borderRadius: 10,
-                                                                            onTap: () {
-                                                                              if (logic.getPending[index].status == "confirm") {
-                                                                                Utils.showToast(
-                                                                                    Get.context!, "txtCheckInAppointment".tr);
-                                                                              } else {
-                                                                                log("Booking Id :: ${logic.getPending[index].id}");
-                                                                                Constant.storage.write(
-                                                                                    'bookingId', logic.getPending[index].id);
-                                                                                Get.dialog(
-                                                                                  GetBuilder<BookingScreenController>(
-                                                                                    id: Constant.idProgressView,
-                                                                                    builder: (logic) {
-                                                                                      return ProgressDialog(
-                                                                                        inAsyncCall: logic.isLoading1.value,
-                                                                                        child: Dialog(
-                                                                                          backgroundColor: Colors.transparent,
-                                                                                          shadowColor: AppColors.transparent,
-                                                                                          surfaceTintColor: AppColors.transparent,
-                                                                                          child: CheckInDialog(
-                                                                                            id: logic.getPending[index]
-                                                                                                    .bookingId ??
-                                                                                                "",
-                                                                                            bookingId:
-                                                                                                logic.getPending[index].id ?? '',
-                                                                                            serviceImage: logic.getPending[index]
-                                                                                                    .service?.first.image ??
-                                                                                                "",
-                                                                                            serviceName: logic.getPending[index]
-                                                                                                    .service?.first.name ??
-                                                                                                "",
-                                                                                            subCategoryName: logic
-                                                                                                    .getPending[index]
-                                                                                                    .category
-                                                                                                    ?.first
-                                                                                                    .name ??
-                                                                                                "",
-                                                                                            rupee: logic
-                                                                                                .getPending[index].withoutTax
-                                                                                                .toString(),
-                                                                                            expertImage: logic.getPending[index]
-                                                                                                    .expert?.image ??
-                                                                                                "",
-                                                                                            expertName:
-                                                                                                "${logic.getPending[index].expert?.fname} ${logic.getPending[index].expert?.lname}",
-                                                                                            date: logic.getPending[index].date
-                                                                                                .toString(),
-                                                                                            time: logic
-                                                                                                    .getPending[index].time?[0] ??
-                                                                                                "",
-                                                                                            index: index,
-                                                                                          ),
-                                                                                        ),
-                                                                                      );
-                                                                                    },
-                                                                                  ),
-                                                                                );
-                                                                              }
-                                                                            },
-                                                                          );
-                                                                        },
-                                                                      ),
-                                                                    ),
-                                                                    Expanded(
-                                                                      child: GetBuilder<BookingScreenController>(
-                                                                        builder: (logic) {
-                                                                          return AppButton(
-                                                                            height: 42,
-                                                                            textColor: AppColors.whiteColor,
-                                                                            buttonColor: AppColors.cancelBooking,
-                                                                            buttonText: "txtCancel".tr,
-                                                                            fontFamily: AppFontFamily.heeBo600,
-                                                                            fontSize: 15,
-                                                                            borderRadius: 10,
-                                                                            onTap: () {
-                                                                              Get.dialog(
-                                                                                GetBuilder<BookingScreenController>(
-                                                                                  id: Constant.idProgressView,
-                                                                                  builder: (logic) {
-                                                                                    return ProgressDialog(
-                                                                                      inAsyncCall: logic.isLoading1.value,
-                                                                                      child: Dialog(
-                                                                                        backgroundColor: Colors.transparent,
-                                                                                        shadowColor: AppColors.transparent,
-                                                                                        surfaceTintColor: AppColors.transparent,
-                                                                                        child: CancelOrderDialog(
-                                                                                          id: logic.getPending[index].bookingId ??
-                                                                                              "",
-                                                                                          bookingId:
-                                                                                              logic.getPending[index].id ?? "",
-                                                                                          serviceImage: logic.getPending[index]
-                                                                                                  .service?.first.image ??
-                                                                                              "",
-                                                                                          serviceName: logic.getPending[index]
-                                                                                                  .service?.first.name ??
-                                                                                              "",
-                                                                                          subCategoryName: logic.getPending[index]
-                                                                                                  .category?.first.name ??
-                                                                                              "",
-                                                                                          rupee: logic
-                                                                                              .getPending[index].withoutTax
-                                                                                              .toString(),
-                                                                                          expertImage: logic.getPending[index]
-                                                                                                  .expert?.image ??
-                                                                                              "",
-                                                                                          expertName:
-                                                                                              "${logic.getPending[index].expert?.fname} ${logic.getPending[index].expert?.lname}",
-                                                                                          date: logic.getPending[index].date
-                                                                                              .toString(),
-                                                                                          time:
-                                                                                              logic.getPending[index].time?[0] ??
-                                                                                                  "",
-                                                                                          index: index,
                                                                                         ),
                                                                                       ),
                                                                                     );

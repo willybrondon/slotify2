@@ -169,7 +169,7 @@ class BookingScreen extends StatelessWidget {
   }
 
   var tabs = [
-    Tab(text: "txtPendingOrder".tr),
+    Tab(text: "txtUpcomingOrder".tr),
     Tab(text: "txtCancelOrder".tr),
     Tab(text: "txtCompletedOrder".tr),
   ];
