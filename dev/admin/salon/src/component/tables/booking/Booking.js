@@ -227,6 +227,10 @@ const Booking = () => {
             </button>
           </div>
         ) : (
+          <div className="d-flex justify-content-center">
+            <span>{row?.status || "-"}</span>
+          </div>
+        ),
     },
     {
       Header: col.firstSlot,
