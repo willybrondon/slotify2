@@ -23,6 +23,44 @@ import 'package:salon_2/utils/utils.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  static Future<void> _openEditProfile(
+    ProfileScreenController logicProfile,
+  ) async {
+    await logicProfile.onGetUserApiCall();
+
+    if (logicProfile.getUserCategory?.status == true) {
+      Constant.storage.write(
+          'fName', logicProfile.getUserCategory?.user?.fname);
+      Constant.storage.write(
+          'lName', logicProfile.getUserCategory?.user?.lname);
+      Constant.storage.write('salonRequestSent',
+          logicProfile.getUserCategory?.user?.salonRequestSent);
+
+      Future.delayed(const Duration(milliseconds: 100), () async {
+        await Get.put<EditProfileScreenController>(
+                EditProfileScreenController())
+            .getDataFromArgs();
+        await Get.put<EditProfileScreenController>(
+                EditProfileScreenController())
+            .getArgumentsData();
+      });
+
+      Get.toNamed(AppRoutes.editProfile, arguments: [
+        logicProfile.getUserCategory?.user?.fname,
+        logicProfile.getUserCategory?.user?.lname,
+        logicProfile.getUserCategory?.user?.email,
+        logicProfile.getUserCategory?.user?.mobile,
+        logicProfile.getUserCategory?.user?.age ?? 0,
+        logicProfile.getUserCategory?.user?.bio,
+        logicProfile.getUserCategory?.user?.loginType,
+        false
+      ]);
+    } else {
+      Utils.showToast(
+          Get.context!, logicProfile.getUserCategory?.message ?? "");
+    }
+  }
+
   /// First + last name from storage; if empty, use part before @ from email (guest / minimal profile).
   static String _profileDisplayName(ProfileScreenController logicProfile) {
     final fn = (Constant.storage.read<String>('fName') ?? '').trim();
@@ -184,6 +222,49 @@ class ProfileScreen extends StatelessWidget {
                                                           ),
                                                         ),
                                                       ),
+                                                      Positioned(
+                                                        top: 88,
+                                                        left:
+                                                            Get.width * 0.55,
+                                                        child: GestureDetector(
+                                                          onTap: () =>
+                                                              _openEditProfile(
+                                                            logicProfile,
+                                                          ),
+                                                          child: Container(
+                                                            height: 35,
+                                                            width: 35,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color: AppColors
+                                                                  .whiteColor,
+                                                            ),
+                                                            child: Container(
+                                                              alignment: Alignment
+                                                                  .center,
+                                                              height: 32,
+                                                              width: 32,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                color: AppColors
+                                                                    .primaryAppColor,
+                                                              ),
+                                                              child: Image.asset(
+                                                                AppAsset
+                                                                    .icProfileEdit,
+                                                                height: 18,
+                                                                width: 18,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
                                                 )
@@ -297,59 +378,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   editUserprofile() {
-    ProfileScreenController profileScreenController =
-        Get.put(ProfileScreenController());
-
     return Column(
       children: [
-        GetBuilder<ProfileScreenController>(
-          id: Constant.idProgressView,
-          init: ProfileScreenController(),
-          builder: (logicProfile) {
-            return profileMenu(
-              leadingImage: AppAsset.icProfile,
-              title: "txtMyAccount".tr,
-              subtitle: "txtAccountDetails".tr,
-              onTap: () async {
-                await logicProfile.onGetUserApiCall();
-
-                if (logicProfile.getUserCategory?.status == true) {
-                  Constant.storage.write('fName',
-                      profileScreenController.getUserCategory?.user?.fname);
-                  Constant.storage.write('lName',
-                      profileScreenController.getUserCategory?.user?.lname);
-                  Constant.storage.write(
-                      'salonRequestSent',
-                      profileScreenController
-                          .getUserCategory?.user?.salonRequestSent);
-
-                  Future.delayed(const Duration(milliseconds: 100), () async {
-                    await Get.put<EditProfileScreenController>(
-                            EditProfileScreenController())
-                        .getDataFromArgs();
-                    await Get.put<EditProfileScreenController>(
-                            EditProfileScreenController())
-                        .getArgumentsData();
-                  });
-
-                  Get.toNamed(AppRoutes.editProfile, arguments: [
-                    logicProfile.getUserCategory?.user?.fname,
-                    logicProfile.getUserCategory?.user?.lname,
-                    logicProfile.getUserCategory?.user?.email,
-                    logicProfile.getUserCategory?.user?.mobile,
-                    logicProfile.getUserCategory?.user?.age ?? 0,
-                    logicProfile.getUserCategory?.user?.bio,
-                    logicProfile.getUserCategory?.user?.loginType,
-                    false
-                  ]);
-                } else {
-                  Utils.showToast(Get.context!,
-                      logicProfile.getUserCategory?.message ?? "");
-                }
-              },
-            );
-          },
-        ),
         GetBuilder<SplashController>(
           id: Constant.idSettingsRefresh,
           builder: (splashLogic) {

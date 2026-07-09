@@ -40,12 +40,7 @@ const SalonPaymentSettings = () => {
     : portalCopy.stripeConnectDisabled;
 
   const handleCashToggle = () => {
-    dispatch(
-      updateSalonPaymentMethods({
-        acceptCash: !acceptCash,
-        acceptStripe: acceptStripePref,
-      })
-    );
+    dispatch(updateSalonPaymentMethods({ acceptCash: !acceptCash }));
   };
 
   const handleStripeToggle = () => {
@@ -94,6 +89,11 @@ const SalonPaymentSettings = () => {
             style={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", color: "#9a3412" }}
           >
             {portalCopy.stripeConnectPlatformOff}
+            {acceptCash && (
+              <p style={{ fontSize: "12px", marginBottom: 0, marginTop: 8 }}>
+                Le paiement au salon (espèces) reste disponible pour vos clientes.
+              </p>
+            )}
           </div>
         </div>
       )}

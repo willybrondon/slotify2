@@ -15,6 +15,7 @@ import {
 import { getAllSalons } from "../../../redux/slice/salonSlice";
 import { SKEDISY_ADMIN_UI as ui } from "../../../constants/skedisyUiCopy";
 import { warning } from "../../../util/Alert";
+import { parseWallClockDate } from "../../../util/scheduleDate";
 import AdminPlanningBookingModal from "./AdminPlanningBookingModal";
 import AdminPlanningBookingDetailModal from "./AdminPlanningBookingDetailModal";
 import "./TeamCalendar.css";
@@ -169,8 +170,8 @@ const AdminTeamCalendar = () => {
       .map((e) => ({
         ...e,
         resourceId: e.resourceId || e.expertId,
-        start: new Date(e.start),
-        end: new Date(e.end),
+        start: parseWallClockDate(e.start),
+        end: parseWallClockDate(e.end),
         title: e.type === "booking" ? `${e.title} (${e.status === "confirm" ? "Confirmé" : e.status})` : e.title,
       }))
       .filter((e) => !Number.isNaN(e.start?.getTime()) && !Number.isNaN(e.end?.getTime()));

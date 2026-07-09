@@ -26,7 +26,13 @@ const {
   resolveInitialBookingStatus,
   getBookingListStatusFilter,
   buildExpertBookingNotification,
+  buildUserBookingConfirmedNotification,
+  buildExpertBookingCancelledByUserNotification,
 } = require("../../services/bookingStatus.service");
+const {
+  notifyExpertPushAndInApp,
+  notifyUserPushAndInApp,
+} = require("../../services/pushNotification.service");
 
 // Initialize SendGrid if API key is available
 if (process.env.SENDGRID_API_KEY) {
@@ -1064,37 +1070,38 @@ exports.newBooking = async (req, res, next) => {
     await Promise.all(walletHistoryPromises);
     }
 
-    if (expert && expert.fcmToken !== null) {
-      const adminPromise = await admin;
-      const expertNotif = buildExpertBookingNotification(booking);
-
-      const payload = {
-        token: expert.fcmToken,
-        notification: {
-          body: expertNotif.body,
+    const expertNotif = buildExpertBookingNotification(booking);
+    setImmediate(async () => {
+      try {
+        await notifyExpertPushAndInApp({
+          expert,
           title: expertNotif.title,
-        },
-      };
-
-      adminPromise
-        .messaging()
-        .send(payload)
-        .then(async (response) => {
-          console.log("Successfully sent with response: ", response);
-
-          const notification = new Notification();
-          notification.expertId = expert._id;
-          notification.title = expertNotif.title;
-          notification.image = req.file ? process.env.baseURL + req.file.path : "";
-          notification.message = expertNotif.body;
-          notification.notificationType = 1;
-          notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-          await notification.save();
-        })
-        .catch((error) => {
-          console.log("Error sending message: ", error);
+          body: expertNotif.body,
+          data: {
+            type: "booking",
+            bookingId: String(booking._id),
+            status: booking.status,
+          },
+          image: req.file ? process.env.baseURL + req.file.path : "",
         });
-    }
+
+        if (booking.status === "confirm" && user) {
+          const userNotif = buildUserBookingConfirmedNotification(booking);
+          await notifyUserPushAndInApp({
+            user,
+            title: userNotif.title,
+            body: userNotif.body,
+            data: {
+              type: "booking",
+              bookingId: String(booking._id),
+              status: booking.status,
+            },
+          });
+        }
+      } catch (notifyErr) {
+        console.error("[Booking] push notification failed:", notifyErr.message);
+      }
+    });
 
     setImmediate(() => {
       sendAdminNewBookingEmail(booking._id).catch((err) =>
@@ -1470,39 +1477,27 @@ exports.cancelBookingByUser = async (req, res) => {
           },
         }
       ),
-      Notification.create({
-        expertId: expert._id,
-        title: req.body.title,
-        image: req.file ? process.env.baseURL + req.file.path : "",
-        message: req.body.message,
-        notificationType: 1,
-        date: new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
-      }),
       UString.deleteMany({ bookingId: booking._id }),
       UserWalletHistory.findOneAndDelete({ booking: booking._id }),
     ]);
 
-    if (expert && expert.fcmToken !== null) {
-      const adminPromise = await admin;
-
-      const payload = {
-        token: expert?.fcmToken,
-        notification: {
-          body: `Your Booking with Id ${booking.bookingId} is cancelled By ${user.fname} ${user.lname}`,
-          title: "Booking Cancel",
-        },
-      };
-
-      adminPromise
-        .messaging()
-        .send(payload)
-        .then(async (response) => {
-          console.log("Successfully sent with response: ", response);
-        })
-        .catch((error) => {
-          console.log("Error sending message:           ", error);
+    const expertCancelNotif = buildExpertBookingCancelledByUserNotification(booking, user);
+    setImmediate(async () => {
+      try {
+        await notifyExpertPushAndInApp({
+          expert,
+          title: expertCancelNotif.title,
+          body: expertCancelNotif.body,
+          data: {
+            type: "booking",
+            bookingId: String(booking._id),
+            status: "cancel",
+          },
         });
-    }
+      } catch (notifyErr) {
+        console.error("[User cancel booking] expert push failed:", notifyErr.message);
+      }
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, message: "Internal server error" });

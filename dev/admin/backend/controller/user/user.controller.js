@@ -10,6 +10,7 @@ const Notification = require("../../models/notification.model");
 const Coupon = require("../../models/coupon.model");
 
 const admin = require("../../firebase");
+const { isValidFcmToken } = require("../../services/pushNotification.service");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
 
 const mongoose = require("mongoose");
@@ -34,7 +35,9 @@ const userFunction = async (user, data_) => {
   user.gender = data?.gender ? data.gender : user?.gender;
   user.analyticDate = new Date().toLocaleString();
   user.bio = data?.bio ? data.bio : user?.bio;
-  user.fcmToken = data?.fcmToken ? data.fcmToken : user?.fcmToken;
+  if (isValidFcmToken(data?.fcmToken)) {
+    user.fcmToken = data.fcmToken.trim();
+  }
   user.identity = data?.identity ? data.identity : user?.identity;
 
   await user.save();
@@ -370,6 +373,34 @@ exports.getProfile = async (req, res) => {
       status: true,
       message: "success!!",
       user,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: "Internal server error" });
+  }
+};
+
+exports.updateFcmToken = async (req, res) => {
+  try {
+    const { userId, fcmToken } = req.body || {};
+    if (!userId) {
+      return res.status(200).send({ status: false, message: "invalid details" });
+    }
+
+    const user = await User.findOne({ _id: userId, isDelete: false });
+    if (!user) {
+      return res.status(200).send({ status: false, message: "User Not found" });
+    }
+
+    if (isValidFcmToken(fcmToken)) {
+      user.fcmToken = fcmToken.trim();
+      await user.save();
+    }
+
+    return res.status(200).send({
+      status: true,
+      message: "FCM token updated",
+      hasValidToken: isValidFcmToken(user.fcmToken),
     });
   } catch (error) {
     console.log(error);

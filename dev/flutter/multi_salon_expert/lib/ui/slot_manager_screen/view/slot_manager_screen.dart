@@ -18,6 +18,7 @@ import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/booking_time_utils.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -738,15 +739,7 @@ Widget _buildDayTimeline(List<dynamic> events) {
       .toList();
   if (visible.isEmpty) return const SizedBox.shrink();
 
-  String formatTime(dynamic value) {
-    if (value == null) return "";
-    try {
-      final dt = DateTime.parse(value.toString()).toLocal();
-      return DateFormat('HH:mm').format(dt);
-    } catch (_) {
-      return "";
-    }
-  }
+  String formatTime(dynamic value) => formatScheduleEventTime(value);
 
   String labelForType(String? type) {
     switch (type) {

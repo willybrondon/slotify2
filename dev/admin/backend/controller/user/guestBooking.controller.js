@@ -3,6 +3,7 @@ const GuestOTP = require("../../models/guestOtp.model");
 const User = require("../../models/user.model");
 const { LOGIN_TYPE } = require("../../types/constant");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
+const { wrapOtpEmailHtml } = require("../../lib/otpEmailAutofill");
 
 const OTP_RATE_LIMIT_MS = 60 * 1000;
 
@@ -124,13 +125,12 @@ exports.sendOtp = async (req, res) => {
     }
 
     const displayName = nameFromEmail(email);
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:Helvetica,Arial,sans-serif;line-height:1.6">
-      <p>Hi ${displayName},</p>
-      <p>Use this code to continue booking on ${process.env.projectName || "our app"}:</p>
-      <p style="font-size:24px;font-weight:bold;letter-spacing:4px">${newOtp}</p>
-      <p style="color:#666;font-size:13px">If you did not request this, you can ignore this email.</p>
-      <p>— ${process.env.projectName || "Team"}</p>
-    </body></html>`;
+    const html = wrapOtpEmailHtml({
+      title: `Hi ${displayName}`,
+      bodyHtml: `<p>Use this code to continue booking on ${process.env.projectName || "Skedisy"}:</p>
+        <p style="color:#666;font-size:13px">If you did not request this, you can ignore this email.</p>`,
+      code: String(newOtp),
+    });
 
     await sgMail.send({
       to: email,

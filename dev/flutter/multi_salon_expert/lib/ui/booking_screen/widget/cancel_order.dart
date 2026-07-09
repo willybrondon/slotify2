@@ -15,6 +15,7 @@ import 'package:salon_2/utils/app_button.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/booking_time_utils.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -308,7 +309,8 @@ class CancelOrder extends StatelessWidget {
                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
                                                                 Text(
-                                                                  logic.getCancel[index].time?[0] ?? "",
+                                                                  expertBookingTimeLabel(
+                                                                      logic.getCancel[index]),
                                                                   style: TextStyle(
                                                                     fontFamily: AppFontFamily.heeBo700,
                                                                     fontSize: 14,

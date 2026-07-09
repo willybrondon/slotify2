@@ -20,6 +20,8 @@ route.post("/busyExpert", checkAccessWithSecretKey(), expertController.busyExper
 
 route.patch("/login", checkAccessWithSecretKey(), expertController.expertLogin);
 
+route.patch("/fcmToken", checkAccessWithSecretKey(), expertController.updateFcmToken);
+
 route.get("/profile", checkAccessWithSecretKey(), expertController.getExpertProfile);
 
 route.patch("/updateProfile", checkAccessWithSecretKey(), upload.single("image"), expertController.updateExpert);

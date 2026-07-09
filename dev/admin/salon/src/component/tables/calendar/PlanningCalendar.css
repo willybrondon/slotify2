@@ -560,3 +560,82 @@
     overflow-y: auto;
   }
 }
+
+/* ——— Week view: scroll vertical (heures) + horizontal (jours) ——— */
+.sq-planning-page.sq-planning-view-week .sq-planning-calendar-zone {
+  overflow: hidden;
+  max-height: min(78vh, 820px);
+}
+
+.sq-planning-page.sq-planning-view-week .sq-calendar-body {
+  height: min(78vh, 820px) !important;
+  max-height: min(78vh, 820px);
+}
+
+.sq-planning-page.sq-planning-view-week .rbc-time-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sq-planning-page.sq-planning-view-week .rbc-time-header {
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sq-planning-page.sq-planning-view-week .rbc-time-header-content {
+  min-width: max(100%, 840px);
+}
+
+.sq-planning-page.sq-planning-view-week .rbc-time-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.sq-planning-page.sq-planning-view-week .rbc-time-content > .rbc-day-slot {
+  min-width: 120px;
+}
+
+.sq-planning-page.sq-planning-view-week .rbc-time-header-content .rbc-header {
+  min-width: 120px;
+}
+
+.sq-planning-page.sq-planning-view-week .rbc-timeslot-group {
+  min-height: 40px;
+}
+
+.sq-planning-page.sq-planning-view-week .rbc-time-gutter {
+  flex-shrink: 0;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .sq-planning-page.sq-planning-view-week .sq-planning-calendar-zone {
+    max-height: none;
+    flex: 1 1 0;
+  }
+
+  .sq-planning-page.sq-planning-view-week .sq-calendar-body {
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+
+  .sq-planning-page.sq-planning-view-week .rbc-time-header-content {
+    min-width: max(100%, 700px);
+  }
+
+  .sq-planning-page.sq-planning-view-week .rbc-time-content > .rbc-day-slot,
+  .sq-planning-page.sq-planning-view-week .rbc-time-header-content .rbc-header {
+    min-width: 100px;
+  }
+}

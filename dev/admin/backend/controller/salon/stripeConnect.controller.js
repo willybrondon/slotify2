@@ -21,6 +21,12 @@ exports.getStatus = async (req, res) => {
       await syncConnectAccountStatus(salon);
     }
 
+    if (!global.settingJSON?.isStripePay && salon.paymentMethods?.acceptStripe === true) {
+      salon.paymentMethods = salon.paymentMethods || {};
+      salon.paymentMethods.acceptStripe = false;
+      await salon.save();
+    }
+
     return res.status(200).send({
       status: true,
       message: "success",
@@ -53,28 +59,35 @@ exports.updatePaymentMethods = async (req, res) => {
       return res.status(200).send({ status: false, message: "Salon not found" });
     }
 
+    salon.paymentMethods = salon.paymentMethods || {};
+    const previousAcceptStripe = salon.paymentMethods.acceptStripe === true;
+    const platformStripeEnabled = !!global.settingJSON?.isStripePay;
+
     if (req.body.acceptCash !== undefined) {
-      salon.paymentMethods = salon.paymentMethods || {};
       salon.paymentMethods.acceptCash =
         req.body.acceptCash === true || req.body.acceptCash === "true";
     }
     if (req.body.acceptStripe !== undefined) {
-      salon.paymentMethods = salon.paymentMethods || {};
-      salon.paymentMethods.acceptStripe =
+      const wantsStripe =
         req.body.acceptStripe === true || req.body.acceptStripe === "true";
+      if (wantsStripe && !previousAcceptStripe && !platformStripeEnabled) {
+        return res.status(200).send({
+          status: false,
+          message: "Stripe Connect n'est pas activé sur la plateforme Skedisy.",
+        });
+      }
+      salon.paymentMethods.acceptStripe = wantsStripe;
+    }
+
+    // Stripe Connect unavailable on platform — keep cash working, clear stale Stripe preference
+    if (!platformStripeEnabled) {
+      salon.paymentMethods.acceptStripe = false;
     }
 
     if (salon.paymentMethods?.acceptCash === false && salon.paymentMethods?.acceptStripe !== true) {
       return res.status(200).send({
         status: false,
         message: "Au moins un mode de paiement doit rester actif (espèces ou Stripe).",
-      });
-    }
-
-    if (salon.paymentMethods?.acceptStripe === true && !global.settingJSON?.isStripePay) {
-      return res.status(200).send({
-        status: false,
-        message: "Stripe Connect n'est pas activé sur la plateforme Skedisy.",
       });
     }
 

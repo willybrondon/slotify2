@@ -17,7 +17,14 @@ const UString = require("../../models/uniqueString.model");
 const {
   getBookingListStatusFilter,
   buildExpertBookingNotification,
+  buildUserBookingCancelledNotification,
+  buildUserBookingCompletedNotification,
+  buildExpertBookingCancelledByUserNotification,
 } = require("../../services/bookingStatus.service");
+const {
+  notifyUserPushAndInApp,
+  notifyExpertPushAndInApp,
+} = require("../../services/pushNotification.service");
 
 function getStatusFilter(status) {
   return getBookingListStatusFilter(status);
@@ -96,6 +103,8 @@ exports.bookingForExpert = async (req, res) => {
           category: { _id: 1, name: 1, image: 1 },
           date: 1,
           time: 1,
+          startTime: 1,
+          duration: 1,
           bookingId: 1,
           amount: 1,
           withoutTax: 1,
@@ -296,7 +305,6 @@ exports.bookingTypeStatusWiseForExpert = async (req, res) => {
 
 exports.cancelConfirmBooking = async (req, res) => {
   try {
-    let payload;
     const status = req?.body?.status;
     const date = moment().format("YYYY-MM-DD");
 
@@ -318,8 +326,10 @@ exports.cancelConfirmBooking = async (req, res) => {
       return res.status(200).send({ status: false, message: "Expert not found Of this booking" });
     }
 
-    const notification = new Notification();
-    const adminPromise = await admin;
+    let pushTitle = "";
+    let pushBody = "";
+    let pushImage = booking.serviceId?.[0]?.image || "";
+
     if (status !== "confirm" && status !== "cancel") {
       return res.status(200).send({ status: false, message: "Invalid Booking Status" });
     }
@@ -340,14 +350,8 @@ exports.cancelConfirmBooking = async (req, res) => {
 
       booking.checkInTime = moment().format("hh:mm A");
       booking.status = "confirm";
-
-      payload = {
-        token: user.fcmToken,
-        notification: {
-          body: `Your Booking with Id ${booking.bookingId} is Starting Soon`,
-          title: "Booking Check-In",
-        },
-      };
+      pushTitle = "Votre rendez-vous commence";
+      pushBody = `RDV #${booking.bookingId} — votre expert vous accueille.`;
     }
 
     if (status == "cancel") {
@@ -363,14 +367,9 @@ exports.cancelConfirmBooking = async (req, res) => {
         return res.status(200).send({ status: false, message: "Booking is already cancel" });
       }
 
-      payload = {
-        token: user.fcmToken,
-        notification: {
-          body: `Your Booking with Id ${booking.bookingId}  is cancelled By Salon`,
-          title: "Booking Cancel",
-          image: booking.serviceId[0].image,
-        },
-      };
+      const cancelNotif = buildUserBookingCancelledNotification(booking, "l'expert");
+      pushTitle = cancelNotif.title;
+      pushBody = `${cancelNotif.body} Motif : ${req.body.reason}`;
 
       booking.status = "cancel";
       booking.cancel.reason = req.body.reason;
@@ -393,7 +392,7 @@ exports.cancelConfirmBooking = async (req, res) => {
       ]);
     }
 
-    if (!payload) {
+    if (!pushTitle) {
       return res.status(200).send({ status: false, message: "Unable to update booking" });
     }
 
@@ -403,30 +402,27 @@ exports.cancelConfirmBooking = async (req, res) => {
       booking,
     });
 
-    notification.userId = user._id;
-    notification.title = payload.notification.title;
-    notification.image = booking.serviceId[0].image;
-    notification.notificationType = 0;
-    notification.message = status == "confirm" ? payload.notification.body : payload.notification.body + " Reason : " + booking.cancel.reason;
-    notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-
-    await Promise.all([booking.save(), notification.save()]);
-
-    if (status === "cancel") {
-      await UString.deleteMany({ bookingId: booking._id });
+    if (status === "confirm") {
+      await booking.save();
     }
 
-    if (user && user.fcmToken !== null) {
-      adminPromise
-        .messaging()
-        .send(payload)
-        .then(async (response) => {
-          console.log("Successfully sent with response: ", response);
-        })
-        .catch((error) => {
-          console.log("Error sending message:      ", error);
+    setImmediate(async () => {
+      try {
+        await notifyUserPushAndInApp({
+          user,
+          title: pushTitle,
+          body: pushBody,
+          image: pushImage,
+          data: {
+            type: "booking",
+            bookingId: String(booking._id),
+            status: booking.status,
+          },
         });
-    }
+      } catch (notifyErr) {
+        console.error("[Expert cancel/confirm] push failed:", notifyErr.message);
+      }
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, message: "Internal server error" });
@@ -540,6 +536,24 @@ exports.completeBooking = async (req, res) => {
         uniqueId: uniqueI2,
       }),
     ]);
+
+    const completedNotif = buildUserBookingCompletedNotification(booking);
+    setImmediate(async () => {
+      try {
+        await notifyUserPushAndInApp({
+          user,
+          title: completedNotif.title,
+          body: completedNotif.body,
+          data: {
+            type: "booking",
+            bookingId: String(booking._id),
+            status: "completed",
+          },
+        });
+      } catch (notifyErr) {
+        console.error("[Complete booking] push failed:", notifyErr.message);
+      }
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, message: "Internal server error" });
@@ -644,7 +658,7 @@ exports.expertEarning = async (req, res) => {
         $facet: {
           pendingBooking: [
             {
-              $match: { status: "pending" },
+              $match: getBookingListStatusFilter("upcoming"),
             },
             {
               $group: {

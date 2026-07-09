@@ -9,7 +9,7 @@ class ProductCategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.whiteColor,
+      backgroundColor: AppColors.backGround,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         flexibleSpace: const ProductCategoryAppBarView(),

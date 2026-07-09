@@ -19,16 +19,7 @@ class RaiseComplainTopView extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppBarCustom(
       title: "txtComplain".tr,
-      method: InkWell(
-        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-        onTap: () {
-          Get.back();
-        },
-        child: Icon(
-          Icons.arrow_back,
-          color: AppColors.blackColor,
-        ),
-      ),
+      method: AppBarCustom.backButton(),
     );
   }
 }

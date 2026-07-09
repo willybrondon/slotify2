@@ -243,16 +243,17 @@ class OrderReportTabView extends StatelessWidget {
                                       child: FadeInAnimation(
                                         child: InkWell(
                                           onTap: () {
+                                            final bookingMongoId = logic
+                                                .getBookingStatusWiseCategory
+                                                ?.data?[index]
+                                                .id;
+                                            if (bookingMongoId == null ||
+                                                bookingMongoId.isEmpty) {
+                                              return;
+                                            }
                                             Get.toNamed(
-                                              AppRoutes.viewDetail,
-                                              arguments: [
-                                                logic.getBookingStatusWiseCategory
-                                                        ?.data?[index] ??
-                                                    [],
-                                                logic.getBookingStatusWiseCategory
-                                                        ?.reviews ??
-                                                    [],
-                                              ],
+                                              AppRoutes.bookingInformation,
+                                              arguments: [bookingMongoId],
                                             );
                                           },
                                           child: Container(
@@ -583,7 +584,7 @@ class OrderReportTabView extends StatelessWidget {
                                                           ),
                                                         ),
                                                         Text(
-                                                          "txtViewDetails".tr,
+                                                          "txtBookingInformation".tr,
                                                           style: TextStyle(
                                                               fontSize: 14,
                                                               fontFamily:

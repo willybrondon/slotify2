@@ -16,6 +16,7 @@ import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
+import 'package:salon_2/services/fcm_sync_service.dart';
 import 'package:salon_2/utils/utils.dart';
 import 'package:salon_2/main.dart' as main_app;
 
@@ -132,8 +133,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
     log("Setting :: $settings");
     await messaging.getToken().then((value) {
-      log("This is FCM token :: $value");
+      main_app.fcmToken = value ?? '';
+      log("This is FCM token :: ${main_app.fcmToken}");
     });
+
+    FcmSyncService.listenTokenRefresh();
+    await FcmSyncService.syncUserTokenIfLoggedIn();
 
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();

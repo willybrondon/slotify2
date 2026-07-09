@@ -23,15 +23,7 @@ class AttendanceScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         flexibleSpace: AppBarCustom(
           title: "txtAttendance".tr,
-          method: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(
-              Icons.arrow_back,
-              color: AppColors.blackColor,
-            ),
-          ),
+          method: AppBarCustom.backButton(),
         ),
       ),
       body: GetBuilder<AttendanceController>(

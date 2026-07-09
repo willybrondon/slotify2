@@ -19,15 +19,7 @@ class WithdrawMethodAppBarView extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppBarCustom(
       title: "txtWithdrawMethod".tr,
-      method: InkWell(
-        onTap: () {
-          Get.back();
-        },
-        child: Icon(
-          Icons.arrow_back,
-          color: AppColors.blackColor,
-        ),
-      ),
+      method: AppBarCustom.backButton(),
     );
   }
 }

@@ -18,18 +18,15 @@ class CategoryWiseProductAppBarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBarCustom(
-      title: "txtProducts".tr,
-      method: InkWell(
-        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-        onTap: () {
-          Get.back();
-        },
-        child: Icon(
-          Icons.arrow_back,
-          color: AppColors.blackColor,
-        ),
-      ),
+    return GetBuilder<CategoryWiseProductController>(
+      builder: (logic) {
+        return AppBarCustom(
+          title: logic.displayCategoryName.isNotEmpty
+              ? logic.displayCategoryName
+              : "txtProducts".tr,
+          method: AppBarCustom.backButton(),
+        );
+      },
     );
   }
 }
@@ -161,7 +158,7 @@ class CategoryWiseProductItemView extends StatelessWidget {
                                                 height: 12,
                                                 color: AppColors.yellow3),
                                             Text(
-                                              "${logic.getCategoryWiseProductModel?.data?[index].rating?.toStringAsFixed(1) ?? ""} | ${logic.getCategoryWiseProductModel?.data?[index].sold ?? ""} Sold",
+                                              "${logic.getCategoryWiseProductModel?.data?[index].rating?.toStringAsFixed(1) ?? ""} | ${logic.getCategoryWiseProductModel?.data?[index].sold ?? ""} ${"txtSold".tr}",
                                               style: TextStyle(
                                                 fontFamily:
                                                     AppFontFamily.heeBo700,

@@ -22,15 +22,7 @@ class HelpScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         flexibleSpace: AppBarCustom(
           title: "txtHelp".tr,
-          method: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(
-              Icons.arrow_back,
-              color: AppColors.whiteColor,
-            ),
-          ),
+          method: AppBarCustom.backButton(),
         ),
       ),
       body: Column(

@@ -66,6 +66,8 @@ class Data {
     num? withoutTax,
     num? expertEarning,
     String? bookingId,
+    String? startTime,
+    int? duration,
     String? createdAt,
     String? updatedAt,
     User? user,
@@ -82,6 +84,8 @@ class Data {
     _withoutTax = withoutTax;
     _expertEarning = expertEarning;
     _bookingId = bookingId;
+    _startTime = startTime;
+    _duration = duration;
     _createdAt = createdAt;
     _updatedAt = updatedAt;
     _user = user;
@@ -100,6 +104,10 @@ class Data {
     _withoutTax = json['withoutTax'];
     _expertEarning = json['expertEarning'];
     _bookingId = json['bookingId'];
+    _startTime = json['startTime'];
+    _duration = json['duration'] is num
+        ? (json['duration'] as num).toInt()
+        : int.tryParse('${json['duration'] ?? ''}');
     _createdAt = json['createdAt'];
     _updatedAt = json['updatedAt'];
     _user = json['user'] != null ? User.fromJson(json['user']) : null;
@@ -126,6 +134,8 @@ class Data {
   num? _withoutTax;
   num? _expertEarning;
   String? _bookingId;
+  String? _startTime;
+  int? _duration;
   String? _createdAt;
   String? _updatedAt;
   User? _user;
@@ -142,6 +152,8 @@ class Data {
     num? withoutTax,
     num? expertEarning,
     String? bookingId,
+    String? startTime,
+    int? duration,
     String? createdAt,
     String? updatedAt,
     User? user,
@@ -159,6 +171,8 @@ class Data {
         withoutTax: withoutTax ?? _withoutTax,
         expertEarning: expertEarning ?? _expertEarning,
         bookingId: bookingId ?? _bookingId,
+        startTime: startTime ?? _startTime,
+        duration: duration ?? _duration,
         createdAt: createdAt ?? _createdAt,
         updatedAt: updatedAt ?? _updatedAt,
         user: user ?? _user,
@@ -175,6 +189,8 @@ class Data {
   num? get withoutTax => _withoutTax;
   num? get expertEarning => _expertEarning;
   String? get bookingId => _bookingId;
+  String? get startTime => _startTime;
+  int? get duration => _duration;
   String? get createdAt => _createdAt;
   String? get updatedAt => _updatedAt;
   User? get user => _user;
@@ -193,6 +209,8 @@ class Data {
     map['withoutTax'] = _withoutTax;
     map['expertEarning'] = _expertEarning;
     map['bookingId'] = _bookingId;
+    map['startTime'] = _startTime;
+    map['duration'] = _duration;
     map['createdAt'] = _createdAt;
     map['updatedAt'] = _updatedAt;
     if (_user != null) {

@@ -46,16 +46,7 @@ class BookingInformationScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         flexibleSpace: AppBarCustom(
           title: "txtBookingInformation".tr,
-          method: InkWell(
-            overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(
-              Icons.arrow_back,
-              color: AppColors.blackColor,
-            ),
-          ),
+          method: AppBarCustom.backButton(),
         ),
       ),
       body: GetBuilder<BookingInformationController>(

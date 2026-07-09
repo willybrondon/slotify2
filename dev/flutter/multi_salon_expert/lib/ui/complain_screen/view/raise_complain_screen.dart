@@ -23,15 +23,7 @@ class RaiseComplainScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         flexibleSpace: AppBarCustom(
           title: "txtComplain".tr,
-          method: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(
-              Icons.arrow_back,
-              color: AppColors.blackColor,
-            ),
-          ),
+          method: AppBarCustom.backButton(),
         ),
       ),
       bottomNavigationBar: GetBuilder<RaiseComplainController>(

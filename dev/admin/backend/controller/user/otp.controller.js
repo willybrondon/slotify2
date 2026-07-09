@@ -6,6 +6,7 @@ const OTP = require("../../models/otp.model");
 const User = require("../../models/user.model");
 
 const sgMail = require('@sendgrid/mail');
+const { wrapOtpEmailHtml } = require("../../lib/otpEmailAutofill");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Rate limit: 60 seconds between OTP emails per email address
@@ -47,19 +48,11 @@ exports.store = async (req, res) => {
       await otp.save();
     }
 
-    var tab = ``;
-    tab += `<!DOCTYPE html><html lang="en"><head>`;
-    tab += `<meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">`;
-    tab += `</head><body><div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">`;
-    tab += `<div style="margin:50px auto;width:70%;padding:20px 0"><div style="border-bottom:1px solid #eee">
-            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Hi, Mr./Mis. ${userEmail.fname}</a>
-          </div>`;
-    tab += ` <p style="font-size:1.1em">Hi,</p><p>Thank you for choosing ${process.env.projectName}. Use the following OTP to forget the Password for Password Security</p>`;
-    tab += `<h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">${newOtp}</h2>`;
-    tab += ` <p style="font-size:0.9em;">Regards,<br />${process.env.projectName}</p><hr style="border:none;border-top:1px solid #eee" />`;
-    tab += ` <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">`;
-    tab += `  </div></div></div></body></html>`;
+    var tab = wrapOtpEmailHtml({
+      title: `Hi, Mr./Ms. ${userEmail.fname}`,
+      bodyHtml: `<p>Thank you for choosing ${process.env.projectName}. Use the following code to reset your password:</p>`,
+      code: String(newOtp),
+    });
 
     const msg = {
       to: req.query.email,
@@ -111,31 +104,11 @@ exports.otplogin = async (req, res) => {
       await otp.save();
     }
 
-    var tab = `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-      .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-      h2 { color: #333; }
-      p { color: #666; }
-      .otp { margin: 20px 0; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; font-size: 17px }
-      .support { color: #007bff; text-decoration: none; }
-    </style>
-    </head>
-    <body>
-      <div class="container">
-        <p>Please use the following One-Time Password (OTP) to complete the verification process:</p>
-        <div class="otp">
-          <b>OTP: ${newOtp}</b>
-          <p>(Note: This OTP is valid for a limited time, so make sure to use it promptly.)</p>
-        </div>
-        <p>If you encounter any issues during the verification process or have any questions, feel free to <a class="support" href="#">reach out to our support team</a>.</p>
-      </div>
-    </body>
-    </html>`;
+    var tab = wrapOtpEmailHtml({
+      bodyHtml: `<p>Please use the following One-Time Password (OTP) to complete the verification process:</p>
+        <p style="color:#666;font-size:14px">This code is valid for a limited time.</p>`,
+      code: String(newOtp),
+    });
 
     const msg = {
       to: req.query.email,

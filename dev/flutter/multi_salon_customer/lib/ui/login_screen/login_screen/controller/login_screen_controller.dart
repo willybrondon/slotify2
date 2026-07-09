@@ -116,7 +116,13 @@ class LoginScreenController extends GetxController {
 
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: '$selectedCountryCode${mobileEditingController.text}',
-      verificationCompleted: (PhoneAuthCredential credential) async {},
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        final smsCode = credential.smsCode;
+        if (smsCode != null && smsCode.isNotEmpty) {
+          otpEditingController.text = smsCode;
+          update([Constant.idProgressView, Constant.idVerification]);
+        }
+      },
       verificationFailed: (FirebaseAuthException e) {
         String errorMessage;
 

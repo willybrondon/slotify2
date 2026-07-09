@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pinput/pinput.dart';
+import 'package:salon_2/custom/otp/skedisy_otp_input.dart';
 import 'package:salon_2/custom/app_button/app_button.dart';
 import 'package:salon_2/custom/dialog/progress_dialog.dart';
 import 'package:salon_2/ui/login_screen/sign_up_otp_verify_screen/controller/sign_up_otp_verify_controller.dart';
@@ -16,20 +16,6 @@ import 'package:salon_2/utils/utils.dart';
 
 class SignUpVerifyOtpScreen extends StatelessWidget {
   SignUpVerifyOtpScreen({super.key});
-
-  final defaultPinTheme = PinTheme(
-    width: 56,
-    height: 56,
-    textStyle: TextStyle(
-      fontSize: 20,
-      color: AppColors.primaryAppColor,
-      fontWeight: FontWeight.w600,
-    ),
-    decoration: BoxDecoration(
-      border: Border.all(color: AppColors.grey),
-      borderRadius: BorderRadius.circular(10),
-    ),
-  );
 
   SignUpOtpVerifyController signUpOtpVerifyController = Get.find<SignUpOtpVerifyController>();
 
@@ -116,12 +102,10 @@ class SignUpVerifyOtpScreen extends StatelessWidget {
                   Image.asset(AppAsset.icVerifyOtp, height: 250, width: 250).paddingOnly(top: 20),
                   GetBuilder<SignUpOtpVerifyController>(
                     builder: (logic) {
-                      return Pinput(
-                        length: 4,
-                        defaultPinTheme: defaultPinTheme,
+                      return SkedisyOtpInput(
                         controller: logic.otpEditingController,
-                        pinAnimationType: PinAnimationType.fade,
-                        onCompleted: (value) async {},
+                        length: 4,
+                        enableSmsAutofill: false,
                       ).paddingOnly(top: 20, bottom: 20);
                     },
                   ),

@@ -139,11 +139,11 @@ Future<void> main() async {
       });
     } else {
       log("Notification permission denied");
-      fcmToken = 'no_permission';
+      fcmToken = '';
     }
   } catch (e) {
     log("Error FCM token: $e");
-    fcmToken = 'error';
+    fcmToken = '';
   }
   log("Final FCM Token :: $fcmToken");
   FirebaseMessaging.onBackgroundMessage(backgroundNotification);

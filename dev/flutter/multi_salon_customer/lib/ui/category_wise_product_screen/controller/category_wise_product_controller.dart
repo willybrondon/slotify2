@@ -8,11 +8,13 @@ import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:http/http.dart' as http;
+import 'package:salon_2/utils/product_category_localization.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class CategoryWiseProductController extends GetxController {
   dynamic args = Get.arguments;
   String? categoryId;
+  String? categoryName;
   List<bool> isCategoryWiseProductSaved = [];
 
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
@@ -36,9 +38,16 @@ class CategoryWiseProductController extends GetxController {
       if (args[0] != null) {
         categoryId = args[0];
       }
+      if (args.length > 1 && args[1] != null) {
+        categoryName = args[1]?.toString();
+      }
       log("Category ID :: $categoryId");
+      log("Category Name :: $categoryName");
     }
   }
+
+  String get displayCategoryName =>
+      ProductCategoryLocalization.displayName(categoryName);
 
   onCategoryWiseProductSaved({
     required String userId,

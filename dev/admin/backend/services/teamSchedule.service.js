@@ -74,9 +74,11 @@ function slotToDateTime(dateStr, timeStr, durationMinutes = SLOT_FALLBACK_MINUTE
   if (!normalized) return null;
   const start = moment(`${dateStr} ${normalized}`, "YYYY-MM-DD hh:mm A");
   if (!start.isValid()) return null;
+  const end = start.clone().add(durationMinutes, "minutes");
+  // Wall-clock strings (no Z) — salon times must not shift with browser timezone.
   return {
-    start: start.toDate(),
-    end: start.clone().add(durationMinutes, "minutes").toDate(),
+    start: start.format("YYYY-MM-DDTHH:mm:ss"),
+    end: end.format("YYYY-MM-DDTHH:mm:ss"),
   };
 }
 
@@ -201,8 +203,8 @@ async function buildExpertDaySchedule(expert, salon, dateStr, { holiday, salonTi
         expertId: expert._id.toString(),
         resourceId: expert._id.toString(),
         title: "Pause",
-        start: bStart.toDate(),
-        end: bEnd.toDate(),
+        start: bStart.format("YYYY-MM-DDTHH:mm:ss"),
+        end: bEnd.format("YYYY-MM-DDTHH:mm:ss"),
       };
     }
   }

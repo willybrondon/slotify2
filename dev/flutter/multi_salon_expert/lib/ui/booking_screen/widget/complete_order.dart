@@ -15,6 +15,7 @@ import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/app_font_family.dart';
+import 'package:salon_2/utils/booking_time_utils.dart';
 import 'package:salon_2/utils/shimmer.dart';
 import 'package:salon_2/utils/utils.dart';
 
@@ -307,7 +308,8 @@ class CompleteOrder extends StatelessWidget {
                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
                                                                 Text(
-                                                                  logic.getComplete[index].time?[0] ?? "",
+                                                                  expertBookingTimeLabel(
+                                                                      logic.getComplete[index]),
                                                                   style: TextStyle(
                                                                     fontFamily: AppFontFamily.heeBo700,
                                                                     fontSize: 14,

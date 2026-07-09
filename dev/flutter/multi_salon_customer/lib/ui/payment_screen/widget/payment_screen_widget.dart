@@ -1067,7 +1067,7 @@ class PaymentCashOnHandView extends StatelessWidget {
                     ),
                     SizedBox(width: Get.width * 0.04),
                     Text(
-                      "Cash After Service",
+                      "txtCashAfterService".tr,
                       style: TextStyle(
                         fontFamily: AppFontFamily.sfProDisplay,
                         fontSize: 16.5,

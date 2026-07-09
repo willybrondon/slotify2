@@ -13,6 +13,8 @@ import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/http_utils.dart';
 import 'package:salon_2/utils/services/app_exception.dart';
+import 'package:salon_2/services/fcm_sync_service.dart';
+import 'package:salon_2/utils/fcm_token_util.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class LoginScreenController extends GetxController {
@@ -55,10 +57,13 @@ class LoginScreenController extends GetxController {
             await onLoginApiCall(
               email: emailController.text,
               password: pwController.text,
-              fcmToken: fcmToken!,
+              fcmToken: FcmTokenUtil.current.isNotEmpty
+                  ? FcmTokenUtil.current
+                  : await FcmSyncService.refreshToken(),
             );
 
             if (loginCategory?.status == true) {
+              await FcmSyncService.syncExpertTokenIfLoggedIn();
               isLogin = true;
               Constant.storage.write('isLogIn', isLogin);
               Constant.storage.write('expertId', loginCategory?.expert?.id);

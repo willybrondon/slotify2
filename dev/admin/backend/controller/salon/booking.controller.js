@@ -13,7 +13,12 @@ const {
   getSalonListStatusFilter,
   buildExpertBookingNotification,
   buildUserBookingConfirmedNotification,
+  buildUserBookingCancelledNotification,
 } = require("../../services/bookingStatus.service");
+const {
+  notifyExpertPushAndInApp,
+  notifyUserPushAndInApp,
+} = require("../../services/pushNotification.service");
 
 exports.getAll = async (req, res) => {
   try {
@@ -627,42 +632,28 @@ exports.acceptPendingBooking = async (req, res) => {
     const userNotif = buildUserBookingConfirmedNotification(booking);
     const expertNotif = buildExpertBookingNotification(booking);
 
-    if (user?.fcmToken) {
-      const adminPromise = await admin;
-      adminPromise.messaging().send({
-        token: user.fcmToken,
-        notification: { title: userNotif.title, body: userNotif.body },
-      }).catch((e) => console.log("[Salon accept booking] user FCM:", e.message));
-    }
-
-    if (expert?.fcmToken) {
-      const adminPromise = await admin;
-      adminPromise.messaging().send({
-        token: expert.fcmToken,
-        notification: { title: expertNotif.title, body: expertNotif.body },
-      }).catch((e) => console.log("[Salon accept booking] expert FCM:", e.message));
-    }
-
-    await Promise.all([
-      user
-        ? Notification.create({
-            userId: user._id,
+    setImmediate(async () => {
+      try {
+        if (user) {
+          await notifyUserPushAndInApp({
+            user,
             title: userNotif.title,
-            message: userNotif.body,
-            notificationType: 0,
-            date: new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
-          })
-        : Promise.resolve(),
-      expert
-        ? Notification.create({
-            expertId: expert._id,
+            body: userNotif.body,
+            data: { type: "booking", bookingId: String(booking._id), status: "confirm" },
+          });
+        }
+        if (expert) {
+          await notifyExpertPushAndInApp({
+            expert,
             title: expertNotif.title,
-            message: expertNotif.body,
-            notificationType: 1,
-            date: new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
-          })
-        : Promise.resolve(),
-    ]);
+            body: expertNotif.body,
+            data: { type: "booking", bookingId: String(booking._id), status: "confirm" },
+          });
+        }
+      } catch (notifyErr) {
+        console.log("[Salon accept booking] push failed:", notifyErr.message);
+      }
+    });
 
     return res.status(200).send({ status: true, message: "Booking confirmed", booking });
   } catch (error) {
@@ -701,25 +692,9 @@ exports.cancelBooking = async (req, res) => {
 
     res.status(200).send({ status: true, message: "Success", booking });
 
-    const payload = {
-      token: user.fcmToken,
-      notification: {
-        body: `Your Booking with Id ${booking.bookingId}  is cancelled By Salon`,
-        title: "Booking Cancel",
-        image: booking.serviceId[0].image,
-      },
-    };
-
-    const notification = new Notification();
-    notification.userId = user._id;
-    notification.title = payload.notification.title;
-    notification.image = booking.serviceId[0].image;
-    notification.notificationType = 0;
-    notification.message = payload.notification.body + " Reason : " + booking.cancel.reason;
-    notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const cancelNotif = buildUserBookingCancelledNotification(booking, "le salon");
 
     await Promise.all([
-      notification.save(),
       User.updateOne(
         { _id: user._id, amount: { $gt: 0 } },
         {
@@ -732,19 +707,18 @@ exports.cancelBooking = async (req, res) => {
       UserWalletHistory.findOneAndDelete({ booking: booking._id }),
     ]);
 
-    if (user && user.fcmToken !== null) {
-      const adminPromise = await admin;
-
-      adminPromise
-        .messaging()
-        .send(payload)
-        .then(async (response) => {
-          console.log("Successfully sent with response: ", response);
-        })
-        .catch((error) => {
-          console.log("Error sending message:      ", error);
+    setImmediate(async () => {
+      try {
+        await notifyUserPushAndInApp({
+          user,
+          title: cancelNotif.title,
+          body: `${cancelNotif.body} Motif : ${booking.cancel.reason}`,
+          data: { type: "booking", bookingId: String(booking._id), status: "cancel" },
         });
-    }
+      } catch (notifyErr) {
+        console.log("[Salon cancel booking] push failed:", notifyErr.message);
+      }
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, message: "Internal server error" });

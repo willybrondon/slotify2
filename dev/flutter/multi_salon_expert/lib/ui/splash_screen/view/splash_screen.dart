@@ -12,6 +12,7 @@ import 'package:salon_2/ui/splash_screen/controller/splash_screen_controller.dar
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/constant.dart';
+import 'package:salon_2/services/fcm_sync_service.dart';
 import 'package:salon_2/utils/utils.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -187,8 +188,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
     log("Setting :: $settings");
     await messaging.getToken().then((value) {
-      log("This is FCM token :: $value");
+      fcmToken = value ?? '';
+      log("This is FCM token :: $fcmToken");
     });
+
+    FcmSyncService.listenTokenRefresh();
+    await FcmSyncService.syncExpertTokenIfLoggedIn();
 
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();

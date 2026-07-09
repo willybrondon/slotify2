@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:pinput/pinput.dart';
+import 'package:salon_2/custom/otp/skedisy_otp_input.dart';
 import 'package:salon_2/custom/app_button/app_button.dart';
 import 'package:salon_2/custom/dialog/progress_dialog.dart';
 import 'package:salon_2/main.dart';
@@ -15,20 +15,6 @@ import 'package:salon_2/utils/utils.dart';
 
 class GuestLoginScreen extends GetView<GuestLoginController> {
   GuestLoginScreen({super.key});
-
-  PinTheme get _pinTheme => PinTheme(
-        width: 48,
-        height: 52,
-        textStyle: TextStyle(
-          fontSize: 18,
-          color: AppColors.primaryAppColor,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.darkGrey.withOpacity(0.2)),
-          borderRadius: BorderRadius.circular(10),
-        ),
-      );
 
   Widget _emailPhoneStep(BuildContext context, double statusBarHeight) {
     return Scaffold(
@@ -177,12 +163,10 @@ class GuestLoginScreen extends GetView<GuestLoginController> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 24, bottom: 24),
-                    child: Pinput(
-                      length: 6,
-                      defaultPinTheme: _pinTheme,
+                    child: SkedisyOtpInput(
                       controller: controller.otpEditingController,
-                      pinAnimationType: PinAnimationType.fade,
-                      keyboardType: TextInputType.number,
+                      length: 6,
+                      enableSmsAutofill: false,
                     ),
                   ),
                   GetBuilder<GuestLoginController>(

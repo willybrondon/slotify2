@@ -30,15 +30,7 @@ class ViewDetailScreen extends StatelessWidget {
         backgroundColor: AppColors.transparent,
         flexibleSpace: AppBarCustom(
           title: "txtViewDetails".tr,
-          method: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(
-              Icons.arrow_back,
-              color: AppColors.whiteColor,
-            ),
-          ),
+          method: AppBarCustom.backButton(),
         ),
       ),
       body: Column(

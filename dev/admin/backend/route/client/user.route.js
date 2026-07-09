@@ -13,6 +13,7 @@ route.post("/loginSignup", checkAccessWithSecretKey(), userController.loginSignu
 route.get("/checkUserForSignup", checkAccessWithSecretKey(), userController.checkUserForSignup);
 route.get("/verifyMobileForSignup", checkAccessWithSecretKey(), userController.verifyMobileForSignup);
 route.get("/profile", checkAccessWithSecretKey(), userController.getProfile);
+route.patch("/fcmToken", checkAccessWithSecretKey(), userController.updateFcmToken);
 route.patch("/update", upload.single("image"), checkAccessWithSecretKey(), userController.updateUser);
 route.put("/delete", checkAccessWithSecretKey(), userController.deleteUser);
 route.patch("/setPassword", checkAccessWithSecretKey(), userController.setPassword);

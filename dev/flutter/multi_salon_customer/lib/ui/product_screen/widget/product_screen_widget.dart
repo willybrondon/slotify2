@@ -6,6 +6,7 @@ import 'package:salon_2/custom/random_color_generator/random_color_generator.dar
 import 'package:salon_2/main.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
+import 'package:salon_2/custom/product_category/product_category_card.dart';
 import 'package:salon_2/ui/home_screen/widget/view_all_screen_widget.dart';
 import 'package:salon_2/ui/product_screen/controller/product_screen_controller.dart';
 import 'package:salon_2/utils/app_asset.dart';
@@ -87,16 +88,16 @@ class ProductWelcomeHeader extends StatelessWidget {
               Text(
                 "txtProductCategoryHeader".tr,
                 style: TextStyle(
-                    fontFamily: AppFontFamily.sfProDisplay,
-                    fontSize: 18,
+                    fontFamily: AppFontFamily.sfProDisplayBold,
+                    fontSize: 20,
                     color: AppColors.blackColor),
               ),
               Text(
-                "txtLongTime".tr,
+                "txtProductCategorySubtitle".tr,
                 style: TextStyle(
                     fontFamily: AppFontFamily.sfProDisplayRegular,
                     fontSize: 13,
-                    color: AppColors.blackColor),
+                    color: AppColors.email),
               ),
             ],
           ),
@@ -175,114 +176,60 @@ class ProductScreenTopView extends StatelessWidget {
 class ProductProductCategoryView extends StatelessWidget {
   const ProductProductCategoryView({super.key});
 
+  void _openCategory(HomeScreenController logic, int index) {
+    final category = logic.getProductCategoryModel?.data?[index];
+    if (category?.id == null) return;
+
+    Get.toNamed(
+      AppRoutes.categoryWiseProduct,
+      arguments: [
+        category!.id,
+        category.name,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        ViewAll(
+          title: "txtProductCategories".tr,
+          subtitle: "txtViewAll".tr,
+          onTap: () => Get.toNamed(AppRoutes.productCategory),
+        ).paddingOnly(left: 15, right: 15, bottom: 12),
         GetBuilder<HomeScreenController>(
           id: Constant.idProgressView,
           builder: (logic) {
+            final total = logic.getProductCategoryModel?.data?.length ?? 0;
+            final visibleCount = total >= 6 ? 6 : total;
+
             return logic.isLoading.value
-                ? Shimmers.productCategoryShimmer()
+                ? Shimmers.productCategoryShimmer().paddingSymmetric(horizontal: 15)
                 : GridView.builder(
-                    padding: EdgeInsets.zero,
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
                     shrinkWrap: true,
-                    itemCount:
-                        (logic.getProductCategoryModel?.data?.length ?? 0) >= 6
-                            ? 6
-                            : logic.getProductCategoryModel?.data?.length ?? 0,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 0.8,
-                      crossAxisSpacing: 10,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: visibleCount,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 0.82,
                     ),
                     itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Get.toNamed(
-                            AppRoutes.categoryWiseProduct,
-                            arguments: [
-                              logic.getProductCategoryModel?.data?[index].id,
-                            ],
-                          );
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            color: AppColors.whiteColor,
-                            boxShadow: Constant.boxShadow,
-                            border: Border.all(
-                              color: AppColors.grey.withOpacity(0.1),
-                              width: 1,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Category image in small square container with solid border
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                alignment: Alignment.center,
-                                child: Container(
-                                  height: 80,
-                                  width: 80,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: AppColors.roundBorder,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: CachedNetworkImage(
-                                    imageUrl: logic.getProductCategoryModel
-                                            ?.data?[index].image ??
-                                        "",
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) {
-                                      return Image.asset(
-                                              AppAsset.icImagePlaceholder)
-                                          .paddingAll(11);
-                                    },
-                                    errorWidget: (context, url, error) {
-                                      return Image.asset(
-                                              AppAsset.icImagePlaceholder)
-                                          .paddingAll(11);
-                                    },
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: Get.height * 0.01),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  logic.getProductCategoryModel?.data?[index]
-                                          .name ??
-                                      "",
-                                  maxLines: 2,
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: AppFontFamily.heeBo700,
-                                    fontSize: 12.5,
-                                    color: AppColors.appText,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: Get.height * 0.01),
-                            ],
-                          ),
-                        ).paddingOnly(bottom: 8),
+                      final category = logic.getProductCategoryModel!.data![index];
+                      return ProductCategoryCard(
+                        category: category,
+                        compact: true,
+                        onTap: () => _openCategory(logic, index),
                       );
                     },
                   );
           },
         ),
       ],
-    ).paddingOnly(left: 15, right: 15, bottom: 10);
+    ).paddingOnly(bottom: 10);
   }
 }
 

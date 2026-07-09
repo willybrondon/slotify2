@@ -36,16 +36,7 @@ class EditProfileTopBarView extends StatelessWidget {
             method: Constant.storage.read<bool>('isLogIn') == true &&
                     Constant.storage.read<bool>('isUpdate') == false
                 ? const SizedBox()
-                : InkWell(
-                    overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Icon(
-                      Icons.arrow_back,
-                      color: AppColors.blackColor,
-                    ).paddingAll(16),
-                  ),
+                : AppBarCustom.backButton(),
           );
         },
       ),

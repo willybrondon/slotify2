@@ -11,6 +11,17 @@ class AppBarCustom extends StatelessWidget {
   List<Widget>? method1;
   AppBarCustom({super.key, required this.title, this.method, this.method1});
 
+  static Widget backButton({VoidCallback? onTap}) {
+    return InkWell(
+      overlayColor: WidgetStatePropertyAll(AppColors.transparent),
+      onTap: onTap ?? () => Get.back(),
+      child: Icon(
+        Icons.arrow_back,
+        color: AppColors.blackColor,
+      ).paddingAll(16),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PreferredSize(
@@ -19,6 +30,7 @@ class AppBarCustom extends StatelessWidget {
         elevation: 0,
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
+        leadingWidth: method != null ? 56 : null,
         leading: method,
         actions: method1,
         title: Text(

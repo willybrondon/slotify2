@@ -72,6 +72,28 @@ function buildUserBookingConfirmedNotification(booking) {
   };
 }
 
+function buildUserBookingCancelledNotification(booking, cancelledBy = "le salon") {
+  return {
+    title: "Réservation annulée",
+    body: `Votre RDV #${booking?.bookingId} du ${booking?.date} a été annulé par ${cancelledBy}.`,
+  };
+}
+
+function buildUserBookingCompletedNotification(booking) {
+  return {
+    title: "Rendez-vous terminé",
+    body: `Votre RDV #${booking?.bookingId} est terminé. Merci pour votre visite !`,
+  };
+}
+
+function buildExpertBookingCancelledByUserNotification(booking, user) {
+  const clientName = [user?.fname, user?.lname].filter(Boolean).join(" ").trim() || "le client";
+  return {
+    title: "Réservation annulée",
+    body: `RDV #${booking?.bookingId} annulé par ${clientName}.`,
+  };
+}
+
 module.exports = {
   isAutoConfirmEnabled,
   resolveInitialBookingStatus,
@@ -80,4 +102,7 @@ module.exports = {
   getSalonListStatusFilter,
   buildExpertBookingNotification,
   buildUserBookingConfirmedNotification,
+  buildUserBookingCancelledNotification,
+  buildUserBookingCompletedNotification,
+  buildExpertBookingCancelledByUserNotification,
 };

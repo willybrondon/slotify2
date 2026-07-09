@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import moment from "moment";
@@ -16,6 +16,7 @@ import {
 } from "../../../redux/slice/teamScheduleSlice";
 import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 import { confirmAction, warning } from "../../../util/Alert";
+import { parseWallClockDate } from "../../../util/scheduleDate";
 import PlanningBookingModal from "./PlanningBookingModal";
 import PlanningBookingDetailModal from "./PlanningBookingDetailModal";
 import "./TeamCalendar.css";
@@ -130,6 +131,7 @@ const TeamCalendar = () => {
   const [plannerMode, setPlannerMode] = useState("booking");
   const [bookingSlot, setBookingSlot] = useState(null);
   const [detailBookingId, setDetailBookingId] = useState(null);
+  const calendarZoneRef = useRef(null);
 
   const dateStr = moment(currentDate).format("YYYY-MM-DD");
   const schedule = useMemo(
@@ -180,8 +182,8 @@ const TeamCalendar = () => {
       .map((e) => ({
         ...e,
         resourceId: e.resourceId || e.expertId,
-        start: new Date(e.start),
-        end: new Date(e.end),
+        start: parseWallClockDate(e.start),
+        end: parseWallClockDate(e.end),
         title:
           e.type === "booking"
             ? `${e.title} (${e.status === "confirm" ? "Confirmé" : e.status})`
@@ -189,6 +191,38 @@ const TeamCalendar = () => {
       }))
       .filter((e) => !Number.isNaN(e.start?.getTime()) && !Number.isNaN(e.end?.getTime()));
   }, [schedule, showFreeSlots]);
+
+  // Week view: sync horizontal scroll between day headers and the time grid.
+  useEffect(() => {
+    if (view !== "week") return undefined;
+    const root = calendarZoneRef.current;
+    if (!root) return undefined;
+
+    const content = root.querySelector(".rbc-time-content");
+    const header = root.querySelector(".rbc-time-header");
+    if (!content || !header) return undefined;
+
+    let syncing = false;
+    const syncHeader = () => {
+      if (syncing) return;
+      syncing = true;
+      header.scrollLeft = content.scrollLeft;
+      syncing = false;
+    };
+    const syncContent = () => {
+      if (syncing) return;
+      syncing = true;
+      content.scrollLeft = header.scrollLeft;
+      syncing = false;
+    };
+
+    content.addEventListener("scroll", syncHeader, { passive: true });
+    header.addEventListener("scroll", syncContent, { passive: true });
+    return () => {
+      content.removeEventListener("scroll", syncHeader);
+      header.removeEventListener("scroll", syncContent);
+    };
+  }, [view, calendarEvents, currentDate, isLoading]);
 
   const resources = useMemo(() => {
     return (schedule?.resources || []).map((r) => ({
@@ -354,7 +388,7 @@ const TeamCalendar = () => {
   const hasExperts = (schedule?.stats?.totalExperts ?? resources.length) > 0;
 
   return (
-    <div className="team-calendar-page sq-planning-page">
+    <div className={`team-calendar-page sq-planning-page sq-planning-view-${view}`}>
       <div className="sq-planning-top">
         <Title name={ui.pages.teamCalendar || "Planning équipe"} />
 
@@ -395,7 +429,10 @@ const TeamCalendar = () => {
       </div>
 
       {hasExperts && (
-        <div className={`sq-planning-calendar-zone team-calendar-wrap card-sq ${isLoading ? "is-loading" : ""}`}>
+        <div
+          ref={calendarZoneRef}
+          className={`sq-planning-calendar-zone team-calendar-wrap card-sq ${isLoading ? "is-loading" : ""}`}
+        >
           <DnDCalendar
             localizer={localizer}
             culture="fr"

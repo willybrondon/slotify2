@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 const { deleteFile } = require("../../middleware/deleteFile");
 const admin = require("../../firebase");
+const { isValidFcmToken } = require("../../services/pushNotification.service");
 
 exports.expertLogin = async (req, res) => {
   try {
@@ -30,7 +31,9 @@ exports.expertLogin = async (req, res) => {
       return res.status(200).json({ status: false, message: "You are blocked by admin!!" });
     }
 
-    expert.fcmToken = req?.body?.fcmToken ? req?.body?.fcmToken : expert?.fcmToken;
+    if (isValidFcmToken(req?.body?.fcmToken)) {
+      expert.fcmToken = req.body.fcmToken.trim();
+    }
 
     await expert.save();
     return res.status(200).json({
@@ -44,6 +47,34 @@ exports.expertLogin = async (req, res) => {
       status: false,
       message: error.message || "Internal Server error",
     });
+  }
+};
+
+exports.updateFcmToken = async (req, res) => {
+  try {
+    const { expertId, fcmToken } = req.body || {};
+    if (!expertId) {
+      return res.status(200).send({ status: false, message: "Invalid details" });
+    }
+
+    const expert = await Expert.findOne({ _id: expertId, isDelete: false });
+    if (!expert) {
+      return res.status(200).send({ status: false, message: "expert not found" });
+    }
+
+    if (isValidFcmToken(fcmToken)) {
+      expert.fcmToken = fcmToken.trim();
+      await expert.save();
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "FCM token updated",
+      hasValidToken: isValidFcmToken(expert.fcmToken),
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: error.message || "Internal server error" });
   }
 };
 
