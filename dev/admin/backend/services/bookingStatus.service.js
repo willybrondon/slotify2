@@ -48,20 +48,24 @@ function getSalonListStatusFilter(type) {
   return getBookingListStatusFilter(key);
 }
 
-function buildExpertBookingNotification(booking) {
+function buildExpertBookingNotification(booking, clientBookingCount) {
   const date = booking?.date || "";
   const time = booking?.startTime || "";
+  const countSuffix =
+    clientBookingCount != null && Number(clientBookingCount) > 0
+      ? ` — ${clientBookingCount} réservation${Number(clientBookingCount) > 1 ? "s" : ""} au total pour ce client`
+      : "";
 
   if (booking?.status === "confirm") {
     return {
       title: "Nouveau RDV confirmé",
-      body: `RDV confirmé le ${date} à ${time}.`,
+      body: `RDV confirmé le ${date} à ${time}${countSuffix}.`,
     };
   }
 
   return {
     title: "RDV en attente (salon)",
-    body: `À valider depuis le panel salon — ${date} à ${time}.`,
+    body: `À valider depuis le panel salon — ${date} à ${time}${countSuffix}.`,
   };
 }
 
@@ -69,6 +73,13 @@ function buildUserBookingConfirmedNotification(booking) {
   return {
     title: "Réservation confirmée",
     body: `Votre RDV #${booking?.bookingId} est confirmé pour le ${booking?.date} à ${booking?.startTime || ""}.`,
+  };
+}
+
+function buildUserBookingPendingNotification(booking) {
+  return {
+    title: "Demande de réservation enregistrée",
+    body: `Votre demande #${booking?.bookingId} pour le ${booking?.date} à ${booking?.startTime || ""} est en attente de validation.`,
   };
 }
 
@@ -102,6 +113,7 @@ module.exports = {
   getSalonListStatusFilter,
   buildExpertBookingNotification,
   buildUserBookingConfirmedNotification,
+  buildUserBookingPendingNotification,
   buildUserBookingCancelledNotification,
   buildUserBookingCompletedNotification,
   buildExpertBookingCancelledByUserNotification,

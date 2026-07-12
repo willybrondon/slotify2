@@ -19,6 +19,11 @@ const {
   notifyExpertPushAndInApp,
   notifyUserPushAndInApp,
 } = require("../../services/pushNotification.service");
+const {
+  sendCustomerBookingConfirmationEmail,
+  sendExpertNewBookingEmail,
+  countClientBookings,
+} = require("../../services/bookingAdminEmail.service");
 
 exports.getAll = async (req, res) => {
   try {
@@ -630,7 +635,8 @@ exports.acceptPendingBooking = async (req, res) => {
     const [user, expert] = await Promise.all([User.findById(booking.userId), Expert.findById(booking.expertId)]);
 
     const userNotif = buildUserBookingConfirmedNotification(booking);
-    const expertNotif = buildExpertBookingNotification(booking);
+    const clientBookingCount = user ? await countClientBookings(user._id) : null;
+    const expertNotif = buildExpertBookingNotification(booking, clientBookingCount);
 
     setImmediate(async () => {
       try {
@@ -650,8 +656,12 @@ exports.acceptPendingBooking = async (req, res) => {
             data: { type: "booking", bookingId: String(booking._id), status: "confirm" },
           });
         }
+        await Promise.all([
+          sendCustomerBookingConfirmationEmail(booking._id, { language: "fr" }),
+          expert ? sendExpertNewBookingEmail(booking._id, { clientBookingCount }) : Promise.resolve(),
+        ]);
       } catch (notifyErr) {
-        console.log("[Salon accept booking] push failed:", notifyErr.message);
+        console.log("[Salon accept booking] notify/email failed:", notifyErr.message);
       }
     });
 

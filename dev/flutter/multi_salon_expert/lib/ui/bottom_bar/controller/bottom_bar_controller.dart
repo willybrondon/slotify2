@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_2/ui/booking_screen/controller/booking_screen_controller.dart';
@@ -27,7 +25,7 @@ class BottomBarController extends GetxController {
     const ProfileScreen(),
   ];
 
-  onClick(value) async {
+  onClick(value, {int? bookingTabIndex}) async {
     if (value == 2) {
       slotManagerController.currentIndex = false;
       slotManagerController.selectedAndBookSlot();
@@ -37,38 +35,25 @@ class BottomBarController extends GetxController {
       slotManagerController.formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     }
 
-    if (value == 1) {
-      bookingScreenController.startPending = 0;
-      bookingScreenController.getPending = [];
-
-      if (bookingScreenController.tabController?.index == 0) {
-        log("Enter in bottom condition if");
-        bookingScreenController.onStatusWiseBookingApiCall(
-          expertId: Constant.storage.read<String>("expertId").toString(),
-          status: "pending",
-          start: bookingScreenController.startPending.toString(),
-          limit: bookingScreenController.limitPending.toString(),
-        );
-      } else {
-        log("Enter in bottom condition else");
-        Get.find<BookingScreenController>().tabController?.index = 0;
-      }
-    }
-
     selectIndex = value;
 
-    value == 2
-        ? slotManagerController.onGetBookingApiCall(
-            selectedDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-            expertId: Constant.storage.read<String>("expertId").toString(),
-            salonId: Constant.storage.read<String>("salonId").toString(),
-          )
-        : null;
+    if (value == 1) {
+      await bookingScreenController.openBookingTab(bookingTabIndex ?? 0);
+    }
 
-    value == 3
-        ? orderReportController.onGetBookingStatusWiseApiCall(
-            expertId: Constant.storage.read<String>("expertId").toString(), status: "ALL", type: "Today")
-        : null;
+    if (value == 2) {
+      await slotManagerController.onGetBookingApiCall(
+        selectedDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        expertId: Constant.storage.read<String>("expertId").toString(),
+        salonId: Constant.storage.read<String>("salonId").toString(),
+      );
+    }
+
+    if (value == 3) {
+      final tabIndex = orderReportController.tabController?.index ?? 0;
+      await orderReportController.onChangeTabBar(tabIndex);
+    }
+
     update([Constant.idBottomBar, Constant.idRevenuePending]);
   }
 }

@@ -43,6 +43,11 @@ final Map<String, String> frFR = {
   "txtTax": "Impôt",
   "txtMin": "min",
   "txtTotalAmount": "Montant total",
+  "txtCheckoutStepDelivery": "Livraison",
+  "txtCheckoutStepPayment": "Paiement",
+  "txtCheckoutStepDone": "Confirmé",
+  "txtCheckoutOrderSummary": "Récapitulatif",
+  "txtCheckoutSecurePayment": "Paiement sécurisé",
   "txtPriceFrom": "À partir de",
   "txtPriceIndicativeHint":
       "Prix indicatif — le montant définitif sera confirmé par le salon.",

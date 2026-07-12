@@ -153,7 +153,7 @@ class OrderSummaryTabView extends StatelessWidget {
                     onTap: () {
                       if (logic.selectedDate == currentMonth) {
                         Get.offNamed(AppRoutes.bottom);
-                        Get.find<BottomBarController>().onClick(1);
+                        Get.find<BottomBarController>().onClick(1, bookingTabIndex: 0);
                       } else {
                         Get.to(PendingBooking());
                       }
@@ -197,7 +197,7 @@ class OrderSummaryTabView extends StatelessWidget {
                     onTap: () {
                       if (logic.selectedDate == currentMonth) {
                         Get.offNamed(AppRoutes.bottom);
-                        Get.find<BottomBarController>().onClick(1);
+                        Get.find<BottomBarController>().onClick(1, bookingTabIndex: 2);
                       } else {
                         Get.to(CompleteBooking());
                       }
@@ -242,7 +242,7 @@ class OrderSummaryTabView extends StatelessWidget {
                     onTap: () {
                       if (logic.selectedDate == currentMonth) {
                         Get.offNamed(AppRoutes.bottom);
-                        Get.find<BottomBarController>().onClick(1);
+                        Get.find<BottomBarController>().onClick(1, bookingTabIndex: 1);
                       } else {
                         Get.to(CancelBooking());
                       }

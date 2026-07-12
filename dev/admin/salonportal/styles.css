@@ -35,9 +35,11 @@
     --sk-hero-overlay-bottom: rgba(0, 0, 0, 0.75);
     --sk-shadow: rgba(0, 0, 0, 0.08);
     --sk-star: var(--sk-brand);
-    --sk-slot-available: var(--sk-gray-light);
+    --sk-slot-available: var(--sk-brand-bg);
     --sk-slot-unavailable: var(--sk-gray-light);
     --sk-slot-selected-border: var(--sk-brand);
+    --sk-slot-text: #484e60;
+    --sk-slot-text-selected: var(--sk-brand);
     --sk-date-active-bg: var(--sk-brand-bg);
 }
 

@@ -21,12 +21,13 @@ const mongoose = require("mongoose");
 const admin = require("../../firebase");
 const moment = require("moment");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
-const { sendAdminNewBookingEmail, sendAdminCustomerCancelledBookingEmail } = require("../../services/bookingAdminEmail.service");
+const { sendAdminNewBookingEmail, sendAdminCustomerCancelledBookingEmail, sendCustomerBookingConfirmationEmail, sendExpertNewBookingEmail } = require("../../services/bookingAdminEmail.service");
 const {
   resolveInitialBookingStatus,
   getBookingListStatusFilter,
   buildExpertBookingNotification,
   buildUserBookingConfirmedNotification,
+  buildUserBookingPendingNotification,
   buildExpertBookingCancelledByUserNotification,
 } = require("../../services/bookingStatus.service");
 const {
@@ -1070,7 +1071,8 @@ exports.newBooking = async (req, res, next) => {
     await Promise.all(walletHistoryPromises);
     }
 
-    const expertNotif = buildExpertBookingNotification(booking);
+    const clientBookingCount = priorBookingsCount + 1;
+    const expertNotif = buildExpertBookingNotification(booking, clientBookingCount);
     setImmediate(async () => {
       try {
         await notifyExpertPushAndInApp({
@@ -1081,12 +1083,16 @@ exports.newBooking = async (req, res, next) => {
             type: "booking",
             bookingId: String(booking._id),
             status: booking.status,
+            clientBookingCount: String(clientBookingCount),
           },
           image: req.file ? process.env.baseURL + req.file.path : "",
         });
 
-        if (booking.status === "confirm" && user) {
-          const userNotif = buildUserBookingConfirmedNotification(booking);
+        if (user) {
+          const userNotif =
+            booking.status === "confirm"
+              ? buildUserBookingConfirmedNotification(booking)
+              : buildUserBookingPendingNotification(booking);
           await notifyUserPushAndInApp({
             user,
             title: userNotif.title,
@@ -1098,15 +1104,15 @@ exports.newBooking = async (req, res, next) => {
             },
           });
         }
-      } catch (notifyErr) {
-        console.error("[Booking] push notification failed:", notifyErr.message);
-      }
-    });
 
-    setImmediate(() => {
-      sendAdminNewBookingEmail(booking._id).catch((err) =>
-        console.error("[Admin Booking Email] send failed:", err.message)
-      );
+        await Promise.all([
+          sendCustomerBookingConfirmationEmail(booking._id, { language: userLanguage }),
+          sendExpertNewBookingEmail(booking._id, { clientBookingCount }),
+          sendAdminNewBookingEmail(booking._id),
+        ]);
+      } catch (notifyErr) {
+        console.error("[Booking] notifications/email failed:", notifyErr.message);
+      }
     });
   } catch (error) {
     console.log(error);

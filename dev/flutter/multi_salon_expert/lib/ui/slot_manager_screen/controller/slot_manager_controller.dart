@@ -271,9 +271,11 @@ class SlotManagerController extends GetxController {
             salonId: Constant.storage.read<String>("salonId").toString(),
           );
 
-          if (getBookingModel?.status == true) {
-            Get.back();
-          } else {
+          onGetSlotsList();
+          selectedAndBookSlot();
+          checkSlot();
+
+          if (getBookingModel?.status != true) {
             Utils.showToast(Get.context!, getBookingModel?.message ?? "");
           }
         } else {

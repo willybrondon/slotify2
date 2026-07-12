@@ -5,9 +5,9 @@ import 'package:salon_2/ui/product_screen/model/get_product_category_model.dart'
 import 'package:salon_2/utils/app_asset.dart';
 import 'package:salon_2/utils/app_colors.dart';
 import 'package:salon_2/utils/app_font_family.dart';
-import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/product_category_localization.dart';
 
+/// Compact category chip — small icon + label (marketplace style).
 class ProductCategoryCard extends StatelessWidget {
   const ProductCategoryCard({
     super.key,
@@ -20,6 +20,8 @@ class ProductCategoryCard extends StatelessWidget {
   final VoidCallback onTap;
   final bool compact;
 
+  static const double _iconSize = 48;
+
   @override
   Widget build(BuildContext context) {
     final label = ProductCategoryLocalization.displayName(category.name);
@@ -29,72 +31,100 @@ class ProductCategoryCard extends StatelessWidget {
       color: AppColors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         child: Ink(
           decoration: BoxDecoration(
             color: AppColors.whiteColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.grey.withOpacity(0.12)),
-            boxShadow: Constant.boxShadow,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.grey.withOpacity(0.1)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.blackColor.withOpacity(0.04),
+                offset: const Offset(0, 2),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? 6 : 8,
+            vertical: compact ? 10 : 12,
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      CachedNetworkImage(
-                        imageUrl: category.image ?? '',
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: AppColors.profileIconBg,
-                          child: Image.asset(AppAsset.icImagePlaceholder).paddingAll(22),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: AppColors.profileIconBg,
-                          child: Image.asset(AppAsset.icImagePlaceholder).paddingAll(22),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    height: _iconSize,
+                    width: _iconSize,
+                    decoration: BoxDecoration(
+                      color: AppColors.profileIconBg,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.grey.withOpacity(0.08),
+                      ),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: CachedNetworkImage(
+                      imageUrl: category.image ?? '',
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(
+                        child: Image.asset(
+                          AppAsset.icImagePlaceholder,
+                          height: 22,
+                          width: 22,
                         ),
                       ),
-                      if (count > 0)
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.blackColor.withOpacity(0.72),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              'txtProductCountShort'.trParams({'count': '$count'}),
-                              style: TextStyle(
-                                fontFamily: AppFontFamily.heeBo700,
-                                fontSize: 10.5,
-                                color: AppColors.whiteColor,
-                              ),
-                            ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Image.asset(
+                          AppAsset.icImagePlaceholder,
+                          height: 22,
+                          width: 22,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (count > 0)
+                    Positioned(
+                      top: -4,
+                      right: -4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryAppColor,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.whiteColor,
+                            width: 1.5,
                           ),
                         ),
-                    ],
-                  ),
-                ),
+                        child: Text(
+                          '$count',
+                          style: TextStyle(
+                            fontFamily: AppFontFamily.heeBo700,
+                            fontSize: 9,
+                            color: AppColors.whiteColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, compact ? 8 : 10, 10, compact ? 10 : 12),
-                child: Text(
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: AppFontFamily.heeBo700,
-                    fontSize: compact ? 12 : 13.5,
-                    height: 1.2,
-                    color: AppColors.primaryTextColor,
-                  ),
+              SizedBox(height: compact ? 6 : 8),
+              Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.heeBo600,
+                  fontSize: compact ? 11 : 12,
+                  height: 1.2,
+                  color: AppColors.primaryTextColor,
                 ),
               ),
             ],

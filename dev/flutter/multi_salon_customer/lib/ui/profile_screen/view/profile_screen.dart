@@ -80,8 +80,11 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
-    LoginScreenController loginScreenController =
-        Get.put(LoginScreenController());
+    final loginScreenController = Get.put(LoginScreenController());
+    loginScreenController.isLogIn =
+        Constant.storage.read<bool>('isLogIn') ?? false;
+    loginScreenController.isUpdate =
+        Constant.storage.read<bool>('isUpdate') ?? false;
 
     log("loginScreenController.emailController.text${loginScreenController.otpEditingController.text}");
 
@@ -103,17 +106,21 @@ class ProfileScreen extends StatelessWidget {
                   return ProgressDialog(
                     inAsyncCall: logic.isLoading.value,
                     child: SingleChildScrollView(
-                      child: GetBuilder<LoginScreenController>(
-                        id: Constant.idBookingAndLogin,
-                        builder: (logic) {
+                      child: GetBuilder<ProfileScreenController>(
+                        id: Constant.idProgressView,
+                        init: ProfileScreenController(),
+                        builder: (logicProfile) {
                           return Column(
                             children: [
-                              logic.isUpdate == false
-                                  ? Container(
-                                      height: 95,
-                                      width: double.infinity,
-                                      alignment: Alignment.center,
+                              Stack(
+                                children: [
+                                  Container(
+                                    height: Get.height * 0.17 + statusBarHeight,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
                                       color: AppColors.whiteColor,
+                                    ),
+                                    child: Center(
                                       child: Text(
                                         "txtProfile".tr,
                                         style: TextStyle(
@@ -122,197 +129,123 @@ class ProfileScreen extends StatelessWidget {
                                           fontSize: 20,
                                           color: AppColors.blackColor,
                                         ),
-                                      ).paddingOnly(top: 30),
-                                    )
-                                  : const SizedBox(),
-                              logic.isUpdate == false
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 30),
-                                      child: userprofile(),
-                                    )
-                                  : GetBuilder<ProfileScreenController>(
-                                      id: Constant.idProgressView,
-                                      init: ProfileScreenController(),
-                                      builder: (logicProfile) {
-                                        return Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Stack(
-                                              children: [
-                                                Container(
-                                                  height: Get.height * 0.17 +
-                                                      statusBarHeight,
-                                                  width: double.infinity,
+                                      ).paddingOnly(bottom: 35),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        top: Get.height * 0.13),
+                                    child: Stack(
+                                      children: [
+                                        Center(
+                                          child: CircleAvatar(
+                                            radius: 63,
+                                            backgroundColor:
+                                                AppColors.whiteColor,
+                                            child: Container(
+                                              height: 120,
+                                              width: 120,
+                                              clipBehavior: Clip.hardEdge,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: AppColors.grey
+                                                    .withOpacity(0.2),
+                                              ),
+                                              child: Image.network(
+                                                Constant.storage.read<String>(
+                                                        'userImage') ??
+                                                    "${ApiConstant.BASE_URL}static/male.png",
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    Container(
+                                                  height: 120,
+                                                  width: 120,
                                                   decoration: BoxDecoration(
-                                                    color: AppColors.whiteColor,
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "txtProfile".tr,
-                                                      style: TextStyle(
-                                                        fontFamily: AppFontFamily
-                                                            .sfProDisplayBold,
-                                                        fontSize: 20,
-                                                        color: AppColors
-                                                            .blackColor,
-                                                      ),
-                                                    ).paddingOnly(bottom: 35),
+                                                    shape: BoxShape.circle,
+                                                    color: AppColors.grey
+                                                        .withOpacity(0.2),
+                                                    image:
+                                                        const DecorationImage(
+                                                      image: AssetImage(
+                                                          AppAsset.imMale),
+                                                      fit: BoxFit.cover,
+                                                    ),
                                                   ),
                                                 ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: Get.height * 0.13),
-                                                  child: Stack(
-                                                    children: [
-                                                      Center(
-                                                        child: CircleAvatar(
-                                                          radius: 63,
-                                                          backgroundColor:
-                                                              AppColors
-                                                                  .whiteColor,
-                                                          child: Container(
-                                                            height: 120,
-                                                            width: 120,
-                                                            clipBehavior:
-                                                                Clip.hardEdge,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                              color: AppColors
-                                                                  .grey
-                                                                  .withOpacity(
-                                                                      0.2),
-                                                            ),
-                                                            child:
-                                                                Image.network(
-                                                              Constant.storage.read<
-                                                                          String>(
-                                                                      'userImage') ??
-                                                                  "${ApiConstant.BASE_URL}static/male.png",
-                                                              fit: BoxFit.cover,
-                                                              errorBuilder:
-                                                                  (context,
-                                                                          error,
-                                                                          stackTrace) =>
-                                                                      Container(
-                                                                height: 120,
-                                                                width: 120,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                  color: AppColors
-                                                                      .grey
-                                                                      .withOpacity(
-                                                                          0.2),
-                                                                  image:
-                                                                      const DecorationImage(
-                                                                    image: AssetImage(
-                                                                        AppAsset
-                                                                            .imMale),
-                                                                    fit: BoxFit
-                                                                        .cover,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Positioned(
-                                                        top: 88,
-                                                        left:
-                                                            Get.width * 0.55,
-                                                        child: GestureDetector(
-                                                          onTap: () =>
-                                                              _openEditProfile(
-                                                            logicProfile,
-                                                          ),
-                                                          child: Container(
-                                                            height: 35,
-                                                            width: 35,
-                                                            alignment: Alignment
-                                                                .center,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                              color: AppColors
-                                                                  .whiteColor,
-                                                            ),
-                                                            child: Container(
-                                                              alignment: Alignment
-                                                                  .center,
-                                                              height: 32,
-                                                              width: 32,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                color: AppColors
-                                                                    .primaryAppColor,
-                                                              ),
-                                                              child: Image.asset(
-                                                                AppAsset
-                                                                    .icProfileEdit,
-                                                                height: 18,
-                                                                width: 18,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                            SizedBox(height: Get.height * 0.01),
-                                            Text(
-                                              _profileDisplayName(logicProfile),
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    AppFontFamily.heeBo800,
-                                                fontSize: 20,
-                                                color:
-                                                    AppColors.primaryTextColor,
                                               ),
                                             ),
-                                            Text(
-                                              logicProfile.getUserCategory?.user
-                                                          ?.loginType ==
-                                                      3
-                                                  ? logicProfile.getUserCategory
-                                                          ?.user?.mobile
-                                                          .toString() ??
-                                                      ""
-                                                  : logicProfile.getUserCategory
-                                                          ?.user?.email
-                                                          .toString() ??
-                                                      "",
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    AppFontFamily.heeBo500,
-                                                fontSize: 16,
-                                                color: AppColors.email,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 88,
+                                          left: Get.width * 0.55,
+                                          child: GestureDetector(
+                                            onTap: () => _openEditProfile(
+                                              logicProfile,
+                                            ),
+                                            child: Container(
+                                              height: 35,
+                                              width: 35,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: AppColors.whiteColor,
+                                              ),
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                height: 32,
+                                                width: 32,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: AppColors
+                                                      .primaryAppColor,
+                                                ),
+                                                child: Image.asset(
+                                                  AppAsset.icProfileEdit,
+                                                  height: 18,
+                                                  width: 18,
+                                                ),
                                               ),
                                             ),
-                                            SizedBox(height: Get.height * 0.04),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12),
-                                              child: logic.isLogIn == true
-                                                  ? editUserprofile()
-                                                  : userprofile(),
-                                            )
-                                          ],
-                                        );
-                                      },
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: Get.height * 0.01),
+                              Text(
+                                _profileDisplayName(logicProfile),
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.heeBo800,
+                                  fontSize: 20,
+                                  color: AppColors.primaryTextColor,
+                                ),
+                              ),
+                              Text(
+                                logicProfile.getUserCategory?.user?.loginType ==
+                                        3
+                                    ? logicProfile.getUserCategory?.user?.mobile
+                                            .toString() ??
+                                        ""
+                                    : logicProfile.getUserCategory?.user?.email
+                                            .toString() ??
+                                        "",
+                                style: TextStyle(
+                                  fontFamily: AppFontFamily.heeBo500,
+                                  fontSize: 16,
+                                  color: AppColors.email,
+                                ),
+                              ),
+                              SizedBox(height: Get.height * 0.04),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12),
+                                child: editUserprofile(logicProfile),
+                              ),
+                              const SizedBox(height: 24),
                             ],
                           );
                         },
@@ -377,9 +310,15 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  editUserprofile() {
+  editUserprofile(ProfileScreenController logicProfile) {
     return Column(
       children: [
+        profileMenu(
+          leadingImage: AppAsset.icProfile,
+          title: "txtMyAccount".tr,
+          subtitle: "txtAccountDetails".tr,
+          onTap: () => _openEditProfile(logicProfile),
+        ),
         GetBuilder<SplashController>(
           id: Constant.idSettingsRefresh,
           builder: (splashLogic) {

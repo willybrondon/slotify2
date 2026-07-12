@@ -48,6 +48,11 @@ final Map<String, String> enUS = {
   "txtTax": "Tax",
   "txtMin": "min",
   "txtTotalAmount": "Total Amount",
+  "txtCheckoutStepDelivery": "Delivery",
+  "txtCheckoutStepPayment": "Payment",
+  "txtCheckoutStepDone": "Confirmed",
+  "txtCheckoutOrderSummary": "Order summary",
+  "txtCheckoutSecurePayment": "Secure payment",
   "txtPriceFrom": "From",
   "txtPriceIndicativeHint":
       "Indicative price — the final amount will be confirmed with the salon.",

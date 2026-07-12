@@ -118,10 +118,10 @@ class ProductCategoryItemView extends StatelessWidget {
             ),
             SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.82,
+                crossAxisCount: 3,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 0.88,
               ),
               delegate: SliverChildBuilderDelegate(
                 (context, index) {

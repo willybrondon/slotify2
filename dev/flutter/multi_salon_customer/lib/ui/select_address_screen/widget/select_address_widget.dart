@@ -15,16 +15,7 @@ class SelectAddressAppBarView extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppBarCustom(
       title: "txtSelectAddress".tr,
-      method: InkWell(
-        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-        onTap: () {
-          Get.back();
-        },
-        child: Icon(
-          Icons.arrow_back,
-          color: AppColors.blackColor,
-        ),
-      ),
+      method: AppBarCustom.backButton(),
     );
   }
 }
@@ -74,8 +65,10 @@ class SelectAddressItemView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: Constant.boxShadow,
                         border: Border.all(
-                          color: AppColors.greyColor.withOpacity(0.15),
-                          width: 1,
+                          color: logic.selectAddress == index
+                              ? AppColors.primaryAppColor
+                              : AppColors.greyColor.withOpacity(0.15),
+                          width: logic.selectAddress == index ? 1.5 : 1,
                         ),
                       ),
                       child: Stack(

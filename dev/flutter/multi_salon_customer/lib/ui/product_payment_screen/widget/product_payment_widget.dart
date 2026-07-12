@@ -19,19 +19,11 @@ class ProductPaymentAppBarView extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppBarCustom(
       title: "txtPayment".tr,
-      method: InkWell(
-        overlayColor: WidgetStatePropertyAll(AppColors.transparent),
-        onTap: () {
-          // Stop any ongoing loading states and go back immediately
-          final productPaymentController = Get.find<ProductPaymentController>();
-          productPaymentController.isLoading.value = false;
-          Get.back();
-        },
-        child: Icon(
-          Icons.arrow_back,
-          color: AppColors.blackColor,
-        ),
-      ),
+      method: AppBarCustom.backButton(onTap: () {
+        final productPaymentController = Get.find<ProductPaymentController>();
+        productPaymentController.isLoading.value = false;
+        Get.back();
+      }),
     );
   }
 }
@@ -51,7 +43,9 @@ class ProductPaymentMethodView extends StatelessWidget {
           id: Constant.idProgressView,
           builder: (logic) {
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const ProductPaymentSummaryCard(),
                 const ProductPaymentTitleView(),
                 if (isWalletPayEnabled) ProductPaymentMyWalletView(),
               ],
@@ -70,11 +64,76 @@ class ProductPaymentTitleView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewAll(
       title: "txtPaymentMethod".tr,
-      subtitle: "",
+      subtitle: "txtCheckoutSecurePayment".tr,
       textColor: AppColors.primaryTextColor,
       fontFamily: AppFontFamily.heeBo700,
       fontSize: 18,
     ).paddingOnly(bottom: 14);
+  }
+}
+
+class ProductPaymentSummaryCard extends StatelessWidget {
+  const ProductPaymentSummaryCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<ProductPaymentController>(
+      id: Constant.idProgressView,
+      builder: (logic) {
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 18),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.whiteColor,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.grey.withOpacity(0.12)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.blackColor.withOpacity(0.04),
+                offset: const Offset(0, 2),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "txtCheckoutOrderSummary".tr,
+                style: TextStyle(
+                  fontFamily: AppFontFamily.heeBo800,
+                  fontSize: 15,
+                  color: AppColors.primaryTextColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "txtTotalAmount".tr,
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.heeBo500,
+                      fontSize: 14,
+                      color: AppColors.email,
+                    ),
+                  ),
+                  Text(
+                    "$currency ${logic.totalAmount ?? '0'}",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.heeBo800,
+                      fontSize: 18,
+                      color: AppColors.primaryAppColor,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 

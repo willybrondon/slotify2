@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:salon_2/custom/checkout/checkout_step_header.dart';
 import 'package:salon_2/ui/product_payment_screen/widget/product_payment_widget.dart';
 import 'package:salon_2/utils/app_colors.dart';
 
@@ -14,7 +15,14 @@ class ProductPaymentScreen extends StatelessWidget {
         flexibleSpace: const ProductPaymentAppBarView(),
       ),
       bottomNavigationBar: const ProductPaymentScreenBottomView(),
-      body: const ProductPaymentMethodView(),
+      body: const SingleChildScrollView(
+        child: Column(
+          children: [
+            CheckoutStepHeader(currentStep: 2),
+            ProductPaymentMethodView(),
+          ],
+        ),
+      ),
     );
   }
 }

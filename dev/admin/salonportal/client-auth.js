@@ -31,10 +31,18 @@
     );
   }
 
-  function onSuccess(user, message) {
+  function onSuccess(user, message, isSignup) {
     setWebUser(user);
-    sessionStorage.setItem("skedisy_resume_booking", "1");
-    showNotice("success", message);
+    const resumeProduct = sessionStorage.getItem("skedisy_resume_product") === "1";
+    if (resumeProduct) {
+      const productMsg = isSignup
+        ? cfg.copy.successSignupProduct
+        : cfg.copy.successLoginProduct;
+      showNotice("success", productMsg || message);
+    } else {
+      sessionStorage.setItem("skedisy_resume_booking", "1");
+      showNotice("success", message);
+    }
     submitBtn.disabled = true;
     setTimeout(() => {
       window.location.href = cfg.returnPath || "/";
@@ -73,7 +81,7 @@
           submitBtn.textContent = prevLabel;
           return;
         }
-        onSuccess(data.user, data.message || cfg.copy.successLogin);
+        onSuccess(data.user, data.message || cfg.copy.successLogin, false);
       } else {
         const fname = document.getElementById("authFname")?.value.trim();
         const lname = document.getElementById("authLname")?.value.trim();
@@ -95,7 +103,7 @@
           submitBtn.textContent = prevLabel;
           return;
         }
-        onSuccess(data.user, data.message || cfg.copy.successSignup);
+        onSuccess(data.user, data.message || cfg.copy.successSignup, true);
       }
     } catch (err) {
       showNotice("error", cfg.copy.genericError);

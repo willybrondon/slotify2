@@ -212,10 +212,10 @@ class ProductProductCategoryView extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: visibleCount,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.82,
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 0.88,
                     ),
                     itemBuilder: (BuildContext context, int index) {
                       final category = logic.getProductCategoryModel!.data![index];

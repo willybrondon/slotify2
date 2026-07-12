@@ -440,6 +440,13 @@ app.post("/api/public/booking/stripe-intent", publicWebBooking.publicCreateStrip
 app.post("/api/public/booking/create", publicWebBooking.publicCreateBooking);
 app.get("/api/public/booking/cancel", publicWebBooking.publicCancelBooking);
 
+const publicWebProduct = require("./controller/user/publicWebProduct.controller");
+app.get("/api/public/product/detail", publicWebProduct.publicProductDetail);
+app.get("/api/public/product/addresses", publicWebProduct.publicUserAddresses);
+app.post("/api/public/product/address", publicWebProduct.publicStoreAddress);
+app.patch("/api/public/product/address/select", publicWebProduct.publicSelectAddress);
+app.post("/api/public/product/order", publicWebProduct.publicCreateOrder);
+
 const publicClientAuth = require("./controller/user/publicClientAuth.controller");
 app.get("/compte/connexion", publicClientAuth.serveLoginPage);
 app.get("/compte/inscription", publicClientAuth.serveSignupPage);

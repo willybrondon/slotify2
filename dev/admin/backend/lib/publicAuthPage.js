@@ -98,6 +98,8 @@ function renderAuthPage(req, res, mode) {
                 creatingAccount: ${JSON.stringify(copy.authCreatingAccount)},
                 successLogin: ${JSON.stringify(copy.authSuccessLogin)},
                 successSignup: ${JSON.stringify(copy.authSuccessSignup)},
+                successLoginProduct: ${JSON.stringify(copy.authSuccessLoginProduct)},
+                successSignupProduct: ${JSON.stringify(copy.authSuccessSignupProduct)},
                 genericError: ${JSON.stringify(copy.genericError)}
             }
         };

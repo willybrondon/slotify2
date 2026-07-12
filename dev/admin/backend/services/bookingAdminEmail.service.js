@@ -72,6 +72,218 @@ function formatSalonAddress(addressDetails) {
   return parts.length ? parts.join(", ") : "—";
 }
 
+function isValidEmailAddress(email) {
+  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+function resolveLanguage(language) {
+  return String(language || "fr").toLowerCase() === "en" ? "en" : "fr";
+}
+
+async function loadBookingForEmail(bookingId) {
+  return Booking.findById(bookingId)
+    .populate("userId", "fname lname email mobile")
+    .populate("expertId", "fname lname email mobile")
+    .populate("salonId", "name email mobile addressDetails")
+    .populate("serviceId", "name duration");
+}
+
+async function countClientBookings(userId) {
+  if (!userId) return 0;
+  return Booking.countDocuments({
+    userId,
+    isDelete: { $ne: true },
+    status: { $nin: ["cancel"] },
+  });
+}
+
+function bookingEmailFrom() {
+  return process.env.EMAIL || "noreply@skedisy.com";
+}
+
+function buildBookingEmailLayout({ title, intro, rows, footer, language }) {
+  const isFr = resolveLanguage(language) === "fr";
+  const rowsHtml = rows
+    .map(
+      ([label, value]) =>
+        `<tr><td style="padding:8px 12px;border-bottom:1px solid #eee;color:#666;width:38%;">${escapeHtml(label)}</td><td style="padding:8px 12px;border-bottom:1px solid #eee;color:#222;"><strong>${value}</strong></td></tr>`
+    )
+    .join("");
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="font-family:Arial,sans-serif;line-height:1.5;color:#222;background:#f4f4f4;margin:0;padding:0;">
+  <div style="max-width:600px;margin:24px auto;padding:24px;background:#fff;border-radius:8px;">
+    <h2 style="margin-top:0;color:#1a1a1a;">${escapeHtml(title)}</h2>
+    <p>${intro}</p>
+    <table style="width:100%;border-collapse:collapse;margin:20px 0;">${rowsHtml}</table>
+    <p style="font-size:12px;color:#888;margin-top:24px;">${escapeHtml(footer)}</p>
+    <p style="font-size:12px;color:#888;">Skedisy — ${isFr ? "Votre rendez-vous beauté" : "Your beauty appointment"}</p>
+  </div>
+</body></html>`;
+}
+
+/**
+ * Customer confirmation / pending acknowledgement email.
+ */
+async function sendCustomerBookingConfirmationEmail(bookingId, { language = "fr" } = {}) {
+  if (!process.env.SENDGRID_API_KEY) {
+    console.warn("[Booking Email] SENDGRID_API_KEY not set; skipping customer confirmation.");
+    return;
+  }
+
+  const booking = await loadBookingForEmail(bookingId);
+  if (!booking || booking.isDelete) return;
+
+  const user = booking.userId;
+  const to = user?.email?.trim();
+  if (!isValidEmailAddress(to)) {
+    console.warn(`[Booking Email] No valid customer email for booking ${booking.bookingId}`);
+    return;
+  }
+
+  const lang = resolveLanguage(language);
+  const isFr = lang === "fr";
+  const salon = booking.salonId;
+  const expert = booking.expertId;
+  const salonName = escapeHtml(salon?.name);
+  const expertName = escapeHtml(expert ? `${expert.fname || ""} ${expert.lname || ""}`.trim() : "—");
+  const services =
+    booking.serviceId && booking.serviceId.length
+      ? escapeHtml(booking.serviceId.map((s) => s.name || "").filter(Boolean).join(", "))
+      : "—";
+  const bookingTime = booking.startTime || (booking.time && booking.time[0]) || "—";
+  const isConfirmed = booking.status === "confirm";
+
+  const title = isFr
+    ? isConfirmed
+      ? "Confirmation de réservation"
+      : "Demande de réservation enregistrée"
+    : isConfirmed
+      ? "Booking confirmation"
+      : "Booking request received";
+
+  const intro = isFr
+    ? isConfirmed
+      ? `Bonjour ${escapeHtml(user?.fname || "")}, votre réservation est confirmée.`
+      : `Bonjour ${escapeHtml(user?.fname || "")}, votre demande de réservation a bien été enregistrée et est en attente de validation par le salon.`
+    : isConfirmed
+      ? `Hello ${escapeHtml(user?.fname || "")}, your booking is confirmed.`
+      : `Hello ${escapeHtml(user?.fname || "")}, your booking request has been received and is awaiting salon approval.`;
+
+  const html = buildBookingEmailLayout({
+    title,
+    intro,
+    language: lang,
+    rows: [
+      [isFr ? "N° réservation" : "Booking ID", escapeHtml(String(booking.bookingId))],
+      [isFr ? "Salon" : "Salon", salonName],
+      [isFr ? "Expert(e)" : "Expert", expertName],
+      [isFr ? "Date" : "Date", escapeHtml(booking.date)],
+      [isFr ? "Heure" : "Time", escapeHtml(bookingTime)],
+      [isFr ? "Prestations" : "Services", services],
+      [isFr ? "Montant" : "Amount", escapeHtml(String(booking.amount ?? "—"))],
+      [
+        isFr ? "Statut" : "Status",
+        isConfirmed
+          ? isFr
+            ? "Confirmée"
+            : "Confirmed"
+          : isFr
+            ? "En attente de validation"
+            : "Awaiting approval",
+      ],
+    ],
+    footer: isFr
+      ? "Conservez cet email comme justificatif. Pour toute question : support@skedisy.com"
+      : "Keep this email as your receipt. Questions: support@skedisy.com",
+  });
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  await sgMail.send({
+    to,
+    from: bookingEmailFrom(),
+    subject: isFr
+      ? `[Skedisy] ${isConfirmed ? "Confirmation" : "Demande"} de réservation #${booking.bookingId}`
+      : `[Skedisy] Booking ${isConfirmed ? "confirmation" : "request"} #${booking.bookingId}`,
+    html,
+  });
+  console.log(`[Booking Email] Customer confirmation sent to ${to} for booking ${booking.bookingId}`);
+}
+
+/**
+ * Expert email when a client books — includes total bookings count for that client.
+ */
+async function sendExpertNewBookingEmail(bookingId, { clientBookingCount } = {}) {
+  if (!process.env.SENDGRID_API_KEY) {
+    console.warn("[Booking Email] SENDGRID_API_KEY not set; skipping expert notification.");
+    return;
+  }
+
+  const booking = await loadBookingForEmail(bookingId);
+  if (!booking || booking.isDelete) return;
+
+  const expert = booking.expertId;
+  const to = expert?.email?.trim();
+  if (!isValidEmailAddress(to)) {
+    console.warn(`[Booking Email] No valid expert email for booking ${booking.bookingId}`);
+    return;
+  }
+
+  const user = booking.userId;
+  const salon = booking.salonId;
+  const count =
+    clientBookingCount != null && !Number.isNaN(Number(clientBookingCount))
+      ? Number(clientBookingCount)
+      : await countClientBookings(user?._id);
+
+  const customerName = escapeHtml(user ? `${user.fname || ""} ${user.lname || ""}`.trim() : "—");
+  const customerEmail = escapeHtml(user?.email);
+  const customerPhone = escapeHtml(user?.mobile);
+  const salonName = escapeHtml(salon?.name);
+  const services =
+    booking.serviceId && booking.serviceId.length
+      ? escapeHtml(booking.serviceId.map((s) => s.name || "").filter(Boolean).join(", "))
+      : "—";
+  const bookingTime = booking.startTime || (booking.time && booking.time[0]) || "—";
+  const isConfirmed = booking.status === "confirm";
+
+  const html = buildBookingEmailLayout({
+    title: "Nouvelle réservation",
+    intro: isConfirmed
+      ? `Bonjour ${escapeHtml(expert?.fname || "")}, un nouveau rendez-vous confirmé vient d'être réservé avec vous.`
+      : `Bonjour ${escapeHtml(expert?.fname || "")}, une nouvelle demande de rendez-vous nécessite une validation salon.`,
+    language: "fr",
+    rows: [
+      ["N° réservation", escapeHtml(String(booking.bookingId))],
+      ["Client", customerName],
+      ["Email client", customerEmail],
+      ["Téléphone client", customerPhone],
+      ["Salon", salonName],
+      ["Date", escapeHtml(booking.date)],
+      ["Heure", escapeHtml(bookingTime)],
+      ["Prestations", services],
+      ["Montant", escapeHtml(String(booking.amount ?? "—"))],
+      ["Statut", isConfirmed ? "Confirmée" : "En attente"],
+      [
+        "Réservations du client",
+        `${count} réservation${count > 1 ? "s" : ""} au total sur Skedisy`,
+      ],
+    ],
+    footer:
+      "Vous recevez cet email car un client a réservé un créneau avec vous. Ouvrez l'app expert Skedisy pour gérer vos rendez-vous.",
+  });
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  await sgMail.send({
+    to,
+    from: bookingEmailFrom(),
+    subject: `[Skedisy] Nouvelle réservation #${booking.bookingId} — ${user?.fname || "Client"}`,
+    html,
+  });
+  console.log(`[Booking Email] Expert notification sent to ${to} for booking ${booking.bookingId}`);
+}
+
 /**
  * After a booking is created: generate token, save on booking, email admin.
  */
@@ -88,11 +300,7 @@ async function sendAdminNewBookingEmail(bookingId) {
     return;
   }
 
-  const booking = await Booking.findById(bookingId)
-    .populate("userId", "fname lname email mobile")
-    .populate("expertId", "fname lname")
-    .populate("salonId", "name email mobile addressDetails")
-    .populate("serviceId", "name duration");
+  const booking = await loadBookingForEmail(bookingId);
 
   if (!booking || booking.isDelete) return;
 
@@ -399,6 +607,9 @@ async function processEmailAction(token, action) {
 module.exports = {
   sendAdminNewBookingEmail,
   sendAdminCustomerCancelledBookingEmail,
+  sendCustomerBookingConfirmationEmail,
+  sendExpertNewBookingEmail,
+  countClientBookings,
   processEmailAction,
   getAdminRecipientEmail,
   getAdminRecipientEmails,

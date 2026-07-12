@@ -738,7 +738,7 @@ exports.serveSalonWebPage = async (req, res) => {
       Product.find({
         salon: salon._id,
         createStatus: "Approved"
-      }).select("productName description price mainImage review rating").limit(10),
+      }).select("productName description price mainImage review rating _id").limit(10),
       Expert.find({
         salonId: salon._id,
         isBlock: false,
@@ -833,6 +833,12 @@ exports.serveSalonWebPage = async (req, res) => {
       reviewCount: expert.reviewCount || 0,
       serviceIds: (expert.serviceId || []).map((id) => String(id)),
     }));
+    const salonProducts = (products || []).map((product) => ({
+      id: String(product._id),
+      name: product.productName || "Product",
+      price: product.price || 0,
+      image: product.mainImage || "",
+    }));
 
     let servicesHtml = "";
     if (bookingServices.length > 0) {
@@ -861,13 +867,13 @@ exports.serveSalonWebPage = async (req, res) => {
           const imageHtml = productImage
             ? `<img src="${productImage}" alt="${productName}" class="sq-product-card__img" loading="lazy" onerror="this.style.display='none'">`
             : `<div class="sq-product-card__placeholder">${productName.charAt(0).toUpperCase()}</div>`;
-          return `<article class="sq-product-card">
+          return `<button type="button" class="sq-product-card" data-product-id="${product._id}" aria-label="${productName}">
         <div class="sq-product-card__thumb">${imageHtml}</div>
         <div class="sq-product-card__body">
           <span class="sq-product-card__name">${productName}</span>
           <span class="sq-product-card__price">${currency}${productPrice}</span>
         </div>
-      </article>`;
+      </button>`;
         })
         .join("");
       productsHtml = `<div class="section sq-salon-products-block"><h3 class="section-title">${copy.products}</h3><div class="sq-products-row">${productsHtml}</div></div>`;
@@ -1216,6 +1222,18 @@ exports.serveSalonWebPage = async (req, res) => {
         </div>
     </div>
 
+    <div id="salonProductModal" class="sq-booking-modal sq-product-modal" aria-hidden="true">
+        <div class="sq-booking-modal__backdrop" data-close-product></div>
+        <div class="sq-booking-modal__panel" role="dialog" aria-labelledby="productModalTitle">
+            <div class="sq-booking-modal__head">
+                <button type="button" class="sq-booking-modal__close" data-close-product aria-label="Fermer">&times;</button>
+                <h2 id="productModalTitle" class="sq-booking-modal__title">${copy.products}</h2>
+            </div>
+            <div id="salonProductStickyBar" class="sq-booking-sticky-bar sq-booking-sticky-bar--hidden" aria-live="polite"></div>
+            <div id="salonProductSteps" class="sq-booking-steps"></div>
+        </div>
+    </div>
+
     <script>
         window.SKEDISY_SALON_BOOKING = {
             salonId: "${salon._id}",
@@ -1329,7 +1347,71 @@ exports.serveSalonWebPage = async (req, res) => {
             }
         };
     </script>
+    <script>
+        window.SKEDISY_SALON_PRODUCTS = {
+            salonId: "${salon._id}",
+            salonName: ${JSON.stringify(salonName)},
+            language: ${JSON.stringify(pageLang)},
+            currency: ${JSON.stringify(currency)},
+            products: ${JSON.stringify(salonProducts)},
+            copy: {
+                productBuyNow: ${JSON.stringify(copy.productBuyNow)},
+                productOutOfStock: ${JSON.stringify(copy.productOutOfStock)},
+                productQuantity: ${JSON.stringify(copy.productQuantity)},
+                productShipping: ${JSON.stringify(copy.productShipping)},
+                productSelectAttribute: ${JSON.stringify(copy.productSelectAttribute)},
+                productSelectAllAttributes: ${JSON.stringify(copy.productSelectAllAttributes)},
+                productDeliveryTitle: ${JSON.stringify(copy.productDeliveryTitle)},
+                productDeliveryHint: ${JSON.stringify(copy.productDeliveryHint)},
+                productAddressName: ${JSON.stringify(copy.productAddressName)},
+                productAddressLine: ${JSON.stringify(copy.productAddressLine)},
+                productAddressCity: ${JSON.stringify(copy.productAddressCity)},
+                productAddressState: ${JSON.stringify(copy.productAddressState)},
+                productAddressZip: ${JSON.stringify(copy.productAddressZip)},
+                productAddressCountry: ${JSON.stringify(copy.productAddressCountry)},
+                productUseAddress: ${JSON.stringify(copy.productUseAddress)},
+                productAddAddress: ${JSON.stringify(copy.productAddAddress)},
+                productOrderTitle: ${JSON.stringify(copy.productOrderTitle)},
+                productOrderConfirm: ${JSON.stringify(copy.productOrderConfirm)},
+                productOrderSuccess: ${JSON.stringify(copy.productOrderSuccess)},
+                productOrderFailed: ${JSON.stringify(copy.productOrderFailed)},
+                productStepProduct: ${JSON.stringify(copy.productStepProduct)},
+                productStepDelivery: ${JSON.stringify(copy.productStepDelivery)},
+                productStepPayment: ${JSON.stringify(copy.productStepPayment)},
+                productStepDone: ${JSON.stringify(copy.productStepDone)},
+                productOrderSuccessTitle: ${JSON.stringify(copy.productOrderSuccessTitle)},
+                productWalletTopUp: ${JSON.stringify(copy.productWalletTopUp)},
+                productWalletDisabled: ${JSON.stringify(copy.productWalletDisabled)},
+                productLoading: ${JSON.stringify(copy.productLoading)},
+                productDescription: ${JSON.stringify(copy.productDescription)},
+                subtotal: ${JSON.stringify(copy.subtotal)},
+                totalLabel: ${JSON.stringify(copy.totalLabel)},
+                selectPayment: ${JSON.stringify(copy.selectPayment)},
+                payWithWallet: ${JSON.stringify(copy.payWithWallet)},
+                payWithWalletBalance: ${JSON.stringify(copy.payWithWalletBalance)},
+                walletInsufficient: ${JSON.stringify(copy.walletInsufficient)},
+                yourDetails: ${JSON.stringify(copy.yourDetails)},
+                alreadyHaveAccount: ${JSON.stringify(copy.alreadyHaveAccount)},
+                authSignInLink: ${JSON.stringify(copy.authSignInLink)},
+                authOr: ${JSON.stringify(copy.authOr)},
+                authSignUpLink: ${JSON.stringify(copy.authSignUpLink)},
+                back: ${JSON.stringify(copy.back)},
+                continue: ${JSON.stringify(copy.continue)},
+                noticeContinue: ${JSON.stringify(copy.noticeContinue)},
+                genericError: ${JSON.stringify(copy.genericError)},
+                loading: ${JSON.stringify(copy.loading)}
+            },
+            authUrls: {
+                login: ${JSON.stringify(clientAuth.login)},
+                signup: ${JSON.stringify(clientAuth.signup)}
+            },
+            payment: {
+                isWalletPay: ${!!global.settingJSON?.isWalletPay}
+            }
+        };
+    </script>
     <script src="${baseURL}/salon-booking.js"></script>
+    <script src="${baseURL}/salon-product.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
 </body>

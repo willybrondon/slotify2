@@ -32,7 +32,9 @@ class ProfileScreenController extends GetxController {
       await Get.find<SplashController>().refreshSettings();
     }
     log("loginnnnnnn :: ${Constant.storage.read<bool>('isLogIn')}");
-    Constant.storage.read<bool>('isLogIn') ?? false == true ? await onGetUserApiCall() : const Text("");
+    if (Constant.storage.read<bool>('isLogIn') == true) {
+      await onGetUserApiCall();
+    }
     Constant.storage.write('userImage', getUserCategory?.user?.image);
     Constant.storage.write('salonRequestSent', getUserCategory?.user?.salonRequestSent);
 

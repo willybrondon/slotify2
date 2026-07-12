@@ -16,10 +16,9 @@ class OrderReportController extends GetxController with GetTickerProviderStateMi
   RxBool isLoading = false.obs;
 
   @override
-  Future<void> onInit() async {
+  void onInit() {
+    super.onInit();
     tabController = TabController(length: 4, vsync: this);
-    await onGetBookingStatusWiseApiCall(
-        expertId: Constant.storage.read<String>("expertId").toString(), status: "ALL", type: "Today");
     tabController?.addListener(() {
       isLoading(true);
       update([Constant.idProgressView]);
@@ -29,7 +28,12 @@ class OrderReportController extends GetxController with GetTickerProviderStateMi
       onChangeTabBar(tabController!.index);
       log("Selected Index: ${tabController!.index}");
     });
-    super.onInit();
+    _loadInitialReport();
+  }
+
+  Future<void> _loadInitialReport() async {
+    await onGetBookingStatusWiseApiCall(
+        expertId: Constant.storage.read<String>("expertId").toString(), status: "ALL", type: "Today");
   }
 
   onChangeTabBar(int index) async {

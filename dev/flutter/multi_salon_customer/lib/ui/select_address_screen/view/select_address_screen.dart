@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:salon_2/custom/checkout/checkout_step_header.dart';
 import 'package:salon_2/custom/dialog/progress_dialog.dart';
 import 'package:salon_2/ui/select_address_screen/controller/select_address_controller.dart';
 import 'package:salon_2/ui/select_address_screen/widget/select_address_widget.dart';
@@ -23,7 +24,12 @@ class SelectAddressScreen extends StatelessWidget {
               flexibleSpace: const SelectAddressAppBarView(),
             ),
             bottomNavigationBar: const SelectAddressBottomView(),
-            body: const SelectAddressItemView(),
+            body: const Column(
+              children: [
+                CheckoutStepHeader(currentStep: 1),
+                Expanded(child: SelectAddressItemView()),
+              ],
+            ),
           ),
         );
       },

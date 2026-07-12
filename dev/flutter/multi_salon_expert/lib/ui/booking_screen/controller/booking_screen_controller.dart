@@ -130,36 +130,44 @@ class BookingScreenController extends GetxController with GetTickerProviderState
   RxBool isLoading1 = false.obs;
 
   @override
-  void onInit() async {
+  void onInit() {
+    super.onInit();
     pendingScrollController.addListener(onPendingPagination);
     completedScrollController.addListener(onCompletedPagination);
     cancelScrollController.addListener(onCancelPagination);
 
-    await onStatusWiseBookingApiCall(
-      expertId: Constant.storage.read<String>("expertId").toString(),
-      status: "pending",
-      start: startPending.toString(),
-      limit: limitPending.toString(),
-    );
-
     tabController = TabController(length: 3, vsync: this, initialIndex: 0);
+    tabController?.addListener(_onBookingTabChanged);
+  }
 
-    tabController?.addListener(() async {
-      isPendingApiCalling = true;
+  void _onBookingTabChanged() async {
+    isPendingApiCalling = true;
 
-      await 400.milliseconds.delay();
+    await 400.milliseconds.delay();
 
-      if (isPendingApiCalling) {
-        isPendingApiCalling = false;
+    if (isPendingApiCalling) {
+      isPendingApiCalling = false;
 
-        statusWiseBookingCategory?.data?.clear();
-        isLoading(true);
+      statusWiseBookingCategory?.data?.clear();
+      isLoading(true);
 
-        update([Constant.idProgressView]);
-        onChangeTabBar(tabController!.index);
-      }
-    });
-    super.onInit();
+      update([Constant.idProgressView]);
+      onChangeTabBar(tabController!.index);
+    }
+  }
+
+  Future<void> openBookingTab(int tabIndex) async {
+    if (tabController == null) {
+      tabController = TabController(length: 3, vsync: this, initialIndex: tabIndex);
+      tabController?.addListener(_onBookingTabChanged);
+    }
+
+    if (tabController!.index != tabIndex) {
+      tabController!.animateTo(tabIndex);
+      return;
+    }
+
+    await onChangeTabBar(tabIndex);
   }
 
   onStatusWiseBookingApiCall({

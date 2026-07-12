@@ -873,97 +873,89 @@ class ProductDetailBottomView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 90,
-      width: Get.width,
       decoration: BoxDecoration(
-        color: AppColors.productBg,
+        color: AppColors.whiteColor,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
         ),
-        border: Border.all(
-          color: AppColors.grey.withOpacity(0.15),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.blackColor.withOpacity(0.08),
+            offset: const Offset(0, -4),
+            blurRadius: 16,
+          ),
+        ],
       ),
-      padding: const EdgeInsets.only(left: 18, right: 18, top: 17, bottom: 17),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        14,
+        16,
+        14 + MediaQuery.of(context).padding.bottom,
+      ),
       child: GetBuilder<ProductDetailController>(
         id: Constant.idSelectProductSize,
         builder: (logic) {
+          final canProceed = logic.isAnyAttributeSelected();
           return Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    logic.addCartModel?.status == true
-                        ? Get.toNamed(AppRoutes.cart)?.then(
-                            (value) {
-                              logic.onBackFromCart();
-                            },
-                          )
-                        : logic.onAddCartClick();
-                  },
-                  child: Container(
-                    height: 56,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: logic.isAnyAttributeSelected()
+                child: OutlinedButton(
+                  onPressed: canProceed
+                      ? () {
+                          logic.addCartModel?.status == true
+                              ? Get.toNamed(AppRoutes.cart)?.then((value) {
+                                  logic.onBackFromCart();
+                                })
+                              : logic.onAddCartClick();
+                        }
+                      : null,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                    side: BorderSide(
+                      color: canProceed
                           ? AppColors.primaryAppColor
-                          : AppColors.grey.withOpacity(0.4),
-                      boxShadow: logic.isAnyAttributeSelected()
-                          ? [
-                              BoxShadow(
-                                color:
-                                    AppColors.primaryAppColor.withOpacity(0.4),
-                                offset: const Offset(0, 4),
-                                blurRadius: 12,
-                                spreadRadius: 0,
-                              ),
-                            ]
-                          : [],
+                          : AppColors.grey.withOpacity(0.3),
                     ),
-                    child: Center(
-                      child: Text(
-                        logic.addCartModel?.status == true
-                            ? "txtGoToCart".tr
-                            : "txtAddToCart".tr,
-                        style: TextStyle(
-                          color: logic.isAnyAttributeSelected()
-                              ? AppColors.whiteColor
-                              : AppColors.grey,
-                          fontFamily: AppFontFamily.heeBo700,
-                          fontSize: 17,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    logic.addCartModel?.status == true
+                        ? "txtGoToCart".tr
+                        : "txtAddToCart".tr,
+                    style: TextStyle(
+                      color: canProceed
+                          ? AppColors.primaryAppColor
+                          : AppColors.grey,
+                      fontFamily: AppFontFamily.heeBo700,
+                      fontSize: 15,
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    logic.onContinueClick();
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(44),
-                      color: logic.isAnyAttributeSelected()
-                          ? AppColors.primaryAppColor
-                          : AppColors.grey.withOpacity(0.4),
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: canProceed ? logic.onContinueClick : null,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                    backgroundColor: canProceed
+                        ? AppColors.primaryAppColor
+                        : AppColors.grey.withOpacity(0.35),
+                    foregroundColor: AppColors.whiteColor,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Center(
-                      child: Text(
-                        "txtContinue".tr,
-                        style: TextStyle(
-                          color: logic.isAnyAttributeSelected()
-                              ? AppColors.whiteColor
-                              : AppColors.grey,
-                          fontFamily: AppFontFamily.heeBo700,
-                          fontSize: 16,
-                        ),
-                      ),
+                  ),
+                  child: Text(
+                    "txtContinue".tr,
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.heeBo700,
+                      fontSize: 16,
                     ),
                   ),
                 ),

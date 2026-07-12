@@ -319,7 +319,7 @@ class _RevenueScreenState extends State<RevenueScreen>
                                   InkWell(
                                     onTap: () {
                                       Get.find<BottomBarController>()
-                                          .onClick(1);
+                                          .onClick(1, bookingTabIndex: 0);
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(
@@ -377,7 +377,7 @@ class _RevenueScreenState extends State<RevenueScreen>
                                   InkWell(
                                     onTap: () {
                                       Get.find<BottomBarController>()
-                                          .onClick(1);
+                                          .onClick(1, bookingTabIndex: 2);
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(
@@ -435,7 +435,7 @@ class _RevenueScreenState extends State<RevenueScreen>
                                   InkWell(
                                     onTap: () {
                                       Get.find<BottomBarController>()
-                                          .onClick(1);
+                                          .onClick(1, bookingTabIndex: 1);
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(

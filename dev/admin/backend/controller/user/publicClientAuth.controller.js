@@ -41,6 +41,7 @@ function sanitizeUser(user) {
     mobile: u.mobile,
     image: u.image,
     loginType: u.loginType,
+    amount: Number(u.amount) || 0,
   };
 }
 

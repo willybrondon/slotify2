@@ -580,7 +580,7 @@ class SlotManagerScreen extends StatelessWidget {
                                 slotTime.hour,
                                 slotTime.minute);
 
-                            ///   isSlotBooked
+                            /// Booked or expert-marked busy slots
                             List<String>? timeSlots =
                                 logic.getBookingModel?.timeSlots;
 
@@ -591,8 +591,9 @@ class SlotManagerScreen extends StatelessWidget {
                                     .isAfter(slotDateTime) &&
                                 currentTimeWithDate.isAfter(slotTimeWithDate);
 
-                            final bool isUnavailable =
-                                isSlotTimePassed || isSlotOccupied;
+                            final bool isUnavailable = isSlotTimePassed ||
+                                isSlotOccupied ||
+                                isSelected;
                             logic.isFirstTap = true;
 
                             return AnimationConfiguration.staggeredGrid(
@@ -648,14 +649,8 @@ class SlotManagerScreen extends StatelessWidget {
                                               ? AppColors.slotUnavailableBg
                                               : AppColors.slotAvailableBg,
                                           border: Border.all(
-                                            color: isUnavailable
-                                                ? Colors.transparent
-                                                : isSelected
-                                                    ? AppColors
-                                                        .brandTerracottaHover
-                                                    : AppColors
-                                                        .slotSelectedBorder,
-                                            width: isSelected ? 2 : 1.5,
+                                            color: Colors.transparent,
+                                            width: 1.5,
                                           ),
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -676,10 +671,7 @@ class SlotManagerScreen extends StatelessWidget {
                                                   : TextDecoration.none,
                                               color: isUnavailable
                                                   ? AppColors.brandGrayMuted
-                                                  : isSelected
-                                                      ? AppColors
-                                                          .slotSelectedText
-                                                      : AppColors.slotText,
+                                                  : AppColors.slotText,
                                             ),
                                           ),
                                         ),

@@ -454,7 +454,7 @@ class Shimmers {
         itemCount: 3,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
-          childAspectRatio: 0.8,
+          childAspectRatio: 0.88,
           crossAxisSpacing: 10,
         ),
         itemBuilder: (BuildContext context, int index) {
@@ -468,35 +468,30 @@ class Shimmers {
                 width: 1,
               ),
             ),
-            clipBehavior: Clip.hardEdge,
+            padding: const EdgeInsets.symmetric(vertical: 12),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
-                  child: Image.asset(AppAsset.icImagePlaceholder).paddingAll(18),
-                ),
                 Container(
-                  height: 40,
+                  height: 48,
+                  width: 48,
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.2),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(14),
-                      bottomRight: Radius.circular(14),
-                    ),
+                    color: Colors.red.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
-                    child: Container(
-                      height: 15,
-                      width: 75,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: Colors.red,
-                      ),
-                    ).paddingOnly(left: 7, right: 7),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 10,
+                  width: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ],
             ),
-          ).paddingOnly(bottom: 8);
+          );
         },
       ),
     );
