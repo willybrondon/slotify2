@@ -34,7 +34,7 @@ class BookingScreenController extends GetxController with GetTickerProviderState
 
   //-------- Custom TabBar Variable --------//
 
-  void onChangeTabBar(int index) async {
+  Future<void> onChangeTabBar(int index) async {
     if (index == 0) {
       startPending = 0;
       getPending = [];

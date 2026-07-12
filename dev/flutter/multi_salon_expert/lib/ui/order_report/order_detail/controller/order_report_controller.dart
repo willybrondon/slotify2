@@ -36,7 +36,7 @@ class OrderReportController extends GetxController with GetTickerProviderStateMi
         expertId: Constant.storage.read<String>("expertId").toString(), status: "ALL", type: "Today");
   }
 
-  onChangeTabBar(int index) async {
+  Future<void> onChangeTabBar(int index) async {
     isLoading(true);
     update([Constant.idProgressView]);
     if (index == 0) {
