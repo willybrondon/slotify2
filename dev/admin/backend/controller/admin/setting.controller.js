@@ -127,6 +127,9 @@ exports.handleSwitch = async (req, res) => {
     if (type == 11) {
       setting.isSalonWalletRecharge = !setting.isSalonWalletRecharge;
     }
+    if (type == 12) {
+      setting.isProductStripePay = !setting.isProductStripePay;
+    }
 
     await setting.save();
     updateSettingFile(setting);

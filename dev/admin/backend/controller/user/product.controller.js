@@ -889,7 +889,7 @@ exports.productDetail = async (req, res) => {
             isNewCollection: 1,
             description: 1,
             brand: 1,
-            category: { name: 1 },
+            category: { _id: 1, name: 1 },
             salon: {
               name: 1,
               addresDetails: 1,
@@ -1005,6 +1005,15 @@ exports.productDetail = async (req, res) => {
           popularProducts,
           reviews,
         });
+    }
+
+    const { salonProductPaymentOptions } = require("../../services/stripeConnect.service");
+    if (data[0] && salon) {
+      data[0].salon = {
+        ...(data[0].salon || {}),
+        _id: salon._id,
+        paymentOptions: salonProductPaymentOptions(salon),
+      };
     }
 
     return res.status(200).json({

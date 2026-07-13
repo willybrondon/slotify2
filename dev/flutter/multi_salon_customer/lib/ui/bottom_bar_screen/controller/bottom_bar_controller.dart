@@ -6,9 +6,11 @@ import 'package:salon_2/ui/booking_detail_screen/controller/booking_detail_scree
 import 'package:salon_2/ui/booking_detail_screen/view/booking.dart';
 import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/home_screen/view/home_screen.dart';
+import 'package:salon_2/ui/login_screen/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/notification_screen/controller/notification_controller.dart';
 import 'package:salon_2/ui/notification_screen/view/notification_screen.dart';
 import 'package:salon_2/ui/product_screen/view/product_screen.dart';
+import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
 import 'package:salon_2/ui/profile_screen/view/profile_screen.dart';
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/constant.dart';
@@ -133,6 +135,29 @@ class BottomBarController extends GetxController {
     if (value == 3) {
       log("BottomBar - Reloading notifications...");
       notificationController.onGetNotificationApiCall(userId: Constant.storage.read<String>('userId') ?? "");
+    }
+
+    // Profile tab (index 4)
+    if (value == 4) {
+      try {
+        final loginController = Get.isRegistered<LoginScreenController>()
+            ? Get.find<LoginScreenController>()
+            : Get.put(LoginScreenController());
+        loginController.isLogIn =
+            Constant.storage.read<bool>('isLogIn') ?? false;
+        loginController.isUpdate =
+            Constant.storage.read<bool>('isUpdate') ?? false;
+        loginController.update([Constant.idBookingAndLogin]);
+
+        if (loginController.isLogIn) {
+          final profileController = Get.isRegistered<ProfileScreenController>()
+              ? Get.find<ProfileScreenController>()
+              : Get.put(ProfileScreenController());
+          await profileController.onGetUserApiCall();
+        }
+      } catch (e) {
+        log("BottomBar - Profile reload failed: $e");
+      }
     }
 
     if (value != null) {

@@ -185,6 +185,7 @@ class ProductProductCategoryView extends StatelessWidget {
       arguments: [
         category!.id,
         category.name,
+        category.image,
       ],
     );
   }

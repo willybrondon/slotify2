@@ -477,7 +477,12 @@ export const SKEDISY_ADMIN_UI = {
     walletSection: "Portefeuille",
     walletPayActive: "Paiement portefeuille — app cliente (activer / désactiver)",
     walletPayHint:
-      "Affiche le portefeuille comme moyen de paiement lors des réservations et achats. Désactivé par défaut pour permettre l'utilisation sans paiement en ligne.",
+      "Affiche le portefeuille comme moyen de paiement lors des réservations et achats produits. Désactivé par défaut pour permettre l'utilisation sans paiement en ligne.",
+    productStripePayActive: "Paiement Stripe — boutique produits (app cliente)",
+    productStripePayHint:
+      "Affiche le paiement par carte (Stripe Connect salon) lors de l'achat de produits. Nécessite Stripe activé et le salon connecté.",
+    stripeBookingHint:
+      "Active Stripe pour les réservations (paiement au salon via Connect) et comme base pour la boutique.",
     salonWalletRechargeActive: "Recharge portefeuille salon (Stripe / MTN MoMo)",
     salonWalletRechargeHint:
       "Affiche la section de recharge du portefeuille dans le panel salon. Désactivé par défaut.",

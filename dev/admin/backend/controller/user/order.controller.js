@@ -20,6 +20,28 @@ const mongoose = require("mongoose");
 const moment = require("moment");
 
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
+const { salonProductPaymentOptions } = require("../../services/stripeConnect.service");
+
+function isStripeOrderPayment(paymentGateway) {
+  return String(paymentGateway || "").trim().toLowerCase() === "stripe";
+}
+
+async function validateProductStripeForSalon(salon) {
+  if (!global.settingJSON?.isStripePay || global.settingJSON?.isProductStripePay === false) {
+    return { ok: false, message: "Stripe payment for products is not available." };
+  }
+  if (!salon) {
+    return { ok: false, message: "Salon not found." };
+  }
+  const payOpts = salonProductPaymentOptions(salon);
+  if (!payOpts.acceptStripe) {
+    return {
+      ok: false,
+      message: "This salon does not accept online card payments for products.",
+    };
+  }
+  return { ok: true };
+}
 
 //create order by the user
 exports.createOrder = async (req, res) => {
@@ -34,6 +56,8 @@ exports.createOrder = async (req, res) => {
 
     const userId = new mongoose.Types.ObjectId(req.body.userId);
     const type = req.body.type.trim().toLowerCase();
+    const paymentGateway = (req.body.paymentGateway || "wallet").trim();
+    const isStripePayment = isStripeOrderPayment(paymentGateway);
 
     if (type === "fromcart") {
       const [uniqueIdForUserWalletHistory, user, dataFromCart] = await Promise.all([generateUniqueIdentifier(), User.findById(userId), Cart.findOne({ userId: userId })]);
@@ -52,6 +76,28 @@ exports.createOrder = async (req, res) => {
 
       if (dataFromCart.items.length === 0) {
         return res.status(200).json({ status: false, message: "Items does not found in cart." });
+      }
+
+      if (isStripePayment) {
+        const salonIds = [
+          ...new Set(dataFromCart.items.map((item) => String(item.salon))),
+        ];
+        if (salonIds.length !== 1) {
+          return res.status(200).json({
+            status: false,
+            message: "Card payment requires all cart items from the same salon.",
+          });
+        }
+        const cartSalon = await Salon.findById(salonIds[0]);
+        const stripeCheck = await validateProductStripeForSalon(cartSalon);
+        if (!stripeCheck.ok) {
+          return res.status(200).json({ status: false, message: stripeCheck.message });
+        }
+      } else if (global.settingJSON?.isWalletPay !== true) {
+        return res.status(200).json({
+          status: false,
+          message: "Wallet payment is not available.",
+        });
       }
 
       //add data in body from cart
@@ -146,6 +192,7 @@ exports.createOrder = async (req, res) => {
       data.purchasedTimeCancelOrderCharges = purchasedTimecancelOrderCharges;
 
       const order = new Order(data);
+      order.paymentGateway = isStripePayment ? "Stripe" : "wallet";
 
       //Set the status "Pending" and date of each item in the "items" array
       order.items.forEach((item) => {
@@ -153,78 +200,118 @@ exports.createOrder = async (req, res) => {
         item.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
       });
 
-      //user wallet history for the order (deduct from user's wallet)
-      for (let i = 0; i < order.items.length; i++) {
-        const product = await Product.findById(order.items[i].product);
-        const salon = await Salon.findById(product.salon);
+      if (!isStripePayment) {
+        //user wallet history for the order (deduct from user's wallet)
+        for (let i = 0; i < order.items.length; i++) {
+          const product = await Product.findById(order.items[i].product);
+          const salon = await Salon.findById(product.salon);
 
-        const purchasedTimeProductPrice = parseInt(order.items[i].purchasedTimeProductPrice);
-        const productQuantity = parseInt(order.items[i].productQuantity);
-        const attributesArray = order.items[i].attributesArray;
-        const itemId = order.items[i]._id;
+          const purchasedTimeProductPrice = parseInt(order.items[i].purchasedTimeProductPrice);
+          const productQuantity = parseInt(order.items[i].productQuantity);
+          const attributesArray = order.items[i].attributesArray;
+          const itemId = order.items[i]._id;
 
-        //user paid amount productQuantity wise with shipping charges
-        const amountCut = purchasedTimeProductPrice * productQuantity + order.items[i].purchasedTimeShippingCharges;
+          //user paid amount productQuantity wise with shipping charges
+          const amountCut = purchasedTimeProductPrice * productQuantity + order.items[i].purchasedTimeShippingCharges;
 
-        await new UserWalletHistory({
-          user: user._id,
-          order: order._id,
-          product: product._id,
-          itemId: itemId,
-          amount: amountCut,
-          type: 3,
-          date: moment().format("YYYY-MM-DD"),
-          time: moment().format("HH:mm a"),
-          uniqueId: uniqueIdForUserWalletHistory,
-        }).save();
+          await new UserWalletHistory({
+            user: user._id,
+            order: order._id,
+            product: product._id,
+            itemId: itemId,
+            amount: amountCut,
+            type: 3,
+            date: moment().format("YYYY-MM-DD"),
+            time: moment().format("HH:mm a"),
+            uniqueId: uniqueIdForUserWalletHistory,
+          }).save();
 
-        //notification related
-        if (salon.fcmToken && salon.fcmToken !== null) {
-          const adminPromise = await admin;
+          //notification related
+          if (salon.fcmToken && salon.fcmToken !== null) {
+            const adminPromise = await admin;
 
-          const payload = {
-            token: salon?.fcmToken,
-            notification: {
-              title: `Thank You for Your Order: ${user.firstName}'s Order Placed Successfully!`,
-              body: "Order In Progress: We're Working on It!",
-            },
-          };
+            const payload = {
+              token: salon?.fcmToken,
+              notification: {
+                title: `Thank You for Your Order: ${user.firstName}'s Order Placed Successfully!`,
+                body: "Order In Progress: We're Working on It!",
+              },
+            };
 
-          adminPromise
-            .messaging()
-            .send(payload)
-            .then(async (response) => {
-              console.log("Successfully sent with response: ", response);
+            adminPromise
+              .messaging()
+              .send(payload)
+              .then(async (response) => {
+                console.log("Successfully sent with response: ", response);
 
-              const notification = new Notification();
-              notification.userId = dataFromCart.userId;
-              notification.image = user.image;
-              notification.salonId = salon._id;
-              notification.productId = product._id;
-              notification.orderId = order._id;
-              notification.title = payload.notification.title;
-              notification.message = payload.notification.body;
-              notification.notificationType = 0;
-              notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-              await notification.save();
-            })
-            .catch((error) => {
-              console.log("Error sending message:      ", error);
-            });
-        }
-      }
-
-      await Promise.all([
-        User.updateOne(
-          { _id: user._id, amount: { $gt: 0 } },
-          {
-            $inc: {
-              amount: -parseInt(req.body.finalTotal),
-            },
+                const notification = new Notification();
+                notification.userId = dataFromCart.userId;
+                notification.image = user.image;
+                notification.salonId = salon._id;
+                notification.productId = product._id;
+                notification.orderId = order._id;
+                notification.title = payload.notification.title;
+                notification.message = payload.notification.body;
+                notification.notificationType = 0;
+                notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+                await notification.save();
+              })
+              .catch((error) => {
+                console.log("Error sending message:      ", error);
+              });
           }
-        ),
-        order.save(),
-      ]);
+        }
+
+        await Promise.all([
+          User.updateOne(
+            { _id: user._id, amount: { $gt: 0 } },
+            {
+              $inc: {
+                amount: -parseInt(req.body.finalTotal),
+              },
+            }
+          ),
+          order.save(),
+        ]);
+      } else {
+        for (let i = 0; i < order.items.length; i++) {
+          const product = await Product.findById(order.items[i].product);
+          const salon = await Salon.findById(product.salon);
+
+          if (salon?.fcmToken) {
+            const adminPromise = await admin;
+            const payload = {
+              token: salon.fcmToken,
+              notification: {
+                title: `Thank You for Your Order: ${user.firstName}'s Order Placed Successfully!`,
+                body: "Order In Progress: We're Working on It!",
+              },
+            };
+
+            adminPromise
+              .messaging()
+              .send(payload)
+              .then(async () => {
+                const notification = new Notification();
+                notification.userId = dataFromCart.userId;
+                notification.image = user.image;
+                notification.salonId = salon._id;
+                notification.productId = product._id;
+                notification.orderId = order._id;
+                notification.title = payload.notification.title;
+                notification.message = payload.notification.body;
+                notification.notificationType = 0;
+                notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+                await notification.save();
+              })
+              .catch((error) => {
+                console.log("Error sending message:      ", error);
+              });
+          }
+        }
+
+        await order.save();
+      }
 
       const populateOrder = await order.populate({
         path: "items.product",
@@ -270,6 +357,24 @@ exports.createOrder = async (req, res) => {
 
       if (user.isBlock) {
         return res.status(200).json({ status: false, message: "you are blocked by the admin." });
+      }
+
+      if (!product) {
+        return res.status(200).json({ status: false, message: "No product was found." });
+      }
+
+      const salon = await Salon.findById(product.salon);
+
+      if (isStripePayment) {
+        const stripeCheck = await validateProductStripeForSalon(salon);
+        if (!stripeCheck.ok) {
+          return res.status(200).json({ status: false, message: stripeCheck.message });
+        }
+      } else if (global.settingJSON?.isWalletPay !== true) {
+        return res.status(200).json({
+          status: false,
+          message: "Wallet payment is not available.",
+        });
       }
 
       const items = [
@@ -385,6 +490,7 @@ exports.createOrder = async (req, res) => {
       data.purchasedTimeCancelOrderCharges = purchasedTimecancelOrderCharges;
 
       const order = new Order(data);
+      order.paymentGateway = isStripePayment ? "Stripe" : "wallet";
 
       //Set the status "Pending" and date of each item in the "items" array
       order.items.forEach((item) => {
@@ -392,78 +498,113 @@ exports.createOrder = async (req, res) => {
         item.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
       });
 
-      //user wallet history for the order (deduct from user's wallet)
-      for (let i = 0; i < order.items.length; i++) {
-        const product = await Product.findById(order.items[i].product);
-        const salon = await Salon.findById(product.salon);
+      if (!isStripePayment) {
+        for (let i = 0; i < order.items.length; i++) {
+          const orderProduct = await Product.findById(order.items[i].product);
+          const orderSalon = await Salon.findById(orderProduct.salon);
 
-        const purchasedTimeProductPrice = parseInt(order.items[i].purchasedTimeProductPrice);
-        const productQuantity = parseInt(order.items[i].productQuantity);
-        const attributesArray = order.items[i].attributesArray;
-        const itemId = order.items[i]._id;
+          const purchasedTimeProductPrice = parseInt(order.items[i].purchasedTimeProductPrice);
+          const productQuantity = parseInt(order.items[i].productQuantity);
+          const itemId = order.items[i]._id;
 
-        //user paid amount productQuantity wise with shipping charges
-        const amountCut = purchasedTimeProductPrice * productQuantity + order.items[i].purchasedTimeShippingCharges;
+          const amountCut =
+            purchasedTimeProductPrice * productQuantity +
+            order.items[i].purchasedTimeShippingCharges;
 
-        await new UserWalletHistory({
-          user: user._id,
-          order: order._id,
-          product: product._id,
-          itemId: itemId,
-          amount: amountCut,
-          type: 3,
-          date: moment().format("YYYY-MM-DD"),
-          time: moment().format("HH:mm a"),
-          uniqueId: uniqueIdForUserWalletHistory,
-        }).save();
+          await new UserWalletHistory({
+            user: user._id,
+            order: order._id,
+            product: orderProduct._id,
+            itemId: itemId,
+            amount: amountCut,
+            type: 3,
+            date: moment().format("YYYY-MM-DD"),
+            time: moment().format("HH:mm a"),
+            uniqueId: uniqueIdForUserWalletHistory,
+          }).save();
 
-        //notification related
-        if (salon.fcmToken && salon.fcmToken !== null) {
-          const adminPromise = await admin;
+          if (orderSalon?.fcmToken) {
+            const adminPromise = await admin;
+            const payload = {
+              token: orderSalon.fcmToken,
+              notification: {
+                title: `Thank You for Your Order: ${user.firstName}'s Order Placed Successfully!`,
+                body: "Order In Progress: We're Working on It!",
+              },
+            };
 
-          const payload = {
-            token: salon?.fcmToken,
-            notification: {
-              title: `Thank You for Your Order: ${user.firstName}'s Order Placed Successfully!`,
-              body: "Order In Progress: We're Working on It!",
-            },
-          };
-
-          adminPromise
-            .messaging()
-            .send(payload)
-            .then(async (response) => {
-              console.log("Successfully sent with response: ", response);
-
-              const notification = new Notification();
-              notification.userId = user._id;
-              notification.image = user.image;
-              notification.salonId = salon._id;
-              notification.productId = product._id;
-              notification.orderId = order._id;
-              notification.title = payload.notification.title;
-              notification.message = payload.notification.body;
-              notification.notificationType = 0;
-              notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-              await notification.save();
-            })
-            .catch((error) => {
-              console.log("Error sending message:      ", error);
-            });
-        }
-      }
-
-      await Promise.all([
-        User.updateOne(
-          { _id: user._id, amount: { $gt: 0 } },
-          {
-            $inc: {
-              amount: -parseInt(req.body.finalTotal),
-            },
+            adminPromise
+              .messaging()
+              .send(payload)
+              .then(async () => {
+                const notification = new Notification();
+                notification.userId = user._id;
+                notification.image = user.image;
+                notification.salonId = orderSalon._id;
+                notification.productId = orderProduct._id;
+                notification.orderId = order._id;
+                notification.title = payload.notification.title;
+                notification.message = payload.notification.body;
+                notification.notificationType = 0;
+                notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+                await notification.save();
+              })
+              .catch((error) => {
+                console.log("Error sending message:      ", error);
+              });
           }
-        ),
-        order.save(),
-      ]);
+        }
+
+        await Promise.all([
+          User.updateOne(
+            { _id: user._id, amount: { $gt: 0 } },
+            {
+              $inc: {
+                amount: -parseInt(req.body.finalTotal),
+              },
+            }
+          ),
+          order.save(),
+        ]);
+      } else {
+        for (let i = 0; i < order.items.length; i++) {
+          const orderProduct = await Product.findById(order.items[i].product);
+          const orderSalon = await Salon.findById(orderProduct.salon);
+
+          if (orderSalon?.fcmToken) {
+            const adminPromise = await admin;
+            const payload = {
+              token: orderSalon.fcmToken,
+              notification: {
+                title: `Thank You for Your Order: ${user.firstName}'s Order Placed Successfully!`,
+                body: "Order In Progress: We're Working on It!",
+              },
+            };
+
+            adminPromise
+              .messaging()
+              .send(payload)
+              .then(async () => {
+                const notification = new Notification();
+                notification.userId = user._id;
+                notification.image = user.image;
+                notification.salonId = orderSalon._id;
+                notification.productId = orderProduct._id;
+                notification.orderId = order._id;
+                notification.title = payload.notification.title;
+                notification.message = payload.notification.body;
+                notification.notificationType = 0;
+                notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+                await notification.save();
+              })
+              .catch((error) => {
+                console.log("Error sending message:      ", error);
+              });
+          }
+        }
+
+        await order.save();
+      }
 
       const populateOrder = await order.populate({
         path: "items.product",

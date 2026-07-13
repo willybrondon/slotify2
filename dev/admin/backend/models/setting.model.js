@@ -16,6 +16,8 @@ const settingSchema = new mongoose.Schema(
 
     /** Show wallet payment on customer app (booking / products) */
     isWalletPay: { type: Boolean, default: false },
+    /** Show Stripe card payment for product orders on customer app (salon Connect) */
+    isProductStripePay: { type: Boolean, default: true },
     /** Allow salon owners to recharge wallet via Stripe / MTN MoMo */
     isSalonWalletRecharge: { type: Boolean, default: false },
 

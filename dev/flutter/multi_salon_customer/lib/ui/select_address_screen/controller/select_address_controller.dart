@@ -25,6 +25,11 @@ class SelectAddressController extends GetxController {
   List<Map<String, dynamic>>? attributes;
   bool? withoutCart;
 
+  String? salonId;
+  bool salonAcceptsStripe = false;
+  int? subTotal;
+  String? salonName;
+
   @override
   void onInit() async {
     await getDataFromArgs();
@@ -45,7 +50,21 @@ class SelectAddressController extends GetxController {
       log("Product Id :: $productId");
       log("Quantity :: $quantity");
       log("Attributes :: $attributes");
-      log("WithoutCart :: $withoutCart");
+      if (args.length > 5 && args[5] != null) {
+        salonId = args[5]?.toString();
+      }
+      if (args.length > 6 && args[6] != null) {
+        salonAcceptsStripe = args[6] == true;
+      }
+      if (args.length > 7 && args[7] != null) {
+        subTotal = int.tryParse(args[7].toString());
+      }
+      if (args.length > 8 && args[8] != null) {
+        salonName = args[8]?.toString();
+      }
+      log("Salon Id :: $salonId");
+      log("Salon Accepts Stripe :: $salonAcceptsStripe");
+      log("SubTotal :: $subTotal");
     }
   }
 
@@ -80,6 +99,35 @@ class SelectAddressController extends GetxController {
 
     log('Address 1 :: $address1');
     log('Address 2 :: $address2');
+  }
+
+  bool get hasSelectedAddress {
+    if (selectAddress < 0) return false;
+    final addresses = getAllAddressModel?.address ?? [];
+    if (selectAddress >= addresses.length) return false;
+    return addresses[selectAddress].isSelect == true;
+  }
+
+  onContinueToPayment() {
+    if (!hasSelectedAddress) {
+      Utils.showToast(Get.context!, "desPleaseSelectAddress".tr);
+      return;
+    }
+
+    Get.toNamed(
+      AppRoutes.productPayment,
+      arguments: [
+        totalAmount,
+        productId,
+        quantity,
+        attributes,
+        withoutCart,
+        salonId,
+        salonAcceptsStripe,
+        subTotal,
+        salonName,
+      ],
+    );
   }
 
   onEditAddress() {
@@ -138,6 +186,14 @@ class SelectAddressController extends GetxController {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         getAllAddressModel = GetAllAddressModel.fromJson(jsonResponse);
+
+        final addresses = getAllAddressModel?.address ?? [];
+        for (int i = 0; i < addresses.length; i++) {
+          if (addresses[i].isSelect == true) {
+            selectAddress = i;
+            break;
+          }
+        }
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.message);

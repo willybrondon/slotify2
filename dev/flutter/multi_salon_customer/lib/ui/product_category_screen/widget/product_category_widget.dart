@@ -34,6 +34,7 @@ class ProductCategoryItemView extends StatelessWidget {
       arguments: [
         category!.id,
         category.name,
+        category.image,
       ],
     );
   }

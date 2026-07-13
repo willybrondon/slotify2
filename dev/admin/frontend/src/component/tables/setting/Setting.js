@@ -490,10 +490,25 @@ const Setting = (props) => {
                     <div className="inputData">
                       <div>
                         <label className="my-3">{ui.settings.stripeActive}</label>
+                        <p className="mb-0 text-muted" style={{ fontSize: "13px" }}>
+                          {ui.settings.stripeBookingHint}
+                        </p>
                       </div>
                       <ToggleSwitch
                         onClick={() => handleSettingSwitch(setting?._id, 2)}
                         value={setting?.isStripePay}
+                      />
+                    </div>
+                    <div className="settingBoxHeader d-flex justify-content-between mt-3">
+                      <div>
+                        <h5 className="mb-1">{ui.settings.productStripePayActive}</h5>
+                        <p className="mb-0 text-muted" style={{ fontSize: "13px" }}>
+                          {ui.settings.productStripePayHint}
+                        </p>
+                      </div>
+                      <ToggleSwitch
+                        onClick={() => handleSettingSwitch(setting?._id, 12)}
+                        value={setting?.isProductStripePay !== false}
                       />
                     </div>
                   </div>

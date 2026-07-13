@@ -519,6 +519,20 @@ final Map<String, String> enUS = {
   "txtCategorySalonsTitle": "Afro salons — __CAT__",
   "txtCategorySalonsLead":
       "Find an Afro salon in Île-de-France for __CAT__.",
+  "txtCategoryProductsTitle": "Products — __CAT__",
+  "txtCategoryProductsLead":
+      "__COUNT__ product(s) in the __CAT__ category.",
+  "desPleaseSelectAddress": "Please select a delivery address.",
+  "desPleaseSelectProductOptions":
+      "Please select all product options.",
+  "desProductWalletOnlyPayment":
+      "Product orders are paid via the Skedisy wallet.",
+  "desSalonStripeUnavailable":
+      "This salon does not accept card payment for products.",
+  "desWalletPaymentUnavailable": "Wallet payment is not available.",
+  "desNoPaymentMethodAvailable": "No payment method is available for this order.",
+  "txtSoldBy": "Sold by",
+  "txtPaySalonDirectly": "Pay directly to the salon",
   "txtCategoryServiceSearchHint": "Filter services…",
   "txtIntentCaptureTitle": "Share a look",
   "txtIntentCaptureBody":

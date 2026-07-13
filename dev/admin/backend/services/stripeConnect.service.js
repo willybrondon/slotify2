@@ -192,14 +192,71 @@ async function createBookingPaymentIntent({ salon, amount, withoutTax, metadata 
   };
 }
 
+async function createProductPaymentIntent({ salon, amount, subTotal, metadata = {} }) {
+  if (!salonStripeReady(salon)) {
+    throw new Error("Stripe Connect is not ready for this salon.");
+  }
+
+  const stripeClient = getPlatformStripe();
+  const { amount: stripeAmount, currency } = toStripeAmount(amount);
+
+  const paymentIntent = await stripeClient.paymentIntents.create(
+    {
+      amount: stripeAmount,
+      currency,
+      automatic_payment_methods: { enabled: true },
+      description: salon.name ? `Commande ${salon.name}` : "Commande Skedisy",
+      metadata: {
+        source: "skedisy_product",
+        salonId: salon._id.toString(),
+        salonName: salon.name || "",
+        subTotal: String(subTotal ?? ""),
+        ...metadata,
+      },
+    },
+    {
+      stripeAccount: salon.stripeConnect.accountId,
+    }
+  );
+
+  return {
+    clientSecret: paymentIntent.client_secret,
+    paymentIntentId: paymentIntent.id,
+    publishableKey: (global.settingJSON?.stripePublishableKey || "").trim(),
+    connectedAccountId: salon.stripeConnect.accountId,
+    salonName: salon.name || "",
+  };
+}
+
+function salonProductPaymentOptions(salon) {
+  const globalStripe =
+    !!global.settingJSON?.isStripePay &&
+    global.settingJSON?.isProductStripePay !== false;
+  const acceptCash = salon?.paymentMethods?.acceptCash !== false;
+  const stripePreference = salon?.paymentMethods?.acceptStripe === true;
+  const connectReady = salonStripeReady(salon);
+  const acceptStripe = globalStripe && connectReady;
+  return {
+    acceptCash,
+    acceptStripe,
+    stripePreference,
+    stripeConnectReady: connectReady,
+    stripeOnboardingComplete: !!salon?.stripeConnect?.onboardingComplete,
+    stripeChargesEnabled: !!salon?.stripeConnect?.chargesEnabled,
+    salonName: salon?.name || "",
+  };
+}
+
 module.exports = {
   getPlatformStripe,
   getCurrency,
   computeApplicationFeeCents,
   salonStripeReady,
   salonPaymentOptions,
+  salonProductPaymentOptions,
   syncConnectAccountStatus,
   ensureConnectAccount,
   createConnectAccountLink,
   createBookingPaymentIntent,
+  createProductPaymentIntent,
 };

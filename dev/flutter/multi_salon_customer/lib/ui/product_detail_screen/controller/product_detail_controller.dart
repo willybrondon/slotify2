@@ -4,8 +4,10 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:salon_2/routes/app_routes.dart';
 import 'package:salon_2/services/app_exception/app_exception.dart';
+import 'package:salon_2/ui/home_screen/controller/home_screen_controller.dart';
 import 'package:salon_2/ui/product_detail_screen/model/add_cart_model.dart';
 import 'package:salon_2/ui/product_detail_screen/model/get_product_detail_model.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/constant.dart';
 import 'package:salon_2/utils/utils.dart';
@@ -26,14 +28,30 @@ class ProductDetailController extends GetxController {
   Map<String, List<String>> selectedIdsByName = <String, List<String>>{};
   List<Map<String, dynamic>> attributes = [];
 
+  HomeScreenController homeScreenController = Get.find<HomeScreenController>();
+  SplashController splashController = Get.find<SplashController>();
+
+  bool salonAcceptsStripe() {
+    final globalStripe =
+        splashController.settingCategory?.setting?.isStripePay == true;
+    final productStripeEnabled =
+        splashController.settingCategory?.setting?.isProductStripePay != false;
+    return globalStripe &&
+        productStripeEnabled &&
+        getProductDetailModel?.product?.salon?.paymentOptions?.acceptStripe ==
+            true;
+  }
+
+  int computeSubTotal() {
+    final price = getProductDetailModel?.product?.price ?? 0;
+    return (price * quantity).round();
+  }
+
   @override
   void onInit() async {
     await getDataFromArgs();
 
-    await onGetProductDetailApiCall(
-      userId: Constant.storage.read<String>('userId') ?? "",
-      productId: productId ?? "",
-    );
+    await loadProduct(productId ?? "");
 
     super.onInit();
   }
@@ -46,6 +64,54 @@ class ProductDetailController extends GetxController {
     }
   }
 
+  List<Attribute> get _requiredAttributes {
+    final attrs = getProductDetailModel?.product?.attributes ?? [];
+    return attrs
+        .where((a) => (a.name?.trim().isNotEmpty ?? false) && (a.value?.isNotEmpty ?? false))
+        .toList();
+  }
+
+  bool canProceedToCheckout() {
+    final required = _requiredAttributes;
+    if (required.isEmpty) return true;
+    for (final attr in required) {
+      final name = attr.name ?? '';
+      if (name.isEmpty) continue;
+      if (!(selectedValuesByName[name]?.isNotEmpty ?? false)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  int computeOrderTotal() {
+    final price = getProductDetailModel?.product?.price ?? 0;
+    final shipping = getProductDetailModel?.product?.shippingCharges ?? 0;
+    return ((price * quantity) + shipping).round();
+  }
+
+  void resetProductState() {
+    quantity = 1;
+    selectProductSize = -1;
+    attributes.clear();
+    selectedValuesByName = <String, List<String>>{};
+    selectedIdsByName = <String, List<String>>{};
+    addCartModel?.status = false;
+    rating = null;
+    roundedRating = null;
+    filledStars = null;
+  }
+
+  Future<void> loadProduct(String id) async {
+    if (id.isEmpty) return;
+    productId = id;
+    resetProductState();
+    await onGetProductDetailApiCall(
+      userId: Constant.storage.read<String>('userId') ?? "",
+      productId: id,
+    );
+  }
+
   void onAttributeSelect(String value, String type, String id) {
     if (selectedValuesByName[type]?.contains(value) ?? false) {
       selectedValuesByName[type]?.remove(value);
@@ -56,10 +122,6 @@ class ProductDetailController extends GetxController {
     }
 
     update([Constant.idSelectProductSize, Constant.idProgressView]);
-  }
-
-  bool isAnyAttributeSelected() {
-    return selectedValuesByName.values.any((selectedValues) => selectedValues.isNotEmpty);
   }
 
   void incrementQuantity() {
@@ -76,67 +138,97 @@ class ProductDetailController extends GetxController {
     }
   }
 
-  onAddCartClick() async {
-    attributes.clear();
-
+  List<Map<String, dynamic>> buildAttributesArray() {
+    final result = <Map<String, dynamic>>[];
     selectedValuesByName.forEach((key, values) {
-      List<String> ids = selectedIdsByName[key] ?? [];
-
+      final ids = selectedIdsByName[key] ?? [];
       for (int i = 0; i < values.length; i++) {
-        Map<String, dynamic> attribute = {
+        result.add({
           'name': key,
           'value': values[i],
-          '_id': ids.isNotEmpty ? ids[i] : "",
-        };
-        attributes.add(attribute);
+          '_id': ids.length > i ? ids[i] : "",
+        });
       }
     });
+    return result;
+  }
 
+  onAddCartClick() async {
+    if (!canProceedToCheckout()) {
+      Utils.showToast(Get.context!, "desPleaseSelectProductOptions".tr);
+      return;
+    }
+
+    attributes = buildAttributesArray();
     log("Selected Attribute: $attributes");
 
-    if (attributes.isNotEmpty) {
-      await onAddCartProductApiCall(
-        userId: Constant.storage.read<String>('userId') ?? "",
-        productId: productId ?? "",
-        productQuantity: quantity.toString(),
-        attributesArray: attributes,
-      );
+    await onAddCartProductApiCall(
+      userId: Constant.storage.read<String>('userId') ?? "",
+      productId: productId ?? "",
+      productQuantity: quantity.toString(),
+      attributesArray: attributes,
+    );
 
+    if (addCartModel?.status == true) {
       Utils.showToast(Get.context!, addCartModel?.message ?? "");
+    } else {
+      Utils.showToast(Get.context!, addCartModel?.message ?? "desErrorProcessingPayment".tr);
     }
   }
 
   onContinueClick() {
-    attributes.clear();
+    if (!canProceedToCheckout()) {
+      Utils.showToast(Get.context!, "desPleaseSelectProductOptions".tr);
+      return;
+    }
 
-    selectedValuesByName.forEach((key, values) {
-      List<String> ids = selectedIdsByName[key] ?? [];
-
-      for (int i = 0; i < values.length; i++) {
-        Map<String, dynamic> attribute = {
-          'name': key,
-          'value': values[i],
-          '_id': ids.isNotEmpty ? ids[i] : "",
-        };
-        attributes.add(attribute);
-      }
-    });
-
+    attributes = buildAttributesArray();
     log("Selected Attribute: $attributes");
 
-    num finalTotal = (getProductDetailModel?.product?.price ?? 0) + (getProductDetailModel?.product?.shippingCharges ?? 0);
-    log("WithOut cart final total: $finalTotal");
+    final finalTotal = computeOrderTotal();
+    log("Without cart final total: $finalTotal");
 
     Get.toNamed(
       AppRoutes.selectAddress,
       arguments: [
-        finalTotal.toStringAsFixed(1),
+        finalTotal.toString(),
         getProductDetailModel?.product?.id,
         quantity,
         attributes,
         true,
+        getProductDetailModel?.product?.salon?.id,
+        salonAcceptsStripe(),
+        computeSubTotal(),
+        getProductDetailModel?.product?.salon?.name ?? '',
       ],
     );
+  }
+
+  Future<void> onToggleFavourite() async {
+    final categoryId = getProductDetailModel?.product?.category?.id;
+    final pid = getProductDetailModel?.product?.id;
+    if (categoryId == null || pid == null) return;
+
+    await homeScreenController.onFavouriteProductCall(
+      userId: Constant.storage.read<String>('userId') ?? '',
+      productId: pid,
+      categoryId: categoryId,
+    );
+
+    if (homeScreenController.favouriteProductModel?.status == true) {
+      final isFav =
+          homeScreenController.favouriteProductModel?.isFavourite == true;
+      getProductDetailModel?.product?.isFavourite = isFav;
+      if (isFav) {
+        Utils.showToast(Get.context!, "desProductSavedSuccess".tr);
+      }
+      update([Constant.idProgressView]);
+    } else {
+      Utils.showToast(
+        Get.context!,
+        homeScreenController.favouriteProductModel?.message ?? "",
+      );
+    }
   }
 
   onBackFromCart() {

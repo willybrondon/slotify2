@@ -253,18 +253,7 @@ class SelectAddressBottomView extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
-                        Get.toNamed(
-                          AppRoutes.productPayment,
-                          arguments: [
-                            logic.totalAmount,
-                            logic.productId,
-                            logic.quantity,
-                            logic.attributes,
-                            logic.withoutCart,
-                          ],
-                        );
-                      },
+                      onTap: logic.onContinueToPayment,
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(

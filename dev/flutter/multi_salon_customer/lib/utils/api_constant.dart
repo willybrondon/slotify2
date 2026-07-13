@@ -51,6 +51,7 @@ class ApiConstant {
 
   /// ---------- Order ---------- ///
   static const createOrder = "user/order/createOrder";
+  static const stripeProductPaymentIntent = "user/order/stripe-payment-intent";
   static const getOrder = "user/order/get?";
   static const cancelOrder = "user/order/cancelOrder?";
 

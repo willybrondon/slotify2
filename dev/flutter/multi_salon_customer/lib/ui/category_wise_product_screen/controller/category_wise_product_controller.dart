@@ -15,6 +15,7 @@ class CategoryWiseProductController extends GetxController {
   dynamic args = Get.arguments;
   String? categoryId;
   String? categoryName;
+  String? categoryImage;
   List<bool> isCategoryWiseProductSaved = [];
 
   HomeScreenController homeScreenController = Get.find<HomeScreenController>();
@@ -41,8 +42,12 @@ class CategoryWiseProductController extends GetxController {
       if (args.length > 1 && args[1] != null) {
         categoryName = args[1]?.toString();
       }
+      if (args.length > 2 && args[2] != null) {
+        categoryImage = args[2]?.toString();
+      }
       log("Category ID :: $categoryId");
       log("Category Name :: $categoryName");
+      log("Category Image :: $categoryImage");
     }
   }
 

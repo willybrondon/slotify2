@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:salon_2/ui/branch_detail_screen/model/get_salon_detail_model.dart';
+
 GetProductDetailModel getProductDetailModelFromJson(String str) => GetProductDetailModel.fromJson(json.decode(str));
 
 String getProductDetailModelToJson(GetProductDetailModel data) => json.encode(data.toJson());
@@ -177,6 +179,7 @@ class Product {
   bool? isOutOfStock;
   bool? isNewCollection;
   Salon? salon;
+  ProductCategoryRef? category;
   num? rating;
   String? createStatus;
   String? updateStatus;
@@ -199,6 +202,7 @@ class Product {
     this.isOutOfStock,
     this.isNewCollection,
     this.salon,
+    this.category,
     this.rating,
     this.createStatus,
     this.updateStatus,
@@ -222,6 +226,9 @@ class Product {
         isOutOfStock: json["isOutOfStock"],
         isNewCollection: json["isNewCollection"],
         salon: json["salon"] == null ? null : Salon.fromJson(json["salon"]),
+        category: json["category"] == null
+            ? null
+            : ProductCategoryRef.fromJson(json["category"]),
         rating: json["rating"],
         createStatus: json["createStatus"],
         updateStatus: json["updateStatus"],
@@ -245,6 +252,7 @@ class Product {
         "isOutOfStock": isOutOfStock,
         "isNewCollection": isNewCollection,
         "salon": salon?.toJson(),
+        "category": category?.toJson(),
         "rating": rating,
         "createStatus": createStatus,
         "updateStatus": updateStatus,
@@ -258,27 +266,55 @@ class Product {
       };
 }
 
-class Salon {
+class ProductCategoryRef {
+  String? id;
   String? name;
-  String? mainImage;
-  bool? isBestSeller;
 
-  Salon({
-    this.name,
-    this.mainImage,
-    this.isBestSeller,
-  });
+  ProductCategoryRef({this.id, this.name});
 
-  factory Salon.fromJson(Map<String, dynamic> json) => Salon(
+  factory ProductCategoryRef.fromJson(Map<String, dynamic> json) =>
+      ProductCategoryRef(
+        id: json["_id"],
         name: json["name"],
-        mainImage: json["mainImage"],
-        isBestSeller: json["isBestSeller"],
       );
 
   Map<String, dynamic> toJson() => {
+        "_id": id,
+        "name": name,
+      };
+}
+
+class Salon {
+  String? id;
+  String? name;
+  String? mainImage;
+  bool? isBestSeller;
+  PaymentOptions? paymentOptions;
+
+  Salon({
+    this.id,
+    this.name,
+    this.mainImage,
+    this.isBestSeller,
+    this.paymentOptions,
+  });
+
+  factory Salon.fromJson(Map<String, dynamic> json) => Salon(
+        id: json["_id"],
+        name: json["name"],
+        mainImage: json["mainImage"],
+        isBestSeller: json["isBestSeller"],
+        paymentOptions: json["paymentOptions"] == null
+            ? null
+            : PaymentOptions.fromJson(json["paymentOptions"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
         "name": name,
         "mainImage": mainImage,
         "isBestSeller": isBestSeller,
+        "paymentOptions": paymentOptions?.toJson(),
       };
 }
 

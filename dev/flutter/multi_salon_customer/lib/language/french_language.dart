@@ -527,6 +527,21 @@ final Map<String, String> frFR = {
   "txtCategorySalonsTitle": "Salons afro — __CAT__",
   "txtCategorySalonsLead":
       "Trouvez un salon afro en Île-de-France pour __CAT__.",
+  "txtCategoryProductsTitle": "Produits — __CAT__",
+  "txtCategoryProductsLead":
+      "__COUNT__ produit(s) dans la catégorie __CAT__.",
+  "desPleaseSelectAddress":
+      "Veuillez sélectionner une adresse de livraison.",
+  "desPleaseSelectProductOptions":
+      "Veuillez sélectionner toutes les options du produit.",
+  "desProductWalletOnlyPayment":
+      "Les commandes produit se paient via le portefeuille Skedisy.",
+  "desSalonStripeUnavailable":
+      "Ce salon n'accepte pas le paiement par carte pour les produits.",
+  "desWalletPaymentUnavailable": "Le paiement par portefeuille n'est pas disponible.",
+  "desNoPaymentMethodAvailable": "Aucun moyen de paiement disponible pour cette commande.",
+  "txtSoldBy": "Vendu par",
+  "txtPaySalonDirectly": "Paiement direct au salon",
   "txtCategoryServiceSearchHint": "Filtrer les prestations…",
   "txtIntentCaptureTitle": "Partager un look",
   "txtIntentCaptureBody":

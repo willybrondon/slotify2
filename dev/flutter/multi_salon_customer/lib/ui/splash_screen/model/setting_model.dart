@@ -61,6 +61,7 @@ class Setting {
     bool? isRazorPay,
     bool? isStripePay,
     bool? isWalletPay,
+    bool? isProductStripePay,
     String? razorPayId,
     String? razorSecretKey,
     String? stripePublishableKey,
@@ -100,6 +101,7 @@ class Setting {
     _isRazorPay = isRazorPay;
     _isStripePay = isStripePay;
     _isWalletPay = isWalletPay;
+    _isProductStripePay = isProductStripePay;
     _razorPayId = razorPayId;
     _razorSecretKey = razorSecretKey;
     _stripePublishableKey = stripePublishableKey;
@@ -141,6 +143,7 @@ class Setting {
     _isRazorPay = json['isRazorPay'];
     _isStripePay = json['isStripePay'];
     _isWalletPay = json['isWalletPay'];
+    _isProductStripePay = json['isProductStripePay'];
     _razorPayId = json['razorPayId'];
     _razorSecretKey = json['razorSecretKey'];
     _stripePublishableKey = json['stripePublishableKey'];
@@ -180,6 +183,7 @@ class Setting {
   bool? _isRazorPay;
   bool? _isStripePay;
   bool? _isWalletPay;
+  bool? _isProductStripePay;
   String? _razorPayId;
   String? _razorSecretKey;
   String? _stripePublishableKey;
@@ -219,6 +223,7 @@ class Setting {
     bool? isRazorPay,
     bool? isStripePay,
     bool? isWalletPay,
+    bool? isProductStripePay,
     String? razorPayId,
     String? razorSecretKey,
     String? stripePublishableKey,
@@ -290,6 +295,7 @@ class Setting {
   bool? get isRazorPay => _isRazorPay;
   bool? get isStripePay => _isStripePay;
   bool? get isWalletPay => _isWalletPay;
+  bool? get isProductStripePay => _isProductStripePay;
   String? get razorPayId => _razorPayId;
   String? get razorSecretKey => _razorSecretKey;
   String? get stripePublishableKey => _stripePublishableKey;

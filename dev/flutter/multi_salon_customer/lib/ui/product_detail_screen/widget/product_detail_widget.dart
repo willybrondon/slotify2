@@ -18,27 +18,23 @@ class ProviderDetailAppBarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        GetBuilder<ProductDetailController>(
-          id: Constant.idProgressView,
-          builder: (logic) {
-            return Container(
-              height: Get.height * 0.3,
-              width: Get.width,
-              decoration: BoxDecoration(
-                color: AppColors.whiteColor,
-              ),
-              clipBehavior: Clip.hardEdge,
-              child: CachedNetworkImage(
-                imageUrl: logic.getProductDetailModel?.product?.mainImage ?? "",
+    return GetBuilder<ProductDetailController>(
+      id: Constant.idProgressView,
+      builder: (logic) {
+        final imageUrl =
+            logic.getProductDetailModel?.product?.mainImage?.trim() ?? '';
+
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            if (imageUrl.isNotEmpty)
+              CachedNetworkImage(
+                imageUrl: imageUrl,
                 fit: BoxFit.cover,
-                width: Get.width,
-                height: Get.height * 0.3,
+                width: double.infinity,
+                height: double.infinity,
                 placeholder: (context, url) {
-                  return Container(
-                    width: Get.width,
-                    height: Get.height * 0.3,
+                  return ColoredBox(
                     color: AppColors.grey.withOpacity(0.2),
                     child: Center(
                       child: Image.asset(AppAsset.icImagePlaceholder)
@@ -47,9 +43,7 @@ class ProviderDetailAppBarView extends StatelessWidget {
                   );
                 },
                 errorWidget: (context, url, error) {
-                  return Container(
-                    width: Get.width,
-                    height: Get.height * 0.3,
+                  return ColoredBox(
                     color: AppColors.grey.withOpacity(0.2),
                     child: Center(
                       child: Image.asset(AppAsset.icImagePlaceholder)
@@ -57,74 +51,86 @@ class ProviderDetailAppBarView extends StatelessWidget {
                     ),
                   );
                 },
-              ),
-            );
-          },
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () {
-                Get.back();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.blackColor.withOpacity(0.1),
-                      offset: const Offset(0, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                child: Image.asset(
-                  AppAsset.icBackArrow,
-                  height: 20,
-                  width: 20,
-                  color: AppColors.blackColor,
+              )
+            else
+              ColoredBox(
+                color: AppColors.grey.withOpacity(0.2),
+                child: Center(
+                  child:
+                      Image.asset(AppAsset.icImagePlaceholder).paddingAll(25),
                 ),
               ),
-            ).paddingOnly(left: 15, right: 12, top: 30),
-            GetBuilder<ProductDetailController>(
-              id: Constant.idProgressView,
-              builder: (logic) {
-                return Container(
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                child: Padding(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.blackColor.withOpacity(0.1),
-                        offset: const Offset(0, 2),
-                        blurRadius: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: Get.back,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.whiteColor.withOpacity(0.92),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.blackColor.withOpacity(0.1),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: Image.asset(
+                            AppAsset.icBackArrow,
+                            height: 20,
+                            width: 20,
+                            color: AppColors.blackColor,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: logic.onToggleFavourite,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.whiteColor.withOpacity(0.92),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.blackColor.withOpacity(0.1),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: logic.getProductDetailModel?.product
+                                      ?.isFavourite ==
+                                  true
+                              ? Image.asset(
+                                  AppAsset.icLikeFilled,
+                                  height: 22,
+                                  width: 22,
+                                  color: AppColors.blackColor,
+                                )
+                              : Image.asset(
+                                  AppAsset.icLikeOutline,
+                                  height: 22,
+                                  width: 22,
+                                  color: AppColors.blackColor,
+                                ),
+                        ),
                       ),
                     ],
                   ),
-                  child:
-                      logic.getProductDetailModel?.product?.isFavourite == true
-                          ? Image.asset(
-                              AppAsset.icLikeFilled,
-                              height: 22,
-                              width: 22,
-                              color: AppColors.blackColor,
-                            )
-                          : Image.asset(
-                              AppAsset.icLikeOutline,
-                              height: 22,
-                              width: 22,
-                              color: AppColors.blackColor,
-                            ),
-                ).paddingOnly(right: 15, top: 30);
-              },
+                ),
+              ),
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -161,52 +167,72 @@ class ProductDetailNameView extends StatelessWidget {
         logic.roundedRating = logic.rating?.round();
         logic.filledStars = logic.roundedRating?.clamp(0, 5);
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Enhanced product name with better typography
-            Text(
-              Constant.capitalizeFirstLetter(
-                  logic.getProductDetailModel?.product?.productName ?? ""),
-              style: TextStyle(
-                fontFamily: AppFontFamily.heeBo700,
-                fontSize: 22,
-                color: AppColors.appText,
-                letterSpacing: 0.3,
-                height: 1.3,
-              ),
-            ).paddingOnly(bottom: 8),
-            // Enhanced brand badge
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.orangeBg,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    color: AppColors.orange.withOpacity(0.15), width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.orange.withOpacity(0.1),
-                    offset: const Offset(0, 2),
-                    blurRadius: 4,
-                    spreadRadius: 0,
+        return Container(
+          color: AppColors.backGround,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(
+                    top: 8, left: 15, right: 15, bottom: 2),
+                child: Text(
+                  Constant.capitalizeFirstLetter(
+                      logic.getProductDetailModel?.product?.productName ?? ""),
+                  style: TextStyle(
+                    color: AppColors.appText,
+                    fontFamily: AppFontFamily.heeBo800,
+                    fontSize: 22,
+                    letterSpacing: 0.5,
+                    height: 1.2,
                   ),
-                ],
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              child: Text(
-                logic.getProductDetailModel?.product?.brand?.toUpperCase() ??
-                    "",
-                style: TextStyle(
-                  fontFamily: AppFontFamily.heeBo600,
-                  fontSize: 13,
-                  color: AppColors.orange,
-                  letterSpacing: 0.5,
                 ),
               ),
-            ).paddingOnly(bottom: 12),
-            // Enhanced price section with better visual design
+              if ((logic.getProductDetailModel?.product?.brand ?? '')
+                  .isNotEmpty)
+                Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                  child: Text(
+                    logic.getProductDetailModel?.product?.brand?.toUpperCase() ??
+                        "",
+                    style: TextStyle(
+                      fontFamily: AppFontFamily.heeBo600,
+                      fontSize: 13,
+                      color: AppColors.brandTerracotta,
+                    ),
+                  ),
+                ),
+              if ((logic.getProductDetailModel?.product?.salon?.name ?? '')
+                  .isNotEmpty)
+                Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        AppAsset.icLocation,
+                        height: 18,
+                        width: 18,
+                        color: AppColors.brandTerracotta,
+                      ).paddingOnly(right: 12),
+                      Expanded(
+                        child: Text(
+                          logic.getProductDetailModel?.product?.salon?.name ??
+                              '',
+                          style: TextStyle(
+                            color: AppColors.appText,
+                            fontFamily: AppFontFamily.heeBo600,
+                            fontSize: 14,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            // Price section
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
               decoration: BoxDecoration(
                 color: AppColors.whiteColor,
                 borderRadius: BorderRadius.circular(12),
@@ -223,6 +249,7 @@ class ProductDetailNameView extends StatelessWidget {
                   ),
                 ],
               ),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               child: Row(
                 children: [
                   Container(
@@ -281,10 +308,10 @@ class ProductDetailNameView extends StatelessWidget {
                   ),
                 ],
               ),
-            ).paddingOnly(bottom: 12),
-            // Enhanced rating section
+            ),
+            // Rating section
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
               decoration: BoxDecoration(
                 color: AppColors.whiteColor,
                 borderRadius: BorderRadius.circular(12),
@@ -301,6 +328,7 @@ class ProductDetailNameView extends StatelessWidget {
                   ),
                 ],
               ),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               child: Row(
                 children: [
                   Container(
@@ -341,23 +369,15 @@ class ProductDetailNameView extends StatelessWidget {
                   ),
                 ],
               ),
-            ).paddingOnly(top: 8, bottom: 8),
-            // Enhanced divider
+            ),
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 8),
+              margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
               height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.grey.withOpacity(0.0),
-                    AppColors.grey.withOpacity(0.2),
-                    AppColors.grey.withOpacity(0.0),
-                  ],
-                ),
-              ),
+              color: AppColors.grey.withOpacity(0.15),
             ),
           ],
-        ).paddingOnly(left: 15, right: 15, top: 0);
+        ),
+        );
       },
     );
   }
@@ -487,6 +507,7 @@ class ProductDetailProductQuantityView extends StatelessWidget {
                   width: 1,
                 ),
               ),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -724,10 +745,8 @@ class ProductDetailPopularProductView extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 return GestureDetector(
                   onTap: () {
-                    logic.onGetProductDetailApiCall(
-                      userId: Constant.storage.read<String>('userId') ?? "",
-                      productId: logic.getProductDetailModel
-                              ?.popularProducts?[index].id ??
+                    logic.loadProduct(
+                      logic.getProductDetailModel?.popularProducts?[index].id ??
                           "",
                     );
                   },
@@ -896,7 +915,7 @@ class ProductDetailBottomView extends StatelessWidget {
       child: GetBuilder<ProductDetailController>(
         id: Constant.idSelectProductSize,
         builder: (logic) {
-          final canProceed = logic.isAnyAttributeSelected();
+          final canProceed = logic.canProceedToCheckout();
           return Row(
             children: [
               Expanded(
