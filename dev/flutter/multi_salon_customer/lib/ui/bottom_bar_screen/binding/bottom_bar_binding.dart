@@ -8,10 +8,14 @@ import 'package:salon_2/ui/product_screen/controller/product_screen_controller.d
 import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
 import 'package:salon_2/ui/search_screen/controller/search_screen_controller.dart';
 import 'package:salon_2/ui/setting_screen/controller/setting_controller.dart';
+import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 
 class BottomBarBinding extends Bindings {
   @override
   void dependencies() {
+    if (!Get.isRegistered<SplashController>()) {
+      Get.put(SplashController(), permanent: true);
+    }
     Get.lazyPut<BottomBarController>(() => BottomBarController());
     Get.lazyPut<HomeScreenController>(() => HomeScreenController());
     Get.lazyPut<BookingDetailScreenController>(() => BookingDetailScreenController());

@@ -12,6 +12,7 @@ import 'package:salon_2/ui/edit_profile_screen/controller/edit_profile_controlle
 import 'package:salon_2/ui/login_screen/login_screen/controller/login_screen_controller.dart';
 import 'package:salon_2/ui/login_screen/sign_in_screen/view/sign_in_screen.dart';
 import 'package:salon_2/ui/profile_screen/controller/profile_screen_controller.dart';
+import 'package:salon_2/main.dart' show isWalletPay;
 import 'package:salon_2/ui/splash_screen/controller/splash_controller.dart';
 import 'package:salon_2/utils/api_constant.dart';
 import 'package:salon_2/utils/app_asset.dart';
@@ -84,6 +85,19 @@ class ProfileScreen extends StatelessWidget {
         '';
   }
 
+  /// After login, [Get.offAllNamed] can dispose [SplashController] from splash
+  /// bindings — reading settings must not crash the profile tab.
+  static bool _isWalletPayEnabled() {
+    if (Get.isRegistered<SplashController>()) {
+      return Get.find<SplashController>()
+              .settingCategory
+              ?.setting
+              ?.isWalletPay ==
+          true;
+    }
+    return isWalletPay == true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final statusBarHeight = MediaQuery.of(context).padding.top;
@@ -97,7 +111,9 @@ class ProfileScreen extends StatelessWidget {
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) {
-        Get.find<BottomBarController>().onClick(0);
+        if (Get.isRegistered<BottomBarController>()) {
+          Get.find<BottomBarController>().onClick(0);
+        }
         if (didPop) {
           return;
         }
@@ -250,24 +266,15 @@ class ProfileScreen extends StatelessWidget {
                         subtitle: "txtAccountDetails".tr,
                         onTap: () => _openEditProfile(logicProfile),
                       ),
-                      GetBuilder<SplashController>(
-                        id: Constant.idSettingsRefresh,
-                        builder: (splashLogic) {
-                          if (splashLogic.settingCategory?.setting
-                                  ?.isWalletPay !=
-                              true) {
-                            return const SizedBox.shrink();
-                          }
-                          return CustomMenu(
-                            leadingImage: AppAsset.icWallet,
-                            title: "txtMyWallet".tr,
-                            subtitle: "txtMyWalletTransactionHistory".tr,
-                            onTap: () {
-                              Get.toNamed(AppRoutes.wallet);
-                            },
-                          );
-                        },
-                      ),
+                      if (_isWalletPayEnabled())
+                        CustomMenu(
+                          leadingImage: AppAsset.icWallet,
+                          title: "txtMyWallet".tr,
+                          subtitle: "txtMyWalletTransactionHistory".tr,
+                          onTap: () {
+                            Get.toNamed(AppRoutes.wallet);
+                          },
+                        ),
                       CustomMenu(
                         leadingImage: AppAsset.icOrder,
                         title: "txtMyOrder".tr,

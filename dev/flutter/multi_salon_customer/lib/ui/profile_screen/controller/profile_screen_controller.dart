@@ -36,7 +36,8 @@ class ProfileScreenController extends GetxController {
       await onGetUserApiCall();
     }
     Constant.storage.write('userImage', getUserCategory?.user?.image);
-    Constant.storage.write('salonRequestSent', getUserCategory?.user?.salonRequestSent);
+    Constant.storage.write(
+        'salonRequestSent', getUserCategory?.user?.salonRequestSent);
 
     if (getUserCategory?.status == false) {
       Utils.showToast(Get.context!, getUserCategory?.message ?? "");
@@ -72,7 +73,13 @@ class ProfileScreenController extends GetxController {
 
         Constant.storage.write("UserEmail", getUserCategory?.user?.email ?? "");
         Constant.storage.write("UserName", getUserCategory?.user?.fname ?? "");
-        Constant.storage.write("UserContactNumber", getUserCategory?.user?.mobile ?? 0);
+        Constant.storage.write('fName', getUserCategory?.user?.fname ?? "");
+        Constant.storage.write('lName', getUserCategory?.user?.lname ?? "");
+        Constant.storage.write('userImage', getUserCategory?.user?.image ?? "");
+        Constant.storage.write(
+            'salonRequestSent', getUserCategory?.user?.salonRequestSent);
+        Constant.storage.write(
+            "UserContactNumber", getUserCategory?.user?.mobile ?? 0);
       }
     } on AppException catch (exception) {
       Utils.showToast(Get.context!, exception.toString());
