@@ -18,19 +18,19 @@ const Products = () => {
   const p = ui.productsPage;
   const { product, total } = useSelector((state) => state.product);
   const { setting } = useSelector((state) => state.setting);
-  const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
-
+    const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
+  
   const [data, setData] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(() => {
+    useEffect(() => {
     dispatch(getProducts({ start: page, limit: rowsPerPage }));
   }, [dispatch, page, rowsPerPage]);
 
-  useEffect(() => {
+    useEffect(() => {
     setData(product || []);
-  }, [product]);
+    }, [product]);
 
   const handleChangePage = (_, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (value) => {
@@ -64,20 +64,20 @@ const Products = () => {
 
   const handleInfo = (id) => {
     navigate("/salonpanel/productDetails", { state: { id } });
-  };
+    };
 
-  const handleCities = (row) => {
-    dispatch(
-      openDialog({
-        type: "productCities",
-        data: {
-          _id: row._id,
-          productName: row.productName,
+    const handleCities = (row) => {
+        dispatch(
+            openDialog({ 
+                type: "productCities", 
+                data: { 
+                    _id: row._id,
+                    productName: row.productName,
           allowCities: row.allowCities || [],
         },
-      })
-    );
-  };
+            })
+        );
+    };
 
   const handleStockToggle = (row) => {
     dispatch(updateOutOfStockProduct(row?._id)).then((res) => {
@@ -92,17 +92,17 @@ const Products = () => {
 
   const canEdit = (row) => row?.createStatus !== "Rejected";
 
-  return (
+    return (
     <div className="mainCategory sq-service-page sq-table-page">
-      <Title name={ui.pages.products} />
+            <Title name={ui.pages.products} />
 
       <div className="sq-page-toolbar">
-        <Button
+                <Button
           className="sq-btn-add"
-          text={ui.labels.addProducts}
+                    text={ui.labels.addProducts}
           bIcon="fa-solid fa-plus"
-          onClick={() => handleAddProduct()}
-        />
+                    onClick={() => handleAddProduct()}
+                />
       </div>
 
       <div className="sq-service-panel card-sq">
@@ -135,7 +135,7 @@ const Products = () => {
                   {p.stock}: {item?.quantity ?? 0} · {stockLabel(item)}
                 </span>
                 <span className="sq-service-salon-item__sub">{statusBadge(item?.createStatus)}</span>
-              </div>
+            </div>
               <div className="sq-service-salon-item__actions sq-product-item__actions">
                 <ToggleSwitch
                   value={item?.isOutOfStock}
@@ -174,19 +174,19 @@ const Products = () => {
         </div>
       </div>
 
-      <Pagination
+                <Pagination
         type="server"
-        serverPage={page}
-        setServerPage={setPage}
-        serverPerPage={rowsPerPage}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+                    serverPage={page}
+                    setServerPage={setPage}
+                    serverPerPage={rowsPerPage}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
         totalData={total ?? 0}
-      />
+                />
 
       {dialogue && dialogueType === "productCities" && <ProductCityDialogue />}
-    </div>
-  );
+        </div>
+    );
 };
 
 export default Products;

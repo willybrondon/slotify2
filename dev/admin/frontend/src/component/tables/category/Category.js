@@ -30,6 +30,10 @@ const Category = () => {
     dispatch(getAllCategory());
   }, [dispatch]);
 
+  useEffect(() => {
+    setData(category || []);
+  }, [category]);
+
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
 
@@ -85,7 +89,7 @@ const Category = () => {
     {
       Header: col.createdAt,
       Cell: ({ row }) => (
-        <span className="text-capitalize">{row?.createdAt.split("T")[0]}</span>
+        <span className="text-capitalize">{row?.createdAt?.split("T")[0] || "-"}</span>
       ),
     },
     {
