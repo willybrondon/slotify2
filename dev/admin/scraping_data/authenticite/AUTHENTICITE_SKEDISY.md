@@ -351,6 +351,7 @@ Les descriptions Play Store / App Store doivent refléter ce document.
 ## 18. Synthèse une page
 
 ```
+
 Planity  = « On organise la beauté de toute la France. »
 NappyMe  = « On soutient la coiffeuse afro, chez toi. »
 Squire   = « On fait grandir le barbershop. »
