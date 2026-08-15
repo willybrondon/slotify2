@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="shareLook.pageTitle">Partager un look — Skedisy</title>
+    <meta name="description" content="Capture d'écran, selfie ou photo — Skedisy analyse ton look et te propose des salons coiffure afro en IDF. Ouvert à toutes.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c45c26">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="intent-hub.css">
+    <link rel="stylesheet" href="ai-concierge.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>window.SKEDISY_SHARE_LOOK_PAGE = true;</script>
+    <script src="language.js" defer></script>
+</head>
+<body class="client-page sq-page sq-share-look-page" data-page="client">
+    <nav class="navbar sq-navbar">
+        <div class="nav-container">
+            <div class="nav-logo"><a href="/" style="text-decoration:none;color:inherit;"><h2>Skedisy</h2></a></div>
+        </div>
+    </nav>
+
+    <section class="ai-concierge-section sq-share-look-section">
+        <div class="container sq-share-look-hero__inner sq-share-look-hero__inner--wide">
+            <p class="sq-share-look-hero__kicker" data-translate="shareLook.kicker">Île-de-France · Trouve ton look</p>
+            <h1 class="sq-share-look-hero__title" data-translate="intentHub.captureTitle">Partager un look</h1>
+            <p class="sq-share-look-hero__lead" data-translate-html="shareLook.lead">
+                Envoie une <strong>capture d'écran</strong>, un <strong>selfie</strong> ou une <strong>photo</strong> du style qui t'inspire. Skedisy analyse ton look et te propose des salons afro adaptés en IDF.
+            </p>
+
+            <div class="sq-share-look-platforms" aria-hidden="true">
+                <i class="fab fa-instagram"></i>
+                <i class="fab fa-tiktok"></i>
+                <i class="fab fa-facebook"></i>
+                <i class="fab fa-snapchat"></i>
+            </div>
+
+            <div class="sq-capture-trust" id="captureTrustBar">
+                <p data-translate="capture.trustLine">Salons experts coiffure afro — ouvert à toutes les clientes.</p>
+                <div class="sq-capture-pills" aria-hidden="true">
+                    <span>Tresses</span><span>Locks</span><span>Perruques</span><span>Homme</span><span>Esthétique</span>
+                </div>
+            </div>
+
+            <div class="sq-hair-strip-mount" data-hair-profile-strip style="margin-bottom: 1rem;"></div>
+
+            <div class="ai-concierge-content" id="mainContent">
+                <div class="upload-section" id="uploadSection">
+                    <p class="sq-capture-privacy sq-capture-privacy--block" id="capturePrivacy" data-translate="capture.privacy">
+                        Skedisy analyse uniquement ta photo ou vidéo. Aucun accès à tes comptes sociaux.
+                    </p>
+
+                    <div class="sq-share-look-upload-actions" id="shareLookUploadActions">
+                        <button type="button" class="sq-share-look-upload-btn" id="btnUploadScreenshot">
+                            <i class="fas fa-mobile-screen-button" aria-hidden="true"></i>
+                            <span data-translate="shareLook.btnScreenshot">Capture d'écran</span>
+                        </button>
+                        <button type="button" class="sq-share-look-upload-btn" id="btnTakeSelfie">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                            <span data-translate="shareLook.btnSelfie">Selfie</span>
+                        </button>
+                        <button type="button" class="sq-share-look-upload-btn sq-share-look-upload-btn--primary" id="btnTakePhoto">
+                            <i class="fas fa-camera" aria-hidden="true"></i>
+                            <span data-translate="shareLook.btnPhoto">Prendre une photo</span>
+                        </button>
+                    </div>
+
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <p class="sq-upload-kicker" id="uploadKicker" data-translate="shareLook.uploadKicker">Île-de-France · Ton look</p>
+                            <i class="fas fa-images" id="uploadAreaIcon" aria-hidden="true"></i>
+                            <h3 id="uploadTitle" data-translate="shareLook.uploadTitle">Envoie ton look</h3>
+                            <p class="sq-upload-lead" id="uploadLead" data-translate-html="shareLook.uploadLead">
+                                Capture d'écran depuis les réseaux, selfie ou photo — on identifie le style et on te propose jusqu'à <strong>4 salons afro</strong> en Île-de-France.
+                            </p>
+                            <p class="upload-hint" id="uploadHint" data-translate="shareLook.uploadHint">JPG, PNG ou vidéo d'écran · max. 10 Mo (photo) / 50 Mo (vidéo)</p>
+                            <p class="sq-capture-screen-tip" id="screenRecordTip" data-translate="capture.screenRecordTip">TikTok / Instagram : lis la vidéo → enregistre l'écran → envoie le fichier ici.</p>
+                            <p class="sq-location-status" id="locationStatus" aria-live="polite"></p>
+                            <button type="button" class="btn-upload" id="uploadBtn" hidden>
+                                <i class="fas fa-image" aria-hidden="true"></i>
+                                <span id="uploadBtnLabel" data-translate="capture.chooseMedia">Choisir un fichier</span>
+                            </button>
+                        </div>
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImage" src="" alt="Aperçu">
+                            <button type="button" class="btn-remove" id="removeBtn">
+                                <i class="fas fa-times" aria-hidden="true"></i>
+                                <span data-translate="shareLook.removeMedia">Supprimer</span>
+                            </button>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*,video/mp4,video/quicktime,video/webm,video/3gpp" style="display: none;">
+                    </div>
+
+                    <div class="analyze-section" id="analyzeSection" style="display: none;">
+                        <button type="button" class="btn-analyze" id="analyzeBtn">
+                            <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+                            <span id="analyzeBtnLabel" data-translate="shareLook.analyzeBtn">Trouver des salons pour ce look</span>
+                            <div class="spinner" id="spinner" style="display: none;">
+                                <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="analysis-card" id="analysisCard">
+                    <h2><i class="fas fa-chart-line" aria-hidden="true"></i> <span data-translate="shareLook.analysisTitle">Analyse de ton look</span></h2>
+                    <div class="analysis-content" id="analysisContent"></div>
+                </div>
+
+                <div class="recommendations-card" id="recommendationsCard">
+                    <h2><i class="fas fa-store" aria-hidden="true"></i> <span data-translate="shareLook.salonsTitle">Salons recommandés</span></h2>
+                    <div class="recommendations-content" id="recommendationsContent"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn-secondary" id="analyzeAnotherBtn">
+                        <i class="fas fa-redo" aria-hidden="true"></i> <span data-translate="shareLook.analyzeAnother">Nouveau look</span>
+                    </button>
+                    <a href="/" class="btn-primary">
+                        <i class="fas fa-home" aria-hidden="true"></i> <span data-translate="shareLook.backHome">Retour à l'accueil</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="error-message" id="errorMessage" style="display: none;" role="alert"></div>
+
+            <div class="sq-share-look-cta sq-share-look-cta--secondary">
+                <p class="sq-share-look-note" data-translate="shareLook.appBonus">Tu préfères partager depuis Instagram ou TikTok ? Télécharge l'app — le partage direct est encore plus rapide.</p>
+                <a href="#" class="sq-btn sq-btn-fill sq-btn--terracotta" onclick="openPhoneSelection('customer'); return false;" data-translate="shareLook.downloadCta">Télécharger l'app Skedisy</a>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script src="hair-profile.js"></script>
+    <script src="ai-concierge.js"></script>
+</body>
+</html>

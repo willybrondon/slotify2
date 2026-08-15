@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="concierge.pageTitle">Concierge IA — Réserver en Île-de-France | Skedisy</title>
+    <meta name="description" content="Trouve ton look et réserve dans un salon coiffure afro en Île-de-France. Capture, vidéo ou Concierge IA Skedisy.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c45c26">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="cookie-consent.css">
+    <link rel="stylesheet" href="legal-pages.css">
+    <link rel="stylesheet" href="ai-concierge.css">
+    <link rel="stylesheet" href="intent-hub.css">
+    <link rel="stylesheet" href="public-pages.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <script>window.SKEDISY_ASSET_BASE = '.';</script>
+    <script src="language.js" defer></script>
+</head>
+<body class="client-page sq-page sq-legal-page sq-ai-concierge-page" data-page="client">
+    <div id="sq-legal-header"></div>
+
+    <section class="ai-concierge-section">
+        <div class="container">
+            <div class="ai-concierge-header" id="conciergeHeader">
+                <p class="sq-legal-kicker">Île-de-France · Beauté afro</p>
+                <h1 id="conciergeTitle" data-translate="concierge.title">Concierge IA Skedisy</h1>
+                <p class="subtitle" id="conciergeSubtitle" data-translate="concierge.subtitle">Parce que réserver des tresses, ce n'est pas réserver une coupe.</p>
+                <p class="description" id="conciergeDescription" data-translate-html="concierge.description">
+                    Selfie ou look partagé : notre IA propose des <strong>salons afro en Île-de-France</strong> adaptés à tes cheveux texturés.
+                </p>
+            </div>
+
+            <div class="sq-hair-strip-mount" data-hair-profile-strip style="margin-bottom: 1.25rem;"></div>
+
+            <div class="sq-capture-trust" id="captureTrustBar" hidden>
+                <p data-translate="capture.trustLine">Salons experts coiffure afro — ouvert à toutes les clientes.</p>
+                <div class="sq-capture-pills" aria-hidden="true">
+                    <span>Tresses</span><span>Locks</span><span>Perruques</span><span>Homme</span><span>Esthétique</span>
+                </div>
+            </div>
+
+            <div class="ai-concierge-content" id="mainContent">
+                <div class="upload-section" id="uploadSection">
+                    <div id="linkCapturePanel" class="sq-link-capture-panel" hidden>
+                        <div class="sq-link-capture-panel__head">
+                            <i class="fab fa-instagram" id="linkPlatformIcon" aria-hidden="true"></i>
+                            <div>
+                                <strong id="linkPlatformLabel">Instagram</strong>
+                                <p id="linkCaptureLead" class="sq-link-capture-panel__lead"></p>
+                            </div>
+                        </div>
+                        <ol id="linkCaptureSteps" class="sq-link-capture-panel__steps"></ol>
+                        <button type="button" class="btn-upload sq-link-upload-cta" id="linkGoUploadBtn">
+                            <i class="fas fa-cloud-arrow-up" aria-hidden="true"></i>
+                            <span data-translate="capture.linkUploadCta">Envoyer ma capture ou vidéo</span>
+                        </button>
+                    </div>
+
+                    <div class="sq-capture-link-block" id="captureLinkBlock" hidden>
+                        <label for="sharedLinkInput" data-translate="capture.pasteLink">Coller un lien</label>
+                        <div class="sq-capture-link-input-row">
+                            <input type="url" id="sharedLinkInput" placeholder="https://instagram.com/reel/…" autocomplete="off" inputmode="url">
+                            <button type="button" class="sq-link-validate-btn" id="linkValidateBtn" data-translate="capture.linkValidateBtn">Valider</button>
+                        </div>
+                        <p class="sq-capture-hint" data-translate="capture.linkHint">Pour un lien, enregistre l'écran pendant la vidéo puis envoie le fichier ici.</p>
+                    </div>
+
+                    <p class="sq-capture-privacy sq-capture-privacy--block" id="capturePrivacy" hidden data-translate="capture.privacy">Skedisy analyse uniquement ta photo ou vidéo. Aucun accès à tes comptes sociaux.</p>
+
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <p class="sq-upload-kicker" id="uploadKicker" data-translate="concierge.uploadKicker">Île-de-France · Cheveux texturés · afro</p>
+                            <i class="fas fa-camera" id="uploadAreaIcon" aria-hidden="true"></i>
+                            <h3 id="uploadTitle" data-translate="concierge.uploadTitle">Ta photo, ton profil beauté</h3>
+                            <p class="sq-upload-lead" id="uploadLead" data-translate-html="concierge.uploadLead">Une selfie bien éclairée : on analyse tes cheveux et ta peau pour te proposer des <strong>salons afro près de chez toi</strong>.</p>
+                            <p class="upload-hint" id="uploadHint" data-translate="concierge.uploadHint">JPG ou PNG · max. 10 Mo · visage et cheveux visibles</p>
+                            <p class="sq-capture-screen-tip" id="screenRecordTip" hidden></p>
+                            <p class="sq-location-status" id="locationStatus" aria-live="polite"></p>
+                            <button type="button" class="btn-upload" id="uploadBtn">
+                                <i class="fas fa-image" aria-hidden="true"></i> <span id="uploadBtnLabel" data-translate="concierge.chooseMedia">Prendre ou choisir une photo</span>
+                            </button>
+                        </div>
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImage" src="" alt="Aperçu de votre photo">
+                            <button type="button" class="btn-remove" id="removeBtn">
+                                <i class="fas fa-times" aria-hidden="true"></i> Supprimer
+                            </button>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*,video/mp4,video/quicktime,video/webm,video/3gpp" style="display: none;">
+                    </div>
+
+                    <div class="analyze-section" id="analyzeSection" style="display: none;">
+                        <button type="button" class="btn-analyze" id="analyzeBtn">
+                            <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+                            <span id="analyzeBtnLabel">Analyser et trouver mon salon</span>
+                            <div class="spinner" id="spinner" style="display: none;">
+                                <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="analysis-card" id="analysisCard">
+                    <h2><i class="fas fa-chart-line" aria-hidden="true"></i> Votre analyse</h2>
+                    <div class="analysis-content" id="analysisContent"></div>
+                </div>
+
+                <div class="recommendations-card" id="recommendationsCard">
+                    <h2><i class="fas fa-store" aria-hidden="true"></i> Salons recommandés</h2>
+                    <div class="recommendations-content" id="recommendationsContent"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn-secondary" id="analyzeAnotherBtn">
+                        <i class="fas fa-redo" aria-hidden="true"></i> Nouvelle analyse
+                    </button>
+                    <a href="/" class="btn-primary">
+                        <i class="fas fa-home" aria-hidden="true"></i> Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+
+            <div class="error-message" id="errorMessage" style="display: none;" role="alert"></div>
+        </div>
+    </section>
+
+    <div id="sq-legal-footer"></div>
+
+    <script src="legal-pages.js"></script>
+    <script src="cookie-consent.js"></script>
+    <script type="module" src="qr-code-init.js"></script>
+    <script src="script.js"></script>
+    <script src="hair-profile.js"></script>
+    <script src="ai-concierge.js"></script>
+</body>
+</html>

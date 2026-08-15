@@ -1,0 +1,11 @@
+{
+  "name": "skedisy-salonportal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Skedisy marketing & public salon portal (static site)",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "start": "npx --yes serve public -l 3001",
+    "clean:root": "node scripts/clean-root.js"
+  }
+}

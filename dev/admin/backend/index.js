@@ -78,10 +78,22 @@ global.updateSettingFile = (settingData) => {
   console.log("Settings file updated.");
 };
 
-// Resolve salonportal path first (works for both dev: ../salonportal and prod: backend/salonportal)
-const salonportalPath = fs.existsSync(path.join(__dirname, "salonportal", "index.html"))
-  ? path.join(__dirname, "salonportal")
-  : path.join(__dirname, "..", "salonportal");
+// Resolve salonportal path (prefer public/ build output; fallback to flat root for older deploys)
+function resolveSalonportalPath() {
+  const candidates = [
+    path.join(__dirname, "salonportal", "public"),
+    path.join(__dirname, "salonportal"),
+    path.join(__dirname, "..", "salonportal", "public"),
+    path.join(__dirname, "..", "salonportal"),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(path.join(candidate, "index.html"))) {
+      return candidate;
+    }
+  }
+  return path.join(__dirname, "..", "salonportal", "public");
+}
+const salonportalPath = resolveSalonportalPath();
 
 const indexRoute = require("./route/index");
 const bookingAdminEmailController = require("./controller/user/bookingAdminEmail.controller");

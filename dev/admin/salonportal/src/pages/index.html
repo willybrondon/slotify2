@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skedisy — Réserve ta coiffure en IDF.</title>
+    <meta name="description" content="Réserve ta coiffure en IDF. Tresses, locks, tissage — salons experts coiffure afro, ouvert à toutes. Réserve sur l'app Skedisy.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c45c26">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="cookie-consent.css">
+    <link rel="stylesheet" href="intent-hub.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <script src="language.js" defer></script>
+</head>
+<body class="client-page sq-page" data-page="client">
+    <div class="login-above-qr header-actions-above-qr">
+        <a href="/professionnel/" class="btn-nav-above btn-pro-above" data-translate="nav.pro">Pro</a>
+        <a href="/compte/connexion" class="btn-login-above" data-translate="nav.login">Connexion</a>
+    </div>
+
+    <div class="qr-topright qr-topright--client">
+        <div class="qr-top-flex">
+            <div class="qr-top-block" id="download-customer" data-app-type="customer" onclick="openPhoneSelection('customer')">
+                <div class="qr-code-wrapper"><div id="qr-customer-top"></div></div>
+                <div class="qr-label" data-translate="qr.customerApp">Download Customer App</div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar sq-navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="https://skedisy.com" style="text-decoration: none; color: inherit;"><h2>Skedisy</h2></a>
+            </div>
+            <div class="nav-menu-center desktop-only" id="categoriesMenu"></div>
+            <div class="mobile-menu-wrapper">
+                <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3 data-translate="nav.forClients">Pour les clientes</h3>
+                <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Passer en anglais"><i class="fas fa-globe"></i> <span>FR</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
+                </div>
+            </div>
+            <div class="mobile-menu-content mobile-menu-content--client">
+                <a href="/compte/connexion" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
+                <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer" data-translate="client.downloadAppCta">Télécharger l'app</button>
+                <div class="mobile-categories-panel">
+                    <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">
+                        <span data-translate="nav.allCategories">Toutes les catégories</span>
+                        <i class="fas fa-chevron-down mobile-categories-toggle__icon" aria-hidden="true"></i>
+                    </button>
+                    <div class="mobile-categories-drawer" id="mobileCategoriesDrawer" hidden>
+                        <div class="mobile-categories-drawer__head">
+                            <span data-translate="nav.allCategories">Toutes les catégories</span>
+                            <button type="button" class="mobile-categories-drawer__close" id="mobileCategoriesClose" aria-label="Fermer">&times;</button>
+                        </div>
+                        <div class="mobile-categories" id="mobileCategories"></div>
+                    </div>
+                </div>
+                <a href="/professionnel/" class="btn-login-mobile-menu btn-for-business-mobile" data-translate="nav.forBusiness">Pour les professionnels</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sq-mobile-float-bar mobile-only" aria-label="Actions rapides">
+        <a href="partager-un-look.html" class="floating-ai-btn floating-ai-btn--share">
+            <i class="fas fa-share-from-square" aria-hidden="true"></i>
+            <span data-translate="intentHub.captureTitle">Partager un look</span>
+        </a>
+        <a href="#" class="floating-download-btn floating-download-btn--customer" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Télécharger l'app</a>
+    </div>
+
+    <!-- Accueil desktop : intro centrée · recherche à gauche · carte avant QR -->
+    <section class="sq-home-landing" id="sqHomeLanding">
+        <div class="sq-home-landing__grid container">
+            <header class="sq-home-landing__intro sq-home-landing__intro--center desktop-only">
+                <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta beauté afro en IDF.</h1>
+                <p class="sq-home-essence" data-translate="homeProduct.essence">Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.</p>
+            </header>
+
+            <div class="sq-home-landing__body">
+                <div class="sq-home-landing__left">
+                    <div class="sq-home-landing__intro sq-home-landing__intro--mobile mobile-only">
+                        <h1 class="sq-display sq-home-headline" data-translate="homeProduct.headline">Réserve ta beauté afro en IDF.</h1>
+                        <p class="sq-home-essence" data-translate="homeProduct.essence">Tresses, locks, tissage, soins : des salons experts en coiffure afro, pour toutes les clientes.</p>
+                    </div>
+
+                    <div class="sq-search-hero-wrap" id="sqIntentHub">
+                    <div class="sq-search-hero">
+                        <div class="sq-search-hero-toolbar">
+                            <div class="sq-location-chip-wrap">
+                                <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
+                                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                                    <span class="sq-location-chip__text">
+                                        <span class="sq-location-chip__label" data-translate="homeProduct.yourLocation">Votre position</span>
+                                        <span class="sq-location-chip__value" id="homeLocationChipValue">Paris</span>
+                                    </span>
+                                    <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
+                                </button>
+                                <div class="sq-location-popover" id="homeLocationPopover" hidden>
+                                    <label class="sq-sr-only" for="homeLocationSearchInput" data-translate="intentHub.searchLocationLabel">Localisation</label>
+                                    <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" data-translate="intentHub.searchLocationPlaceholder" placeholder="Paris, Seine-Saint-Denis…" autocomplete="off">
+                                    <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
+                                </div>
+                            </div>
+                            <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
+                                <i class="fas fa-map" aria-hidden="true"></i>
+                                <span data-translate="homeProduct.viewMap">Voir la carte</span>
+                            </a>
+                        </div>
+
+                        <form id="homeSalonSearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
+                            <div class="sq-search-bar-unified__inner sq-search-bar-unified__inner--query-only">
+                                <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+                                <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
+                                    <label class="sq-sr-only" for="homeQuerySearchInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
+                                    <input type="search" id="homeQuerySearchInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off" enterkeyhint="search">
+                                    <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
+                                        <div class="sq-search-suggestions__section">
+                                            <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
+                                            <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
+                                        </div>
+                                        <div class="sq-search-suggestions__section">
+                                            <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
+                                            <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="sq-search-bar-unified__submit" aria-label="Rechercher">
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search">
+                        <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
+                        <span class="sq-share-look-banner__body">
+                            <strong data-translate="intentHub.captureTitle">Partager un look</strong>
+                            <span data-translate="intentHub.captureBodyShort">Capture d'écran depuis Instagram, TikTok, Facebook ou Snapchat → partage avec l'app Skedisy. On te propose des salons adaptés.</span>
+                        </span>
+                        <i class="fas fa-chevron-right sq-share-look-banner__chevron" aria-hidden="true"></i>
+                    </a>
+
+                    <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
+                </div>
+                </div>
+
+                <aside class="sq-home-landing__map desktop-only" aria-label="Carte des salons">
+                    <div id="homeSalonMap" class="sq-home-landing__map-el"></div>
+                    <a href="/recherche?view=map" class="sq-home-map-panel__link" id="homeMapPanelLink">
+                        <i class="fas fa-map" aria-hidden="true"></i>
+                        <span data-translate="homeProduct.viewMap">Voir la carte</span>
+                    </a>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bandeau app (style Fresha) -->
+    <section class="sq-home-app-strip" id="sqHomeAppStrip">
+        <div class="container sq-home-app-strip-inner">
+            <div class="sq-home-app-strip-copy">
+                <h2 data-translate="homeProduct.appStripTitle">Télécharge l'app Skedisy</h2>
+                <p data-translate="homeProduct.appStripBody">Créneaux, expertes, rappels SMS — la réservation se fait sur l'app gratuite.</p>
+            </div>
+            <div class="sq-home-app-strip-actions">
+                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                <div class="sq-store-badges-mount" data-app="customer"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Story marketing (visuels desktop — hors zone recherche) -->
+    <section class="sq-hero sq-hero--story sq-hero--story-compact">
+        <div class="sq-hero-grid">
+            <div class="sq-hero-copy">
+                <div class="sq-hero-copy__dup mobile-only">
+                    <p class="sq-kicker" data-translate="client.marketingEyebrow">Skedisy</p>
+                    <h2 class="sq-display sq-display--story" data-translate="client.marketingHeadline">L'app où les salons coiffure afro d'IDF rencontrent leurs clientes</h2>
+                    <p class="sq-lead" data-translate="client.marketingSubheadline">Salons de quartier, cheveux texturés, prestations qui vous comprennent. Visible sur le web, réservable en quelques taps.</p>
+                </div>
+                <div class="sq-cta-row">
+                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                    <a href="/recherche" class="sq-btn sq-btn-ghost" data-translate="client.browseSalons">Parcourir les prestations</a>
+                </div>
+                <p class="sq-note" data-translate="client.heroAppNote">Réservez votre créneau sur le site ou sur l'app Skedisy (gratuite).</p>
+            </div>
+            <div class="sq-hero-visual">
+                <div class="sq-photo-frame">
+                    <img src="images/client/experience-salon.png" alt="Expérience salon beauté afro Skedisy" width="600" height="750" loading="lazy">
+                </div>
+                <div class="sq-device-frame" aria-hidden="true">
+                    <img src="images/client/app-menu.png" alt="App Skedisy — menu principal" width="280" height="560" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-trust-bar">
+        <div class="container sq-trust-bar-inner">
+            <p data-translate="client.trustBar">Salons experts coiffure afro — ouvert à toutes les clientes.</p>
+            <div class="sq-pills" aria-label="Catégories">
+                <span data-translate="trust.tresses">Tresses</span>
+                <span data-translate="trust.locks">Locks</span>
+                <span data-translate="trust.wigs">Perruques</span>
+                <span data-translate="trust.homme">Homme</span>
+                <span data-translate="trust.esthetique">Esthétique</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blocs alternés type Squire -->
+    <section class="sq-feature sq-feature--squire">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media">
+                <img src="images/client/tresses-en-cours.png" alt="Tresses en cours dans un salon afro" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label" data-translate="client.feature1Label">Trouve ton salon</p>
+                <h2 data-translate="client.feature1Title">Là où tout le monde réserve</h2>
+                <p data-translate="client.feature1Desc">Salons coiffure afro en Île-de-France : par quartier, par prestation, par avis. Visible sur le web, réservable sur l'app.</p>
+                <a href="/recherche" class="sq-link" data-translate="client.feature1Link">Parcourir les prestations</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--dark sq-feature--squire">
+        <div class="container sq-feature-inner sq-feature-inner--reverse">
+            <div class="sq-feature-media sq-feature-media--app">
+                <img src="images/client/app-reservations.png" alt="Réservations sur l'app Skedisy" width="320" height="640" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label sq-feature-label--light" data-translate="client.feature2Label">Réserve sur l'app</p>
+                <h2 data-translate="client.feature2Title">Créneau confirmé, sans WhatsApp</h2>
+                <p data-translate="client.feature2Desc">Créneaux en temps réel, choix de l'experte, paiement sécurisé et rappels SMS avant ton rendez-vous.</p>
+                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill sq-btn-sm sq-btn-fill--light" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                <div class="sq-store-badges-mount" data-app="customer" data-variant="on-dark"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--squire">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media">
+                <img src="images/client/reveal-naturel.png" alt="Cheveux naturels et soins en salon afro" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label" data-translate="client.feature3Label">Nos expertes</p>
+                <h2 data-translate="client.feature3Title">Des professionnelles qui connaissent nos cheveux</h2>
+                <p data-translate="client.feature3Desc">Tresses, locks, lace, soins : des professionnelles formées aux cheveux texturés et à toutes les textures.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--dark sq-feature--squire">
+        <div class="container sq-feature-inner sq-feature-inner--reverse">
+            <div class="sq-feature-media sq-feature-media--wide">
+                <img src="images/client/coupe-homme.png" alt="Coupe homme et prestations barbier afro" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label sq-feature-label--light" data-translate="client.feature4Label">Homme &amp; plus</p>
+                <h2 data-translate="client.feature4Title">Fade, barbe, tresses homme</h2>
+                <p data-translate="client.feature4Desc">Toutes les prestations en IDF — homme inclus. Découvre sur le site, réserve sur l'app.</p>
+                <a href="/recherche" class="sq-link sq-link--light" data-translate="client.feature1Link">Parcourir les prestations</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--squire">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media sq-feature-media--app">
+                <img src="images/client/app-produits.png" alt="Produits beauté sur Skedisy" width="320" height="640" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label" data-translate="client.featureAiLabel">Concierge IA</p>
+                <h2 data-translate="platform.aiTitle">Concierge beauté IA</h2>
+                <p data-translate="client.aiDesc">Envoie un selfie : une recommandation adaptée à ta texture et à ce que tu veux faire au salon.</p>
+                <a href="partager-un-look.html" class="sq-link" data-translate="platform.tryNow">Essayer</a>
+            </div>
+        </div>
+    </section>
+
+  <!-- Pour qui — inspiré FOR BARBERS / CLIENTS / BUSINESS -->
+    <section class="sq-for" id="how-it-works">
+        <div class="container">
+            <p class="sq-for-pre" data-translate="client.audienceKicker">Pour</p>
+            <div class="sq-for-grid">
+                <span class="sq-for-word" data-translate="client.audienceClient">Clientes</span>
+                <span class="sq-for-word" data-translate="client.audienceSalon">Salons</span>
+                <span class="sq-for-word" data-translate="client.audienceExpert">Expertes</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-audience sq-audience--dark">
+        <div class="container">
+            <h2 class="sq-section-title sq-section-title--light" data-translate="client.audienceTitle">Une plateforme, trois usages</h2>
+            <div class="sq-audience-grid">
+                <article class="sq-audience-card">
+                    <h3 data-translate="client.audienceClient">Clientes</h3>
+                    <p data-translate="client.audienceClientDesc">Découvre les salons, compare les prestations, réserve et reçois tes rappels sur l'app.</p>
+                    <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-link" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                </article>
+                <article class="sq-audience-card">
+                    <h3 data-translate="client.audienceSalon">Salons</h3>
+                    <p data-translate="client.audienceSalonDesc">Agenda en ligne, nouveaux clients en IDF, avis et visibilité sans dépendre du DM Instagram.</p>
+                    <a href="/professionnel/" class="sq-link" data-translate="nav.pro">Espace Pro</a>
+                </article>
+                <article class="sq-audience-card">
+                    <h3 data-translate="client.audienceExpert">Expertes</h3>
+                    <p data-translate="client.audienceExpertDesc">Gère tes créneaux et réservations depuis l'app Expert, au salon ou en déplacement.</p>
+                    <a href="#" onclick="openPhoneSelection('expert'); return false;" class="sq-link" data-translate="qr.expertApp">App Expert</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-steps sq-steps--light">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="client.howItWorksTitle">Comment ça marche</h2>
+            <ol class="sq-steps-list">
+                <li>
+                    <span class="sq-step-num">1</span>
+                    <div>
+                        <h3 data-translate="client.step1Title">Découvre</h3>
+                        <p data-translate="client.step1Desc">Parcours les catégories ou une fiche salon sur skedisy.com — services, équipe, avis.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="sq-step-num">2</span>
+                    <div>
+                        <h3 data-translate="client.step2Title">Télécharge l'app</h3>
+                        <p data-translate="client.step2Desc">Installe Skedisy sur iPhone ou Android (gratuit).</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="sq-step-num">3</span>
+                    <div>
+                        <h3 data-translate="client.step3Title">Réserve</h3>
+                        <p data-translate="client.step3Desc">Choisis ta prestation, ton experte et ton créneau — confirmation et rappels SMS.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <section class="sq-quotes">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="client.quotesTitle">Elles en parlent</h2>
+            <div class="sq-quotes-grid">
+                <blockquote>
+                    <p data-translate="client.quote1">« Enfin une app où je trouve des salons qui font vraiment du knotless, pas juste « coiffure ». »</p>
+                    <footer data-translate="client.quote1Author">Cliente · Seine-Saint-Denis</footer>
+                </blockquote>
+                <blockquote>
+                    <p data-translate="client.quote2">« Je book mes tresses sans envoyer dix messages sur WhatsApp. Le créneau est confirmé tout de suite. »</p>
+                    <footer data-translate="client.quote2Author">Cliente · Paris 18e</footer>
+                </blockquote>
+                <blockquote>
+                    <p data-translate="client.quote3">« Mes clientes réservent seules le soir. Moins de trous dans l'agenda. »</p>
+                    <footer data-translate="client.quote3Author">Gérante de salon · Val-de-Marne</footer>
+                </blockquote>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blocs alternés type Squire -->
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="faq.title">Questions fréquentes</h2>
+            <div class="faq-grid">
+                <div class="faq-item collapsible">
+                    <h3 data-translate="client.faqWhyApp">Pourquoi télécharger l'app pour réserver ?</h3>
+                    <div class="faq-content">
+                        <p data-translate="client.faqWhyAppDesc">Non. Sur skedisy.com, depuis la fiche de chaque salon, vous choisissez prestations, experte, créneau et paiement en toute sécurité. L'app Skedisy (gratuite) ajoute notifications, portefeuille et une expérience mobile optimisée.</p>
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3 data-translate="faq.customerAccount">Comment créer un compte cliente ?</h3>
+                    <div class="faq-content">
+                        <ol>
+                            <li data-translate="client.faqAccountStep1">Scannez le QR code ou téléchargez l'app Skedisy.</li>
+                            <li data-translate="client.faqAccountStep2">Ouvrez l'app et créez votre compte.</li>
+                            <li data-translate="client.faqAccountStep3">Parcourez les salons et réservez votre prestation.</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3 data-translate="faq.downloadApp">Comment télécharger l'app ?</h3>
+                    <div class="faq-content">
+                        <p data-translate="client.faqDownloadDesc">Scannez le QR code en haut à droite ou téléchargez l'app directement :</p>
+                        <div class="sq-store-badges-mount" data-app="customer"></div>
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3 data-translate="client.faqZone">Quelles zones sont couvertes ?</h3>
+                    <div class="faq-content">
+                        <p data-translate="client.faqZoneDesc">Skedisy est dédié à l'Île-de-France : Paris et banlieue. Les salons listés sont spécialisés beauté afro.</p>
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3 data-translate="client.faqProLink">Vous êtes gérant de salon ?</h3>
+                    <div class="faq-content">
+                        <p><span data-translate="client.faqProLinkDesc">Rendez-vous sur notre espace</span> <a href="/professionnel/" data-translate="nav.pro">Professionnel</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-final-cta">
+        <div class="container sq-final-cta-inner">
+            <h2 data-translate="client.finalCtaTitle">Prête pour ton prochain rendez-vous ?</h2>
+            <p data-translate="client.finalCtaDesc">Réservez en ligne ou téléchargez l'app pour les salons coiffure afro en Île-de-France.</p>
+            <div class="sq-cta-row sq-cta-row--center">
+                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill" data-translate="client.downloadAppCta">Télécharger l'app</a>
+                <a href="partager-un-look.html" class="sq-btn sq-btn-ghost sq-btn-ghost--on-dark" data-translate="hero.tryAI">Essayer le Concierge IA</a>
+            </div>
+            <div class="sq-store-badges-mount" data-app="customer" data-variant="on-dark" data-center="true"></div>
+        </div>
+    </section>
+
+    <footer class="footer sq-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Skedisy</h3>
+                    <p data-translate="footer.clientTagline">Réserve dans les salons coiffure afro en Île-de-France — pour toutes.</p>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> support@skedisy.com</p>
+                        <p>
+                            <a href="https://wa.me/33766160394" class="btn-whatsapp-inline" target="_blank" rel="noopener noreferrer" data-translate="footer.whatsapp">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </p>
+                    </div>
+                    <div class="footer-social">
+                        <h4 data-translate="footer.followUs">Suivez-nous</h4>
+                        <div class="footer-social-links">
+                            <a href="https://www.facebook.com/profile.php?id=61586655939283" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur Facebook">
+                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.instagram.com/skedisy/" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur Instagram">
+                                <i class="fab fa-instagram" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.tiktok.com/@skedisy" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur TikTok">
+                                <i class="fab fa-tiktok" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.about">About</h4>
+                    <ul>
+                        <li><a href="#" onclick="openPhoneSelection('customer'); return false;" data-translate="client.downloadAppCta">Download the App</a></li>
+                        <li><a href="partager-un-look.html" data-translate="nav.aiConcierge">AI Concierge</a></li>
+                        <li><a href="/professionnel/" data-translate="nav.pro">Pro</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.legal">Legal</h4>
+                    <ul>
+                        <li><a href="/terms/" data-translate="footer.terms">Terms of Service</a></li>
+                        <li><a href="/privacy/" data-translate="footer.privacy">Privacy Policy</a></li>
+                        <li><a href="/cookies/" id="cookie-management-link" data-translate="footer.cookies">Cookie Management</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-translate="footer.rights">&copy; 2024 Skedisy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="phone-selection-modal" class="modal">
+        <div class="modal-content phone-selection">
+            <span class="close">&times;</span>
+            <h2 id="modal-title" data-translate="modal.choosePlatform">Choose Your Platform</h2>
+            <p id="modal-description" data-translate="modal.selectDevice">Select your device to download the app</p>
+            <div class="phone-options">
+                <div class="phone-option" data-platform="android">
+                    <div class="store-logo"><i class="fab fa-google-play"></i></div>
+                    <h3 data-translate="modal.android">Android</h3>
+                    <p data-translate="modal.downloadAndroid">Download from Google Play Store</p>
+                    <div class="download-link" id="android-link"><i class="fas fa-download"></i> <span data-translate="modal.download">Download</span></div>
+                </div>
+                <div class="phone-option" data-platform="ios">
+                    <div class="store-logo"><i class="fab fa-apple"></i></div>
+                    <h3 data-translate="modal.iphone">iPhone</h3>
+                    <p data-translate="modal.downloadIOS">Download from App Store</p>
+                    <div class="download-link" id="ios-link"><i class="fas fa-download"></i> <span data-translate="modal.download">Download</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="cookie-consent.js"></script>
+    <script type="module" src="qr-code-init.js"></script>
+    <script src="script.js"></script>
+    <script src="search-suggestions.js"></script>
+    <script src="location-chip.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="salon-map-ui.js"></script>
+    <script src="home-map.js"></script>
+    <script src="home-discovery.js"></script>
+    <script src="hair-profile.js"></script>
+</body>
+</html>

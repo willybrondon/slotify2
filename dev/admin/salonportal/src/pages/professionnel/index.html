@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skedisy Pro — Salons afro en Île-de-France</title>
+    <meta name="description" content="Rejoignez Skedisy : la plateforme de réservation pour les salons de beauté afro en Île-de-France. Gratuit pour commencer.">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c45c26">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../cookie-consent.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <script src="../language.js" defer></script>
+</head>
+<body class="pro-page sq-page" data-page="pro">
+    <div class="login-above-qr header-actions-above-qr">
+        <a href="/" class="btn-nav-above btn-clients-above" data-translate="nav.forClients">Clients</a>
+        <a href="https://skedisy.com/salonpanel/" class="btn-login-above" data-translate="nav.login">Login</a>
+    </div>
+
+    <div class="qr-topright qr-topright-pro">
+        <div class="qr-top-flex">
+            <div class="qr-top-block" id="download-expert" data-app-type="expert" onclick="openPhoneSelection('expert')">
+                <div class="qr-code-wrapper"><div id="qr-expert-top"></div></div>
+                <div class="qr-label" data-translate="qr.expertApp">Download the Expert App</div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar sq-navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/" style="text-decoration: none; color: inherit;"><h2>Skedisy</h2></a>
+            </div>
+            <div class="nav-menu-center desktop-only" id="proNavMenu"></div>
+            <div class="mobile-menu-wrapper">
+                <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3 data-translate="nav.forProfessionals">Pour les professionnels</h3>
+                <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Passer en anglais"><i class="fas fa-globe"></i> <span>FR</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
+                </div>
+            </div>
+            <div class="mobile-menu-content mobile-menu-content--pro">
+                <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
+                <a href="/blog/" class="btn-login-mobile-menu" data-translate="nav.blog">Blog</a>
+                <a href="../request-adding-salon.html" class="btn-login-mobile-menu" data-translate="hero.joinFree">Rejoindre gratuitement</a>
+                <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="expert" data-translate="qr.expertApp">Télécharger l'app Expert</button>
+                <a href="/" class="btn-login-mobile-menu btn-for-clients-mobile" data-translate="nav.forClients">Pour les clientes</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sq-mobile-float-bar sq-mobile-float-bar--pro mobile-only" aria-label="Télécharger l'app">
+        <a href="#" class="floating-download-btn floating-download-btn--expert" onclick="openPhoneSelection('expert'); return false;" data-translate="qr.expertApp">Télécharger l'app Expert</a>
+    </div>
+
+    <section class="sq-hero sq-hero--pro">
+        <div class="sq-hero-grid">
+            <div class="sq-hero-copy">
+                <p class="sq-kicker" data-translate="pro.heroEyebrow">Espace professionnel</p>
+                <h1 class="sq-display" data-translate="hero.afroHeadline">Attirez plus de clientes pour votre salon afro en Île-de-France</h1>
+                <p class="sq-lead" data-translate="hero.afroSubheadline">
+                    La plateforme dédiée aux salons coiffure afro.<br>
+                    Nouveaux clients — gratuit pour commencer.
+                </p>
+                <div class="sq-cta-row">
+                    <a href="../request-adding-salon.html" class="sq-btn sq-btn-fill" data-translate="hero.joinFree">Rejoindre gratuitement</a>
+                    <a href="https://skedisy.com/salon/claim" class="sq-btn sq-btn-ghost" data-translate="pro.claimSalon">Réclamer mon salon</a>
+                </div>
+                <p class="sq-note" data-translate="pro.downloadExpertNote">App Expert pour votre équipe (agenda &amp; réservations) :</p>
+                <div class="sq-store-badges-mount" data-app="expert"></div>
+            </div>
+            <div class="sq-hero-visual">
+                <div class="sq-photo-frame">
+                    <img src="../images/pro/hero-tresses.png" alt="Salon afro — prestations tresses" width="600" height="750" loading="eager">
+                </div>
+                <div class="sq-device-frame" aria-hidden="true">
+                    <img src="../images/pro/app-reservations.png" alt="App Pro Skedisy — réservations" width="280" height="560" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-trust-bar">
+        <div class="container sq-trust-bar-inner">
+            <p data-translate="trust.niche">Beauté afro uniquement — pas de beauté générique.</p>
+            <div class="sq-pills" aria-label="Catégories">
+                <span data-translate="trust.tresses">Tresses</span>
+                <span data-translate="trust.locks">Locks</span>
+                <span data-translate="trust.wigs">Perruques</span>
+                <span data-translate="trust.homme">Homme</span>
+                <span data-translate="trust.esthetique">Esthétique</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-problem">
+        <div class="container sq-problem-inner">
+            <h2 data-translate="problem.title">La plupart des salons afro dépendent d'Instagram et WhatsApp :</h2>
+            <ul class="sq-problem-list">
+                <li data-translate="problem.missed">Rendez-vous manqués</li>
+                <li data-translate="problem.noShows">Clientes absentes</li>
+                <li data-translate="problem.timeWasted">Temps perdu à gérer les messages</li>
+                <li data-translate="problem.hardToAttract">Difficile d'attirer de nouvelles clientes</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--squire">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media">
+                <img src="../images/pro/wide-naturel.png" alt="Salon afro visible sur Skedisy" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label" data-translate="pro.feature1Label">Visibilité</p>
+                <h2 data-translate="pro.feature1Title">Soyez trouvées</h2>
+                <p data-translate="pro.feature1Desc">Des clientes en IDF cherchent knotless, tissage, locks ou lace — votre salon apparaît là où elles réservent.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--dark sq-feature--squire">
+        <div class="container sq-feature-inner sq-feature-inner--reverse">
+            <div class="sq-feature-media sq-feature-media--app">
+                <img src="../images/pro/app-disponibilites.png" alt="App Pro — disponibilités" width="320" height="640" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label sq-feature-label--light" data-translate="pro.feature2Label">Agenda</p>
+                <h2 data-translate="pro.feature2Title">Réservations 24h/24</h2>
+                <p data-translate="pro.feature2Desc">Agenda en ligne, rappels SMS, moins de no-shows. Vos clientes réservent même quand vous êtes en prestation.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--squire">
+        <div class="container sq-feature-inner">
+            <div class="sq-feature-media">
+                <img src="../images/pro/portrait-salon.png" alt="Gérante de salon afro" width="560" height="420" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label" data-translate="pro.feature3Label">Réputation</p>
+                <h2 data-translate="pro.feature3Title">Réputation et avis</h2>
+                <p data-translate="pro.feature3Desc">Collectez des avis vérifiés, mettez en avant vos expertes et vos prestations phares.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-feature sq-feature--dark sq-feature--squire">
+        <div class="container sq-feature-inner sq-feature-inner--reverse">
+            <div class="sq-feature-media sq-feature-media--app">
+                <img src="../images/pro/app-revenus.png" alt="App Pro — revenus" width="320" height="640" loading="lazy">
+            </div>
+            <div class="sq-feature-copy">
+                <p class="sq-feature-label sq-feature-label--light" data-translate="pro.feature4Label">Pilotage</p>
+                <h2 data-translate="pro.feature4Title">Suivez votre activité</h2>
+                <p data-translate="pro.feature4Desc">Revenus, réservations et performance : tout depuis l'app Pro et le Salon Panel.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-gallery">
+        <div class="container sq-gallery-inner">
+            <img src="../images/pro/square-locks.png" alt="Locks — prestation salon" width="400" height="400" loading="lazy">
+            <img src="../images/pro/card-client.png" alt="Fiche cliente sur Skedisy" width="400" height="400" loading="lazy">
+        </div>
+    </section>
+
+    <section class="sq-solutions sq-solutions--dark">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="solution.title">Skedisy vous aide à</h2>
+            <ul class="sq-solutions-grid">
+                <li><span class="sq-solutions-num">01</span><span data-translate="solution.bookings">Accepter des réservations 24h/24</span></li>
+                <li><span class="sq-solutions-num">02</span><span data-translate="solution.discovered">Être découvertes par de nouvelles clientes</span></li>
+                <li><span class="sq-solutions-num">03</span><span data-translate="solution.reputation">Construire votre réputation</span></li>
+                <li><span class="sq-solutions-num">04</span><span data-translate="solution.revenue">Développer votre chiffre d'affaires</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="sq-quotes">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="pro.quotesTitle">Salons partenaires</h2>
+            <div class="sq-quotes-grid">
+                <blockquote>
+                    <p data-translate="pro.quote1">« Moins de messages WhatsApp à minuit. Les créneaux se remplissent dans l'app. »</p>
+                    <footer data-translate="pro.quote1Author">Salon · Seine-Saint-Denis</footer>
+                </blockquote>
+                <blockquote>
+                    <p data-translate="pro.quote2">« On est référencées sur les prestations qu'on fait vraiment : braids, tissage, locks. »</p>
+                    <footer data-translate="pro.quote2Author">Salon · Paris</footer>
+                </blockquote>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-request sq-request--light">
+        <div class="container sq-request-inner">
+            <h2 data-translate="request.salonTitle">Intégrer votre salon sur Skedisy ?</h2>
+            <a href="../request-adding-salon.html" class="sq-btn sq-btn-fill" data-translate="request.salonButton">Faire ma demande</a>
+        </div>
+    </section>
+
+    <section class="faq faq-pro sq-faq">
+        <div class="container">
+            <h2 class="sq-section-title" data-translate="faq.title">Questions fréquentes</h2>
+            <div class="faq-grid">
+                <div class="faq-item collapsible">
+                    <h3 data-translate="faq.salonAccount">Comment créer un compte gérant ?</h3>
+                    <div class="faq-content">
+                        <ol>
+                            <li data-translate="pro.faqStep1">Téléchargez l'app Skedisy Client et créez un compte.</li>
+                            <li data-translate="pro.faqStep2">Profil → <strong>Enregistrer votre salon</strong>.</li>
+                            <li data-translate="pro.faqStep3">Renseignez votre salon et le nombre d'expertes.</li>
+                            <li data-translate="pro.faqStep4">Après validation, vous recevez les accès Expert.</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3 data-translate="faq.expertCredentials">Comment l'experte reçoit ses accès ?</h3>
+                    <div class="faq-content">
+                        <p data-translate="pro.faqExpertDesc">La gérante crée les comptes expertes à l'inscription. Chaque experte reçoit ses identifiants.</p>
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3 data-translate="faq.appDifference">App Client vs App Expert ?</h3>
+                    <div class="faq-content">
+                        <ul>
+                            <li data-translate="pro.faqAppClient"><strong>App Client :</strong> réservation pour vos clientes.</li>
+                            <li data-translate="pro.faqAppExpert"><strong>App Expert :</strong> agenda et réservations pour votre équipe.</li>
+                        </ul>
+                        <p data-translate="pro.faqExpertDownload">Téléchargez Skedisy Expert (iPhone ou Android) :</p>
+                        <div class="sq-store-badges-mount" data-app="expert"></div>
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3 data-translate="faq.manageBusiness">Gérer experts, services et réservations ?</h3>
+                    <div class="faq-content">
+                        <p data-translate="pro.faqPanelDesc">Connectez-vous au <a href="https://skedisy.com/salonpanel/">Salon Panel</a> pour gérer experts, prestations, réservations et fiche salon.</p>
+                    </div>
+                </div>
+                <div class="faq-item collapsible">
+                    <h3 data-translate="pro.faqClaim">Mon salon est déjà en ligne — comment le réclamer ?</h3>
+                    <div class="faq-content">
+                        <p data-translate="pro.faqClaimDesc">Utilisez le lien reçu par e-mail ou rendez-vous sur <a href="https://skedisy.com/salon/claim">skedisy.com/salon/claim</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sq-final-cta">
+        <div class="container sq-final-cta-inner">
+            <h2 data-translate="ctaAgain.title">Commencez à recevoir de nouvelles clientes</h2>
+            <a href="../request-adding-salon.html" class="sq-btn sq-btn-fill" data-translate="ctaAgain.button">Rejoindre Skedisy gratuitement</a>
+            <p class="sq-note sq-note--on-dark" data-translate="pro.downloadExpertNote">App Expert pour votre équipe (agenda &amp; réservations) :</p>
+            <div class="sq-store-badges-mount" data-app="expert" data-variant="on-dark" data-center="true"></div>
+        </div>
+    </section>
+
+    <footer class="footer sq-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Skedisy</h3>
+                    <p data-translate="footer.proTagline">La plateforme de réservation des salons afro en Île-de-France.</p>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> support@skedisy.com</p>
+                        <p>
+                            <a href="https://wa.me/33766160394" class="btn-whatsapp-inline" target="_blank" rel="noopener noreferrer" data-translate="footer.whatsapp">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </p>
+                    </div>
+                    <div class="footer-social">
+                        <h4 data-translate="footer.followUs">Suivez-nous</h4>
+                        <div class="footer-social-links">
+                            <a href="https://www.facebook.com/profile.php?id=61586655939283" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur Facebook">
+                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.instagram.com/skedisy/" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur Instagram">
+                                <i class="fab fa-instagram" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.tiktok.com/@skedisy" class="footer-social-link" target="_blank" rel="noopener noreferrer" aria-label="Skedisy sur TikTok">
+                                <i class="fab fa-tiktok" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.about">About</h4>
+                    <ul>
+                        <li><a href="/" data-translate="nav.forClients">For clients</a></li>
+                        <li><a href="https://skedisy.com/salonpanel/" data-translate="nav.login">Login</a></li>
+                        <li><a href="../request-adding-salon.html" data-translate="request.salonButton">Make your Request</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.legal">Legal</h4>
+                    <ul>
+                        <li><a href="/terms/" data-translate="footer.terms">Terms of Service</a></li>
+                        <li><a href="/privacy/" data-translate="footer.privacy">Privacy Policy</a></li>
+                        <li><a href="/cookies/" data-translate="footer.cookies">Cookie Management</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-translate="footer.rights">&copy; 2024 Skedisy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="phone-selection-modal" class="modal">
+        <div class="modal-content phone-selection">
+            <span class="close">&times;</span>
+            <h2 id="modal-title" data-translate="modal.choosePlatform">Choose Your Platform</h2>
+            <p id="modal-description" data-translate="modal.selectDevice">Select your device to download the app</p>
+            <div class="phone-options">
+                <div class="phone-option" data-platform="android">
+                    <div class="store-logo"><i class="fab fa-google-play"></i></div>
+                    <h3 data-translate="modal.android">Android</h3>
+                    <p data-translate="modal.downloadAndroid">Download from Google Play Store</p>
+                    <div class="download-link" id="android-link"><i class="fas fa-download"></i> <span data-translate="modal.download">Download</span></div>
+                </div>
+                <div class="phone-option" data-platform="ios">
+                    <div class="store-logo"><i class="fab fa-apple"></i></div>
+                    <h3 data-translate="modal.iphone">iPhone</h3>
+                    <p data-translate="modal.downloadIOS">Download from App Store</p>
+                    <div class="download-link" id="ios-link"><i class="fas fa-download"></i> <span data-translate="modal.download">Download</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../cookie-consent.js"></script>
+    <script type="module" src="../qr-code-init.js"></script>
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -415,7 +415,17 @@ echo "
 "
 sudo rm -rf /home/admin/backend/salonportal
 mkdir -p /home/admin/backend/salonportal
-sudo cp -r /home/admin/salonportal/* /home/admin/backend/salonportal/
+# Prefer built public/ tree (new structure); fallback to flat salonportal root
+if [ -f /home/admin/salonportal/public/index.html ]; then
+  sudo cp -r /home/admin/salonportal/public/* /home/admin/backend/salonportal/
+elif [ -f /home/admin/salonportal/index.html ]; then
+  sudo cp -r /home/admin/salonportal/* /home/admin/backend/salonportal/
+  sudo rm -rf /home/admin/backend/salonportal/src /home/admin/backend/salonportal/scripts /home/admin/backend/salonportal/public /home/admin/backend/salonportal/node_modules
+else
+  echo "ERROR: salonportal public build missing (run npm run build in salonportal)"
+  exit 1
+fi
+
 
 
 # Configure Nginx
