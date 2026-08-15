@@ -201,15 +201,27 @@
     return list;
   }
 
+  function productThumbHtml(sizeClass) {
+    const p = state.product;
+    const cls = sizeClass || "sq-product-thumb-inline";
+    if (!p?.mainImage) {
+      return `<div class="${cls}" aria-hidden="true"><span>${escapeHtml((p?.productName || "P").charAt(0))}</span></div>`;
+    }
+    return `<div class="${cls}"><img src="${escapeHtml(p.mainImage)}" alt="" loading="lazy"></div>`;
+  }
+
   function updateStickyBar() {
     if (!stickyBar || !state.product) return;
     const { total } = computeTotals();
     const outOfStock = state.product.isOutOfStock;
     stickyBar.innerHTML = `
       <div class="sq-booking-sticky-bar__inner">
-        <div class="sq-booking-sticky-bar__info">
-          <p class="sq-booking-sticky-bar__count">${escapeHtml(state.product.productName || "")}</p>
-          <p class="sq-booking-sticky-bar__meta">${formatMoney(total)}</p>
+        <div class="sq-booking-sticky-bar__info sq-booking-sticky-bar__info--with-thumb">
+          ${productThumbHtml("sq-product-thumb-inline sq-product-thumb-inline--sticky")}
+          <div>
+            <p class="sq-booking-sticky-bar__count">${escapeHtml(state.product.productName || "")}</p>
+            <p class="sq-booking-sticky-bar__meta">${formatMoney(total)}</p>
+          </div>
         </div>
         <button type="button" class="sq-booking-sticky-bar__cta" id="btnProductStickyCta" ${outOfStock ? "disabled" : ""}>
           ${escapeHtml(outOfStock ? t("productOutOfStock") : t("productBuyNow"))}
@@ -444,6 +456,13 @@
       stepsEl.innerHTML = `
         ${renderCheckoutSteps(2)}
         <div class="sq-booking-step">
+          <div class="sq-product-payment-card__row" style="margin-bottom:16px">
+            <div class="sq-product-payment-card__info">
+              ${productThumbHtml()}
+              <span>${escapeHtml(state.product?.productName || "")}</span>
+            </div>
+            <span>× ${state.quantity}</span>
+          </div>
           <h3 class="sq-booking-step__label">${escapeHtml(t("productDeliveryTitle"))}</h3>
           <p class="sq-booking-step__hint">${escapeHtml(t("productDeliveryHint"))}</p>
           ${cardsHtml ? `<div class="sq-product-address-list">${cardsHtml}</div>` : ""}
@@ -542,7 +561,10 @@
         <h3 class="sq-booking-step__label">${escapeHtml(t("productOrderTitle"))}</h3>
         <div class="sq-product-payment-card">
           <div class="sq-product-payment-card__row">
-            <span>${escapeHtml(state.product?.productName || "")}</span>
+            <div class="sq-product-payment-card__info">
+              ${productThumbHtml()}
+              <span>${escapeHtml(state.product?.productName || "")}</span>
+            </div>
             <span>× ${state.quantity}</span>
           </div>
           <div class="sq-product-summary">
