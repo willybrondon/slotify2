@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <rect width="1080" height="1920" fill="#111111"/>
+  <rect x="80" y="620" width="920" height="680" rx="28" fill="#ffffff"/>
+  <text x="140" y="740" font-family="Arial, Helvetica, sans-serif" font-size="42" fill="#9a9a9a">Paris 18 � Ch�teau Rouge</text>
+  <text x="140" y="830" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" fill="#111111">For Eve Hair</text>
+  <text x="140" y="930" font-family="Arial, Helvetica, sans-serif" font-size="52" fill="#111111">Knotless braids</text>
+  <text x="140" y="1040" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#c45c26">50 �</text>
+  <text x="400" y="1040" font-family="Arial, Helvetica, sans-serif" font-size="40" fill="#9a9a9a">� 45 min</text>
+  <text x="140" y="1160" font-family="Arial, Helvetica, sans-serif" font-size="36" fill="#9a9a9a">Donn�es Skedisy � 94 Rue Myrha</text>
+  <text x="140" y="1220" font-family="Arial, Helvetica, sans-serif" font-size="32" fill="#c45c26">skedisy.com</text>
+</svg>

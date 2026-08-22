@@ -1,0 +1,89 @@
+{
+  "test_id": "TEST-01-coiffeuse-18e",
+  "source": "https://skedisy.com/salon/for-eve-hair-salon-de-tresses-et-tissages-chteau-rouge-paris-18-69cc37",
+  "fetched_at": "2026-08-16",
+  "hook_fr": "Tu cherches une coiffeuse dans le 18e ?",
+  "format": "9:16",
+  "duration_sec_target": 20,
+  "character": {
+    "brand_name": "Skedisy Girl",
+    "story_name": "Maya",
+    "reference_file": "maya-ref-01.png",
+    "runway": "Gen-4 References — always attach maya-ref-01.png"
+  },
+  "location": {
+    "city": "Paris",
+    "arrondissement": "18e",
+    "neighborhood": "Château Rouge",
+    "map_label": "Paris → 18e",
+    "latitude": 48.886456,
+    "longitude": 2.348272,
+    "google_maps": "https://www.google.com/maps/search/?api=1&query=94+Rue+Myrha,+75018+Paris",
+    "openstreetmap": "https://www.openstreetmap.org/?mlat=48.886456&mlon=2.348272#map=17/48.886456/2.348272"
+  },
+  "salon": {
+    "name": "For Eve Hair - Salon de Tresses et Tissages à Château Rouge - Paris 18",
+    "short_name": "For Eve Hair",
+    "skedisy_url": "https://skedisy.com/salon/for-eve-hair-salon-de-tresses-et-tissages-chteau-rouge-paris-18-69cc37",
+    "address": "94 Rue Myrha, 75018 Paris, France",
+    "streetAddress": "94 Rue Myrha",
+    "addressLocality": "75018 Paris",
+    "about": "Salon For Eve Hair Coiffure Afro à Paris 18 Château Rouge",
+    "hours": "09:00 – 21:00 (lun–dim)",
+    "priceRange": "$$",
+    "aggregateRating": null,
+    "images": {
+      "main": "salon-exterior-for-eve-hair.png",
+      "alt": "salon-alt-for-eve-hair.png",
+      "source_main": "https://skedisy.com/storage/1774991182030for eve hair.png",
+      "source_alt": "https://skedisy.com/storage/1774992311527evehair.png"
+    }
+  },
+  "service_card": {
+    "service_name": "Knotless braids",
+    "category": "Tresses",
+    "price_eur": 50,
+    "duration_min": 45,
+    "rating": null,
+    "rating_display": null,
+    "slot_label": "À choisir dans l'app au moment du recording (ex. prochain samedi dispo)",
+    "display_lines": [
+      "For Eve Hair",
+      "Knotless braids",
+      "50 €",
+      "45 min",
+      "Paris 18 · Château Rouge"
+    ],
+    "note": "Prix et durée = données live Skedisy au 2026-08-16. Pas d'avis (aggregateRating null) → ne pas inventer d'étoiles."
+  },
+  "services_highlight_tresses": [
+    { "name": "Knotless braids", "price_eur": 50, "duration_min": 45 },
+    { "name": "Box braids", "price_eur": 50, "duration_min": 45 },
+    { "name": "Fulani braids", "price_eur": 50, "duration_min": 70 },
+    { "name": "Vanilles", "price_eur": 50, "duration_min": 60 },
+    { "name": "Twists", "price_eur": 50, "duration_min": 60 },
+    { "name": "Nattes collées", "price_eur": 45, "duration_min": 70 },
+    { "name": "Tissage", "price_eur": 55, "duration_min": 60 },
+    { "name": "Ghana braids", "price_eur": 50, "duration_min": 50 },
+    { "name": "Lemonade braids", "price_eur": 50, "duration_min": 60 },
+    { "name": "Stitch braids", "price_eur": 45, "duration_min": 30 }
+  ],
+  "assets_in_this_folder": [
+    "maya-ref-01.png",
+    "salon-exterior-for-eve-hair.png",
+    "salon-alt-for-eve-hair.png",
+    "skedisy-logo.png",
+    "DATA.json",
+    "services-for-eve-hair.json",
+    "services-tresses.json",
+    "PROMPTS.md",
+    "RUNWAY_STEPS.md",
+    "VOICEOVER.md",
+    "CAPTION.md"
+  ],
+  "cta": {
+    "logo_text": "SKEDISY",
+    "tagline": "Trouve. Compare. Réserve.",
+    "bio_hint": "Lien en bio · skedisy.com · app gratuite"
+  }
+}

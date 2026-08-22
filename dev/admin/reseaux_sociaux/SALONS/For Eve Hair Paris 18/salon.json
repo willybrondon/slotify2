@@ -1,0 +1,21 @@
+{
+  "name": "For Eve Hair - Salon de Tresses et Tissages à Château Rouge - Paris 18",
+  "short_name": "For Eve Hair",
+  "skedisy_url": "https://skedisy.com/salon/for-eve-hair-salon-de-tresses-et-tissages-chteau-rouge-paris-18-69cc37",
+  "address": "94 Rue Myrha, 75018 Paris, France",
+  "latitude": 48.886456,
+  "longitude": 2.348272,
+  "hours": "09:00-21:00 daily",
+  "aggregateRating": null,
+  "hero_service": {
+    "name": "Knotless braids",
+    "price_eur": 50,
+    "duration_min": 45,
+    "category": "Tresses"
+  },
+  "images": [
+    "exterior/for-eve-hair-main.png",
+    "exterior/for-eve-hair-alt.png"
+  ],
+  "services_file": "services.json"
+}

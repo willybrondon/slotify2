@@ -1,0 +1,14 @@
+{
+  "source": "dev/admin/salonportal/public/styles.css",
+  "palette_name": "Skedisy 3-colour",
+  "colors": {
+    "brand": "#c45c26",
+    "brand_hover": "#a84d1f",
+    "brand_bg": "#fdf6f0",
+    "black": "#111111",
+    "white": "#ffffff",
+    "gray_light": "#f2f2f2",
+    "gray_muted": "#9a9a9a"
+  },
+  "runway_style_prompt": "Premium French beauty grade using Skedisy palette: warm terracotta accent #c45c26, deep black #111111, clean white, soft cream undertones #fdf6f0, natural skin texture, no purple neon, no heavy glow"
+}
