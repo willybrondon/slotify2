@@ -1,0 +1,122 @@
+﻿[
+    {
+        "name":  "Box braids",
+        "price":  50,
+        "duration_min":  45,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Brushing  mouillé",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Brushing \u0026 Coiffage",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Brushing avec steampod",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Coiffure afro",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Coiffure cheveux caucasiens",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Coiffure corbeau lisse",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Création locks",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Dépose tissage",
+        "price":  50,
+        "duration_min":  50,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Fulani braids",
+        "price":  50,
+        "duration_min":  70,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Ghana braids",
+        "price":  50,
+        "duration_min":  50,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Knotless braids",
+        "price":  50,
+        "duration_min":  45,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Lemonade braids",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Nattes collées",
+        "price":  50,
+        "duration_min":  70,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Retwist",
+        "price":  50,
+        "duration_min":  80,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Stitch braids",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Tissage",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Tissage crochet",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Twists",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Vanilles",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    }
+]

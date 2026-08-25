@@ -1,0 +1,58 @@
+{
+  "test_id": "TEST-02-box-braids-13e",
+  "source": "https://skedisy.com/salon/coiffure-beaute-brasil-6885e2",
+  "fetched_at": "2026-08-22",
+  "hook_fr": "Tu cherches des box braids dans le 13e ?",
+  "format": "9:16",
+  "duration_sec_target": 20,
+  "character": {
+    "brand_name": "Skedisy Girl",
+    "story_name": "Maya",
+    "reference_file": "maya-ref-01.png",
+    "runway": "Gen-4 References — always attach maya-ref-01.png"
+  },
+  "location": {
+    "city": "Paris",
+    "arrondissement": "13e",
+    "neighborhood": "Saint-Marcel",
+    "metro": "Campo-Formio (ligne 5)",
+    "map_label": "Paris → 13e",
+    "latitude": 48.834886,
+    "longitude": 2.358379,
+    "google_maps": "https://www.google.com/maps/search/?api=1&query=137+boulevard+de+l'h%C3%B4pital,+75013+Paris"
+  },
+  "salon": {
+    "name": "Coiffure Beauté Brasil",
+    "short_name": "Coiffure Beauté Brasil",
+    "skedisy_url": "https://skedisy.com/salon/coiffure-beaute-brasil-6885e2",
+    "address": "137 boulevard de l'hôpital, 75013 Paris",
+    "about": "Salon mixte Paris 13, quartier Saint-Marcel",
+    "hours": "09:00 – 21:00 (lun–dim)",
+    "aggregateRating": { "ratingValue": 4.5, "reviewCount": 2 },
+    "images": {
+      "main": "salon-exterior-brasil.png",
+      "alt": "salon-alt-brasil.png"
+    }
+  },
+  "service_card": {
+    "service_name": "Box braids",
+    "category": "Tresses",
+    "price_eur": 50,
+    "duration_min": 45,
+    "rating": 4.5,
+    "rating_display": "4.5 · 2 avis",
+    "slot_label": "À choisir dans l'app au moment du recording",
+    "display_lines": [
+      "Coiffure Beauté Brasil",
+      "Box braids",
+      "50 €",
+      "45 min",
+      "⭐ 4.5 · Paris 13"
+    ]
+  },
+  "cta": {
+    "logo_text": "SKEDISY",
+    "tagline": "Trouve. Compare. Réserve."
+  },
+  "same_workflow_as": "TEST-01-coiffeuse-18e"
+}

@@ -26,6 +26,20 @@ import { toast } from "react-toastify";
 import Pagination from "../../extras/Pagination";
 
 
+const isBlank = (value) => value === "" || value === null || value === undefined;
+
+const parseOptionalInt = (value, fallback = 0) => {
+  if (isBlank(value)) return fallback;
+  const n = parseInt(value, 10);
+  return Number.isNaN(n) ? fallback : n;
+};
+
+const parseOptionalFloat = (value, fallback = 0) => {
+  if (isBlank(value)) return fallback;
+  const n = parseFloat(value);
+  return Number.isNaN(n) ? fallback : n;
+};
+
 const Setting = (props) => {
   const dispatch = useDispatch();
   const { setting } = useSelector((state) => state.setting);
@@ -154,44 +168,50 @@ const Setting = (props) => {
     e.preventDefault();
 
     if (
-      !privacyPolicyLink ||
-      !tnc ||
-      !stripePublishableKey ||
-      !stripeSecretKey ||
-      !razorPayId ||
-      !razorSecretKey ||
-      !tax ||
-      !currencyName ||
-      !currencySymbol ||
-      !flutterWaveKey ||
-      !firebaseKey || 
-      !adminCommissionCharges || 
-      !customerCommissionCharges ||
-      !salonCommissionCharges ||
-      !cancelOrderCharges
+      isBlank(privacyPolicyLink) ||
+      isBlank(tnc) ||
+      isBlank(stripePublishableKey) ||
+      isBlank(stripeSecretKey) ||
+      isBlank(razorPayId) ||
+      isBlank(razorSecretKey) ||
+      isBlank(tax) ||
+      isBlank(currencyName) ||
+      isBlank(currencySymbol) ||
+      isBlank(flutterWaveKey) ||
+      isBlank(firebaseKey) ||
+      isBlank(adminCommissionCharges) ||
+      isBlank(customerCommissionCharges) ||
+      isBlank(salonCommissionCharges) ||
+      isBlank(cancelOrderCharges) ||
+      isBlank(minWithdrawalRequestedAmount)
     ) {
       let error = {};
-      if (!privacyPolicyLink)
+      if (isBlank(privacyPolicyLink))
         error.privacyPolicyLink = ui.settings.privacyPolicyRequired;
-      if (!tnc) error.tnc = ui.settings.tncRequired;
-      if (!stripePublishableKey)
+      if (isBlank(tnc)) error.tnc = ui.settings.tncRequired;
+      if (isBlank(stripePublishableKey))
         error.stripePublishableKey = ui.settings.stripePublishableRequired;
-      if (!stripeSecretKey)
+      if (isBlank(stripeSecretKey))
         error.stripeSecretKey = ui.settings.stripeSecretRequired;
-      if (!razorPayId) error.razorPayId = ui.settings.razorIdRequired;
-      if (!razorSecretKey)
+      if (isBlank(razorPayId)) error.razorPayId = ui.settings.razorIdRequired;
+      if (isBlank(razorSecretKey))
         error.razorSecretKey = ui.settings.razorSecretRequired;
-      if (!tax) error.tax = ui.settings.taxRequired;
-      if (!currencyName) error.currencyName = ui.settings.currencyNameRequired;
-      if (!currencySymbol) error.currencySymbol = ui.settings.currencySymbolRequired;
-      if (!flutterWaveKey)
+      if (isBlank(tax)) error.tax = ui.settings.taxRequired;
+      if (isBlank(currencyName)) error.currencyName = ui.settings.currencyNameRequired;
+      if (isBlank(currencySymbol)) error.currencySymbol = ui.settings.currencySymbolRequired;
+      if (isBlank(flutterWaveKey))
         error.flutterWaveKey = ui.settings.flutterWaveRequired;
-      if (!firebaseKey) error.firebaseKey = ui.settings.firebaseRequired;
-      if (!adminCommissionCharges) error.commissionPerProductQuantity = ui.settings.adminCommissionRequired;
-      if (!customerCommissionCharges) error.customerCommissionCharges = ui.settings.customerCommissionRequired;
-      if (!salonCommissionCharges) error.salonCommissionCharges = ui.settings.salonCommissionRequired;
-      if (!cancelOrderCharges) error.cancelOrderCharges = ui.settings.cancelOrderRequired;
-      if (!minWithdrawalRequestedAmount) error.minWithdrawalRequestedAmount = ui.settings.minWithdrawRequired;
+      if (isBlank(firebaseKey)) error.firebaseKey = ui.settings.firebaseRequired;
+      if (isBlank(adminCommissionCharges))
+        error.adminCommissionCharges = ui.settings.adminCommissionRequired;
+      if (isBlank(customerCommissionCharges))
+        error.customerCommissionCharges = ui.settings.customerCommissionRequired;
+      if (isBlank(salonCommissionCharges))
+        error.salonCommissionCharges = ui.settings.salonCommissionRequired;
+      if (isBlank(cancelOrderCharges))
+        error.cancelOrderCharges = ui.settings.cancelOrderRequired;
+      if (isBlank(minWithdrawalRequestedAmount))
+        error.minWithdrawalRequestedAmount = ui.settings.minWithdrawRequired;
       return setError({ ...error });
     } else {
       const data = {
@@ -209,18 +229,18 @@ const Setting = (props) => {
         mtnMomoSecondaryKey,
         razorPayId,
         razorSecretKey,
-        tax,
+        tax: parseOptionalInt(tax, 0),
         currencyName,
         currencySymbol,
         flutterWaveKey,
         firebaseKey,
-        minWithdrawalRequestedAmount,
-        minSalonWalletBalance,
+        minWithdrawalRequestedAmount: parseOptionalInt(minWithdrawalRequestedAmount, 0),
+        minSalonWalletBalance: parseOptionalFloat(minSalonWalletBalance, 0),
+        cancelOrderCharges: parseOptionalInt(cancelOrderCharges, 0),
+        adminCommissionCharges: parseOptionalInt(adminCommissionCharges, 0),
+        customerCommissionCharges: parseOptionalFloat(customerCommissionCharges, 0),
+        salonCommissionCharges: parseOptionalFloat(salonCommissionCharges, 0),
         reservationNotificationEmails,
-        cancelOrderCharges,
-        adminCommissionCharges,
-        customerCommissionCharges,
-        salonCommissionCharges
       };
       const payload = { data: data, id: setting?._id };
       await dispatch(updateSetting(payload)).unwrap();
@@ -964,7 +984,7 @@ const Setting = (props) => {
                           placeholder={ui.settings.taxPh}
                           onChange={(e) => {
                             setTax(e.target.value);
-                            if (!e.target.value) {
+                            if (isBlank(e.target.value)) {
                               return setError({
                                 ...error,
                                 tax: ui.settings.taxRequired,
@@ -1068,7 +1088,7 @@ const Setting = (props) => {
                           placeholder={ui.settings.cancelOrderPh}
                           onChange={(e) => {
                             setCancelOrderCharges(e.target.value);
-                            if (!e.target.value) {
+                            if (isBlank(e.target.value)) {
                               return setError({
                                 ...error,
                                 cancelOrderCharges: ui.settings.cancelOrderRequired,
@@ -1101,7 +1121,7 @@ const Setting = (props) => {
                           placeholder={ui.settings.adminCommissionPh}
                           onChange={(e) => {
                             setAdminCommissionCharges(e.target.value);
-                            if (!e.target.value) {
+                            if (isBlank(e.target.value)) {
                               return setError({
                                 ...error,
                                 adminCommissionCharges: ui.settings.adminCommissionRequired,
@@ -1137,7 +1157,7 @@ const Setting = (props) => {
                           placeholder={ui.settings.customerCommissionPh}
                           onChange={(e) => {
                             setCustomerCommissionCharges(e.target.value);
-                            if (!e.target.value) {
+                            if (isBlank(e.target.value)) {
                               return setError({
                                 ...error,
                                 customerCommissionCharges: ui.settings.customerCommissionRequired,
@@ -1173,7 +1193,7 @@ const Setting = (props) => {
                           placeholder={ui.settings.salonCommissionPh}
                           onChange={(e) => {
                             setSalonCommissionCharges(e.target.value);
-                            if (!e.target.value) {
+                            if (isBlank(e.target.value)) {
                               return setError({
                                 ...error,
                                 salonCommissionCharges: ui.settings.salonCommissionRequired,
@@ -1409,7 +1429,7 @@ const Setting = (props) => {
                           placeholder={ui.settings.minWithdrawPh}
                           onChange={(e) => {
                             setMinWithdrawalRequestedAmount(e.target.value);
-                            if (!e.target.value) {
+                            if (isBlank(e.target.value)) {
                               return setError({
                                 ...error,
                                 minWithdrawalRequestedAmount: ui.settings.minWithdrawRequired,
@@ -1417,7 +1437,7 @@ const Setting = (props) => {
                             } else {
                               return setError({
                                 ...error,
-                                razorSecretKey: "",
+                                minWithdrawalRequestedAmount: "",
                               });
                             }
                           }}

@@ -1,0 +1,350 @@
+﻿[
+    {
+        "name":  "Épilation aisselles",
+        "price":  50,
+        "duration_min":  35,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Épilation sourcils",
+        "price":  45,
+        "duration_min":  35,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Épilation visage",
+        "price":  50,
+        "duration_min":  50,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Esthétique - Dépose ongles",
+        "price":  50,
+        "duration_min":  40,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Esthétique - French",
+        "price":  50,
+        "duration_min":  50,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Fil au visage",
+        "price":  50,
+        "duration_min":  35,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Gommage visage",
+        "price":  50,
+        "duration_min":  35,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Maillot brésilien",
+        "price":  45,
+        "duration_min":  40,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Manicure gel",
+        "price":  45,
+        "duration_min":  60,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Pédicure sèche",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Esthétique"
+    },
+    {
+        "name":  "Bain Parffine",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Barbe + coupe",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Contour barbe",
+        "price":  50,
+        "duration_min":  40,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Coupe afro",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Coupe fade",
+        "price":  46,
+        "duration_min":  50,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Masque hydratant",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Microdermabrasion",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Nattes homme",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Rasage barbe",
+        "price":  50,
+        "duration_min":  40,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Skin fade",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Taille barbe",
+        "price":  35,
+        "duration_min":  30,
+        "category":  "Homme"
+    },
+    {
+        "name":  "Dépose locks",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Entretien locks",
+        "price":  50,
+        "duration_min":  70,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Enveloppements corps",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Epilation",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Épilation",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Faux locks",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Gommage \u0026 Pollisage",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Jacuzzi",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Massage",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Massage femme enceinte",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Starter locs",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Locks"
+    },
+    {
+        "name":  "Coiffure mariée",
+        "price":  50,
+        "duration_min":  45,
+        "category":  "Perruques"
+    },
+    {
+        "name":  "Couture perruque",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Perruques"
+    },
+    {
+        "name":  "Dépose perruque",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Perruques"
+    },
+    {
+        "name":  "Lace front",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Perruques"
+    },
+    {
+        "name":  "Pose closure",
+        "price":  50,
+        "duration_min":  90,
+        "category":  "Perruques"
+    },
+    {
+        "name":  "Pose perruque",
+        "price":  50,
+        "duration_min":  55,
+        "category":  "Perruques"
+    },
+    {
+        "name":  "Box braids",
+        "price":  50,
+        "duration_min":  45,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Brushing  mouillé",
+        "price":  54,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Brushing \u0026 Coiffage",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Brushing avec steampod",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Coiffure afro",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Coiffure cheveux caucasiens",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Coiffure corbeau lisse",
+        "price":  50,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Création locks",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Dépose tissage",
+        "price":  50,
+        "duration_min":  50,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Fulani braids",
+        "price":  45,
+        "duration_min":  70,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Ghana braids",
+        "price":  45,
+        "duration_min":  50,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Knotless braids",
+        "price":  54,
+        "duration_min":  45,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Lemonade braids",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Nattes collées",
+        "price":  45,
+        "duration_min":  70,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Retwist",
+        "price":  50,
+        "duration_min":  80,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Stitch braids",
+        "price":  45,
+        "duration_min":  30,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Tissage",
+        "price":  45,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Tissage crochet",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Twists",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    },
+    {
+        "name":  "Vanilles",
+        "price":  50,
+        "duration_min":  60,
+        "category":  "Tresses"
+    }
+]

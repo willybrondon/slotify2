@@ -6,7 +6,7 @@ const OTP = require("../../models/otp.model");
 const User = require("../../models/user.model");
 
 const sgMail = require('@sendgrid/mail');
-const { wrapOtpEmailHtml } = require("../../lib/otpEmailAutofill");
+const { wrapOtpEmailHtml, otpAutofillPlainLine, otpEmailSubject } = require("../../lib/otpEmailAutofill");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Rate limit: 60 seconds between OTP emails per email address
@@ -54,10 +54,12 @@ exports.store = async (req, res) => {
       code: String(newOtp),
     });
 
+    const codeStr = String(newOtp);
     const msg = {
       to: req.query.email,
       from: process.env.EMAIL,
-      subject: `Sending Email from ${process.env.projectName} for Password Security`,
+      subject: otpEmailSubject(codeStr),
+      text: otpAutofillPlainLine(codeStr),
       html: tab,
     };
 
@@ -110,10 +112,12 @@ exports.otplogin = async (req, res) => {
       code: String(newOtp),
     });
 
+    const codeStr = String(newOtp);
     const msg = {
       to: req.query.email,
       from: process.env.EMAIL,
-      subject: `Sending Email from ${process.env.projectName}`,
+      subject: otpEmailSubject(codeStr),
+      text: otpAutofillPlainLine(codeStr),
       html: tab,
     };
 

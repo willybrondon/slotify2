@@ -3,7 +3,7 @@ const GuestOTP = require("../../models/guestOtp.model");
 const User = require("../../models/user.model");
 const { LOGIN_TYPE } = require("../../types/constant");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
-const { wrapOtpEmailHtml } = require("../../lib/otpEmailAutofill");
+const { wrapOtpEmailHtml, otpAutofillPlainLine, otpEmailSubject } = require("../../lib/otpEmailAutofill");
 
 const OTP_RATE_LIMIT_MS = 60 * 1000;
 
@@ -132,10 +132,12 @@ exports.sendOtp = async (req, res) => {
       code: String(newOtp),
     });
 
+    const codeStr = String(newOtp);
     await sgMail.send({
       to: email,
       from: process.env.EMAIL,
-      subject: `${process.env.projectName || "Booking"} — your verification code`,
+      subject: otpEmailSubject(codeStr),
+      text: otpAutofillPlainLine(codeStr),
       html,
     });
 

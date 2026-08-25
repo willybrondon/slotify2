@@ -1,0 +1,14 @@
+{
+  "name": "Coiffure Beauté Brasil",
+  "skedisy_url": "https://skedisy.com/salon/coiffure-beaute-brasil-6885e2",
+  "address": "137 boulevard de l'hôpital, 75013 Paris",
+  "latitude": 48.834886,
+  "longitude": 2.358379,
+  "aggregateRating": { "ratingValue": 4.5, "reviewCount": 2 },
+  "hero_service": {
+    "name": "Box braids",
+    "price_eur": 50,
+    "duration_min": 45,
+    "category": "Tresses"
+  }
+}

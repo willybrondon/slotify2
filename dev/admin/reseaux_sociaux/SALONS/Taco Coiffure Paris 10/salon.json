@@ -1,0 +1,15 @@
+{
+  "name": "Taco coiffure",
+  "skedisy_url": "https://skedisy.com/salon/taco-coiffure-69c99f",
+  "address": "56 Bd de Strasbourg, 75010 Paris",
+  "latitude": 48.873454,
+  "longitude": 2.356805,
+  "aggregateRating": null,
+  "hero_service": {
+    "name": "Knotless braids",
+    "price_eur": 54,
+    "duration_min": 45,
+    "category": "Tresses"
+  },
+  "images": ["exterior/taco-salon-1.png"]
+}

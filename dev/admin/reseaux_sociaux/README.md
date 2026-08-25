@@ -117,8 +117,11 @@ Références visuelles pour prompts Runway / tournage.
 
 ## 6. REELS (storyboards)
 
-**Test #1 (commencer ici) :** `REELS/TEST-01-coiffeuse-18e/`  
-→ Hook *Tu cherches une coiffeuse dans le 18e ?* · salon **For Eve Hair** (vrai) · steps Runway dans `RUNWAY_STEPS.md`
+**Test #1 :** `REELS/TEST-01-coiffeuse-18e/` — For Eve Hair · Paris 18 · Knotless 50 €  
+**Test #2 :** `REELS/TEST-02-box-braids-13e/` — Coiffure Beauté Brasil · Paris 13 · Box braids 50 € · ⭐ 4.5  
+**Test #3 :** `REELS/TEST-03-knotless-10e/` — Taco coiffure · Paris 10 · Knotless 54 €  
+
+Chaque dossier contient : `DATA.json` · `RUNWAY_STEPS.md` · `PROMPTS.md` · `VOICEOVER.md` · `CAPTION.md` · assets Runway.
 
 Template knotless générique : `REELS/20s-knotless-18e/BRIEF.md`
 

@@ -1,5 +1,18 @@
 const Setting = require("../../models/setting.model");
 
+/** Accept 0 — do not use truthy checks on numeric settings. */
+const parseOptionalInt = (value, fallback) => {
+  if (value === undefined || value === null || value === "") return fallback;
+  const n = parseInt(value, 10);
+  return Number.isNaN(n) ? fallback : n;
+};
+
+const parseOptionalFloat = (value, fallback) => {
+  if (value === undefined || value === null || value === "") return fallback;
+  const n = parseFloat(value);
+  return Number.isNaN(n) ? fallback : n;
+};
+
 exports.get = async (req, res) => {
   try {
     const setting = await Setting.findOne().sort({ createdAt: -1 });
@@ -28,14 +41,35 @@ exports.update = async (req, res) => {
       return res.status(200).send({ status: false, message: "Setting Not Exist" });
     }
 
-    setting.minWithdrawalRequestedAmount = req.body.minWithdrawalRequestedAmount ? parseInt(req.body.minWithdrawalRequestedAmount) : setting.minWithdrawalRequestedAmount;
-    setting.minSalonWalletBalance = req.body.minSalonWalletBalance ? parseFloat(req.body.minSalonWalletBalance) : setting.minSalonWalletBalance;
-    setting.minUserWalletBalance = req.body.minUserWalletBalance ? parseFloat(req.body.minUserWalletBalance) : setting.minUserWalletBalance;
-    setting.tax = req.body.tax ? parseInt(req.body.tax) : setting.tax;
-    setting.adminCommissionCharges = req.body.adminCommissionCharges ? parseInt(req.body.adminCommissionCharges) : setting.adminCommissionCharges;
-    setting.customerCommissionCharges = req.body.customerCommissionCharges ? parseFloat(req.body.customerCommissionCharges) : setting.customerCommissionCharges;
-    setting.salonCommissionCharges = req.body.salonCommissionCharges ? parseFloat(req.body.salonCommissionCharges) : setting.salonCommissionCharges;
-    setting.cancelOrderCharges = req.body.cancelOrderCharges ? parseInt(req.body.cancelOrderCharges) : setting.cancelOrderCharges;
+    setting.minWithdrawalRequestedAmount = parseOptionalInt(
+      req.body.minWithdrawalRequestedAmount,
+      setting.minWithdrawalRequestedAmount
+    );
+    setting.minSalonWalletBalance = parseOptionalFloat(
+      req.body.minSalonWalletBalance,
+      setting.minSalonWalletBalance
+    );
+    setting.minUserWalletBalance = parseOptionalFloat(
+      req.body.minUserWalletBalance,
+      setting.minUserWalletBalance
+    );
+    setting.tax = parseOptionalInt(req.body.tax, setting.tax);
+    setting.adminCommissionCharges = parseOptionalInt(
+      req.body.adminCommissionCharges,
+      setting.adminCommissionCharges
+    );
+    setting.customerCommissionCharges = parseOptionalFloat(
+      req.body.customerCommissionCharges,
+      setting.customerCommissionCharges
+    );
+    setting.salonCommissionCharges = parseOptionalFloat(
+      req.body.salonCommissionCharges,
+      setting.salonCommissionCharges
+    );
+    setting.cancelOrderCharges = parseOptionalInt(
+      req.body.cancelOrderCharges,
+      setting.cancelOrderCharges
+    );
 
     setting.tnc = req.body.tnc ? req.body.tnc : setting.tnc;
     setting.privacyPolicyLink = req.body.privacyPolicyLink ? req.body.privacyPolicyLink : setting.privacyPolicyLink;
