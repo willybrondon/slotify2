@@ -367,6 +367,15 @@ app.get("/salon/claim", (req, res) => {
   res.sendFile(filePath);
 });
 
+// Ad / organic landing: same 3-step self-register page (cleaner URL for Meta ads)
+app.get(["/salon/rejoindre", "/rejoindre"], (req, res) => {
+  const filePath = path.join(__dirname, "public", "salon-claim.html");
+  if (!fs.existsSync(filePath)) {
+    return res.redirect(302, "/salon/claim");
+  }
+  res.sendFile(path.resolve(filePath));
+});
+
 // Public web route for salon pages (for sharing and deep linking)
 // New format: /salon/slug-shortId (e.g., /salon/coiffure-beaute-brasil-6885e2)
 const salonController = require("./controller/user/salon.controller");

@@ -487,3 +487,160 @@ exports.bulkSendInvitations = async (req, res) => {
   }
 };
 
+/**
+ * Public self-registration for ads / organic signup (3-step form).
+ * Creates an active claimed salon so the owner can log into the salon panel.
+ * POST /salon/self-register
+ * Body: { name, mobile, city, email, password, address, about?, utmSource?, utmMedium?, utmCampaign? }
+ */
+exports.selfRegister = async (req, res) => {
+  try {
+    const name = String(req.body?.name || "").trim();
+    const mobile = String(req.body?.mobile || "").trim();
+    const city = String(req.body?.city || "").trim();
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const password = String(req.body?.password || "");
+    const address = String(req.body?.address || "").trim();
+    const about = String(req.body?.about || "").trim();
+    const utmSource = String(req.body?.utmSource || "").trim();
+    const utmMedium = String(req.body?.utmMedium || "").trim();
+    const utmCampaign = String(req.body?.utmCampaign || "").trim();
+
+    if (!name || !mobile || !city || !email || !password || !address) {
+      return res.status(200).json({
+        status: false,
+        message: "Nom du salon, téléphone, ville, e-mail, mot de passe et adresse sont requis.",
+      });
+    }
+
+    if (!email.includes("@")) {
+      return res.status(200).json({
+        status: false,
+        message: "Adresse e-mail invalide.",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(200).json({
+        status: false,
+        message: "Le mot de passe doit contenir au moins 6 caractères.",
+      });
+    }
+
+    const existing = await Salon.findOne({
+      isDelete: false,
+      $or: [{ email }, { mobile }],
+    });
+
+    if (existing) {
+      if (existing.email === email) {
+        return res.status(200).json({
+          status: false,
+          message: existing.isClaimed
+            ? "Cet e-mail est déjà utilisé. Connectez-vous à votre espace salon."
+            : "Ce salon existe déjà sur Skedisy. Utilisez le lien d'invitation pour le réclamer.",
+        });
+      }
+      return res.status(200).json({
+        status: false,
+        message: "Ce numéro de téléphone est déjà associé à un salon.",
+      });
+    }
+
+    const capitalize = (str) => {
+      const s = String(str || "").trim();
+      if (!s) return "";
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+
+    let uniqueId;
+    let isUnique = false;
+    while (!isUnique) {
+      uniqueId = Math.floor(Math.random() * 10000000) + 100000;
+      const clash = await Salon.findOne({ uniqueId });
+      isUnique = !clash;
+    }
+
+    const baseURL = (process.env.baseURL || "").replace(/\/?$/, "/");
+    const defaultImage = `${baseURL}storage/male.png`;
+
+    const sourceParts = ["self_register"];
+    if (utmSource) sourceParts.push(utmSource);
+    if (utmMedium) sourceParts.push(utmMedium);
+    if (utmCampaign) sourceParts.push(utmCampaign);
+
+    const defaultSalonTime = {
+      openTime: "09:00 AM",
+      closedTime: "07:00 PM",
+      isActive: true,
+      breakStartTime: "01:00 PM",
+      breakEndTime: "02:00 PM",
+      time: 15,
+      isBreak: true,
+    };
+
+    const salon = new Salon();
+    salon.name = name;
+    salon.email = email;
+    salon.mobile = mobile;
+    salon.password = password;
+    salon.uniqueId = uniqueId;
+    salon.addressDetails = {
+      addressLine1: capitalize(address),
+      landMark: capitalize(city),
+      city: capitalize(city),
+      state: "Île-de-France",
+      country: "France",
+    };
+    salon.locationCoordinates = { latitude: "", longitude: "" };
+    salon.about =
+      about ||
+      `${name} — salon partenaire Skedisy à ${capitalize(city)}.`;
+    salon.platformFee = 0;
+    salon.wallet = 0;
+    salon.minWalletBalance = 0;
+    salon.paymentMethods = { acceptCash: true, acceptStripe: false };
+    salon.image = [defaultImage];
+    salon.mainImage = defaultImage;
+    salon.isActive = true;
+    salon.isDelete = false;
+    salon.isClaimed = true;
+    salon.claimToken = "";
+    salon.source = sourceParts.join(":");
+    salon.autoConfirmBookings = true;
+    salon.salonTime = [
+      { day: "Monday", ...defaultSalonTime },
+      { day: "Tuesday", ...defaultSalonTime },
+      { day: "Wednesday", ...defaultSalonTime },
+      { day: "Thursday", ...defaultSalonTime },
+      { day: "Friday", ...defaultSalonTime },
+      { day: "Saturday", ...defaultSalonTime },
+      { day: "Sunday", ...defaultSalonTime, isActive: false },
+    ];
+
+    await salon.save();
+
+    console.log(
+      `[SelfRegister] Salon created: ${salon.name} (${salon.email}) source=${salon.source}`
+    );
+
+    return res.status(200).json({
+      status: true,
+      message: "Salon créé avec succès ! Vous pouvez vous connecter.",
+      data: {
+        salonId: salon._id,
+        name: salon.name,
+        email: salon.email,
+        isActive: salon.isActive,
+        isClaimed: salon.isClaimed,
+      },
+    });
+  } catch (error) {
+    console.error("[SelfRegister] error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+

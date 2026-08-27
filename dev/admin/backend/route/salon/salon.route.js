@@ -16,6 +16,9 @@ route.post("/login", checkAccessWithSecretKey(), salonController.login);
 // Salon claim endpoint (public - no auth required for claiming)
 route.post("/claim", claimController.claimSalon);
 
+// Public self-registration (ads / 3-step join — no auth)
+route.post("/self-register", claimController.selfRegister);
+
 route.get("/profile", salon, checkAccessWithSecretKey(), salonController.profile);
 
 route.patch("/update", salon, upload.fields([{ name: "image", maxCount: 10 }, { name: "mainImage" }, { name: "heroImage" }]), checkAccessWithSecretKey(), salonController.update);
