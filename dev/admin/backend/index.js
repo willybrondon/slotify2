@@ -155,226 +155,36 @@ app.get(["/blog", "/blog/", "/blog.html"], (req, res) => {
   }
 });
 
-// Public web route for salon claim page
-app.get("/salon/claim", (req, res) => {
-  const filePath = path.join(__dirname, "public", "salon-claim.html");
-  
-  // Check if file exists, if not serve inline HTML
-  if (!fs.existsSync(filePath)) {
-    console.warn(`[Salon Claim] File not found at ${filePath}, serving inline HTML`);
-    // Serve the HTML inline as fallback
-    return res.send(`
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Réclamer votre salon - Skedisy</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --sk-black: #111111;
-            --sk-white: #ffffff;
-            --sk-brand: #c45c26;
-            --sk-brand-light: rgba(196, 92, 38, 0.14);
-            --sk-btn: #111111;
-            --sk-btn-hover: #333333;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--sk-black);
-            background: linear-gradient(180deg, rgba(196, 92, 38, 0.32) 0%, rgba(196, 92, 38, 0.1) 14%, var(--sk-black) 38%, var(--sk-black) 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: var(--sk-white);
-        }
-        .container {
-            background: var(--sk-white);
-            border-radius: 20px;
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
-            max-width: 500px;
-            width: 100%;
-            padding: 40px;
-        }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo .kicker {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--sk-brand);
-            margin-bottom: 0.65rem;
-        }
-        .logo h1 { color: var(--sk-black); font-size: 32px; margin-bottom: 10px; font-weight: 700; }
-        .logo p { color: rgba(17, 17, 17, 0.62); font-size: 14px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: var(--sk-black); font-weight: 600; font-size: 14px; }
-        input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid rgba(17, 17, 17, 0.12);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            background: var(--sk-white);
-            color: var(--sk-black);
-        }
-        input:focus { outline: none; border-color: var(--sk-brand); }
-        .error { background: #fee; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
-        .success { background: #efe; color: #3c3; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--sk-btn);
-            color: var(--sk-white);
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(17, 17, 17, 0.25); background: var(--sk-btn-hover); }
-        .btn:active { transform: translateY(0); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .loading { display: none; text-align: center; margin-top: 20px; }
-        .spinner {
-            border: 3px solid rgba(17, 17, 17, 0.08);
-            border-top: 3px solid var(--sk-brand);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .info {
-            background: var(--sk-brand-light);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: rgba(17, 17, 17, 0.72);
-            border-left: 3px solid var(--sk-brand);
-        }
-        .info strong { color: var(--sk-brand); }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <p class="kicker">Skedisy · Espace pro</p>
-            <h1>Bienvenue sur Skedisy</h1>
-            <p>Réclamez votre profil salon</p>
-        </div>
-        <div class="error" id="error"></div>
-        <div class="success" id="success"></div>
-        <div class="info">
-            <strong>Votre salon a été ajouté sur Skedisy!</strong><br>
-            Créez un mot de passe pour réclamer votre profil et commencer à gérer vos réservations en ligne.
-        </div>
-        <form id="claimForm">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required readonly>
-            </div>
-            <div class="form-group">
-                <label for="password">Nouveau mot de passe</label>
-                <input type="password" id="password" name="password" required minlength="6" placeholder="Minimum 6 caractères">
-            </div>
-            <div class="form-group">
-                <label for="confirmPassword">Confirmer le mot de passe</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Répétez le mot de passe">
-            </div>
-            <button type="submit" class="btn" id="submitBtn">Réclamer mon profil</button>
-        </form>
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p style="margin-top: 10px; color: rgba(17, 17, 17, 0.62);">Traitement en cours...</p>
-        </div>
-    </div>
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const email = urlParams.get('email');
-        if (!token || !email) {
-            document.getElementById('error').textContent = 'Lien invalide. Veuillez utiliser le lien fourni dans votre email.';
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('claimForm').style.display = 'none';
-        } else {
-            document.getElementById('email').value = decodeURIComponent(email);
-        }
-        document.getElementById('claimForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            if (password !== confirmPassword) {
-                document.getElementById('error').textContent = 'Les mots de passe ne correspondent pas.';
-                document.getElementById('error').style.display = 'block';
-                return;
-            }
-            if (password.length < 6) {
-                document.getElementById('error').textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
-                document.getElementById('error').style.display = 'block';
-                return;
-            }
-            document.getElementById('error').style.display = 'none';
-            document.getElementById('success').style.display = 'none';
-            document.getElementById('claimForm').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
-            try {
-                const baseURL = window.location.origin;
-                const apiURL = \`\${baseURL}/salon/claim\`;
-                console.log('[Claim Form] Attempting to claim salon...');
-                console.log('[Claim Form] API URL:', apiURL);
-                console.log('[Claim Form] Token:', token ? token.substring(0, 10) + '...' : 'missing');
-                console.log('[Claim Form] Email:', decodeURIComponent(email));
-                const response = await fetch(apiURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: token, email: decodeURIComponent(email), password: password })
-                });
-                const data = await response.json();
-                if (data.status === true) {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('success').textContent = '✅ Profil réclamé avec succès! Vous pouvez maintenant vous connecter.';
-                    document.getElementById('success').style.display = 'block';
-                    setTimeout(() => { window.location.href = '/salonpanel/login'; }, 3000);
-                } else {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('error').textContent = data.message || 'Une erreur est survenue. Veuillez réessayer.';
-                    document.getElementById('error').style.display = 'block';
-                    document.getElementById('claimForm').style.display = 'block';
-                }
-            } catch (error) {
-                console.error('[Claim Form] Fetch error:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').textContent = 'Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('claimForm').style.display = 'block';
-            }
-        });
-    </script>
-</body>
-</html>
-    `);
-  }
-  
-  res.sendFile(filePath);
-});
+// Public salon onboarding: claim (token) OR 3-step self-register (ads)
+const salonOnboardingHtml = require("./lib/salonOnboardingHtml");
 
-// Ad / organic landing: same 3-step self-register page (cleaner URL for Meta ads)
-app.get(["/salon/rejoindre", "/rejoindre"], (req, res) => {
+function serveSalonOnboardingPage(req, res) {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+
   const filePath = path.join(__dirname, "public", "salon-claim.html");
-  if (!fs.existsSync(filePath)) {
-    return res.redirect(302, "/salon/claim");
+  try {
+    if (fs.existsSync(filePath)) {
+      const fromDisk = fs.readFileSync(filePath, "utf8");
+      // Prefer disk only if it has the 3-step register flow (avoids stale prod file / old inline)
+      if (fromDisk.includes('id="registerMode"')) {
+        return res.type("html").send(fromDisk);
+      }
+      console.warn(
+        `[Salon Onboarding] Stale salon-claim.html at ${filePath} — serving bundled 3-step page`
+      );
+    } else {
+      console.warn(`[Salon Onboarding] Missing ${filePath} — serving bundled 3-step page`);
+    }
+  } catch (err) {
+    console.warn("[Salon Onboarding] Could not read salon-claim.html:", err.message);
   }
-  res.sendFile(path.resolve(filePath));
-});
+
+  return res.type("html").send(salonOnboardingHtml);
+}
+
+app.get(["/salon/claim", "/salon/rejoindre", "/rejoindre"], serveSalonOnboardingPage);
 
 // Public web route for salon pages (for sharing and deep linking)
 // New format: /salon/slug-shortId (e.g., /salon/coiffure-beaute-brasil-6885e2)
