@@ -20,20 +20,20 @@ function Table(props) {
     }
   };
 
-  const sortedData =
-    data?.length > 0 &&
-    [...data]?.sort((a, b) => {
-      const valueA = a[sortColumn];
-      const valueB = b[sortColumn];
+  const sortedData = Array.isArray(data) && data.length > 0
+    ? [...data].sort((a, b) => {
+        const valueA = a[sortColumn];
+        const valueB = b[sortColumn];
 
-      if (valueA < valueB) {
-        return sortOrder === "asc" ? -1 : 1;
-      }
-      if (valueA > valueB) {
-        return sortOrder === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
+        if (valueA < valueB) {
+          return sortOrder === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortOrder === "asc" ? 1 : -1;
+        }
+        return 0;
+      })
+    : [];
 
   const handleClick = (value) => {
     // Replace with your actual value

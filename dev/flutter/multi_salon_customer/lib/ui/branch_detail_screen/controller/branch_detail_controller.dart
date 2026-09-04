@@ -64,17 +64,26 @@ class BranchDetailController extends GetxController
   String activeServiceCategory = 'all';
 
   @override
-  void onInit() async {
+  void onInit() {
+    super.onInit();
     tabController = TabController(initialIndex: 0, length: 6, vsync: this);
+    _loadSalonDetail();
+  }
 
-    await getDataFromArgs();
+  Future<void> _loadSalonDetail() async {
+    getDataFromArgs();
+    final id = salonId?.trim() ?? "";
+    if (id.isEmpty) {
+      log("Branch Detail - Missing salonId, skip API");
+      isLoading(false);
+      update([Constant.idProgressView, Constant.idServiceList]);
+      return;
+    }
     await onGetSalonDetailApiCall(
-        salonId: salonId ?? "",
+        salonId: id,
         latitude: localLatitude ?? 0.0,
         longitude: localLongitude ?? 0.0);
     _applyDeepLinkServicePreselection();
-
-    super.onInit();
   }
 
   getDataFromArgs() {
@@ -86,18 +95,24 @@ class BranchDetailController extends GetxController
     deepLinkServiceId = null;
     deepLinkVenuePreference = null;
 
-    if (args != null) {
+    if (args is String && args.toString().trim().isNotEmpty) {
+      salonId = args.toString().trim();
+    } else if (args is List && args.isNotEmpty) {
       if (args[0] != null) {
-        salonId = args[0];
+        salonId = args[0].toString().trim();
       }
       if (args.length > 1 && args[1] != null) {
-        localCity = args[1];
+        localCity = args[1].toString();
       }
       if (args.length > 2 && args[2] != null) {
-        localLatitude = args[2];
+        localLatitude = args[2] is num
+            ? (args[2] as num).toDouble()
+            : double.tryParse(args[2].toString());
       }
       if (args.length > 3 && args[3] != null) {
-        localLongitude = args[3];
+        localLongitude = args[3] is num
+            ? (args[3] as num).toDouble()
+            : double.tryParse(args[3].toString());
       }
       if (args.length > 4 && args[4] != null) {
         final s = args[4].toString().trim();
@@ -108,6 +123,9 @@ class BranchDetailController extends GetxController
         deepLinkVenuePreference =
             (v == 'At Salon' || v == 'At Home') ? v : null;
       }
+    } else if (args is Map) {
+      salonId = args["salonId"]?.toString().trim();
+      localCity = args["city"]?.toString();
     }
 
     // Fallback to global values if not provided in arguments
@@ -256,11 +274,11 @@ class BranchDetailController extends GetxController
       getSalonDetailCategory = null;
       update([Constant.idProgressView, Constant.idServiceList]);
 
-      final queryParameters = {
+      final queryParameters = <String, String>{
         "salonId": salonId,
-        "latitude": latitude == 0.0 ? null : latitude.toString(),
-        "longitude": longitude == 0.0 ? null : longitude.toString(),
-        "city": localCity ?? "",
+        if (latitude != 0.0) "latitude": latitude.toString(),
+        if (longitude != 0.0) "longitude": longitude.toString(),
+        if ((localCity ?? "").trim().isNotEmpty) "city": localCity!.trim(),
       };
 
       log("Get Salon Detail Params :: $queryParameters");
@@ -288,8 +306,24 @@ class BranchDetailController extends GetxController
       log("Get Salon Detail Body :: ${response.body}");
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        getSalonDetailCategory = GetSalonDetailModel.fromJson(jsonResponse);
+        final decoded = jsonDecode(response.body);
+        if (decoded is! Map) {
+          log("Get Salon Detail - unexpected JSON type: ${decoded.runtimeType}");
+          return;
+        }
+        final jsonResponse = Map<String, dynamic>.from(decoded);
+        if (jsonResponse["status"] == false) {
+          log("Get Salon Detail - API status false: ${jsonResponse["message"]}");
+          Utils.showToast(
+              Get.context!, jsonResponse["message"]?.toString() ?? "");
+        }
+        try {
+          getSalonDetailCategory = GetSalonDetailModel.fromJson(jsonResponse);
+        } catch (parseError, stack) {
+          log("Get Salon Detail parse error :: $parseError\n$stack");
+          getSalonDetailCategory = null;
+          return;
+        }
 
         final n = getSalonDetailCategory?.salon?.serviceIds?.length ?? 0;
         if (isBranchSelected.length != n) {
@@ -308,9 +342,9 @@ class BranchDetailController extends GetxController
       Utils.showToast(Get.context!, exception.message);
     } catch (e) {
       log("Error call Get Salon Detail Api :: $e");
-      Utils.showToast(
-          Get.context!, getSalonDetailCategory?.message.toString() ?? "");
-    } finally {
+      if (Get.context != null) {
+        Utils.showToast(Get.context!, "Unable to load salon details");
+      } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idServiceList]);
     }

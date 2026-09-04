@@ -8,12 +8,17 @@ const { deleteFile } = require("../../middleware/deleteFile");
 //get all category
 exports.getAll = async (req, res) => {
   try {
-    const categories = await Category.find({ isDelete: false }).select("-isDelete -updatedAt").sort({ createdAt: -1 }).lean();
+    // $ne: true also includes docs where isDelete is missing (older records)
+    const categories = await Category.find({ isDelete: { $ne: true } })
+      .select("-isDelete -updatedAt")
+      .sort({ createdAt: -1 })
+      .lean();
 
     return res.status(200).send({
       status: true,
       message: "Categories Found",
-      data: categories,
+      data: categories || [],
+      total: categories?.length || 0,
     });
   } catch (error) {
     console.log(error);
@@ -100,18 +105,22 @@ exports.delete = async (req, res) => {
 
     await Service.updateMany({ categoryId: category._id }, { $set: { isDelete: true } });
 
-    const experts = await Expert.find({
-      serviceId: { $in: category.serviceIds },
-      isDelete: false,
-    });
+    const serviceIds = Array.isArray(category.serviceIds) ? category.serviceIds : [];
+    if (serviceIds.length > 0) {
+      const experts = await Expert.find({
+        serviceId: { $in: serviceIds },
+        isDelete: false,
+      });
 
-    // Update each expert to remove the deleted services
-    await Promise.all(
-      experts.map(async (expert) => {
-        expert.serviceId = expert.serviceId.filter((id) => !category.serviceIds.includes(id));
-        await expert.save();
-      })
-    );
+      await Promise.all(
+        experts.map(async (expert) => {
+          expert.serviceId = (expert.serviceId || []).filter(
+            (id) => !serviceIds.some((sid) => String(sid) === String(id))
+          );
+          await expert.save();
+        })
+      );
+    }
 
     category.isDelete = true;
     await category.save();

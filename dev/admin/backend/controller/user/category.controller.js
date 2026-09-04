@@ -296,7 +296,7 @@ exports.getAll = async (req, res) => {
   try {
     const language = req.query.language || 'en'; // Get language from query parameter, default to 'en'
     
-    const categories = await Category.find({ isDelete: false, status: true }).select("-isDelete -updatedAt -createdAt").sort({
+    const categories = await Category.find({ isDelete: { $ne: true }, status: true }).select("-isDelete -updatedAt -createdAt").sort({
       createdAt: -1,
     });
 

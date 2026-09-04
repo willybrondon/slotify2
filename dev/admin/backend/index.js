@@ -207,7 +207,7 @@ app.get("/api/public/categories", async (req, res) => {
     const Category = require("./models/category.model");
     const language = req.query.language || 'fr'; // Get language from query, default to French
     
-    const categories = await Category.find({ isDelete: false, status: true })
+    const categories = await Category.find({ isDelete: { $ne: true }, status: true })
       .select("name nameEn nameFr namePt image _id")
       .sort({ createdAt: -1 });
     

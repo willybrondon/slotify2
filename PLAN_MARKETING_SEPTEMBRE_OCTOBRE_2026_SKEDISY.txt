@@ -1,0 +1,411 @@
+================================================================================
+PLAN MARKETING SKEDISY
+Septembre & octobre 2026
+Île-de-France — salons afro — clientes + professionnels
+================================================================================
+
+Objectif des 8 semaines : pas « être connu de toute la France ».
+Devenir évident dans quelques quartiers d’Île-de-France : les clientes ouvrent
+Skedisy pour réserver, et assez de salons UTILISENT vraiment l’agenda.
+
+Une inscription de salon sans créneau ouvert = zéro.
+Un like TikTok sans installation = zéro.
+
+Les deux KPI qui comptent : salons actifs  et  RDV honorés.
+
+
+--------------------------------------------------------------------------------
+1. CIBLES (réalistes, équipe réduite)
+--------------------------------------------------------------------------------
+
+KPI                                              30 sept.        31 oct.
+---------------------------------------------------------------------------
+Salons inscrits / claimés                            35             70
+Salons actifs (agenda ouvert + ≥ 1 RDV accepté)      12             30
+Ambassadeurs (QR vitrine + script d’accueil)          6             12
+Installs app (iOS + Android)                        800          2 000
+RDV créés                                            50            180
+RDV honorés                                          30            100
+Vues organiques (IG + TikTok, cumul)                80k           200k
+
+Sans budget pub : viser 50 salons inscrits / 20 actifs / 1 000 installs.
+Le levier devient le terrain, pas les ads.
+
+
+--------------------------------------------------------------------------------
+2. LE PIÈGE À ÉVITER
+--------------------------------------------------------------------------------
+
+Marketplace = poule et œuf. Si vous cherchez « un grand nombre » partout en
+IDF en même temps, vous aurez des fiches vides et des clientes frustrées.
+
+Septembre = densité.
+Octobre  = élargir seulement là où septembre a marché.
+
+Mois         Zones                                              Logique
+---------------------------------------------------------------------------
+Septembre    93 (Saint-Denis, Aubervilliers, Montreuil,         Plus forte
+             Bondy) + Paris 18 / 19 / 20 (Château Rouge,        densité de
+             Barbès)                                            salons afro,
+                                                                rentrée = pic
+                                                                de tresses
+
+Octobre      Les mêmes + 94 (Créteil, Vitry, Ivry)              On duplique
+             + 1 ville test 91 ou 92                            un modèle qui
+                                                                convertit, on
+                                                                ne disperse pas
+
+Message unique, deux publics :
+
+  Clientes (@skedisy)
+  « L’app où les salons afro d’IDF et leurs clientes se retrouvent. »
+
+  Salons (@skedisy.pro)
+  « Gratuit pour commencer. Vos clientes vous cherchent déjà —
+    réclamez votre fiche. »
+
+
+--------------------------------------------------------------------------------
+3. DEUX MACHINES EN PARALLÈLE
+--------------------------------------------------------------------------------
+
+CLIENTES (notoriété)                    SALONS (inscription + usage)
+TikTok / IG / Reels                     Visites terrain 3 j / semaine
+Micro-influence IDF                     Claim SMS / WhatsApp / email
+Code SKEDISY10                          Kit QR + script d’accueil
+Ads géolocalisées (S3+)                 Mise en avant Reel = contrepartie
+QR en salon                             Relance J+1 / J+3 / J+7
+
+                    \                          /
+                     \                        /
+                      →  RDV dans l’app  ←  salon qui accepte et honore
+
+Règle : chaque Reel cliente nomme un VRAI salon d’une zone où vous avez déjà
+un gérant claimé (ou un claim en cours). Sinon vous générez de la demande
+vers le vide.
+
+
+--------------------------------------------------------------------------------
+4. OFFRES D’ACTIVATION (septembre–octobre)
+--------------------------------------------------------------------------------
+
+Côté salon
+  - Inscription / claim gratuit
+  - Mise en avant 1 Reel + 1 story si le salon ouvre l’agenda ET met le QR
+  - Page publique skedisy.com/salon/... + lien bio Instagram
+
+Côté cliente
+  - Code SKEDISY10 : première réservation (montant ou %) — un seul code,
+    date de fin 31 octobre
+  - Codes influenceuses : PRENOM10 (trackable, 15 jours de validité)
+  - Pas de « 0 % commission » si ce n’est pas vrai ; dire
+    « gratuit pour commencer »
+
+Ce qu’on ne lance pas en 8 semaines (pas en prod) :
+  parrainage « 10 € / 10 € », points fidélité.
+  Ne pas le promettre.
+
+
+--------------------------------------------------------------------------------
+5. CADENCE HEBDOMADAIRE (à tenir 8 semaines)
+--------------------------------------------------------------------------------
+
+Jour        B2C                                      B2B
+---------------------------------------------------------------------------
+Lundi       TikTok éducation résa (15–25 s)          Relance claims de la
+                                                     semaine précédente
+Mardi       —                                        Terrain : 6–8 salons
+                                                     (porte-à-porte)
+Mercredi    Reel IG transformation / presta          1 post @skedisy.pro
+Jeudi       —                                        Terrain : 6–8 salons
+Vendredi    Portrait salon + lien fiche              Kit QR livré aux
+                                                     nouveaux signés
+Samedi      Stories + UGC                            2–3 visites (les
+                                                     gérants sont là)
+Dimanche    Revue KPI 20 min                         Liste S+1 : qui
+                                                     relancer, qui filmer
+
+Volume contenu : 4–5 posts @skedisy / sem. · 1–2 @skedisy.pro ·
+                 stories @skedisy tous les jours.
+
+Volume terrain : 12–16 salons vus / semaine
+                 → ~100 contacts en 8 semaines
+                 → ~70 inscrits si 1 sur 1,5 convertit
+                   (objectif tendu, d’où la relance).
+
+
+--------------------------------------------------------------------------------
+6. SEPTEMBRE — « RENTRÉE : ON EXISTE ICI »
+--------------------------------------------------------------------------------
+
+Thème : la cliente rebook ses tresses / locks pour la rentrée.
+        Le salon n’a plus le temps pour les DM.
+
+
+SEMAINE 1 — 1–7 septembre · Fondations
+--------------------------------------
+
+Produit / ops (2 jours max, avant de courir)
+  - Lien unique bio : skedisy.com → apps (UTM ig, tt, pro)
+  - Coupon SKEDISY10 créé et testé de bout en bout
+  - Kit salon v1 : 1 A4 QR cliente, 1 carte visagiste, script 20 s (voir §8)
+  - Liste 80 salons prioritaire (scraping + déjà en base) : 93 + 18e/19e/20e
+
+B2B
+  - 12 visites minimum
+  - SMS / WhatsApp claim à 40 fiches déjà listées :
+    « Votre salon est sur Skedisy — réclamez pour recevoir les RDV. »
+  - Objectif : 8 claims + 3 agendas ouverts
+
+B2C
+  - 3 Reels d’appartenance :
+      « Ce n’est pas une coupe »
+      « Chez nous en IDF »
+      carrousel 5 catégories
+  - Stories quotidiennes : sondage « Tu réserves comment ? »
+    DM / WhatsApp / app
+
+Interdit cette semaine : ads.
+D’abord 3 salons filmables et un parcours claim qui marche.
+
+
+SEMAINE 2 — 8–14 septembre · Premiers ambassadeurs
+--------------------------------------------------
+
+  - 12–16 visites, MÊMES rues que S1 (densité > liste Excel)
+  - Signer 6 ambassadeurs : QR en vitrine cette semaine
+  - Filmer 2 salons (30 min chacun) : vitrine, gérante 15 s, presta, QR
+  - @skedisy.pro : « Ton salon est déjà là — réclame ta fiche »
+  - @skedisy : série « Salon afro du 93 / du 18e » avec vrais noms,
+    prix, lien
+
+Objectif : 18 inscrits cumulés, 5 actifs, 1er RDV réel
+           (même offert / SKEDISY10).
+
+
+SEMAINE 3 — 15–21 septembre · Première pub + influence
+------------------------------------------------------
+
+Ads (budget ~100–150 €)
+  - Meta + TikTok, geo 93 + 18/19/20, 18–45 ans,
+    intérêts coiffure afro / tresses
+  - 2 créas :
+      1 cliente « Trouve un salon knotless près de chez toi »
+      1 preuve salon
+  - Landing = fiche salon ACTIVE ou store, jamais une page vide
+
+Influence (3 micro, 5–20k abonnés IDF)
+  - Barter : mise en avant + SKEDISY10 / PRENOM10,
+    pas 100 €/poste au début
+  - Brief : 1 Reel + 3 stories, réserver dans l’app à l’écran (vrai salon)
+
+B2B
+  - Relance J+3 des non-claimés
+  - Former l’équipe des 6 ambassadeurs :
+    « Tu peux réserver sur Skedisy, le QR est là »
+
+Objectif : 25 inscrits, 8 actifs, 250 installs dans la semaine.
+
+
+SEMAINE 4 — 22–30 septembre · Preuve sociale de rentrée
+-------------------------------------------------------
+
+  - Recueillir 5 avis réels (demander après chaque RDV honoré)
+  - 2 portraits gérantes + chiffres RÉELS uniquement
+    (RDV de la semaine, pas Planity)
+  - Event light : 1 après-midi « onboarding groupé »
+    (café / salon partenaire) — 8 gérants, 45 min, claim en live
+  - Dimanche 28 : revue septembre —
+    garder les rues qui convertissent, tuer les zones 0 claim
+
+Cible fin septembre :
+  35 inscrits · 12 actifs · 6 ambassadeurs · 800 installs · 30 RDV honorés.
+
+
+--------------------------------------------------------------------------------
+7. OCTOBRE — « ÇA MARCHE : ON ACCÉLÈRE »
+--------------------------------------------------------------------------------
+
+Thème : preuves + volume.
+Les salons signés en septembre doivent avoir des clientes.
+Sinon octobre sera du vent.
+
+
+SEMAINE 5 — 1–7 octobre · Activation, pas nouvelles fiches d’abord
+------------------------------------------------------------------
+
+Priorité n°1 : les 35 inscrits de septembre.
+
+  - Appel / WhatsApp à chaque salon inactif :
+    ouvrir créneaux, 1 photo, 1 presta phare
+  - Pousser 20 clientes (ads + stories) vers CES salons seulement
+  - Lancer 94 seulement si ≥ 8 salons actifs en 93/18e
+
+Objectif semaine : +5 actifs (passage 12 → 17)
+plus que +15 inscrits fantômes.
+
+
+SEMAINE 6 — 8–14 octobre · 94 + 2e vague influence
+--------------------------------------------------
+
+  - Terrain Créteil / Vitry / Ivry : même script qu’en septembre
+  - 5 nouvelles micro-influenceuses 94 / 93
+  - Ads : dupliquer les 2 meilleures créas de septembre, budget ~800 €
+  - Série « En 94, pour des locks… »
+
+Objectif cumul : 50 inscrits, 22 actifs.
+
+
+SEMAINE 7 — 15–21 octobre · Contenu UGC + SEO léger
+---------------------------------------------------
+
+  - 8 Reels UGC salons (elles filment, vous montez + CTA app)
+  - 2 articles blog :
+      « Réserver des tresses en IDF »
+      « Salon afro [ville] » → fiches
+  - WhatsApp Broadcast aux salons actifs :
+    créneaux vides du mardi/mercredi + idée promo coupon
+
+
+SEMAINE 8 — 22–31 octobre · Clôture + machine novembre
+------------------------------------------------------
+
+  - Push / stories : dernière semaine SKEDISY10
+  - Recueillir 10 avis + 3 témoignages gérants (vidéo 20 s)
+  - Kit « novembre » :
+      liste des 20 meilleurs salons,
+      10 rues à re-visiter,
+      5 créas ads gagnantes
+  - Décision : UNE ville 91/92 à pousser en novembre,
+    ou doublement 93/94
+
+Cible fin octobre :
+  70 inscrits · 30 actifs · 12 ambassadeurs · 2 000 installs · 100 RDV honorés.
+
+
+--------------------------------------------------------------------------------
+8. SCRIPT TERRAIN
+--------------------------------------------------------------------------------
+
+20 secondes
+-----------
+Skedisy, c’est l’app des salons afro d’Île-de-France. Vos clientes cherchent
+knotless, tissage, locks — pas « coiffeur ». On vous met une fiche, un QR,
+les RDV 24 h/24. Gratuit pour commencer. Instagram reste votre vitrine ;
+Skedisy prend la réservation.
+
+Si elles ont Planity
+--------------------
+Gardez Planity si ça vous sert. Skedisy, c’est en plus, pour les clientes
+qui veulent VOTRE métier.
+
+Closing
+-------
+Je réclame la fiche maintenant (2 min) et je vous envoie le QR aujourd’hui.
+La seule chose à faire : ouvrir 5 créneaux cette semaine.
+
+Script d’accueil (pour l’experte)
+---------------------------------
+Tu peux réserver le prochain RDV sur Skedisy — le QR est à l’accueil.
+Tu reçois un rappel, plus besoin de me MP.
+
+
+--------------------------------------------------------------------------------
+9. INDICATIF 2 MOIS
+--------------------------------------------------------------------------------
+
+Sans budget ads : 0 € média, tout sur visites + contenu + barter influence.
+La cible installs descend, la cible salons ACTIFS peut tenir si le terrain
+est tenu.
+
+CPA cible ads :
+  < 2 € / install
+  < 15 € / premier RDV
+Si c’est au-dessus 7 jours d’affilée, couper la créa, pas augmenter le budget.
+
+
+--------------------------------------------------------------------------------
+10. TABLEAU DE BORD (dimanche, 20 minutes)
+--------------------------------------------------------------------------------
+
+Question                                         Vert     Orange      Rouge
+---------------------------------------------------------------------------
+Combien de nouveaux claims cette semaine ?       ≥ 8      4–7         < 4
+Combien de salons ont accepté un RDV ?           ≥ 4      2–3         0–1
+Installs (stores)                                ≥ 200    80–199      < 80
+RDV honorés                                      ≥ 12     5–11        < 5
+Salons vus en physique                           ≥ 12     6–11        < 6
+
+Règle d’arrêt : si au 21 septembre vous avez < 5 salons actifs,
+STOP ads, tout le monde sur le terrain et l’activation.
+La pub sans offre = avis 1 étoile.
+
+
+--------------------------------------------------------------------------------
+11. QUI FAIT QUOI (équipe 1–2 personnes)
+--------------------------------------------------------------------------------
+
+Rôle                         Charge / sem.              Focus
+---------------------------------------------------------------------------
+Fondateur / commercial       3 j terrain + 1 j relances Claims + agendas
+                                                        ouverts
+Contenu (Directrice)         1,5 j tournage-montage     @skedisy +
+                             + 0,5 j community          @skedisy.pro
+Ops (même personne           20 min KPI + 1 h kits QR   SKEDISY10, UTM,
+le dimanche)                                            relances J+7
+
+Pas de 4e canal (Pinterest, YouTube long) avant novembre.
+TikTok + Instagram + WhatsApp + la rue.
+
+
+--------------------------------------------------------------------------------
+12. CE QUI FAIT ÉCHOUER CE PLAN
+--------------------------------------------------------------------------------
+
+1. Lister 200 salons sans en activer 20
+2. Filmer des Reels sans lien vers un salon bookable
+3. Dire « on est le Planity afro » ou coller des stats inventées
+4. Promettre de remplacer Instagram
+5. Courir le 77 / 78 / 95 trop tôt
+6. Compter les followers au lieu des RDV honorés
+
+
+--------------------------------------------------------------------------------
+EN UNE PHRASE
+--------------------------------------------------------------------------------
+
+Septembre, vous devenez le réflexe d’un quartier (93 + nord-est parisien) ;
+octobre, vous remplissez ces salons et vous copiez le modèle en 94.
+La notoriété suit les RDV, pas l’inverse.
+
+
+--------------------------------------------------------------------------------
+LIENS UTILES
+--------------------------------------------------------------------------------
+
+App cliente Android
+  https://play.google.com/store/apps/details?id=com.skedisy.customer
+
+App cliente iOS
+  https://apps.apple.com/fr/app/skedisy/id6752954525
+
+Site cliente
+  https://skedisy.com
+
+Page pro
+  https://skedisy.com/professionnel/
+
+Claim salon
+  https://skedisy.com/salon/claim
+
+Portail salon
+  https://skedisy.com/salonpanel/
+
+WhatsApp support
+  https://wa.me/33766160394
+
+
+--------------------------------------------------------------------------------
+Document interne Skedisy — plan opérationnel septembre / octobre 2026
+Référence marque : AUTHENTICITE_SKEDISY.md
+================================================================================

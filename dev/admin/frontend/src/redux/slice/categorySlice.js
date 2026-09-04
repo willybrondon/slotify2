@@ -45,8 +45,9 @@ const categorySlice = createSlice({
         })
 
         builder.addCase(getAllCategory.fulfilled, (state, action) => {
-          state.total = action.payload.total
-            state.category = action.payload.data;
+            const list = action.payload?.data;
+            state.category = Array.isArray(list) ? list : [];
+            state.total = action.payload?.total ?? state.category.length;
             state.isSkeleton = false;
         })
 

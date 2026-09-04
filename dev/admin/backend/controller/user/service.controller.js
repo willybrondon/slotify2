@@ -4,6 +4,7 @@ const Expert = require("../../models/expert.model");
 
 const geolib = require("geolib");
 const mongoose = require("mongoose");
+const { getPlatformTax } = require("../../lib/platformTax");
 
 // Generate slug from name
 const generateSlug = (name) => {
@@ -80,8 +81,6 @@ exports.getAll = async (req, res) => {
 
     let query = {};
 
-    const tax = global.settingJSON;
-    
     // Only apply search filter if search term is not empty
     if (search && search.trim() !== "") {
       query = {
@@ -225,7 +224,7 @@ exports.getAll = async (req, res) => {
       message: "Services found",
       total: result.length,
       services: result,
-      tax: tax.tax,
+      tax: getPlatformTax(),
     });
   } catch (error) {
     console.error(error);
@@ -267,7 +266,7 @@ exports.serviceBasedCategory = async (req, res) => {
       status: true,
       message: "Services found",
       services: translatedServices,
-      tax: tax.tax,
+      tax: getPlatformTax(),
     });
   } catch (error) {
     console.log(error);

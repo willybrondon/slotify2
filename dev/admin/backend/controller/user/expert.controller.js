@@ -7,6 +7,7 @@ const User = require("../../models/user.model");
 const Notification = require("../../models/notification.model");
 
 const mongoose = require("mongoose");
+const { getPlatformTax, hasPlatformSettings } = require("../../lib/platformTax");
 const fs = require("fs");
 const { deleteFile } = require("../../middleware/deleteFile");
 const admin = require("../../firebase");
@@ -95,7 +96,7 @@ exports.getExpertProfile = async (req, res) => {
         .select("-password -isDelete -isBlock  -isAvailable "),
     ]);
 
-    if (!tax) {
+    if (!hasPlatformSettings()) {
       return res.status(200).send({ status: false, message: "setting does not found." });
     }
 
@@ -110,7 +111,7 @@ exports.getExpertProfile = async (req, res) => {
     return res.status(200).json({
       status: true,
       message: "Data found",
-      tax: tax.tax,
+      tax: getPlatformTax(),
       data: expert,
     });
   } catch (error) {

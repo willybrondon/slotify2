@@ -34,6 +34,7 @@ const {
   notifyExpertPushAndInApp,
   notifyUserPushAndInApp,
 } = require("../../services/pushNotification.service");
+const { getPlatformTax } = require("../../lib/platformTax");
 
 // Initialize SendGrid if API key is available
 if (process.env.SENDGRID_API_KEY) {
@@ -762,7 +763,7 @@ exports.newBooking = async (req, res, next) => {
 
     let coupon, discountAmount, totalAmount;
 
-    const taxAmount = (req.body.withoutTax * global.settingJSON.tax) / 100;
+    const taxAmount = (req.body.withoutTax * getPlatformTax()) / 100;
     const withTaxAmount = (taxAmount + req.body.withoutTax).toFixed(2);
     const bookingAmount = req?.body?.amount.toFixed(2);
 
@@ -1291,7 +1292,7 @@ exports.checkSlots = async (req, res, next) => {
       return res.status(200).send({ status: false, message: "Invalid Service Price" });
     }
 
-    const taxAmount = (req.body.withoutTax * global.settingJSON.tax) / 100;
+    const taxAmount = (req.body.withoutTax * getPlatformTax()) / 100;
     const withTaxAmount = (taxAmount + req.body.withoutTax).toFixed(2);
     const bookingAmount = req?.body?.amount.toFixed(2);
 

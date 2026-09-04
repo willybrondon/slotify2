@@ -124,7 +124,7 @@ const Setting = (props) => {
       !stripeSecretKey ||
       !razorPayId ||
       !razorSecretKey ||
-      !tax ||
+      (tax === "" || tax === null || tax === undefined) ||
       !currencyName ||
       !currencySymbol ||
       !flutterWaveKey ||
@@ -143,7 +143,7 @@ const Setting = (props) => {
       if (!razorPayId) error.razorPayId = ui.settings.razorIdRequired;
       if (!razorSecretKey)
         error.razorSecretKey = ui.settings.razorSecretRequired;
-      if (!tax) error.tax = ui.settings.taxRequired;
+      if (tax === "" || tax === null || tax === undefined) error.tax = ui.settings.taxRequired;
       if (!currencyName) error.currencyName = ui.settings.currencyNameRequired;
       if (!currencySymbol) error.currencySymbol = ui.settings.currencySymbolRequired;
       if (!flutterWaveKey)

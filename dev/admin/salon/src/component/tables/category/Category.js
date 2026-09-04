@@ -91,7 +91,9 @@ const Category = () => {
     {
       Header: col.createdAt,
       Cell: ({ row }) => (
-        <span className="text-capitalize">{row?.createdAt.split("T")[0]}</span>
+        <span className="text-capitalize">
+          {row?.createdAt ? String(row.createdAt).split("T")[0] : "-"}
+        </span>
       ),
     },
     {

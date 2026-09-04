@@ -15,6 +15,7 @@ const {
   formatSalonHoursItemHtml,
 } = require("../../lib/webPageCopy");
 const { authUrls } = require("../../lib/publicAuthPage");
+const { getPlatformTax } = require("../../lib/platformTax");
 
 const geolib = require("geolib");
 
@@ -429,10 +430,8 @@ exports.salonData = async (req, res) => {
       salonType: typeof p.salon
     })));
 
-    const tax = global.settingJSON.tax;
-    if (!tax) {
-      return res.status(200).send({ status: false, message: "Tax settings not found." });
-    }
+    // Tax may be 0 in admin — still return the full salon payload.
+    const tax = getPlatformTax();
 
     // salonData is already a plain object from lean(), create a copy for modification
     let salonResponseData = { ...salonData };
@@ -559,11 +558,22 @@ exports.salonData = async (req, res) => {
     const reviewsData = (reviews || []).map(review => {
       const reviewObj = review.toObject ? review.toObject() : review;
       const userIdObj = reviewObj.userId;
+      let userId = null;
+      if (userIdObj && typeof userIdObj === "object") {
+        userId = {
+          _id: userIdObj._id ? String(userIdObj._id) : null,
+          fname: userIdObj.fname || "",
+          lname: userIdObj.lname || "",
+          image: userIdObj.image || "",
+        };
+      } else if (userIdObj) {
+        userId = String(userIdObj);
+      }
       return {
         ...reviewObj,
         _id: reviewObj._id ? String(reviewObj._id) : null,
         salonId: reviewObj.salonId ? String(reviewObj.salonId) : null,
-        userId: userIdObj ? (userIdObj._id ? String(userIdObj._id) : (typeof userIdObj === 'string' ? userIdObj : String(userIdObj))) : null,
+        userId,
         expertId: reviewObj.expertId ? String(reviewObj.expertId) : null,
       };
     });
@@ -590,7 +600,7 @@ exports.salonData = async (req, res) => {
       product: productsData,
       reviews: reviewsData,
       experts: expertsData,
-      tax: tax || 0,
+      tax: tax,
     };
 
     console.log("Salon Data API - Final response - Services count:", responseData.salon.serviceIds.length);

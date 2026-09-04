@@ -1,6 +1,7 @@
 const Expert = require("../../models/expert.model");
 const Salon = require("../../models/salon.model");
 const mongoose = require("mongoose");
+const { getPlatformTax, hasPlatformSettings } = require("../../lib/platformTax");
 
 exports.getExpertServiceWise = async (req, res) => {
   try {
@@ -54,7 +55,7 @@ exports.getExpertServiceWise = async (req, res) => {
       status: true,
       message: "Data found",
       data: expert,
-      tax: tax.tax,
+      tax: getPlatformTax(),
       matchedServices,
     });
   } catch (error) {
@@ -154,7 +155,7 @@ exports.getExpertWithServiceForUser = async (req, res) => {
       return res.status(201).send({ status: false, message: "Salon not found" });
     }
 
-    if (!tax) {
+    if (!hasPlatformSettings()) {
       return res.status(201).send({ status: false, message: "Setting not found" });
     }
 
@@ -168,7 +169,7 @@ exports.getExpertWithServiceForUser = async (req, res) => {
     const data = {
       services: servicesWithPrice,
       expert,
-      tax: tax.tax,
+      tax: getPlatformTax(),
     };
 
     return res.status(200).json({

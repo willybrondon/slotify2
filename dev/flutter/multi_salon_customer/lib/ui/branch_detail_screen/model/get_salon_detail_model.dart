@@ -4,9 +4,84 @@
 
 import 'dart:convert';
 
-GetSalonDetailModel getSalonDetailModelFromJson(String str) => GetSalonDetailModel.fromJson(json.decode(str));
+GetSalonDetailModel getSalonDetailModelFromJson(String str) =>
+    GetSalonDetailModel.fromJson(json.decode(str));
 
-String getSalonDetailModelToJson(GetSalonDetailModel data) => json.encode(data.toJson());
+String getSalonDetailModelToJson(GetSalonDetailModel data) =>
+    json.encode(data.toJson());
+
+Map<String, dynamic>? _asMap(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return Map<String, dynamic>.from(value);
+  return null;
+}
+
+String? _asString(dynamic value) {
+  if (value == null) return null;
+  if (value is String) return value;
+  return value.toString();
+}
+
+num? _asNum(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value;
+  if (value is String) return num.tryParse(value);
+  return null;
+}
+
+int? _asInt(dynamic value) {
+  return _asNum(value)?.toInt();
+}
+
+double? _asDouble(dynamic value) {
+  return _asNum(value)?.toDouble();
+}
+
+bool? _asBool(dynamic value) {
+  if (value == null) return null;
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  if (value is String) {
+    final v = value.toLowerCase();
+    if (v == 'true' || v == '1') return true;
+    if (v == 'false' || v == '0') return false;
+  }
+  return null;
+}
+
+DateTime? _asDate(dynamic value) {
+  if (value == null) return null;
+  if (value is DateTime) return value;
+  if (value is String && value.isNotEmpty) return DateTime.tryParse(value);
+  return null;
+}
+
+List<String> _asStringList(dynamic value) {
+  if (value is! List) return [];
+  return value
+      .map((x) {
+        if (x == null) return '';
+        if (x is String) return x;
+        if (x is Map && x['_id'] != null) return x['_id'].toString();
+        return x.toString();
+      })
+      .where((s) => s.isNotEmpty && s != 'null')
+      .toList();
+}
+
+List<T> _mapList<T>(dynamic value, T? Function(Map<String, dynamic>) parse) {
+  if (value is! List) return [];
+  final out = <T>[];
+  for (final item in value) {
+    final map = _asMap(item);
+    if (map == null) continue;
+    try {
+      final parsed = parse(map);
+      if (parsed != null) out.add(parsed);
+    } catch (_) {}
+  }
+  return out;
+}
 
 class GetSalonDetailModel {
   bool? status;
@@ -15,7 +90,7 @@ class GetSalonDetailModel {
   List<Product>? product;
   List<dynamic>? reviews;
   List<Expert>? experts;
-  int? tax;
+  num? tax;
 
   GetSalonDetailModel({
     this.status,
@@ -27,23 +102,35 @@ class GetSalonDetailModel {
     this.tax,
   });
 
-  factory GetSalonDetailModel.fromJson(Map<String, dynamic> json) => GetSalonDetailModel(
-        status: json["status"],
-        message: json["message"],
-        salon: json["salon"] == null ? null : Salon.fromJson(json["salon"]),
-        product: json["product"] == null ? [] : List<Product>.from(json["product"]!.map((x) => Product.fromJson(x))),
-        reviews: json["reviews"] == null ? [] : List<dynamic>.from(json["reviews"]!.map((x) => x)),
-        experts: json["experts"] == null ? [] : List<Expert>.from(json["experts"]!.map((x) => Expert.fromJson(x))),
-        tax: json["tax"],
-      );
+  factory GetSalonDetailModel.fromJson(Map<String, dynamic> json) {
+    Salon? salon;
+    try {
+      final salonMap = _asMap(json["salon"]);
+      if (salonMap != null) salon = Salon.fromJson(salonMap);
+    } catch (_) {}
+
+    return GetSalonDetailModel(
+      status: _asBool(json["status"]),
+      message: _asString(json["message"]),
+      salon: salon,
+      product: _mapList(json["product"], Product.fromJson),
+      reviews: json["reviews"] is List ? List<dynamic>.from(json["reviews"]) : [],
+      experts: _mapList(json["experts"], Expert.fromJson),
+      tax: _asNum(json["tax"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "status": status,
         "message": message,
         "salon": salon?.toJson(),
-        "product": product == null ? [] : List<dynamic>.from(product!.map((x) => x.toJson())),
-        "reviews": reviews == null ? [] : List<dynamic>.from(reviews!.map((x) => x)),
-        "experts": experts == null ? [] : List<dynamic>.from(experts!.map((x) => x.toJson())),
+        "product": product == null
+            ? []
+            : List<dynamic>.from(product!.map((x) => x.toJson())),
+        "reviews": reviews == null ? [] : List<dynamic>.from(reviews!),
+        "experts": experts == null
+            ? []
+            : List<dynamic>.from(experts!.map((x) => x.toJson())),
         "tax": tax,
       };
 }
@@ -68,13 +155,13 @@ class Expert {
   });
 
   factory Expert.fromJson(Map<String, dynamic> json) => Expert(
-        id: json["_id"],
-        fname: json["fname"],
-        lname: json["lname"],
-        image: json["image"],
-        serviceId: json["serviceId"] == null ? [] : List<String>.from(json["serviceId"]!.map((x) => x)),
-        review: json["review"]?.toDouble(),
-        reviewCount: json["reviewCount"],
+        id: _asString(json["_id"] ?? json["id"]),
+        fname: _asString(json["fname"]),
+        lname: _asString(json["lname"]),
+        image: _asString(json["image"]),
+        serviceId: _asStringList(json["serviceId"]),
+        review: _asDouble(json["review"]),
+        reviewCount: _asInt(json["reviewCount"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -82,7 +169,9 @@ class Expert {
         "fname": fname,
         "lname": lname,
         "image": image,
-        "serviceId": serviceId == null ? [] : List<dynamic>.from(serviceId!.map((x) => x)),
+        "serviceId": serviceId == null
+            ? []
+            : List<dynamic>.from(serviceId!),
         "review": review,
         "reviewCount": reviewCount,
       };
@@ -91,11 +180,11 @@ class Expert {
 class Product {
   String? id;
   String? productCode;
-  int? price;
-  int? shippingCharges;
+  num? price;
+  num? shippingCharges;
   List<String>? images;
   int? quantity;
-  int? review;
+  num? review;
   int? sold;
   bool? isOutOfStock;
   String? createStatus;
@@ -126,22 +215,22 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
-        id: json["_id"],
-        productCode: json["productCode"],
-        price: json["price"],
-        shippingCharges: json["shippingCharges"],
-        images: json["images"] == null ? [] : List<String>.from(json["images"]!.map((x) => x)),
-        quantity: json["quantity"],
-        review: json["review"],
-        sold: json["sold"],
-        isOutOfStock: json["isOutOfStock"],
-        createStatus: json["createStatus"],
-        updateStatus: json["updateStatus"],
-        productName: json["productName"],
-        description: json["description"],
-        category: json["category"],
-        salon: json["salon"],
-        mainImage: json["mainImage"],
+        id: _asString(json["_id"] ?? json["id"]),
+        productCode: _asString(json["productCode"]),
+        price: _asNum(json["price"]),
+        shippingCharges: _asNum(json["shippingCharges"]),
+        images: _asStringList(json["images"]),
+        quantity: _asInt(json["quantity"]),
+        review: _asNum(json["review"]),
+        sold: _asInt(json["sold"]),
+        isOutOfStock: _asBool(json["isOutOfStock"]),
+        createStatus: _asString(json["createStatus"]),
+        updateStatus: _asString(json["updateStatus"]),
+        productName: _asString(json["productName"]),
+        description: _asString(json["description"]),
+        category: _asString(json["category"]),
+        salon: _asString(json["salon"]),
+        mainImage: _asString(json["mainImage"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -149,7 +238,7 @@ class Product {
         "productCode": productCode,
         "price": price,
         "shippingCharges": shippingCharges,
-        "images": images == null ? [] : List<dynamic>.from(images!.map((x) => x)),
+        "images": images == null ? [] : List<dynamic>.from(images!),
         "quantity": quantity,
         "review": review,
         "sold": sold,
@@ -173,7 +262,7 @@ class Salon {
   String? email;
   String? mobile;
   String? about;
-  int? platformFee;
+  num? platformFee;
   double? review;
   int? reviewCount;
   bool? isActive;
@@ -184,7 +273,7 @@ class Salon {
   List<SalonTime>? salonTime;
   List<ServiceId>? serviceIds;
   String? password;
-  int? uniqueId;
+  num? uniqueId;
   DateTime? createdAt;
   DateTime? updatedAt;
   double? distance;
@@ -217,35 +306,64 @@ class Salon {
     this.paymentOptions,
   });
 
-  factory Salon.fromJson(Map<String, dynamic> json) => Salon(
-        addressDetails: json["addressDetails"] == null ? null : AddressDetails.fromJson(json["addressDetails"]),
-        locationCoordinates:
-            json["locationCoordinates"] == null ? null : LocationCoordinates.fromJson(json["locationCoordinates"]),
-        isBestSeller: json["isBestSeller"],
-        id: json["_id"]?.toString(),
-        name: json["name"],
-        email: json["email"],
-        mobile: json["mobile"],
-        about: json["about"],
-        platformFee: json["platformFee"],
-        review: json["review"]?.toDouble(),
-        reviewCount: json["reviewCount"],
-        isActive: json["isActive"],
-        isDelete: json["isDelete"],
-        image: json["image"] == null ? [] : List<String>.from(json["image"]!.map((x) => x)),
-        mainImage: json["mainImage"],
-        flag: json["flag"],
-        salonTime: json["salonTime"] == null ? [] : List<SalonTime>.from(json["salonTime"]!.map((x) => SalonTime.fromJson(x))),
-        serviceIds: json["serviceIds"] == null ? [] : List<ServiceId>.from(json["serviceIds"]!.map((x) => ServiceId.fromJson(x))),
-        password: json["password"],
-        uniqueId: json["uniqueId"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
-        distance: json["distance"]?.toDouble(),
-        paymentOptions: json["paymentOptions"] == null
-            ? null
-            : PaymentOptions.fromJson(json["paymentOptions"]),
-      );
+  factory Salon.fromJson(Map<String, dynamic> json) {
+    AddressDetails? addressDetails;
+    final addressMap = _asMap(json["addressDetails"]);
+    if (addressMap != null) {
+      try {
+        addressDetails = AddressDetails.fromJson(addressMap);
+      } catch (_) {}
+    }
+
+    LocationCoordinates? locationCoordinates;
+    final locMap = _asMap(json["locationCoordinates"]);
+    if (locMap != null) {
+      try {
+        locationCoordinates = LocationCoordinates.fromJson(locMap);
+      } catch (_) {}
+    }
+
+    final image = _asStringList(json["image"]);
+    var mainImage = _asString(json["mainImage"] ?? json["heroImage"]);
+    if ((mainImage == null || mainImage.isEmpty) && image.isNotEmpty) {
+      mainImage = image.first;
+    }
+
+    PaymentOptions? paymentOptions;
+    final payMap = _asMap(json["paymentOptions"]);
+    if (payMap != null) {
+      try {
+        paymentOptions = PaymentOptions.fromJson(payMap);
+      } catch (_) {}
+    }
+
+    return Salon(
+      addressDetails: addressDetails,
+      locationCoordinates: locationCoordinates,
+      isBestSeller: _asBool(json["isBestSeller"]),
+      id: _asString(json["_id"] ?? json["id"]),
+      name: _asString(json["name"]),
+      email: _asString(json["email"]),
+      mobile: _asString(json["mobile"]),
+      about: _asString(json["about"]),
+      platformFee: _asNum(json["platformFee"]),
+      review: _asDouble(json["review"]),
+      reviewCount: _asInt(json["reviewCount"]),
+      isActive: _asBool(json["isActive"]),
+      isDelete: _asBool(json["isDelete"]),
+      image: image,
+      mainImage: mainImage,
+      flag: _asBool(json["flag"]),
+      salonTime: _mapList(json["salonTime"], SalonTime.fromJson),
+      serviceIds: _mapList(json["serviceIds"], ServiceId.fromJson),
+      password: _asString(json["password"]),
+      uniqueId: _asNum(json["uniqueId"]),
+      createdAt: _asDate(json["createdAt"]),
+      updatedAt: _asDate(json["updatedAt"]),
+      distance: _asDouble(json["distance"]),
+      paymentOptions: paymentOptions,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "addressDetails": addressDetails?.toJson(),
@@ -261,11 +379,15 @@ class Salon {
         "reviewCount": reviewCount,
         "isActive": isActive,
         "isDelete": isDelete,
-        "image": image == null ? [] : List<dynamic>.from(image!.map((x) => x)),
+        "image": image == null ? [] : List<dynamic>.from(image!),
         "mainImage": mainImage,
         "flag": flag,
-        "salonTime": salonTime == null ? [] : List<dynamic>.from(salonTime!.map((x) => x.toJson())),
-        "serviceIds": serviceIds == null ? [] : List<dynamic>.from(serviceIds!.map((x) => x.toJson())),
+        "salonTime": salonTime == null
+            ? []
+            : List<dynamic>.from(salonTime!.map((x) => x.toJson())),
+        "serviceIds": serviceIds == null
+            ? []
+            : List<dynamic>.from(serviceIds!.map((x) => x.toJson())),
         "password": password,
         "uniqueId": uniqueId,
         "createdAt": createdAt?.toIso8601String(),
@@ -323,11 +445,11 @@ class AddressDetails {
   });
 
   factory AddressDetails.fromJson(Map<String, dynamic> json) => AddressDetails(
-        addressLine1: json["addressLine1"]?.toString(),
-        landMark: json["landMark"]?.toString(),
-        city: json["city"]?.toString(),
-        state: json["state"]?.toString(),
-        country: json["country"]?.toString(),
+        addressLine1: _asString(json["addressLine1"]),
+        landMark: _asString(json["landMark"]),
+        city: _asString(json["city"]),
+        state: _asString(json["state"]),
+        country: _asString(json["country"]),
       );
 
   String get formatted => [addressLine1, landMark, city, state, country]
@@ -354,9 +476,10 @@ class LocationCoordinates {
     this.longitude,
   });
 
-  factory LocationCoordinates.fromJson(Map<String, dynamic> json) => LocationCoordinates(
-        latitude: json["latitude"],
-        longitude: json["longitude"],
+  factory LocationCoordinates.fromJson(Map<String, dynamic> json) =>
+      LocationCoordinates(
+        latitude: _asString(json["latitude"]),
+        longitude: _asString(json["longitude"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -391,16 +514,16 @@ class SalonTime {
   });
 
   factory SalonTime.fromJson(Map<String, dynamic> json) => SalonTime(
-        day: json["day"],
-        openTime: json["openTime"],
-        closedTime: json["closedTime"],
-        isActive: json["isActive"],
-        isBreak: json["isBreak"],
-        breakTime: json["breakTime"],
-        breakStartTime: json["breakStartTime"],
-        breakEndTime: json["breakEndTime"],
-        time: json["time"],
-        id: json["_id"],
+        day: _asString(json["day"]),
+        openTime: _asString(json["openTime"]),
+        closedTime: _asString(json["closedTime"]),
+        isActive: _asBool(json["isActive"]),
+        isBreak: _asBool(json["isBreak"]),
+        breakTime: _asString(json["breakTime"]),
+        breakStartTime: _asString(json["breakStartTime"]),
+        breakEndTime: _asString(json["breakEndTime"]),
+        time: _asInt(json["time"]),
+        id: _asString(json["_id"] ?? json["id"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -419,7 +542,7 @@ class SalonTime {
 
 class ServiceId {
   Id? serviceIdId;
-  int? price;
+  num? price;
   String? id;
 
   ServiceId({
@@ -428,11 +551,19 @@ class ServiceId {
     this.id,
   });
 
-  factory ServiceId.fromJson(Map<String, dynamic> json) => ServiceId(
-        serviceIdId: json["id"] == null ? null : Id.fromJson(json["id"]),
-        price: json["price"],
-        id: json["_id"],
-      );
+  factory ServiceId.fromJson(Map<String, dynamic> json) {
+    Id? serviceIdId;
+    final rawId = json["id"] ?? json["serviceId"];
+    final idMap = _asMap(rawId);
+    if (idMap != null) {
+      serviceIdId = Id.fromJson(idMap);
+    }
+    return ServiceId(
+      serviceIdId: serviceIdId,
+      price: _asNum(json["price"]),
+      id: _asString(json["_id"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": serviceIdId?.toJson(),
@@ -476,27 +607,25 @@ class Id {
     String? catName;
     final rawCat = json["categoryId"];
     if (rawCat is Map) {
-      catId = rawCat["_id"]?.toString();
-      catName = rawCat["name"]?.toString() ??
-          rawCat["nameFr"]?.toString() ??
-          rawCat["nameEn"]?.toString();
+      catId = _asString(rawCat["_id"]);
+      catName = _asString(rawCat["name"] ?? rawCat["nameFr"] ?? rawCat["nameEn"]);
     } else if (rawCat != null) {
-      catId = rawCat.toString();
+      catId = _asString(rawCat);
     }
-    catName ??= json["categoryName"]?.toString();
+    catName ??= _asString(json["categoryName"]);
 
     return Id(
-        id: json["_id"],
-        status: json["status"],
-        isDelete: json["isDelete"],
-        name: json["name"],
-        duration: json["duration"],
-        categoryId: catId,
-        categoryName: catName,
-        image: json["image"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
-      );
+      id: _asString(json["_id"] ?? json["id"]),
+      status: _asBool(json["status"]),
+      isDelete: _asBool(json["isDelete"]),
+      name: _asString(json["name"] ?? json["nameFr"] ?? json["nameEn"]),
+      duration: _asInt(json["duration"]),
+      categoryId: catId,
+      categoryName: catName,
+      image: _asString(json["image"]),
+      createdAt: _asDate(json["createdAt"]),
+      updatedAt: _asDate(json["updatedAt"]),
+    );
   }
 
   Map<String, dynamic> toJson() => {
