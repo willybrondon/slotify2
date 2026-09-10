@@ -30,6 +30,11 @@ subprojects { sub ->
                 targetCompatibility JavaVersion.VERSION_17
             }
         }
+        sub.configurations.configureEach {
+            resolutionStrategy {
+                force 'com.android.billingclient:billing:8.0.0'
+            }
+        }
     }
     sub.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         kotlinOptions {

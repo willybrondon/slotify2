@@ -48,9 +48,8 @@ keytool -list -v -keystore path/to/your/release.keystore -alias your-key-alias
 ### Step 2: Update assetlinks.json
 
 1. Open: `dev/admin/backend/public/.well-known/assetlinks.json`
-2. Replace `YOUR_SHA256_FINGERPRINT_HERE` with your actual SHA256 fingerprint
-3. Remove the colons (`:`) from the fingerprint
-   - Example: `AA:BB:CC:DD` becomes `AABBCCDD`
+2. Put the Play App Signing SHA-256 fingerprint (from Play Console) in `sha256_cert_fingerprints`. Keep the colons.
+   - Play Console → App integrity / App signing → SHA-256 certificate fingerprint
 
 ### Step 3: Get Your iOS Team ID (iOS)
 

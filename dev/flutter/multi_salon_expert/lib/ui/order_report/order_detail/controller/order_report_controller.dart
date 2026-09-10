@@ -12,6 +12,7 @@ import 'package:salon_2/utils/services/app_exception.dart';
 class OrderReportController extends GetxController with GetTickerProviderStateMixin {
   TabController? tabController;
   int? index;
+  int? _lastFetchedTab;
   GetBookingStatusWiseModel? getBookingStatusWiseCategory;
   RxBool isLoading = false.obs;
 
@@ -19,24 +20,26 @@ class OrderReportController extends GetxController with GetTickerProviderStateMi
   void onInit() {
     super.onInit();
     tabController = TabController(length: 4, vsync: this);
-    tabController?.addListener(() {
-      isLoading(true);
-      update([Constant.idProgressView]);
-
-      index = tabController!.index;
-
-      onChangeTabBar(tabController!.index);
-      log("Selected Index: ${tabController!.index}");
-    });
+    tabController?.addListener(_onReportTabChanged);
     _loadInitialReport();
   }
 
+  void _onReportTabChanged() {
+    if (tabController == null || tabController!.indexIsChanging) return;
+    if (_lastFetchedTab == tabController!.index) return;
+    index = tabController!.index;
+    onChangeTabBar(tabController!.index);
+  }
+
   Future<void> _loadInitialReport() async {
+    _lastFetchedTab = 0;
     await onGetBookingStatusWiseApiCall(
         expertId: Constant.storage.read<String>("expertId").toString(), status: "ALL", type: "Today");
   }
 
   Future<void> onChangeTabBar(int index) async {
+    _lastFetchedTab = index;
+    this.index = index;
     isLoading(true);
     update([Constant.idProgressView]);
     if (index == 0) {

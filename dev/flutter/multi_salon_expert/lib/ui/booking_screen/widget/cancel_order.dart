@@ -64,8 +64,8 @@ class CancelOrder extends StatelessWidget {
                     )
               : Container(
                   margin: const EdgeInsets.symmetric(horizontal: 10),
-                  child: GetBuilder<BookingScreenController>(
-                    id: Constant.idOnChangeTabBar,
+                    child: GetBuilder<BookingScreenController>(
+                    id: Constant.idProgressView,
                     builder: (logic) {
                       return Column(
                         children: [

@@ -344,7 +344,8 @@ class BranchDetailController extends GetxController
       log("Error call Get Salon Detail Api :: $e");
       if (Get.context != null) {
         Utils.showToast(Get.context!, "Unable to load salon details");
-      } finally {
+      }
+    } finally {
       isLoading(false);
       update([Constant.idProgressView, Constant.idServiceList]);
     }

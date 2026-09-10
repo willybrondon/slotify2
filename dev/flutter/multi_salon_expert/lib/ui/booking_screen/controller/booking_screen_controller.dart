@@ -25,6 +25,12 @@ class BookingScreenController extends GetxController with GetTickerProviderState
   int startCompleted = 0;
   int limitCompleted = 20;
 
+  int _bookingFetchGen = 0;
+  int? _lastFetchedTab;
+  bool _pendingHasMore = true;
+  bool _cancelHasMore = true;
+  bool _completedHasMore = true;
+
   TabController? tabController;
   TextEditingController reasonEditingController = TextEditingController();
 
@@ -32,82 +38,81 @@ class BookingScreenController extends GetxController with GetTickerProviderState
   ScrollController completedScrollController = ScrollController();
   ScrollController cancelScrollController = ScrollController();
 
-  //-------- Custom TabBar Variable --------//
+  List<int> get _bookingViewIds => [Constant.idProgressView, Constant.idOnChangeTabBar];
+
+  String get _expertId => Constant.storage.read<String>("expertId").toString();
 
   Future<void> onChangeTabBar(int index) async {
+    _lastFetchedTab = index;
     if (index == 0) {
       startPending = 0;
       getPending = [];
-
+      _pendingHasMore = true;
       await onStatusWiseBookingApiCall(
-        expertId: Constant.storage.read<String>("expertId").toString(),
+        expertId: _expertId,
         status: "pending",
-        start: startPending.toString(),
+        start: "0",
         limit: limitPending.toString(),
       );
-    }
-    if (index == 1) {
+    } else if (index == 1) {
       startCancel = 0;
       getCancel = [];
-
+      _cancelHasMore = true;
       await onStatusWiseBookingApiCall(
-        expertId: Constant.storage.read<String>("expertId").toString(),
+        expertId: _expertId,
         status: "cancel",
-        start: startCancel.toString(),
+        start: "0",
         limit: limitCancel.toString(),
       );
-    }
-    if (index == 2) {
+    } else if (index == 2) {
       startCompleted = 0;
       getComplete = [];
-
+      _completedHasMore = true;
       await onStatusWiseBookingApiCall(
-        expertId: Constant.storage.read<String>("expertId").toString(),
+        expertId: _expertId,
         status: "completed",
-        start: startCompleted.toString(),
+        start: "0",
         limit: limitCompleted.toString(),
       );
     }
-    update([Constant.idProgressView]);
+    update(_bookingViewIds);
+  }
+
+  bool _shouldPaginate(ScrollController controller, {required bool hasMore}) {
+    if (!hasMore || isLoading.value || !controller.hasClients) return false;
+    final position = controller.position;
+    if (position.maxScrollExtent <= 0) return false;
+    return position.pixels >= position.maxScrollExtent - 80;
   }
 
   void onPendingPagination() async {
-    if (pendingScrollController.hasClients) {
-      if (pendingScrollController.position.pixels == pendingScrollController.position.maxScrollExtent) {
-        await onStatusWiseBookingApiCall(
-          expertId: Constant.storage.read<String>("expertId").toString(),
-          status: "pending",
-          start: startPending.toString(),
-          limit: limitPending.toString(),
-        );
-      }
-    }
+    if (!_shouldPaginate(pendingScrollController, hasMore: _pendingHasMore)) return;
+    await onStatusWiseBookingApiCall(
+      expertId: _expertId,
+      status: "pending",
+      start: startPending.toString(),
+      limit: limitPending.toString(),
+    );
   }
 
   void onCompletedPagination() async {
-    if (completedScrollController.hasClients) {
-      if (completedScrollController.position.pixels == completedScrollController.position.maxScrollExtent) {
-        await onStatusWiseBookingApiCall(
-          expertId: Constant.storage.read<String>("expertId").toString(),
-          status: "completed",
-          start: startCompleted.toString(),
-          limit: limitCompleted.toString(),
-        );
-      }
-    }
+    if (!_shouldPaginate(completedScrollController, hasMore: _completedHasMore)) return;
+    await onStatusWiseBookingApiCall(
+      expertId: _expertId,
+      status: "completed",
+      start: startCompleted.toString(),
+      limit: limitCompleted.toString(),
+    );
   }
 
   void onCancelPagination() async {
-    if (cancelScrollController.hasClients) {
-      if (cancelScrollController.position.pixels == cancelScrollController.position.maxScrollExtent) {
-        await onStatusWiseBookingApiCall(
-          expertId: Constant.storage.read<String>("expertId").toString(),
-          status: "pending",
-          start: startCancel.toString(),
-          limit: limitCancel.toString(),
-        );
-      }
-    }
+    if (!_shouldPaginate(cancelScrollController, hasMore: _cancelHasMore)) return;
+    await onStatusWiseBookingApiCall(
+      expertId: _expertId,
+      status: "cancel",
+      start: startCancel.toString(),
+      limit: limitCancel.toString(),
+    );
   }
 
   onSwitch(value) {
@@ -140,20 +145,15 @@ class BookingScreenController extends GetxController with GetTickerProviderState
     tabController?.addListener(_onBookingTabChanged);
   }
 
-  void _onBookingTabChanged() async {
-    isPendingApiCalling = true;
+  void _onBookingTabChanged() {
+    if (tabController == null || tabController!.indexIsChanging) return;
+    final index = tabController!.index;
+    if (_lastFetchedTab == index) return;
+    onChangeTabBar(index);
+  }
 
-    await 400.milliseconds.delay();
-
-    if (isPendingApiCalling) {
-      isPendingApiCalling = false;
-
-      statusWiseBookingCategory?.data?.clear();
-      isLoading(true);
-
-      update([Constant.idProgressView]);
-      onChangeTabBar(tabController!.index);
-    }
+  void primeBookingTab(int tabIndex) {
+    _lastFetchedTab = tabIndex;
   }
 
   Future<void> openBookingTab(int tabIndex) async {
@@ -162,9 +162,9 @@ class BookingScreenController extends GetxController with GetTickerProviderState
       tabController?.addListener(_onBookingTabChanged);
     }
 
+    _lastFetchedTab = tabIndex;
     if (tabController!.index != tabIndex) {
       tabController!.animateTo(tabIndex);
-      return;
     }
 
     await onChangeTabBar(tabIndex);
@@ -176,17 +176,13 @@ class BookingScreenController extends GetxController with GetTickerProviderState
     required String start,
     required String limit,
   }) async {
-    try {
-      if (status == "pending") {
-        startPending++;
-      } else if (status == "cancel") {
-        startCancel++;
-      } else {
-        startCompleted++;
-      }
+    final gen = ++_bookingFetchGen;
+    final page = int.tryParse(start) ?? 0;
+    final pageLimit = int.tryParse(limit) ?? 20;
 
+    try {
       isLoading(true);
-      update([Constant.idProgressView]);
+      update(_bookingViewIds);
 
       final queryParameters = {
         "expertId": expertId,
@@ -209,32 +205,54 @@ class BookingScreenController extends GetxController with GetTickerProviderState
       log("Status Wise Booking Status Code :: ${response.statusCode}");
       log("Status Wise Booking Response :: ${response.body}");
 
+      if (gen != _bookingFetchGen) return;
+
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         statusWiseBookingCategory = StatusWiseBookingModel.fromJson(jsonResponse);
+        final List<Data> data = statusWiseBookingCategory?.data ?? [];
+        final hasMore = data.length >= pageLimit;
 
-        if (statusWiseBookingCategory != null) {
-          final List<Data> data = statusWiseBookingCategory?.data ?? [];
-
-          if (data.isNotEmpty) {
-            if (status == "pending") {
-              getPending.addAll(data);
-            } else if (status == "cancel") {
-              getCancel.addAll(data);
-            } else {
-              getComplete.addAll(data);
-            }
-          }
+        if (status == "pending") {
+          if (page == 0) getPending = [];
+          _mergeBookings(getPending, data);
+          _pendingHasMore = hasMore;
+          if (hasMore) startPending = page + 1;
+        } else if (status == "cancel") {
+          if (page == 0) getCancel = [];
+          _mergeBookings(getCancel, data);
+          _cancelHasMore = hasMore;
+          if (hasMore) startCancel = page + 1;
+        } else {
+          if (page == 0) getComplete = [];
+          _mergeBookings(getComplete, data);
+          _completedHasMore = hasMore;
+          if (hasMore) startCompleted = page + 1;
         }
       }
       log("User Status Wise Booking Api Call SuccessFully..!");
     } on AppException catch (exception) {
-      Utils.showToast(Get.context!, exception.message);
+      if (gen == _bookingFetchGen) {
+        Utils.showToast(Get.context!, exception.message);
+      }
     } catch (e) {
       log("Error call Status Wise Booking Api :: $e");
     } finally {
-      isLoading(false);
-      update([Constant.idProgressView]);
+      if (gen == _bookingFetchGen) {
+        isLoading(false);
+        update(_bookingViewIds);
+      }
+    }
+  }
+
+  void _mergeBookings(List<Data> target, List<Data> incoming) {
+    final existingIds = target.map((item) => item.id).whereType<String>().toSet();
+    for (final item in incoming) {
+      final id = item.id;
+      if (id == null || !existingIds.contains(id)) {
+        target.add(item);
+        if (id != null) existingIds.add(id);
+      }
     }
   }
 

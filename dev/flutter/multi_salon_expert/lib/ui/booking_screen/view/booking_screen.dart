@@ -119,11 +119,13 @@ class BookingScreen extends StatelessWidget {
                 ),
               ),
               GetBuilder<BookingScreenController>(
+                id: Constant.idBookingTabBar,
                 builder: (logic) {
                   return TabBar(
                     tabAlignment: TabAlignment.start,
                     controller: logic.tabController,
                     tabs: tabs,
+                    onTap: logic.onChangeTabBar,
                     labelStyle: const TextStyle(
                       fontSize: 15,
                       fontFamily: AppFontFamily.heeBo500,
@@ -147,18 +149,14 @@ class BookingScreen extends StatelessWidget {
               ),
               Divider(color: AppColors.greyColor.withOpacity(0.2)),
               Expanded(
-                child: GetBuilder<BookingScreenController>(
-                  builder: (logic) {
-                    return TabBarView(
-                      controller: logic.tabController,
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        PendingOrder(),
-                        CancelOrder(),
-                        CompleteOrder(),
-                      ],
-                    );
-                  },
+                child: TabBarView(
+                  controller: bookingScreenController.tabController,
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    PendingOrder(),
+                    CancelOrder(),
+                    CompleteOrder(),
+                  ],
                 ),
               ),
             ],

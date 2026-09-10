@@ -111,10 +111,7 @@ class PendingOrder extends StatelessWidget {
                         ],
                       ),
                     )
-              : GetBuilder<BookingScreenController>(
-                  id: Constant.idOnChangeTabBar,
-                  builder: (logic) {
-                    return Column(
+              : Column(
                       children: [
                         Expanded(
                           child: AnimationLimiter(
@@ -573,8 +570,6 @@ class PendingOrder extends StatelessWidget {
                             : const SizedBox()
                       ],
                     );
-                  },
-                );
         },
       ),
     );

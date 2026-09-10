@@ -3,6 +3,20 @@ import 'dart:convert';
 StatusWiseBookingModel statusWiseBookingModelFromJson(String str) => StatusWiseBookingModel.fromJson(json.decode(str));
 String statusWiseBookingModelToJson(StatusWiseBookingModel data) => json.encode(data.toJson());
 
+List<String> _stringList(dynamic value) {
+  if (value is String && value.isNotEmpty) return [value];
+  if (value is List) {
+    return value.map((item) => item?.toString() ?? '').where((item) => item.isNotEmpty).toList();
+  }
+  return [];
+}
+
+int? _parseInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse('${value ?? ''}');
+}
+
 class StatusWiseBookingModel {
   StatusWiseBookingModel({
     bool? status,
@@ -16,12 +30,14 @@ class StatusWiseBookingModel {
 
   StatusWiseBookingModel.fromJson(dynamic json) {
     _status = json['status'];
-    _message = json['message'];
-    if (json['data'] != null) {
+    _message = json['message']?.toString();
+    if (json['data'] is List) {
       _data = [];
-      json['data'].forEach((v) {
-        _data?.add(Data.fromJson(v));
-      });
+      for (final item in json['data']) {
+        try {
+          _data?.add(Data.fromJson(item));
+        } catch (_) {}
+      }
     }
   }
   bool? _status;
@@ -95,34 +111,36 @@ class Data {
   }
 
   Data.fromJson(dynamic json) {
-    _id = json['_id'];
-    _time = json['time'] != null ? json['time'].cast<String>() : [];
-    _status = json['status'];
-    _date = json['date'];
-    _paymentType = json['paymentType'];
+    _id = json['_id']?.toString();
+    _time = _stringList(json['time']);
+    _status = json['status']?.toString();
+    _date = json['date']?.toString();
+    _paymentType = json['paymentType']?.toString();
     _amount = json['amount'];
     _withoutTax = json['withoutTax'];
     _expertEarning = json['expertEarning'];
-    _bookingId = json['bookingId'];
-    _startTime = json['startTime'];
-    _duration = json['duration'] is num
-        ? (json['duration'] as num).toInt()
-        : int.tryParse('${json['duration'] ?? ''}');
-    _createdAt = json['createdAt'];
-    _updatedAt = json['updatedAt'];
-    _user = json['user'] != null ? User.fromJson(json['user']) : null;
-    _expert = json['expert'] != null ? Expert.fromJson(json['expert']) : null;
-    if (json['service'] != null) {
+    _bookingId = json['bookingId']?.toString();
+    _startTime = json['startTime']?.toString();
+    _duration = _parseInt(json['duration']);
+    _createdAt = json['createdAt']?.toString();
+    _updatedAt = json['updatedAt']?.toString();
+    _user = json['user'] is Map ? User.fromJson(json['user']) : null;
+    _expert = json['expert'] is Map ? Expert.fromJson(json['expert']) : null;
+    if (json['service'] is List) {
       _service = [];
-      json['service'].forEach((v) {
-        _service?.add(Service.fromJson(v));
-      });
+      for (final item in json['service']) {
+        if (item is Map) {
+          _service?.add(Service.fromJson(item));
+        }
+      }
     }
-    if (json['category'] != null) {
+    if (json['category'] is List) {
       _category = [];
-      json['category'].forEach((v) {
-        _category?.add(Category.fromJson(v));
-      });
+      for (final item in json['category']) {
+        if (item is Map) {
+          _category?.add(Category.fromJson(item));
+        }
+      }
     }
   }
   String? _id;
@@ -244,9 +262,9 @@ class Category {
   }
 
   Category.fromJson(dynamic json) {
-    _id = json['_id'];
-    _name = json['name'];
-    _image = json['image'];
+    _id = json['_id']?.toString();
+    _name = json['name']?.toString();
+    _image = json['image']?.toString();
   }
   String? _id;
   String? _name;
@@ -301,15 +319,15 @@ class Service {
   }
 
   Service.fromJson(dynamic json) {
-    _id = json['_id'];
-    _status = json['status'];
-    _isDelete = json['isDelete'];
-    _name = json['name'];
-    _duration = json['duration'];
-    _categoryId = json['categoryId'];
-    _image = json['image'];
-    _createdAt = json['createdAt'];
-    _updatedAt = json['updatedAt'];
+    _id = json['_id']?.toString();
+    _status = json['status'] is bool ? json['status'] : null;
+    _isDelete = json['isDelete'] is bool ? json['isDelete'] : null;
+    _name = json['name']?.toString();
+    _duration = _parseInt(json['duration']);
+    _categoryId = json['categoryId']?.toString();
+    _image = json['image']?.toString();
+    _createdAt = json['createdAt']?.toString();
+    _updatedAt = json['updatedAt']?.toString();
   }
   String? _id;
   bool? _status;
@@ -384,10 +402,10 @@ class Expert {
   }
 
   Expert.fromJson(dynamic json) {
-    _id = json['_id'];
-    _fname = json['fname'];
-    _lname = json['lname'];
-    _image = json['image'];
+    _id = json['_id']?.toString();
+    _fname = json['fname']?.toString();
+    _lname = json['lname']?.toString();
+    _image = json['image']?.toString();
   }
   String? _id;
   String? _fname;
@@ -437,10 +455,10 @@ class User {
   }
 
   User.fromJson(dynamic json) {
-    _id = json['_id'];
-    _fname = json['fname'];
-    _lname = json['lname'];
-    _image = json['image'];
+    _id = json['_id']?.toString();
+    _fname = json['fname']?.toString();
+    _lname = json['lname']?.toString();
+    _image = json['image']?.toString();
   }
   String? _id;
   String? _fname;

@@ -29,6 +29,64 @@ app.use(express.json());
 app.use(cors());
 app.use(logger("dev"));
 
+const PLAY_APP_SIGNING_SHA256 =
+  "87:D2:14:4D:A8:06:1F:D1:16:80:33:8F:2E:24:2B:DD:10:98:A5:1D:0B:08:E1:D0:DD:C4:3D:5C:8A:11:A5:12";
+
+function sendWellKnownJson(res, payload) {
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  return res.status(200).json(payload);
+}
+
+// Must be reachable at https://skedisy.com/.well-known/assetlinks.json (Play App Links).
+// Served inline so a missing `.well-known` folder on the VPS cannot 404.
+app.get("/.well-known/assetlinks.json", (req, res) => {
+  const filePath = path.join(__dirname, "public", ".well-known", "assetlinks.json");
+  if (fs.existsSync(filePath)) {
+    try {
+      const fromDisk = JSON.parse(fs.readFileSync(filePath, "utf8"));
+      if (Array.isArray(fromDisk) && fromDisk.length > 0 && !JSON.stringify(fromDisk).includes("YOUR_SHA256")) {
+        return sendWellKnownJson(res, fromDisk);
+      }
+    } catch (e) {
+      console.warn("[App Links] Could not parse assetlinks.json, using built-in statements:", e.message);
+    }
+  }
+  return sendWellKnownJson(res, [
+    {
+      relation: ["delegate_permission/common.handle_all_urls"],
+      target: {
+        namespace: "android_app",
+        package_name: "com.skedisy.customer",
+        sha256_cert_fingerprints: [PLAY_APP_SIGNING_SHA256],
+      },
+    },
+  ]);
+});
+
+app.get("/.well-known/apple-app-site-association", (req, res) => {
+  const filePath = path.join(__dirname, "public", ".well-known", "apple-app-site-association");
+  if (fs.existsSync(filePath)) {
+    try {
+      const fromDisk = JSON.parse(fs.readFileSync(filePath, "utf8"));
+      return sendWellKnownJson(res, fromDisk);
+    } catch (e) {
+      console.warn("[App Links] Could not parse apple-app-site-association:", e.message);
+    }
+  }
+  return sendWellKnownJson(res, {
+    applinks: {
+      apps: [],
+      details: [
+        {
+          appID: "7B755FRMAM.com.skedisy.customer",
+          paths: ["/salon/*"],
+        },
+      ],
+    },
+  });
+});
+
 const cron = require("node-cron");
 const Salon = require("./models/salon.model");
 const Expert = require("./models/expert.model");
@@ -288,29 +346,6 @@ app.post("/api/public/auth/register", publicClientAuth.publicRegister);
 const sitemapController = require("./controller/user/sitemap.controller");
 app.get("/sitemap.xml", sitemapController.generateSitemap);
 app.get("/robots.txt", sitemapController.generateRobots);
-
-// Serve .well-known files for App Links verification (must be before other static routes)
-app.get("/.well-known/assetlinks.json", (req, res) => {
-  const filePath = path.join(__dirname, "public", ".well-known", "assetlinks.json");
-  if (fs.existsSync(filePath)) {
-    res.setHeader('Content-Type', 'application/json');
-    res.sendFile(filePath);
-  } else {
-    console.warn(`[App Links] File not found: ${filePath} - This is not critical, app links will still work`);
-    res.status(404).json({ error: "File not found" });
-  }
-});
-
-app.get("/.well-known/apple-app-site-association", (req, res) => {
-  const filePath = path.join(__dirname, "public", ".well-known", "apple-app-site-association");
-  if (fs.existsSync(filePath)) {
-    res.setHeader('Content-Type', 'application/json');
-    res.sendFile(filePath);
-  } else {
-    console.warn(`[App Links] File not found: ${filePath} - This is not critical, app links will still work`);
-    res.status(404).json({ error: "File not found" });
-  }
-});
 
 async function updateAttendance(expertId, action) {
   try {

@@ -50,11 +50,20 @@ exports.bookingForExpert = async (req, res) => {
     const start = parseInt(req.query.start) || 0;
     const limit = parseInt(req.query.limit) || 20;
     const skip = start * limit;
+    const isUpcomingTab = status === "pending" || status === "upcoming";
+    const sortStage = isUpcomingTab
+      ? { $sort: { date: 1, startTime: 1 } }
+      : { $sort: { date: -1, startTime: 1 } };
 
     const pipeline = [
-      { $match: { expertId: expert._id } },
+      {
+        $match: {
+          expertId: expert._id,
+          isDelete: { $ne: true },
+        },
+      },
       { $match: getStatusFilter(status) },
-      { $sort: { date: -1, time: 1 } },
+      sortStage,
       {
         $lookup: {
           from: "users",
@@ -63,7 +72,12 @@ exports.bookingForExpert = async (req, res) => {
           as: "user",
         },
       },
-      { $unwind: "$user" },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: "experts",
@@ -72,7 +86,12 @@ exports.bookingForExpert = async (req, res) => {
           as: "expert",
         },
       },
-      { $unwind: "$expert" },
+      {
+        $unwind: {
+          path: "$expert",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: "services",
@@ -182,21 +201,7 @@ exports.bookingTypeStatusWiseForExpert = async (req, res) => {
       return res.status(200).send({ status: false, message: "Invalid Status" });
     }
 
-    let statusQuery = {};
-
-    if (status === "ALL") {
-      statusQuery = { $in: ["pending", "confirm", "completed", "cancel"] };
-    } else if (status == "pending") {
-      statusQuery = "pending";
-    } else if (status == "confirm") {
-      statusQuery = "confirm";
-    } else if (status == "completed") {
-      statusQuery = "completed";
-    } else if (status == "cancel") {
-      statusQuery = "cancel";
-    } else {
-      return res.status(200).send({ status: false, message: "Invalid Type" });
-    }
+    let statusQuery = getStatusFilter(status === "ALL" ? "all" : status);
 
     const [expert, bookings, reviews] = await Promise.all([
       Expert.findOne({
@@ -207,7 +212,8 @@ exports.bookingTypeStatusWiseForExpert = async (req, res) => {
         {
           $match: {
             expertId: expertId,
-            $or: [{ status: statusQuery }, { status: { $eq: statusQuery } }],
+            isDelete: { $ne: true },
+            ...statusQuery,
           },
         },
         {
@@ -228,7 +234,10 @@ exports.bookingTypeStatusWiseForExpert = async (req, res) => {
         },
 
         {
-          $unwind: "$expert",
+          $unwind: {
+            path: "$expert",
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -239,7 +248,10 @@ exports.bookingTypeStatusWiseForExpert = async (req, res) => {
           },
         },
         {
-          $unwind: "$user",
+          $unwind: {
+            path: "$user",
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -624,6 +636,7 @@ exports.expertEarning = async (req, res) => {
       {
         $match: {
           expertId: expert._id,
+          isDelete: { $ne: true },
           ...dateFilterQuery,
         },
       },
@@ -644,7 +657,10 @@ exports.expertEarning = async (req, res) => {
         },
       },
       {
-        $unwind: "$user",
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $lookup: {

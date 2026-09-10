@@ -32,7 +32,8 @@ class Constant {
   static var idProgressView = 'idProgressView';
   static var idCheckInUpdate = 'idCheckInUpdate';
   static var idOnChangeTabBar = 'idOnChangeTabBar';
-  static var idMyEarnings = 'idOnChangeTabBar';
+  static var idBookingTabBar = 'idBookingTabBar';
+  static var idMyEarnings = 'idMyEarnings';
   static var idOrderReportTabView = 'idOrderReportTabView';
   static var idFullDayNotAvailable = 'idFullDayNotAvailable';
   static var idUpdateSlots = 'idUpdateSlots';

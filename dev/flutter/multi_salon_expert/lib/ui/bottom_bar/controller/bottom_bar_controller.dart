@@ -35,7 +35,12 @@ class BottomBarController extends GetxController {
       slotManagerController.formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     }
 
+    if (value == 1) {
+      bookingScreenController.primeBookingTab(bookingTabIndex ?? 0);
+    }
+
     selectIndex = value;
+    update([Constant.idBottomBar, Constant.idRevenuePending]);
 
     if (value == 1) {
       await bookingScreenController.openBookingTab(bookingTabIndex ?? 0);

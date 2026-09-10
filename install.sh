@@ -450,6 +450,22 @@ server {
     error_log /var/log/nginx/skedisy.error.log;
 
     # Proxy settings
+    location = /.well-known/assetlinks.json {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        default_type application/json;
+    }
+
+    location = /.well-known/apple-app-site-association {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        default_type application/json;
+    }
+
     location / {
         proxy_pass http://localhost:5000;
         proxy_http_version 1.1;

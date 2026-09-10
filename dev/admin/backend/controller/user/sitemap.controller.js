@@ -97,6 +97,7 @@ exports.generateRobots = async (req, res) => {
     
     const robots = `User-agent: *
 Allow: /
+Allow: /.well-known/
 Allow: /category/
 Allow: /salon/
 Disallow: /admin/
