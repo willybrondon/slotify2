@@ -119,11 +119,10 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
 
-# Play Console requires Google Play Billing Library 8.0.0+ (deadline 31 Aug 2026).
-# in_app_purchase 3.2.2 still pulls android 0.4.x (Billing 7). 0.5.0 ships Billing 8.0.0
-# without requiring Flutter 3.38+/3.44+ (later 0.5.0+1 does).
+# Keep the Android IAP plugin on 0.4.0+1: later 0.4.0+3 / 0.5.0 need Dart > 3.6
+# (CI is Flutter 3.27.4). Play Billing 8 is forced in android/build.gradle.
 dependency_overrides:
-  in_app_purchase_android: 0.5.0
+  in_app_purchase_android: 0.4.0+1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

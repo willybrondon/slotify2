@@ -31,6 +31,9 @@ subprojects { sub ->
             }
         }
         sub.configurations.configureEach {
+            // Play Console: Billing 8+ required. Flutter 3.27 cannot use
+            // in_app_purchase_android 0.5.0 (needs Dart > 3.6), so we keep
+            // the 0.4.x plugin and force the native library to 8.0.0.
             resolutionStrategy {
                 force 'com.android.billingclient:billing:8.0.0'
             }
