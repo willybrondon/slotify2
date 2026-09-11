@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-09-10T21:34:20.355Z",
+  "method_limits": {
+    "fact": "Les JSON fournis ne contiennent quasiment aucune description métier utile (about générique), aucune prestation, aucune catégorie Google Places. Classification basée surtout sur le nom commercial et l'URL website/metadata.",
+    "rule": "Aucun salon afro-family n'est classé 'élevé' sur le seul nom.",
+    "ignored_fields": [
+      "password",
+      "claimToken",
+      "email credentials",
+      "images paths non analysées"
+    ]
+  },
+  "inputs": [
+    {
+      "file": "salons_ile_de_france_20251211_200234.json",
+      "status": "ok",
+      "count": 350
+    },
+    {
+      "file": "salons_ile_de_france_20251210_230107.json",
+      "status": "ok",
+      "count": 170
+    },
+    {
+      "file": "salons_ile_de_france_20251207_180758.json",
+      "status": "ok",
+      "count": 119
+    },
+    {
+      "file": "salons_ile_de_france_20251207_175108.json",
+      "status": "empty",
+      "count": 0
+    }
+  ],
+  "counts": {
+    "raw_rows": 639,
+    "unique_salons": 487,
+    "afro_pertinent": 26,
+    "uncertain": 229,
+    "hors_perimetre": 232,
+    "deep_dive_recommended": 255
+  },
+  "by_category_afro_pertinent": {
+    "coiffure afro": 21,
+    "braids / tresses": 1,
+    "salon mixte": 1,
+    "extensions": 3
+  },
+  "by_confidence_afro_pertinent": {
+    "moyen": 25,
+    "élevé": 1
+  },
+  "by_category_uncertain": {
+    "inconnu": 229
+  },
+  "booking_systems_detected": {
+    "Calendly": 1
+  },
+  "booking_systems_all": {
+    "Planity": 59,
+    "Treatwell": 18,
+    "Calendly": 1,
+    "Booksy": 1,
+    "Fresha": 1
+  }
+}

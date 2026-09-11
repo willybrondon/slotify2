@@ -1,0 +1,2510 @@
+[
+  {
+    "salon": "NOUCHE PARIS meilleur salon Afro Antillais",
+    "ville": "75008 Paris",
+    "departement": "75",
+    "telephone_public": "0977754829",
+    "url_site": "https://www.institut-nouche.fr/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://www.institut-nouche.fr/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Google (volume d'avis public élevé cité par annuaires)",
+        "Planity",
+        "Site"
+      ],
+      "principal_apparent": "Google (volume d'avis public élevé cité par annuaires)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Planity (https://www.planity.com/nouche-paris-75008)",
+        "Téléphone public"
+      ],
+      "details_outils": [
+        "Planity",
+        "Téléphone"
+      ],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Choix de prestation + durée affichées sur Planity",
+        "Suppléments longueur/masse/volume listés"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "fait",
+        "detail": "Prix affichés sur Planity (ex. tissage 130–400€, twists 200–400€, box braids longs 350€/4h). Politique d'acompte spécifique non extraite clairement sur la fiche Planity consultée."
+      }
+    ],
+    "E_complexite_prestations": [
+      "Twists sénégalaises 2h–4h20",
+      "Box braids 4h",
+      "Extensions kératine 3–4h",
+      "Lissages 2–3h",
+      "Perruques/lace"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: aucun widget booking classique",
+        "source": "https://www.institut-nouche.fr/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "https://www.institut-nouche.fr/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      },
+      {
+        "probleme": "Écart / hausse de prix perçue entre deux visites",
+        "preuve": "Avis Planity 4,0 (06/09/2026): « prix très élevés : un mois après, même prestation payée 20€ de plus »",
+        "source": "https://www.planity.com/nouche-paris-75008",
+        "frequence": "au moins 1 avis public explicite",
+        "gravite": "moyenne",
+        "impact": "Perte de confiance prix / abandon (hypothèse d'impact)",
+        "solution_actuelle": "Tarifs Planity + réponses salon sur avis",
+        "opportunite_skedisy": "Prix verrouillé à la réservation + transparence suppléments"
+      },
+      {
+        "probleme": "Complexité catalogue + durée longue difficile à self-serve sans diagnostic",
+        "preuve": "Catalogue Planity: dizaines de prestations afro (tresses, locks, tissage, lace) avec durées 30min–4h20 et suppléments masse/longueur",
+        "source": "https://www.planity.com/nouche-paris-75008",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Mauvaise estimation durée/prix → retards chaîne + mécontentement (hypothèse)",
+        "solution_actuelle": "Planity + téléphone",
+        "opportunite_skedisy": "Parcours guidé texture/longueur/photo avant créneau"
+      },
+      {
+        "probleme": "Risque de dommages capillaires / résultat non conforme aux attentes",
+        "preuve": "Avis agrégés sur annuaire public (meilleur-coiffeur.fr) mentionnant cheveux brûlés / déception après soin (verbatim partiels publics)",
+        "source": "https://salon-de-coiffure.meilleur-coiffeur.fr/nouche-paris-meilleur-salon-afro-antillais-1077124.html",
+        "frequence": "avis négatifs présents parmi un volume majoritairement positif (non quantifié exhaustivement ici)",
+        "gravite": "haute",
+        "impact": "Litiges / perte de confiance / coût de reprise",
+        "solution_actuelle": "Réponses ponctuelles / expertise affichée",
+        "opportunite_skedisy": "Briefing pré-RDV + photos + consentement prestation à risque"
+      },
+      {
+        "probleme": "Tarifs non publiés hors Planity selon certains annuaires",
+        "preuve": "MCB: « Ce salon ne publie pas ses tarifs. Appelle-le pour connaître le prix »",
+        "source": "https://www.mon-coiffeur-boucles.fr/paris/nouche-paris-meilleur-salon-afro-antillais-paris",
+        "frequence": "signal d'annuaire",
+        "gravite": "moyenne",
+        "impact": "Friction acquisition / appels de qualification",
+        "solution_actuelle": "Planity publie des prix; site/annuaires inconsistants",
+        "opportunite_skedisy": "Une source de vérité prix + devis"
+      }
+    ],
+    "G_outils": [
+      "Planity",
+      "Téléphone"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Boucle d'Or - Salon de coiffure Afro",
+    "ville": "75015 Paris",
+    "departement": "75",
+    "telephone_public": "0142505657",
+    "url_site": "http://www.boucledorcoiffure.com/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://www.boucledorcoiffure.com/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Facebook (lien site)",
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Facebook (lien site)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [
+        "Facebook link",
+        "Email",
+        "Téléphone (lien)"
+      ],
+      "booking_hrefs": [
+        "https://www.boucledorcoiffure.com/bookly-appointment-booking/"
+      ]
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: Facebook link, Email, Téléphone (lien)",
+        "source": "http://www.boucledorcoiffure.com/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "http://www.boucledorcoiffure.com/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Facebook link",
+      "Email",
+      "Téléphone (lien)"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [
+        "n de coiffure Afro Skip to content Skip to footer Mar - Ven 10h30 - 18h30 (Jeu 19:30) / Sam 10h00 - 18h30 01 42 50 56 57 3 rue de Viroflay, 75015 Paris Boucle d&#0",
+        "ffure Afro Skip to content Skip to footer Mar - Ven 10h30 - 18h30 (Jeu 19:30) / Sam 10h00 - 18h30 01 42 50 56 57 3 rue de Viroflay, 75015 Paris Boucle d&#039;Or Co",
+        "nt Skip to footer Mar - Ven 10h30 - 18h30 (Jeu 19:30) / Sam 10h00 - 18h30 01 42 50 56 57 3 rue de Viroflay, 75015 Paris Boucle d&#039;Or Coiffure LE SALON PRESTATI",
+        "to footer Mar - Ven 10h30 - 18h30 (Jeu 19:30) / Sam 10h00 - 18h30 01 42 50 56 57 3 rue de Viroflay, 75015 Paris Boucle d&#039;Or Coiffure LE SALON PRESTATIONS ET P",
+        "nce _____________________________ Mardi-Mercredi-Vendredi : 10h30 – 18h30 Jeudi (nocturne) : 11h – 19h30 Samedi : 10h – 18h30 Horaires Mardi-Mercredi-Vendredi : 10"
+      ],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": [
+          "https://www.boucledorcoiffure.com/bookly-appointment-booking/"
+        ]
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Afro Beauty",
+    "ville": "75010 Paris",
+    "departement": "75",
+    "telephone_public": "",
+    "url_site": "",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "no_url",
+      "finalUrl": ""
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [],
+      "principal_apparent": "Non identifiable",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Non identifiable depuis les sources collectées"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "MB Coiffure vlg - Coiffure afro",
+    "ville": "92390 Villeneuve-la-Garenne",
+    "departement": "75",
+    "telephone_public": "0147909429",
+    "url_site": "http://www.mbcoiffure.com/?utm_source=gmb",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://mbcoiffure.com/?utm_source=gmb"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Instagram (lien site)",
+        "Facebook (lien site)",
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Instagram (lien site)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "CTA réservation sur site (outil non identifiable clairement)",
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [
+        "Instagram link",
+        "Facebook link",
+        "Email",
+        "Téléphone (lien)"
+      ],
+      "booking_hrefs": [
+        "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/produits-villeneuve-la-garenne-la-caravelle",
+        "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/bons-cadeaux",
+        "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/produits-villeneuve-la-garenne-la-caravelle",
+        "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/bons-cadeaux",
+        "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/prestations-villeneuve-la-garenne-la-caravelle",
+        "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/prestations-villeneueve-la-garenne-la-caravelle",
+        "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/prestations-villeneueve-la-garenne-la-caravelle"
+      ]
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "perruque/lace"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: Instagram link, Facebook link, Email, Téléphone (lien)",
+        "source": "http://www.mbcoiffure.com/?utm_source=gmb",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "http://www.mbcoiffure.com/?utm_source=gmb",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Instagram link",
+      "Facebook link",
+      "Email",
+      "Téléphone (lien)"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [
+        "ou la coiffure qui convient le mieux à vos besoins. Puis-je annuler ou modifier mon rendez-vous ? Oui, nous vous demandons simplement de nous prévenir au moins 24 heures à l’avance. MB COIFFURE vous attend pour votre coupe. Ce qu’ils pensent de no"
+      ],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [
+        "i, nous vous demandons simplement de nous prévenir au moins 24 heures à l’avance. MB COIFFURE vous attend pour votre coupe. Ce qu’ils pensent de nous Découvrez l’expérie"
+      ],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://www.instagram.com/mbcoiffure92390/",
+          "https://www.instagram.com/mbcoiffure92390/"
+        ],
+        "facebook": [
+          "https://www.facebook.com/mbcoiffure92390",
+          "https://www.facebook.com/mbcoiffure92390"
+        ],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": [
+          "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/produits-villeneuve-la-garenne-la-caravelle",
+          "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/bons-cadeaux",
+          "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/produits-villeneuve-la-garenne-la-caravelle",
+          "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/bons-cadeaux",
+          "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/prestations-villeneuve-la-garenne-la-caravelle",
+          "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/prestations-villeneueve-la-garenne-la-caravelle",
+          "https://reservationcoiffeur.fr/sojenscoiffurevilleneuvelagarenne-92390/prestations-villeneueve-la-garenne-la-caravelle"
+        ]
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "CindyFashion Paris- Meilleur coiffeur Afro Antillais",
+    "ville": "75010 Paris",
+    "departement": "75",
+    "telephone_public": "0171976595",
+    "url_site": "http://www.cindyfashion-coiffure-afro.fr/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://cindyfashion-coiffure-afro.fr/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Site web",
+        "Google/annuaires",
+        "Bouche-à-oreille (non mesuré)"
+      ],
+      "principal_apparent": "Site web",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Formulaire site « nous vous contacterons pour confirmer » (pas de confirmation instantanée)",
+        "Téléphone 01 71 97 65 95 / 06 59 12 85 45",
+        "Walk-in possible: site indique « Avec ou sans rendez-vous »"
+      ],
+      "details_outils": [
+        "Formulaire propriétaire site",
+        "Téléphone",
+        "Instagram/Facebook (liens site)"
+      ],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Date souhaitée",
+        "Heure souhaitée",
+        "Confirmation manuelle par le salon"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "fait",
+        "detail": "Acompte non trouvé sur pages RDV/contact consultées. Témoignage site: prestation jugée « onéreuse »."
+      }
+    ],
+    "E_complexite_prestations": [
+      "Tresses",
+      "Tissage/closure",
+      "Locks/twist",
+      "Lissage tanin",
+      "Défrisage",
+      "Curly",
+      "Homme/enfant"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: Instagram link, Facebook link",
+        "source": "http://www.cindyfashion-coiffure-afro.fr/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "http://www.cindyfashion-coiffure-afro.fr/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      },
+      {
+        "probleme": "Réservation non instantanée — file d'attente de confirmation humaine",
+        "preuve": "Page RDV: « Remplissez le formulaire… nous vous contacterons pour confirmer votre rendez vous »",
+        "source": "https://cindyfashion-coiffure-afro.fr/rendez-vous-coiffeur/",
+        "frequence": "structurelle (design du funnel)",
+        "gravite": "haute",
+        "impact": "Abandon entre demande et confirmation; charge téléphone",
+        "solution_actuelle": "Formulaire + rappel salon",
+        "opportunite_skedisy": "Confirmation auto + créneaux réels + file d'attente intelligente"
+      },
+      {
+        "probleme": "Mix RDV / sans RDV → risque d'attente au salon",
+        "preuve": "Homepage: « Avec ou sans rendez-vous » + horaires non-stop",
+        "source": "https://cindyfashion-coiffure-afro.fr/",
+        "frequence": "politique affichée",
+        "gravite": "moyenne",
+        "impact": "Attente client / surcharge journée (hypothèse opérationnelle)",
+        "solution_actuelle": "Walk-in accepté",
+        "opportunite_skedisy": "File d'attente digitale + ETA"
+      },
+      {
+        "probleme": "Durée longue perçue (tresses)",
+        "preuve": "Livre d'or site: cliente « 3h30 » pour tresses longues",
+        "source": "https://cindyfashion-coiffure-afro.fr/avis-coiffeur-cindyfashion-paris-75010/",
+        "frequence": "au moins 1 témoignage public",
+        "gravite": "moyenne",
+        "impact": "Sous-estimation durée à la réservation",
+        "solution_actuelle": "Non visible clairement sur formulaire RDV",
+        "opportunite_skedisy": "Estimateur durée selon style/longueur/mèches"
+      },
+      {
+        "probleme": "Perception prix élevé",
+        "preuve": "Témoignage site: « bonne prestation mais reste tout de même onéreux »",
+        "source": "https://cindyfashion-coiffure-afro.fr/",
+        "frequence": "au moins 1 témoignage",
+        "gravite": "basse-moyenne",
+        "impact": "Friction conversion",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Devis clair avant confirmation"
+      },
+      {
+        "probleme": "Dommages capillaires allégués dans avis agrégés",
+        "preuve": "Avis agrégés mentionnant cheveux brûlés après prestation (annuaire public)",
+        "source": "https://salon-de-coiffure.meilleur-coiffeur.fr/cindyfashion-paris-meilleur-coiffeur-afro-antillais-1034315.html",
+        "frequence": "avis négatifs présents (volume total non audité exhaustivement)",
+        "gravite": "haute",
+        "impact": "Litige / reprise / e-réputation",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Checklist contre-indications + consentement + photos avant/après"
+      }
+    ],
+    "G_outils": [
+      "Formulaire propriétaire site",
+      "Téléphone",
+      "Instagram/Facebook (liens site)"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [
+        "eauté afro du : lundi au samedi Avec ou sans rendez-vous de 10h00 à 19h00 sans interruption Donnez le meilleur à vos cheveux avec un service de qualité. COIFFEUR A",
+        "ro du : lundi au samedi Avec ou sans rendez-vous de 10h00 à 19h00 sans interruption Donnez le meilleur à vos cheveux avec un service de qualité. COIFFEUR AFRO ANTI",
+        "ne belle couleur. Cindy Fashion Paris Du lundi au samedi De 10h00 à 19h00 non stop 203 rue Saint-Maur 75010 Paris 01 71 97 65 95 06 59 12 85 45 Prendre Rendez-vous",
+        "couleur. Cindy Fashion Paris Du lundi au samedi De 10h00 à 19h00 non stop 203 rue Saint-Maur 75010 Paris 01 71 97 65 95 06 59 12 85 45 Prendre Rendez-vous © 2025"
+      ],
+      "prix": [
+        "metisse, frisé, à Paris Lissage brésilien chez Cindyfashion Tarif Avis Notre boutique Contact Blog Accueil Qui sommes nous La boutique afro du salon de coiffure CFP",
+        "metisse, frisé, à Paris Lissage brésilien chez Cindyfashion Tarif Avis Notre boutique Contact Blog Prendre rendez-vous Coiffeur-visagiste multiethnique Envie de tres",
+        "à tous : salon mixte pour tout type de cheveux ethniques et européen. Donnez de l’éclat à votre coiffure, éblouissez et charmez avec nos coiffures. SERVICES PREMIUM",
+        "t 3 Mois. DURÉE DU FORFAIT: 3 mois PRIX : Avec brushing: 700€ Sans brushing: 600€ Prenez rendez-vous PACKAGE SOLUTION CHEVEUX SECS ET CASSANTS Notre routine pour",
+        "ORFAIT: 3 mois PRIX : Avec brushing: 700€ Sans brushing: 600€ Prenez rendez-vous PACKAGE SOLUTION CHEVEUX SECS ET CASSANTS Notre routine pour cheveux secs et cas"
+      ],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://www.instagram.com/cindyfashionparis/"
+        ],
+        "facebook": [
+          "https://www.facebook.com/profile.php?id=100064873440414"
+        ],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Salon de coiffure Afro Queen Lace Paris",
+    "ville": "75019 Paris",
+    "departement": "75",
+    "telephone_public": "0987174949",
+    "url_site": "https://queenlaceparis.com/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://queenlaceparis.com/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Planity",
+        "Treatwell",
+        "Google",
+        "Site",
+        "TikTok/IG (liens site)"
+      ],
+      "principal_apparent": "Planity",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Planity",
+        "Treatwell",
+        "Téléphone",
+        "Email"
+      ],
+      "details_outils": [
+        "Planity",
+        "Treatwell",
+        "Téléphone",
+        "Email",
+        "Instagram",
+        "TikTok"
+      ],
+      "booking_hrefs": [
+        "https://www.planity.com/queen-lace-paris-75019",
+        "https://www.planity.com/queen-lace-paris-75019",
+        "https://www.planity.com/queen-lace-paris-75019",
+        "https://www.planity.com/queen-lace-paris-75019",
+        "https://www.planity.com/queen-lace-paris-75019",
+        "https://www.planity.com/queen-lace-paris-75019"
+      ]
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Diagnostic affiché comme étape 1 du parcours (site)",
+        "Réservation en ligne via plateformes"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "fait",
+        "detail": "Prix « dès X€ » affichés sur site (ex. lissages dès 210€ / 2h). Acompte: non extrait explicitement sur homepage."
+      }
+    ],
+    "E_complexite_prestations": [
+      "Lissages sans formol",
+      "Soins/Silk Press/Head Spa",
+      "Balayages texturés",
+      "Parcours Queen Signature"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "https://queenlaceparis.com/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      },
+      {
+        "probleme": "Parcours multi-plateformes (Planity + Treatwell) → complexité ops & pricing",
+        "preuve": "Site affiche notes Planity 4,9 / Treatwell 4,7 / Google 4,4 et CTA réservation",
+        "source": "https://queenlaceparis.com/",
+        "frequence": "structurelle",
+        "gravite": "moyenne",
+        "impact": "Double gestion agenda / commissions (hypothèse coût)",
+        "solution_actuelle": "Planity + Treatwell",
+        "opportunite_skedisy": "Agenda unique vertical afro + moins de fragmentation"
+      }
+    ],
+    "G_outils": [
+      "Planity",
+      "Treatwell",
+      "Téléphone",
+      "Email",
+      "Instagram",
+      "TikTok"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [
+        "ures Des soins pensés pour votre nature de cheveux dès 210€ 2h Lissages Lissage au tanin et nano-indien, sans formol. Discipline durable, brillance naturelle, fri",
+        "veux restent vos cheveux. Découvrir les lissages → dès 120€ 2h Soins &amp; Silk Press Silk Press, Head Spa, botox capillaire, Tokio Inkarami : des soins haute tec",
+        "&#x27;éclat de vos cheveux. Découvrir les soins → dès 74€ 2–5h Balayages &amp; colorations Contouring, balayage light ou intense, coloration sur-mesure. Des nuanc",
+        "des Lilas Horaires Lundi, mardi, jeudi, vendredi, samedi : 10h – 17h Mercredi &amp; dimanche : fermé Contact 09 87 17 49 49 · queenlaceparis@gmail.com Réserver en",
+        "ilas Horaires Lundi, mardi, jeudi, vendredi, samedi : 10h – 17h Mercredi &amp; dimanche : fermé Contact 09 87 17 49 49 · queenlaceparis@gmail.com Réserver en ligne"
+      ],
+      "prix": [
+        "atures Des soins pensés pour votre nature de cheveux dès 210€ 2h Lissages Lissage au tanin et nano-indien, sans formol. Discipline durable, brillance naturelle,",
+        "heveux restent vos cheveux. Découvrir les lissages → dès 120€ 2h Soins &amp; Silk Press Silk Press, Head Spa, botox capillaire, Tokio Inkarami : des soins haute",
+        "er l&#x27;éclat de vos cheveux. Découvrir les soins → dès 74€ 2–5h Balayages &amp; colorations Contouring, balayage light ou intense, coloration sur-mesure. Des"
+      ],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://www.instagram.com/queenlace_paris/"
+        ],
+        "facebook": [],
+        "tiktok": [
+          "https://www.tiktok.com/@queenlaceparis"
+        ],
+        "whatsapp": [],
+        "booking": [
+          "https://www.planity.com/queen-lace-paris-75019",
+          "https://www.planity.com/queen-lace-paris-75019",
+          "https://www.planity.com/queen-lace-paris-75019",
+          "https://www.planity.com/queen-lace-paris-75019",
+          "https://www.planity.com/queen-lace-paris-75019",
+          "https://www.planity.com/queen-lace-paris-75019"
+        ]
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Floraphashion - Coiffure Afro Américaine Le Blanc Mesnil",
+    "ville": "93150 Le Blanc-Mesnil",
+    "departement": "75",
+    "telephone_public": "0751368423",
+    "url_site": "https://floraphashion.fr/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://floraphashion.fr/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Instagram (lien site)",
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Instagram (lien site)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "CTA réservation sur site (outil non identifiable clairement)",
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [
+        "Instagram link"
+      ],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "tresses",
+      "braids",
+      "locks",
+      "perruque/lace",
+      "styles_afro_specifiques"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: Instagram link",
+        "source": "https://floraphashion.fr/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "https://floraphashion.fr/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Instagram link"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [
+        "-moi sublimer votre chevelure avec un soin tout en douceur. 1 min - 80.00€ Réserver Natte collée + rajouts Les tresses avec rajouts sont bien plus qu’une simple coif",
+        "ndez-vous et offrez à vos cheveux le soin qu’ils méritent ! 1 min - 100.00€ Réserver Shampoing + natte naturelle Parce que des cheveux en bonne santé sont la clé d’u",
+        "dez-vous et laissez-moi sublimer vos cheveux avec passion ! 1h00 - 80.00€ Réserver Voir tout... Avis Google Les avis de nos clients Note globale 4.9 18 avis Pas e"
+      ],
+      "prix": [
+        "votre chevelure avec un soin tout en douceur. 1 min - 80.00€ Réserver Natte collée + rajouts Les tresses avec rajouts sont bien plus qu’une simple coiffure : el",
+        "ffrez à vos cheveux le soin qu’ils méritent ! 1 min - 100.00€ Réserver Shampoing + natte naturelle Parce que des cheveux en bonne santé sont la clé d’une belle c",
+        "laissez-moi sublimer vos cheveux avec passion ! 1h00 - 80.00€ Réserver Voir tout... Avis Google Les avis de nos clients Note globale 4.9 18 avis Pas encore d&#x2"
+      ],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://www.instagram.com/floraphashion93/",
+          "https://www.instagram.com/floraphashion93/"
+        ],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Salon Nixya Paris - Coiffeur afro - Braids, Tresses, Lissage, Coloration",
+    "ville": "75012 Paris",
+    "departement": "75",
+    "telephone_public": "0784832963",
+    "url_site": "https://nixya.fr/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://nixya.fr/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Site",
+        "Google (« 90+ avis » affiché)",
+        "Réseaux sociaux"
+      ],
+      "principal_apparent": "Site",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Formulaire / email / téléphone / réseaux / WhatsApp (lien public site) — pas de Planity détecté"
+      ],
+      "details_outils": [
+        "WhatsApp",
+        "Instagram",
+        "Facebook",
+        "Email",
+        "Téléphone"
+      ],
+      "booking_hrefs": [
+        "https://nixya.fr/reservation/",
+        "/reservation/",
+        "/reservation/",
+        "https://nixya.fr/reservation/",
+        "/reservation/",
+        "https://nixya.fr/reservation/",
+        "https://nixya.fr/reservation/",
+        "https://nixya.fr/reservation/"
+      ]
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Contact pour « tout renseignement supplémentaire » sur prestations marquées ***",
+        "Diagnostic capillaire mis en avant"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Tarifs non listés clairement sur homepage; orientation contact manuel"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Locks",
+      "Braids/vanille/crochets",
+      "Tissage",
+      "Lissages",
+      "Coloration/ombre",
+      "Chignons"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: WhatsApp, Instagram link, Facebook link, Email, Téléphone (lien)",
+        "source": "https://nixya.fr/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "WhatsApp public",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "https://nixya.fr/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      },
+      {
+        "probleme": "Prestations complexes hors self-serve (*** = contacter)",
+        "preuve": "Site: reprises plaques / réparation locks / extensions locks marquées *** + « contactez-nous… pour tout renseignement »",
+        "source": "https://nixya.fr/",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Réservation impossible sans qualification humaine",
+        "solution_actuelle": "WhatsApp / DM / téléphone / formulaire",
+        "opportunite_skedisy": "Qualification structurée (photos, historique locks) avant créneau"
+      },
+      {
+        "probleme": "Canal WhatsApp comme couche de réservation",
+        "preuve": "Lien/outil WhatsApp détecté sur le site public",
+        "source": "https://nixya.fr/ (+ détection HTML)",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Charge opérationnelle + perte de tracking no-show",
+        "solution_actuelle": "WhatsApp",
+        "opportunite_skedisy": "Remplacer le fil WhatsApp par un tunnel de réservation qualifiant"
+      }
+    ],
+    "G_outils": [
+      "WhatsApp",
+      "Instagram",
+      "Facebook",
+      "Email",
+      "Téléphone"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [
+        "Enfants Coupe Horaires d&#8217;ouverture du lundi à samedi 10h – 19h Prenez votre RDV dès maintenant ! Réservez votre séance au +33 7 84 83 29 63 ou cliquez sur l",
+        "ts Coupe Horaires d&#8217;ouverture du lundi à samedi 10h – 19h Prenez votre RDV dès maintenant ! Réservez votre séance au +33 7 84 83 29 63 ou cliquez sur le bout",
+        "ris Itinéraire Google Maps  Nos horaires Du lundi à samedi 10h – 19h Le dimanche fermé Mentions légales | Cookies | ⚑ Signaler un problème | Création M. milorad.p",
+        "inéraire Google Maps  Nos horaires Du lundi à samedi 10h – 19h Le dimanche fermé Mentions légales | Cookies | ⚑ Signaler un problème | Création M. milorad.pro Cop"
+      ],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://www.instagram.com/salon_nixya/",
+          "https://www.instagram.com/salon_nixya/"
+        ],
+        "facebook": [
+          "https://www.facebook.com/salonnixya",
+          "https://www.facebook.com/salonnixya"
+        ],
+        "tiktok": [],
+        "whatsapp": [
+          "https://wa.me/33784832963",
+          "https://wa.me/33784832963",
+          "https://wa.me/33784832963"
+        ],
+        "booking": [
+          "https://nixya.fr/reservation/",
+          "/reservation/",
+          "/reservation/",
+          "https://nixya.fr/reservation/",
+          "/reservation/",
+          "https://nixya.fr/reservation/",
+          "https://nixya.fr/reservation/",
+          "https://nixya.fr/reservation/"
+        ]
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Glory Day'z COIFFURE AFRO 92",
+    "ville": "92270 Bois-Colombes",
+    "departement": "75",
+    "telephone_public": "0627122906",
+    "url_site": "https://www.glorydayz.fr/",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "write EPROTO D0240000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\rec_layer_s3.c:1605:SSL alert number 80\n",
+      "finalUrl": "https://www.glorydayz.fr/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Site web non accessible ou non récupérable au moment de l'analyse",
+        "preuve": "write EPROTO D0240000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\rec_layer_s3.c:1605:SSL alert number 80\n",
+        "source": "https://www.glorydayz.fr/",
+        "type": "fait_technique",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Parcours digitale cassé → cliente bascule téléphone/DM (hypothèse)",
+        "solution_actuelle": "Canaux alternatifs éventuels non vérifiés",
+        "opportunite_skedisy": "Landing réservation fiable + fiche salon"
+      }
+    ],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Dede Afro Tresses",
+    "ville": "75019 Paris",
+    "departement": "75",
+    "telephone_public": "0698959860",
+    "url_site": "",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "no_url",
+      "finalUrl": ""
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Daba Beauté et bien être salon de coiffure afro paris",
+    "ville": "75011 Paris",
+    "departement": "75",
+    "telephone_public": "0627202792",
+    "url_site": "",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "no_url",
+      "finalUrl": ""
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "BOOBEAUTY PARIS /salon de coiffure esthétique ,spécialiste extensions de cheveux et balayage , onglerie ,afro et rehaussement",
+    "ville": "75020 Paris",
+    "departement": "75",
+    "telephone_public": "0983967654",
+    "url_site": "http://www.boobeautyparis.fr/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://www.boobeautyparis.fr/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Instagram (lien site)",
+        "Planity",
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Instagram (lien site)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Planity (détecté sur site)",
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [
+        "Planity",
+        "Instagram link"
+      ],
+      "booking_hrefs": [
+        "https://www.planity.com/boobeauty-paris-75017"
+      ]
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "tresses",
+      "tissage",
+      "locks",
+      "perruque/lace",
+      "lissage",
+      "styles_afro_specifiques",
+      "extensions"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "http://www.boobeautyparis.fr/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Planity",
+      "Instagram link"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [
+        "ns Réservables EXTENSIONS DE CILS Cil à Cil - Pose Complète 1h 40min 80 € Choisir Cil à Cil - Remplissage 1h 60 € Choisir Mixte - Pose Complète 2h 85 € Choisir Mi",
+        "Réservables EXTENSIONS DE CILS Cil à Cil - Pose Complète 1h 40min 80 € Choisir Cil à Cil - Remplissage 1h 60 € Choisir Mixte - Pose Complète 2h 85 € Choisir Mixte -",
+        "Pose Complète 1h 40min 80 € Choisir Cil à Cil - Remplissage 1h 60 € Choisir Mixte - Pose Complète 2h 85 € Choisir Mixte - Remplissage 1h 65 € Choisir Volume Russe",
+        "l à Cil - Remplissage 1h 60 € Choisir Mixte - Pose Complète 2h 85 € Choisir Mixte - Remplissage 1h 65 € Choisir Volume Russe - Pose Complète 3D / 6D 2h 90 € Chois",
+        "r Mixte - Pose Complète 2h 85 € Choisir Mixte - Remplissage 1h 65 € Choisir Volume Russe - Pose Complète 3D / 6D 2h 90 € Choisir Voir les 6 autres prestations EXT"
+      ],
+      "prix": [
+        "es EXTENSIONS DE CILS Cil à Cil - Pose Complète 1h 40min 80 € Choisir Cil à Cil - Remplissage 1h 60 € Choisir Mixte - Pose Complète 2h 85 € Choisir Mixte - Rempl",
+        "omplète 1h 40min 80 € Choisir Cil à Cil - Remplissage 1h 60 € Choisir Mixte - Pose Complète 2h 85 € Choisir Mixte - Remplissage 1h 65 € Choisir Volume Russe - Po",
+        "l - Remplissage 1h 60 € Choisir Mixte - Pose Complète 2h 85 € Choisir Mixte - Remplissage 1h 65 € Choisir Volume Russe - Pose Complète 3D / 6D 2h 90 € Choisir Vo",
+        "e - Pose Complète 2h 85 € Choisir Mixte - Remplissage 1h 65 € Choisir Volume Russe - Pose Complète 3D / 6D 2h 90 € Choisir Voir les 6 autres prestations EXTENSIO",
+        "1h 65 € Choisir Volume Russe - Pose Complète 3D / 6D 2h 90 € Choisir Voir les 6 autres prestations EXTENSIONS DE CHEVEUX Extension Cheveux Micro-Anneaux 100% Na"
+      ],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://www.instagram.com/boobeauty.paris/",
+          "https://www.instagram.com/boobeauty.paris/"
+        ],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": [
+          "https://www.planity.com/boobeauty-paris-75017"
+        ]
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Tresses africaines à domicile",
+    "ville": "91150 Étampes",
+    "departement": "75",
+    "telephone_public": "0695355445",
+    "url_site": "",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "no_url",
+      "finalUrl": ""
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Coiffeuse Afro à domicile de Conflans Ste Honorine",
+    "ville": "78700 Conflans-Sainte-Honorine",
+    "departement": "75",
+    "telephone_public": "",
+    "url_site": "https://calendly.com/jeilabraidwigs",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://calendly.com/jeilabraidwigs"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Calendly",
+        "Site web"
+      ],
+      "principal_apparent": "Calendly",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Calendly (détecté)"
+      ],
+      "details_outils": [
+        "Calendly"
+      ],
+      "booking_hrefs": [
+        "https://calendly.com/favicon.ico",
+        "https://calendly.com/media/favicon/apple-touch-icon.png",
+        "https://assets.calendly.com/assets/booking/css/booking-edea3dcb5.css"
+      ]
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "https://calendly.com/jeilabraidwigs",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Calendly"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": [
+          "https://calendly.com/favicon.ico",
+          "https://calendly.com/media/favicon/apple-touch-icon.png",
+          "https://assets.calendly.com/assets/booking/css/booking-edea3dcb5.css"
+        ]
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Ethni'Ka Coiffure Afro",
+    "ville": "94240 L'Haÿ-les-Roses",
+    "departement": "75",
+    "telephone_public": "0769119607",
+    "url_site": "https://frmaps.xyz/business/ethni-ka-coiffure-afro-Cev7m928",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "no_url",
+      "finalUrl": ""
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Site web non accessible ou non récupérable au moment de l'analyse",
+        "preuve": "no_url",
+        "source": "https://frmaps.xyz/business/ethni-ka-coiffure-afro-Cev7m928",
+        "type": "fait_technique",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Parcours digitale cassé → cliente bascule téléphone/DM (hypothèse)",
+        "solution_actuelle": "Canaux alternatifs éventuels non vérifiés",
+        "opportunite_skedisy": "Landing réservation fiable + fiche salon"
+      }
+    ],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "coiffure africaine senegalaise MabyPro Marietou",
+    "ville": "92110 Clichy",
+    "departement": "75",
+    "telephone_public": "0760197044",
+    "url_site": "https://www.pinterest.fr/MabyPro/_created/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "truncated",
+      "finalUrl": "https://fr.pinterest.com/MabyPro/_created/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Calendly",
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Calendly",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Calendly (détecté)",
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [
+        "Calendly"
+      ],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "https://www.pinterest.fr/MabyPro/_created/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Calendly"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [
+        "olor:var(--comp-iconbuttonsocial-color-background-container-whatsapp)}@media (hover:hover){.pywVWT:hover{background:linear-gradient(0deg,var(--sema-color-hover-backgrou",
+        "00%),var(--comp-iconbuttonsocial-color-background-container-whatsapp)}}.pywVWT:active{background:linear-gradient(0deg,var(--sema-color-pressed-background-elevated-wash-",
+        "00%),var(--comp-iconbuttonsocial-color-background-container-whatsapp)}.hJ6ECk{background-origin:border-box!important;background:var(--comp-iconbuttonsocial-color-backgr"
+      ],
+      "duree": [
+        "und-color:var(--sema-color-background-neutral-default)}.GPfU9h{background-color:var(--sema-color-background-neutral-weak)}.Kbc8NH{background-color:var(--sema-colo",
+        "U{margin-left:var(--sema-space-1000)}html:not([dir=rtl]) .EU7hq4,html[dir=rtl] .et7zXU{margin-right:var(--sema-space-1000)}html[dir=rtl] .EU7hq4{margin-left:var(-",
+        "et7zXU{margin-right:var(--sema-space-1000)}html[dir=rtl] .EU7hq4{margin-left:var(--sema-space-1000)}html:not([dir=rtl]) .eyKG6Z{margin-left:var(--sema-space-negat",
+        "4{margin-left:var(--sema-space-1200)}html:not([dir=rtl]) .Cu9hQM{margin-left:var(--sema-space-negative-1200)}html:not([dir=rtl]) .frfMTO,html[dir=rtl] .Cu9hQM{mar",
+        "negative-1200)}html:not([dir=rtl]) .frfMTO,html[dir=rtl] .Cu9hQM{margin-right:var(--sema-space-negative-1200)}html[dir=rtl] .frfMTO{margin-left:var(--sema-space-n"
+      ],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Laly's hair coiffeur afro-européen",
+    "ville": "78570 Andrésy",
+    "departement": "75",
+    "telephone_public": "0650448764",
+    "url_site": "https://lalyshair25.com/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://lalyshair25.com/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Instagram (lien site)",
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Instagram (lien site)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "CTA réservation sur site (outil non identifiable clairement)",
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [
+        "Instagram link"
+      ],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: Instagram link",
+        "source": "https://lalyshair25.com/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "https://lalyshair25.com/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Instagram link"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [
+        "Laly&apos;s Hair - Coiffeur afro-européen En savoir plus Bienvenue chez Laly's Hair Nous vous accueillons dans la joie et la bonne humeur"
+      ],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://www.instagram.com/lalys.hair25/"
+        ],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Prestige Hair Fashion - Coiffeur afro Sarcelles",
+    "ville": "95200 Sarcelles",
+    "departement": "75",
+    "telephone_public": "0139935558",
+    "url_site": "",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "no_url",
+      "finalUrl": ""
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Afro-Tresse",
+    "ville": "75018 Paris",
+    "departement": "75",
+    "telephone_public": "0769043266",
+    "url_site": "http://www.afro-tresse.fr/?utm_source=gmb",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://www.afro-tresse.fr/?utm_source=gmb"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Instagram (lien site)",
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Instagram (lien site)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "CTA réservation sur site (outil non identifiable clairement)",
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [
+        "Instagram link",
+        "Email",
+        "Téléphone (lien)"
+      ],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "tresses",
+      "perruque/lace"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: Instagram link, Email, Téléphone (lien)",
+        "source": "http://www.afro-tresse.fr/?utm_source=gmb",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "http://www.afro-tresse.fr/?utm_source=gmb",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Instagram link",
+      "Email",
+      "Téléphone (lien)"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://instagram.com/Maya traore",
+          "https://instagram.com/Maya traore"
+        ],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Ar Studio Salon Paris 20- Coiffeur Paris, Lissage, Ombré Hair Et Balayage, Épilation, Onglerie, Extension De Cil",
+    "ville": "75020 Paris",
+    "departement": "75",
+    "telephone_public": "0981031707",
+    "url_site": "https://salon-coiffure.net/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://salon-coiffure.net/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "CTA réservation sur site (outil non identifiable clairement)",
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "tresses",
+      "perruque/lace",
+      "lissage",
+      "extensions"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: aucun widget booking classique",
+        "source": "https://salon-coiffure.net/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "https://salon-coiffure.net/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [
+        "convenir d&rsquo;une [&hellip;] Plus d'informations Guéret, 23000 Hair Show Retrouvez le salon de coiffure Hair Show situé à Guéret (23000) en Nouvelle-Aquitaine pour",
+        "moi ! Actus et infos Salon de coiffure Celine 19 mai 2025 à 9h02 Adopter la tendance effortless de 2025 : mes conseils pour un style soigné en toute simplicité &#",
+        "ode redéfinit [&hellip;] Lire la suite Celine 18 mai 2025 à 11h01 Mon expérience de 30 jours avec la tresse couronne inversée : des transformations inattendues La",
+        "nne inversée, [&hellip;] Lire la suite Celine 18 mai 2025 à 10h02 Découvrez les coiffures éblouissantes qui volent la vedette sur le tapis rouge de Cannes 2025 Le",
+        "éblouissantes [&hellip;] Lire la suite Celine 18 mai 2025 à 1h02 Le bob texturé : l&rsquo;alliance parfaite avec les tendances mode actuelles pour cette journée m"
+      ],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "C NAILS ART & Beauty Prothésiste ongulaire, Onglerie, Spécilalisée nail art, Extensions de cils, VAUREAL 95",
+    "ville": "95490 Vauréal",
+    "departement": "75",
+    "telephone_public": "0760728324",
+    "url_site": "",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "no_url",
+      "finalUrl": ""
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Katy Coiffure Afro",
+    "ville": "92400 Courbevoie",
+    "departement": "77",
+    "telephone_public": "0659729456",
+    "url_site": "https://www.katyafro92.fr/",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "write EPROTO D0240000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\rec_layer_s3.c:1605:SSL alert number 80\n",
+      "finalUrl": "https://www.katyafro92.fr/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Site web non accessible ou non récupérable au moment de l'analyse",
+        "preuve": "write EPROTO D0240000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\rec_layer_s3.c:1605:SSL alert number 80\n",
+        "source": "https://www.katyafro92.fr/",
+        "type": "fait_technique",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Parcours digitale cassé → cliente bascule téléphone/DM (hypothèse)",
+        "solution_actuelle": "Canaux alternatifs éventuels non vérifiés",
+        "opportunite_skedisy": "Landing réservation fiable + fiche salon"
+      }
+    ],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "AFRO HAIR TRUCK (SPÉCIALISTE CHEVEUX AFRO )",
+    "ville": "94400 Vitry-sur-Seine",
+    "departement": "77",
+    "telephone_public": "0753611724",
+    "url_site": "",
+    "fetch": {
+      "ok": false,
+      "status": 0,
+      "error": "no_url",
+      "finalUrl": ""
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {}
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "GBD.Ez37.9/92/ Coiffure 92 AFRO tresses tissage lissage au tanin soin de cheveux",
+    "ville": "92270 Bois-Colombes",
+    "departement": "77",
+    "telephone_public": "0661265469",
+    "url_site": "http://www.glorybeauty-37-9.fr/",
+    "fetch": {
+      "ok": false,
+      "status": 404,
+      "error": "http_404",
+      "finalUrl": "http://www.glorybeauty-37-9.fr/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "Non listées clairement dans le HTML récupéré"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Site web non accessible ou non récupérable au moment de l'analyse",
+        "preuve": "http_404",
+        "source": "http://www.glorybeauty-37-9.fr/",
+        "type": "fait_technique",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Parcours digitale cassé → cliente bascule téléphone/DM (hypothèse)",
+        "solution_actuelle": "Canaux alternatifs éventuels non vérifiés",
+        "opportunite_skedisy": "Landing réservation fiable + fiche salon"
+      }
+    ],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [],
+      "faq": false,
+      "socials": {
+        "instagram": [],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "COIFFURE AFRO DRAMEY STYLE",
+    "ville": "92000 Nanterre",
+    "departement": "77",
+    "telephone_public": "0146989031",
+    "url_site": "http://www.dramey-style.fr/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "http://www.dramey-style.fr/joomla/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Téléphone (présent dans fiche Google importée)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "tresses",
+      "styles_afro_specifiques"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: aucun widget booking classique",
+        "source": "http://www.dramey-style.fr/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "Téléphone / autre non identifié",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "http://www.dramey-style.fr/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "Aucun système identifiable sur les sources collectées"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [
+        "Style - Accueil Accueil Heures d'ouvertures Itin�raire Nos Tarifs Nous contacter Notre salon en vid�o Photos Flash info NOTRE SALON EN VIDEO ESPACE FEMMES COIFFURES"
+      ],
+      "faq": false,
+      "socials": {
+        "instagram": [],
+        "facebook": [],
+        "tiktok": [],
+        "whatsapp": [],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  },
+  {
+    "salon": "Jenny & Paola Atelier - coiffeur Paris 17e - Soin TOKIO - Extensions Great length - Balayage Ombré Hair - Lissage Brésilien",
+    "ville": "75017 Paris",
+    "departement": "77",
+    "telephone_public": "0142940762",
+    "url_site": "http://jennyetpaola.com/",
+    "fetch": {
+      "ok": true,
+      "status": 200,
+      "error": "",
+      "finalUrl": "https://jennyetpaola.com/"
+    },
+    "A_acquisition": {
+      "canaux_apparents_faits": [
+        "Instagram (lien site)",
+        "Facebook (lien site)",
+        "WhatsApp",
+        "Téléphone (présent dans fiche Google importée)",
+        "Site web"
+      ],
+      "principal_apparent": "Instagram (lien site)",
+      "note": "Sans Google/Instagram scrape, le canal d'acquisition principal reste non prouvé (hypothèse interdite)."
+    },
+    "B_reservation": {
+      "modes_detectes_faits": [
+        "WhatsApp (bouton/lien public sur site)",
+        "Téléphone possible (numéro public)"
+      ],
+      "details_outils": [
+        "WhatsApp",
+        "Instagram link",
+        "Facebook link",
+        "TikTok link"
+      ],
+      "booking_hrefs": []
+    },
+    "C_qualification": {
+      "infos_demandees_detectees": [
+        "Non vérifié sur le site (pas d'extrait trouvé) — ne pas conclure à l'absence"
+      ],
+      "extraits_photo": []
+    },
+    "D_paiement": [
+      {
+        "type": "non_verifie",
+        "detail": "Politique d'acompte non trouvée sur le HTML récupéré"
+      }
+    ],
+    "E_complexite_prestations": [
+      "lissage",
+      "extensions"
+    ],
+    "F_problemes": [
+      {
+        "probleme": "Réservation principalement manuelle (pas d'outil Planity/Fresha/Booksy/Calendly détecté sur le site)",
+        "preuve": "Outils détectés: WhatsApp, Instagram link, Facebook link, TikTok link",
+        "source": "http://jennyetpaola.com/",
+        "type": "fait",
+        "frequence": "structurelle",
+        "gravite": "haute",
+        "impact": "Friction + no-show + charge WhatsApp/téléphone (hypothèse d'impact)",
+        "solution_actuelle": "WhatsApp public",
+        "opportunite_skedisy": "Réservation guidée prestations afro + qualification photo + acompte"
+      },
+      {
+        "probleme": "Politique d'acompte non visible clairement sur le site",
+        "preuve": "Aucun extrait 'acompte/arrhes/deposit' trouvé dans le HTML analysé",
+        "source": "http://jennyetpaola.com/",
+        "type": "fait_absence_sur_page",
+        "frequence": "n/a",
+        "gravite": "moyenne",
+        "impact": "Hypothèse: risque no-show / malentendu prix — non prouvé sans avis",
+        "solution_actuelle": "Non identifiable",
+        "opportunite_skedisy": "Acompte intégré au funnel de réservation"
+      }
+    ],
+    "G_outils": [
+      "WhatsApp",
+      "Instagram link",
+      "Facebook link",
+      "TikTok link"
+    ],
+    "H_extraits": {
+      "acompte": [],
+      "annulation": [],
+      "retard": [],
+      "whatsapp": [],
+      "duree": [],
+      "prix": [
+        "ons de coiffure à Paris Skip to content Monnaie France (EUR €) Allemagne (EUR €) Autriche (EUR €) Belgique (EUR €) Bulgarie (EUR €) Chypre (EUR €) Croatie (EUR €",
+        "Paris Skip to content Monnaie France (EUR €) Allemagne (EUR €) Autriche (EUR €) Belgique (EUR €) Bulgarie (EUR €) Chypre (EUR €) Croatie (EUR €) Danemark (EUR €)",
+        "tent Monnaie France (EUR €) Allemagne (EUR €) Autriche (EUR €) Belgique (EUR €) Bulgarie (EUR €) Chypre (EUR €) Croatie (EUR €) Danemark (EUR €) Espagne (EUR €)",
+        "ce (EUR €) Allemagne (EUR €) Autriche (EUR €) Belgique (EUR €) Bulgarie (EUR €) Chypre (EUR €) Croatie (EUR €) Danemark (EUR €) Espagne (EUR €) Estonie (EUR €) F",
+        "gne (EUR €) Autriche (EUR €) Belgique (EUR €) Bulgarie (EUR €) Chypre (EUR €) Croatie (EUR €) Danemark (EUR €) Espagne (EUR €) Estonie (EUR €) Finlande (EUR €) F"
+      ],
+      "faq": false,
+      "socials": {
+        "instagram": [
+          "https://www.instagram.com/jennyetpaola?igsh=Y20yZzNpNDc0ZzBn",
+          "https://www.instagram.com/jennyetpaola?igsh=Y20yZzNpNDc0ZzBn",
+          "https://www.instagram.com/jennyetpaola?igsh=Y20yZzNpNDc0ZzBn"
+        ],
+        "facebook": [
+          "https://www.facebook.com/jennyetpaola",
+          "https://www.facebook.com/jennyetpaola",
+          "https://www.facebook.com/jennyetpaola"
+        ],
+        "tiktok": [
+          "https://www.tiktok.com/@jennyetpaola",
+          "https://www.tiktok.com/@jennyetpaola",
+          "https://www.tiktok.com/@jennyetpaola"
+        ],
+        "whatsapp": [
+          "https://wa.me/33145220685",
+          "https://wa.me/33145220685",
+          "https://wa.me/33145220685"
+        ],
+        "booking": []
+      }
+    },
+    "limites": [
+      "Avis Google non collectés dans ce passage automatisé site-only",
+      "Commentaires Instagram/TikTok non accessibles sans API/login — non inventés",
+      "Conversations WhatsApp privées non consultées"
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-09-10T23:14:07.922640+00:00",
+  "target": 5000,
+  "count_unique": 618,
+  "target_reached": false,
+  "details_enriched_this_run": 102,
+  "with_reviews_api": 0,
+  "with_negative_reviews_api": 0,
+  "blockers": [
+    "SearchTextRequest quota on this GCP project is 100/day — insufficient for 5000.",
+    "Place Details returns no 'reviews' field for this project/key (even with FieldMask *).",
+    "Enable billing + Places Atmosphere / request quota increase; rotate exposed API key."
+  ],
+  "shards": [
+    "salons_afro_idf_part001_20260911_011407.json",
+    "salons_afro_idf_part002_20260911_011407.json"
+  ],
+  "all": "salons_afro_idf_ALL_20260911_011407.json",
+  "avis_negatifs_index": "avis_negatifs_index_20260911_011407.json"
+}

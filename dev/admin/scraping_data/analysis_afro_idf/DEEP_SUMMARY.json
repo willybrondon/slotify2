@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-09-10T21:43:03.966Z",
+  "n_salons": 26,
+  "sites_ok": 15,
+  "with_planity": 2,
+  "with_whatsapp_public": 2,
+  "with_calendly": 2,
+  "with_acompte_visible": 0,
+  "with_annulation_visible": 1,
+  "problems_rows": 30,
+  "method_limits": [
+    "FAIT: analyse basée sur HTML des sites listés + champs du JSON d'import.",
+    "NON FAIT dans ce run: scrape Google Reviews, Instagram comments, TikTok, Facebook posts.",
+    "Les problèmes liés aux avis clients doivent être ajoutés via recherche manuelle/API Maps autorisée."
+  ]
+}

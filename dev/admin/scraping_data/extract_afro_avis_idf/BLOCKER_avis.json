@@ -1,0 +1,14 @@
+{
+  "error": "REVIEWS_NOT_AVAILABLE_ON_THIS_API_KEY",
+  "why": "Places API (New) returns rating/userRatingCount but not the reviews[] field for this GCP project. Legacy Place Details is REQUEST_DENIED (Places API Legacy not enabled).",
+  "fix_now": [
+    "Open https://console.cloud.google.com/google/maps-apis/api-list",
+    "Enable billing on the project that owns the API key",
+    "Enable 'Places API' (Legacy) — required for reliable reviews via details/json",
+    "Also keep 'Places API (New)' enabled",
+    "Key restrictions: application restriction None or IP (not HTTP referrer) for this script",
+    "Rotate the key that was pasted in chat",
+    "Re-run: python enrich_afro_places_avis.py"
+  ],
+  "sample_place_id": "ChIJ_-zZOihv5kcRB_efBVg-PSc"
+}

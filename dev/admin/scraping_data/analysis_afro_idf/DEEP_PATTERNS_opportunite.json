@@ -1,0 +1,41 @@
+{
+  "sample_size": 26,
+  "booking_stack_observed": {
+    "planity_on_site_or_verified": [
+      "Queen Lace",
+      "BOOBEAUTY",
+      "NOUCHE (Planity page verified)"
+    ],
+    "whatsapp_public": [
+      "Nixya",
+      "Jenny & Paola"
+    ],
+    "calendly": [
+      "Coiffeuse Afro domicile Conflans",
+      "MabyPro (Pinterest URL edge case / calendly detect)"
+    ],
+    "formulaire_manuel": [
+      "CindyFashion"
+    ],
+    "telephone_only_or_unknown": "Majorité des fiches sans widget booking détecté"
+  },
+  "journey_hypothesis_forbidden_note": "Les frictions Instagram DM / TikTok / no-show ne sont PAS affirmées comme faits pour chaque salon faute d'accès commentaires publics exhaustifs dans ce run.",
+  "skedisy_opportunity_clusters": [
+    {
+      "cluster": "Qualification avant créneau",
+      "why_fact_based": "Catalogues longs (Nouche Planity) + prestations *** contact required (Nixya) + formulaire confirm-later (CindyFashion)"
+    },
+    {
+      "cluster": "Transparence prix & suppléments",
+      "why_fact_based": "Avis hausse +20€ (Nouche Planity) + suppléments longueur/masse listés + tarifs « sur devis »"
+    },
+    {
+      "cluster": "Remplacement WhatsApp ops",
+      "why_fact_based": "WhatsApp public détecté (Nixya, Jenny & Paola) comme canal de contact/réservation"
+    },
+    {
+      "cluster": "Gestion durée réelle",
+      "why_fact_based": "Durées Planity jusqu'à 4h20; témoignage 3h30 tresses (CindyFashion)"
+    }
+  ]
+}

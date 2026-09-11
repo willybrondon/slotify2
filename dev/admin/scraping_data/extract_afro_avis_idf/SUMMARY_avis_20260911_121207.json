@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-09-11T10:12:07.588226+00:00",
+  "count_unique": 618,
+  "with_avis_api": 604,
+  "with_avis_negatifs_api": 293,
+  "pct_with_avis": 97.7,
+  "note_api_limit": "Google Place Details returns at most ~5 reviews per place.",
+  "shards": [
+    "salons_afro_idf_part001_20260911_121207.json",
+    "salons_afro_idf_part002_20260911_121207.json"
+  ],
+  "all": "salons_afro_idf_ALL_20260911_121207.json",
+  "avis_negatifs_index": "avis_negatifs_index_20260911_121207.json"
+}

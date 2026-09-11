@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-09-11T11:12:38.468983+00:00",
+  "source": "D:\\Multi Saloon All File\\slotify-dev\\slotify2\\slotify2\\dev\\admin\\scraping_data\\extract_afro_avis_idf\\_checkpoint.json",
+  "input_count": 1758,
+  "afro_pertinent": 329,
+  "uncertain": 1238,
+  "hors_perimetre": 191,
+  "merite_analyse_approfondie": 633,
+  "with_avis_in_outputs": 1724,
+  "with_avis_negatifs_in_outputs": 855,
+  "salons_avec_negatifs_index_produit": 760,
+  "pertinent_par_categorie": {
+    "perruques / lace": 18,
+    "braids / tresses": 104,
+    "coiffure afro": 72,
+    "extensions": 46,
+    "locks / cheveux naturels": 54,
+    "salon mixte": 33,
+    "barber afro": 2
+  },
+  "pertinent_par_confiance": {
+    "élevé": 107,
+    "moyen": 222
+  },
+  "method_notes": [
+    "Confiance élevée jamais attribuée sur le seul nom pour les catégories afro.",
+    "Les textes d'avis Google (API, ≤5/salon) sont inclus dans chaque fiche (avis + avis_negatifs).",
+    "Le mot-clé de recherche de collecte est un biais, pas une preuve métier.",
+    "Instagram/Facebook/TikTok / système de réservation renseignés uniquement si présents dans le champ site.",
+    "Faits et hypothèses sont des listes séparées dans chaque fiche."
+  ],
+  "outputs": [
+    "AFRO_pertinents.json / .csv (avec avis + avis_negatifs)",
+    "UNCERTAIN_a_verifier.json / .csv (avec avis + avis_negatifs)",
+    "HORS_perimetre.json",
+    "ALL_classified.json",
+    "DEEP_DIVE_candidats.json",
+    "AVIS_NEGATIFS_pour_produit.json"
+  ]
+}
