@@ -30,3 +30,21 @@ python etape3_squire_rank.py
 
 → `PROMPT5_AUDIT_EPISTEMOLOGIQUE.md`  
 → Canvas: `skedisy-audit-hypotheses.canvas.tsx`
+
+## Prompt 6 — Product Strategy Audit (SQUIRE)
+
+→ `PROMPT6_PRODUCT_STRATEGY_AUDIT.md`  
+→ Canvas: `skedisy-product-strategy-audit.canvas.tsx`
+
+## Prompt 7 — SQUIRE Blueprint (décision build)
+
+Sans interviews terrain — base = données publiques + Prompts 1–6.
+
+→ `PROMPT7_SQUIRE_BLUEPRINT.md`  
+→ Canvas: `skedisy-squire-blueprint.canvas.tsx`
+
+## Plan d’implémentation (sans code)
+
+Cartographie existant Skedisy × Blueprint · phases · sprints · décisions D1–D7.
+
+→ `IMPLEMENTATION_PLAN_SQUIRE.md`

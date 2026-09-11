@@ -311,8 +311,13 @@ jobs:
           cd "dev/flutter/multi_salon_${{ matrix.app }}"
           flutter clean
           flutter pub get
-          flutter pub upgrade
-      
+          # Fail fast on Dart compile errors (same ones that break Xcode Run Script)
+          dart analyze lib --fatal-warnings 2>&1 | tee "$RUNNER_TEMP/dart-analyze-${{ matrix.app }}.log" || true
+          if grep -E "error -|error •" "$RUNNER_TEMP/dart-analyze-${{ matrix.app }}.log" >/dev/null 2>&1; then
+            echo "::error::Dart analyze reported errors — fix these before Xcode archive"
+            grep -E "error -|error •" "$RUNNER_TEMP/dart-analyze-${{ matrix.app }}.log" | head -50
+            exit 1
+          fi      
 
       - name: Install the Apple certificate and provisioning profile
         env:
@@ -447,6 +452,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "dev/flutter/multi_salon_${{ matrix.app }}/ios"
+          set +e
           xcodebuild -workspace Runner.xcworkspace -scheme "Runner" \
           -archivePath $RUNNER_TEMP/Runner.xcarchive \
           -sdk iphoneos \
@@ -455,6 +461,15 @@ jobs:
           DEVELOPMENT_TEAM=7B755FRMAM \
           APS_ENVIRONMENT=production \
           clean archive 2>&1 | tee "$RUNNER_TEMP/xcodebuild-archive.log"
+          XC_STATUS=${PIPESTATUS[0]}
+          set -e
+          if [ "$XC_STATUS" -ne 0 ]; then
+            echo "::error::xcodebuild archive failed (exit $XC_STATUS). Relevant Flutter/Dart errors:"
+            grep -E "error:|Error:|Failed to package|Target .* failed|This expression has type|Exception:" "$RUNNER_TEMP/xcodebuild-archive.log" | tail -80 || true
+            echo "---- last 60 lines ----"
+            tail -60 "$RUNNER_TEMP/xcodebuild-archive.log" || true
+            exit "$XC_STATUS"
+          fi
           if [ "${{ matrix.app }}" = "customer" ]; then
             PLUGINS="$RUNNER_TEMP/Runner.xcarchive/Products/Applications/Runner.app/PlugIns"
             ls -la "$PLUGINS" || true

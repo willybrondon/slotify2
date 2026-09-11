@@ -38,7 +38,7 @@ class BookingScreenController extends GetxController with GetTickerProviderState
   ScrollController completedScrollController = ScrollController();
   ScrollController cancelScrollController = ScrollController();
 
-  List<int> get _bookingViewIds => [Constant.idProgressView, Constant.idOnChangeTabBar];
+  List<String> get _bookingViewIds => [Constant.idProgressView, Constant.idOnChangeTabBar];
 
   String get _expertId => Constant.storage.read<String>("expertId").toString();
 
