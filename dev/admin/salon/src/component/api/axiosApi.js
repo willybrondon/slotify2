@@ -18,18 +18,29 @@ function resolveApiBase() {
 /** Always build an absolute API URL on site root (never under /salonpanel/). */
 export function buildApiUrl(path) {
   const raw = String(path || "").trim();
-  if (/^https?:\/\//i.test(raw)) {
-    return raw.replace(/\/salonpanel\/(salon|admin|user)\//, "/$1/");
-  }
   const origin =
     typeof window !== "undefined" && window.location?.origin
       ? window.location.origin
       : "https://skedisy.com";
-  const base = resolveApiBase().includes("/salonpanel")
-    ? `${origin}/`
-    : resolveApiBase();
-  const normalized = raw.replace(/^\//, "").replace(/^salonpanel\//, "");
-  return new URL(normalized, base.endsWith("/") ? base : `${base}/`).href;
+
+  let href = raw;
+  if (/^https?:\/\//i.test(raw)) {
+    href = raw;
+  } else {
+    const normalized = raw
+      .replace(/^\//, "")
+      .replace(/^salonpanel\//i, "")
+      .replace(/^salonPanel\//i, "");
+    href = `${origin}/${normalized}`;
+  }
+
+  // Collapse accidental /salonpanel/salon|admin|user/ → /salon|admin|user/
+  href = href.replace(/\/salonpanel\/(salon|admin|user)\//gi, "/$1/");
+  href = href.replace(/\/salonPanel\/(salon|admin|user)\//gi, "/$1/");
+  // Also fix origin/salonpanel/ duplicated once more
+  href = href.replace(`://${new URL(origin).host}/salonpanel/`, `://${new URL(origin).host}/`);
+
+  return href;
 }
 
 export const apiInstance = axios.create({
@@ -113,11 +124,11 @@ const handleErrors = async (response, requestUrl) => {
       }
     }
     if (!data && isHtmlBody(trimmed)) {
-      console.error("[Salon API] HTML response for:", requestUrl);
+      console.error("[Salon API] HTML response for:", requestUrl, response.status);
       DangerRight(
-        "API unreachable (got HTML instead of JSON). Reload the page."
+        `API unreachable (${response.status} HTML). Check ${String(requestUrl || "").replace(/\?.*$/, "")}`
       );
-      return Promise.reject({ message: text, wrongPath: true });
+      return Promise.reject({ message: text, wrongPath: true, url: requestUrl });
     }
     if (!data) {
       if (!response.ok) {

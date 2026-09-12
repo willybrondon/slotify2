@@ -1,0 +1,35 @@
+{
+  "files": {
+    "main.css": "/salonpanel/static/css/main.7e0bd82a.css",
+    "main.js": "/salonpanel/static/js/main.def6b512.js",
+    "static/js/511.b4c8f9fa.chunk.js": "/salonpanel/static/js/511.b4c8f9fa.chunk.js",
+    "static/media/login.jpg": "/salonpanel/static/media/login.d03974a3649b51cacdfb.jpg",
+    "static/media/withDraw.png": "/salonpanel/static/media/withDraw.889171327293109d598f.png",
+    "static/media/male.png": "/salonpanel/static/media/male.459a8699b07b4b9bf3d6.png",
+    "static/media/star.svg": "/salonpanel/static/media/star.91c2589c90ffddfc8ddb32c23e487acd.svg",
+    "static/media/logo2.png": "/salonpanel/static/media/logo2.e29c578582bd8d295f0c.png",
+    "static/media/logo.png": "/salonpanel/static/media/logo.8d4c8ec1510c9ee70a87.png",
+    "static/media/call.svg": "/salonpanel/static/media/call.bdcf30c4493e9913bbc5de5a28d35d3a.svg",
+    "static/media/refund.svg": "/salonpanel/static/media/refund.4d36d28818d911c6a9eb0736818b0822.svg",
+    "static/media/services.svg": "/salonpanel/static/media/services.acf839b0f78ef52956a59eded5a4ff47.svg",
+    "static/media/age.svg": "/salonpanel/static/media/age.43551b594ef913100d9ece3fb03fe367.svg",
+    "static/media/wit.svg": "/salonpanel/static/media/wit.3d84dadcdfb71500bf88b2d39ee8b88b.svg",
+    "static/media/logo.svg": "/salonpanel/static/media/logo.ba376c3f58f18baa01f0e2cf47c60058.svg",
+    "index.html": "/salonpanel/index.html",
+    "static/media/cancel.svg": "/salonpanel/static/media/cancel.70d20e4d6adb064be9fbfaca836d0ba7.svg",
+    "static/media/complete.svg": "/salonpanel/static/media/complete.a3742a54f6f8c727a35a78a3d46ee1b3.svg",
+    "static/media/order.svg": "/salonpanel/static/media/order.90d2c4e299abc14e45fd725ddea4ebf4.svg",
+    "static/media/deliever.svg": "/salonpanel/static/media/deliever.b5972dc2e7695968870f000d32e46e7e.svg",
+    "static/media/mail.svg": "/salonpanel/static/media/mail.52d19cb28afafd2ff74c9fd9d2e9b59a.svg",
+    "static/media/category.svg": "/salonpanel/static/media/category.7feca57c05f17695ea5592d51c53c271.svg",
+    "static/media/edit.svg": "/salonpanel/static/media/edit.a5f6471ce5f1fbcf93551c1b93bf1d94.svg",
+    "static/media/withDrawMoney.svg": "/salonpanel/static/media/withDrawMoney.f6ff56030d2bacdd5720a8e94cf80532.svg",
+    "main.7e0bd82a.css.map": "/salonpanel/static/css/main.7e0bd82a.css.map",
+    "main.def6b512.js.map": "/salonpanel/static/js/main.def6b512.js.map",
+    "511.b4c8f9fa.chunk.js.map": "/salonpanel/static/js/511.b4c8f9fa.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7e0bd82a.css",
+    "static/js/main.def6b512.js"
+  ]
+}

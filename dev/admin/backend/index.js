@@ -704,8 +704,14 @@ app.use("/admin", express.static(path.join(__dirname, "public")));
 app.get("/admin", function (req, res) {
   res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
 });
-// Direct route for admin dashboard (all /admin/* paths)
-app.get("/admin/*", function (req, res) {
+// SPA fallback for admin UI — but never swallow real API misses as HTML
+app.get("/admin/*", function (req, res, next) {
+  if (req.headers.key || req.headers.authorization) {
+    return res.status(404).json({
+      status: false,
+      message: `API route not found: ${req.method} ${req.path}`,
+    });
+  }
   res.status(200).sendFile(path.join(__dirname, "public", "index.html"));
 });
 
@@ -798,6 +804,23 @@ app.use("/", express.static(salonportalPath));
 // Direct route for salonportal as main page - MUST BE LAST
 app.get("/", function (req, res) {
   res.status(200).sendFile(path.join(salonportalPath, "index.html"));
+});
+
+// Final API-friendly 404 (avoid Express HTML "Cannot GET" for panel clients)
+app.use((req, res) => {
+  const isApiClient = !!(
+    req.headers.key ||
+    req.headers.authorization ||
+    req.path.startsWith("/api/") ||
+    (req.headers.accept || "").includes("application/json")
+  );
+  if (isApiClient) {
+    return res.status(404).json({
+      status: false,
+      message: `API route not found: ${req.method} ${req.path}`,
+    });
+  }
+  return res.status(404).type("text").send("Not found");
 });
 
 app.listen(port, () => {

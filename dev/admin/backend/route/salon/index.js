@@ -35,7 +35,7 @@ route.use("/review", salonMiddleware, review);
 route.use("/dashboard", dashboard);
 route.use("/service", service);
 route.use("/booking", salonMiddleware, booking);
-route.use("/demand", salonMiddleware, afroDemand);
+route.use("/demand", afroDemand);
 route.use("/teamSchedule", salonMiddleware, teamSchedule);
 route.use("/stripeConnect", salonMiddleware, stripeConnect);
 route.use("/settlement", salonMiddleware, settlement);
