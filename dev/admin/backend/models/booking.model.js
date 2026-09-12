@@ -76,6 +76,16 @@ const bookingSchema = new mongoose.Schema(
       time: String,
       date: String,
     },
+
+    /** SQUIRE wedge — link from ServiceDemand after deposit */
+    demandId: { type: mongoose.Schema.Types.ObjectId, ref: "ServiceDemand", default: null },
+    configSnapshot: { type: mongoose.Schema.Types.Mixed, default: null },
+    quotedPrice: { type: Number, default: null },
+    estimatedDuration: { type: Number, default: null },
+    depositAmount: { type: Number, default: 0 },
+    depositPaidAt: { type: Date, default: null },
+    balanceDue: { type: Number, default: 0 },
+    actualDurationMinutes: { type: Number, default: null },
   },
   {
     timestamps: true,

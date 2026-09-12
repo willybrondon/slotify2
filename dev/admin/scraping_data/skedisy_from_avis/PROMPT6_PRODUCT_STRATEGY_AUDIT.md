@@ -2,8 +2,10 @@
 
 **Date :** 2026-09-11  
 **Sources :** extract Places + Prompts 1–5 (`skedisy_from_avis/`)  
-**Sample ancré :** 329 salons Afro pertinents IDF  
+**Sample ancré :** **458** salons Afro pertinents IDF (re-run 2026-09-11 · extract 2973)  
 **Règle :** FACT / INFERENCE / HYPOTHESIS / UNKNOWN — jamais confondre
+
+> **Refresh :** prompts 1–3 rejoués. Ordre des thèmes avis **identique** → wedge / MVP / engines **non réécrits** — chiffres mis à jour seulement.
 
 ---
 
@@ -20,7 +22,7 @@ Skedisy doit maîtriser le **workflow de *projet capillaire*** (qualification �
 | Source | Usage |
 |---|---|
 | Extract Google Places (IDF, avis ≤5/salon) | FACT sur présence, notes, thèmes avis |
-| Prompt 1 classification | FACT sur typologie (329 pertinents) |
+| Prompt 1 classification | FACT sur typologie (**458** pertinents) |
 | Prompt 2 fiches / matrice | FACT crawl sites + thèmes problèmes |
 | Prompt 3 SQUIRE TOP20 | Ranking WTP (modèle, pas vérité terrain) |
 | Prompt 4 wedge | Thèse produit (à valider) |
@@ -188,7 +190,7 @@ Jamais un formulaire unique maximaliste.
 
 | Signal | Statut |
 |---|---|
-| Plaintes mèches/qualité | FACT (90 salons) |
+| Plaintes mèches/qualité | FACT (**118** salons) |
 | Process commande mèches / stock | UNKNOWN |
 | Module supply software utile | HYPOTHESIS — distinguer exécution vs process |
 
@@ -372,8 +374,8 @@ une prestation Afro comme **projet configurable** (photo + variables → prix/du
 | Conclusion | Tag |
 |---|---|
 | Prestations Afro souvent plus complexes qu’une coupe 30 min | **FACT** (catégories + catalogues + avis) |
-| Beaucoup de salons sans widget booking classique | **FACT** (249/329) |
-| Acompte rarement visible sur site | **FACT** (161/329) |
+| Beaucoup de salons sans widget booking classique | **FACT** (343/458) |
+| Acompte rarement visible sur site | **FACT** (230/458) |
 | Litiges prix / qualité / durée dans avis | **FACT** |
 | WA/IG = canal principal de demande | **INFERENCE** (à valider H1) |
 | Funnel Skedisy réduira no-show de X% | **HYPOTHESIS** |

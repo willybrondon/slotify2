@@ -329,6 +329,15 @@ app.post("/api/public/booking/stripe-intent", publicWebBooking.publicCreateStrip
 app.post("/api/public/booking/create", publicWebBooking.publicCreateBooking);
 app.get("/api/public/booking/cancel", publicWebBooking.publicCancelBooking);
 
+const publicAfroDemand = require("./controller/user/publicAfroDemand.controller");
+app.get("/api/public/demand/services", publicAfroDemand.publicListDemandServices);
+app.post("/api/public/demand/quote", publicAfroDemand.publicQuoteDemand);
+app.post("/api/public/demand/create", publicAfroDemand.publicCreateDemand);
+app.post("/api/public/demand/stripe-intent", publicAfroDemand.publicDemandStripeIntent);
+app.post("/api/public/demand/confirm-deposit", publicAfroDemand.publicConfirmDeposit);
+app.post("/api/public/demand/convert", publicAfroDemand.publicConvertDemand);
+app.get("/api/public/demand/:id", publicAfroDemand.publicGetDemand);
+
 const publicWebProduct = require("./controller/user/publicWebProduct.controller");
 app.get("/api/public/product/detail", publicWebProduct.publicProductDetail);
 app.get("/api/public/product/addresses", publicWebProduct.publicUserAddresses);

@@ -29,6 +29,7 @@ export const SKEDISY_SALON_UI = {
     salonTime: "Horaires salon",
     salonHoliday: "Fermetures / congés",
     teamCalendar: "Planning équipe",
+    demands: "Demandes devis",
     paymentSettings: "Paiements Stripe",
     expertWithdrawRequests: "Retraits pros",
     expertEarnings: "Gains des pros",

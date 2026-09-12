@@ -1,30 +1,30 @@
 {
-  "generated_at": "2026-09-11T11:19:07.662584+00:00",
-  "n_salons": 329,
-  "sites_ok": 176,
-  "salons_avec_probleme_avis": 137,
+  "generated_at": "2026-09-11T21:51:57.562369+00:00",
+  "n_salons": 458,
+  "sites_ok": 246,
+  "salons_avec_probleme_avis": 179,
   "themes_avis_par_salon_count": {
-    "qualite_cheveux": 90,
-    "prix_ecart": 78,
-    "duree_prestation": 57,
-    "comprehension_prestation": 54,
-    "reservation_difficile": 44,
-    "communication": 43,
-    "attente_retard": 41,
-    "hygiene_accueil": 32,
-    "annulation_noshow": 5,
+    "qualite_cheveux": 118,
+    "prix_ecart": 96,
+    "duree_prestation": 73,
+    "comprehension_prestation": 63,
+    "reservation_difficile": 55,
+    "communication": 54,
+    "attente_retard": 50,
+    "hygiene_accueil": 46,
+    "annulation_noshow": 9,
     "acompte": 3
   },
   "outils_detectes": {
-    "aucun système identifiable": 249,
-    "Planity": 39,
-    "WhatsApp": 21,
-    "Treatwell": 12,
+    "aucun système identifiable": 343,
+    "Planity": 64,
+    "WhatsApp": 28,
+    "Treatwell": 14,
     "Booksy": 6,
-    "SimplyBook": 5,
-    "Skedisy": 3,
-    "Fresha": 3,
-    "Calendly": 2
+    "SimplyBook": 6,
+    "Fresha": 5,
+    "Skedisy": 4,
+    "Calendly": 4
   },
-  "matrice_rows": 763
+  "matrice_rows": 1005
 }

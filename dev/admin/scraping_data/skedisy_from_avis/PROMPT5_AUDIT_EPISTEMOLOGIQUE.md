@@ -1,7 +1,9 @@
 # Audit épistémologique — conclusions Skedisy (Prompts 1–4)
 
 **But :** ne pas confondre commentaires Internet / crawl sites avec la réalité opérationnelle du salon.  
-**Sample :** 329 salons afro pertinents IDF · avis Google Places API (≤5/salon) · HTML sites publics · **pas** de DM IG/WA privés · **pas** d’interviews terrain encore.
+**Sample :** **458** salons afro pertinents IDF (re-run 2026-09-11 sur extract 2973) · avis Google Places API (≤5/salon) · HTML sites publics · **pas** de DM IG/WA privés · **pas** d’interviews terrain encore.
+
+> **Refresh chiffres :** prompts 1–3 rejoués après extract `180628`. Ordre des thèmes avis **inchangé** (qualité → prix → durée → compréhension…). Thèse O1–O7 et wedge **confirmés** — seuls les N sont mis à jour.
 
 ---
 
@@ -11,7 +13,7 @@
 
 | Dimension | Contenu |
 |---|---|
-| **Observé directement** | 249/329 sans widget booking classique détecté ; 161/329 sans politique d’acompte visible sur site ; présence fréquente de téléphone / liens WA publics ; catégories prestations complexes (tresses/locks/extensions) ; avis API sur malentendu prestation (54), prix (78), durée (57), qualité/mèches (90) |
+| **Observé directement** | 343/458 sans widget booking classique détecté ; 230/458 sans politique d’acompte visible sur site ; présence fréquente de téléphone / liens WA publics ; catégories prestations complexes (tresses/locks/extensions) ; avis API sur malentendu prestation (63), prix (96), durée (73), qualité/mèches (118) |
 | **Déduit** | Beaucoup de demandes passent par un canal manuel (tél/WA/IG) avant confirmation ; le catalogue seul ne suffit pas à verrouiller durée/prix |
 | **Hypothétique** | Le owner « perd des heures par jour » dans WhatsApp ; l’acompte via Skedisy réduira le no-show de X% ; les salons paieront Y€/mois pour ce funnel |
 | **Qualité preuve** | **Moyenne-haute** sur la *structure* (absence d’outil + complexité verticale) ; **moyenne** sur la *douleur quotidienne* (avis ≠ log ops) |
@@ -23,7 +25,7 @@
 
 | Dimension | Contenu |
 |---|---|
-| **Observé** | 57 salons avec avis évoquant durée/trop long ; 41 attente/retard ; durées longues typiques dans le discours public (hors mesure chrono salon) |
+| **Observé** | 73 salons avec avis évoquant durée/trop long ; 50 attente/retard ; durées longues typiques dans le discours public (hors mesure chrono salon) |
 | **Déduit** | Le planning « dérape » quand la durée estimée est fausse |
 | **Hypothétique** | Un estimateur ML/règles réduira les retards de façon mesurable |
 | **Qualité preuve** | **Moyenne** — thème avis réel, mais pas de logs de planning |
@@ -35,7 +37,7 @@
 
 | Dimension | Contenu |
 |---|---|
-| **Observé** | 78 salons avec avis prix/écart/supplément ; sites/Planity souvent « à partir de » (quand crawl OK) |
+| **Observé** | 96 salons avec avis prix/écart/supplément ; sites/Planity souvent « à partir de » (quand crawl OK) |
 | **Déduit** | Le devis n’est pas verrouillé avant le jour J |
 | **Hypothétique** | Un devis digital signé réduira les litiges et améliorera la note Google |
 | **Qualité preuve** | **Moyenne-haute** sur existence du litige prix ; **faible** sur fréquence ops |
@@ -47,7 +49,7 @@
 
 | Dimension | Contenu |
 |---|---|
-| **Observé** | Liens WA publics sur une minorité de sites ; 43 salons avis communication ; 249 sans booking détecté |
+| **Observé** | Liens WA publics sur une minorité de sites ; 54 salons avis communication ; 343 sans booking détecté |
 | **Déduit** | WA/IG sont des canaux majeurs de prise de RDV en France beauté |
 | **Hypothétique** | Volume DM élevé et chaotique chez la majorité des salons afro IDF ; Skedisy sera adopté *à la place* de WA |
 | **Qualité preuve** | **Faible-moyenne** — on n’a **pas** lu d’inbox ; sous-détection des liens WA |
@@ -59,7 +61,7 @@
 
 | Dimension | Contenu |
 |---|---|
-| **Observé** | 161 sites sans politique acompte visible ; **seulement 5** salons avec avis API annulation/no-show ; 3 avis mentionnant acompte |
+| **Observé** | 230 sites sans politique acompte visible ; **seulement 9** salons avec avis API annulation/no-show ; 3 avis mentionnant acompte |
 | **Déduit** | L’acompte est souvent oral / non publié |
 | **Hypothétique** | Le no-show est un problème économique majeur et fréquent ; l’acompte le résout |
 | **Qualité preuve** | **Faible** sur la fréquence no-show ; **moyenne** sur l’absence de politique écrite |
@@ -71,7 +73,7 @@
 
 | Dimension | Contenu |
 |---|---|
-| **Observé** | 90 salons avec avis qualité/cheveux/mèches (thème #1 avis) |
+| **Observé** | 118 salons avec avis qualité/cheveux/mèches (thème #1 avis) |
 | **Déduit** | La supply (qui apporte les mèches, quelle qualité) est un point de friction |
 | **Hypothétique** | Un module « validation mèches + photo » réduira les reprises |
 | **Qualité preuve** | **Moyenne** — plaintes qualité réelles ; lien causal « process amont » non prouvé |
@@ -83,7 +85,7 @@
 
 | Dimension | Contenu |
 |---|---|
-| **Observé** | 39 salons avec Planity détecté ; une partie a encore des thèmes avis douleur ; majorité sans Planity |
+| **Observé** | 64 salons avec Planity détecté ; une partie a encore des thèmes avis douleur ; majorité sans Planity |
 | **Déduit** | Agenda généraliste n’élimine pas qualif/prix/durée |
 | **Hypothétique** | Les salons Planity *voudraient* quitter ou compléter Planity avec Skedisy |
 | **Qualité preuve** | **Moyenne** sur underfit ; **faible** sur intention de switch |

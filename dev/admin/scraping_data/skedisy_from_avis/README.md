@@ -48,3 +48,29 @@ Sans interviews terrain — base = données publiques + Prompts 1–6.
 Cartographie existant Skedisy × Blueprint · phases · sprints · décisions D1–D7.
 
 → `IMPLEMENTATION_PLAN_SQUIRE.md`
+
+## Suite nouvel extract (2973 places · 2026-09-11 18:06)
+
+Plus d’avis / avis négatifs (volume), schéma inchangé.  
+→ `UPDATE_APRES_EXTRACT_180628.md`
+
+**Re-run fait :** prompts 1→2→3 · **458** Afro pertinents · thèmes ordre inchangé · chiffres prompts 5–7 mis à jour · wedge/MVP non réécrits.
+
+## Sprint A — code foundations (FAIT)
+
+→ `SPRINT_A_DEMAND_FOUNDATIONS.md`  
+Models + `/api/public/demand/*` + `/salon/demand/*` · moteur devis Knotless S2.
+
+## Sprint B/C/D — tunnel + acompte + panel (FAIT code)
+
+→ `SPRINT_B_TUNNEL_DEPOSIT.md` · `SPRINT_C_PANEL_CONFIG.md`  
+Tunnel web · Stripe acompte · convert booking · inbox + config salon + lien WA.
+
+## Sprint E — onboarding + notifs (FAIT code)
+
+→ `SPRINT_E_ONBOARDING_NOTIFS.md`  
+Checklist 3 étapes · emails demande/acompte · reste dû bookings.
+
+## Marketing 3 mois
+
+→ `PROPOSITION_MARKETING_3MOIS.md`

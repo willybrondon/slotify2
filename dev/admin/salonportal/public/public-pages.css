@@ -3022,3 +3022,100 @@ body.sk-public-page .main-wrapper {
 .sq-product-success__cta {
     width: 100%;
 }
+
+/* Afro demand (SQUIRE wedge) */
+.sq-afro-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sq-afro-card {
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid var(--sk-border, #e5e7eb);
+  border-radius: 12px;
+  background: var(--sk-bg, #fff);
+  cursor: pointer;
+}
+.sq-afro-card strong {
+  display: block;
+  margin-bottom: 4px;
+}
+.sq-afro-card span {
+  font-size: 0.85rem;
+  color: var(--sk-text-muted, #6b7280);
+}
+.sq-afro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sq-afro-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.sq-afro-form input,
+.sq-afro-form select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--sk-border, #e5e7eb);
+}
+.sq-afro-primary,
+.sq-afro-secondary,
+.sq-afro-back {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.sq-afro-primary {
+  background: var(--sk-primary, #c45c26);
+  color: #fff;
+}
+.sq-afro-secondary {
+  background: transparent;
+  border: 1px solid var(--sk-border, #e5e7eb);
+}
+.sq-afro-back {
+  background: transparent;
+  align-self: flex-start;
+  padding: 4px 0;
+  color: var(--sk-text-muted, #6b7280);
+}
+.sq-afro-price {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 8px 0;
+}
+.sq-afro-hint {
+  font-size: 0.85rem;
+  color: var(--sk-text-muted, #6b7280);
+}
+.sq-afro-error {
+  color: #b91c1c;
+}
+.sq-afro-breakdown {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+.sq-afro-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 6px 4px 0;
+  padding: 8px 10px;
+  border: 1px solid var(--sk-border, #e5e7eb);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.open-app-btn--secondary {
+  background: transparent !important;
+  color: var(--sk-primary, #c45c26) !important;
+  border: 1px solid var(--sk-primary, #c45c26) !important;
+}
+

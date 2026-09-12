@@ -25,6 +25,7 @@ import citySlice from "./slice/citySlice";
 import attributeSlice from "./slice/attributeSlice";
 import teamScheduleSlice from "./slice/teamScheduleSlice";
 import stripeConnectSlice from "./slice/stripeConnectSlice";
+import demandSlice from "./slice/demandSlice";
 
 const store = configureStore({
     reducer: {
@@ -49,13 +50,13 @@ const store = configureStore({
         holiday: holidaySlice,
         product: productSlice,
         order: orderSlice,
-        withDraw:withDrawSlice,
+        withDraw: withDrawSlice,
         city: citySlice,
         attribute: attributeSlice,
         teamSchedule: teamScheduleSlice,
         stripeConnect: stripeConnectSlice,
+        demand: demandSlice,
     },
-
 });
 
 export default store;

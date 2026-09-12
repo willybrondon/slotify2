@@ -156,6 +156,17 @@ const Booking = () => {
       Cell: ({ row }) => (
         <span className="text-capitalize">
           {row?.amount?.toFixed(2) + " " + setting?.currencySymbol}
+          {row?.demandId && Number(row?.balanceDue) > 0 ? (
+            <>
+              <br />
+              <small className="text-muted">
+                Reste {Number(row.balanceDue).toFixed(2)} {setting?.currencySymbol}
+                {Number(row?.depositAmount) > 0
+                  ? ` (acompte ${Number(row.depositAmount).toFixed(2)})`
+                  : ""}
+              </small>
+            </>
+          ) : null}
         </span>
       ),
       sorting: { type: "client" },

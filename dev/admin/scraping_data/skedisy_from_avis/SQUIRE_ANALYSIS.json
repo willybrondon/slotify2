@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-11T11:37:09.334011+00:00",
+  "generated_at": "2026-09-11T21:52:15.074042+00:00",
   "method": "SQUIRE-style WTP ranking on public sample",
-  "n_salons_analyses": 329,
+  "n_salons_analyses": 458,
   "data_sources": [
     "AFRO_pertinents.json",
     "DEEP_FICHES_parcours_cliente.json",
@@ -133,31 +133,31 @@
   },
   "sample_stats": {
     "themes_avis": {
-      "qualite_cheveux": 90,
-      "prix_ecart": 78,
-      "duree_prestation": 57,
-      "comprehension_prestation": 54,
-      "reservation_difficile": 44,
-      "communication": 43,
-      "attente_retard": 41,
-      "hygiene_accueil": 32,
-      "annulation_noshow": 5,
+      "qualite_cheveux": 118,
+      "prix_ecart": 96,
+      "duree_prestation": 73,
+      "comprehension_prestation": 63,
+      "reservation_difficile": 55,
+      "communication": 54,
+      "attente_retard": 50,
+      "hygiene_accueil": 46,
+      "annulation_noshow": 9,
       "acompte": 3
     },
     "outils": {
-      "aucun système identifiable": 249,
-      "Planity": 39,
-      "WhatsApp": 21,
-      "Treatwell": 12,
+      "aucun système identifiable": 343,
+      "Planity": 64,
+      "WhatsApp": 28,
+      "Treatwell": 14,
       "Booksy": 6,
-      "SimplyBook": 5,
-      "Skedisy": 3,
-      "Fresha": 3,
-      "Calendly": 2
+      "SimplyBook": 6,
+      "Fresha": 5,
+      "Skedisy": 4,
+      "Calendly": 4
     },
-    "no_widget_site": 137,
-    "no_acompte_visible_site": 161,
-    "planity_with_remaining_pain": 16
+    "no_widget_site": 183,
+    "no_acompte_visible_site": 230,
+    "planity_with_remaining_pain": 22
   },
   "all_problems_ranked": [
     {
@@ -169,11 +169,11 @@
       ],
       "probleme": "Méta-problème vertical: la prestation afro est un projet (devis + supply + 3–6h), pas une coupe 30 min",
       "preuves": [
-        "Distribution catégories: {'perruques / lace': 18, 'braids / tresses': 104, 'coiffure afro': 72, 'extensions': 46, 'locks / cheveux naturels': 54, 'salon mixte': 33, 'barber afro': 2}",
+        "Distribution catégories: {'perruques / lace': 31, 'braids / tresses': 144, 'coiffure afro': 99, 'locks / cheveux naturels': 69, 'extensions': 75, 'salon mixte': 38, 'barber afro': 2}",
         "Durées longues et variables documentées dans avis durée/attente",
         "Outils détectés majoritairement absents ou généralistes"
       ],
-      "salons_concernes": 329,
+      "salons_concernes": 458,
       "note_comptage": "Problème méta — haute confiance conceptuelle, ancré dans la distribution du sample.",
       "gravite": 10,
       "frequence": 9,
@@ -193,7 +193,7 @@
       "pct_salons": 100.0,
       "potentiel_skedisy": 10,
       "score_composite": 9.4,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P20",
@@ -205,10 +205,10 @@
       "probleme": "Wedge ops: Qualif → devis/durée → acompte (demande WA/IG → booking structuré)",
       "preuves": [
         "Convergence P01+P02+P03+P05+P06 dans le sample",
-        "Planity présent chez seulement 39/329 — et 16 ont encore des douleurs avis",
+        "Planity présent chez seulement 64/458 — et 22 ont encore des douleurs avis",
         "Professionnel paie pour réduire chaos inbox + no-show + litige prix"
       ],
-      "salons_concernes": 329,
+      "salons_concernes": 458,
       "note_comptage": "Synthèse SQUIRE — pas un 50e feature, le job-to-be-done.",
       "gravite": 10,
       "frequence": 9,
@@ -228,7 +228,7 @@
       "pct_salons": 100.0,
       "potentiel_skedisy": 10,
       "score_composite": 9.4,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P01",
@@ -239,13 +239,13 @@
       ],
       "probleme": "Impossible de confirmer automatiquement une prestation afro complexe sans qualification (texture, longueur, mèches, style, photo)",
       "preuves": [
-        "327/329 salons classés dans des lignes afro complexes (tresses/locks/extensions/mixte/afro)",
-        "54 salons avec avis négatifs sur malentendu de prestation",
-        "249/329 sans système booking classique → confirmation souvent humaine",
+        "456/458 salons classés dans des lignes afro complexes (tresses/locks/extensions/mixte/afro)",
+        "63 salons avec avis négatifs sur malentendu de prestation",
+        "343/458 sans système booking classique → confirmation souvent humaine",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Génération Coiffure: Avis Google note=1: « À fuir. Très mauvaise expérience avec Samira. Elle a fait passer d’autres clientes avant moi pour récupérer leurs pourboires, ce qui est t"
       ],
-      "salons_concernes": 327,
+      "salons_concernes": 456,
       "note_comptage": "Proxy structurel: catégories afro complexes Étape 1 + avis malentendu. Confiance élevée sur la nature du vertical.",
       "gravite": 9,
       "frequence": 9,
@@ -262,10 +262,10 @@
         "Gestion des prestations",
         "Autres problèmes spécifiques à la coiffure afro"
       ],
-      "pct_salons": 99.4,
+      "pct_salons": 99.6,
       "potentiel_skedisy": 10,
       "score_composite": 9.0,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P02",
@@ -276,14 +276,14 @@
       ],
       "probleme": "La durée réelle déborde le créneau théorique → planning en accordéon et retards en chaîne",
       "preuves": [
-        "57 salons avec avis évoquant durée/trop long",
-        "41 salons avec avis attente/retard",
-        "16 salons Planity ont encore des thèmes durée/prix/qualité/attente dans les avis API",
+        "73 salons avec avis évoquant durée/trop long",
+        "50 salons avec avis attente/retard",
+        "22 salons Planity ont encore des thèmes durée/prix/qualité/attente dans les avis API",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Harmony Beauty Paris: Avis Google note=2: « Après avoir attendu plus de 3h, la coiffeuse s’agace par rapport au modèle que je lui montre, en plus elle souffle lorsque je lui dis que ",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement"
       ],
-      "salons_concernes": 57,
+      "salons_concernes": 73,
       "note_comptage": "Comptage avis API (≤5/salon). Sous-estimation probable de la fréquence réelle. Structurel pour tresses/locks.",
       "gravite": 9,
       "frequence": 8,
@@ -300,10 +300,10 @@
         "Gestion du planning",
         "Retard"
       ],
-      "pct_salons": 17.3,
+      "pct_salons": 15.9,
       "potentiel_skedisy": 10,
       "score_composite": 8.9,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P04",
@@ -313,13 +313,13 @@
       ],
       "probleme": "Réservation non instantanée / friction (pas de self-serve ou dispo opaque)",
       "preuves": [
-        "137/329 salons: aucun widget Planity/Fresha/Booksy/Calendly détecté sur le site",
-        "249/329 classés « aucun système identifiable »",
-        "44 salons avec avis difficultés réservation/dispo",
+        "183/458 salons: aucun widget Planity/Fresha/Booksy/Calendly détecté sur le site",
+        "343/458 classés « aucun système identifiable »",
+        "55 salons avec avis difficultés réservation/dispo",
         "Harmony Beauty Paris: Avis Google note=1: « Très déçue par ce salon. C’est vraiment dommage, car les coiffeuses coiffent bien et le résultat peut être très joli, mais je trouve que l",
         "FF Beauty - Coiffeur Afro / Barber Poissy: Avis Google note=3: « Je suis ravie des prestations effectuées sur mon fils.\n\nCependant je mets un gros bémol sur la ponctualité. Rdv pris pour 14h, prestation "
       ],
-      "salons_concernes": 137,
+      "salons_concernes": 183,
       "note_comptage": "Signal structurel site très fort; avis dispo plus faibles (API limitée).",
       "gravite": 8,
       "frequence": 9,
@@ -335,10 +335,10 @@
         "Réservation",
         "Communication avec la cliente"
       ],
-      "pct_salons": 41.6,
+      "pct_salons": 40.0,
       "potentiel_skedisy": 9,
       "score_composite": 8.4,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P07",
@@ -349,12 +349,12 @@
       ],
       "probleme": "Gestion des mèches / supply cliente vs salon → litiges qualité et coût",
       "preuves": [
-        "90 salons avec avis négatifs qualité/cheveux/mèches",
+        "118 salons avec avis négatifs qualité/cheveux/mèches",
         "UNICIA AFRO: Avis Google note=1: « Partie me coiffer la veille de mon mariage (ponytail avec lace frontal) le résultat le lendemain est plus que décevant. Catastrophe! le ma",
         "Harmony Beauty Paris: Avis Google note=2: « Après avoir attendu plus de 3h, la coiffeuse s’agace par rapport au modèle que je lui montre, en plus elle souffle lorsque je lui dis que ",
         "FF Beauty - Coiffeur Afro / Barber Poissy: Avis Google note=2: « Mon commentaire sera long, mais j’espère qu’il sera pris en compte.\n\nAvant toute chose, je tiens à préciser que ce n’est pas un affront di"
       ],
-      "salons_concernes": 90,
+      "salons_concernes": 118,
       "note_comptage": "Thème #1 dans les avis négatifs API du sample.",
       "gravite": 9,
       "frequence": 8,
@@ -371,10 +371,10 @@
         "Gestion des prestations",
         "Autres problèmes spécifiques à la coiffure afro"
       ],
-      "pct_salons": 27.4,
+      "pct_salons": 25.8,
       "potentiel_skedisy": 9,
       "score_composite": 8.4,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P05",
@@ -385,14 +385,14 @@
       ],
       "probleme": "WhatsApp / DM comme « OS » de réservation → charge mentale et perte d'info",
       "preuves": [
-        "18 salons avec lien WhatsApp public sur site",
-        "21 détections WhatsApp dans outils",
-        "43 salons avec avis problèmes de communication/relance",
+        "25 salons avec lien WhatsApp public sur site",
+        "28 détections WhatsApp dans outils",
+        "54 salons avec avis problèmes de communication/relance",
         "Conversations privées non lues (limite éthique) — signal = canal public + plaintes com",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Harmony Beauty Paris: Avis Google note=1: « Très déçue par ce salon. C’est vraiment dommage, car les coiffeuses coiffent bien et le résultat peut être très joli, mais je trouve que l"
       ],
-      "salons_concernes": 43,
+      "salons_concernes": 54,
       "note_comptage": "Sous-estimation: beaucoup de salons utilisent WA/IG sans lien crawlable.",
       "gravite": 9,
       "frequence": 8,
@@ -409,10 +409,10 @@
         "Communication avec la cliente",
         "Réservation"
       ],
-      "pct_salons": 13.1,
+      "pct_salons": 11.8,
       "potentiel_skedisy": 9,
       "score_composite": 8.2,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P03",
@@ -423,13 +423,13 @@
       ],
       "probleme": "Prix final imprévisible (suppléments, devis, écart vs annoncé)",
       "preuves": [
-        "78 salons avec avis négatifs prix/écart/supplément",
-        "39 salons sur Planity — le catalogue n'empêche pas les litiges prix",
+        "96 salons avec avis négatifs prix/écart/supplément",
+        "64 salons sur Planity — le catalogue n'empêche pas les litiges prix",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Kessa Beauty: Avis Google note=1: « Des coiffeuse très peu honnête sur le prix. avant de faire ma coiffure j’ai envoyé un message avec le modèle de coiffure que je souhaitais",
         "Dakar Afro: Avis Google note=1: « Salon de coiffure qui ne sait pas gérer les cheveux afro malgré son nom et qui fixe les prix à la tête du client !\nJ’ai fait un shampooing"
       ],
-      "salons_concernes": 78,
+      "salons_concernes": 96,
       "note_comptage": "Preuves directes via avis API. % = salons avec ≥1 avis négatif prix dans l'échantillon API.",
       "gravite": 8,
       "frequence": 7,
@@ -446,10 +446,10 @@
         "Paiement",
         "Communication avec la cliente"
       ],
-      "pct_salons": 23.7,
+      "pct_salons": 21.0,
       "potentiel_skedisy": 9,
       "score_composite": 8.1,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P06",
@@ -460,11 +460,11 @@
       ],
       "probleme": "Acompte / anti-no-show absent ou flou → risque de créneaux brûlés",
       "preuves": [
-        "161/329 salons: politique d'acompte non visible sur site",
+        "230/458 salons: politique d'acompte non visible sur site",
         "3 avis API mentionnant acompte explicitement",
-        "5 avis API annulation/no-show (échantillon faible)"
+        "9 avis API annulation/no-show (échantillon faible)"
       ],
-      "salons_concernes": 161,
+      "salons_concernes": 230,
       "note_comptage": "Absence sur site = fait. Fréquence no-show dans avis API très sous-représentée (≤5 avis, biais positifs possibles).",
       "gravite": 8,
       "frequence": 7,
@@ -481,10 +481,10 @@
         "No-show",
         "Annulation"
       ],
-      "pct_salons": 48.9,
+      "pct_salons": 50.2,
       "potentiel_skedisy": 10,
       "score_composite": 8.1,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P09",
@@ -494,12 +494,12 @@
       ],
       "probleme": "Retards / attente cliente au salon",
       "preuves": [
-        "41 salons avec avis attente/retard",
+        "50 salons avec avis attente/retard",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Harmony Beauty Paris: Avis Google note=1: « Très déçue par ce salon. C’est vraiment dommage, car les coiffeuses coiffent bien et le résultat peut être très joli, mais je trouve que l",
         "FF Beauty - Coiffeur Afro / Barber Poissy: Avis Google note=2: « Coiffure ok mais organisation à revoir. Tu prends un rdv mais l heure n est pas respecté. Un peu de retard c est OK mais 1h30 de retard c "
       ],
-      "salons_concernes": 41,
+      "salons_concernes": 50,
       "note_comptage": "Preuves avis. Souvent conséquence de P02.",
       "gravite": 7,
       "frequence": 7,
@@ -515,10 +515,10 @@
         "Retard",
         "Gestion du planning"
       ],
-      "pct_salons": 12.5,
+      "pct_salons": 10.9,
       "potentiel_skedisy": 8,
       "score_composite": 7.3,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P10",
@@ -528,12 +528,12 @@
       ],
       "probleme": "Communication / relance défaillante (pas de réponse, flou RDV)",
       "preuves": [
-        "43 salons avec avis communication",
+        "54 salons avec avis communication",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Harmony Beauty Paris: Avis Google note=1: « Très déçue par ce salon. C’est vraiment dommage, car les coiffeuses coiffent bien et le résultat peut être très joli, mais je trouve que l",
         "FF Beauty - Coiffeur Afro / Barber Poissy: Avis Google note=2: « Mon commentaire sera long, mais j’espère qu’il sera pris en compte.\n\nAvant toute chose, je tiens à préciser que ce n’est pas un affront di"
       ],
-      "salons_concernes": 43,
+      "salons_concernes": 54,
       "note_comptage": "Avis API. Canaux IG/WA privés non audités.",
       "gravite": 7,
       "frequence": 7,
@@ -549,10 +549,10 @@
         "Communication avec la cliente",
         "WhatsApp / Instagram / DM"
       ],
-      "pct_salons": 13.1,
+      "pct_salons": 11.8,
       "potentiel_skedisy": 8,
       "score_composite": 7.3,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P13",
@@ -562,12 +562,12 @@
       ],
       "probleme": "No-show / annulations tardives",
       "preuves": [
-        "5 salons avec avis API annulation/no-show seulement",
+        "9 salons avec avis API annulation/no-show seulement",
         "Sous-détection forte probable (sujet rarement détaillé dans 5 avis)",
-        "La Maison Du Lissage: Avis Google note=1: « Je suis venue en décembre 2025 pour un lissage au tanin, coiffée par Chaïma, et l’expérience avait été excellente. Elle avait parfaitement",
-        "SENA HAIR COSMETICS: Avis Google note=2: « J'avais pris rendez-vous pour samedi à 12h15, car son agenda indiquait qu'elle était disponible. À mon arrivée, elle était en train de tre"
+        "Kwayah African Braiding Hair Salon: Avis Google note=2: « **Mise à jour*** 20/07/2026 - J'avais appelé deux jours auparavant pour obtenir un devis pour le défait de mes tresses mi-longues sans nœu",
+        "La Maison Du Lissage: Avis Google note=1: « Je suis venue en décembre 2025 pour un lissage au tanin, coiffée par Chaïma, et l’expérience avait été excellente. Elle avait parfaitement"
       ],
-      "salons_concernes": 5,
+      "salons_concernes": 9,
       "note_comptage": "CONFIDENCE FAIBLE sur le volume — problème probable métier mais peu prouvé dans l'API.",
       "gravite": 9,
       "frequence": 6,
@@ -583,10 +583,10 @@
         "No-show",
         "Annulation"
       ],
-      "pct_salons": 1.5,
+      "pct_salons": 2.0,
       "potentiel_skedisy": 9,
       "score_composite": 7.1,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P11",
@@ -595,10 +595,10 @@
       ],
       "probleme": "Avis/réputation: plaintes visibles (qualité, prix, attente) sans boucle de prévention amont",
       "preuves": [
-        "137 salons avec ≥1 problème typé depuis avis",
-        "Thèmes top: qualité 90, prix 78, durée 57"
+        "179 salons avec ≥1 problème typé depuis avis",
+        "Thèmes top: qualité 118, prix 96, durée 73"
       ],
-      "salons_concernes": 137,
+      "salons_concernes": 179,
       "note_comptage": "Basé sur avis API négatifs/thèmes.",
       "gravite": 7,
       "frequence": 7,
@@ -613,10 +613,10 @@
       "categories_labels": [
         "Avis/réputation"
       ],
-      "pct_salons": 41.6,
+      "pct_salons": 39.1,
       "potentiel_skedisy": 7,
       "score_composite": 7.0,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P14",
@@ -626,10 +626,10 @@
       ],
       "probleme": "Catalogue prestations afro trop granulaire / difficile à self-serve",
       "preuves": [
-        "Catégories braids=104, locks=54, extensions=46",
-        "39 sur Planity — preuve que catalogue existe mais complexité reste"
+        "Catégories braids=144, locks=69, extensions=75",
+        "64 sur Planity — preuve que catalogue existe mais complexité reste"
       ],
-      "salons_concernes": 204,
+      "salons_concernes": 288,
       "note_comptage": "Proxy catégories Étape 1.",
       "gravite": 7,
       "frequence": 8,
@@ -645,10 +645,10 @@
         "Gestion des prestations",
         "Gestion du planning"
       ],
-      "pct_salons": 62.0,
+      "pct_salons": 62.9,
       "potentiel_skedisy": 7,
       "score_composite": 6.9,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P12",
@@ -659,9 +659,9 @@
       "probleme": "Acquisition Google → appel/DM sans conversion structurée",
       "preuves": [
         "Tous les salons du sample ont une fiche Google (source extract)",
-        "Majorité sans booking self-serve (249/329)"
+        "Majorité sans booking self-serve (343/458)"
       ],
-      "salons_concernes": 249,
+      "salons_concernes": 343,
       "note_comptage": "Proxy: présence Google + absence outil booking.",
       "gravite": 6,
       "frequence": 8,
@@ -677,10 +677,10 @@
         "Réservation",
         "Acquisition"
       ],
-      "pct_salons": 75.7,
+      "pct_salons": 74.9,
       "potentiel_skedisy": 7,
       "score_composite": 6.7,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P19",
@@ -693,7 +693,7 @@
         "URLs IG/TikTok parfois détectées sur sites; contenu/DM non audités",
         "Pas de compteur conversion IG→RDV dans données publiques"
       ],
-      "salons_concernes": 105,
+      "salons_concernes": 131,
       "note_comptage": "URLs seulement — confiance faible sur le pain exact.",
       "gravite": 6,
       "frequence": 6,
@@ -709,10 +709,10 @@
         "Acquisition",
         "WhatsApp / Instagram / DM"
       ],
-      "pct_salons": 31.9,
+      "pct_salons": 28.6,
       "potentiel_skedisy": 7,
       "score_composite": 5.6,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P17",
@@ -722,10 +722,10 @@
       ],
       "probleme": "Paiement final déconnecté du devis digital",
       "preuves": [
-        "Litiges prix documentés sur 78 salons",
+        "Litiges prix documentés sur 96 salons",
         "Peu de preuves de caisse connectée au devis dans crawl"
       ],
-      "salons_concernes": 78,
+      "salons_concernes": 96,
       "note_comptage": "Inféré depuis litiges prix + absence process acompte visible.",
       "gravite": 5,
       "frequence": 6,
@@ -741,10 +741,10 @@
         "Paiement",
         "Prix et devis"
       ],
-      "pct_salons": 23.7,
+      "pct_salons": 21.0,
       "potentiel_skedisy": 6,
       "score_composite": 5.1,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P15",
@@ -758,7 +758,7 @@
         "Aucune automation reprise/entretien détectée dans les crawls site de cette passe",
         "Cycles afro (6–8 sem) non modélisés dans outils détectés"
       ],
-      "salons_concernes": 164,
+      "salons_concernes": 229,
       "note_comptage": "Absence d'évidence ≠ absence totale. Confiance faible — hypothèse ops.",
       "gravite": 5,
       "frequence": 5,
@@ -775,10 +775,10 @@
         "Réactivation",
         "Gestion des clientes"
       ],
-      "pct_salons": 49.8,
+      "pct_salons": 50.0,
       "potentiel_skedisy": 6,
       "score_composite": 5.0,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P21",
@@ -789,7 +789,7 @@
       "preuves": [
         "Non observable directement; inféré du recours WA et absences CRM dans crawls"
       ],
-      "salons_concernes": 164,
+      "salons_concernes": 229,
       "note_comptage": "Confiance faible.",
       "gravite": 5,
       "frequence": 6,
@@ -804,10 +804,10 @@
       "categories_labels": [
         "Gestion des clientes"
       ],
-      "pct_salons": 49.8,
+      "pct_salons": 50.0,
       "potentiel_skedisy": 6,
       "score_composite": 4.9,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P18",
@@ -817,11 +817,11 @@
       ],
       "probleme": "Hygiène / accueil dégradent la note Google",
       "preuves": [
-        "32 salons avec avis hygiène/accueil",
+        "46 salons avec avis hygiène/accueil",
         "UNICIA AFRO: Avis Google note=1: « Si je pouvais mettre 0 je l’aurais fais.\nAucune communication avec sa clientèle déjà dès que la patronne est partis il m’ont demander de p",
         "Harmony Beauty Paris: Avis Google note=1: « Horrible expérience, aucune écoute de certaines coiffeurs ( E…a) grosse tresse sous la perruque ,  BEAUCOUP BEAUCOUP BEAUCOUp trop de coll"
       ],
-      "salons_concernes": 32,
+      "salons_concernes": 46,
       "note_comptage": "Réel mais WTP logiciel plus faible (ops salon, pas core Skedisy).",
       "gravite": 6,
       "frequence": 5,
@@ -837,10 +837,10 @@
         "Avis/réputation",
         "Communication avec la cliente"
       ],
-      "pct_salons": 9.7,
+      "pct_salons": 10.0,
       "potentiel_skedisy": 4,
       "score_composite": 4.8,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P16",
@@ -871,7 +871,7 @@
       "pct_salons": 0.0,
       "potentiel_skedisy": 5,
       "score_composite": 4.7,
-      "n_sample": 329
+      "n_sample": 458
     }
   ],
   "top20": [
@@ -884,11 +884,11 @@
       ],
       "probleme": "Méta-problème vertical: la prestation afro est un projet (devis + supply + 3–6h), pas une coupe 30 min",
       "preuves": [
-        "Distribution catégories: {'perruques / lace': 18, 'braids / tresses': 104, 'coiffure afro': 72, 'extensions': 46, 'locks / cheveux naturels': 54, 'salon mixte': 33, 'barber afro': 2}",
+        "Distribution catégories: {'perruques / lace': 31, 'braids / tresses': 144, 'coiffure afro': 99, 'locks / cheveux naturels': 69, 'extensions': 75, 'salon mixte': 38, 'barber afro': 2}",
         "Durées longues et variables documentées dans avis durée/attente",
         "Outils détectés majoritairement absents ou généralistes"
       ],
-      "salons_concernes": 329,
+      "salons_concernes": 458,
       "note_comptage": "Problème méta — haute confiance conceptuelle, ancré dans la distribution du sample.",
       "gravite": 10,
       "frequence": 9,
@@ -908,7 +908,7 @@
       "pct_salons": 100.0,
       "potentiel_skedisy": 10,
       "score_composite": 9.4,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P20",
@@ -920,10 +920,10 @@
       "probleme": "Wedge ops: Qualif → devis/durée → acompte (demande WA/IG → booking structuré)",
       "preuves": [
         "Convergence P01+P02+P03+P05+P06 dans le sample",
-        "Planity présent chez seulement 39/329 — et 16 ont encore des douleurs avis",
+        "Planity présent chez seulement 64/458 — et 22 ont encore des douleurs avis",
         "Professionnel paie pour réduire chaos inbox + no-show + litige prix"
       ],
-      "salons_concernes": 329,
+      "salons_concernes": 458,
       "note_comptage": "Synthèse SQUIRE — pas un 50e feature, le job-to-be-done.",
       "gravite": 10,
       "frequence": 9,
@@ -943,7 +943,7 @@
       "pct_salons": 100.0,
       "potentiel_skedisy": 10,
       "score_composite": 9.4,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P01",
@@ -954,13 +954,13 @@
       ],
       "probleme": "Impossible de confirmer automatiquement une prestation afro complexe sans qualification (texture, longueur, mèches, style, photo)",
       "preuves": [
-        "327/329 salons classés dans des lignes afro complexes (tresses/locks/extensions/mixte/afro)",
-        "54 salons avec avis négatifs sur malentendu de prestation",
-        "249/329 sans système booking classique → confirmation souvent humaine",
+        "456/458 salons classés dans des lignes afro complexes (tresses/locks/extensions/mixte/afro)",
+        "63 salons avec avis négatifs sur malentendu de prestation",
+        "343/458 sans système booking classique → confirmation souvent humaine",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Génération Coiffure: Avis Google note=1: « À fuir. Très mauvaise expérience avec Samira. Elle a fait passer d’autres clientes avant moi pour récupérer leurs pourboires, ce qui est t"
       ],
-      "salons_concernes": 327,
+      "salons_concernes": 456,
       "note_comptage": "Proxy structurel: catégories afro complexes Étape 1 + avis malentendu. Confiance élevée sur la nature du vertical.",
       "gravite": 9,
       "frequence": 9,
@@ -977,10 +977,10 @@
         "Gestion des prestations",
         "Autres problèmes spécifiques à la coiffure afro"
       ],
-      "pct_salons": 99.4,
+      "pct_salons": 99.6,
       "potentiel_skedisy": 10,
       "score_composite": 9.0,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P02",
@@ -991,14 +991,14 @@
       ],
       "probleme": "La durée réelle déborde le créneau théorique → planning en accordéon et retards en chaîne",
       "preuves": [
-        "57 salons avec avis évoquant durée/trop long",
-        "41 salons avec avis attente/retard",
-        "16 salons Planity ont encore des thèmes durée/prix/qualité/attente dans les avis API",
+        "73 salons avec avis évoquant durée/trop long",
+        "50 salons avec avis attente/retard",
+        "22 salons Planity ont encore des thèmes durée/prix/qualité/attente dans les avis API",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Harmony Beauty Paris: Avis Google note=2: « Après avoir attendu plus de 3h, la coiffeuse s’agace par rapport au modèle que je lui montre, en plus elle souffle lorsque je lui dis que ",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement"
       ],
-      "salons_concernes": 57,
+      "salons_concernes": 73,
       "note_comptage": "Comptage avis API (≤5/salon). Sous-estimation probable de la fréquence réelle. Structurel pour tresses/locks.",
       "gravite": 9,
       "frequence": 8,
@@ -1015,10 +1015,10 @@
         "Gestion du planning",
         "Retard"
       ],
-      "pct_salons": 17.3,
+      "pct_salons": 15.9,
       "potentiel_skedisy": 10,
       "score_composite": 8.9,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P04",
@@ -1028,13 +1028,13 @@
       ],
       "probleme": "Réservation non instantanée / friction (pas de self-serve ou dispo opaque)",
       "preuves": [
-        "137/329 salons: aucun widget Planity/Fresha/Booksy/Calendly détecté sur le site",
-        "249/329 classés « aucun système identifiable »",
-        "44 salons avec avis difficultés réservation/dispo",
+        "183/458 salons: aucun widget Planity/Fresha/Booksy/Calendly détecté sur le site",
+        "343/458 classés « aucun système identifiable »",
+        "55 salons avec avis difficultés réservation/dispo",
         "Harmony Beauty Paris: Avis Google note=1: « Très déçue par ce salon. C’est vraiment dommage, car les coiffeuses coiffent bien et le résultat peut être très joli, mais je trouve que l",
         "FF Beauty - Coiffeur Afro / Barber Poissy: Avis Google note=3: « Je suis ravie des prestations effectuées sur mon fils.\n\nCependant je mets un gros bémol sur la ponctualité. Rdv pris pour 14h, prestation "
       ],
-      "salons_concernes": 137,
+      "salons_concernes": 183,
       "note_comptage": "Signal structurel site très fort; avis dispo plus faibles (API limitée).",
       "gravite": 8,
       "frequence": 9,
@@ -1050,10 +1050,10 @@
         "Réservation",
         "Communication avec la cliente"
       ],
-      "pct_salons": 41.6,
+      "pct_salons": 40.0,
       "potentiel_skedisy": 9,
       "score_composite": 8.4,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P07",
@@ -1064,12 +1064,12 @@
       ],
       "probleme": "Gestion des mèches / supply cliente vs salon → litiges qualité et coût",
       "preuves": [
-        "90 salons avec avis négatifs qualité/cheveux/mèches",
+        "118 salons avec avis négatifs qualité/cheveux/mèches",
         "UNICIA AFRO: Avis Google note=1: « Partie me coiffer la veille de mon mariage (ponytail avec lace frontal) le résultat le lendemain est plus que décevant. Catastrophe! le ma",
         "Harmony Beauty Paris: Avis Google note=2: « Après avoir attendu plus de 3h, la coiffeuse s’agace par rapport au modèle que je lui montre, en plus elle souffle lorsque je lui dis que ",
         "FF Beauty - Coiffeur Afro / Barber Poissy: Avis Google note=2: « Mon commentaire sera long, mais j’espère qu’il sera pris en compte.\n\nAvant toute chose, je tiens à préciser que ce n’est pas un affront di"
       ],
-      "salons_concernes": 90,
+      "salons_concernes": 118,
       "note_comptage": "Thème #1 dans les avis négatifs API du sample.",
       "gravite": 9,
       "frequence": 8,
@@ -1086,10 +1086,10 @@
         "Gestion des prestations",
         "Autres problèmes spécifiques à la coiffure afro"
       ],
-      "pct_salons": 27.4,
+      "pct_salons": 25.8,
       "potentiel_skedisy": 9,
       "score_composite": 8.4,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P05",
@@ -1100,14 +1100,14 @@
       ],
       "probleme": "WhatsApp / DM comme « OS » de réservation → charge mentale et perte d'info",
       "preuves": [
-        "18 salons avec lien WhatsApp public sur site",
-        "21 détections WhatsApp dans outils",
-        "43 salons avec avis problèmes de communication/relance",
+        "25 salons avec lien WhatsApp public sur site",
+        "28 détections WhatsApp dans outils",
+        "54 salons avec avis problèmes de communication/relance",
         "Conversations privées non lues (limite éthique) — signal = canal public + plaintes com",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Harmony Beauty Paris: Avis Google note=1: « Très déçue par ce salon. C’est vraiment dommage, car les coiffeuses coiffent bien et le résultat peut être très joli, mais je trouve que l"
       ],
-      "salons_concernes": 43,
+      "salons_concernes": 54,
       "note_comptage": "Sous-estimation: beaucoup de salons utilisent WA/IG sans lien crawlable.",
       "gravite": 9,
       "frequence": 8,
@@ -1124,10 +1124,10 @@
         "Communication avec la cliente",
         "Réservation"
       ],
-      "pct_salons": 13.1,
+      "pct_salons": 11.8,
       "potentiel_skedisy": 9,
       "score_composite": 8.2,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P03",
@@ -1138,13 +1138,13 @@
       ],
       "probleme": "Prix final imprévisible (suppléments, devis, écart vs annoncé)",
       "preuves": [
-        "78 salons avec avis négatifs prix/écart/supplément",
-        "39 salons sur Planity — le catalogue n'empêche pas les litiges prix",
+        "96 salons avec avis négatifs prix/écart/supplément",
+        "64 salons sur Planity — le catalogue n'empêche pas les litiges prix",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Kessa Beauty: Avis Google note=1: « Des coiffeuse très peu honnête sur le prix. avant de faire ma coiffure j’ai envoyé un message avec le modèle de coiffure que je souhaitais",
         "Dakar Afro: Avis Google note=1: « Salon de coiffure qui ne sait pas gérer les cheveux afro malgré son nom et qui fixe les prix à la tête du client !\nJ’ai fait un shampooing"
       ],
-      "salons_concernes": 78,
+      "salons_concernes": 96,
       "note_comptage": "Preuves directes via avis API. % = salons avec ≥1 avis négatif prix dans l'échantillon API.",
       "gravite": 8,
       "frequence": 7,
@@ -1161,10 +1161,10 @@
         "Paiement",
         "Communication avec la cliente"
       ],
-      "pct_salons": 23.7,
+      "pct_salons": 21.0,
       "potentiel_skedisy": 9,
       "score_composite": 8.1,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P06",
@@ -1175,11 +1175,11 @@
       ],
       "probleme": "Acompte / anti-no-show absent ou flou → risque de créneaux brûlés",
       "preuves": [
-        "161/329 salons: politique d'acompte non visible sur site",
+        "230/458 salons: politique d'acompte non visible sur site",
         "3 avis API mentionnant acompte explicitement",
-        "5 avis API annulation/no-show (échantillon faible)"
+        "9 avis API annulation/no-show (échantillon faible)"
       ],
-      "salons_concernes": 161,
+      "salons_concernes": 230,
       "note_comptage": "Absence sur site = fait. Fréquence no-show dans avis API très sous-représentée (≤5 avis, biais positifs possibles).",
       "gravite": 8,
       "frequence": 7,
@@ -1196,10 +1196,10 @@
         "No-show",
         "Annulation"
       ],
-      "pct_salons": 48.9,
+      "pct_salons": 50.2,
       "potentiel_skedisy": 10,
       "score_composite": 8.1,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P09",
@@ -1209,12 +1209,12 @@
       ],
       "probleme": "Retards / attente cliente au salon",
       "preuves": [
-        "41 salons avec avis attente/retard",
+        "50 salons avec avis attente/retard",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Harmony Beauty Paris: Avis Google note=1: « Très déçue par ce salon. C’est vraiment dommage, car les coiffeuses coiffent bien et le résultat peut être très joli, mais je trouve que l",
         "FF Beauty - Coiffeur Afro / Barber Poissy: Avis Google note=2: « Coiffure ok mais organisation à revoir. Tu prends un rdv mais l heure n est pas respecté. Un peu de retard c est OK mais 1h30 de retard c "
       ],
-      "salons_concernes": 41,
+      "salons_concernes": 50,
       "note_comptage": "Preuves avis. Souvent conséquence de P02.",
       "gravite": 7,
       "frequence": 7,
@@ -1230,10 +1230,10 @@
         "Retard",
         "Gestion du planning"
       ],
-      "pct_salons": 12.5,
+      "pct_salons": 10.9,
       "potentiel_skedisy": 8,
       "score_composite": 7.3,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P10",
@@ -1243,12 +1243,12 @@
       ],
       "probleme": "Communication / relance défaillante (pas de réponse, flou RDV)",
       "preuves": [
-        "43 salons avec avis communication",
+        "54 salons avec avis communication",
         "UNICIA AFRO: Avis Google note=1: « Je ne voulais pas me fier uniquement aux avis Google et je me suis dit que chacun pouvait avoir une expérience différente. Malheureusement",
         "Harmony Beauty Paris: Avis Google note=1: « Très déçue par ce salon. C’est vraiment dommage, car les coiffeuses coiffent bien et le résultat peut être très joli, mais je trouve que l",
         "FF Beauty - Coiffeur Afro / Barber Poissy: Avis Google note=2: « Mon commentaire sera long, mais j’espère qu’il sera pris en compte.\n\nAvant toute chose, je tiens à préciser que ce n’est pas un affront di"
       ],
-      "salons_concernes": 43,
+      "salons_concernes": 54,
       "note_comptage": "Avis API. Canaux IG/WA privés non audités.",
       "gravite": 7,
       "frequence": 7,
@@ -1264,10 +1264,10 @@
         "Communication avec la cliente",
         "WhatsApp / Instagram / DM"
       ],
-      "pct_salons": 13.1,
+      "pct_salons": 11.8,
       "potentiel_skedisy": 8,
       "score_composite": 7.3,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P13",
@@ -1277,12 +1277,12 @@
       ],
       "probleme": "No-show / annulations tardives",
       "preuves": [
-        "5 salons avec avis API annulation/no-show seulement",
+        "9 salons avec avis API annulation/no-show seulement",
         "Sous-détection forte probable (sujet rarement détaillé dans 5 avis)",
-        "La Maison Du Lissage: Avis Google note=1: « Je suis venue en décembre 2025 pour un lissage au tanin, coiffée par Chaïma, et l’expérience avait été excellente. Elle avait parfaitement",
-        "SENA HAIR COSMETICS: Avis Google note=2: « J'avais pris rendez-vous pour samedi à 12h15, car son agenda indiquait qu'elle était disponible. À mon arrivée, elle était en train de tre"
+        "Kwayah African Braiding Hair Salon: Avis Google note=2: « **Mise à jour*** 20/07/2026 - J'avais appelé deux jours auparavant pour obtenir un devis pour le défait de mes tresses mi-longues sans nœu",
+        "La Maison Du Lissage: Avis Google note=1: « Je suis venue en décembre 2025 pour un lissage au tanin, coiffée par Chaïma, et l’expérience avait été excellente. Elle avait parfaitement"
       ],
-      "salons_concernes": 5,
+      "salons_concernes": 9,
       "note_comptage": "CONFIDENCE FAIBLE sur le volume — problème probable métier mais peu prouvé dans l'API.",
       "gravite": 9,
       "frequence": 6,
@@ -1298,10 +1298,10 @@
         "No-show",
         "Annulation"
       ],
-      "pct_salons": 1.5,
+      "pct_salons": 2.0,
       "potentiel_skedisy": 9,
       "score_composite": 7.1,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P11",
@@ -1310,10 +1310,10 @@
       ],
       "probleme": "Avis/réputation: plaintes visibles (qualité, prix, attente) sans boucle de prévention amont",
       "preuves": [
-        "137 salons avec ≥1 problème typé depuis avis",
-        "Thèmes top: qualité 90, prix 78, durée 57"
+        "179 salons avec ≥1 problème typé depuis avis",
+        "Thèmes top: qualité 118, prix 96, durée 73"
       ],
-      "salons_concernes": 137,
+      "salons_concernes": 179,
       "note_comptage": "Basé sur avis API négatifs/thèmes.",
       "gravite": 7,
       "frequence": 7,
@@ -1328,10 +1328,10 @@
       "categories_labels": [
         "Avis/réputation"
       ],
-      "pct_salons": 41.6,
+      "pct_salons": 39.1,
       "potentiel_skedisy": 7,
       "score_composite": 7.0,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P14",
@@ -1341,10 +1341,10 @@
       ],
       "probleme": "Catalogue prestations afro trop granulaire / difficile à self-serve",
       "preuves": [
-        "Catégories braids=104, locks=54, extensions=46",
-        "39 sur Planity — preuve que catalogue existe mais complexité reste"
+        "Catégories braids=144, locks=69, extensions=75",
+        "64 sur Planity — preuve que catalogue existe mais complexité reste"
       ],
-      "salons_concernes": 204,
+      "salons_concernes": 288,
       "note_comptage": "Proxy catégories Étape 1.",
       "gravite": 7,
       "frequence": 8,
@@ -1360,10 +1360,10 @@
         "Gestion des prestations",
         "Gestion du planning"
       ],
-      "pct_salons": 62.0,
+      "pct_salons": 62.9,
       "potentiel_skedisy": 7,
       "score_composite": 6.9,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P12",
@@ -1374,9 +1374,9 @@
       "probleme": "Acquisition Google → appel/DM sans conversion structurée",
       "preuves": [
         "Tous les salons du sample ont une fiche Google (source extract)",
-        "Majorité sans booking self-serve (249/329)"
+        "Majorité sans booking self-serve (343/458)"
       ],
-      "salons_concernes": 249,
+      "salons_concernes": 343,
       "note_comptage": "Proxy: présence Google + absence outil booking.",
       "gravite": 6,
       "frequence": 8,
@@ -1392,10 +1392,10 @@
         "Réservation",
         "Acquisition"
       ],
-      "pct_salons": 75.7,
+      "pct_salons": 74.9,
       "potentiel_skedisy": 7,
       "score_composite": 6.7,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P19",
@@ -1408,7 +1408,7 @@
         "URLs IG/TikTok parfois détectées sur sites; contenu/DM non audités",
         "Pas de compteur conversion IG→RDV dans données publiques"
       ],
-      "salons_concernes": 105,
+      "salons_concernes": 131,
       "note_comptage": "URLs seulement — confiance faible sur le pain exact.",
       "gravite": 6,
       "frequence": 6,
@@ -1424,10 +1424,10 @@
         "Acquisition",
         "WhatsApp / Instagram / DM"
       ],
-      "pct_salons": 31.9,
+      "pct_salons": 28.6,
       "potentiel_skedisy": 7,
       "score_composite": 5.6,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P17",
@@ -1437,10 +1437,10 @@
       ],
       "probleme": "Paiement final déconnecté du devis digital",
       "preuves": [
-        "Litiges prix documentés sur 78 salons",
+        "Litiges prix documentés sur 96 salons",
         "Peu de preuves de caisse connectée au devis dans crawl"
       ],
-      "salons_concernes": 78,
+      "salons_concernes": 96,
       "note_comptage": "Inféré depuis litiges prix + absence process acompte visible.",
       "gravite": 5,
       "frequence": 6,
@@ -1456,10 +1456,10 @@
         "Paiement",
         "Prix et devis"
       ],
-      "pct_salons": 23.7,
+      "pct_salons": 21.0,
       "potentiel_skedisy": 6,
       "score_composite": 5.1,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P15",
@@ -1473,7 +1473,7 @@
         "Aucune automation reprise/entretien détectée dans les crawls site de cette passe",
         "Cycles afro (6–8 sem) non modélisés dans outils détectés"
       ],
-      "salons_concernes": 164,
+      "salons_concernes": 229,
       "note_comptage": "Absence d'évidence ≠ absence totale. Confiance faible — hypothèse ops.",
       "gravite": 5,
       "frequence": 5,
@@ -1490,10 +1490,10 @@
         "Réactivation",
         "Gestion des clientes"
       ],
-      "pct_salons": 49.8,
+      "pct_salons": 50.0,
       "potentiel_skedisy": 6,
       "score_composite": 5.0,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P21",
@@ -1504,7 +1504,7 @@
       "preuves": [
         "Non observable directement; inféré du recours WA et absences CRM dans crawls"
       ],
-      "salons_concernes": 164,
+      "salons_concernes": 229,
       "note_comptage": "Confiance faible.",
       "gravite": 5,
       "frequence": 6,
@@ -1519,10 +1519,10 @@
       "categories_labels": [
         "Gestion des clientes"
       ],
-      "pct_salons": 49.8,
+      "pct_salons": 50.0,
       "potentiel_skedisy": 6,
       "score_composite": 4.9,
-      "n_sample": 329
+      "n_sample": 458
     },
     {
       "id": "P18",
@@ -1532,11 +1532,11 @@
       ],
       "probleme": "Hygiène / accueil dégradent la note Google",
       "preuves": [
-        "32 salons avec avis hygiène/accueil",
+        "46 salons avec avis hygiène/accueil",
         "UNICIA AFRO: Avis Google note=1: « Si je pouvais mettre 0 je l’aurais fais.\nAucune communication avec sa clientèle déjà dès que la patronne est partis il m’ont demander de p",
         "Harmony Beauty Paris: Avis Google note=1: « Horrible expérience, aucune écoute de certaines coiffeurs ( E…a) grosse tresse sous la perruque ,  BEAUCOUP BEAUCOUP BEAUCOUp trop de coll"
       ],
-      "salons_concernes": 32,
+      "salons_concernes": 46,
       "note_comptage": "Réel mais WTP logiciel plus faible (ops salon, pas core Skedisy).",
       "gravite": 6,
       "frequence": 5,
@@ -1552,10 +1552,10 @@
         "Avis/réputation",
         "Communication avec la cliente"
       ],
-      "pct_salons": 9.7,
+      "pct_salons": 10.0,
       "potentiel_skedisy": 4,
       "score_composite": 4.8,
-      "n_sample": 329
+      "n_sample": 458
     }
   ],
   "wedge_recommande": {

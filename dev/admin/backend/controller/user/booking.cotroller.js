@@ -358,6 +358,38 @@ exports.newBooking = async (req, res, next) => {
       return res.status(200).send({ status: false, message: "Salon not found" });
     }
 
+    // SQUIRE wedge: optional ServiceDemand overrides catalogue price/duration
+    let linkedDemand = null;
+    if (req.body.demandId) {
+      const ServiceDemand = require("../../models/serviceDemand.model");
+      linkedDemand = await ServiceDemand.findOne({
+        _id: req.body.demandId,
+        salonId: salon._id,
+      });
+      if (!linkedDemand) {
+        return res.status(200).send({ status: false, message: "Demand not found" });
+      }
+      if (linkedDemand.bookingId) {
+        return res.status(200).send({ status: false, message: "Demand already converted" });
+      }
+      const okStatus = ["quoted", "awaiting_slot", "deposit_paid"].includes(linkedDemand.status);
+      if (!okStatus) {
+        return res.status(200).send({
+          status: false,
+          message: "Demand not ready to convert (status=" + linkedDemand.status + ")",
+        });
+      }
+      if (
+        linkedDemand.depositStatus === "unpaid" &&
+        linkedDemand.depositAmount > 0
+      ) {
+        return res.status(200).send({
+          status: false,
+          message: "Deposit must be paid or waived before booking",
+        });
+      }
+    }
+
     // Get user language preference (from request or default to 'en')
     const userLanguage = getLanguage(req);
 
@@ -744,6 +776,14 @@ exports.newBooking = async (req, res, next) => {
       totalServicePrice += parseInt(service.price);
     });
 
+    if (linkedDemand) {
+      totalServicePrice = Number(linkedDemand.estimatedPrice) || totalServicePrice;
+      totalDuration =
+        Number(linkedDemand.estimatedDurationMinutes) > 0
+          ? Number(linkedDemand.estimatedDurationMinutes)
+          : totalDuration;
+    }
+
     const totalSlots = Math.ceil(totalDuration / 15);
     const resultOfGreater = totalDuration / totalSlots;
     const result = totalDuration / timeArray.length;
@@ -757,8 +797,14 @@ exports.newBooking = async (req, res, next) => {
     console.log("servicePrice           ", servicePrice);
     console.log("req.body.withoutTax    ", req.body.withoutTax);
 
-    if (servicePrice !== req.body.withoutTax.toFixed(2)) {
+    if (!linkedDemand && servicePrice !== req.body.withoutTax.toFixed(2)) {
       return res.status(200).send({ status: false, message: "Invalid Service Price" });
+    }
+    if (linkedDemand && Math.abs(Number(req.body.withoutTax) - totalServicePrice) > 0.02) {
+      return res.status(200).send({
+        status: false,
+        message: "Invalid demand quote price",
+      });
     }
 
     let coupon, discountAmount, totalAmount;
@@ -897,6 +943,19 @@ exports.newBooking = async (req, res, next) => {
     booking.duration = totalDuration;
     booking.time = timeArray;
 
+    if (linkedDemand) {
+      booking.demandId = linkedDemand._id;
+      booking.configSnapshot = linkedDemand.configSnapshot || linkedDemand.answers;
+      booking.quotedPrice = linkedDemand.estimatedPrice;
+      booking.estimatedDuration = linkedDemand.estimatedDurationMinutes;
+      booking.depositAmount = linkedDemand.depositAmount || 0;
+      booking.depositPaidAt = linkedDemand.depositPaidAt || null;
+      booking.balanceDue =
+        linkedDemand.balanceDue != null
+          ? linkedDemand.balanceDue
+          : Math.max(0, linkedDemand.estimatedPrice - (linkedDemand.depositAmount || 0));
+    }
+
     booking.coupon = coupon
       ? {
           title: coupon.title,
@@ -913,6 +972,13 @@ exports.newBooking = async (req, res, next) => {
 
     // Save booking first to get a valid _id
     await booking.save();
+
+    if (linkedDemand) {
+      linkedDemand.bookingId = booking._id;
+      linkedDemand.status = "converted";
+      linkedDemand.userId = linkedDemand.userId || user._id;
+      await linkedDemand.save();
+    }
 
     // Deduct platform commission from salon wallet (cash / wallet / MTN — not Stripe Connect)
     const commissionAmount = parseFloat(platformFee.toFixed(2));

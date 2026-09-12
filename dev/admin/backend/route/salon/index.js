@@ -23,6 +23,7 @@ const withdrawRequest = require("./withdrawRequestcontroller");
 const teamSchedule = require("./teamSchedule.route");
 const stripeConnect = require("./stripeConnect.route");
 const expertWithdrawRequest = require("./expertWithdrawRequest.route");
+const afroDemand = require("./afroDemand.route");
 
 route.use("/", salon);
 route.use("/product", product);
@@ -34,6 +35,7 @@ route.use("/review", salonMiddleware, review);
 route.use("/dashboard", dashboard);
 route.use("/service", service);
 route.use("/booking", salonMiddleware, booking);
+route.use("/demand", salonMiddleware, afroDemand);
 route.use("/teamSchedule", salonMiddleware, teamSchedule);
 route.use("/stripeConnect", salonMiddleware, stripeConnect);
 route.use("/settlement", salonMiddleware, settlement);

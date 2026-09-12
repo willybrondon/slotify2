@@ -942,12 +942,19 @@ exports.serveSalonWebPage = async (req, res) => {
       ? `<p class="sq-salon-detail__address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${salonAddress}</p>`
       : "";
 
+    const afroFlowEnabled = !!salon.afroProjectFlowEnabled;
+    const afroDemandCtaHtml = afroFlowEnabled
+      ? `<button type="button" data-open-afro-demand class="open-app-btn open-app-btn--secondary" style="margin-top:10px">
+                                <i class="fas fa-list-check"></i> Obtenir un devis
+                            </button>`
+      : "";
     const bookingCardHtml = `<div class="booking-card">
                             <h3>${copy.bookingCardTitle}</h3>
                             <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonBookingAsideSummary" aria-live="polite"></div>
                             <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
                                 <i class="fas fa-calendar-check"></i> ${copy.bookNow}
                             </button>
+                            ${afroDemandCtaHtml}
                             <div id="download-section" class="sq-salon-download">
                                 <p class="sq-salon-download__lead">${copy.noAppDesc}</p>
                                 <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill sq-salon-download__cta">${copy.downloadAppCta}</a>
@@ -1244,6 +1251,21 @@ exports.serveSalonWebPage = async (req, res) => {
         </div>
     </div>
 
+    ${
+      afroFlowEnabled
+        ? `<div id="salonAfroDemandModal" class="sq-booking-modal" aria-hidden="true">
+        <div class="sq-booking-modal__backdrop" data-close-afro-demand></div>
+        <div class="sq-booking-modal__panel" role="dialog" aria-labelledby="afroDemandModalTitle">
+            <div class="sq-booking-modal__head">
+                <button type="button" class="sq-booking-modal__close" data-close-afro-demand aria-label="Fermer">&times;</button>
+                <h2 id="afroDemandModalTitle" class="sq-booking-modal__title">Devis personnalisé</h2>
+            </div>
+            <div id="salonAfroDemandSteps" class="sq-booking-steps"></div>
+        </div>
+    </div>`
+        : ""
+    }
+
     <script>
         window.SKEDISY_SALON_BOOKING = {
             salonId: "${salon._id}",
@@ -1252,6 +1274,7 @@ exports.serveSalonWebPage = async (req, res) => {
             language: ${JSON.stringify(pageLang)},
             currency: ${JSON.stringify(currency)},
             tax: ${global.settingJSON?.tax || 0},
+            afroProjectFlowEnabled: ${afroFlowEnabled},
             services: ${JSON.stringify(bookingServices)},
             categories: ${JSON.stringify(bookingCategories)},
             experts: ${JSON.stringify(bookingExperts)},
@@ -1422,6 +1445,7 @@ exports.serveSalonWebPage = async (req, res) => {
     </script>
     <script src="${baseURL}/salon-booking.js"></script>
     <script src="${baseURL}/salon-product.js"></script>
+    ${afroFlowEnabled ? `<script src="${baseURL}/salon-afro-demand.js"></script>` : ""}
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
 </body>

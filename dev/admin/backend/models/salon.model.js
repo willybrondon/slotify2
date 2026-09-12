@@ -79,6 +79,9 @@ const salonSchema = new mongoose.Schema(
       detailsSubmitted: { type: Boolean, default: false },
     },
 
+    /** SQUIRE Afro wedge — enable demand → quote → deposit flow for this salon */
+    afroProjectFlowEnabled: { type: Boolean, default: false },
+
     serviceIds: [
       {
         id: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
@@ -89,6 +92,14 @@ const salonSchema = new mongoose.Schema(
             city: { type: String, trim: true },
           },
         ],
+        /**
+         * Optional Afro service engine config (Complexity / Pricing / Duration / Deposit).
+         * Absent or empty → treat as S0 (catalogue booking classique).
+         */
+        afroConfig: {
+          type: mongoose.Schema.Types.Mixed,
+          default: null,
+        },
       },
     ],
   },

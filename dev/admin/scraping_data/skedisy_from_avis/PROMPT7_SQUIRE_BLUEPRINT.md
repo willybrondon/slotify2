@@ -3,8 +3,10 @@
 **Date :** 2026-09-11  
 **Statut :** décision produit initiale (sans interviews terrain)  
 **Source de vérité initiale :** avis Google + crawl public + Prompts 1–6  
-**Sample ancré :** 329 salons Afro pertinents IDF · ≤5 avis API/salon  
+**Sample ancré :** **458** salons Afro pertinents IDF · ≤5 avis API/salon (re-run 2026-09-11 · extract 2973)  
 **Règle :** FACT · PATTERN · INFERENCE · HYPOTHESIS — jamais confondre
+
+> **Refresh :** prompts 1–3 rejoués. Ordre des thèmes **confirmé** (qualité → prix → durée → compréhension…). Blueprint / MVP / wedge **non réécrits** — chiffres uniquement.
 
 ---
 
@@ -23,8 +25,8 @@ Les réseaux sociaux serviront ensuite à **commercialiser**, observer les réac
 
 | Niveau | Définition | Exemple |
 |---|---|---|
-| **FACT** | Observable dans les données | 90/329 salons avec thème avis qualité/mèches |
-| **PATTERN** | Récurrence multi-salons / multi-avis | Prix imprévisible (78), durée (57), malentendu (54) |
+| **FACT** | Observable dans les données | 118/458 salons avec thème avis qualité/mèches |
+| **PATTERN** | Récurrence multi-salons / multi-avis | Prix imprévisible (96), durée (73), malentendu (63) |
 | **INFERENCE** | Interprétation raisonnable | Le catalogue plat ne verrouille pas prix/durée |
 | **HYPOTHESIS** | Non prouvé ops | Le salon « perd des heures/jour » dans WhatsApp |
 
@@ -37,8 +39,8 @@ Les réseaux sociaux serviront ensuite à **commercialiser**, observer les réac
 | Livrable | Apport |
 |---|---|
 | Extract Places IDF | Établissements, notes, avis, contacts publics |
-| Prompt 1 | 329 Afro pertinents (104 braids, 72 afro, 54 locks, 46 extensions…) |
-| Prompt 2 | Parcours public, outils détectés, matrice 763 rows |
+| Prompt 1 | **458** Afro pertinents (144 braids, 99 afro, 75 extensions, 69 locks, 38 mixte, 31 lace…) |
+| Prompt 2 | Parcours public, outils détectés, matrice **1005** rows |
 | Prompt 3 | TOP20 SQUIRE + scores WTP |
 | Prompt 4 | Wedge fondateur : Qualif → devis/durée → acompte |
 | Prompt 5 | Cartographie épistémique O1–O7 |
@@ -48,17 +50,19 @@ Les réseaux sociaux serviront ensuite à **commercialiser**, observer les réac
 
 | Signal | Valeur |
 |---|---|
-| Sans widget booking classique | **249/329** |
-| Planity détecté | 39 |
-| Acompte non visible (site) | **161/329** |
-| Thème avis qualité/mèches | **90** |
-| Prix / écart | **78** |
-| Durée prestation | **57** |
-| Malentendu prestation | **54** |
-| Réservation difficile | **44** |
-| Communication | **43** |
-| Attente / retard | **41** |
-| Annulation / no-show (avis) | **5** (signal faible) |
+| Sans widget booking classique | **343/458** |
+| Planity détecté | 64 |
+| Acompte non visible (site) | **230/458** |
+| Thème avis qualité/mèches | **118** |
+| Prix / écart | **96** |
+| Durée prestation | **73** |
+| Malentendu prestation | **63** |
+| Réservation difficile | **55** |
+| Communication | **54** |
+| Attente / retard | **50** |
+| Hygiène / accueil | **46** |
+| Annulation / no-show (avis) | **9** (signal faible) |
+| Acompte mentionné (avis) | **3** |
 
 ---
 
@@ -68,15 +72,15 @@ Comptage = **salons** avec ≥1 avis touchant le thème (pas volume absolu d’a
 
 | # | Problème apparent | Salons | Catégorie | Gravité | Impact € (pot.) | Satisfaction | Résolvable logiciel ? | Confiance signal |
 |---|---|---:|---|---:|---|---|---|---|
-| 1 | Qualité / mèches / cheveux | 90 | Supply + exécution | 9 | Élevé (reprises, litiges) | Fort | Partiel (process amont) | Haute (thème) / Faible (cause) |
-| 2 | Prix final ≠ annoncé | 78 | Devis | 8 | Élevé (litige, note) | Fort | Oui (devis verrouillé) | Haute |
-| 3 | Prestation trop longue | 57 | Durée / planning | 8 | Élevé (créneaux brûlés) | Fort | Oui (durée dynamique) | Haute |
-| 4 | Malentendu prestation | 54 | Qualification | 9 | Élevé | Fort | Oui (config + photo) | Haute |
-| 5 | Réservation difficile | 44 | Accès / friction | 7 | Moyen-élevé | Moyen | Oui (lien self-serve) | Moyenne-haute |
-| 6 | Communication / flou | 43 | Ops canal | 7 | Moyen | Moyen | Partiel (statut + notifs) | Moyenne |
-| 7 | Attente / retard | 41 | Planning | 7 | Moyen | Fort | Oui (durée + buffer) | Haute |
-| 8 | Hygiène / accueil | 32 | Ops salon | 6 | Moyen | Fort | Non (hors scope) | Haute |
-| 9 | Annulation / no-show | 5 | Engagement | 9 | Élevé *si fréquent* | — | Oui (acompte) | **Faible** (avis) |
+| 1 | Qualité / mèches / cheveux | 118 | Supply + exécution | 9 | Élevé (reprises, litiges) | Fort | Partiel (process amont) | Haute (thème) / Faible (cause) |
+| 2 | Prix final ≠ annoncé | 96 | Devis | 8 | Élevé (litige, note) | Fort | Oui (devis verrouillé) | Haute |
+| 3 | Prestation trop longue | 73 | Durée / planning | 8 | Élevé (créneaux brûlés) | Fort | Oui (durée dynamique) | Haute |
+| 4 | Malentendu prestation | 63 | Qualification | 9 | Élevé | Fort | Oui (config + photo) | Haute |
+| 5 | Réservation difficile | 55 | Accès / friction | 7 | Moyen-élevé | Moyen | Oui (lien self-serve) | Moyenne-haute |
+| 6 | Communication / flou | 54 | Ops canal | 7 | Moyen | Moyen | Partiel (statut + notifs) | Moyenne |
+| 7 | Attente / retard | 50 | Planning | 7 | Moyen | Fort | Oui (durée + buffer) | Haute |
+| 8 | Hygiène / accueil | 46 | Ops salon | 6 | Moyen | Fort | Non (hors scope) | Haute |
+| 9 | Annulation / no-show | 9 | Engagement | 9 | Élevé *si fréquent* | — | Oui (acompte) | **Faible** (avis) |
 | 10 | Acompte mentionné | 3 | Paiement | — | — | — | — | Très faible en avis |
 
 **Structure marché (FACT complémentaire) :** majorité sans booking classique → confirmation souvent manuelle (**INFERENCE**).
@@ -107,14 +111,14 @@ Concentration des plaintes → moments à protéger en priorité :
 
 ```
 Découverte ─────────────── faible dans avis (acquisition OK souvent)
-Choix / inspiration ────── PATTERN malentendu (54)
-« Réservation » ─────────── PATTERN friction (44) + absence outil (249)
-Qualification / prix ────── PATTERN prix (78) + comprehension (54)  ← MOMENT CRITIQUE
-Préparation / mèches ────── PATTERN qualité (90)                    ← MOMENT CRITIQUE
-Arrivée / attente ───────── PATTERN retard (41)
-Prestation / durée ──────── PATTERN durée (57)
-Paiement final ──────────── PATTERN écart prix (78)
-Résultat / après-vente ──── QUALITÉ (90) + note Google
+Choix / inspiration ────── PATTERN malentendu (63)
+« Réservation » ─────────── PATTERN friction (55) + absence outil (343)
+Qualification / prix ────── PATTERN prix (96) + comprehension (63)  ← MOMENT CRITIQUE
+Préparation / mèches ────── PATTERN qualité (118)                   ← MOMENT CRITIQUE
+Arrivée / attente ───────── PATTERN retard (50)
+Prestation / durée ──────── PATTERN durée (73)
+Paiement final ──────────── PATTERN écart prix (96)
+Résultat / après-vente ──── QUALITÉ (118) + note Google
 ```
 
 **Verdict :** le « moment de vérité » n’est pas le clic calendrier.  
@@ -157,7 +161,7 @@ Chaque prestation = **objet configurable** (pas une ligne catalogue plate).
 | Photo inspiration | PATTERN malentendu + sites | 9 | Indirect | Indirect | S3 oui / S2 reco |
 | Longueur | FACT suppléments / avis | 9 | Élevé | Élevé | S2+ |
 | Taille / volume (S/M/L…) | FACT catalogues | 8 | Élevé | Élevé | S2+ |
-| Qui fournit les mèches | FACT avis qualité (90) | 9 | Élevé | Moyen | S2+ |
+| Qui fournit les mèches | FACT avis qualité (118) | 9 | Élevé | Moyen | S2+ |
 | Type / qualité mèches (si salon) | PATTERN qualité | 7 | Moyen | Faible | Facultatif V1 |
 | Couleur / multi-couleurs | FACT catalogues | 7 | Moyen | Moyen | Si applicable |
 | Densité / texture naturelle | Métier (peu dans data) | — | — | — | **Ne pas imposer V1** |
@@ -270,7 +274,7 @@ Réduit la friction *et* augmente la précision devis/durée.
 | **B** WA complète Skedisy | Compatible |
 | **C** WA/IG = découverte → lien Skedisy = moteur qualif+devis+acompte | **CHOIX** |
 
-**PATTERN :** 249 sans booking classique + canaux publics tél/WA.  
+**PATTERN :** 343 sans booking classique + canaux publics tél/WA.  
 **INFERENCE :** le lien dans le chat est le plus petit pas d’adoption.  
 **Ne pas conclure :** « WhatsApp est l’OS » (HYPOTHESIS non mesurée).
 
@@ -315,11 +319,11 @@ Données à accumuler progressivement :
 
 | # | Feature | Problème | Preuve avis / data | User | Workflow | Écran | Donnée | KPI |
 |---|---|---|---|---|---|---|---|---|
-| **1** | Lien de demande public | Friction résa / chaos canal | 249 sans booking ; 44 résa difficile | Cliente + pro | Ouvre lien → demande | Landing salon | Salon ID, canal | Demandes / semaine |
-| **2** | Complexity Engine | Malentendu presta | 54 comprehension ; catégories S2 | Cliente | Questions min selon tier | Flow adaptatif | Réponses + photo | % demandes complètes |
-| **3** | Devis + durée estimés | Prix & durée imprévisibles | 78 prix ; 57 durée | Les deux | Config → devis affiché | Écran devis | Règles salon | % devis acceptés |
-| **4** | Acompte lié au devis | Créneau long non engagé | 161 sans politique visible ; no-show UNKNOWN | Cliente | Paiement → confirm | Checkout | Montant, status | % acomptes / devis |
-| **5** | Dashboard demandes pro | Charge mentale confirmation | 43 com ; wedge O1 | Pro | Inbox structurée | Liste status | Status pipeline | Demandes traitées / j |
+| **1** | Lien de demande public | Friction résa / chaos canal | 343 sans booking ; 55 résa difficile | Cliente + pro | Ouvre lien → demande | Landing salon | Salon ID, canal | Demandes / semaine |
+| **2** | Complexity Engine | Malentendu presta | 63 comprehension ; catégories S2 | Cliente | Questions min selon tier | Flow adaptatif | Réponses + photo | % demandes complètes |
+| **3** | Devis + durée estimés | Prix & durée imprévisibles | 96 prix ; 73 durée | Les deux | Config → devis affiché | Écran devis | Règles salon | % devis acceptés |
+| **4** | Acompte lié au devis | Créneau long non engagé | 230 sans politique visible ; no-show UNKNOWN | Cliente | Paiement → confirm | Checkout | Montant, status | % acomptes / devis |
+| **5** | Dashboard demandes pro | Charge mentale confirmation | 54 com ; wedge O1 | Pro | Inbox structurée | Liste status | Status pipeline | Demandes traitées / j |
 
 **Hors MVP volontairement :** CRM complet, sync Planity, multi-staff, AI, marketplace, ERP mèches.
 

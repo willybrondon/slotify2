@@ -3,7 +3,8 @@
 **Date :** 2026-09-11  
 **Statut :** plan seulement — **aucun code modifié**  
 **Références :** `PROMPT7_SQUIRE_BLUEPRINT.md` · inventaire codebase `dev/admin/*` + Flutter  
-**Principe :** ne pas reconstruire l’agenda ; greffer le wedge Afro sur le stack booking/paiement déjà là.
+**Principe :** ne pas reconstruire l’agenda ; greffer le wedge Afro sur le stack booking/paiement déjà là.  
+**Data (refresh) :** sample Afro **458** (prompts 1–3 rejoués) — wedge / MVP inchangés.
 
 ---
 
@@ -248,44 +249,50 @@ Marketplace · WA Business API · CRM memory · prep checklist riche · Flutter 
 
 ## 6. Découpage technique recommandé (sprints Phase 1)
 
-### Sprint A — Fondations données (1–2 sem)
-1. Spec figée : champs ServiceDemand + deposit policy + commission  
-2. Models + migrations / indexes Mongo  
-3. Feature flag salon : `afroProjectFlowEnabled`  
-4. Seeds : 1–2 services démo Knotless S2 avec 4 variables  
+### Sprint A — Fondations données (1–2 sem) · **FAIT (2026-09-12)**
+1. Spec figée : champs ServiceDemand + deposit policy + commission → `SPRINT_A_DEMAND_FOUNDATIONS.md`
+2. Models + indexes Mongo · `afroQuote.service.js`
+3. Feature flag salon : `afroProjectFlowEnabled`
+4. Seed Knotless S2 via `PUT /salon/demand/afro-config` (`seedKnotlessDemo`)
+5. API publique quote/create + inbox salon
 
-*Livrable : API interne quote dry-run sans UI.*
+*Livrable : API quote dry-run + persist demand — UI web = Sprint C.*
 
-### Sprint B — Panel pro config (1–2 sem)
-1. UI : tier + variables + règles prix/durée + acompte %  
-2. Liste demandes (lecture seule d’abord)  
-3. Validation design partners (config en &lt; 30–60 min)
+### Sprint B — Panel pro config (1–2 sem) · **FAIT (2026-09-12)**
+1. UI : activer flow + seed Knotless + acompte % · onglet Config
+2. Liste demandes + ajuster prix/durée/acompte · Valider / Exonérer
+3. Lien public `?flow=devis` à coller WA/IG
 
-*Livrable : salon peut publier un service configurable.*
+*Livrable : salon peut publier un service configurable + inbox devis.*
 
-### Sprint C — Tunnel cliente web (2–3 sem)
-1. Brancher `salon-booking.js` : branche S0 vs S1+  
-2. Steps : service → questions/photo → devis → slot (reuse) → acompte Stripe  
-3. Guest OTP inchangé  
-4. Confirmation page + email/SMS existants adaptés  
+### Sprint C — Tunnel cliente web (2–3 sem) · **FAIT (avec Sprint B code)**
+1. `salon-afro-demand.js` branché si `afroProjectFlowEnabled`
+2. Steps : service → questions → devis → OTP → acompte Stripe → slot → convert
+3. Guest OTP réutilisé
+4. Deep link `?flow=devis`
 
-*Livrable : parcours bout-en-bout staging.*
+*Livrable : parcours bout-en-bout (staging à valider Stripe).*
 
-### Sprint D — Paiement acompte + conversion booking (1–2 sem)
-1. PaymentIntent montant partiel  
-2. Webhook → demand paid → create booking linked  
-3. Balance due visible panel + app later  
-4. Cas cash acompte (si besoin design partner)  
+### Sprint D — Paiement acompte + conversion booking (1–2 sem) · **FAIT (API)**
+1. PaymentIntent montant partiel (`/demand/stripe-intent`)
+2. confirm-deposit → `deposit_paid` → convert → booking linked
+3. Balance due visible panel
+4. Cas cash acompte : exonérer depuis panel
 
-*Livrable : argent réel test Stripe Connect.*
+*Livrable : argent réel test Stripe Connect (à faire sur salon démo).*
 
-### Sprint E — Dashboard + polish + 20 salons (2 sem)
-1. Kanban demandes + actions adjust/waive  
-2. Analytics simples (compteurs KPI)  
-3. Copy FR « lien à coller dans WhatsApp »  
-4. Onboarding checklist salon  
+### Sprint E — Dashboard + polish + 20 salons (2 sem) · **FAIT code (2026-09-12)**
+1. Inbox + actions adjust/waive · **fait**
+2. Compteurs KPI simples · **minimal** (badges inbox)
+3. Copy FR lien WA · **fait**
+4. Onboarding checklist salon · **fait** (3 étapes Config)
+5. Emails salon demande / acompte · **fait**
+6. Reste dû sur liste bookings · **fait**
+7. Kanban riche · **TODO optionnel**
+8. Test Stripe 1 salon démo · **manuel staging**
 
-*Livrable : go design partners.*
+*Livrable : go design partners après seed + test Stripe 1 salon.*
+→ `SPRINT_E_ONBOARDING_NOTIFS.md`
 
 **Durée indicative Phase 1 :** ~8–11 semaines calendaires (1 équipe full-stack).
 

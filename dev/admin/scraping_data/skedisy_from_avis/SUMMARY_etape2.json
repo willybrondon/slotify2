@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-09-11T11:19:07.662584+00:00",
+  "generated_at": "2026-09-11T21:51:57.562369+00:00",
   "input": "AFRO_pertinents.json",
-  "n_fiches": 329,
-  "sites_fetched_ok": 176,
-  "matrice_rows": 763,
+  "n_fiches": 458,
+  "sites_fetched_ok": 246,
+  "matrice_rows": 1005,
   "outputs": [
     "DEEP_FICHES_parcours_cliente.json",
     "DEEP_MATRICE_problemes.csv",

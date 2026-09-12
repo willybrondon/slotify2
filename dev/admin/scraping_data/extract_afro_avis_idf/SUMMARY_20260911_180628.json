@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-09-11T16:06:30.413319+00:00",
+  "api": "Places Legacy",
+  "target": 5000,
+  "count_unique": 2973,
+  "target_reached": false,
+  "with_avis_api": 2901,
+  "with_avis_negatifs_api": 1374,
+  "note": "Google returns at most ~5 reviews/place. 5000 unique afro IDF may exceed real market; export = max unique found.",
+  "shards": [
+    "salons_afro_idf_part001_20260911_180628.json",
+    "salons_afro_idf_part002_20260911_180628.json",
+    "salons_afro_idf_part003_20260911_180628.json",
+    "salons_afro_idf_part004_20260911_180628.json",
+    "salons_afro_idf_part005_20260911_180628.json",
+    "salons_afro_idf_part006_20260911_180628.json"
+  ],
+  "all": "salons_afro_idf_ALL_20260911_180628.json",
+  "avis_negatifs_index": "avis_negatifs_index_20260911_180628.json"
+}
