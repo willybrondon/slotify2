@@ -62,7 +62,7 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
   }
 
   if (afro.requirePhoto && (!photoUrls || photoUrls.length === 0)) {
-    return { ok: false, error: "Photo required for this service" };
+    // Soft: do not block reservation — salon can ask for photo via 1 question.
   }
 
   const basePrice = Number(entry.price);
@@ -115,7 +115,8 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
     depositStatus = "unpaid";
   }
 
-  const needsSalonReview = tier === "S3" || Boolean(afro.requirePhoto && photoUrls?.length);
+  const needsSalonReview =
+    tier === "S3" || Boolean(afro.requirePhoto && (!photoUrls || !photoUrls.length));
 
   return {
     ok: true,

@@ -3023,34 +3023,15 @@ body.sk-public-page .main-wrapper {
     width: 100%;
 }
 
-/* Afro demand (SQUIRE wedge) */
-.sq-afro-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.sq-afro-card {
-  text-align: left;
-  padding: 14px 16px;
-  border: 1px solid var(--sk-border, #e5e7eb);
-  border-radius: 12px;
-  background: var(--sk-bg, #fff);
-  cursor: pointer;
-}
-.sq-afro-card strong {
-  display: block;
-  margin-bottom: 4px;
-}
-.sq-afro-card span {
-  font-size: 0.85rem;
-  color: var(--sk-text-muted, #6b7280);
-}
+/* Afro project tasks (inline in classic booking) */
 .sq-afro-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin: 12px 0 16px;
 }
-.sq-afro-form label {
+.sq-afro-form label,
+.sq-afro-form .sq-booking-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -3061,29 +3042,38 @@ body.sk-public-page .main-wrapper {
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--sk-border, #e5e7eb);
+  font: inherit;
 }
-.sq-afro-primary,
-.sq-afro-secondary,
-.sq-afro-back {
-  border: none;
-  border-radius: 10px;
-  padding: 12px 16px;
-  cursor: pointer;
-  font-weight: 600;
+.sq-afro-accept {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0 16px;
+  font-size: 0.95rem;
+  line-height: 1.35;
 }
-.sq-afro-primary {
-  background: var(--sk-primary, #c45c26);
+.sq-afro-accept input {
+  margin-top: 3px;
+}
+.sq-service-card__badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 7px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  border-radius: 4px;
+  background: var(--sk-text, #111);
   color: #fff;
 }
-.sq-afro-secondary {
-  background: transparent;
-  border: 1px solid var(--sk-border, #e5e7eb);
-}
-.sq-afro-back {
-  background: transparent;
-  align-self: flex-start;
-  padding: 4px 0;
+.sq-service-card__info {
+  display: block;
+  font-size: 0.78rem;
   color: var(--sk-text-muted, #6b7280);
+  margin-top: 2px;
+  line-height: 1.3;
 }
 .sq-afro-price {
   font-size: 1.75rem;
@@ -3098,20 +3088,10 @@ body.sk-public-page .main-wrapper {
   color: #b91c1c;
 }
 .sq-afro-breakdown {
-  list-style: none;
-  padding: 0;
+  list-style: disc;
+  padding-left: 1.15rem;
   margin: 12px 0;
   font-size: 0.9rem;
-}
-.sq-afro-slot {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 4px 6px 4px 0;
-  padding: 8px 10px;
-  border: 1px solid var(--sk-border, #e5e7eb);
-  border-radius: 8px;
-  font-size: 0.85rem;
 }
 .open-app-btn--secondary {
   background: transparent !important;

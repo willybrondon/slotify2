@@ -80,6 +80,11 @@ const serviceDemandSchema = new mongoose.Schema(
     },
 
     reviewNote: { type: String, default: "" },
+    /** Soft salon clarification (1 question) — does not block the booking tunnel */
+    salonQuestion: { type: String, default: "" },
+    salonQuestionAt: { type: Date, default: null },
+    clientReply: { type: String, default: "" },
+    clientReplyAt: { type: Date, default: null },
     cancelReason: { type: String, default: "" },
   },
   {

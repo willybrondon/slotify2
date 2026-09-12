@@ -342,7 +342,9 @@ exports.publicConvertDemand = async (req, res) => {
       return bad(res, "Already converted");
     }
     if (demand.status === "needs_salon_review") {
-      return bad(res, "Salon must approve this quote before booking");
+      // Soft: allow convert as pending booking; salon confirms / may ask a question.
+    } else if (demand.status === "cancelled" || demand.status === "converted") {
+      return bad(res, "Demand not convertible");
     }
 
     if (

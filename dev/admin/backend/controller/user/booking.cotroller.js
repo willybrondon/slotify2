@@ -372,7 +372,12 @@ exports.newBooking = async (req, res, next) => {
       if (linkedDemand.bookingId) {
         return res.status(200).send({ status: false, message: "Demand already converted" });
       }
-      const okStatus = ["quoted", "awaiting_slot", "deposit_paid"].includes(linkedDemand.status);
+      const okStatus = [
+        "quoted",
+        "awaiting_slot",
+        "deposit_paid",
+        "needs_salon_review",
+      ].includes(linkedDemand.status);
       if (!okStatus) {
         return res.status(200).send({
           status: false,

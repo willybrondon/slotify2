@@ -11,11 +11,11 @@ import { toast } from "react-toastify";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Toutes" },
-  { value: "quoted", label: "Devisé" },
-  { value: "needs_salon_review", label: "À valider" },
+  { value: "quoted", label: "Estimé" },
+  { value: "needs_salon_review", label: "À valider / question" },
   { value: "awaiting_slot", label: "Créneau" },
   { value: "deposit_paid", label: "Acompte payé" },
-  { value: "converted", label: "Converti" },
+  { value: "converted", label: "Réservé" },
   { value: "cancelled", label: "Annulé" },
 ];
 
@@ -24,6 +24,7 @@ const emptyEdit = {
   estimatedDurationMinutes: "",
   depositAmount: "",
   reviewNote: "",
+  salonQuestion: "",
 };
 
 const Demand = () => {
@@ -86,10 +87,35 @@ const Demand = () => {
       })
     );
     if (res?.payload?.status) {
-      toast.success("Devis validé");
+      toast.success("Réservation validée");
       reload();
     } else {
       toast.error(res?.payload?.message || "Échec validation");
+    }
+  };
+
+  const onAskQuestion = async (row) => {
+    const q = window.prompt(
+      "Une question précise pour la cliente (ex. Qui apporte les mèches ?)",
+      row.salonQuestion || ""
+    );
+    if (q == null) return;
+    const trimmed = String(q).trim();
+    if (!trimmed) {
+      toast.error("Question vide");
+      return;
+    }
+    const res = await dispatch(
+      adjustDemand({
+        id: row._id,
+        body: { salonQuestion: trimmed, status: "needs_salon_review" },
+      })
+    );
+    if (res?.payload?.status) {
+      toast.success("Question enregistrée — la cliente pourra y répondre");
+      reload();
+    } else {
+      toast.error(res?.payload?.message || "Échec");
     }
   };
 
@@ -112,6 +138,7 @@ const Demand = () => {
       estimatedDurationMinutes: String(row.estimatedDurationMinutes ?? ""),
       depositAmount: String(row.depositAmount ?? ""),
       reviewNote: row.reviewNote || "",
+      salonQuestion: row.salonQuestion || "",
     });
   };
 
@@ -125,13 +152,16 @@ const Demand = () => {
           estimatedDurationMinutes: Number(editForm.estimatedDurationMinutes),
           depositAmount: Number(editForm.depositAmount),
           reviewNote: editForm.reviewNote,
+          salonQuestion: editForm.salonQuestion || undefined,
           status:
-            editing.status === "needs_salon_review" ? "quoted" : undefined,
+            editing.status === "needs_salon_review" && !editForm.salonQuestion
+              ? "quoted"
+              : undefined,
         },
       })
     );
     if (res?.payload?.status) {
-      toast.success("Devis mis à jour");
+      toast.success("Estimation mise à jour");
       setEditing(null);
       reload();
     } else {
@@ -142,7 +172,11 @@ const Demand = () => {
   const toggleFlow = async (enabled) => {
     const res = await dispatch(updateAfroConfig({ enabled }));
     if (res?.payload?.status) {
-      toast.success(enabled ? "Parcours devis activé" : "Parcours devis désactivé");
+      toast.success(
+        enabled
+          ? "Réservation sur mesure activée"
+          : "Réservation sur mesure désactivée"
+      );
       dispatch(fetchAfroConfig());
     } else {
       toast.error(res?.payload?.message || "Échec");
@@ -212,7 +246,7 @@ const Demand = () => {
 
   return (
     <div className="userPage">
-      <Title name="Demandes / devis Afro" />
+      <Title name="Demandes / réservations projet" />
 
       <div className="d-flex gap-2 mb-3 flex-wrap">
         <button
@@ -264,7 +298,7 @@ const Demand = () => {
                 >
                   {onboarding?.flowEnabled ? "OK" : "2"}
                 </span>
-                Activer le parcours devis sur la page publique
+                Activer la réservation sur mesure sur la page publique
               </li>
               <li className="mb-2">
                 <span
@@ -291,9 +325,9 @@ const Demand = () => {
 
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
             <div>
-              <h5 className="mb-1">Parcours devis projet (S1+)</h5>
+              <h5 className="mb-1">Parcours projet (dans « Réserver »)</h5>
               <p className="text-muted mb-0 small">
-                Active le bouton « Obtenir un devis » sur la page publique du salon.
+                Active questions + estimation + acompte dans le tunnel « Réserver » (pas de second bouton).
               </p>
             </div>
             <div className="form-check form-switch">
@@ -320,7 +354,7 @@ const Demand = () => {
               </button>
             </div>
             <small className="text-muted">
-              À coller en bio ou dans la conversation : la cliente ouvre le devis sans app.
+              À coller en bio ou dans la conversation : la cliente ouvre la réservation (estimation incluse).
             </small>
           </div>
 
@@ -509,6 +543,15 @@ const Demand = () => {
                             Ajuster
                           </button>
                         )}
+                        {row.status !== "converted" && (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-warning me-1"
+                            onClick={() => onAskQuestion(row)}
+                          >
+                            Question
+                          </button>
+                        )}
                         {row.status === "needs_salon_review" && (
                           <button
                             type="button"
@@ -518,6 +561,16 @@ const Demand = () => {
                             Valider
                           </button>
                         )}
+                        {row.salonQuestion ? (
+                          <div className="small text-muted mt-1" style={{ maxWidth: 180 }}>
+                            Q: {row.salonQuestion}
+                            {row.clientReply ? (
+                              <>
+                                <br />R: {row.clientReply}
+                              </>
+                            ) : null}
+                          </div>
+                        ) : null}
                         {row.depositAmount > 0 &&
                           row.depositStatus === "unpaid" &&
                           row.status !== "converted" && (
@@ -548,7 +601,7 @@ const Demand = () => {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Ajuster le devis</h5>
+                <h5 className="modal-title">Ajuster l’estimation</h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -605,6 +658,23 @@ const Demand = () => {
                       setEditForm((f) => ({ ...f, reviewNote: e.target.value }))
                     }
                   />
+                </div>
+                <div className="mb-2">
+                  <label className="form-label">Question à la cliente (optionnel)</label>
+                  <textarea
+                    className="form-control"
+                    rows={2}
+                    placeholder="Ex. Qui apporte les mèches ?"
+                    value={editForm.salonQuestion || ""}
+                    onChange={(e) =>
+                      setEditForm((f) => ({ ...f, salonQuestion: e.target.value }))
+                    }
+                  />
+                  {editing.clientReply ? (
+                    <p className="small text-success mt-1 mb-0">
+                      Réponse cliente : {editing.clientReply}
+                    </p>
+                  ) : null}
                 </div>
               </div>
               <div className="modal-footer">

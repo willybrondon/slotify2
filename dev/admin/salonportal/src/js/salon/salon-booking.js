@@ -35,6 +35,13 @@
     /** Retour depuis l’étape expert pour ajouter des prestations. */
     returnToExpertStep: false,
     walletBalance: 0,
+    /** Afro project flow (inline dans le tunnel classique). */
+    afroByServiceId: {},
+    afroMetaLoaded: false,
+    afroAnswers: {},
+    afroPhotoUrls: [],
+    afroDemand: null,
+    afroConfigServiceId: null,
   };
 
   const payCfg = { ...(cfg.payment || {}) };
@@ -228,6 +235,90 @@
     return calcTotals(getSelectedServices()).dur || 0;
   }
 
+  function afroEnabled() {
+    return Boolean(cfg.afroProjectFlowEnabled);
+  }
+
+  function getAfroMeta(serviceId) {
+    return state.afroByServiceId[normalizeServiceId(serviceId)] || null;
+  }
+
+  function getPrimaryProjectService() {
+    for (const sid of state.selectedServiceIds) {
+      const meta = getAfroMeta(sid);
+      if (meta && meta.usesProjectFlow) {
+        const svc = cfg.services.find(
+          (s) => normalizeServiceId(s.id) === normalizeServiceId(sid)
+        );
+        return { id: normalizeServiceId(sid), service: svc, meta };
+      }
+    }
+    return null;
+  }
+
+  function clearAfroQuote() {
+    state.afroAnswers = {};
+    state.afroPhotoUrls = [];
+    state.afroDemand = null;
+    state.afroConfigServiceId = null;
+  }
+
+  function hasAcceptedAfroQuote() {
+    const primary = getPrimaryProjectService();
+    if (!primary) return true;
+    if (!state.afroDemand) return false;
+    if (normalizeServiceId(state.afroConfigServiceId) !== primary.id) return false;
+    // Estimation soft : même en review salon, on laisse finir la résa (pending).
+    return true;
+  }
+
+  function needsAfroConfigStep() {
+    if (!afroEnabled()) return false;
+    const primary = getPrimaryProjectService();
+    if (!primary) return false;
+    return !hasAcceptedAfroQuote();
+  }
+
+  async function loadAfroMeta() {
+    if (!afroEnabled() || state.afroMetaLoaded) return;
+    try {
+      const res = await fetch(
+        `/api/public/demand/services?salonId=${encodeURIComponent(cfg.salonId)}`
+      );
+      const data = await res.json();
+      if (!data.status || !data.afroProjectFlowEnabled) {
+        state.afroMetaLoaded = true;
+        return;
+      }
+      const map = {};
+      (data.services || []).forEach((s) => {
+        map[normalizeServiceId(s.serviceId)] = s;
+      });
+      state.afroByServiceId = map;
+      state.afroMetaLoaded = true;
+    } catch (e) {
+      console.warn("[salon-booking] afro meta load failed", e);
+      state.afroMetaLoaded = true;
+    }
+  }
+
+  function channelHintFromReferrer() {
+    const ref = String(document.referrer || "");
+    if (/instagram/i.test(ref)) return "instagram";
+    if (/facebook|fb\.com/i.test(ref)) return "facebook";
+    if (/google/i.test(ref)) return "google";
+    if (/wa\.me|whatsapp/i.test(ref)) return "whatsapp";
+    return "other";
+  }
+
+  function demandNeedsDeposit(demand) {
+    if (!demand) return false;
+    const amount = Number(demand.depositAmount) || 0;
+    if (amount <= 0) return false;
+    const st = demand.depositStatus;
+    return st !== "paid" && st !== "waived" && st !== "not_required";
+  }
+
   function markPickedSlots(container) {
     if (!container) return;
     const picked = new Set(state.timeSlots);
@@ -409,6 +500,14 @@
     } else {
       state.selectedServiceIds = [...state.selectedServiceIds, sid];
     }
+    if (
+      state.afroConfigServiceId &&
+      !state.selectedServiceIds.some(
+        (x) => normalizeServiceId(x) === normalizeServiceId(state.afroConfigServiceId)
+      )
+    ) {
+      clearAfroQuote();
+    }
   }
 
   function buildServiceCardHtml(s) {
@@ -419,10 +518,32 @@
     const stateLabel = selected
       ? t("serviceTapToDeselect")
       : t("serviceTapToSelect");
+    const afro = getAfroMeta(s.id);
+    const projectBadge =
+      afro && afro.usesProjectFlow
+        ? `<span class="sq-service-card__badge">${escapeHtml(t("afroProjectBadge"))}</span>`
+        : "";
+    const baseDur = Number(afro?.baseDuration || s.duration) || Number(s.duration) || 0;
+    const maxDur = afro && afro.usesProjectFlow ? Math.round(baseDur * 1.6) : baseDur;
+    const durationInfo =
+      afro && afro.usesProjectFlow && baseDur > 0
+        ? `<span class="sq-service-card__info">${escapeHtml(
+            t("afroServiceInfoDuration")
+              .split("__MIN__")
+              .join(String(baseDur))
+              .split("__MAX__")
+              .join(String(maxDur))
+          )}</span>`
+        : "";
+    const priceLabel =
+      afro && afro.usesProjectFlow
+        ? `${escapeHtml(t("afroFromPrice"))} ${escapeHtml(cfg.currency)}${s.price}`
+        : `${escapeHtml(cfg.currency)}${s.price} · ${s.duration} ${escapeHtml(cfg.copy.min)}`;
     return `<button type="button" class="sq-service-card${selected ? " sq-service-card--selected" : ""}" data-service-id="${escapeHtml(s.id)}" aria-pressed="${selected ? "true" : "false"}">
         ${check}
-        <span class="sq-service-card__name">${escapeHtml(s.name)}</span>
-        <span class="sq-service-card__meta">${escapeHtml(cfg.currency)}${s.price} · ${s.duration} ${escapeHtml(cfg.copy.min)}</span>
+        <span class="sq-service-card__name">${escapeHtml(s.name)}${projectBadge}</span>
+        <span class="sq-service-card__meta">${priceLabel}</span>
+        ${durationInfo}
         <span class="sq-service-card__state${selected ? " sq-service-card__state--selected" : ""}">${escapeHtml(stateLabel)}</span>
       </button>`;
   }
@@ -453,6 +574,14 @@
       return;
     }
     hideBookingStickyBar();
+    if (needsAfroConfigStep()) {
+      if (state.afroDemand?.needsSalonReview) {
+        renderStepAfroQuote();
+        return;
+      }
+      renderStepAfroConfig();
+      return;
+    }
     afterServicesContinue();
   }
 
@@ -711,10 +840,21 @@
   function calcTotals(serviceList) {
     let sub = 0;
     let dur = 0;
-    serviceList.forEach((s) => {
-      sub += Number(s.price) || 0;
-      dur += Number(s.duration) || 0;
-    });
+    const demand = state.afroDemand;
+    const useQuote =
+      demand &&
+      Number(demand.estimatedPrice) >= 0 &&
+      hasAcceptedAfroQuote();
+
+    if (useQuote) {
+      sub = Number(demand.estimatedPrice) || 0;
+      dur = Number(demand.estimatedDurationMinutes) || 0;
+    } else {
+      serviceList.forEach((s) => {
+        sub += Number(s.price) || 0;
+        dur += Number(s.duration) || 0;
+      });
+    }
     const taxPct = Number(cfg.tax) || 0;
     const taxAmount = (sub * taxPct) / 100;
     const withTaxNum = parseFloat((taxAmount + sub).toFixed(2));
@@ -723,6 +863,11 @@
     state.withoutTax = Number(sub.toFixed(2));
     state.total = Number(totalAfter.toFixed(2));
     state.duration = dur;
+    const depositAmount = useQuote ? Number(demand.depositAmount) || 0 : 0;
+    const balanceDue =
+      useQuote && demand.balanceDue != null
+        ? Number(demand.balanceDue)
+        : Math.max(0, sub - depositAmount);
     return {
       sub: state.withoutTax,
       tax: Number(taxAmount.toFixed(2)),
@@ -730,16 +875,23 @@
       total: state.total,
       discount,
       dur,
+      depositAmount,
+      balanceDue,
+      quoted: Boolean(useQuote),
     };
   }
 
   function buildBookingPayload(userId, totals) {
     const timeStr = state.timeSlots.filter(Boolean).join(",");
+    const serviceIds =
+      state.afroDemand && state.afroConfigServiceId
+        ? [String(state.afroConfigServiceId)]
+        : state.selectedServiceIds.map(String);
     const body = {
       userId: String(userId),
       expertId: String(state.expertId),
       salonId: String(cfg.salonId),
-      serviceId: state.selectedServiceIds.map(String).join(","),
+      serviceId: serviceIds.join(","),
       date: state.date,
       time: timeStr,
       amount: totals.total,
@@ -750,6 +902,9 @@
     };
     if (state.couponId && state.couponDiscount > 0) {
       body.couponId = String(state.couponId);
+    }
+    if (state.afroDemand?.id || state.afroDemand?._id) {
+      body.demandId = String(state.afroDemand.id || state.afroDemand._id);
     }
     return body;
   }
@@ -922,6 +1077,176 @@
     return missing;
   }
 
+  function renderAfroBreakdownList(demand) {
+    const rows = demand.priceBreakdown || [];
+    if (!rows.length) return "";
+    return `<ul class="sq-afro-breakdown">${rows
+      .map(
+        (b) =>
+          `<li>${escapeHtml(b.label)} : ${escapeHtml(cfg.currency)}${Number(b.amount).toFixed(2)}</li>`
+      )
+      .join("")}</ul>`;
+  }
+
+  async function createAfroDemandFromAnswers(answers, photoUrls) {
+    const primary = getPrimaryProjectService();
+    if (!primary) throw new Error(t("selectOneService"));
+    const res = await fetch("/api/public/demand/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        salonId: cfg.salonId,
+        serviceId: primary.id,
+        answers: answers || {},
+        photoUrls: photoUrls || [],
+        source: "web",
+        channelHint: channelHintFromReferrer(),
+        userId: state.userId || undefined,
+      }),
+    });
+    const data = await res.json();
+    if (!data.status || !data.demand) {
+      throw new Error(data.message || t("genericError"));
+    }
+    state.afroAnswers = answers || {};
+    state.afroPhotoUrls = photoUrls || [];
+    state.afroConfigServiceId = primary.id;
+    state.afroDemand = data.demand;
+    state.selectedServiceIds = [primary.id];
+    return data.demand;
+  }
+
+  function renderStepAfroQuote() {
+    hideBookingStickyBar();
+    const q = state.afroDemand;
+    const primary = getPrimaryProjectService();
+    const name = primary?.service?.name || primary?.meta?.name || "";
+    if (!q) {
+      renderStepAfroConfig();
+      return;
+    }
+    const reviewNote = q.needsSalonReview
+      ? `<p class="sq-booking-step__hint">${escapeHtml(t("afroReviewHint"))}</p>`
+      : `<p class="sq-booking-step__hint">${escapeHtml(t("afroQuoteHint"))}</p>`;
+    stepsEl.innerHTML = `
+      <p class="sq-booking-step__lead">${escapeHtml(
+        q.needsSalonReview ? t("afroReviewTitle") : t("afroQuoteTitle")
+      )}</p>
+      ${reviewNote}
+      <div class="sq-booking-summary">
+        <p><strong>${escapeHtml(name)}</strong></p>
+        <p class="sq-afro-price">${escapeHtml(cfg.currency)}${Number(q.estimatedPrice).toFixed(2)}</p>
+        <p>${escapeHtml(t("afroEstimatedDuration"))} : <strong>${escapeHtml(String(q.estimatedDurationMinutes))} ${escapeHtml(t("min"))}</strong></p>
+        ${
+          Number(q.depositAmount) > 0
+            ? `<p>${escapeHtml(t("afroDeposit"))} : <strong>${escapeHtml(cfg.currency)}${Number(q.depositAmount).toFixed(2)}</strong></p>`
+            : ""
+        }
+        ${renderAfroBreakdownList(q)}
+      </div>
+      <button type="button" class="sq-booking-btn" id="btnAfroQuoteNext">${escapeHtml(
+        q.needsSalonReview ? t("afroContinuePending") : t("continue")
+      )}</button>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnAfroBackCfg2">${escapeHtml(t("back"))}</button>
+    `;
+    document.getElementById("btnAfroQuoteNext").onclick = () => {
+      afterServicesContinue();
+    };
+    document.getElementById("btnAfroBackCfg2").onclick = () => {
+      clearAfroQuote();
+      renderStepAfroConfig();
+    };
+  }
+
+  function renderStepAfroConfig() {
+    hideBookingStickyBar();
+    const primary = getPrimaryProjectService();
+    if (!primary) {
+      afterServicesContinue();
+      return;
+    }
+    const schema = primary.meta.configSchema || [];
+    const requirePhoto = Boolean(primary.meta.requirePhoto);
+    const name = primary.service?.name || primary.meta.name || "";
+
+    if (!schema.length && !requirePhoto) {
+      stepsEl.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("loading"))}</p>`;
+      createAfroDemandFromAnswers({}, [])
+        .then(() => renderStepAfroQuote())
+        .catch((err) => {
+          showBookingNotice("error", err.message || t("genericError"), () =>
+            renderStepServices()
+          );
+        });
+      return;
+    }
+
+    const fieldsHtml = schema
+      .map((f) => {
+        if (f.type === "select" && Array.isArray(f.options)) {
+          return `<label class="sq-booking-field">${escapeHtml(f.label)}${f.required ? " *" : ""}
+            <select name="${escapeHtml(f.id)}" ${f.required ? "required" : ""}>
+              <option value="">—</option>
+              ${f.options
+                .map((o) => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`)
+                .join("")}
+            </select></label>`;
+        }
+        if (f.type === "boolean") {
+          return `<label class="sq-afro-accept"><input type="checkbox" name="${escapeHtml(f.id)}" value="oui" /> <span>${escapeHtml(f.label)}</span></label>`;
+        }
+        return `<label class="sq-booking-field">${escapeHtml(f.label)}${f.required ? " *" : ""}
+          <input name="${escapeHtml(f.id)}" ${f.required ? "required" : ""} /></label>`;
+      })
+      .join("");
+
+    const photoHtml = requirePhoto
+      ? `<label class="sq-booking-field">${escapeHtml(t("afroPhotoLabel"))}
+          <input type="url" name="__photoUrl" placeholder="https://" /></label>
+         <p class="sq-booking-step__hint">${escapeHtml(t("afroPhotoHint"))}</p>`
+      : `<label class="sq-booking-field">${escapeHtml(t("afroPhotoOptional"))}
+          <input type="url" name="__photoUrl" placeholder="https://" /></label>`;
+
+    stepsEl.innerHTML = `
+      <p class="sq-booking-step__lead">${escapeHtml(t("afroConfigTitle"))}</p>
+      <p class="sq-booking-step__hint">${escapeHtml(tFmt("afroConfigHint", "__NAME__", name))}</p>
+      <form id="afroConfigForm" class="sq-afro-form">
+        ${fieldsHtml}
+        ${photoHtml}
+        <button type="submit" class="sq-booking-btn">${escapeHtml(t("afroSeeQuote"))}</button>
+      </form>
+      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnAfroBackSvc">${escapeHtml(t("back"))}</button>
+    `;
+    document.getElementById("btnAfroBackSvc").onclick = () => {
+      clearAfroQuote();
+      renderStepServices();
+    };
+    document.getElementById("afroConfigForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const answers = {};
+      fd.forEach((v, k) => {
+        if (k === "__photoUrl") return;
+        if (v) answers[k] = String(v);
+      });
+      schema.forEach((f) => {
+        if (f.type === "boolean" && answers[f.id] == null) answers[f.id] = "non";
+      });
+      const photoRaw = String(fd.get("__photoUrl") || "").trim();
+      const photoUrls = photoRaw ? [photoRaw] : [];
+      stepsEl.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("loading"))}</p>`;
+      try {
+        await createAfroDemandFromAnswers(answers, photoUrls);
+        renderStepAfroQuote();
+      } catch (err) {
+        showBookingNotice("error", err.message || t("genericError"), () =>
+          renderStepAfroConfig()
+        );
+      }
+    };
+    if (stepsEl) stepsEl.scrollTop = 0;
+  }
+
   function renderStepServices() {
     const list =
       state.expertId != null
@@ -1001,6 +1326,7 @@
     );
     document.getElementById("btnAddMoreServices").onclick = () => {
       state.returnToExpertStep = true;
+      clearAfroQuote();
       renderStepServices();
     };
     const row = document.getElementById("bookingExpertsPick");
@@ -1022,7 +1348,13 @@
         renderStepDateTime();
       };
     });
-    document.getElementById("btnBackSvc").onclick = renderStepServices;
+    document.getElementById("btnBackSvc").onclick = () => {
+      if (state.afroDemand && !state.afroDemand.needsSalonReview) {
+        renderStepAfroQuote();
+        return;
+      }
+      renderStepServices();
+    };
   }
 
   async function renderStepDateTime() {
@@ -1209,12 +1541,23 @@
   }
 
   function renderPriceBreakdown(totals) {
-    let html = `<p>${escapeHtml(cfg.copy.subtotal)} : ${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)}</p>`;
+    let html = "";
+    if (totals.quoted) {
+      html += `<p class="sq-booking-summary__quote-badge">${escapeHtml(t("afroQuoteLocked"))}</p>`;
+    }
+    html += `<p>${escapeHtml(cfg.copy.subtotal)} : ${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)}</p>`;
+    if (totals.quoted && totals.dur > 0) {
+      html += `<p>${escapeHtml(t("afroEstimatedDuration"))} : <strong>${totals.dur} ${escapeHtml(t("min"))}</strong></p>`;
+    }
     if (totals.tax > 0) {
       html += `<p>${escapeHtml(cfg.copy.taxLabel)} : ${escapeHtml(cfg.currency)}${totals.tax.toFixed(2)}</p>`;
     }
     if (totals.discount > 0) {
       html += `<p class="sq-booking-summary__discount">${escapeHtml(cfg.copy.discount)} : −${escapeHtml(cfg.currency)}${totals.discount.toFixed(2)}</p>`;
+    }
+    if (totals.quoted && totals.depositAmount > 0) {
+      html += `<p>${escapeHtml(t("afroDeposit"))} : <strong>${escapeHtml(cfg.currency)}${totals.depositAmount.toFixed(2)}</strong></p>`;
+      html += `<p>${escapeHtml(t("afroBalanceDue"))} : ${escapeHtml(cfg.currency)}${Number(totals.balanceDue || 0).toFixed(2)}</p>`;
     }
     html += `<p class="sq-booking-summary__total"><strong>${escapeHtml(cfg.copy.totalLabel)} : ${escapeHtml(cfg.currency)}${totals.total.toFixed(2)}</strong></p>`;
     return html;
@@ -1335,81 +1678,107 @@
     hideBookingStickyBar();
     await refreshPaymentSettings();
     const totals = calcTotals(getSelectedServices());
+    const needDeposit = demandNeedsDeposit(state.afroDemand);
     const methods = getAvailablePaymentMethods();
     const showStripe = methods.some((m) => m.value === "Stripe");
-    const paymentOptionsHtml = methods
-      .map(
-        (m) =>
-          `<label class="sq-payment-option"><input type="radio" name="payMethod" value="${escapeHtml(m.value)}" ${state.paymentMethod === m.value ? "checked" : ""}> <span>${escapeHtml(m.label)}</span></label>`
-      )
-      .join("");
 
-    const couponList =
-      state.availableCoupons.length > 0
-        ? `<div class="sq-coupon-list">${state.availableCoupons
-            .map(
-              (c) =>
-                `<button type="button" class="sq-coupon-pick" data-code="${escapeHtml(c.code)}">${escapeHtml(c.code)}${c.title ? ` — ${escapeHtml(c.title)}` : ""}</button>`
-            )
-            .join("")}</div>`
-        : "";
+    if (needDeposit) {
+      state.paymentMethod = "cashAfterService";
+    }
 
-    const appliedCoupon =
-      state.couponDiscount > 0
-        ? `<p class="sq-coupon-applied">${escapeHtml(cfg.copy.couponApplied)} : <strong>${escapeHtml(state.couponCode)}</strong> (−${escapeHtml(cfg.currency)}${state.couponDiscount.toFixed(2)}) <button type="button" class="sq-coupon-remove" id="btnRemoveCoupon">${escapeHtml(cfg.copy.removeCoupon)}</button></p>`
-        : "";
+    const paymentOptionsHtml = needDeposit
+      ? `<p class="sq-booking-step__hint">${escapeHtml(t("afroDepositPayHint"))}</p>`
+      : methods
+          .map(
+            (m) =>
+              `<label class="sq-payment-option"><input type="radio" name="payMethod" value="${escapeHtml(m.value)}" ${state.paymentMethod === m.value ? "checked" : ""}> <span>${escapeHtml(m.label)}</span></label>`
+          )
+          .join("");
 
-    stepsEl.innerHTML = `
-      <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.paymentTitle)}</p>
-      <div class="sq-booking-summary">${renderPriceBreakdown(totals)}</div>
-      <div class="sq-coupon-block">
+    const couponBlock = needDeposit
+      ? ""
+      : `<div class="sq-coupon-block">
         <label class="sq-booking-field">${escapeHtml(cfg.copy.couponCode)}
           <div class="sq-coupon-row">
             <input type="text" id="bkCouponCode" class="sq-coupon-row__input" value="${escapeHtml(state.couponCode)}" placeholder="${escapeHtml(t("couponPlaceholder"))}" autocomplete="off" spellcheck="false">
             <button type="button" class="sq-booking-btn sq-booking-btn--ghost sq-coupon-row__btn" id="btnApplyCoupon">${escapeHtml(cfg.copy.applyCoupon)}</button>
           </div>
         </label>
-        ${couponList}
-        ${appliedCoupon}
-      </div>
+        ${
+          state.availableCoupons.length > 0
+            ? `<div class="sq-coupon-list">${state.availableCoupons
+                .map(
+                  (c) =>
+                    `<button type="button" class="sq-coupon-pick" data-code="${escapeHtml(c.code)}">${escapeHtml(c.code)}${c.title ? ` — ${escapeHtml(c.title)}` : ""}</button>`
+                )
+                .join("")}</div>`
+            : ""
+        }
+        ${
+          state.couponDiscount > 0
+            ? `<p class="sq-coupon-applied">${escapeHtml(cfg.copy.couponApplied)} : <strong>${escapeHtml(state.couponCode)}</strong> (−${escapeHtml(cfg.currency)}${state.couponDiscount.toFixed(2)}) <button type="button" class="sq-coupon-remove" id="btnRemoveCoupon">${escapeHtml(cfg.copy.removeCoupon)}</button></p>`
+            : ""
+        }
+      </div>`;
+
+    const confirmLabel = needDeposit
+      ? tFmt(
+          "afroConfirmWithDeposit",
+          "__AMOUNT__",
+          `${cfg.currency}${Number(state.afroDemand.depositAmount).toFixed(2)}`
+        )
+      : cfg.copy.confirmBooking;
+
+    stepsEl.innerHTML = `
+      <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.paymentTitle)}</p>
+      <div class="sq-booking-summary">${renderPriceBreakdown(totals)}</div>
+      ${
+        needDeposit
+          ? `<p class="sq-booking-step__hint">${escapeHtml(t("afroCancelPolicyHint"))}</p>`
+          : ""
+      }
+      ${couponBlock}
       <p class="sq-booking-step__label">${escapeHtml(cfg.copy.selectPayment)}</p>
       <div class="sq-payment-methods">
         ${paymentOptionsHtml || `<p class="sq-booking-step__hint">${escapeHtml(t("stripeUnavailable"))}</p>`}
       </div>
-      <div id="sq-stripe-wrap" class="sq-stripe-wrap${state.paymentMethod === "Stripe" ? "" : " sq-stripe-wrap--hidden"}">
-        <p class="sq-stripe-hint">${escapeHtml(cfg.copy.stripeSecure)}</p>
+      <div id="sq-stripe-wrap" class="sq-stripe-wrap${needDeposit || state.paymentMethod === "Stripe" ? "" : " sq-stripe-wrap--hidden"}">
+        <p class="sq-stripe-hint">${escapeHtml(needDeposit ? t("afroDepositStripeHint") : cfg.copy.stripeSecure)}</p>
         <div id="sq-stripe-element"></div>
       </div>
-      <button type="button" class="sq-booking-btn" id="btnConfirm">${escapeHtml(cfg.copy.confirmBooking)}</button>
+      <button type="button" class="sq-booking-btn" id="btnConfirm">${escapeHtml(confirmLabel)}</button>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackContact">${escapeHtml(t("back"))}</button>
     `;
 
-    stepsEl.querySelectorAll('input[name="payMethod"]').forEach((radio) => {
-      radio.onchange = async () => {
-        state.paymentMethod = radio.value;
-        destroyStripeElement();
-        const wrap = document.getElementById("sq-stripe-wrap");
-        if (wrap) {
-          wrap.classList.toggle("sq-stripe-wrap--hidden", state.paymentMethod !== "Stripe");
-        }
-        if (state.paymentMethod === "Stripe" && state.userId) {
-          await mountStripePaymentElement(state.userId);
-        }
-      };
-    });
+    if (!needDeposit) {
+      stepsEl.querySelectorAll('input[name="payMethod"]').forEach((radio) => {
+        radio.onchange = async () => {
+          state.paymentMethod = radio.value;
+          destroyStripeElement();
+          const wrap = document.getElementById("sq-stripe-wrap");
+          if (wrap) {
+            wrap.classList.toggle("sq-stripe-wrap--hidden", state.paymentMethod !== "Stripe");
+          }
+          if (state.paymentMethod === "Stripe" && state.userId) {
+            await mountStripePaymentElement(state.userId);
+          }
+        };
+      });
 
-    stepsEl.querySelectorAll(".sq-coupon-pick").forEach((btn) => {
-      btn.onclick = () => {
-        const inp = document.getElementById("bkCouponCode");
-        if (inp) inp.value = btn.getAttribute("data-code");
-        applyCouponCode(state.userId);
-      };
-    });
+      stepsEl.querySelectorAll(".sq-coupon-pick").forEach((btn) => {
+        btn.onclick = () => {
+          const inp = document.getElementById("bkCouponCode");
+          if (inp) inp.value = btn.getAttribute("data-code");
+          applyCouponCode(state.userId);
+        };
+      });
 
-    document.getElementById("btnApplyCoupon")?.addEventListener("click", () =>
-      applyCouponCode(state.userId)
-    );
-    document.getElementById("btnRemoveCoupon")?.addEventListener("click", clearCoupon);
+      document.getElementById("btnApplyCoupon")?.addEventListener("click", () =>
+        applyCouponCode(state.userId)
+      );
+      document.getElementById("btnRemoveCoupon")?.addEventListener("click", clearCoupon);
+    }
+
     document.getElementById("btnBackContact").onclick = renderStepContact;
 
     document.getElementById("btnConfirm").onclick = async () => {
@@ -1424,31 +1793,47 @@
       btn.textContent = "…";
 
       let result;
-      if (state.paymentMethod === "Stripe") {
-        result = await confirmStripePayment(userId);
-      } else if (state.paymentMethod === "wallet") {
-        const totalsNow = calcTotals(getSelectedServices());
-        if (state.walletBalance < totalsNow.total) {
-          showBookingNotice(
-            "error",
-            cfg.copy.walletInsufficient || t("walletInsufficient"),
-            () => renderStepPayment()
-          );
-          btn.disabled = false;
-          btn.textContent = cfg.copy.confirmBooking;
-          return;
+      try {
+        if (needDeposit) {
+          const depOk = await confirmAfroDepositPayment();
+          if (!depOk.ok) {
+            showBookingNotice("error", depOk.message || t("bookingFailed"), () =>
+              renderStepPayment()
+            );
+            btn.disabled = false;
+            btn.textContent = confirmLabel;
+            return;
+          }
+          state.paymentMethod = "cashAfterService";
+          result = await createBooking(userId);
+        } else if (state.paymentMethod === "Stripe") {
+          result = await confirmStripePayment(userId);
+        } else if (state.paymentMethod === "wallet") {
+          const totalsNow = calcTotals(getSelectedServices());
+          if (state.walletBalance < totalsNow.total) {
+            showBookingNotice(
+              "error",
+              cfg.copy.walletInsufficient || t("walletInsufficient"),
+              () => renderStepPayment()
+            );
+            btn.disabled = false;
+            btn.textContent = cfg.copy.confirmBooking;
+            return;
+          }
+          result = await createBooking(userId);
+        } else {
+          result = await createBooking(userId);
         }
-        result = await createBooking(userId);
-      } else {
-        result = await createBooking(userId);
+      } catch (err) {
+        result = { status: false, message: err.message || t("bookingFailed") };
       }
 
       btn.disabled = false;
-      btn.textContent = cfg.copy.confirmBooking;
+      btn.textContent = confirmLabel;
 
       if (result?.status) {
         destroyStripeElement();
-        showBookingNotice("success", cfg.copy.bookingSuccess);
+        showBookingSuccess(result);
       } else if (result) {
         showBookingNotice(
           "error",
@@ -1458,11 +1843,132 @@
       }
     };
 
-    if (state.paymentMethod === "Stripe" && showStripe && state.userId) {
+    if (needDeposit && state.userId) {
+      await mountAfroDepositElement();
+    } else if (state.paymentMethod === "Stripe" && showStripe && state.userId) {
       const wrap = document.getElementById("sq-stripe-wrap");
       if (wrap) wrap.classList.remove("sq-stripe-wrap--hidden");
       mountStripePaymentElement(state.userId);
     }
+  }
+
+  function showBookingSuccess(result) {
+    const bookingId =
+      result?.booking?.bookingId ||
+      result?.data?.bookingId ||
+      result?.bookingId ||
+      "";
+    const totals = calcTotals(getSelectedServices());
+    const pendingHint = state.afroDemand?.needsSalonReview
+      ? `<p class="sq-booking-step__hint">${escapeHtml(t("afroReviewHint"))}</p>`
+      : "";
+    const checklist = state.afroDemand
+      ? `<ul class="sq-afro-breakdown">
+          <li>${escapeHtml(t("afroPrep1"))}</li>
+          <li>${escapeHtml(t("afroPrep2"))}</li>
+          <li>${escapeHtml(t("afroPrep3"))}</li>
+        </ul>`
+      : "";
+    const quoteLine =
+      state.afroDemand && totals.quoted
+        ? `<p>${escapeHtml(t("afroQuoteLocked"))} · ${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)} · ${totals.dur} ${escapeHtml(t("min"))}</p>
+           ${
+             totals.depositAmount > 0
+               ? `<p>${escapeHtml(t("afroBalanceDue"))} : ${escapeHtml(cfg.currency)}${Number(totals.balanceDue || 0).toFixed(2)}</p>`
+               : ""
+           }`
+        : "";
+    stepsEl.innerHTML = `
+      <div class="sq-booking-notice sq-booking-notice--success">
+        <p class="sq-booking-notice__message">${escapeHtml(t("afroConfirmUnified") || cfg.copy.bookingSuccess)}</p>
+        ${bookingId ? `<p><strong>N° ${escapeHtml(String(bookingId))}</strong></p>` : ""}
+        ${quoteLine}
+        ${pendingHint}
+        ${checklist ? `<p class="sq-booking-step__lead">${escapeHtml(t("afroPrepTitle"))}</p>${checklist}` : ""}
+        <button type="button" class="sq-booking-btn" id="btnBookingDone">${escapeHtml(t("afroClose"))}</button>
+      </div>
+    `;
+    document.getElementById("btnBookingDone").onclick = closeModal;
+    clearAfroQuote();
+  }
+
+  let afroDepositElements = null;
+  let afroDepositStripe = null;
+
+  async function mountAfroDepositElement() {
+    destroyStripeElement();
+    const demandId = state.afroDemand?.id || state.afroDemand?._id;
+    if (!demandId) return false;
+    const intentRes = await fetch("/api/public/demand/stripe-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ demandId }),
+    });
+    const intent = await intentRes.json();
+    if (!intent.status) {
+      showBookingNotice("error", intent.message || t("genericError"), () =>
+        renderStepPayment()
+      );
+      return false;
+    }
+    if (intent.alreadyPaid) {
+      state.afroDemand.depositStatus = "paid";
+      await renderStepPayment();
+      return true;
+    }
+    if (typeof Stripe === "undefined") {
+      showBookingNotice("error", t("stripeNotLoaded"), () => renderStepPayment());
+      return false;
+    }
+    afroDepositStripe = window.Stripe(intent.publishableKey, {
+      stripeAccount: intent.connectedAccountId,
+    });
+    afroDepositElements = afroDepositStripe.elements({
+      clientSecret: intent.clientSecret,
+    });
+    const paymentElement = afroDepositElements.create("payment");
+    const mountEl = document.getElementById("sq-stripe-element");
+    if (mountEl) paymentElement.mount("#sq-stripe-element");
+    state._afroDepositIntent = intent;
+    return true;
+  }
+
+  async function confirmAfroDepositPayment() {
+    const demand = state.afroDemand;
+    if (!demandNeedsDeposit(demand)) return { ok: true };
+    if (demand.depositStatus === "paid") return { ok: true };
+    if (!afroDepositStripe || !afroDepositElements) {
+      const mounted = await mountAfroDepositElement();
+      if (demandNeedsDeposit(state.afroDemand) === false) return { ok: true };
+      if (!mounted || !afroDepositStripe) {
+        return { ok: false, message: t("stripeNotLoaded") };
+      }
+    }
+    const { error, paymentIntent } = await afroDepositStripe.confirmPayment({
+      elements: afroDepositElements,
+      redirect: "if_required",
+    });
+    if (error) {
+      return { ok: false, message: error.message || t("paymentCancelled") };
+    }
+    const demandId = demand.id || demand._id;
+    const conf = await fetch("/api/public/demand/confirm-deposit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        demandId,
+        paymentIntentId: paymentIntent?.id,
+      }),
+    });
+    const data = await conf.json();
+    if (!data.status) {
+      return { ok: false, message: data.message || t("bookingFailed") };
+    }
+    state.afroDemand.depositStatus = "paid";
+    if (data.demand) {
+      Object.assign(state.afroDemand, data.demand);
+    }
+    return { ok: true };
   }
 
   function tryResumeBooking() {
@@ -1520,6 +2026,7 @@
       state.bookingFromExpert = Boolean(opts.expertId);
       state.returnToExpertStep = false;
       state.expertId = opts.expertId || null;
+      clearAfroQuote();
 
       if (opts.expertId && !opts.serviceId) {
         state.selectedServiceIds = [];
@@ -1557,6 +2064,16 @@
   });
 
   tryResumeBooking();
+
+  void loadAfroMeta().then(() => {
+    renderServicesGrid();
+    if (/[?&]flow=devis(?:&|$)/.test(location.search)) {
+      setTimeout(() => {
+        openModal();
+        renderStepServices();
+      }, 350);
+    }
+  });
 
   document.addEventListener("visibilitychange", () => {
     if (

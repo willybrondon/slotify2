@@ -129,6 +129,18 @@ exports.adjust = async (req, res) => {
       }
     }
     if (body.reviewNote != null) demand.reviewNote = String(body.reviewNote);
+    if (body.salonQuestion != null) {
+      const q = String(body.salonQuestion).trim();
+      demand.salonQuestion = q;
+      demand.salonQuestionAt = q ? new Date() : null;
+      if (q && demand.status === "quoted") {
+        demand.status = "needs_salon_review";
+      }
+    }
+    if (body.clientReply != null) {
+      demand.clientReply = String(body.clientReply).trim();
+      demand.clientReplyAt = demand.clientReply ? new Date() : null;
+    }
 
     demand.balanceDue = Math.max(0, demand.estimatedPrice - (demand.depositAmount || 0));
 
