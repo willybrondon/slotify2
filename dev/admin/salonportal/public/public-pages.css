@@ -300,6 +300,7 @@ body.sk-public-page .main-wrapper {
 .sk-public-page .sq-salon-contact-actions {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
     margin: 12px 0 4px;
 }
@@ -328,9 +329,57 @@ body.sk-public-page .main-wrapper {
     border-color: #111;
 }
 
-.sk-public-page .sq-salon-contact-btn--ig {
+.sk-public-page .sq-salon-social-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.sk-public-page .sq-salon-social-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: 1px solid #e8e4df;
+    background: #fff;
+    color: #222;
+    font-size: 1.05rem;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.sk-public-page .sq-salon-social-btn:hover {
+    transform: translateY(-1px);
+}
+
+.sk-public-page .sq-salon-social-btn--ig {
     color: #c13584;
     border-color: #f0d0e0;
+}
+
+.sk-public-page .sq-salon-social-btn--ig:hover {
+    background: #fdf2f8;
+}
+
+.sk-public-page .sq-salon-social-btn--fb {
+    color: #1877f2;
+    border-color: #d6e6fb;
+}
+
+.sk-public-page .sq-salon-social-btn--fb:hover {
+    background: #f0f6ff;
+}
+
+.sk-public-page .sq-salon-social-btn--tt {
+    color: #111;
+    border-color: #ddd;
+}
+
+.sk-public-page .sq-salon-social-btn--tt:hover {
+    background: #f5f5f5;
 }
 
 .sk-public-page .sq-salon-contact-hint {
@@ -3934,6 +3983,85 @@ body.sk-public-page .main-wrapper {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+}
+.sk-public-page .sq-svc-products {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.sk-public-page .sq-svc-product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--sk-border-light);
+}
+.sk-public-page .sq-svc-product:last-child {
+    border-bottom: 0;
+}
+.sk-public-page .sq-svc-product.is-oos {
+    opacity: 0.65;
+}
+.sk-public-page .sq-svc-product__thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--sk-bg-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sk-public-page .sq-svc-product__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.sk-public-page .sq-svc-product__ph {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--sk-text-muted);
+}
+.sk-public-page .sq-svc-product__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.sk-public-page .sq-svc-product__name {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--sk-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sk-public-page .sq-svc-product__price {
+    font-size: 0.8rem;
+    color: var(--sk-text-muted);
+}
+.sk-public-page .sq-svc-product__add {
+    border: 1px solid var(--sk-primary);
+    background: transparent;
+    color: var(--sk-primary);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+}
+.sk-public-page .sq-svc-product__add:hover {
+    background: var(--sk-primary);
+    color: #fff;
+}
+.sk-public-page .sq-svc-product__oos {
+    font-size: 0.75rem;
+    color: var(--sk-text-muted);
+    flex-shrink: 0;
 }
 .sk-public-page .sq-svc-stats {
     display: flex;

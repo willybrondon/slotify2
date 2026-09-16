@@ -164,9 +164,6 @@
     const compose = document.getElementById("sqMsgCompose");
     if (compose) compose.hidden = true;
     const auth = cfg().authUrls || {};
-    const call = cfg().salonMobile
-      ? `<p class="sq-msg-urgent"><a href="tel:${escapeHtml(String(cfg().salonMobile).replace(/\s+/g, ""))}">${escapeHtml(t("callSalon"))}</a> — ${escapeHtml(t("messageUrgentHint"))}</p>`
-      : `<p class="sq-msg-urgent">${escapeHtml(t("messageUrgentHint"))}</p>`;
     if (body) {
       body.innerHTML = `
         <p class="sq-msg-empty">${escapeHtml(t("messageLoginHint"))}</p>
@@ -174,8 +171,7 @@
           <a class="sq-btn sq-btn-fill" href="${escapeHtml(auth.login || "/compte/connexion")}">${escapeHtml(t("authSignInLink"))}</a>
           <span>${escapeHtml(t("authOr") || "ou")}</span>
           <a href="${escapeHtml(auth.signup || "/compte/inscription")}">${escapeHtml(t("authSignUpLink"))}</a>
-        </div>
-        ${call}`;
+        </div>`;
     }
   }
 

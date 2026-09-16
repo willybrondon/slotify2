@@ -32,6 +32,10 @@ const salonSchema = new mongoose.Schema(
     about: { type: String, default: "" },
     /** Public Instagram profile URL (https://instagram.com/…) */
     instagramUrl: { type: String, default: "" },
+    /** Public Facebook page/profile URL */
+    facebookUrl: { type: String, default: "" },
+    /** Public TikTok profile URL */
+    tiktokUrl: { type: String, default: "" },
     /** Allow clients to Message the salon from the public profile */
     messagingEnabled: { type: Boolean, default: true },
 
@@ -142,7 +146,8 @@ const salonSchema = new mongoose.Schema(
         },
         /**
          * Public service card (StyleSeat-inspired) — salon-owned copy.
-         * shortDescription, includes, prepMust, prepAvoid, addons, deposit, etc.
+         * shortDescription, includes, prepMust, prepAvoid, addons,
+         * recommendedProductIds, deposit, etc.
          */
         detailCard: {
           type: mongoose.Schema.Types.Mixed,

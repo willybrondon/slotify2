@@ -43,6 +43,8 @@ export const AdminProfile = () => {
   const [longitude, setLongitude] = useState();
   const [about, setAbout] = useState();
   const [instagramUrl, setInstagramUrl] = useState("");
+  const [facebookUrl, setFacebookUrl] = useState("");
+  const [tiktokUrl, setTiktokUrl] = useState("");
   const [messagingEnabled, setMessagingEnabled] = useState(true);
   const [autoConfirmBookings, setAutoConfirmBookings] = useState(true);
   const [galleryFiles, setGalleryFiles] = useState([]);
@@ -118,6 +120,8 @@ export const AdminProfile = () => {
       setImagePath(data?.mainImage);
       setAbout(data?.about);
       setInstagramUrl(data?.instagramUrl || "");
+      setFacebookUrl(data?.facebookUrl || "");
+      setTiktokUrl(data?.tiktokUrl || "");
       setMessagingEnabled(data?.messagingEnabled !== false);
       setAutoConfirmBookings(data?.autoConfirmBookings !== false);
       setHeroImagePath(data?.heroImage);
@@ -213,6 +217,8 @@ export const AdminProfile = () => {
       formData.append("mobile", mobile);
       formData.append("about", about);
       formData.append("instagramUrl", instagramUrl || "");
+      formData.append("facebookUrl", facebookUrl || "");
+      formData.append("tiktokUrl", tiktokUrl || "");
       formData.append("messagingEnabled", messagingEnabled ? "true" : "false");
       formData.append("autoConfirmBookings", autoConfirmBookings ? "true" : "false");
       formData.append(
@@ -503,6 +509,9 @@ export const AdminProfile = () => {
                         }
                       }}
                     />
+                    <p style={{ fontSize: "13px", color: "#666", marginTop: 4 }}>
+                      {portalCopy.aboutPhoneHint}
+                    </p>
                   </div>
                 </div>
                 <div className="row mt-2">
@@ -518,6 +527,36 @@ export const AdminProfile = () => {
                     />
                     <p style={{ fontSize: "13px", color: "#666", marginTop: 4 }}>
                       {portalCopy.instagramHint}
+                    </p>
+                  </div>
+                </div>
+                <div className="row mt-2">
+                  <div className="col-md-6">
+                    <ExInput
+                      type={`text`}
+                      id={`facebookUrl`}
+                      name={`facebookUrl`}
+                      value={facebookUrl}
+                      label={portalCopy.facebookLabel}
+                      placeholder="https://facebook.com/monsalon"
+                      onChange={(e) => setFacebookUrl(e.target.value)}
+                    />
+                    <p style={{ fontSize: "13px", color: "#666", marginTop: 4 }}>
+                      {portalCopy.facebookHint}
+                    </p>
+                  </div>
+                  <div className="col-md-6">
+                    <ExInput
+                      type={`text`}
+                      id={`tiktokUrl`}
+                      name={`tiktokUrl`}
+                      value={tiktokUrl}
+                      label={portalCopy.tiktokLabel}
+                      placeholder="https://tiktok.com/@monsalon ou @monsalon"
+                      onChange={(e) => setTiktokUrl(e.target.value)}
+                    />
+                    <p style={{ fontSize: "13px", color: "#666", marginTop: 4 }}>
+                      {portalCopy.tiktokHint}
                     </p>
                   </div>
                 </div>

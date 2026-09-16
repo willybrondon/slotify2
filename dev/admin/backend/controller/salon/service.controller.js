@@ -79,6 +79,7 @@ exports.getSalonBasedServiceForExpert = async (req, res) => {
       path: "serviceIds",
       populate: {
         path: "id",
+        populate: { path: "categoryId", select: "name nameFr nameEn" },
       },
     });
 

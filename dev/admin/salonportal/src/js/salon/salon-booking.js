@@ -663,6 +663,42 @@
           .join("")}</div></div>`
       : "";
 
+    const recProducts = Array.isArray(s.recommendedProducts)
+      ? s.recommendedProducts
+      : [];
+    const productsBlock = recProducts.length
+      ? `<div class="sq-svc-block"><p class="sq-svc-block__title">🛍️ ${escapeHtml(
+          t("serviceProductsTitle")
+        )}</p><div class="sq-svc-products">${recProducts
+          .map((p) => {
+            const oos = Boolean(p.isOutOfStock);
+            const img = p.image
+              ? `<img src="${escapeHtml(p.image)}" alt="" class="sq-svc-product__img" loading="lazy">`
+              : `<span class="sq-svc-product__ph">${escapeHtml(
+                  (p.name || "?").charAt(0)
+                )}</span>`;
+            return `<div class="sq-svc-product${oos ? " is-oos" : ""}">
+              <div class="sq-svc-product__thumb">${img}</div>
+              <div class="sq-svc-product__body">
+                <span class="sq-svc-product__name">${escapeHtml(p.name || "")}</span>
+                <span class="sq-svc-product__price">${escapeHtml(cfg.currency)}${
+              Number(p.price) || 0
+            }</span>
+              </div>
+              ${
+                oos
+                  ? `<span class="sq-svc-product__oos">${escapeHtml(
+                      t("serviceProductOutOfStock")
+                    )}</span>`
+                  : `<button type="button" class="sq-svc-product__add" data-svc-product-add="${escapeHtml(
+                      String(p.id)
+                    )}">${escapeHtml(t("serviceProductAdd"))}</button>`
+              }
+            </div>`;
+          })
+          .join("")}</div></div>`
+      : "";
+
     const statsBlock = `<div class="sq-svc-stats">
         <div class="sq-svc-stat"><strong>⏱️ ${escapeHtml(
           t("serviceDurationTitle")
@@ -710,6 +746,7 @@
         ${prepBlock}
         ${inspirationBlock}
         ${addonsBlock}
+        ${productsBlock}
         ${statsBlock}
         ${noteBlock}
         <div class="sq-svc-row__actions">
@@ -752,6 +789,16 @@
           }
         });
       }
+      row.querySelectorAll("[data-svc-product-add]").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const pid = btn.getAttribute("data-svc-product-add");
+          if (pid && window.SalonProduct && typeof window.SalonProduct.open === "function") {
+            window.SalonProduct.open(pid);
+          }
+        });
+      });
     });
   }
 
@@ -1522,7 +1569,6 @@
     const answers = { ...(state.afroAnswers || {}) };
     const visibleSchema = schema.filter((f) => afroFieldVisible(f, answers));
     const fieldsHtml = visibleSchema.map((f) => renderAfroFieldControl(f, answers)).join("");
-    const addonDefs = primary.meta.addonDefs || [];
     const selectedAddons = Array.isArray(answers.addons) ? answers.addons.map(String) : [];
     const addonsHtml = addonDefs.length
       ? `<fieldset class="sq-afro-addons"><legend>${escapeHtml(

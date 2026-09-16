@@ -16,6 +16,9 @@ const {
 } = require("../../lib/webPageCopy");
 const { authUrls } = require("../../lib/publicAuthPage");
 const { getPlatformTax } = require("../../lib/platformTax");
+const {
+  resolveDetailCardPrep,
+} = require("../../services/prepTemplates.service");
 
 const geolib = require("geolib");
 
@@ -744,11 +747,38 @@ exports.serveSalonWebPage = async (req, res) => {
     const copy = getWebCopy(pageLang);
 
     // Fetch additional data: products, experts, reviews with expert info
-    const [products, experts, reviews, serviceRatingRows] = await Promise.all([
+    const linkedProductIdSet = new Set();
+    (salon.serviceIds || []).forEach((entry) => {
+      const ids = entry?.detailCard?.recommendedProductIds;
+      if (Array.isArray(ids)) {
+        ids.forEach((id) => {
+          if (id) linkedProductIdSet.add(String(id));
+        });
+      }
+    });
+    const linkedProductIds = [...linkedProductIdSet]
+      .filter((id) => mongoose.Types.ObjectId.isValid(id))
+      .map((id) => new mongoose.Types.ObjectId(id));
+
+    const [products, linkedProducts, experts, reviews, serviceRatingRows] = await Promise.all([
       Product.find({
         salon: salon._id,
-        createStatus: "Approved"
-      }).select("productName description price mainImage review rating _id").limit(10),
+        createStatus: "Approved",
+        isDelete: { $ne: true },
+      })
+        .select("productName description price mainImage review rating _id isOutOfStock")
+        .limit(10)
+        .lean(),
+      linkedProductIds.length
+        ? Product.find({
+            _id: { $in: linkedProductIds },
+            salon: salon._id,
+            createStatus: "Approved",
+            isDelete: { $ne: true },
+          })
+            .select("productName description price mainImage review rating _id isOutOfStock")
+            .lean()
+        : Promise.resolve([]),
       Expert.find({
         salonId: salon._id,
         isBlock: false,
@@ -851,6 +881,9 @@ exports.serveSalonWebPage = async (req, res) => {
 
     const bookingServices = [];
     const categoryMap = new Map();
+    const linkedProductById = new Map(
+      (linkedProducts || []).map((p) => [String(p._id), p])
+    );
     if (salon.serviceIds && salon.serviceIds.length > 0) {
       salon.serviceIds.forEach((service) => {
         if (!service.id || !service.id._id) return;
@@ -871,6 +904,25 @@ exports.serveSalonWebPage = async (req, res) => {
         const svcId = String(service.id._id);
         const hasSvcRating = serviceRatingMap.has(svcId);
         const svcRating = serviceRatingMap.get(svcId) || {};
+        const resolvedCard = resolveDetailCardPrep(
+          service.id.name || "",
+          categoryName,
+          service.detailCard || null
+        );
+        const recommendedProducts = (
+          Array.isArray(resolvedCard.recommendedProductIds)
+            ? resolvedCard.recommendedProductIds
+            : []
+        )
+          .map((id) => linkedProductById.get(String(id)))
+          .filter(Boolean)
+          .map((p) => ({
+            id: String(p._id),
+            name: p.productName || "Product",
+            price: p.price || 0,
+            image: p.mainImage || "",
+            isOutOfStock: Boolean(p.isOutOfStock),
+          }));
         bookingServices.push({
           id: svcId,
           name: service.id.name || "Service",
@@ -878,7 +930,11 @@ exports.serveSalonWebPage = async (req, res) => {
           duration: service.id.duration || 0,
           categoryId,
           categoryName,
-          detailCard: service.detailCard || null,
+          detailCard: {
+            ...resolvedCard,
+            recommendedProductIds: recommendedProducts.map((p) => p.id),
+          },
+          recommendedProducts,
           depositPercent: depositPct,
           // Per-service from booking reviews; fallback to salon rating (same badge style)
           review: hasSvcRating
@@ -899,12 +955,19 @@ exports.serveSalonWebPage = async (req, res) => {
       reviewCount: expert.reviewCount || 0,
       serviceIds: (expert.serviceId || []).map((id) => String(id)),
     }));
-    const salonProducts = (products || []).map((product) => ({
-      id: String(product._id),
-      name: product.productName || "Product",
-      price: product.price || 0,
-      image: product.mainImage || "",
-    }));
+    const salonProductsMap = new Map();
+    [...(products || []), ...(linkedProducts || [])].forEach((product) => {
+      if (!product?._id) return;
+      salonProductsMap.set(String(product._id), {
+        id: String(product._id),
+        name: product.productName || "Product",
+        price: product.price || 0,
+        image: product.mainImage || "",
+        description: product.description || "",
+        isOutOfStock: Boolean(product.isOutOfStock),
+      });
+    });
+    const salonProducts = Array.from(salonProductsMap.values());
 
     let servicesHtml = "";
     if (bookingServices.length > 0) {
@@ -1089,10 +1152,40 @@ exports.serveSalonWebPage = async (req, res) => {
 
     const afroFlowEnabled = !!salon.afroProjectFlowEnabled;
     const salonInstagram = String(salon.instagramUrl || "").trim();
+    const salonFacebook = String(salon.facebookUrl || "").trim();
+    const salonTiktok = String(salon.tiktokUrl || "").trim();
     const messagingOn = salon.messagingEnabled !== false;
-    const callHref = salonMobile
-      ? `tel:${String(salonMobile).replace(/\s+/g, "")}`
-      : "";
+    const socialLinks = [
+      salonInstagram
+        ? `<a class="sq-salon-social-btn sq-salon-social-btn--ig" href="${esc(
+            salonInstagram
+          )}" target="_blank" rel="noopener noreferrer" aria-label="${esc(
+            copy.instagramSalon || "Instagram"
+          )}" title="${esc(copy.instagramSalon || "Instagram")}">
+              <i class="fab fa-instagram" aria-hidden="true"></i>
+            </a>`
+        : "",
+      salonFacebook
+        ? `<a class="sq-salon-social-btn sq-salon-social-btn--fb" href="${esc(
+            salonFacebook
+          )}" target="_blank" rel="noopener noreferrer" aria-label="${esc(
+            copy.facebookSalon || "Facebook"
+          )}" title="${esc(copy.facebookSalon || "Facebook")}">
+              <i class="fab fa-facebook-f" aria-hidden="true"></i>
+            </a>`
+        : "",
+      salonTiktok
+        ? `<a class="sq-salon-social-btn sq-salon-social-btn--tt" href="${esc(
+            salonTiktok
+          )}" target="_blank" rel="noopener noreferrer" aria-label="${esc(
+            copy.tiktokSalon || "TikTok"
+          )}" title="${esc(copy.tiktokSalon || "TikTok")}">
+              <i class="fab fa-tiktok" aria-hidden="true"></i>
+            </a>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("");
     const contactActionsHtml = `<div class="sq-salon-contact-actions">
       ${
         messagingOn
@@ -1102,25 +1195,11 @@ exports.serveSalonWebPage = async (req, res) => {
           : ""
       }
       ${
-        callHref
-          ? `<a class="sq-salon-contact-btn sq-salon-contact-btn--call" href="${esc(callHref)}">
-              <i class="fas fa-phone"></i> ${esc(copy.callSalon || "Appeler")}
-            </a>`
+        socialLinks
+          ? `<div class="sq-salon-social-links">${socialLinks}</div>`
           : ""
       }
-      ${
-        salonInstagram
-          ? `<a class="sq-salon-contact-btn sq-salon-contact-btn--ig" href="${esc(salonInstagram)}" target="_blank" rel="noopener noreferrer">
-              <i class="fab fa-instagram"></i> ${esc(copy.instagramSalon || "Instagram")}
-            </a>`
-          : ""
-      }
-    </div>
-    ${
-      messagingOn && salonMobile
-        ? `<p class="sq-salon-contact-hint">${esc(copy.messageUrgentHint || "")}</p>`
-        : ""
-    }`;
+    </div>`;
 
     const bookingCardHtml = `<div class="booking-card sq-salon-detail__book-card">
                             <h3>${copy.bookingCardTitle}</h3>
@@ -1592,6 +1671,9 @@ exports.serveSalonWebPage = async (req, res) => {
                 serviceInspirationTitle: ${JSON.stringify(copy.serviceInspirationTitle)},
                 serviceInspirationHint: ${JSON.stringify(copy.serviceInspirationHint)},
                 serviceAddonsTitle: ${JSON.stringify(copy.serviceAddonsTitle)},
+                serviceProductsTitle: ${JSON.stringify(copy.serviceProductsTitle)},
+                serviceProductAdd: ${JSON.stringify(copy.serviceProductAdd)},
+                serviceProductOutOfStock: ${JSON.stringify(copy.serviceProductOutOfStock)},
                 serviceDurationTitle: ${JSON.stringify(copy.serviceDurationTitle)},
                 servicePriceTitle: ${JSON.stringify(copy.servicePriceTitle)},
                 serviceDepositTitle: ${JSON.stringify(copy.serviceDepositTitle)},

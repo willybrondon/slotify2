@@ -12,7 +12,9 @@ import {
   blockCity,
   getParticularSalonService,
   updateServiceDetailCard,
+  getPrepTemplates,
 } from "../../../redux/slice/serviceSlice";
+import { getProducts } from "../../../redux/slice/productSlice";
 import { getAllCity } from "../../../redux/slice/citySlice";
 import { Success } from "../../api/toastServices";
 
@@ -21,7 +23,8 @@ const textToLines = (s) =>
   String(s || "")
     .split("\n")
     .map((x) => x.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .slice(0, 5);
 
 const addonsToText = (addons) =>
   Array.isArray(addons)
@@ -64,14 +67,34 @@ const ServiceEditDialogue = () => {
     addons: "",
     importantNote: "",
     depositPercent: "",
+    prepFamilyId: "",
+    recommendedProductIds: [],
   });
 
   const [cityOptions, setCityOptions] = useState([]);
   const [citiesToBlock, setCitiesToBlock] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [prepFamilies, setPrepFamilies] = useState([]);
+  const [applyingPrep, setApplyingPrep] = useState(false);
+  const [productOptions, setProductOptions] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
 
   useEffect(() => {
     dispatch(getAllCity());
+    dispatch(getProducts({ start: 0, limit: 100 }))
+      .unwrap()
+      .then((res) => {
+        const list = Array.isArray(res?.products) ? res.products : [];
+        setProductOptions(
+          list
+            .filter((p) => !p.createStatus || p.createStatus === "Approved")
+            .map((p) => ({
+              id: String(p._id),
+              name: p.productName || p.name || "Produit",
+            }))
+        );
+      })
+      .catch(() => setProductOptions([]));
   }, [dispatch]);
 
   useEffect(() => {
@@ -113,10 +136,98 @@ const ServiceEditDialogue = () => {
           dc.depositPercent === null || dc.depositPercent === undefined
             ? ""
             : String(dc.depositPercent),
+        prepFamilyId: dc.prepFamilyId || "",
+        recommendedProductIds: Array.isArray(dc.recommendedProductIds)
+          ? dc.recommendedProductIds.map(String)
+          : [],
       });
       setCitiesToBlock([]);
+
+      const categoryName =
+        dialogueData?.categoryName ||
+        dialogueData?.categoryId?.name ||
+        dialogueData?.categoryId?.nameFr ||
+        "";
+      dispatch(
+        getPrepTemplates({
+          serviceName: dialogueData?.name || "",
+          categoryName,
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res?.status && Array.isArray(res.families)) {
+            setPrepFamilies(res.families);
+          }
+          if (!dc.prepFamilyId && res?.detectedFamilyId) {
+            setDetail((prev) => ({
+              ...prev,
+              prepFamilyId: res.detectedFamilyId,
+            }));
+          }
+          const emptyPrep =
+            !linesToText(dc.prepMust) && !linesToText(dc.prepAvoid);
+          if (emptyPrep && res?.suggested) {
+            setDetail((prev) => ({
+              ...prev,
+              prepFamilyId: res.suggested.familyId || prev.prepFamilyId,
+              prepMust: linesToText(res.suggested.prepMust),
+              prepAvoid: linesToText(res.suggested.prepAvoid),
+            }));
+          }
+        })
+        .catch(() => {});
     }
-  }, [dialogueData]);
+  }, [dialogueData, dispatch]);
+
+  useEffect(() => {
+    const ids = detail.recommendedProductIds || [];
+    if (!ids.length || !productOptions.length) {
+      setSelectedProducts(
+        ids.length
+          ? ids.map((id) => ({ id: String(id), name: String(id) }))
+          : []
+      );
+      return;
+    }
+    setSelectedProducts(
+      ids.map((id) => {
+        const found = productOptions.find((p) => p.id === String(id));
+        return found || { id: String(id), name: String(id) };
+      })
+    );
+  }, [detail.recommendedProductIds, productOptions]);
+
+  const applyPrepTemplate = async () => {
+    setApplyingPrep(true);
+    try {
+      const categoryName =
+        dialogueData?.categoryName ||
+        dialogueData?.categoryId?.name ||
+        dialogueData?.categoryId?.nameFr ||
+        "";
+      const res = await dispatch(
+        getPrepTemplates({
+          serviceName: dialogueData?.name || formData.name || "",
+          categoryName,
+          familyId: detail.prepFamilyId || undefined,
+        })
+      ).unwrap();
+      if (res?.suggested) {
+        setDetail((prev) => ({
+          ...prev,
+          prepFamilyId: res.suggested.familyId || prev.prepFamilyId,
+          prepMust: linesToText(res.suggested.prepMust),
+          prepAvoid: linesToText(res.suggested.prepAvoid),
+        }));
+        Success(ui.servicesPage.prepTemplateApplied);
+      }
+    } catch (e) {
+      // toast via api layer
+    } finally {
+      setApplyingPrep(false);
+    }
+  };
 
   const handleSubmit = async () => {
     const existingCities = dialogueData?.cities || [];
@@ -179,6 +290,8 @@ const ServiceEditDialogue = () => {
             importantNote: detail.importantNote,
             depositPercent:
               detail.depositPercent === "" ? null : Number(detail.depositPercent),
+            prepFamilyId: detail.prepFamilyId || null,
+            recommendedProductIds: selectedProducts.map((p) => p.id).slice(0, 12),
           },
         })
       ).unwrap();
@@ -284,9 +397,40 @@ const ServiceEditDialogue = () => {
                 onChange={(e) => setDetail({ ...detail, includes: e.target.value })}
               />
             </div>
+            <div className="col-12 mb-2">
+              <label className="sq-dialog-pro__label">
+                {ui.servicesPage.prepTemplateLabel}
+              </label>
+              <p className="text-muted mb-2" style={{ fontSize: 12 }}>
+                {ui.servicesPage.prepTemplateHint}
+              </p>
+              <div className="d-flex flex-wrap gap-2 align-items-center">
+                <select
+                  className="form-select"
+                  style={{ maxWidth: 360 }}
+                  value={detail.prepFamilyId || ""}
+                  onChange={(e) =>
+                    setDetail({ ...detail, prepFamilyId: e.target.value })
+                  }
+                >
+                  <option value="">— {ui.servicesPage.prepTemplateDetected} —</option>
+                  {prepFamilies.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  className="bg-gray text-light"
+                  text={applyingPrep ? "…" : ui.servicesPage.prepTemplateApply}
+                  onClick={applyPrepTemplate}
+                />
+              </div>
+            </div>
             <div className="col-md-6 mb-3">
               <Textarea
-                row={4}
+                row={5}
                 value={detail.prepMust}
                 label={ui.servicesPage.prepMust}
                 placeholder={"cheveux propres\ncheveux démêlés\ncheveux séchés"}
@@ -295,7 +439,7 @@ const ServiceEditDialogue = () => {
             </div>
             <div className="col-md-6 mb-3">
               <Textarea
-                row={4}
+                row={5}
                 value={detail.prepAvoid}
                 label={ui.servicesPage.prepAvoid}
                 placeholder={"huiles lourdes\nproduits gras\ncheveux encore mouillés"}
@@ -311,6 +455,41 @@ const ServiceEditDialogue = () => {
                 onChange={(e) => setDetail({ ...detail, addons: e.target.value })}
               />
               <p style={{ fontSize: 12, color: "#666" }}>{ui.servicesPage.addonsHint}</p>
+            </div>
+            <div className="col-12 mb-3">
+              <label className="sq-dialog-pro__label">
+                {ui.servicesPage.recommendedProducts}
+              </label>
+              <p className="text-muted mb-2" style={{ fontSize: 12 }}>
+                {ui.servicesPage.recommendedProductsHint}
+              </p>
+              {productOptions.length === 0 ? (
+                <p style={{ fontSize: 13, color: "#8a6a00" }}>
+                  {ui.servicesPage.recommendedProductsEmpty}
+                </p>
+              ) : (
+                <Multiselect
+                  options={productOptions}
+                  selectedValues={selectedProducts}
+                  onSelect={(list) => {
+                    setSelectedProducts(list);
+                    setDetail({
+                      ...detail,
+                      recommendedProductIds: list.map((p) => p.id),
+                    });
+                  }}
+                  onRemove={(list) => {
+                    setSelectedProducts(list);
+                    setDetail({
+                      ...detail,
+                      recommendedProductIds: list.map((p) => p.id),
+                    });
+                  }}
+                  displayValue="name"
+                  hideOnClickOutside={false}
+                  selectionLimit={12}
+                />
+              )}
             </div>
             <div className="col-md-4 mb-3">
               <ExInput

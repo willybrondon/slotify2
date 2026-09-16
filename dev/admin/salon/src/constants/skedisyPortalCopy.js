@@ -96,8 +96,14 @@ export const SKEDISY_SALON_PORTAL_COPY = {
   longitudeRequired: "La longitude est requise.",
   aboutLabel: "À propos",
   aboutRequired: "La description est requise.",
+  aboutPhoneHint:
+    "Vous pouvez y indiquer votre numéro d’appel si vous souhaitez être joint par téléphone.",
   instagramLabel: "Page Instagram",
-  instagramHint: "URL ou @pseudo — affiché sur votre fiche publique Skedisy.",
+  instagramHint: "URL ou @pseudo — logo Instagram sur votre fiche publique.",
+  facebookLabel: "Page Facebook",
+  facebookHint: "URL ou nom de page — logo Facebook sur votre fiche publique.",
+  tiktokLabel: "Compte TikTok",
+  tiktokHint: "URL ou @pseudo — logo TikTok sur votre fiche publique.",
   messagingEnabledLabel: "Messagerie Skedisy",
   messagingEnabledHint:
     "Les clientes peuvent vous écrire depuis votre fiche (photos d'inspiration comprises). Répondez dans Messages.",

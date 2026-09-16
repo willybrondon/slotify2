@@ -131,6 +131,22 @@ exports.update = async (req, res) => {
       }
       salon.instagramUrl = ig;
     }
+    if (req.body.facebookUrl !== undefined) {
+      let fb = String(req.body.facebookUrl || "").trim();
+      if (fb && !/^https?:\/\//i.test(fb)) {
+        const handle = fb.replace(/^@/, "").replace(/^(www\.)?facebook\.com\//i, "").replace(/^\//, "");
+        fb = handle ? `https://facebook.com/${handle}` : "";
+      }
+      salon.facebookUrl = fb;
+    }
+    if (req.body.tiktokUrl !== undefined) {
+      let tt = String(req.body.tiktokUrl || "").trim();
+      if (tt && !/^https?:\/\//i.test(tt)) {
+        const handle = tt.replace(/^@/, "").replace(/^(www\.)?tiktok\.com\/@?/i, "").replace(/^\//, "");
+        tt = handle ? `https://www.tiktok.com/@${handle}` : "";
+      }
+      salon.tiktokUrl = tt;
+    }
     if (req.body.messagingEnabled !== undefined) {
       salon.messagingEnabled =
         req.body.messagingEnabled === true ||
@@ -331,7 +347,31 @@ exports.addServices = async (req, res) => {
     if (existingService) {
       existingService.price = price;
     } else {
-      salon.serviceIds.push({ id: serviceId, price: price });
+      const Service = require("../../models/service.model");
+      const { suggestPrep } = require("../../services/prepTemplates.service");
+      const catalog = await Service.findById(serviceId)
+        .populate("categoryId")
+        .select("name categoryId")
+        .lean();
+      const suggested = suggestPrep(
+        catalog?.name || "",
+        catalog?.categoryId?.name || ""
+      );
+      salon.serviceIds.push({
+        id: serviceId,
+        price: price,
+        detailCard: {
+          shortDescription: "",
+          includes: [],
+          prepMust: suggested.prepMust,
+          prepAvoid: suggested.prepAvoid,
+          inspirationPhotoEnabled: false,
+          addons: [],
+          importantNote: "",
+          depositPercent: null,
+          prepFamilyId: suggested.familyId,
+        },
+      });
     }
 
     await salon.save();
@@ -382,9 +422,9 @@ exports.updateServiceDetailCard = async (req, res) => {
       return res.status(200).json({ status: false, message: "Service not offered by salon" });
     }
 
-    const cleanList = (arr) =>
+const cleanList = (arr, max = 5) =>
       Array.isArray(arr)
-        ? arr.map((x) => String(x || "").trim()).filter(Boolean).slice(0, 20)
+        ? arr.map((x) => String(x || "").trim()).filter(Boolean).slice(0, max)
         : [];
 
     const addons = Array.isArray(detailCard.addons)
@@ -399,18 +439,29 @@ exports.updateServiceDetailCard = async (req, res) => {
           .slice(0, 15)
       : [];
 
+    const recommendedProductIds = Array.isArray(detailCard.recommendedProductIds)
+      ? detailCard.recommendedProductIds
+          .map((id) => String(id || "").trim())
+          .filter(Boolean)
+          .slice(0, 12)
+      : [];
+
     entry.detailCard = {
       shortDescription: String(detailCard.shortDescription || "").slice(0, 500),
-      includes: cleanList(detailCard.includes),
-      prepMust: cleanList(detailCard.prepMust),
-      prepAvoid: cleanList(detailCard.prepAvoid),
+      includes: cleanList(detailCard.includes, 20),
+      prepMust: cleanList(detailCard.prepMust, 5),
+      prepAvoid: cleanList(detailCard.prepAvoid, 5),
       inspirationPhotoEnabled: Boolean(detailCard.inspirationPhotoEnabled),
       addons,
+      recommendedProductIds,
       importantNote: String(detailCard.importantNote || "").slice(0, 500),
       depositPercent:
         detailCard.depositPercent === null || detailCard.depositPercent === ""
           ? null
           : Math.min(100, Math.max(0, Number(detailCard.depositPercent) || 0)),
+      prepFamilyId: detailCard.prepFamilyId
+        ? String(detailCard.prepFamilyId)
+        : entry.detailCard?.prepFamilyId || null,
     };
 
     await salon.save();
@@ -421,6 +472,38 @@ exports.updateServiceDetailCard = async (req, res) => {
     });
   } catch (error) {
     console.error("[updateServiceDetailCard]", error);
+    return res.status(500).json({ status: false, error: error.message });
+  }
+};
+
+/**
+ * GET /salon/prepTemplates — familles de préparation (avis → checklists max 5)
+ */
+exports.getPrepTemplates = async (req, res) => {
+  try {
+    const {
+      listPrepFamilies,
+      suggestPrep,
+      detectPrepFamilyId,
+    } = require("../../services/prepTemplates.service");
+    const serviceName = String(req.query.serviceName || "").trim();
+    const categoryName = String(req.query.categoryName || "").trim();
+    const familyId = String(req.query.familyId || "").trim() || null;
+    const suggested =
+      serviceName || categoryName || familyId
+        ? suggestPrep(serviceName, categoryName, familyId)
+        : null;
+    return res.status(200).json({
+      status: true,
+      families: listPrepFamilies(),
+      detectedFamilyId:
+        serviceName || categoryName
+          ? detectPrepFamilyId(serviceName, categoryName)
+          : null,
+      suggested,
+    });
+  } catch (error) {
+    console.error("[getPrepTemplates]", error);
     return res.status(500).json({ status: false, error: error.message });
   }
 };

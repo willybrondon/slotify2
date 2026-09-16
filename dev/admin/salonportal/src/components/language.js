@@ -112,7 +112,7 @@ const translations = {
         'help.cMsg1': 'Sign in (or create an account).',
         'help.cMsg2': 'Send text + inspiration photos.',
         'help.cMsg3': 'The salon replies in Skedisy — you get notified.',
-        'help.cMsgP2': 'Urgent question? Use <strong>Call</strong> (number on the page).',
+        'help.cMsgP2': 'The salon may also put a phone number in its description if needed.',
         'help.cCancel': 'Cancel / reschedule',
         'help.cCancelH2': '5. Cancel or reschedule',
         'help.cCancelP1': 'The salon policy (free cancel until X hours, late / no-show fees, late arrival tolerance) is shown on the page and accepted before confirmation.',

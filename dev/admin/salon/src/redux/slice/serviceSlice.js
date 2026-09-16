@@ -64,6 +64,20 @@ export const updateServiceDetailCard = createAsyncThunk(
   }
 );
 
+export const getPrepTemplates = createAsyncThunk(
+  "salon/prepTemplates",
+  async (params = {}) => {
+    const q = new URLSearchParams();
+    if (params.serviceName) q.set("serviceName", params.serviceName);
+    if (params.categoryName) q.set("categoryName", params.categoryName);
+    if (params.familyId) q.set("familyId", params.familyId);
+    const qs = q.toString();
+    return apiInstanceFetch.get(
+      `salon/prepTemplates${qs ? `?${qs}` : ""}`
+    );
+  }
+);
+
 const serviceSlice = createSlice({
   name: "serviceSlice",
   initialState,

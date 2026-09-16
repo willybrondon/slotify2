@@ -108,6 +108,8 @@ const Service = () => {
                       (Array.isArray(dc.prepMust) && dc.prepMust.length) ||
                       (Array.isArray(dc.prepAvoid) && dc.prepAvoid.length) ||
                       (Array.isArray(dc.addons) && dc.addons.length) ||
+                      (Array.isArray(dc.recommendedProductIds) &&
+                        dc.recommendedProductIds.length) ||
                       dc.inspirationPhotoEnabled ||
                       (dc.importantNote && String(dc.importantNote).trim()) ||
                       (dc.depositPercent != null && dc.depositPercent !== "")
@@ -159,6 +161,12 @@ const Service = () => {
                               duration: item?.id?.duration,
                               cities: item?.allowCities || [],
                               detailCard: item?.detailCard || null,
+                              categoryId: item?.id?.categoryId || null,
+                              categoryName:
+                                item?.id?.categoryId?.nameFr ||
+                                item?.id?.categoryId?.name ||
+                                item?.id?.categoryId?.nameEn ||
+                                "",
                             },
                           })
                         )

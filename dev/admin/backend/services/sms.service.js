@@ -170,8 +170,12 @@ async function sendSMS(to, message) {
 
 /**
  * Collect prep tips from salon.serviceIds[].detailCard for this booking's services.
+ * Falls back to avis-based templates when the salon left prep empty.
  */
 function collectBookingPrepTips(salon, booking) {
+  const {
+    resolveDetailCardPrep,
+  } = require("./prepTemplates.service");
   const bookedIds = new Set(
     (booking.serviceId || []).map((s) => String(s?._id || s)).filter(Boolean)
   );
@@ -190,33 +194,37 @@ function collectBookingPrepTips(salon, booking) {
     list.push(tip);
   };
 
-  for (const entry of salon.serviceIds || []) {
-    const sid = String(entry?.id?._id || entry?.id || "");
-    if (!sid || (bookedIds.size && !bookedIds.has(sid))) continue;
-    const card = entry.detailCard || {};
+  const ingestEntry = (entry) => {
+    const svc = entry?.id;
+    const name =
+      (svc && typeof svc === "object" && svc.name) || entry?.name || "";
+    const categoryName =
+      (svc && typeof svc === "object" && svc.categoryId && svc.categoryId.name) ||
+      "";
+    const card = resolveDetailCardPrep(name, categoryName, entry.detailCard || null);
     (Array.isArray(card.prepMust) ? card.prepMust : []).forEach((t) =>
       pushUnique(must, t)
     );
     (Array.isArray(card.prepAvoid) ? card.prepAvoid : []).forEach((t) =>
       pushUnique(avoid, t)
     );
+  };
+
+  for (const entry of salon.serviceIds || []) {
+    const sid = String(entry?.id?._id || entry?.id || "");
+    if (!sid || (bookedIds.size && !bookedIds.has(sid))) continue;
+    ingestEntry(entry);
   }
 
   // If booking has no serviceId match but salon has one card only, still use it
   if (!must.length && !avoid.length && bookedIds.size === 0) {
     for (const entry of salon.serviceIds || []) {
-      const card = entry.detailCard || {};
-      (Array.isArray(card.prepMust) ? card.prepMust : []).forEach((t) =>
-        pushUnique(must, t)
-      );
-      (Array.isArray(card.prepAvoid) ? card.prepAvoid : []).forEach((t) =>
-        pushUnique(avoid, t)
-      );
+      ingestEntry(entry);
       if (must.length || avoid.length) break;
     }
   }
 
-  return { must, avoid };
+  return { must: must.slice(0, 5), avoid: avoid.slice(0, 5) };
 }
 
 /**

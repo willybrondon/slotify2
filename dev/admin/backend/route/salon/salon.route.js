@@ -23,6 +23,7 @@ route.get("/profile", salon, checkAccessWithSecretKey(), salonController.profile
 
 route.patch("/update", salon, upload.fields([{ name: "image", maxCount: 10 }, { name: "mainImage" }, { name: "heroImage" }]), checkAccessWithSecretKey(), salonController.update);
 route.patch("/serviceDetailCard", checkAccessWithSecretKey(), salon, salonController.updateServiceDetailCard);
+route.get("/prepTemplates", checkAccessWithSecretKey(), salon, salonController.getPrepTemplates);
 
 route.post("/updateSalonPassword", checkAccessWithSecretKey(), salon, salonController.updateSalonPassword);
 
