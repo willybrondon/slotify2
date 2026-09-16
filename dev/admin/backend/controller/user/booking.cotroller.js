@@ -787,6 +787,53 @@ exports.newBooking = async (req, res, next) => {
         Number(linkedDemand.estimatedDurationMinutes) > 0
           ? Number(linkedDemand.estimatedDurationMinutes)
           : totalDuration;
+    } else if (req.body.clientAnswers && typeof req.body.clientAnswers === "object") {
+      // Options cochées sur la fiche presta (sans devis)
+      try {
+        const { resolveAddonCatalog } = require("../../services/afroQuote.service");
+        const answers = req.body.clientAnswers;
+        const rawAddons = Array.isArray(answers.addons) ? answers.addons.map(String) : [];
+        const firstSid = Array.isArray(serviceIds) ? serviceIds[0] : serviceIds;
+        const entry = (salon.serviceIds || []).find((s) => String(s.id) === String(firstSid));
+        if (entry && rawAddons.length) {
+          const catalog = resolveAddonCatalog(entry, entry.afroConfig || null);
+          catalog.forEach((a) => {
+            if (!rawAddons.includes(String(a.id))) return;
+            totalServicePrice += Number(a.addPrice) || 0;
+            totalDuration += Number(a.addMinutes) || 0;
+          });
+        }
+        if (Array.isArray(answers.selectedProductIds) || Array.isArray(req.body.selectedProductIds)) {
+          const pids = new Set(
+            [
+              ...(answers.selectedProductIds || []),
+              ...(req.body.selectedProductIds || []),
+            ].map(String)
+          );
+          const Product = require("../../models/product.model");
+          if (pids.size) {
+            const products = await Product.find({
+              _id: { $in: Array.from(pids) },
+              salon: salon._id,
+              isDelete: { $ne: true },
+            })
+              .select("price isOutOfStock")
+              .lean();
+            products.forEach((p) => {
+              if (!p.isOutOfStock) totalServicePrice += Number(p.price) || 0;
+            });
+          }
+        }
+        const prepBuf = Math.max(0, Number(entry?.afroConfig?.prepBufferMinutes) || 0);
+        if (prepBuf && entry?.afroConfig?.baseDurationMinutes) {
+          // duration already from service; if afro base used client-side, trust body.duration when close
+        }
+      } catch (e) {
+        console.warn("[Booking] clientAnswers price adjust", e.message);
+      }
+      if (Number(req.body.duration) > 0) {
+        totalDuration = Number(req.body.duration);
+      }
     }
 
     const totalSlots = Math.ceil(totalDuration / 15);
@@ -796,13 +843,15 @@ exports.newBooking = async (req, res, next) => {
     if (result > 15 || result < 1 || resultOfGreater !== result) {
       return res.status(200).send({ status: false, message: "Slots not correctly booked" });
     }
-    const servicePrice = totalServicePrice.toFixed(2);
+    const servicePrice = Number(totalServicePrice).toFixed(2);
+    const bodyWithoutTax = Number(req.body.withoutTax).toFixed(2);
 
     console.log("totalServicePrice      ", totalServicePrice);
     console.log("servicePrice           ", servicePrice);
     console.log("req.body.withoutTax    ", req.body.withoutTax);
 
-    if (!linkedDemand && servicePrice !== req.body.withoutTax.toFixed(2)) {
+    if (!linkedDemand && Math.abs(Number(servicePrice) - Number(bodyWithoutTax)) > 0.5) {
+      // Tolérance légère (options / arrondis) — sinon rejeter
       return res.status(200).send({ status: false, message: "Invalid Service Price" });
     }
     if (linkedDemand && Math.abs(Number(req.body.withoutTax) - totalServicePrice) > 0.02) {
@@ -1003,6 +1052,38 @@ exports.newBooking = async (req, res, next) => {
     if (req.body.policyAccepted === true || req.body.policyAccepted === "true") {
       booking.policyAcceptedAt = new Date();
       booking.policyAcceptText = String(req.body.policyAcceptText || "").slice(0, 500);
+    }
+
+    // Options / photo / produits saisis sur la fiche presta (sans étape devis)
+    if (!linkedDemand) {
+      if (req.body.clientAnswers && typeof req.body.clientAnswers === "object") {
+        booking.clientAnswers = req.body.clientAnswers;
+        booking.configSnapshot = req.body.clientAnswers;
+      }
+      if (Array.isArray(req.body.inspirationPhotoUrls) && req.body.inspirationPhotoUrls.length) {
+        booking.inspirationPhotoUrls = req.body.inspirationPhotoUrls
+          .map((u) => String(u || "").trim())
+          .filter(Boolean)
+          .slice(0, 6);
+      }
+      if (Array.isArray(req.body.selectedProductIds) && req.body.selectedProductIds.length) {
+        const ids = req.body.selectedProductIds.map(String).filter(Boolean).slice(0, 12);
+        booking.clientAnswers = {
+          ...(booking.clientAnswers || {}),
+          selectedProductIds: ids,
+        };
+      }
+      const afroEntry = (salon.serviceIds || []).find(
+        (s) =>
+          String(s.id) ===
+          String(Array.isArray(booking.serviceId) ? booking.serviceId[0] : booking.serviceId)
+      );
+      const materials =
+        afroEntry?.afroConfig?.materials || afroEntry?.detailCard?.materials || null;
+      if (materials) booking.materialsSnapshot = materials;
+      if (afroEntry?.detailCard?.inspirationPhotoEnabled || afroEntry?.afroConfig?.requirePhoto) {
+        booking.inspirationPhotoRequired = Boolean(afroEntry?.afroConfig?.requirePhoto);
+      }
     }
 
     if (!booking.plannedDurationMinutes && totalDuration) {

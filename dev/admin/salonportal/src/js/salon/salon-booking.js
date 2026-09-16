@@ -52,6 +52,10 @@
     loyaltyLabel: "",
     applyLoyalty: false,
     clientHistory: [],
+    /** Produits cochés sur la fiche presta (ids) */
+    selectedProductIds: [],
+    /** Sélections inline par prestation sur la page salon */
+    pageSvcDraft: {},
   };
 
   const payCfg = { ...(cfg.payment || {}) };
@@ -576,13 +580,78 @@
       .join("")}</ul>`;
   }
 
+  function getServiceAddonCatalog(s) {
+    const card = s?.detailCard || {};
+    const fromCard = Array.isArray(card.addons) ? card.addons : [];
+    if (fromCard.length) return fromCard;
+    const afro = getAfroMeta(s?.id);
+    return Array.isArray(afro?.addonDefs) ? afro.addonDefs : [];
+  }
+
+  function getPageSvcDraft(serviceId) {
+    const sid = normalizeServiceId(serviceId);
+    if (!state.pageSvcDraft[sid]) {
+      state.pageSvcDraft[sid] = {
+        addons: [],
+        productIds: [],
+        photoFile: null,
+        photoPreview: "",
+      };
+    }
+    return state.pageSvcDraft[sid];
+  }
+
+  function estimateServiceLiveTotals(s, draft) {
+    const afro = getAfroMeta(s.id);
+    let price = Number(s.price) || 0;
+    let dur =
+      Number(afro?.baseDuration) > 0
+        ? Number(afro.baseDuration)
+        : Number(s.duration) || 0;
+    dur += Math.max(0, Number(afro?.prepBufferMinutes) || 0);
+    const catalog = getServiceAddonCatalog(s);
+    const chosen = new Set((draft?.addons || []).map(String));
+    catalog.forEach((a) => {
+      if (!chosen.has(String(a.id || a._id))) return;
+      price += Number(a.addPrice) || 0;
+      dur += Number(a.addMinutes) || 0;
+    });
+    (draft?.productIds || []).forEach((pid) => {
+      const p = (s.recommendedProducts || []).find(
+        (x) => String(x.id) === String(pid)
+      );
+      if (p && !p.isOutOfStock) price += Number(p.price) || 0;
+    });
+    return { price, dur };
+  }
+
+  function updateServiceCardLiveTotals(row) {
+    if (!row) return;
+    const sid = row.getAttribute("data-service-id");
+    const s = cfg.services.find(
+      (x) => normalizeServiceId(x.id) === normalizeServiceId(sid)
+    );
+    if (!s) return;
+    const draft = getPageSvcDraft(sid);
+    const live = estimateServiceLiveTotals(s, draft);
+    const priceEl = row.querySelector("[data-svc-live-price]");
+    const durEl = row.querySelector("[data-svc-live-dur]");
+    if (priceEl) {
+      priceEl.textContent = `${cfg.currency}${Number(live.price).toFixed(0)}`;
+    }
+    if (durEl) {
+      durEl.textContent = formatDurationLabel(live.dur) || "—";
+    }
+  }
+
   function buildSalonPageServiceCardHtml(s) {
     const card = s.detailCard || {};
     const afro = getAfroMeta(s.id);
-    const baseDur = Number(afro?.baseDuration || s.duration) || Number(s.duration) || 0;
-    const durLabel = formatDurationLabel(baseDur);
-    const priceNum = Number(s.price) || 0;
-    const priceStr = `${escapeHtml(cfg.currency)}${priceNum}`;
+    const draft = getPageSvcDraft(s.id);
+    const live = estimateServiceLiveTotals(s, draft);
+    const durLabel = formatDurationLabel(live.dur);
+    const priceNum = Number(live.price) || 0;
+    const priceStr = `${escapeHtml(cfg.currency)}${priceNum.toFixed(0)}`;
     const metaLine = [durLabel, priceStr].filter(Boolean).join(" · ");
     const svcReview = Number(s.review) || 0;
     const svcReviewCount = Number(s.reviewCount) || 0;
@@ -596,7 +665,7 @@
     const includes = Array.isArray(card.includes) ? card.includes : [];
     const prepMust = Array.isArray(card.prepMust) ? card.prepMust : [];
     const prepAvoid = Array.isArray(card.prepAvoid) ? card.prepAvoid : [];
-    const addons = Array.isArray(card.addons) ? card.addons : [];
+    const addons = getServiceAddonCatalog(s);
     const depositPct =
       card.depositPercent != null
         ? Number(card.depositPercent)
@@ -607,7 +676,6 @@
       depositPct != null && depositPct > 0
         ? Math.round((priceNum * depositPct) / 100)
         : null;
-    const extraMin = addons.reduce((acc, a) => acc + (Number(a.addMinutes) || 0), 0);
 
     const includesBlock = includes.length
       ? `<div class="sq-svc-block"><p class="sq-svc-block__title">✨ ${escapeHtml(
@@ -639,26 +707,56 @@
         : "";
 
     const inspirationBlock = card.inspirationPhotoEnabled
-      ? `<div class="sq-svc-block"><p class="sq-svc-block__title">📸 ${escapeHtml(
-          t("serviceInspirationTitle")
-        )}</p><p class="sq-svc-row__desc" style="-webkit-line-clamp:unset;display:block">${escapeHtml(
-          t("serviceInspirationHint")
-        )}</p></div>`
+      ? `<div class="sq-svc-block">
+          <p class="sq-svc-block__title">📸 ${escapeHtml(
+            t("serviceInspirationTitle")
+          )}</p>
+          <p class="sq-svc-row__desc" style="-webkit-line-clamp:unset;display:block">${escapeHtml(
+            t("serviceInspirationHint")
+          )}</p>
+          <label class="sq-svc-inspire-upload">
+            <input type="file" accept="image/*" capture="environment" data-svc-inspire-file hidden />
+            <span class="sq-svc-inspire-upload__btn" data-svc-inspire-label>${escapeHtml(
+              draft.photoPreview
+                ? t("serviceInspirationChange")
+                : t("serviceInspirationUpload")
+            )}</span>
+          </label>
+          <div class="sq-svc-inspire-preview${
+            draft.photoPreview ? "" : " sq-svc-inspire-preview--hidden"
+          }" data-svc-inspire-preview>
+            ${
+              draft.photoPreview
+                ? `<img src="${escapeHtml(
+                    draft.photoPreview
+                  )}" alt="" class="sq-svc-inspire-preview__img" />`
+                : ""
+            }
+          </div>
+        </div>`
       : "";
 
+    const selectedAddons = new Set((draft.addons || []).map(String));
     const addonsBlock = addons.length
       ? `<div class="sq-svc-block"><p class="sq-svc-block__title">➕ ${escapeHtml(
           t("serviceAddonsTitle")
         )}</p><div class="sq-svc-addons">${addons
-          .map((a) => {
+          .map((a, i) => {
+            const id = String(a.id || a._id || `addon_${i + 1}`);
             const addP = Number(a.addPrice) || 0;
             const addM = Number(a.addMinutes) || 0;
             const bits = [];
             if (addP) bits.push(`+${escapeHtml(cfg.currency)}${addP}`);
             if (addM) bits.push(`+${formatDurationLabel(addM)}`);
-            return `<label class="sq-svc-addon"><span>□</span> <span>${escapeHtml(
-              a.label || ""
-            )}${bits.length ? ` ${bits.join(" · ")}` : ""}</span></label>`;
+            const checked = selectedAddons.has(id) ? "checked" : "";
+            return `<label class="sq-svc-addon sq-svc-addon--check">
+              <input type="checkbox" data-svc-addon="${escapeHtml(
+                id
+              )}" ${checked} />
+              <span>${escapeHtml(a.label || id)}${
+              bits.length ? ` · ${bits.join(" · ")}` : ""
+            }</span>
+            </label>`;
           })
           .join("")}</div></div>`
       : "";
@@ -666,18 +764,21 @@
     const recProducts = Array.isArray(s.recommendedProducts)
       ? s.recommendedProducts
       : [];
+    const selectedProducts = new Set((draft.productIds || []).map(String));
     const productsBlock = recProducts.length
       ? `<div class="sq-svc-block"><p class="sq-svc-block__title">🛍️ ${escapeHtml(
           t("serviceProductsTitle")
         )}</p><div class="sq-svc-products">${recProducts
           .map((p) => {
             const oos = Boolean(p.isOutOfStock);
+            const pid = String(p.id);
             const img = p.image
               ? `<img src="${escapeHtml(p.image)}" alt="" class="sq-svc-product__img" loading="lazy">`
               : `<span class="sq-svc-product__ph">${escapeHtml(
                   (p.name || "?").charAt(0)
                 )}</span>`;
-            return `<div class="sq-svc-product${oos ? " is-oos" : ""}">
+            const checked = selectedProducts.has(pid) ? "checked" : "";
+            return `<label class="sq-svc-product${oos ? " is-oos" : ""}">
               <div class="sq-svc-product__thumb">${img}</div>
               <div class="sq-svc-product__body">
                 <span class="sq-svc-product__name">${escapeHtml(p.name || "")}</span>
@@ -690,11 +791,13 @@
                   ? `<span class="sq-svc-product__oos">${escapeHtml(
                       t("serviceProductOutOfStock")
                     )}</span>`
-                  : `<button type="button" class="sq-svc-product__add" data-svc-product-add="${escapeHtml(
-                      String(p.id)
-                    )}">${escapeHtml(t("serviceProductAdd"))}</button>`
+                  : `<span class="sq-svc-product__check"><input type="checkbox" data-svc-product="${escapeHtml(
+                      pid
+                    )}" ${checked} /><span>${escapeHtml(
+                      t("serviceProductSelect")
+                    )}</span></span>`
               }
-            </div>`;
+            </label>`;
           })
           .join("")}</div></div>`
       : "";
@@ -702,16 +805,12 @@
     const statsBlock = `<div class="sq-svc-stats">
         <div class="sq-svc-stat"><strong>⏱️ ${escapeHtml(
           t("serviceDurationTitle")
-        )}</strong>${escapeHtml(durLabel || "—")}${
-      extraMin
-        ? `<div style="font-size:0.75rem;color:var(--sk-text-muted)">${escapeHtml(
-            t("serviceAddonsTitle")
-          )}: +${escapeHtml(formatDurationLabel(extraMin))}</div>`
-        : ""
-    }</div>
+        )}</strong><span data-svc-live-dur>${escapeHtml(
+      durLabel || "—"
+    )}</span></div>
         <div class="sq-svc-stat"><strong>💰 ${escapeHtml(
-          t("servicePriceTitle")
-        )}</strong>${priceStr}</div>
+          t("serviceLiveTotal") || t("servicePriceTitle")
+        )}</strong><span data-svc-live-price>${priceStr}</span></div>
         ${
           depositAmt != null
             ? `<div class="sq-svc-stat"><strong>🔐 ${escapeHtml(
@@ -744,9 +843,9 @@
       <div class="sq-svc-row__panel">
         ${includesBlock}
         ${prepBlock}
-        ${inspirationBlock}
         ${addonsBlock}
         ${productsBlock}
+        ${inspirationBlock}
         ${statsBlock}
         ${noteBlock}
         <div class="sq-svc-row__actions">
@@ -780,25 +879,97 @@
           toggle.setAttribute("aria-expanded", open ? "true" : "false");
         });
       }
+
+      const syncDraftFromDom = () => {
+        const draft = getPageSvcDraft(sid);
+        draft.addons = Array.from(
+          row.querySelectorAll("[data-svc-addon]:checked")
+        ).map((el) => String(el.getAttribute("data-svc-addon")));
+        draft.productIds = Array.from(
+          row.querySelectorAll("[data-svc-product]:checked")
+        ).map((el) => String(el.getAttribute("data-svc-product")));
+        updateServiceCardLiveTotals(row);
+      };
+
+      row.querySelectorAll("[data-svc-addon], [data-svc-product]").forEach((el) => {
+        el.addEventListener("click", (e) => e.stopPropagation());
+        el.addEventListener("change", (e) => {
+          e.stopPropagation();
+          syncDraftFromDom();
+        });
+      });
+
+      const fileInput = row.querySelector("[data-svc-inspire-file]");
+      const previewEl = row.querySelector("[data-svc-inspire-preview]");
+      const labelEl = row.querySelector("[data-svc-inspire-label]");
+      fileInput?.addEventListener("click", (e) => e.stopPropagation());
+      fileInput?.addEventListener("change", (e) => {
+        e.stopPropagation();
+        const draft = getPageSvcDraft(sid);
+        const file = fileInput.files && fileInput.files[0];
+        if (draft.photoPreview) {
+          try {
+            URL.revokeObjectURL(draft.photoPreview);
+          } catch (err) {
+            /* ignore */
+          }
+        }
+        if (!file || !file.type.startsWith("image/")) {
+          draft.photoFile = null;
+          draft.photoPreview = "";
+          if (previewEl) {
+            previewEl.innerHTML = "";
+            previewEl.classList.add("sq-svc-inspire-preview--hidden");
+          }
+          if (labelEl) labelEl.textContent = t("serviceInspirationUpload");
+          return;
+        }
+        draft.photoFile = file;
+        draft.photoPreview = URL.createObjectURL(file);
+        if (previewEl) {
+          previewEl.innerHTML = `<img src="${draft.photoPreview}" alt="" class="sq-svc-inspire-preview__img" />`;
+          previewEl.classList.remove("sq-svc-inspire-preview--hidden");
+        }
+        if (labelEl) labelEl.textContent = t("serviceInspirationChange");
+      });
+
       if (bookBtn) {
-        bookBtn.addEventListener("click", (e) => {
+        bookBtn.addEventListener("click", async (e) => {
           e.preventDefault();
           e.stopPropagation();
-          if (sid && window.SalonBooking) {
-            window.SalonBooking.open({ serviceId: sid });
+          if (!sid || !window.SalonBooking) return;
+          syncDraftFromDom();
+          const draft = getPageSvcDraft(sid);
+          bookBtn.disabled = true;
+          const prevText = bookBtn.textContent;
+          bookBtn.textContent = t("loading") || "…";
+          try {
+            let photoUrls = [];
+            if (draft.photoFile) {
+              photoUrls = [await uploadAfroInspirationPhoto(draft.photoFile)];
+            }
+            await window.SalonBooking.open({
+              serviceId: sid,
+              skipPrecision: true,
+              addons: draft.addons || [],
+              productIds: draft.productIds || [],
+              photoUrls,
+              afroAnswers: {
+                ...(draft.addons?.length ? { addons: draft.addons } : {}),
+                ...(draft.productIds?.length
+                  ? { selectedProductIds: draft.productIds }
+                  : {}),
+              },
+            });
+          } catch (err) {
+            console.warn("[svc-book]", err);
+            alert(err.message || t("genericError"));
+          } finally {
+            bookBtn.disabled = false;
+            bookBtn.textContent = prevText;
           }
         });
       }
-      row.querySelectorAll("[data-svc-product-add]").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const pid = btn.getAttribute("data-svc-product-add");
-          if (pid && window.SalonProduct && typeof window.SalonProduct.open === "function") {
-            window.SalonProduct.open(pid);
-          }
-        });
-      });
     });
   }
 
@@ -849,11 +1020,8 @@
       return;
     }
     hideBookingStickyBar();
+    // Pas d’écran devis : config afro optionnelle puis expert / créneau
     if (needsAfroConfigStep()) {
-      if (state.afroDemand?.needsSalonReview) {
-        renderStepAfroQuote();
-        return;
-      }
       renderStepAfroConfig();
       return;
     }
@@ -1112,32 +1280,44 @@
   function calcTotals(serviceList) {
     let sub = 0;
     let dur = 0;
-    const demand = state.afroDemand;
-    const useQuote =
-      demand &&
-      Number(demand.estimatedPrice) >= 0 &&
-      hasAcceptedAfroQuote() &&
-      !state.afroSkipPrecision;
-
-    if (useQuote) {
-      sub = Number(demand.estimatedPrice) || 0;
-      dur = Number(demand.estimatedDurationMinutes) || 0;
-    } else {
-      serviceList.forEach((s) => {
-        sub += Number(s.price) || 0;
-        const sid = normalizeServiceId(s.id || s._id);
-        const meta = state.afroByServiceId?.[sid];
-        // Skip-precision (or no quote): prefer afro baseDuration + prep buffer over catalogue minutes
-        let serviceDur = Number(s.duration) || 0;
-        if (meta) {
-          const base =
-            Number(meta.baseDuration) > 0
-              ? Number(meta.baseDuration)
-              : serviceDur;
-          const buffer = Math.max(0, Number(meta.prepBufferMinutes) || 0);
-          serviceDur = base + buffer;
-        }
-        dur += serviceDur;
+    // Plus de devis : prix/durée = catalogue + options/produits cochés sur la presta
+    serviceList.forEach((s) => {
+      sub += Number(s.price) || 0;
+      const sid = normalizeServiceId(s.id || s._id);
+      const meta = state.afroByServiceId?.[sid];
+      let serviceDur = Number(s.duration) || 0;
+      if (meta) {
+        const base =
+          Number(meta.baseDuration) > 0
+            ? Number(meta.baseDuration)
+            : serviceDur;
+        const buffer = Math.max(0, Number(meta.prepBufferMinutes) || 0);
+        serviceDur = base + buffer;
+      }
+      const chosen = Array.isArray(state.afroAnswers?.addons)
+        ? state.afroAnswers.addons.map(String)
+        : [];
+      if (chosen.length) {
+        const catalog = getServiceAddonCatalog(s);
+        catalog.forEach((a) => {
+          if (!chosen.includes(String(a.id || a._id))) return;
+          sub += Number(a.addPrice) || 0;
+          serviceDur += Number(a.addMinutes) || 0;
+        });
+      }
+      dur += serviceDur;
+    });
+    if (state.selectedProductIds?.length) {
+      const svcPool = serviceList.length ? serviceList : cfg.services || [];
+      svcPool.forEach((s) => {
+        (s.recommendedProducts || []).forEach((p) => {
+          if (
+            state.selectedProductIds.includes(String(p.id)) &&
+            !p.isOutOfStock
+          ) {
+            sub += Number(p.price) || 0;
+          }
+        });
       });
     }
     const taxPct = Number(cfg.tax) || 0;
@@ -1154,11 +1334,6 @@
     state.withoutTax = Number(sub.toFixed(2));
     state.total = Number(totalAfter.toFixed(2));
     state.duration = dur;
-    const depositAmount = useQuote ? Number(demand.depositAmount) || 0 : 0;
-    const balanceDue =
-      useQuote && demand.balanceDue != null
-        ? Number(demand.balanceDue)
-        : Math.max(0, sub - depositAmount);
     return {
       sub: state.withoutTax,
       tax: Number(taxAmount.toFixed(2)),
@@ -1166,16 +1341,16 @@
       total: state.total,
       discount,
       dur,
-      depositAmount,
-      balanceDue,
-      quoted: Boolean(useQuote),
+      depositAmount: 0,
+      balanceDue: state.withoutTax,
+      quoted: false,
     };
   }
 
   function buildBookingPayload(userId, totals) {
     const timeStr = state.timeSlots.filter(Boolean).join(",");
     const serviceIds =
-      state.afroDemand && state.afroConfigServiceId
+      state.afroConfigServiceId
         ? [String(state.afroConfigServiceId)]
         : state.selectedServiceIds.map(String);
     const body = {
@@ -1197,8 +1372,19 @@
     if (state.applyLoyalty && state.loyaltyDiscount > 0) {
       body.applyLoyalty = true;
     }
-    if (state.afroDemand?.id || state.afroDemand?._id) {
-      body.demandId = String(state.afroDemand.id || state.afroDemand._id);
+    // Infos presta (options / photo / produits) → salon à la confirmation, sans étape devis
+    const answers = state.afroAnswers && typeof state.afroAnswers === "object"
+      ? { ...state.afroAnswers }
+      : {};
+    delete answers._skipPrecision;
+    if (Object.keys(answers).length) {
+      body.clientAnswers = answers;
+    }
+    if (Array.isArray(state.afroPhotoUrls) && state.afroPhotoUrls.length) {
+      body.inspirationPhotoUrls = state.afroPhotoUrls;
+    }
+    if (Array.isArray(state.selectedProductIds) && state.selectedProductIds.length) {
+      body.selectedProductIds = state.selectedProductIds.map(String);
     }
     if (state.policyAccepted) {
       body.policyAccepted = true;
@@ -1388,21 +1574,26 @@
       .join("")}</ul>`;
   }
 
-  async function createAfroDemandFromAnswers(answers, photoUrls) {
+  async function createAfroDemandFromAnswers(answers, photoUrls, opts = {}) {
     const primary = getPrimaryProjectService();
     if (!primary) throw new Error(t("selectOneService"));
+    const payload = {
+      salonId: cfg.salonId,
+      serviceId: primary.id,
+      answers: answers || {},
+      photoUrls: photoUrls || [],
+      source: "web",
+      channelHint: channelHintFromReferrer(),
+      userId: state.userId || undefined,
+    };
+    if (opts.skipPrecision || answers?._skipPrecision) {
+      payload.skipPrecision = true;
+      payload.answers = { ...(answers || {}), _skipPrecision: true };
+    }
     const res = await fetch("/api/public/demand/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        salonId: cfg.salonId,
-        serviceId: primary.id,
-        answers: answers || {},
-        photoUrls: photoUrls || [],
-        source: "web",
-        channelHint: channelHintFromReferrer(),
-        userId: state.userId || undefined,
-      }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     if (!data.status || !data.demand) {
@@ -1533,14 +1724,8 @@
     const name = primary.service?.name || primary.meta.name || "";
 
     if (!schema.length && !requirePhoto && !addonDefs.length) {
-      stepsEl.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("loading"))}</p>`;
-      createAfroDemandFromAnswers({}, [])
-        .then(() => renderStepAfroQuote())
-        .catch((err) => {
-          showBookingNotice("error", err.message || t("genericError"), () =>
-            renderStepServices()
-          );
-        });
+      // Rien à préciser → suite réservation (pas d’écran devis)
+      afterServicesContinue();
       return;
     }
 
@@ -1691,8 +1876,11 @@
           photoUrls = [await uploadAfroInspirationPhoto(file)];
         }
         state.afroAnswers = nextAnswers;
-        await createAfroDemandFromAnswers(nextAnswers, photoUrls);
-        renderStepAfroQuote();
+        state.afroPhotoUrls = photoUrls;
+        state.afroConfigServiceId = primary.id;
+        state.afroDemand = null;
+        state.afroSkipPrecision = true;
+        afterServicesContinue();
       } catch (err) {
         showBookingNotice("error", err.message || t("genericError"), () =>
           renderStepAfroConfig()
@@ -1818,10 +2006,6 @@
       };
     });
     document.getElementById("btnBackSvc").onclick = () => {
-      if (state.afroDemand && !state.afroDemand.needsSalonReview) {
-        renderStepAfroQuote();
-        return;
-      }
       renderStepServices();
     };
   }
@@ -2069,12 +2253,9 @@
 
   function renderPriceBreakdown(totals) {
     let html = "";
-    if (totals.quoted) {
-      html += `<p class="sq-booking-summary__quote-badge">${escapeHtml(t("afroQuoteLocked"))}</p>`;
-    }
     html += `<p>${escapeHtml(cfg.copy.subtotal)} : ${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)}</p>`;
-    if (totals.quoted && totals.dur > 0) {
-      html += `<p>${escapeHtml(t("afroEstimatedDuration"))} : <strong>${totals.dur} ${escapeHtml(t("min"))}</strong></p>`;
+    if (totals.dur > 0) {
+      html += `<p>${escapeHtml(t("afroEstimatedDuration") || t("serviceDurationTitle"))} : <strong>${totals.dur} ${escapeHtml(t("min"))}</strong></p>`;
     }
     if (totals.tax > 0) {
       html += `<p>${escapeHtml(cfg.copy.taxLabel)} : ${escapeHtml(cfg.currency)}${totals.tax.toFixed(2)}</p>`;
@@ -2087,10 +2268,6 @@
             )}</span>`
           : "";
       html += `<p class="sq-booking-summary__discount">${escapeHtml(cfg.copy.discount)} : −${escapeHtml(cfg.currency)}${totals.discount.toFixed(2)}${loyaltyBit}</p>`;
-    }
-    if (totals.quoted && totals.depositAmount > 0) {
-      html += `<p>${escapeHtml(t("afroDeposit"))} : <strong>${escapeHtml(cfg.currency)}${totals.depositAmount.toFixed(2)}</strong></p>`;
-      html += `<p>${escapeHtml(t("afroBalanceDue"))} : ${escapeHtml(cfg.currency)}${Number(totals.balanceDue || 0).toFixed(2)}</p>`;
     }
     html += `<p class="sq-booking-summary__total"><strong>${escapeHtml(cfg.copy.totalLabel)} : ${escapeHtml(cfg.currency)}${totals.total.toFixed(2)}</strong></p>`;
     return html;
@@ -2211,7 +2388,8 @@
     hideBookingStickyBar();
     await refreshPaymentSettings();
     const totals = calcTotals(getSelectedServices());
-    const needDeposit = demandNeedsDeposit(state.afroDemand);
+    // Plus d’acompte via devis — paiement classique à la confirmation
+    const needDeposit = false;
     const methods = getAvailablePaymentMethods();
     const showStripe = methods.some((m) => m.value === "Stripe");
 
@@ -2422,9 +2600,6 @@
       result?.bookingId ||
       "";
     const totals = calcTotals(getSelectedServices());
-    const pendingHint = state.afroDemand?.needsSalonReview
-      ? `<p class="sq-booking-step__hint">${escapeHtml(t("afroReviewHint"))}</p>`
-      : "";
     const checklist = (() => {
       const primary = getPrimaryProjectService();
       const card =
@@ -2449,28 +2624,12 @@
             : []
       ).slice(0, 5);
       if (!must.length && !avoid.length) {
-        return state.afroDemand
-          ? `<ul class="sq-afro-breakdown">
-          <li>${escapeHtml(t("afroPrep1"))}</li>
-          <li>${escapeHtml(t("afroPrep2"))}</li>
-          <li>${escapeHtml(t("afroPrep3"))}</li>
-        </ul>`
-          : "";
+        return "";
       }
       return `<ul class="sq-afro-breakdown">${must
         .map((x) => `<li>✓ ${escapeHtml(x)}</li>`)
         .join("")}${avoid.map((x) => `<li>✕ ${escapeHtml(x)}</li>`).join("")}</ul>`;
     })();
-    const quoteLine =
-      state.afroDemand && totals.quoted
-        ? `<p>${escapeHtml(t("afroQuoteLocked"))} · ${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)} · ${totals.dur} ${escapeHtml(t("min"))}</p>
-           ${
-             totals.depositAmount > 0
-               ? `<p>${escapeHtml(t("afroBalanceDue"))} : ${escapeHtml(cfg.currency)}${Number(totals.balanceDue || 0).toFixed(2)}</p>`
-               : ""
-           }`
-        : "";
-    // Cancel / edit live in confirmation email + upcoming history — not in the booking tunnel.
     const emailHint = `<p class="sq-booking-step__hint">${escapeHtml(
       t("bookingCancelEmailHint") ||
         "Un email de confirmation vous a été envoyé (lien pour annuler si besoin)."
@@ -2479,9 +2638,8 @@
       <div class="sq-booking-notice sq-booking-notice--success">
         <p class="sq-booking-notice__message">${escapeHtml(t("afroConfirmUnified") || cfg.copy.bookingSuccess)}</p>
         ${bookingId ? `<p><strong>N° ${escapeHtml(String(bookingId))}</strong></p>` : ""}
-        ${quoteLine}
+        <p>${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)} · ${totals.dur} ${escapeHtml(t("min"))}</p>
         ${emailHint}
-        ${pendingHint}
         ${checklist ? `<p class="sq-booking-step__lead">${escapeHtml(t("afroPrepTitle"))}</p>${checklist}` : ""}
         <button type="button" class="sq-booking-btn" id="btnBookingDone">${escapeHtml(t("afroClose"))}</button>
       </div>
@@ -2775,7 +2933,7 @@
   }
 
   window.SalonBooking = {
-    open(opts = {}) {
+    async open(opts = {}) {
       state.bookingFromExpert = Boolean(opts.expertId);
       state.returnToExpertStep = false;
       state.expertId = opts.expertId || null;
@@ -2794,9 +2952,35 @@
       state.couponId = null;
       state.couponCode = "";
       state.couponDiscount = 0;
+      state.selectedProductIds = Array.isArray(opts.productIds)
+        ? opts.productIds.map(String)
+        : [];
       destroyStripeElement();
       renderServicesGrid();
       openModal();
+
+      // Options déjà cochées sur la fiche presta → réservation directe (pas de devis)
+      if (opts.skipPrecision && opts.serviceId) {
+        const sid = normalizeServiceId(opts.serviceId);
+        const answers = {
+          ...(opts.afroAnswers || {}),
+        };
+        if (Array.isArray(opts.addons) && opts.addons.length) {
+          answers.addons = opts.addons.map(String);
+        }
+        delete answers._skipPrecision;
+        state.afroAnswers = answers;
+        state.afroPhotoUrls = Array.isArray(opts.photoUrls)
+          ? opts.photoUrls
+          : [];
+        state.afroSkipPrecision = true;
+        state.afroConfigServiceId = sid;
+        state.afroPrecisionFormOpen = false;
+        state.afroDemand = null;
+        afterServicesContinue();
+        return;
+      }
+
       if (opts.serviceId && state.selectedServiceIds.length) {
         continueFromServices();
       } else {
@@ -2922,24 +3106,10 @@
         }
         state.clientHistory = Array.isArray(rb.history) ? rb.history : [];
         openModal();
-        if (needsAfroConfigStep()) {
-          void (async () => {
-            try {
-              await createAfroDemandFromAnswers(rb.answers || {}, rb.photoUrls || []);
-              if (slot?.date) {
-                // Quote accepted path then jump toward datetime with prefilled slot
-                afterServicesContinue();
-              } else {
-                renderStepAfroQuote();
-              }
-            } catch (e) {
-              console.warn("[rebook] create demand failed", e);
-              renderStepAfroConfig();
-            }
-          })();
-        } else {
-          continueFromServices();
-        }
+        // Rebook : mêmes réponses, pas d’écran devis — directement expert / créneau
+        state.afroSkipPrecision = true;
+        state.afroDemand = null;
+        afterServicesContinue();
       };
       document.getElementById("sqRebookCta")?.addEventListener("click", () => go(null));
       banner.querySelectorAll("[data-rebook-slot]").forEach((btn) => {

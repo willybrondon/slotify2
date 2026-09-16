@@ -97,6 +97,9 @@ exports.publicQuoteDemand = async (req, res) => {
       serviceId,
       answers: answers || {},
       photoUrls: photoUrls || [],
+      skipRequired: Boolean(
+        req.body?.skipPrecision || answers?._skipPrecision
+      ),
     });
     if (!result.ok) return bad(res, result.error);
 
@@ -136,6 +139,7 @@ exports.publicCreateDemand = async (req, res) => {
       serviceId,
       answers: body.answers || {},
       photoUrls: body.photoUrls || [],
+      skipRequired: Boolean(body.skipPrecision || body.answers?._skipPrecision),
     });
     if (!result.ok) return bad(res, result.error);
 

@@ -61,7 +61,7 @@ function selectedAddonIds(answers) {
   return [];
 }
 
-function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] }) {
+function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [], skipRequired = false }) {
   const entry = getSalonServiceEntry(salon, serviceId);
   if (!entry) {
     return { ok: false, error: "Service not offered by this salon" };
@@ -78,8 +78,13 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
 
   const tier = afro.complexityTier || "S0";
   const schema = Array.isArray(afro.configSchema) ? afro.configSchema : [];
+  const softSkip =
+    skipRequired ||
+    answers?._skipPrecision === true ||
+    answers?._skipPrecision === "true";
 
   for (const field of schema) {
+    if (softSkip) break;
     if (!field.required) continue;
     if (!fieldIsVisible(field, answers)) continue;
     const v = answers[field.id];
@@ -162,7 +167,8 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
   }
 
   const needsSalonReview =
-    tier === "S3" || Boolean(afro.requirePhoto && (!photoUrls || !photoUrls.length));
+    !softSkip &&
+    (tier === "S3" || Boolean(afro.requirePhoto && (!photoUrls || !photoUrls.length)));
 
   const materials = afro.materials || entry?.detailCard?.materials || null;
 

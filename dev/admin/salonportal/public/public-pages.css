@@ -4082,6 +4082,22 @@ body.sk-public-page .main-wrapper {
     align-items: center;
     gap: 6px;
 }
+.sk-public-page .sq-svc-addon--check {
+    cursor: pointer;
+    padding: 6px 10px;
+    border: 1px solid var(--sk-border-light);
+    border-radius: 8px;
+    color: var(--sk-text);
+    background: #fff;
+}
+.sk-public-page .sq-svc-addon--check:has(input:checked) {
+    border-color: var(--sk-primary);
+    background: rgba(196, 92, 38, 0.06);
+}
+.sk-public-page .sq-svc-addon--check input {
+    accent-color: var(--sk-primary);
+    margin: 0;
+}
 .sk-public-page .sq-svc-products {
     display: flex;
     flex-direction: column;
@@ -4093,12 +4109,14 @@ body.sk-public-page .main-wrapper {
     gap: 12px;
     padding: 8px 0;
     border-bottom: 1px solid var(--sk-border-light);
+    cursor: pointer;
 }
 .sk-public-page .sq-svc-product:last-child {
     border-bottom: 0;
 }
 .sk-public-page .sq-svc-product.is-oos {
     opacity: 0.65;
+    cursor: default;
 }
 .sk-public-page .sq-svc-product__thumb {
     width: 48px;
@@ -4139,6 +4157,52 @@ body.sk-public-page .main-wrapper {
 .sk-public-page .sq-svc-product__price {
     font-size: 0.8rem;
     color: var(--sk-text-muted);
+}
+.sk-public-page .sq-svc-product__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--sk-primary);
+    flex-shrink: 0;
+}
+.sk-public-page .sq-svc-product__check input {
+    accent-color: var(--sk-primary);
+    width: 16px;
+    height: 16px;
+}
+.sk-public-page .sq-svc-product__oos {
+    font-size: 0.75rem;
+    color: #a33;
+    flex-shrink: 0;
+}
+.sk-public-page .sq-svc-inspire-upload {
+    display: inline-flex;
+    margin-top: 8px;
+    cursor: pointer;
+}
+.sk-public-page .sq-svc-inspire-upload__btn {
+    display: inline-block;
+    border: 1px dashed var(--sk-primary);
+    color: var(--sk-primary);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+.sk-public-page .sq-svc-inspire-preview {
+    margin-top: 10px;
+}
+.sk-public-page .sq-svc-inspire-preview--hidden {
+    display: none;
+}
+.sk-public-page .sq-svc-inspire-preview__img {
+    max-width: 160px;
+    max-height: 160px;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
 }
 .sk-public-page .sq-svc-product__add {
     border: 1px solid var(--sk-primary);
