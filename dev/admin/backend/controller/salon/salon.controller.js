@@ -122,10 +122,103 @@ exports.update = async (req, res) => {
 
     salon.mobile = req.body.mobile ? req.body.mobile : salon.mobile;
     salon.about = req.body.about ? req.body.about : salon.about;
+
+    if (req.body.instagramUrl !== undefined) {
+      let ig = String(req.body.instagramUrl || "").trim();
+      if (ig && !/^https?:\/\//i.test(ig)) {
+        const handle = ig.replace(/^@/, "").replace(/^instagram\.com\//i, "").replace(/^\//, "");
+        ig = handle ? `https://instagram.com/${handle}` : "";
+      }
+      salon.instagramUrl = ig;
+    }
+    if (req.body.messagingEnabled !== undefined) {
+      salon.messagingEnabled =
+        req.body.messagingEnabled === true ||
+        req.body.messagingEnabled === "true";
+    }
+
     if (req.body.autoConfirmBookings !== undefined) {
       salon.autoConfirmBookings =
         req.body.autoConfirmBookings === true ||
         req.body.autoConfirmBookings === "true";
+    }
+
+    if (req.body.cancellationPolicy !== undefined) {
+      let policy = req.body.cancellationPolicy;
+      if (typeof policy === "string") {
+        try {
+          policy = JSON.parse(policy);
+        } catch (e) {
+          policy = null;
+        }
+      }
+      if (policy && typeof policy === "object") {
+        salon.cancellationPolicy = salon.cancellationPolicy || {};
+        if (policy.enabled !== undefined) {
+          salon.cancellationPolicy.enabled =
+            policy.enabled === true || policy.enabled === "true";
+        }
+        if (policy.lateCancelPercent !== undefined) {
+          salon.cancellationPolicy.lateCancelPercent = Math.min(
+            100,
+            Math.max(0, Number(policy.lateCancelPercent) || 0)
+          );
+        }
+        if (policy.noShowPercent !== undefined) {
+          salon.cancellationPolicy.noShowPercent = Math.min(
+            100,
+            Math.max(0, Number(policy.noShowPercent) || 0)
+          );
+        }
+        if (policy.freeCancelHours !== undefined) {
+          salon.cancellationPolicy.freeCancelHours = Math.max(
+            0,
+            Number(policy.freeCancelHours) || 0
+          );
+        }
+        if (policy.lateArrivalMinutes !== undefined) {
+          salon.cancellationPolicy.lateArrivalMinutes = Math.min(
+            60,
+            Math.max(0, Number(policy.lateArrivalMinutes) || 0)
+          );
+        }
+      }
+    }
+
+    if (req.body.loyaltyProgram !== undefined) {
+      let loyalty = req.body.loyaltyProgram;
+      if (typeof loyalty === "string") {
+        try {
+          loyalty = JSON.parse(loyalty);
+        } catch (e) {
+          loyalty = null;
+        }
+      }
+      if (loyalty && typeof loyalty === "object") {
+        salon.loyaltyProgram = salon.loyaltyProgram || {};
+        if (loyalty.enabled !== undefined) {
+          salon.loyaltyProgram.enabled =
+            loyalty.enabled === true || loyalty.enabled === "true";
+        }
+        if (loyalty.sameServiceRebookPercent !== undefined) {
+          salon.loyaltyProgram.sameServiceRebookPercent = Math.min(
+            50,
+            Math.max(0, Number(loyalty.sameServiceRebookPercent) || 0)
+          );
+        }
+        if (loyalty.minCompletedCount !== undefined) {
+          salon.loyaltyProgram.minCompletedCount = Math.max(
+            1,
+            Number(loyalty.minCompletedCount) || 1
+          );
+        }
+        if (loyalty.maxDiscountAmount !== undefined) {
+          salon.loyaltyProgram.maxDiscountAmount = Math.max(
+            0,
+            Number(loyalty.maxDiscountAmount) || 0
+          );
+        }
+      }
     }
     salon.locationCoordinates = {
       latitude: req.body.latitude ? req.body.latitude : salon.locationCoordinates.latitude,
@@ -160,7 +253,7 @@ exports.update = async (req, res) => {
       }
     }
 
-    if (req.files.mainImage) {
+    if (req.files && req.files.mainImage) {
       const image = salon?.mainImage.split("storage");
       if (image) {
         if (fs.existsSync("storage" + image[1])) {
@@ -170,7 +263,7 @@ exports.update = async (req, res) => {
       salon.mainImage = process.env.baseURL + req.files.mainImage[0].path;
     }
 
-    if (req.files.image) {
+    if (req.files && req.files.image) {
       var imagesData = [];
 
       if (salon.image.length > 0) {
@@ -192,7 +285,7 @@ exports.update = async (req, res) => {
     }
 
     // Handle hero image upload
-    if (req.files.heroImage) {
+    if (req.files && req.files.heroImage) {
       if (salon.heroImage) {
         const heroImage = salon.heroImage.split("storage");
         if (heroImage && heroImage[1] && fs.existsSync("storage" + heroImage[1])) {
@@ -251,6 +344,84 @@ exports.addServices = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ status: false, error: " Internal Server Error" });
+  }
+};
+
+/**
+ * PATCH /salon/serviceDetailCard
+ * Body: { serviceId, detailCard: { shortDescription, includes[], prepMust[], prepAvoid[],
+ *   inspirationPhotoEnabled, addons[{id,label,addPrice,addMinutes}], importantNote, depositPercent } }
+ */
+exports.updateServiceDetailCard = async (req, res) => {
+  try {
+    const serviceId = req.body.serviceId || req.query.serviceId;
+    if (!serviceId) {
+      return res.status(200).json({ status: false, message: "serviceId required" });
+    }
+    let detailCard = req.body.detailCard;
+    if (typeof detailCard === "string") {
+      try {
+        detailCard = JSON.parse(detailCard);
+      } catch (e) {
+        return res.status(200).json({ status: false, message: "Invalid detailCard JSON" });
+      }
+    }
+    if (!detailCard || typeof detailCard !== "object") {
+      return res.status(200).json({ status: false, message: "detailCard required" });
+    }
+
+    const salon = await Salon.findById(req.salon._id);
+    if (!salon) {
+      return res.status(200).json({ status: false, message: "Salon not found" });
+    }
+
+    const entry = (salon.serviceIds || []).find(
+      (s) => String(s.id) === String(serviceId)
+    );
+    if (!entry) {
+      return res.status(200).json({ status: false, message: "Service not offered by salon" });
+    }
+
+    const cleanList = (arr) =>
+      Array.isArray(arr)
+        ? arr.map((x) => String(x || "").trim()).filter(Boolean).slice(0, 20)
+        : [];
+
+    const addons = Array.isArray(detailCard.addons)
+      ? detailCard.addons
+          .map((a, i) => ({
+            id: String(a.id || `addon_${i + 1}`),
+            label: String(a.label || "").trim(),
+            addPrice: Number(a.addPrice) || 0,
+            addMinutes: Number(a.addMinutes) || 0,
+          }))
+          .filter((a) => a.label)
+          .slice(0, 15)
+      : [];
+
+    entry.detailCard = {
+      shortDescription: String(detailCard.shortDescription || "").slice(0, 500),
+      includes: cleanList(detailCard.includes),
+      prepMust: cleanList(detailCard.prepMust),
+      prepAvoid: cleanList(detailCard.prepAvoid),
+      inspirationPhotoEnabled: Boolean(detailCard.inspirationPhotoEnabled),
+      addons,
+      importantNote: String(detailCard.importantNote || "").slice(0, 500),
+      depositPercent:
+        detailCard.depositPercent === null || detailCard.depositPercent === ""
+          ? null
+          : Math.min(100, Math.max(0, Number(detailCard.depositPercent) || 0)),
+    };
+
+    await salon.save();
+    return res.status(200).json({
+      status: true,
+      message: "Service detail card updated",
+      detailCard: entry.detailCard,
+    });
+  } catch (error) {
+    console.error("[updateServiceDetailCard]", error);
+    return res.status(500).json({ status: false, error: error.message });
   }
 };
 

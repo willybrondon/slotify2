@@ -169,6 +169,146 @@ async function sendSMS(to, message) {
 }
 
 /**
+ * Collect prep tips from salon.serviceIds[].detailCard for this booking's services.
+ */
+function collectBookingPrepTips(salon, booking) {
+  const bookedIds = new Set(
+    (booking.serviceId || []).map((s) => String(s?._id || s)).filter(Boolean)
+  );
+  const must = [];
+  const avoid = [];
+  const seen = new Set();
+
+  const pushUnique = (list, raw) => {
+    const tip = String(raw || "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!tip) return;
+    const key = tip.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    list.push(tip);
+  };
+
+  for (const entry of salon.serviceIds || []) {
+    const sid = String(entry?.id?._id || entry?.id || "");
+    if (!sid || (bookedIds.size && !bookedIds.has(sid))) continue;
+    const card = entry.detailCard || {};
+    (Array.isArray(card.prepMust) ? card.prepMust : []).forEach((t) =>
+      pushUnique(must, t)
+    );
+    (Array.isArray(card.prepAvoid) ? card.prepAvoid : []).forEach((t) =>
+      pushUnique(avoid, t)
+    );
+  }
+
+  // If booking has no serviceId match but salon has one card only, still use it
+  if (!must.length && !avoid.length && bookedIds.size === 0) {
+    for (const entry of salon.serviceIds || []) {
+      const card = entry.detailCard || {};
+      (Array.isArray(card.prepMust) ? card.prepMust : []).forEach((t) =>
+        pushUnique(must, t)
+      );
+      (Array.isArray(card.prepAvoid) ? card.prepAvoid : []).forEach((t) =>
+        pushUnique(avoid, t)
+      );
+      if (must.length || avoid.length) break;
+    }
+  }
+
+  return { must, avoid };
+}
+
+/**
+ * Compact prep line for SMS cost control (aim 1 GSM segment with core message).
+ * Prefer prepMust; at most 2 tips, each truncated.
+ */
+function buildShortPrepSnippet(must, avoid, maxLen = 52) {
+  const shorten = (s, n) => {
+    const t = String(s).trim();
+    return t.length <= n ? t : `${t.slice(0, Math.max(1, n - 3))}...`;
+  };
+
+  const bits = [];
+  for (const tip of must.slice(0, 2)) {
+    bits.push(shorten(tip, 22));
+  }
+  if (!bits.length && avoid.length) {
+    bits.push(`Eviter ${shorten(avoid[0], 20)}`);
+  }
+
+  if (!bits.length) return "";
+
+  let line = `Prep: ${bits.join(", ")}`;
+  if (line.length > maxLen) {
+    line = `${line.slice(0, Math.max(1, maxLen - 3)).replace(/\s+\S*$/, "")}...`;
+  }
+  return line;
+}
+
+/**
+ * Build reminder SMS — short, GSM-7 friendly, optional prep tip.
+ * Soft cap ~153 chars (1 concatenated segment) after normalize.
+ */
+function buildAppointmentReminderMessage({
+  reminderType,
+  customerName,
+  salonName,
+  appointmentDate,
+  appointmentTime,
+  bookingId,
+  prepMust = [],
+  prepAvoid = [],
+}) {
+  const first = String(customerName || "Cliente")
+    .trim()
+    .split(/\s+/)[0]
+    .slice(0, 12);
+  const salon = String(salonName || "Salon").trim().slice(0, 22);
+  const time = String(appointmentTime || "").trim();
+  const id = String(bookingId || "").trim();
+
+  // Core (no accents — normalizeForGSM7 also strips them)
+  let core;
+  if (reminderType === "24h") {
+    core = `Skedisy: RDV ${salon} demain ${time}.`;
+  } else if (reminderType === "j1" || reminderType === "prep") {
+    core = `Skedisy: RDV ${salon} demain ${time}.`;
+  } else if (reminderType === "2h") {
+    core = `Skedisy: RDV ${salon} dans 2h (${time}).`;
+  } else {
+    core = `Skedisy: RDV ${salon} ${appointmentDate || ""} ${time}.`.replace(
+      /\s+/g,
+      " "
+    );
+  }
+
+  // Budget for prep: keep total near 1 SMS segment
+  const idPart = id ? ` #${id}` : "";
+  const maxTotal = 153;
+  const prepBudget = Math.max(
+    0,
+    maxTotal - core.length - idPart.length - 1
+  );
+  const prep =
+    prepBudget >= 12
+      ? buildShortPrepSnippet(prepMust, prepAvoid, Math.min(52, prepBudget))
+      : "";
+
+  let message = prep ? `${core} ${prep}${idPart}` : `${core}${idPart}`;
+  // Drop booking id first if still too long
+  if (message.length > maxTotal && idPart) {
+    message = prep ? `${core} ${prep}` : core;
+  }
+  if (message.length > maxTotal) {
+    message = `${message.slice(0, maxTotal - 3)}...`;
+  }
+  // first name unused in ultra-short template to save chars; keep param for future
+  void first;
+  return message.trim();
+}
+
+/**
  * Send appointment reminder SMS
  * @param {Object} booking - Booking object with populated user and salon
  * @param {string} reminderType - Type of reminder: '24h' or '2h'
@@ -186,7 +326,9 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
 
     const [user, salon] = await Promise.all([
       booking.userId.mobile ? booking.userId : User.findById(booking.userId),
-      booking.salonId.name ? booking.salonId : Salon.findById(booking.salonId),
+      booking.salonId.name && booking.salonId.serviceIds
+        ? booking.salonId
+        : Salon.findById(booking.salonId).select("name serviceIds"),
     ]);
 
     if (!user || !user.mobile || user.mobile.trim() === "") {
@@ -200,32 +342,57 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
       return { success: false, error: "Salon not found" };
     }
 
-    // Format appointment date and time
     const appointmentDate = booking.date;
-    const appointmentTime = booking.startTime || booking.time[0] || "";
-    const customerName = user.fname || "Customer";
+    const appointmentTime = booking.startTime || booking.time?.[0] || "";
+    const customerName = user.fname || "Cliente";
     const salonName = salon.name || "Salon";
     const bookingId = booking.bookingId || "";
+    const { must: prepMust, avoid: prepAvoid } = collectBookingPrepTips(
+      salon,
+      booking
+    );
 
-    // Create message (short for GSM-7, <153 chars/segment to reduce cost)
-    let message = "";
-    if (reminderType === "24h") {
-      message = `Hi ${customerName}! Appt at ${salonName} tomorrow ${appointmentDate} ${appointmentTime}. ID: ${bookingId}. Skedisy`;
-    } else if (reminderType === "2h") {
-      message = `Hi ${customerName}! Appt at ${salonName} in 2h - ${appointmentDate} ${appointmentTime}. ID: ${bookingId}. Skedisy`;
-    } else {
-      message = `Hi ${customerName}! Appt at ${salonName} ${appointmentDate} ${appointmentTime}. ID: ${bookingId}. Skedisy`;
+    let message = buildAppointmentReminderMessage({
+      reminderType,
+      customerName,
+      salonName,
+      appointmentDate,
+      appointmentTime,
+      bookingId,
+      prepMust,
+      prepAvoid,
+    });
+
+    // J-1 checklist: photo / prep (soft, short)
+    if (reminderType === "24h" || reminderType === "j1") {
+      const checks = [];
+      const hasPhoto =
+        Array.isArray(booking.inspirationPhotoUrls) &&
+        booking.inspirationPhotoUrls.length > 0;
+      if (booking.inspirationPhotoRequired && !hasPhoto) {
+        checks.push("Photo inspiration manquante");
+      }
+      if (!booking.prepConfirmedAt && prepMust.length) {
+        checks.push("Confirmer prep");
+      }
+      if (checks.length && message.length < 120) {
+        const extra = checks.join(" / ").slice(0, 40);
+        message = `${message} ${extra}`.trim().slice(0, 153);
+      }
     }
 
-    // Send SMS
+    console.log(
+      `[SMS Reminder] Message (${message.length} chars): ${message}`
+    );
+
     const result = await sendSMS(user.mobile, message);
-    
+
     if (result.success) {
       console.log(`[SMS Reminder] Successfully sent ${reminderType} reminder to ${user.mobile} for booking ${booking.bookingId || booking._id}`);
     } else {
       console.error(`[SMS Reminder] Failed to send ${reminderType} reminder to ${user.mobile} for booking ${booking.bookingId || booking._id}: ${result.error}`);
     }
-    
+
     return result;
   } catch (error) {
     console.error("Error in sendAppointmentReminder:", error);
@@ -236,5 +403,8 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
 module.exports = {
   sendSMS,
   sendAppointmentReminder,
+  collectBookingPrepTips,
+  buildShortPrepSnippet,
+  buildAppointmentReminderMessage,
 };
 

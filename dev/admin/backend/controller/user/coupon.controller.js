@@ -22,15 +22,28 @@ exports.retriveCoupons = async (req, res) => {
 
     const customerObjId = new mongoose.Types.ObjectId(userId);
     const todayDate = moment().format("YYYY-MM-DD");
+    const salonId = (req.query.salonId || req.body?.salonId || "").trim();
+
+    const couponQuery = {
+      type: type,
+      isActive: true,
+      minAmountToApply: { $lte: amount },
+      expiryDate: { $gte: todayDate },
+    };
+    if (salonId && mongoose.Types.ObjectId.isValid(salonId)) {
+      couponQuery.$or = [
+        { salonId: null },
+        { salonId: { $exists: false } },
+        { salonId: salonId },
+      ];
+    } else {
+      // Platform / legacy list: hide salon-scoped promos
+      couponQuery.$or = [{ salonId: null }, { salonId: { $exists: false } }];
+    }
 
     const [customer, coupons] = await Promise.all([
       User.findOne({ _id: customerObjId }),
-      Coupon.find({
-        type: type,
-        isActive: true,
-        minAmountToApply: { $lte: amount }, //greater than or equal to ($lte)
-        expiryDate: { $gte: todayDate },
-      }),
+      Coupon.find(couponQuery),
     ]);
 
     if (!customer) {

@@ -35,6 +35,10 @@ Sur chaque carte / détail service (surtout projets longs) :
 
 Les **questions config** (0–N) restent *dans* Prestations — ce ne sont pas un devis, c’est « préciser la presta ».
 
+**StyleSeat (plan, 2026-09-15) :** la fiche presta doit aussi porter **inclus / avant de venir / important / politique** + **add-ons** (prix+durée).  
+Flux cible mental : `Réservation → Préparation → RDV` (prep dans confirm + rappels).  
+Canon : `STYLESEAT_LEARNINGS_PLAN.md`. Politiques d’annulation/no-show = affichées et acceptées **sans** transformer le tunnel en « devis ».
+
 ---
 
 ## 3. Estimation ≠ fonctionnalité bloquante

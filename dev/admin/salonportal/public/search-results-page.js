@@ -46,7 +46,7 @@
     const priceFromLabel = lang === "fr" ? "À partir de" : "From";
     const noImageLabel = lang === "fr" ? "Pas d'image" : "No image";
 
-    let filters = { minRating: 0, sort: "distance" };
+    let filters = { minRating: 0, sort: "best", minPrice: 0, maxPrice: 0 };
     const mapUi = () => window.skedisySalonMapUi;
 
     function sumReviews(list) {
@@ -196,6 +196,8 @@
         if (clientCoords.lng) qs.set("longitude", String(clientCoords.lng));
         if (filters.minRating) qs.set("minRating", String(filters.minRating));
         if (filters.sort) qs.set("sort", filters.sort);
+        if (filters.minPrice) qs.set("minPrice", String(filters.minPrice));
+        if (filters.maxPrice) qs.set("maxPrice", String(filters.maxPrice));
 
         salonsGrid.innerHTML = `<p class="sq-home-discovery-loading">${escapeHtml(t("homeProduct.salonsLoading"))}</p>`;
 
@@ -248,7 +250,11 @@
             const key = el.dataset.filter;
             const val = el.dataset.value;
             if (key === "minRating") filters.minRating = parseFloat(val) || 0;
-            if (key === "sort") filters.sort = val || "distance";
+            if (key === "sort") filters.sort = val || "best";
+            if (key === "price") {
+                filters.minPrice = parseFloat(el.dataset.min) || 0;
+                filters.maxPrice = parseFloat(el.dataset.max) || 0;
+            }
             filterPanel.querySelectorAll(`[data-filter="${key}"]`).forEach((b) => b.classList.remove("sq-filter-chip--active"));
             el.classList.add("sq-filter-chip--active");
             fetchResults();

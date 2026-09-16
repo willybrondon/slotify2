@@ -15,6 +15,8 @@
 
 Skedisy doit maîtriser le **workflow de *projet capillaire*** (qualification → configuration → devis dynamique → durée dynamique → acompte → confirmation), pas le calendrier générique.
 
+> **MAJ 2026-09-15 (StyleSeat, plan only) :** reformulation opérationnelle — *« transformer une presta complexe en RDV parfaitement préparé »* (config + add-ons + prep + politiques + historique/rebooking). Canon : `STYLESEAT_LEARNINGS_PLAN.md`. Ne pas traiter les claims marketing StyleSeat comme preuves.
+
 ---
 
 # 1. Sources & discipline

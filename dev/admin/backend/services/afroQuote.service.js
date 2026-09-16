@@ -1,16 +1,8 @@
 /**
  * Afro quote engine (SQUIRE wedge V1) — règles salon, pas de ML.
  *
- * afroConfig on salon.serviceIds[]:
- * {
- *   complexityTier: 'S0'|'S1'|'S2'|'S3',
- *   requirePhoto: boolean,
- *   baseDurationMinutes?: number,
- *   configSchema: [{ id, label, type, options?, required?, affectsPrice?, affectsDuration? }],
- *   pricingRules: [{ when: { variableId, equals }, addPrice, label? }],
- *   durationRules: [{ when: { variableId, equals }, addMinutes, label? }],
- *   depositPolicy: { enabled, type: 'percent'|'fixed', value }
- * }
+ * answers.addons = ['curly_ends', ...] — selected add-on ids
+ * Add-ons from afroConfig.addonDefs or entry.detailCard.addons
  */
 
 function getSalonServiceEntry(salon, serviceId) {
@@ -26,15 +18,49 @@ function getAfroConfig(entry) {
 function ruleMatches(when, answers) {
   if (!when || !when.variableId) return false;
   const val = answers[when.variableId];
+  const hasVal = val !== undefined && val !== null && val !== "";
+  if (when.notEquals !== undefined && when.notEquals !== null) {
+    return hasVal && String(val) !== String(when.notEquals);
+  }
   if (when.equals === undefined || when.equals === null) {
-    return val !== undefined && val !== null && val !== "";
+    return hasVal;
   }
   return String(val) === String(when.equals);
 }
 
-/**
- * @returns {{ ok: boolean, error?: string, needsSalonReview?: boolean, quote?: object }}
- */
+function fieldIsVisible(field, answers) {
+  if (!field || !field.showWhen) return true;
+  return ruleMatches(field.showWhen, answers);
+}
+
+function normalizeAddonList(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((a, i) => ({
+      id: String(a.id || a._id || `addon_${i + 1}`),
+      label: String(a.label || a.name || a.id || `Option ${i + 1}`),
+      addPrice: Number(a.addPrice) || 0,
+      addMinutes: Number(a.addMinutes) || 0,
+      prepNote: a.prepNote ? String(a.prepNote) : "",
+    }))
+    .filter((a) => a.id);
+}
+
+function resolveAddonCatalog(entry, afro) {
+  const fromAfro = normalizeAddonList(afro?.addonDefs);
+  if (fromAfro.length) return fromAfro;
+  return normalizeAddonList(entry?.detailCard?.addons);
+}
+
+function selectedAddonIds(answers) {
+  const raw = answers?.addons;
+  if (Array.isArray(raw)) return raw.map(String).filter(Boolean);
+  if (typeof raw === "string" && raw.trim()) {
+    return raw.split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
 function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] }) {
   const entry = getSalonServiceEntry(salon, serviceId);
   if (!entry) {
@@ -55,14 +81,11 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
 
   for (const field of schema) {
     if (!field.required) continue;
+    if (!fieldIsVisible(field, answers)) continue;
     const v = answers[field.id];
     if (v === undefined || v === null || v === "") {
       return { ok: false, error: `Missing required field: ${field.id}` };
     }
-  }
-
-  if (afro.requirePhoto && (!photoUrls || photoUrls.length === 0)) {
-    // Soft: do not block reservation — salon can ask for photo via 1 question.
   }
 
   const basePrice = Number(entry.price);
@@ -103,6 +126,29 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
     }
   }
 
+  const catalog = resolveAddonCatalog(entry, afro);
+  const chosen = selectedAddonIds(answers);
+  const appliedAddons = [];
+  for (const id of chosen) {
+    const def = catalog.find((a) => a.id === id);
+    if (!def) continue;
+    if (def.addPrice) {
+      price += def.addPrice;
+      priceBreakdown.push({ label: def.label, amount: def.addPrice });
+    }
+    if (def.addMinutes) {
+      duration += def.addMinutes;
+      durationBreakdown.push({ label: def.label, minutes: def.addMinutes });
+    }
+    appliedAddons.push(def);
+  }
+
+  const prepBuffer = Math.max(0, Number(afro.prepBufferMinutes) || 0);
+  if (prepBuffer > 0) {
+    duration += prepBuffer;
+    durationBreakdown.push({ label: "Buffer préparation", minutes: prepBuffer });
+  }
+
   const depositPolicy = afro.depositPolicy || { enabled: false, type: "percent", value: 0 };
   let depositAmount = 0;
   let depositStatus = "not_required";
@@ -118,6 +164,8 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
   const needsSalonReview =
     tier === "S3" || Boolean(afro.requirePhoto && (!photoUrls || !photoUrls.length));
 
+  const materials = afro.materials || entry?.detailCard?.materials || null;
+
   return {
     ok: true,
     needsSalonReview,
@@ -127,6 +175,9 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
       estimatedDurationMinutes: duration,
       priceBreakdown,
       durationBreakdown,
+      appliedAddons,
+      availableAddons: catalog,
+      materials,
       depositAmount,
       depositStatus,
       balanceDue: Math.max(0, price - depositAmount),
@@ -134,20 +185,29 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [] 
         afroConfig: afro,
         basePrice,
         serviceName: service?.name || "",
+        addons: chosen,
       },
     },
   };
 }
 
-/** Example Knotless S2 config for seeds / docs */
 const KNOTLESS_S2_DEMO_CONFIG = {
   complexityTier: "S2",
   requirePhoto: false,
   baseDurationMinutes: 240,
+  prepBufferMinutes: 0,
+  styleLifetimeWeeks: 7,
+  rebookRemindersEnabled: true,
+  materials: {
+    salonProvides: true,
+    clientBrings: false,
+    packs: "6 paquets (réf. salon)",
+    note: "Si cliente apporte les mèches : indiquer couleur / quantité.",
+  },
   configSchema: [
     {
       id: "longueur",
-      label: "Longueur",
+      label: "Longueur souhaitée",
       type: "select",
       options: ["épaule", "mi-dos", "taille", "fesses"],
       required: true,
@@ -155,10 +215,10 @@ const KNOTLESS_S2_DEMO_CONFIG = {
       affectsDuration: true,
     },
     {
-      id: "taille",
-      label: "Taille des nattes",
+      id: "finesse_nattes",
+      label: "Finesse des nattes",
       type: "select",
-      options: ["S", "M", "L"],
+      options: ["fines", "moyennes", "grosses"],
       required: true,
       affectsPrice: true,
       affectsDuration: true,
@@ -173,26 +233,49 @@ const KNOTLESS_S2_DEMO_CONFIG = {
       affectsDuration: false,
     },
     {
-      id: "couleur",
-      label: "Couleur",
+      id: "meches_couleur",
+      label: "Couleur des mèches",
       type: "select",
-      options: ["1B", "autre"],
+      options: [
+        "Noir naturel",
+        "1B",
+        "Brun",
+        "Blond / 613",
+        "Rouge / bordeaux",
+        "Orange / cuivré",
+        "Bleu",
+        "Vert",
+        "Rose / violet",
+        "Mélange / ombré",
+        "Autre",
+      ],
       required: false,
       affectsPrice: true,
       affectsDuration: false,
+      showWhen: { variableId: "meches_qui", equals: "salon" },
     },
+  ],
+  addonDefs: [
+    { id: "curly_ends", label: "Curly ends", addPrice: 30, addMinutes: 30 },
+    { id: "human_hair", label: "Human hair", addPrice: 80, addMinutes: 15 },
+    { id: "takedown", label: "Takedown", addPrice: 45, addMinutes: 45 },
+    { id: "lavage", label: "Lavage", addPrice: 20, addMinutes: 20 },
   ],
   pricingRules: [
     { when: { variableId: "longueur", equals: "taille" }, addPrice: 20, label: "Longueur taille" },
     { when: { variableId: "longueur", equals: "fesses" }, addPrice: 40, label: "Longueur fesses" },
-    { when: { variableId: "taille", equals: "S" }, addPrice: 30, label: "Nattes S" },
+    { when: { variableId: "finesse_nattes", equals: "fines" }, addPrice: 30, label: "Nattes fines" },
     { when: { variableId: "meches_qui", equals: "salon" }, addPrice: 50, label: "Mèches salon" },
-    { when: { variableId: "couleur", equals: "autre" }, addPrice: 15, label: "Couleur spéciale" },
+    {
+      when: { variableId: "meches_couleur", notEquals: "Noir naturel" },
+      addPrice: 15,
+      label: "Couleur mèches",
+    },
   ],
   durationRules: [
     { when: { variableId: "longueur", equals: "taille" }, addMinutes: 30, label: "+ longueur" },
     { when: { variableId: "longueur", equals: "fesses" }, addMinutes: 60, label: "+ longueur" },
-    { when: { variableId: "taille", equals: "S" }, addMinutes: 45, label: "+ nattes fines" },
+    { when: { variableId: "finesse_nattes", equals: "fines" }, addMinutes: 45, label: "+ nattes fines" },
   ],
   depositPolicy: { enabled: true, type: "percent", value: 30 },
 };
@@ -201,5 +284,9 @@ module.exports = {
   getSalonServiceEntry,
   getAfroConfig,
   computeQuote,
+  fieldIsVisible,
+  ruleMatches,
+  resolveAddonCatalog,
+  normalizeAddonList,
   KNOTLESS_S2_DEMO_CONFIG,
 };

@@ -174,8 +174,8 @@ const Demand = () => {
     if (res?.payload?.status) {
       toast.success(
         enabled
-          ? "Réservation sur mesure activée"
-          : "Réservation sur mesure désactivée"
+          ? "Enrichissement réservation activé"
+          : "Enrichissement réservation désactivé"
       );
       dispatch(fetchAfroConfig());
     } else {
@@ -209,6 +209,23 @@ const Demand = () => {
     );
     if (res?.payload?.status) {
       toast.success("Acompte mis à jour");
+      dispatch(fetchAfroConfig());
+    } else {
+      toast.error(res?.payload?.message || "Échec");
+    }
+  };
+
+  const setStyleLifetimeWeeks = async (serviceId, weeks) => {
+    const n = Number(weeks);
+    const res = await dispatch(
+      updateAfroConfig({
+        serviceId,
+        styleLifetimeWeeks: n,
+        rebookRemindersEnabled: n > 0,
+      })
+    );
+    if (res?.payload?.status) {
+      toast.success("Durée de vie / rebooking mis à jour");
       dispatch(fetchAfroConfig());
     } else {
       toast.error(res?.payload?.message || "Échec");
@@ -298,7 +315,7 @@ const Demand = () => {
                 >
                   {onboarding?.flowEnabled ? "OK" : "2"}
                 </span>
-                Activer la réservation sur mesure sur la page publique
+                Activer l’enrichissement sur le tunnel « Réserver »
               </li>
               <li className="mb-2">
                 <span
@@ -325,9 +342,10 @@ const Demand = () => {
 
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
             <div>
-              <h5 className="mb-1">Parcours projet (dans « Réserver »)</h5>
+              <h5 className="mb-1">Enrichir la réservation (mêmes étapes)</h5>
               <p className="text-muted mb-0 small">
-                Active questions + estimation + acompte dans le tunnel « Réserver » (pas de second bouton).
+                Active questions + estimation + acompte <strong>dans</strong> le tunnel
+                Réserver existant — pas un second parcours.
               </p>
             </div>
             <div className="form-check form-switch">
@@ -389,6 +407,9 @@ const Demand = () => {
                   <th>Tier</th>
                   <th>Questions</th>
                   <th>Acompte %</th>
+                  <th title="Relance cliente après X semaines (protective styles)">
+                    Vie (sem.)
+                  </th>
                   <th></th>
                 </tr>
               </thead>
@@ -397,6 +418,7 @@ const Demand = () => {
                   const pct = s.depositPolicy?.enabled
                     ? Number(s.depositPolicy.value || 0)
                     : 0;
+                  const life = Number(s.styleLifetimeWeeks) || 0;
                   return (
                     <tr key={String(s.serviceId)}>
                       <td>{s.name}</td>
@@ -425,6 +447,22 @@ const Demand = () => {
                           }}
                         />
                       </td>
+                      <td style={{ maxWidth: 100 }}>
+                        <input
+                          type="number"
+                          min={0}
+                          max={52}
+                          className="form-control form-control-sm"
+                          defaultValue={life}
+                          disabled={!s.afroConfig}
+                          title="0 = pas de relance rebooking"
+                          onBlur={(e) => {
+                            if (!s.afroConfig) return;
+                            if (Number(e.target.value) === life) return;
+                            setStyleLifetimeWeeks(s.serviceId, e.target.value);
+                          }}
+                        />
+                      </td>
                       <td>
                         {s.afroConfig && (
                           <button
@@ -441,7 +479,7 @@ const Demand = () => {
                 })}
                 {!configLoading && (!afroServices || afroServices.length === 0) && (
                   <tr>
-                    <td colSpan={5}>Ajoutez d’abord des prestations au salon.</td>
+                    <td colSpan={6}>Ajoutez d’abord des prestations au salon.</td>
                   </tr>
                 )}
               </tbody>

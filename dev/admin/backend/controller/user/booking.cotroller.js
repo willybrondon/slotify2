@@ -872,6 +872,28 @@ exports.newBooking = async (req, res, next) => {
       totalAmount = parseFloat(withTaxAmount) - discountAmount;
     }
 
+    // Loyalty: same-service rebook discount (stackable after coupon, on HT then recompute TTC)
+    let loyaltyApplied = null;
+    if (req.body.applyLoyalty === true || req.body.applyLoyalty === "true") {
+      const { computeLoyaltyDiscount } = require("../../services/loyalty.service");
+      const primarySid = services[0];
+      loyaltyApplied = await computeLoyaltyDiscount({
+        salon,
+        userId: user._id,
+        serviceId: primarySid,
+        amountHt: req.body.withoutTax,
+      });
+      if (loyaltyApplied?.eligible && loyaltyApplied.amount > 0) {
+        const couponPart = Number(discountAmount) || 0;
+        discountAmount = couponPart + loyaltyApplied.amount;
+        // Recalc: tax on HT, then subtract total discounts from TTC
+        totalAmount = parseFloat(withTaxAmount) - discountAmount;
+        if (totalAmount < 0) totalAmount = 0;
+      } else {
+        loyaltyApplied = null;
+      }
+    }
+
     console.log("totalAmount after add tax and deduct the discount (if any)", totalAmount);
     console.log("totalAmount type:", typeof totalAmount);
     console.log("withTaxAmount:", withTaxAmount, "type:", typeof withTaxAmount);
@@ -951,14 +973,40 @@ exports.newBooking = async (req, res, next) => {
     if (linkedDemand) {
       booking.demandId = linkedDemand._id;
       booking.configSnapshot = linkedDemand.configSnapshot || linkedDemand.answers;
+      booking.clientAnswers = linkedDemand.answers || {};
       booking.quotedPrice = linkedDemand.estimatedPrice;
       booking.estimatedDuration = linkedDemand.estimatedDurationMinutes;
+      booking.plannedDurationMinutes = linkedDemand.estimatedDurationMinutes;
       booking.depositAmount = linkedDemand.depositAmount || 0;
       booking.depositPaidAt = linkedDemand.depositPaidAt || null;
       booking.balanceDue =
         linkedDemand.balanceDue != null
           ? linkedDemand.balanceDue
           : Math.max(0, linkedDemand.estimatedPrice - (linkedDemand.depositAmount || 0));
+      if (Array.isArray(linkedDemand.photoUrls) && linkedDemand.photoUrls.length) {
+        booking.inspirationPhotoUrls = linkedDemand.photoUrls;
+      }
+      const afroEntry = (salon.serviceIds || []).find(
+        (s) => String(s.id) === String(Array.isArray(booking.serviceId) ? booking.serviceId[0] : booking.serviceId)
+      );
+      const materials =
+        linkedDemand.configSnapshot?.afroConfig?.materials ||
+        afroEntry?.afroConfig?.materials ||
+        afroEntry?.detailCard?.materials ||
+        null;
+      if (materials) booking.materialsSnapshot = materials;
+      booking.inspirationPhotoRequired = Boolean(
+        afroEntry?.afroConfig?.requirePhoto || linkedDemand.requirePhoto
+      );
+    }
+
+    if (req.body.policyAccepted === true || req.body.policyAccepted === "true") {
+      booking.policyAcceptedAt = new Date();
+      booking.policyAcceptText = String(req.body.policyAcceptText || "").slice(0, 500);
+    }
+
+    if (!booking.plannedDurationMinutes && totalDuration) {
+      booking.plannedDurationMinutes = totalDuration;
     }
 
     booking.coupon = coupon
@@ -971,6 +1019,15 @@ exports.newBooking = async (req, res, next) => {
           minAmountToApply: coupon.minAmountToApply,
         }
       : {};
+
+    if (loyaltyApplied?.eligible) {
+      booking.loyaltyDiscount = {
+        percent: loyaltyApplied.percent,
+        amount: loyaltyApplied.amount,
+        priorCount: loyaltyApplied.priorCount,
+        label: loyaltyApplied.label,
+      };
+    }
 
     const uniqueBookingId = await generateUniqueBookingId();
     booking.bookingId = uniqueBookingId;
@@ -1506,7 +1563,11 @@ exports.cancelBookingByUser = async (req, res) => {
       return res.status(200).send({ status: false, message: "data not found" });
     }
 
-    const [user, expert] = await Promise.all([User.findById(booking.userId), Expert.findById(booking.expertId)]);
+    const [user, expert, salon] = await Promise.all([
+      User.findById(booking.userId),
+      Expert.findById(booking.expertId),
+      Salon.findById(booking.salonId),
+    ]);
 
     if (!user) {
       return res.status(200).send({ status: false, message: "User not found" });
@@ -1520,19 +1581,38 @@ exports.cancelBookingByUser = async (req, res) => {
       return res.status(200).send({ status: false, message: "Booking is already cancel" });
     }
 
-    if (booking.status == "confirm") {
+    if (booking.status == "confirm" && booking.checkInTime) {
       return res.status(200).send({
         status: false,
         message: "You are already checked In.Cancellation is not allowed after checkIn.Contact Salon for more details",
       });
     }
 
-    booking.status = "cancel";
-    booking.cancel.reason = req.body.reason;
-    booking.cancel.time = moment().format("hh:mm A");
-    booking.cancel.date = moment().format("YYYY-MM-DD");
-    booking.cancel.person = "user";
-    await booking.save();
+    const {
+      applyClientCancel,
+      evaluateBookingActions,
+    } = require("../../services/bookingLifecycle.service");
+
+    const preview = evaluateBookingActions(booking, salon);
+    if (!preview.canCancel) {
+      return res.status(200).send({
+        status: false,
+        message: preview.message,
+        evaluation: preview,
+      });
+    }
+
+    const applied = await applyClientCancel(booking, salon, {
+      reason: req.body.reason,
+      person: "user",
+    });
+    if (!applied.ok) {
+      return res.status(200).send({
+        status: false,
+        message: applied.message,
+        evaluation: applied.evaluation,
+      });
+    }
 
     setImmediate(() => {
       sendAdminCustomerCancelledBookingEmail(booking._id).catch((err) =>
@@ -1542,22 +1622,32 @@ exports.cancelBookingByUser = async (req, res) => {
 
     res.status(200).send({
       status: true,
-      message: "Booking Cancelled successfully!!",
-      booking,
+      message:
+        applied.evaluation.mode === "late"
+          ? `Réservation annulée. Acompte retenu : ${applied.evaluation.retainedAmount} (${applied.evaluation.retainPercent} %).`
+          : "Booking Cancelled successfully!!",
+      booking: applied.booking,
+      evaluation: applied.evaluation,
     });
 
-    await Promise.all([
-      User.updateOne(
-        { _id: user._id, amount: { $gt: 0 } },
-        {
-          $inc: {
-            amount: booking.amount,
-          },
-        }
-      ),
-      UString.deleteMany({ bookingId: booking._id }),
-      UserWalletHistory.findOneAndDelete({ booking: booking._id }),
-    ]);
+    const refundAmount = Number(applied.evaluation.refundAmount) || 0;
+    const walletOps = [UString.deleteMany({ bookingId: booking._id })];
+    if (refundAmount > 0) {
+      walletOps.push(
+        User.updateOne(
+          { _id: user._id },
+          {
+            $inc: {
+              amount: refundAmount,
+            },
+          }
+        )
+      );
+    } else {
+      walletOps.push(UserWalletHistory.findOneAndDelete({ booking: booking._id }));
+    }
+
+    await Promise.all(walletOps);
 
     const expertCancelNotif = buildExpertBookingCancelledByUserNotification(booking, user);
     setImmediate(async () => {

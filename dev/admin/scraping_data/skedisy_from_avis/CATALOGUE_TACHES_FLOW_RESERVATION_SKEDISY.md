@@ -2,7 +2,8 @@
 
 **Statut :** spécification produit — **pas d’implémentation**  
 **Base :** tunnel web actuel `salon-booking.js` (modale page salon)  
-**Règle :** on **garde** les étapes actuelles ; on **ajoute** des tâches ; chaque étape a un slot **« Infos salon »** configurable.
+**Règle :** on **garde** les étapes actuelles ; on **ajoute** des tâches ; chaque étape a un slot **« Infos salon »** configurable.  
+**MAJ 2026-09-15 :** intégrer StyleSeat (Service objet métier, add-ons, prep, politiques) — voir `STYLESEAT_LEARNINGS_PLAN.md`.
 
 ---
 
@@ -31,6 +32,8 @@ Sur **chaque** étape E1–E6 (et optionnellement E0), le salon peut ajouter :
 | **Texte info** (non bloquant) | « Prévoir 4–6h », « Parking derrière » | Affiché, pas de saisie |
 | **Question** (texte / select / oui-non / nombre) | « Longueur », « Qui apporte les mèches » | Réponse stockée sur la résa |
 | **Photo** (upload) | Inspiration, état cheveux | Liée à la résa / devis |
+| **Add-on** (checkbox tarifée) | Curly ends +€, Takedown +€ | Modifie prix **et** durée |
+| **Bloc prep** | Checklist « Avant de venir » | Affiché E1 + confirm + rappels |
 | **Case à cocher obligatoire** | « J’accepte les conditions d’acompte » | Bloque Continuer si non cochée |
 | **Lien** | Instagram du salon, FAQ | Ouverture externe |
 

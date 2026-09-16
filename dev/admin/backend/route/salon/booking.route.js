@@ -12,5 +12,11 @@ route.get("/monthlyState", checkAccessWithSecretKey(),salon, bookingController.m
 route.get("/upcoming", checkAccessWithSecretKey(),salon, bookingController.upcomingBookings);
 route.put("/acceptPendingBooking", checkAccessWithSecretKey(), salon, bookingController.acceptPendingBooking);
 route.put("/cancelBooking", checkAccessWithSecretKey(), bookingController.cancelBooking);
+route.post(
+  "/result-photos",
+  checkAccessWithSecretKey(),
+  salon,
+  require("../../controller/user/publicBeautyProfile.controller").salonAttachResultPhotos
+);
 
 module.exports = route;

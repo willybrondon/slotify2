@@ -156,11 +156,20 @@
           <button type="button" class="sq-filter-chip" data-filter="minRating" data-value="4">4+ ★</button>
           <button type="button" class="sq-filter-chip" data-filter="minRating" data-value="4.5">4,5+ ★</button>
         </div>
+        <p class="sq-filter-panel__label" data-translate="searchResults.filterPrice">Prix (à partir de)</p>
+        <div class="sq-filter-chips">
+          <button type="button" class="sq-filter-chip sq-filter-chip--active" data-filter="price" data-min="0" data-max="0" data-translate="searchResults.filterPriceAll">Tous</button>
+          <button type="button" class="sq-filter-chip" data-filter="price" data-min="0" data-max="50" data-translate="searchResults.filterPriceUnder50">Moins de 50 €</button>
+          <button type="button" class="sq-filter-chip" data-filter="price" data-min="50" data-max="100" data-translate="searchResults.filterPrice50to100">50–100 €</button>
+          <button type="button" class="sq-filter-chip" data-filter="price" data-min="100" data-max="0" data-translate="searchResults.filterPriceOver100">100 € et +</button>
+        </div>
         <p class="sq-filter-panel__label" data-translate="searchResults.filterSort">Trier par</p>
         <div class="sq-filter-chips">
-          <button type="button" class="sq-filter-chip sq-filter-chip--active" data-filter="sort" data-value="distance" data-translate="searchResults.sortDistance">Distance</button>
+          <button type="button" class="sq-filter-chip sq-filter-chip--active" data-filter="sort" data-value="best" data-translate="searchResults.sortBest">Meilleurs</button>
+          <button type="button" class="sq-filter-chip" data-filter="sort" data-value="distance" data-translate="searchResults.sortDistance">Distance</button>
           <button type="button" class="sq-filter-chip" data-filter="sort" data-value="rating" data-translate="searchResults.sortRating">Note</button>
           <button type="button" class="sq-filter-chip" data-filter="sort" data-value="reviews" data-translate="searchResults.sortReviews">Avis</button>
+          <button type="button" class="sq-filter-chip" data-filter="sort" data-value="price" data-translate="searchResults.sortPrice">Prix</button>
         </div>
       </div>
 

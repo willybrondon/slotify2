@@ -29,6 +29,7 @@ function mountLegalFooter() {
         '<h4 data-translate="footer.about">À propos</h4>' +
         "<ul>" +
         '<li><a href="/">Accueil</a></li>' +
+        '<li><a href="/aide/" data-translate="footer.helpCenter">Centre d\'Aide</a></li>' +
         '<li><a href="/blog/" data-translate="nav.blog">Blog</a></li>' +
         '<li><a href="/professionnel/" data-translate="nav.pro">Pro</a></li>' +
         '<li><a href="https://skedisy.com/salonpanel/" data-translate="nav.login">Connexion</a></li>' +

@@ -744,7 +744,7 @@ exports.serveSalonWebPage = async (req, res) => {
     const copy = getWebCopy(pageLang);
 
     // Fetch additional data: products, experts, reviews with expert info
-    const [products, experts, reviews] = await Promise.all([
+    const [products, experts, reviews, serviceRatingRows] = await Promise.all([
       Product.find({
         salon: salon._id,
         createStatus: "Approved"
@@ -768,7 +768,43 @@ exports.serveSalonWebPage = async (req, res) => {
         })
         .sort({ createdAt: -1 })
         .limit(20),
+      Review.aggregate([
+        {
+          $match: {
+            salonId: salon._id,
+            rating: { $gt: 0 },
+            bookingId: { $ne: null },
+          },
+        },
+        {
+          $lookup: {
+            from: "bookings",
+            localField: "bookingId",
+            foreignField: "_id",
+            as: "booking",
+          },
+        },
+        { $unwind: "$booking" },
+        { $unwind: "$booking.serviceId" },
+        {
+          $group: {
+            _id: "$booking.serviceId",
+            review: { $avg: "$rating" },
+            reviewCount: { $sum: 1 },
+          },
+        },
+      ]),
     ]);
+
+    const serviceRatingMap = new Map(
+      (serviceRatingRows || []).map((row) => [
+        String(row._id),
+        {
+          review: Number(row.review) || 0,
+          reviewCount: Number(row.reviewCount) || 0,
+        },
+      ])
+    );
 
     // Generate the new slug format for share URL
     const salonSlug = generateSlug(salon.name);
@@ -803,14 +839,15 @@ exports.serveSalonWebPage = async (req, res) => {
     const currency = global.settingJSON?.currencySymbol || "$";
 
     // Build HTML sections
-    // Opening Hours Section
-    let openingHoursHtml = '';
+    // Opening Hours — compact for booking aside
+    let openingHoursInner = "";
     if (salon.salonTime && salon.salonTime.length > 0) {
-      openingHoursHtml = salon.salonTime
+      openingHoursInner = salon.salonTime
         .map((time) => formatSalonHoursItemHtml(time, pageLang, copy))
         .join("");
-      openingHoursHtml = `<div class="section"><h3 class="section-title">${copy.openingHours}</h3><div class="hours-grid">${openingHoursHtml}</div></div>`;
     }
+    // Keep empty string for legacy section (hours move into booking card)
+    const openingHoursHtml = "";
 
     const bookingServices = [];
     const categoryMap = new Map();
@@ -824,13 +861,32 @@ exports.serveSalonWebPage = async (req, res) => {
         if (!categoryMap.has(categoryId)) {
           categoryMap.set(categoryId, { id: categoryId, name: categoryName });
         }
+        const afro = service.afroConfig || null;
+        const depositPct =
+          service.detailCard?.depositPercent != null
+            ? Number(service.detailCard.depositPercent)
+            : afro?.depositPolicy?.enabled
+              ? Number(afro.depositPolicy.value) || 0
+              : null;
+        const svcId = String(service.id._id);
+        const hasSvcRating = serviceRatingMap.has(svcId);
+        const svcRating = serviceRatingMap.get(svcId) || {};
         bookingServices.push({
-          id: String(service.id._id),
+          id: svcId,
           name: service.id.name || "Service",
           price: service.price || 0,
           duration: service.id.duration || 0,
           categoryId,
           categoryName,
+          detailCard: service.detailCard || null,
+          depositPercent: depositPct,
+          // Per-service from booking reviews; fallback to salon rating (same badge style)
+          review: hasSvcRating
+            ? svcRating.review || 0
+            : Number(salon.review) || 0,
+          reviewCount: hasSvcRating
+            ? svcRating.reviewCount || 0
+            : Number(salon.reviewCount) || 0,
         });
       });
     }
@@ -856,7 +912,7 @@ exports.serveSalonWebPage = async (req, res) => {
         <h3 class="section-title">${copy.services}</h3>
         <p class="sq-booking-step__hint sq-salon-services-hint">${copy.servicesMultiHint}</p>
         <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
-        <div class="sq-services-grid-4" id="salonServicesGrid"></div>
+        <div class="sq-services-list" id="salonServicesGrid"></div>
         <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonServicesSummary" aria-live="polite"></div>
             </div>`;
     } else {
@@ -931,24 +987,151 @@ exports.serveSalonWebPage = async (req, res) => {
     // Rating badge HTML
     const ratingBadgeHtml = salonRating > 0 ? `<div class="rating-badge"><span class="rating-stars">⭐</span><span>${salonRating.toFixed(1)} (${salonReviewCount} ${copy.reviewsCount})</span></div>` : '';
 
-    const salonCoverHtml = salonImage
-      ? `<div class="sq-salon-detail__cover"><img src="${salonImage}" alt="" class="sq-salon-detail__cover-img" loading="eager" onerror="this.parentElement.classList.add('sq-salon-detail__cover--placeholder')"></div>`
-      : `<div class="sq-salon-detail__cover sq-salon-detail__cover--placeholder" aria-hidden="true"></div>`;
+    const esc = (s) =>
+      String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+
+    const avatarUrl = salon.mainImage || salonImage || "";
+    const realizationUrls = [];
+    const pushUrl = (u) => {
+      if (!u || typeof u !== "string") return;
+      const t = u.trim();
+      if (!t || realizationUrls.includes(t)) return;
+      realizationUrls.push(t);
+    };
+    (salon.image || []).forEach(pushUrl);
+    pushUrl(salon.heroImage);
+    pushUrl(salon.mainImage);
+    if (!realizationUrls.length && salonImage) pushUrl(salonImage);
+
+    const mosaicHtml = realizationUrls.length
+      ? `<div class="sq-salon-detail__mosaic${
+          realizationUrls.length === 1 ? " sq-salon-detail__mosaic--single" : ""
+        }" data-mosaic-count="${realizationUrls.length}">
+          ${realizationUrls
+            .slice(0, 5)
+            .map(
+              (url, i) =>
+                `<button type="button" class="sq-salon-detail__mosaic-shot${
+                  i === 0 ? " is-active" : ""
+                }" data-mosaic-index="${i}" aria-label="Photo ${i + 1}">
+                  <img src="${esc(url)}" alt="" loading="${i === 0 ? "eager" : "lazy"}">
+                </button>`
+            )
+            .join("")}
+          ${
+            realizationUrls.length > 1
+              ? `<button type="button" class="sq-salon-detail__mosaic-nav sq-salon-detail__mosaic-nav--prev" data-mosaic-prev aria-label="Previous">‹</button>
+                 <button type="button" class="sq-salon-detail__mosaic-nav sq-salon-detail__mosaic-nav--next" data-mosaic-next aria-label="Next">›</button>
+                 <div class="sq-salon-detail__mosaic-dots">${realizationUrls
+                   .slice(0, 5)
+                   .map(
+                     (_, i) =>
+                       `<span class="sq-salon-detail__mosaic-dot${
+                         i === 0 ? " is-active" : ""
+                       }" data-mosaic-dot="${i}"></span>`
+                   )
+                   .join("")}</div>`
+              : ""
+          }
+        </div>`
+      : `<div class="sq-salon-detail__mosaic sq-salon-detail__mosaic--placeholder" aria-hidden="true"></div>`;
+
+    const salonCoverHtml = mosaicHtml;
 
     const salonRatingBlock = ratingBadgeHtml
       ? `<div class="sq-salon-detail__rating">${ratingBadgeHtml}</div>`
       : "";
     const salonAddressBlock = salonAddress
-      ? `<p class="sq-salon-detail__address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${salonAddress}</p>`
+      ? `<p class="sq-salon-detail__address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${esc(salonAddress)}</p>`
+      : "";
+
+    const avatarHtml = avatarUrl
+      ? `<img src="${esc(avatarUrl)}" alt="" class="sq-salon-detail__avatar-img" loading="eager" onerror="this.parentElement.classList.add('sq-salon-detail__avatar--fallback')">`
+      : `<span class="sq-salon-detail__avatar-fallback">${esc((salonName || "?").charAt(0))}</span>`;
+
+    const policy = salon.cancellationPolicy || {};
+    const policyEnabled = Boolean(policy.enabled);
+    const policyHtml = policyEnabled
+      ? `<div class="sq-salon-detail__policy">
+            <h4 class="sq-salon-detail__policy-title">${esc(copy.noShowPolicyTitle || "No-Show / Late Cancellation")}</h4>
+            <ul class="sq-salon-detail__policy-list">
+              <li>${esc(
+                (copy.freeCancelHint || "Free cancel until __H__h before")
+                  .split("__H__")
+                  .join(String(policy.freeCancelHours ?? 24))
+              )}</li>
+              <li>${esc(
+                (copy.lateCancelHint || "Late cancel: __P__%")
+                  .split("__P__")
+                  .join(String(policy.lateCancelPercent ?? 50))
+              )}</li>
+              <li>${esc(
+                (copy.noShowHint || "No-show: __P__%")
+                  .split("__P__")
+                  .join(String(policy.noShowPercent ?? 100))
+              )}</li>
+              <li>${esc(
+                (copy.lateArrivalHint || "Retard toléré : __M__ min")
+                  .split("__M__")
+                  .join(String(policy.lateArrivalMinutes ?? 15))
+              )}</li>
+            </ul>
+          </div>`
+      : "";
+
+    const hoursBlock = openingHoursInner
+      ? `<div class="sq-salon-detail__hours"><h4>${esc(copy.openingHours)}</h4><div class="hours-grid hours-grid--compact">${openingHoursInner}</div></div>`
       : "";
 
     const afroFlowEnabled = !!salon.afroProjectFlowEnabled;
-    const bookingCardHtml = `<div class="booking-card">
+    const salonInstagram = String(salon.instagramUrl || "").trim();
+    const messagingOn = salon.messagingEnabled !== false;
+    const callHref = salonMobile
+      ? `tel:${String(salonMobile).replace(/\s+/g, "")}`
+      : "";
+    const contactActionsHtml = `<div class="sq-salon-contact-actions">
+      ${
+        messagingOn
+          ? `<button type="button" class="sq-salon-contact-btn sq-salon-contact-btn--message" onclick="window.SalonMessaging && SalonMessaging.open()">
+              <i class="fas fa-comment"></i> ${esc(copy.messageSalon || "Message")}
+            </button>`
+          : ""
+      }
+      ${
+        callHref
+          ? `<a class="sq-salon-contact-btn sq-salon-contact-btn--call" href="${esc(callHref)}">
+              <i class="fas fa-phone"></i> ${esc(copy.callSalon || "Appeler")}
+            </a>`
+          : ""
+      }
+      ${
+        salonInstagram
+          ? `<a class="sq-salon-contact-btn sq-salon-contact-btn--ig" href="${esc(salonInstagram)}" target="_blank" rel="noopener noreferrer">
+              <i class="fab fa-instagram"></i> ${esc(copy.instagramSalon || "Instagram")}
+            </a>`
+          : ""
+      }
+    </div>
+    ${
+      messagingOn && salonMobile
+        ? `<p class="sq-salon-contact-hint">${esc(copy.messageUrgentHint || "")}</p>`
+        : ""
+    }`;
+
+    const bookingCardHtml = `<div class="booking-card sq-salon-detail__book-card">
                             <h3>${copy.bookingCardTitle}</h3>
+                            <p class="sq-salon-detail__book-desc">${esc(salonDescription)}</p>
+                            ${hoursBlock}
+                            ${policyHtml}
                             <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonBookingAsideSummary" aria-live="polite"></div>
                             <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
                                 <i class="fas fa-calendar-check"></i> ${copy.bookNow}
                             </button>
+                            ${contactActionsHtml}
                             <div id="download-section" class="sq-salon-download">
                                 <p class="sq-salon-download__lead">${copy.noAppDesc}</p>
                                 <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill sq-salon-download__cta">${copy.downloadAppCta}</a>
@@ -1188,11 +1371,14 @@ exports.serveSalonWebPage = async (req, res) => {
 
                 <div class="sq-salon-detail__head">
                     <div class="sq-salon-detail__meta">
-                        <h1 class="sq-salon-detail__title">${salonName.replace(/"/g, "&quot;").replace(/</g, "&lt;")}</h1>
-                        ${salonRatingBlock}
-                        <p class="sq-salon-detail__desc">${salonDescription}</p>
-                        ${salonAddressBlock}
-                        ${openingHoursHtml}
+                        <div class="sq-salon-detail__identity">
+                            <div class="sq-salon-detail__avatar">${avatarHtml}</div>
+                            <div class="sq-salon-detail__identity-text">
+                                <h1 class="sq-salon-detail__title">${salonName.replace(/"/g, "&quot;").replace(/</g, "&lt;")}</h1>
+                                ${salonRatingBlock}
+                                ${salonAddressBlock}
+                            </div>
+                        </div>
                         </div>
                     <aside class="sq-salon-detail__aside sidebar-content">
                         ${bookingCardHtml}
@@ -1256,11 +1442,22 @@ exports.serveSalonWebPage = async (req, res) => {
             currency: ${JSON.stringify(currency)},
             tax: ${global.settingJSON?.tax || 0},
             afroProjectFlowEnabled: ${afroFlowEnabled},
+            cancellationPolicy: ${JSON.stringify({
+              enabled: Boolean(policy.enabled),
+              freeCancelHours: policy.freeCancelHours ?? 24,
+              lateCancelPercent: policy.lateCancelPercent ?? 50,
+              noShowPercent: policy.noShowPercent ?? 100,
+              lateArrivalMinutes: policy.lateArrivalMinutes ?? 15,
+            })},
             services: ${JSON.stringify(bookingServices)},
             categories: ${JSON.stringify(bookingCategories)},
             experts: ${JSON.stringify(bookingExperts)},
             copy: {
                 allCategoriesTab: ${JSON.stringify(copy.allCategoriesTab)},
+                afroAddonsTitle: ${JSON.stringify(copy.afroAddonsTitle)},
+                policyAcceptLabel: ${JSON.stringify(copy.policyAcceptLabel)},
+                policyAcceptRequired: ${JSON.stringify(copy.policyAcceptRequired)},
+                lateArrivalHint: ${JSON.stringify(copy.lateArrivalHint)},
                 selectServices: ${JSON.stringify(copy.selectServices)},
                 selectExpert: ${JSON.stringify(copy.selectExpert)},
                 selectDateTime: ${JSON.stringify(copy.selectDateTime)},
@@ -1287,6 +1484,7 @@ exports.serveSalonWebPage = async (req, res) => {
                 selectPayment: ${JSON.stringify(copy.selectPayment)},
                 stripeSecure: ${JSON.stringify(copy.stripeSecure)},
                 bookingSuccess: ${JSON.stringify(copy.bookingSuccess)},
+                bookingCancelEmailHint: ${JSON.stringify(copy.bookingCancelEmailHint)},
                 min: ${JSON.stringify(copy.min)},
                 bookNow: ${JSON.stringify(copy.bookNow)},
                 continue: ${JSON.stringify(copy.continue)},
@@ -1350,6 +1548,10 @@ exports.serveSalonWebPage = async (req, res) => {
                 afroDurationHint: ${JSON.stringify(copy.afroDurationHint)},
                 afroConfigTitle: ${JSON.stringify(copy.afroConfigTitle)},
                 afroConfigHint: ${JSON.stringify(copy.afroConfigHint)},
+                afroPrecisionChoiceTitle: ${JSON.stringify(copy.afroPrecisionChoiceTitle)},
+                afroPrecisionChoiceHint: ${JSON.stringify(copy.afroPrecisionChoiceHint)},
+                afroPrecisionAdd: ${JSON.stringify(copy.afroPrecisionAdd)},
+                afroPrecisionSkip: ${JSON.stringify(copy.afroPrecisionSkip)},
                 afroSeeQuote: ${JSON.stringify(copy.afroSeeQuote)},
                 afroQuoteTitle: ${JSON.stringify(copy.afroQuoteTitle)},
                 afroQuoteHint: ${JSON.stringify(copy.afroQuoteHint)},
@@ -1365,6 +1567,8 @@ exports.serveSalonWebPage = async (req, res) => {
                 afroPhotoOptional: ${JSON.stringify(copy.afroPhotoOptional)},
                 afroPhotoHint: ${JSON.stringify(copy.afroPhotoHint)},
                 afroPhotoRequired: ${JSON.stringify(copy.afroPhotoRequired)},
+                afroPhotoUploading: ${JSON.stringify(copy.afroPhotoUploading)},
+                afroPhotoUploadFailed: ${JSON.stringify(copy.afroPhotoUploadFailed)},
                 afroDepositPayHint: ${JSON.stringify(copy.afroDepositPayHint)},
                 afroDepositStripeHint: ${JSON.stringify(copy.afroDepositStripeHint)},
                 afroConfirmWithDeposit: ${JSON.stringify(copy.afroConfirmWithDeposit)},
@@ -1375,7 +1579,32 @@ exports.serveSalonWebPage = async (req, res) => {
                 afroPrep3: ${JSON.stringify(copy.afroPrep3)},
                 afroServiceInfoDuration: ${JSON.stringify(copy.afroServiceInfoDuration)},
                 afroContinuePending: ${JSON.stringify(copy.afroContinuePending)},
-                afroConfirmUnified: ${JSON.stringify(copy.afroConfirmUnified)}
+                afroConfirmUnified: ${JSON.stringify(copy.afroConfirmUnified)},
+                manageReschedule: ${JSON.stringify(copy.manageReschedule)},
+                manageCancel: ${JSON.stringify(copy.manageCancel)},
+                manageCancelConfirm: ${JSON.stringify(copy.manageCancelConfirm)},
+                manageRescheduleConfirm: ${JSON.stringify(copy.manageRescheduleConfirm)},
+                manageRescheduleLead: ${JSON.stringify(copy.manageRescheduleLead)},
+                upcomingTitle: ${JSON.stringify(copy.upcomingTitle)},
+                bookNewSlot: ${JSON.stringify(copy.bookNewSlot)},
+                noShowPolicyTitle: ${JSON.stringify(copy.noShowPolicyTitle)},
+                freeCancelHint: ${JSON.stringify(copy.freeCancelHint)},
+                lateCancelHint: ${JSON.stringify(copy.lateCancelHint)},
+                noShowHint: ${JSON.stringify(copy.noShowHint)},
+                serviceIncludesTitle: ${JSON.stringify(copy.serviceIncludesTitle)},
+                servicePrepTitle: ${JSON.stringify(copy.servicePrepTitle)},
+                servicePrepMust: ${JSON.stringify(copy.servicePrepMust)},
+                servicePrepAvoid: ${JSON.stringify(copy.servicePrepAvoid)},
+                serviceInspirationTitle: ${JSON.stringify(copy.serviceInspirationTitle)},
+                serviceInspirationHint: ${JSON.stringify(copy.serviceInspirationHint)},
+                serviceAddonsTitle: ${JSON.stringify(copy.serviceAddonsTitle)},
+                serviceDurationTitle: ${JSON.stringify(copy.serviceDurationTitle)},
+                servicePriceTitle: ${JSON.stringify(copy.servicePriceTitle)},
+                serviceDepositTitle: ${JSON.stringify(copy.serviceDepositTitle)},
+                serviceImportantTitle: ${JSON.stringify(copy.serviceImportantTitle)},
+                serviceSeeDetails: ${JSON.stringify(copy.serviceSeeDetails)},
+                serviceHideDetails: ${JSON.stringify(copy.serviceHideDetails)},
+                reviewsCount: ${JSON.stringify(copy.reviewsCount)}
             },
             authUrls: {
                 login: ${JSON.stringify(clientAuth.login)},
@@ -1454,8 +1683,37 @@ exports.serveSalonWebPage = async (req, res) => {
                 isWalletPay: ${!!global.settingJSON?.isWalletPay}
             }
         };
+        window.SKEDISY_SALON_MESSAGING = {
+            salonId: "${salon._id}",
+            salonName: ${JSON.stringify(salonName)},
+            salonMobile: ${JSON.stringify(salonMobile)},
+            messagingEnabled: ${messagingOn},
+            language: ${JSON.stringify(pageLang)},
+            authUrls: {
+                login: ${JSON.stringify(clientAuth.login)},
+                signup: ${JSON.stringify(clientAuth.signup)}
+            },
+            copy: {
+                messageTitle: ${JSON.stringify(copy.messageTitle)},
+                messageSalon: ${JSON.stringify(copy.messageSalon)},
+                messagePlaceholder: ${JSON.stringify(copy.messagePlaceholder)},
+                messageSend: ${JSON.stringify(copy.messageSend)},
+                messageAddPhoto: ${JSON.stringify(copy.messageAddPhoto)},
+                messageEmpty: ${JSON.stringify(copy.messageEmpty)},
+                messageLoginHint: ${JSON.stringify(copy.messageLoginHint)},
+                messageUrgentHint: ${JSON.stringify(copy.messageUrgentHint)},
+                messageSending: ${JSON.stringify(copy.messageSending)},
+                messageError: ${JSON.stringify(copy.messageError)},
+                callSalon: ${JSON.stringify(copy.callSalon)},
+                authSignInLink: ${JSON.stringify(copy.authSignInLink)},
+                authSignUpLink: ${JSON.stringify(copy.authSignUpLink)},
+                authOr: ${JSON.stringify(copy.authOr)},
+                loading: ${JSON.stringify(copy.loading)}
+            }
+        };
     </script>
     <script src="${baseURL}/salon-booking.js"></script>
+    <script src="${baseURL}/salon-messaging.js"></script>
     <script src="${baseURL}/salon-product.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>

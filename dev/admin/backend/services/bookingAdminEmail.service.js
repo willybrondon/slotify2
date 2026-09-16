@@ -84,7 +84,7 @@ async function loadBookingForEmail(bookingId) {
   return Booking.findById(bookingId)
     .populate("userId", "fname lname email mobile")
     .populate("expertId", "fname lname email mobile")
-    .populate("salonId", "name email mobile addressDetails")
+    .populate("salonId", "name email mobile addressDetails serviceIds cancellationPolicy")
     .populate("serviceId", "name duration");
 }
 
@@ -101,7 +101,7 @@ function bookingEmailFrom() {
   return process.env.EMAIL || "noreply@skedisy.com";
 }
 
-function buildBookingEmailLayout({ title, intro, rows, footer, language }) {
+function buildBookingEmailLayout({ title, intro, rows, footer, language, ctaHtml = "" }) {
   const isFr = resolveLanguage(language) === "fr";
   const rowsHtml = rows
     .map(
@@ -117,10 +117,18 @@ function buildBookingEmailLayout({ title, intro, rows, footer, language }) {
     <h2 style="margin-top:0;color:#1a1a1a;">${escapeHtml(title)}</h2>
     <p>${intro}</p>
     <table style="width:100%;border-collapse:collapse;margin:20px 0;">${rowsHtml}</table>
+    ${ctaHtml || ""}
     <p style="font-size:12px;color:#888;margin-top:24px;">${escapeHtml(footer)}</p>
     <p style="font-size:12px;color:#888;">Skedisy — ${isFr ? "Votre rendez-vous beauté" : "Your beauty appointment"}</p>
   </div>
 </body></html>`;
+}
+
+function makeCustomerCancelToken(bookingId) {
+  return crypto
+    .createHmac("sha256", process.env.secretKey || "skedisy")
+    .update(String(bookingId))
+    .digest("hex");
 }
 
 /**
@@ -155,6 +163,25 @@ async function sendCustomerBookingConfirmationEmail(bookingId, { language = "fr"
   const bookingTime = booking.startTime || (booking.time && booking.time[0]) || "—";
   const isConfirmed = booking.status === "confirm";
 
+  const { collectBookingPrepTips } = require("./sms.service");
+  const { must: prepMust, avoid: prepAvoid } = collectBookingPrepTips(
+    salon || {},
+    booking
+  );
+  const prepRows = [];
+  if (prepMust.length) {
+    prepRows.push([
+      isFr ? "À apporter / préparer" : "Please bring / prepare",
+      escapeHtml(prepMust.join(" · ")),
+    ]);
+  }
+  if (prepAvoid.length) {
+    prepRows.push([
+      isFr ? "À éviter" : "Please avoid",
+      escapeHtml(prepAvoid.join(" · ")),
+    ]);
+  }
+
   const title = isFr
     ? isConfirmed
       ? "Confirmation de réservation"
@@ -171,6 +198,43 @@ async function sendCustomerBookingConfirmationEmail(bookingId, { language = "fr"
       ? `Hello ${escapeHtml(user?.fname || "")}, your booking is confirmed.`
       : `Hello ${escapeHtml(user?.fname || "")}, your booking request has been received and is awaiting salon approval.`;
 
+  const policy = salon?.cancellationPolicy || {};
+  const freeHours = Math.max(0, Number(policy.freeCancelHours) || 24);
+  const latePct = Math.min(100, Math.max(0, Number(policy.lateCancelPercent) || 50));
+  const policyEnabled = Boolean(policy.enabled);
+  const policyLine = isFr
+    ? policyEnabled
+      ? `Annulation / modification gratuites jusqu’à ${freeHours} h avant le RDV. Au-delà, le salon peut conserver ${latePct} % de l’acompte.`
+      : `Annulation possible jusqu’à ${freeHours} h avant le rendez-vous (sinon contactez le salon).`
+    : policyEnabled
+      ? `Free cancel/reschedule until ${freeHours}h before. Later, the salon may keep ${latePct}% of the deposit.`
+      : `Cancellation possible until ${freeHours}h before (otherwise contact the salon).`;
+
+  const cancelToken = makeCustomerCancelToken(booking._id);
+  const cancelUrl = `${getBaseUrl()}/api/public/booking/cancel?bookingId=${booking._id}&token=${cancelToken}`;
+  const ctaHtml = `
+    <p style="color:#444;font-size:14px;margin:16px 0 8px;">${escapeHtml(policyLine)}</p>
+    <p style="margin:16px 0 8px;">
+      <a href="${cancelUrl}" style="display:inline-block;padding:12px 20px;background:#111;color:#fff;text-decoration:none;border-radius:8px;">${
+        isFr ? "Annuler ma réservation" : "Cancel my booking"
+      }</a>
+    </p>
+    <p style="font-size:12px;color:#888;margin:0 0 8px;">${
+      isFr
+        ? "Pour modifier le créneau (dans la fenêtre gratuite), répondez à cet email ou contactez le salon."
+        : "To change your time slot (within the free window), reply to this email or contact the salon."
+    }</p>`;
+
+  const depositRow =
+    Number(booking.depositAmount) > 0
+      ? [
+          [
+            isFr ? "Acompte" : "Deposit",
+            escapeHtml(String(booking.depositAmount)),
+          ],
+        ]
+      : [];
+
   const html = buildBookingEmailLayout({
     title,
     intro,
@@ -183,6 +247,7 @@ async function sendCustomerBookingConfirmationEmail(bookingId, { language = "fr"
       [isFr ? "Heure" : "Time", escapeHtml(bookingTime)],
       [isFr ? "Prestations" : "Services", services],
       [isFr ? "Montant" : "Amount", escapeHtml(String(booking.amount ?? "—"))],
+      ...depositRow,
       [
         isFr ? "Statut" : "Status",
         isConfirmed
@@ -193,10 +258,12 @@ async function sendCustomerBookingConfirmationEmail(bookingId, { language = "fr"
             ? "En attente de validation"
             : "Awaiting approval",
       ],
+      ...prepRows,
     ],
+    ctaHtml,
     footer: isFr
-      ? "Conservez cet email comme justificatif. Pour toute question : support@skedisy.com"
-      : "Keep this email as your receipt. Questions: support@skedisy.com",
+      ? "Conservez cet email comme justificatif. Un SMS de rappel (court) vous sera envoyé avant le RDV. Pour toute question : support@skedisy.com"
+      : "Keep this email as your receipt. A short SMS reminder will be sent before your appointment. Questions: support@skedisy.com",
   });
 
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);

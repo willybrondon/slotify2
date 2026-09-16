@@ -39,6 +39,8 @@ exports.publicListDemandServices = async (req, res) => {
         if (!svc) return null;
         const afro = getAfroConfig(entry);
         const tier = afro?.complexityTier || "S0";
+        const { resolveAddonCatalog } = require("../../services/afroQuote.service");
+        const addons = resolveAddonCatalog(entry, afro);
         return {
           serviceId: entry.id,
           name: svc.name,
@@ -48,6 +50,8 @@ exports.publicListDemandServices = async (req, res) => {
           complexityTier: tier,
           requirePhoto: Boolean(afro?.requirePhoto),
           configSchema: afro?.configSchema || [],
+          addonDefs: addons,
+          materials: afro?.materials || entry.detailCard?.materials || null,
           depositPolicy: afro?.depositPolicy || { enabled: false },
           usesProjectFlow: tier !== "S0" && Boolean(afro),
         };
@@ -413,6 +417,38 @@ exports.publicConvertDemand = async (req, res) => {
     return res.status(result.statusCode || 200).json(result.payload);
   } catch (error) {
     console.error("[publicConvertDemand]", error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+/**
+ * POST /api/public/demand/upload-photo
+ * multipart field "photo" — inspiration image for booking config.
+ */
+exports.publicUploadDemandPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return bad(res, "Aucune photo reçue");
+    }
+    const mime = String(req.file.mimetype || "");
+    if (!mime.startsWith("image/")) {
+      try {
+        require("fs").unlinkSync(req.file.path);
+      } catch (e) {
+        /* ignore */
+      }
+      return bad(res, "Fichier image requis (jpg, png, webp…)");
+    }
+    const base = (process.env.baseURL || "").replace(/\/?$/, "/");
+    const rel = String(req.file.path || `storage/${req.file.filename}`).replace(/\\/g, "/");
+    const url = `${base}${rel}`;
+    return res.status(200).json({
+      status: true,
+      url,
+      filename: req.file.filename,
+    });
+  } catch (error) {
+    console.error("[publicUploadDemandPhoto]", error);
     return res.status(500).json({ status: false, message: error.message });
   }
 };

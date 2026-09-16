@@ -57,6 +57,13 @@ export const blockCity = createAsyncThunk(
   }
 );
 
+export const updateServiceDetailCard = createAsyncThunk(
+  "salon/serviceDetailCard",
+  async (payload) => {
+    return apiInstanceFetch.patch(`salon/serviceDetailCard`, payload);
+  }
+);
+
 const serviceSlice = createSlice({
   name: "serviceSlice",
   initialState,

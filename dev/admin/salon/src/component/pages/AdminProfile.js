@@ -42,7 +42,20 @@ export const AdminProfile = () => {
   const [latitude, setLatitude] = useState();
   const [longitude, setLongitude] = useState();
   const [about, setAbout] = useState();
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [messagingEnabled, setMessagingEnabled] = useState(true);
   const [autoConfirmBookings, setAutoConfirmBookings] = useState(true);
+  const [galleryFiles, setGalleryFiles] = useState([]);
+  const [galleryPreview, setGalleryPreview] = useState([]);
+  const [policyEnabled, setPolicyEnabled] = useState(false);
+  const [policyFreeHours, setPolicyFreeHours] = useState(24);
+  const [policyLatePercent, setPolicyLatePercent] = useState(50);
+  const [policyNoShowPercent, setPolicyNoShowPercent] = useState(100);
+  const [policyLateArrivalMinutes, setPolicyLateArrivalMinutes] = useState(15);
+  const [loyaltyEnabled, setLoyaltyEnabled] = useState(false);
+  const [loyaltyPercent, setLoyaltyPercent] = useState(10);
+  const [loyaltyMinVisits, setLoyaltyMinVisits] = useState(1);
+  const [loyaltyMaxDiscount, setLoyaltyMaxDiscount] = useState(0);
   const [valuePropositionTitle, setValuePropositionTitle] = useState();
   const [valuePropositionDescription, setValuePropositionDescription] = useState();
   const [valuePropositionFeatures, setValuePropositionFeatures] = useState();
@@ -104,8 +117,21 @@ export const AdminProfile = () => {
       setPlatformFee(data?.platformFee);
       setImagePath(data?.mainImage);
       setAbout(data?.about);
+      setInstagramUrl(data?.instagramUrl || "");
+      setMessagingEnabled(data?.messagingEnabled !== false);
       setAutoConfirmBookings(data?.autoConfirmBookings !== false);
       setHeroImagePath(data?.heroImage);
+      setGalleryPreview(Array.isArray(data?.image) ? data.image.filter(Boolean) : []);
+      setGalleryFiles([]);
+      setPolicyEnabled(Boolean(data?.cancellationPolicy?.enabled));
+      setPolicyFreeHours(data?.cancellationPolicy?.freeCancelHours ?? 24);
+      setPolicyLatePercent(data?.cancellationPolicy?.lateCancelPercent ?? 50);
+      setPolicyNoShowPercent(data?.cancellationPolicy?.noShowPercent ?? 100);
+      setPolicyLateArrivalMinutes(data?.cancellationPolicy?.lateArrivalMinutes ?? 15);
+      setLoyaltyEnabled(Boolean(data?.loyaltyProgram?.enabled));
+      setLoyaltyPercent(data?.loyaltyProgram?.sameServiceRebookPercent ?? 10);
+      setLoyaltyMinVisits(data?.loyaltyProgram?.minCompletedCount ?? 1);
+      setLoyaltyMaxDiscount(data?.loyaltyProgram?.maxDiscountAmount ?? 0);
       setValuePropositionTitle(data?.valueProposition?.title || "");
       setValuePropositionDescription(data?.valueProposition?.description || "");
       setValuePropositionFeatures(data?.valueProposition?.features?.join(", ") || "");
@@ -129,6 +155,12 @@ export const AdminProfile = () => {
       ...prevErrors,
       heroImage: "",
     }));
+  };
+
+  const handleUploadGallery = (e) => {
+    const files = Array.from(e.target.files || []).slice(0, 10);
+    setGalleryFiles(files);
+    setGalleryPreview(files.map((f) => URL.createObjectURL(f)));
   };
 
   const handleChangePassword = () => {
@@ -180,7 +212,33 @@ export const AdminProfile = () => {
       formData.append("longitude", longitude);
       formData.append("mobile", mobile);
       formData.append("about", about);
+      formData.append("instagramUrl", instagramUrl || "");
+      formData.append("messagingEnabled", messagingEnabled ? "true" : "false");
       formData.append("autoConfirmBookings", autoConfirmBookings ? "true" : "false");
+      formData.append(
+        "cancellationPolicy",
+        JSON.stringify({
+          enabled: policyEnabled,
+          freeCancelHours: Number(policyFreeHours) || 0,
+          lateCancelPercent: Number(policyLatePercent) || 0,
+          noShowPercent: Number(policyNoShowPercent) || 0,
+          lateArrivalMinutes: Number(policyLateArrivalMinutes) || 0,
+        })
+      );
+      formData.append(
+        "loyaltyProgram",
+        JSON.stringify({
+          enabled: loyaltyEnabled,
+          sameServiceRebookPercent: Number(loyaltyPercent) || 0,
+          minCompletedCount: Number(loyaltyMinVisits) || 1,
+          maxDiscountAmount: Number(loyaltyMaxDiscount) || 0,
+        })
+      );
+      if (galleryFiles.length > 0) {
+        galleryFiles.forEach((file) => {
+          formData.append("image", file);
+        });
+      }
       if (valuePropositionTitle) {
         formData.append("valuePropositionTitle", valuePropositionTitle);
       }
@@ -449,6 +507,36 @@ export const AdminProfile = () => {
                 </div>
                 <div className="row mt-2">
                   <div className="col-12">
+                    <ExInput
+                      type={`text`}
+                      id={`instagramUrl`}
+                      name={`instagramUrl`}
+                      value={instagramUrl}
+                      label={portalCopy.instagramLabel}
+                      placeholder="https://instagram.com/monsalon ou @monsalon"
+                      onChange={(e) => setInstagramUrl(e.target.value)}
+                    />
+                    <p style={{ fontSize: "13px", color: "#666", marginTop: 4 }}>
+                      {portalCopy.instagramHint}
+                    </p>
+                  </div>
+                </div>
+                <div className="row mt-2">
+                  <div className="col-12 d-flex align-items-center justify-content-between">
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{portalCopy.messagingEnabledLabel}</div>
+                      <div style={{ fontSize: "13px", color: "#666" }}>
+                        {portalCopy.messagingEnabledHint}
+                      </div>
+                    </div>
+                    <ToggleSwitch
+                      value={messagingEnabled}
+                      onClick={() => setMessagingEnabled(!messagingEnabled)}
+                    />
+                  </div>
+                </div>
+                <div className="row mt-2">
+                  <div className="col-12">
                     <div className="d-flex justify-content-between align-items-center p-3 rounded" style={{ backgroundColor: "#f8f9fa" }}>
                       <div>
                         <div style={{ fontWeight: 600 }}>{portalCopy.autoConfirmBookingsLabel}</div>
@@ -460,6 +548,123 @@ export const AdminProfile = () => {
                         value={autoConfirmBookings}
                         onClick={() => setAutoConfirmBookings(!autoConfirmBookings)}
                       />
+                    </div>
+                  </div>
+                </div>
+                <div className="row mt-3">
+                  <div className="col-12">
+                    <div className="p-3 rounded" style={{ backgroundColor: "#f8f9fa" }}>
+                      <div className="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                          <div style={{ fontWeight: 600 }}>{portalCopy.profileCancelPolicyLabel}</div>
+                          <p style={{ fontSize: "12px", color: "#666", marginBottom: 0 }}>
+                            {portalCopy.profileCancelPolicyHint}
+                          </p>
+                        </div>
+                        <ToggleSwitch
+                          value={policyEnabled}
+                          onClick={() => setPolicyEnabled(!policyEnabled)}
+                        />
+                      </div>
+                      {policyEnabled && (
+                        <div className="row mt-2">
+                          <div className="col-md-4">
+                            <ExInput
+                              type="number"
+                              id="policyFreeHours"
+                              name="policyFreeHours"
+                              value={policyFreeHours}
+                              label={portalCopy.profileCancelFreeHours}
+                              onChange={(e) => setPolicyFreeHours(e.target.value)}
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <ExInput
+                              type="number"
+                              id="policyLatePercent"
+                              name="policyLatePercent"
+                              value={policyLatePercent}
+                              label={portalCopy.profileCancelLatePercent}
+                              onChange={(e) => setPolicyLatePercent(e.target.value)}
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <ExInput
+                              type="number"
+                              id="policyNoShowPercent"
+                              name="policyNoShowPercent"
+                              value={policyNoShowPercent}
+                              label={portalCopy.profileCancelNoShowPercent}
+                              onChange={(e) => setPolicyNoShowPercent(e.target.value)}
+                            />
+                          </div>
+                          <div className="col-md-6 mt-2">
+                            <ExInput
+                              type="number"
+                              id="policyLateArrivalMinutes"
+                              name="policyLateArrivalMinutes"
+                              value={policyLateArrivalMinutes}
+                              label="Tolérance retard (minutes)"
+                              onChange={(e) => setPolicyLateArrivalMinutes(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="row mt-3">
+                  <div className="col-12">
+                    <div className="p-3 rounded" style={{ backgroundColor: "#f8f9fa" }}>
+                      <div className="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                          <div style={{ fontWeight: 600 }}>{portalCopy.profileLoyaltyLabel}</div>
+                          <p style={{ fontSize: "12px", color: "#666", marginBottom: 0 }}>
+                            {portalCopy.profileLoyaltyHint}
+                          </p>
+                        </div>
+                        <ToggleSwitch
+                          value={loyaltyEnabled}
+                          onClick={() => setLoyaltyEnabled(!loyaltyEnabled)}
+                        />
+                      </div>
+                      {loyaltyEnabled && (
+                        <div className="row mt-2">
+                          <div className="col-md-4">
+                            <ExInput
+                              type="number"
+                              id="loyaltyPercent"
+                              name="loyaltyPercent"
+                              value={loyaltyPercent}
+                              label={portalCopy.profileLoyaltyPercent}
+                              onChange={(e) => setLoyaltyPercent(e.target.value)}
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <ExInput
+                              type="number"
+                              id="loyaltyMinVisits"
+                              name="loyaltyMinVisits"
+                              value={loyaltyMinVisits}
+                              label={portalCopy.profileLoyaltyMinVisits}
+                              onChange={(e) => setLoyaltyMinVisits(e.target.value)}
+                            />
+                            <p style={{ fontSize: 11, color: "#666" }}>
+                              {portalCopy.profileLoyaltyMinVisitsHint}
+                            </p>
+                          </div>
+                          <div className="col-md-4">
+                            <ExInput
+                              type="number"
+                              id="loyaltyMaxDiscount"
+                              name="loyaltyMaxDiscount"
+                              value={loyaltyMaxDiscount}
+                              label={portalCopy.profileLoyaltyMax}
+                              onChange={(e) => setLoyaltyMaxDiscount(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -524,6 +729,49 @@ export const AdminProfile = () => {
                         {portalCopy.profileHeroHint} Format conseillé : 1200×400 px.
                       </p>
                     </div>
+                  </div>
+                  <div className="col-lg-6 col-md-6 col-12 mb-3">
+                    <label style={{ marginBottom: "10px", display: "block", fontWeight: "500" }}>
+                      {portalCopy.profileGalleryLabel}
+                    </label>
+                    <input
+                      id="gallery-image-input"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleUploadGallery}
+                    />
+                    <p style={{ fontSize: "12px", color: "#666", marginTop: "8px" }}>
+                      {portalCopy.profileGalleryHint}
+                    </p>
+                    {galleryPreview?.length > 0 && (
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fill, minmax(72px, 1fr))",
+                          gap: 8,
+                          marginTop: 10,
+                        }}
+                      >
+                        {galleryPreview.map((src, i) => (
+                          <img
+                            key={`${src}-${i}`}
+                            src={src}
+                            alt=""
+                            style={{
+                              width: "100%",
+                              height: 72,
+                              objectFit: "cover",
+                              borderRadius: 8,
+                              border: "1px solid #ddd",
+                            }}
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="col-lg-6 col-md-6 col-12">
                     <ExInput

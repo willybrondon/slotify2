@@ -1,17 +1,34 @@
 # Plan d’implémentation — SQUIRE Blueprint × Skedisy existant
 
-**Date :** 2026-09-11  
-**Statut :** plan seulement — **aucun code modifié**  
-**Références :** `PROMPT7_SQUIRE_BLUEPRINT.md` · inventaire codebase `dev/admin/*` + Flutter  
+**Date :** 2026-09-11 · **MAJ plan StyleSeat :** 2026-09-15  
+**Statut :** plan seulement — **aucun code modifié** (ce fichier)  
+**Références :** `PROMPT7_SQUIRE_BLUEPRINT.md` · `STYLESEAT_LEARNINGS_PLAN.md` · inventaire codebase `dev/admin/*` + Flutter  
 **Principe :** ne pas reconstruire l’agenda ; greffer le wedge Afro sur le stack booking/paiement déjà là.  
-**Data (refresh) :** sample Afro **458** (prompts 1–3 rejoués) — wedge / MVP inchangés.
+**Data (refresh) :** sample Afro **458** (prompts 1–3 rejoués) — wedge / MVP inchangés.  
+**Lecture concurrente :** StyleSeat (braiders) confirme que le **Service** doit être un objet métier (config + add-ons + prep + politiques) — à intégrer aux phases ci-dessous **sans** tout implémenter d’un coup.
 
 ---
 
 ## 0. Verdict en une phrase
 
 Skedisy a déjà un **OS de réservation multi-salon** (lien public, catalogue, experts, créneaux, Stripe, rappels).  
-Ce qui manque pour le SQUIRE Afro, c’est la couche **demande configurée → devis/durée → acompte → prep**, pas un nouveau calendrier.
+Ce qui manque pour le SQUIRE Afro (et ce que StyleSeat vend aux braiders), c’est la couche qui transforme une presta complexe en **RDV préparé** :  
+**Service configuré → prix/durée → prep → acompte/politiques → créneau → historique/rebooking** — pas un nouveau calendrier.
+
+---
+
+## 0bis. Roadmap StyleSeat × Skedisy (à planifier, pas coder ici)
+
+Canon détaillé : `STYLESEAT_LEARNINGS_PLAN.md`
+
+| Niveau | Contenu | Lien phases ci-dessous |
+|---|---|---|
+| **L1** Service + Booking Engine | Description structurée, variantes, **add-ons**, prep, photo, acompte, politiques, rappels | Phase 1–2 |
+| **L2** Difficile à remplacer | Beauty Profile, rebooking « dernière config », actual vs planned, no-show auto | Phase 2–3 |
+| **L3** Croissance | Marketplace, IG/Google→Skedisy, fidélité, packages, promos | Phase 3+ |
+| **L4** Intelligence | Apprentissage durées/prix/configs réels | Après instrumentation |
+
+**7 problèmes produit à couvrir (croisement avis × StyleSeat) :** prix réel · durée · prep · compréhension · inclus/add-ons · politiques/acompte · retrouver sa coiffure habituelle.
 
 ---
 
@@ -26,8 +43,10 @@ Ce qui manque pour le SQUIRE Afro, c’est la couche **demande configurée → d
 | Duration Engine | **PARTIEL** | `duration` fixe · `checkInTime` / `checkOutTime` à la complétion | Réutiliser check-in/out ; ajouter estimateurs |
 | Booking Engine | **EXISTANT** | Flow : services → expert → slot → contact → pay | Insérer étapes **avant** le slot pour S2/S3 |
 | Acompte client | **ABSENT** | Stripe = montant **plein** · « deposit » code = wallet salon | **Construire** (payment partial) |
-| Prep Engine | **ABSENT** | — | **Construire** (Phase 2) |
-| Beauty CRM / Memory | **PARTIEL** | Historique bookings · pas de config/photos métier | **Construire** (Phase 3) |
+| Prep Engine | **ABSENT** | — | **Construire** (Phase 2) — fiche « Avant votre RDV » + rappels (StyleSeat) |
+| Add-ons Engine | **ABSENT** | — | **Construire** (L1 plan) — options +€/+min |
+| Beauty CRM / Memory | **PARTIEL** | Historique bookings · pas de config/photos métier | **Construire** (Phase 3 / L2 StyleSeat) |
+| Rebooking Engine | **ABSENT** | — | **Construire** (L2) — durée de vie protective styles |
 | Dashboard pro | **EXISTANT** | Salon panel bookings · email accept/reject | Étendre : file « demandes / devis » |
 | WA/IG natif | **ABSENT** (OK) | Share links + OG ; pas Business API | **Ne pas construire** V1 — scénario C = lien |
 | Multi-staff / calendar | **EXISTANT** | Experts, slots, `TeamCalendar`, busy | Réutiliser tel quel |
@@ -122,7 +141,10 @@ Lien (WA/IG/bio)
 | `pricingRules[]` | if variable=X then +€ |
 | `durationRules[]` | if variable=X then +min |
 | `depositPolicy` | `{ type: percent\|fixed, value, enabled }` |
-| `prepInstructions` | texte / checklist items (Phase 2) |
+| `prepInstructions` | texte / checklist items (Phase 2) — **fiche « Avant votre RDV »** (StyleSeat prep forms) |
+| `addons[]` | options cochables : `{ id, label, addPrice, addMinutes }` (StyleSeat L1 — **plan**) |
+| `cancellationPolicy` | late cancel / no-show % (affichage + acceptation avant paiement — **plan**) |
+| `styleLifetimeWeeks` | pour rebooking protectif (L2 — **plan**) |
 
 Alternative V1 minimale : stocker config au niveau **salon-service** (pas le Service global admin) pour que chaque salon définisse ses règles.
 

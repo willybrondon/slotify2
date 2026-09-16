@@ -58,6 +58,8 @@ exports.getAfroConfigStatus = async (req, res) => {
           complexityTier: afro?.complexityTier || "S0",
           usesProjectFlow: Boolean(afro && afro.complexityTier && afro.complexityTier !== "S0"),
           depositPolicy: afro?.depositPolicy || null,
+          styleLifetimeWeeks: Number(afro?.styleLifetimeWeeks) || 0,
+          rebookRemindersEnabled: afro?.rebookRemindersEnabled !== false,
           schemaFieldCount: Array.isArray(afro?.configSchema) ? afro.configSchema.length : 0,
         };
       })
@@ -213,6 +215,29 @@ exports.updateAfroConfig = async (req, res) => {
           type: "percent",
           value: pct,
         };
+        entry.afroConfig = afro;
+      } else if (body.styleLifetimeWeeks != null || body.rebookRemindersEnabled != null) {
+        const afro = entry.afroConfig
+          ? JSON.parse(JSON.stringify(entry.afroConfig))
+          : {
+              complexityTier: "S2",
+              requirePhoto: false,
+              configSchema: [],
+              pricingRules: [],
+              durationRules: [],
+              depositPolicy: { enabled: false, type: "percent", value: 0 },
+            };
+        if (body.styleLifetimeWeeks != null) {
+          afro.styleLifetimeWeeks = Math.max(
+            0,
+            Math.min(52, Number(body.styleLifetimeWeeks) || 0)
+          );
+        }
+        if (body.rebookRemindersEnabled != null) {
+          afro.rebookRemindersEnabled =
+            body.rebookRemindersEnabled === true ||
+            body.rebookRemindersEnabled === "true";
+        }
         entry.afroConfig = afro;
       }
       salon.markModified("serviceIds");

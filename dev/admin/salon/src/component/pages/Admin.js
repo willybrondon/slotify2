@@ -44,6 +44,8 @@ import TeamCalendar from "../tables/calendar/TeamCalendar";
 import PaymentSettingsPage from "./PaymentSettingsPage";
 import ExpertRequest from "../tables/WithDrawal/ExpertRequest";
 import Demand from "../tables/demand/Demand";
+import Messages from "../tables/messaging/Messages";
+import Marketing from "../tables/marketing/Marketing";
 
 
 
@@ -78,6 +80,8 @@ const Admin = () => {
             <Route path="/paymentSettings" element={<PaymentSettingsPage />} />
             <Route path="/bookingTable" element={<Booking />} />
             <Route path="/demandTable" element={<Demand />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/marketing" element={<Marketing />} />
             <Route path="/profile" element={<AdminProfile />} />
             <Route path="/allExperts" element={<Expert />} />
             <Route path="/addExpert" element={<ExpertDialogue />} />

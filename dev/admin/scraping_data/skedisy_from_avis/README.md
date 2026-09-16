@@ -74,3 +74,14 @@ Checklist 3 étapes · emails demande/acompte · reste dû bookings.
 ## Marketing 3 mois
 
 → `PROPOSITION_MARKETING_3MOIS.md`
+
+## StyleSeat — apprentissages à intégrer (plan only)
+
+Lecture braiders StyleSeat + help client × audit avis.  
+**Aucune implémentation** — enrichit vision, Service Engine, prep, add-ons, Beauty Profile, rebooking, roadmap L1–L4.
+
+→ `STYLESEAT_LEARNINGS_PLAN.md`  
+→ Rebooking auto (L1) : `REBOOKING_AUTO_IMPLEMENTATION.md`  
+→ Fidélisation (rebook + historique) : `FIDELISATION_REBOOKING.md`
+
+**Vision recalée :** Skedisy = système qui transforme une prestation complexe en **rendez-vous parfaitement préparé** (chaîne Prestation → Config → Prix → Durée → Prep → Acompte → RDV → Historique → Rebooking).

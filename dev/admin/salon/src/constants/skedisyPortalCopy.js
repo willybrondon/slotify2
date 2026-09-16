@@ -27,6 +27,24 @@ export const SKEDISY_SALON_PORTAL_COPY = {
     "Ce qui rend votre salon unique (prestations afro, quartier, expertise…)",
   profileHeroHint:
     "Image en tête de votre fiche publique (clientes : skedisy.com · réservation sur l'app).",
+  profileGalleryLabel: "Photos réalisations (mosaïque fiche publique)",
+  profileGalleryHint:
+    "Jusqu’à 10 photos affichées en mosaïque sur votre page salon (comme StyleSeat). Formats JPG/PNG.",
+  profileCancelPolicyLabel: "Politique No-Show / annulation tardive",
+  profileCancelPolicyHint:
+    "Fenêtre gratuite (défaut 24 h) puis, si activé, rétention de l’acompte (ex. 50 %) sur annulation tardive. Reprogrammation libre uniquement dans la fenêtre gratuite.",
+  profileCancelPolicyEnabled: "Activer la politique sur la fiche",
+  profileCancelFreeHours: "Annulation gratuite jusqu’à (heures avant RDV)",
+  profileCancelLatePercent: "Pénalité annulation tardive (%)",
+  profileCancelNoShowPercent: "Pénalité no-show (%)",
+  profileLoyaltyLabel: "Fidélité rebooking (même prestation)",
+  profileLoyaltyHint:
+    "Si une cliente rebook la même presta chez vous, elle obtient une réduction. Basé sur l’historique completed — pas de points génériques.",
+  profileLoyaltyEnabled: "Activer la réduction fidélité",
+  profileLoyaltyPercent: "Réduction (%)",
+  profileLoyaltyMinVisits: "Après combien de visites completed ?",
+  profileLoyaltyMinVisitsHint: "1 = dès le 2ᵉ passage sur la même presta",
+  profileLoyaltyMax: "Plafond réduction (€, 0 = pas de plafond)",
   profileValueTitleLabel: "Accroche fiche publique",
   profileValueDescLabel: "Description",
   profileValueFeaturesLabel: "Points forts (séparés par des virgules)",
@@ -78,6 +96,11 @@ export const SKEDISY_SALON_PORTAL_COPY = {
   longitudeRequired: "La longitude est requise.",
   aboutLabel: "À propos",
   aboutRequired: "La description est requise.",
+  instagramLabel: "Page Instagram",
+  instagramHint: "URL ou @pseudo — affiché sur votre fiche publique Skedisy.",
+  messagingEnabledLabel: "Messagerie Skedisy",
+  messagingEnabledHint:
+    "Les clientes peuvent vous écrire depuis votre fiche (photos d'inspiration comprises). Répondez dans Messages.",
   addressLabel: "Adresse",
   addressRequired: "L'adresse est requise.",
   landmarkLabel: "Repère",

@@ -1,6 +1,7 @@
 # Sprint F — Convergence flow Réservation (devis inline)
 
-**Statut :** implémenté (web public)
+**Statut :** implémenté (web public)  
+**Backlog plan (non codé ici) :** `STYLESEAT_LEARNINGS_PLAN.md` — Service Engine (add-ons, fiche prep structurée, politiques), puis L2 Beauty Profile / rebooking.
 
 ## Changements
 - Un seul CTA **Réserver** (suppression « Obtenir un devis »)

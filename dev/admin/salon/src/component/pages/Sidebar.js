@@ -83,6 +83,27 @@ const Sidebar = () => {
       ),
       onClick: handleOnClick,
     },
+    {
+      name: n.messages || "Messages",
+      path: "/salonpanel/messages",
+      navSVG: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6H20V16H7L4 19V6Z" stroke="#818185" strokeWidth="1.8" strokeLinejoin="round"/>
+          <path d="M8 10H16M8 13H13" stroke="#818185" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+      ),
+      onClick: handleOnClick,
+    },
+    {
+      name: n.marketing || "Marketing",
+      path: "/salonpanel/marketing",
+      navSVG: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 19V5L20 12L4 19Z" stroke="#818185" strokeWidth="1.8" strokeLinejoin="round"/>
+        </svg>
+      ),
+      onClick: handleOnClick,
+    },
   ];
 
   const array2 = [

@@ -59,8 +59,45 @@ const bookingSchema = new mongoose.Schema(
     isSettle: { type: Boolean, default: false }, //at the end of the month it will be true after settlement
 
     // SMS Reminder tracking
-    smsReminder24hSent: { type: Boolean, default: false }, // 24 hours before appointment
+    smsReminder24hSent: { type: Boolean, default: false }, // J-1 (day before)
     smsReminder2hSent: { type: Boolean, default: false }, // 2 hours before appointment
+    /** Soft checklist nudge embedded in J-1 SMS (photo / prep) */
+    smsPrepChecklistSent: { type: Boolean, default: false },
+    /** Client confirmed prep done (optional) */
+    prepConfirmedAt: { type: Date, default: null },
+    /** Inspiration photo missing flag for checklist */
+    inspirationPhotoRequired: { type: Boolean, default: false },
+    inspirationPhotoUrls: [{ type: String }],
+    /** After appointment — result proof */
+    resultPhotoUrls: [{ type: String }],
+    resultPhotoNote: { type: String, default: "" },
+    /** Planned vs actual */
+    plannedDurationMinutes: { type: Number, default: null },
+    actualDurationMinutes: { type: Number, default: null },
+    actualPrice: { type: Number, default: null },
+    actualVarianceNote: { type: String, default: "" },
+    /** Materials snapshot at book time */
+    materialsSnapshot: { type: mongoose.Schema.Types.Mixed, default: null },
+    /** Client accepted salon policies at booking */
+    policyAcceptedAt: { type: Date, default: null },
+    policyAcceptText: { type: String, default: "" },
+
+    /**
+     * StyleSeat-style protective rebooking (Afro lifetime).
+     * Set on checkout when service afroConfig.styleLifetimeWeeks > 0.
+     */
+    clientAnswers: { type: mongoose.Schema.Types.Mixed, default: null },
+    rebookDueAt: { type: Date, default: null, index: true },
+    rebookToken: { type: String, default: "", index: true },
+    rebookReminderSent: { type: Boolean, default: false },
+
+    /** Applied loyalty discount (same-service rebook) */
+    loyaltyDiscount: {
+      percent: { type: Number, default: 0 },
+      amount: { type: Number, default: 0 },
+      priorCount: { type: Number, default: 0 },
+      label: { type: String, default: "" },
+    },
 
     // Admin email: accept/reject reservation from email (token links)
     adminEmailActionToken: { type: String, default: "" },
@@ -77,6 +114,17 @@ const bookingSchema = new mongoose.Schema(
       date: String,
     },
 
+    /** Outcome of cancel vs salon cancellationPolicy (deposit retention) */
+    cancelSettlement: {
+      mode: { type: String, default: "" }, // free | late
+      retainPercent: { type: Number, default: 0 },
+      retainedAmount: { type: Number, default: 0 },
+      refundAmount: { type: Number, default: 0 },
+      prepaidBase: { type: Number, default: 0 },
+      policyEnabled: { type: Boolean, default: false },
+      appliedAt: { type: Date, default: null },
+    },
+
     /** SQUIRE wedge — link from ServiceDemand after deposit */
     demandId: { type: mongoose.Schema.Types.ObjectId, ref: "ServiceDemand", default: null },
     configSnapshot: { type: mongoose.Schema.Types.Mixed, default: null },
@@ -85,7 +133,6 @@ const bookingSchema = new mongoose.Schema(
     depositAmount: { type: Number, default: 0 },
     depositPaidAt: { type: Date, default: null },
     balanceDue: { type: Number, default: 0 },
-    actualDurationMinutes: { type: Number, default: null },
   },
   {
     timestamps: true,

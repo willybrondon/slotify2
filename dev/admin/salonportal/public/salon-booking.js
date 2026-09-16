@@ -39,9 +39,19 @@
     afroByServiceId: {},
     afroMetaLoaded: false,
     afroAnswers: {},
+    policyAccepted: false,
+    policyAcceptText: "",
     afroPhotoUrls: [],
     afroDemand: null,
     afroConfigServiceId: null,
+    afroSkipPrecision: false,
+    afroPrecisionFormOpen: false,
+    manageReschedule: null,
+    loyaltyDiscount: 0,
+    loyaltyPercent: 0,
+    loyaltyLabel: "",
+    applyLoyalty: false,
+    clientHistory: [],
   };
 
   const payCfg = { ...(cfg.payment || {}) };
@@ -261,11 +271,14 @@
     state.afroPhotoUrls = [];
     state.afroDemand = null;
     state.afroConfigServiceId = null;
+    state.afroSkipPrecision = false;
+    state.afroPrecisionFormOpen = false;
   }
 
   function hasAcceptedAfroQuote() {
     const primary = getPrimaryProjectService();
     if (!primary) return true;
+    if (state.afroSkipPrecision) return true;
     if (!state.afroDemand) return false;
     if (normalizeServiceId(state.afroConfigServiceId) !== primary.id) return false;
     // Estimation soft : même en review salon, on laisse finir la résa (pending).
@@ -510,6 +523,16 @@
     }
   }
 
+  function formatDurationLabel(minutes) {
+    const m = Math.max(0, Number(minutes) || 0);
+    if (m <= 0) return "";
+    if (m < 60) return `${m} ${t("min")}`;
+    const h = Math.floor(m / 60);
+    const rem = m % 60;
+    if (!rem) return `${h}h`;
+    return `${h}h${String(rem).padStart(2, "0")}`;
+  }
+
   function buildServiceCardHtml(s) {
     const selected = isServiceSelected(s.id);
     const check = selected
@@ -519,10 +542,7 @@
       ? t("serviceTapToDeselect")
       : t("serviceTapToSelect");
     const afro = getAfroMeta(s.id);
-    const projectBadge =
-      afro && afro.usesProjectFlow
-        ? `<span class="sq-service-card__badge">${escapeHtml(t("afroProjectBadge"))}</span>`
-        : "";
+    const projectBadge = "";
     const baseDur = Number(afro?.baseDuration || s.duration) || Number(s.duration) || 0;
     const maxDur = afro && afro.usesProjectFlow ? Math.round(baseDur * 1.6) : baseDur;
     const durationInfo =
@@ -535,6 +555,7 @@
               .join(String(maxDur))
           )}</span>`
         : "";
+    // Même carte prestation : prix catalogue ; durée indicative si règles salon
     const priceLabel =
       afro && afro.usesProjectFlow
         ? `${escapeHtml(t("afroFromPrice"))} ${escapeHtml(cfg.currency)}${s.price}`
@@ -548,12 +569,219 @@
       </button>`;
   }
 
+  function listHtml(items, prefix) {
+    if (!items || !items.length) return "";
+    return `<ul>${items
+      .map((x) => `<li>${escapeHtml(prefix || "")}${escapeHtml(x)}</li>`)
+      .join("")}</ul>`;
+  }
+
+  function buildSalonPageServiceCardHtml(s) {
+    const card = s.detailCard || {};
+    const afro = getAfroMeta(s.id);
+    const baseDur = Number(afro?.baseDuration || s.duration) || Number(s.duration) || 0;
+    const durLabel = formatDurationLabel(baseDur);
+    const priceNum = Number(s.price) || 0;
+    const priceStr = `${escapeHtml(cfg.currency)}${priceNum}`;
+    const metaLine = [durLabel, priceStr].filter(Boolean).join(" · ");
+    const svcReview = Number(s.review) || 0;
+    const svcReviewCount = Number(s.reviewCount) || 0;
+    const ratingBadge =
+      svcReview > 0
+        ? `<div class="sq-svc-row__rating rating-badge"><span class="rating-stars" aria-hidden="true">⭐</span><span>${svcReview.toFixed(1)} (${svcReviewCount} ${escapeHtml(
+            t("reviewsCount")
+          )})</span></div>`
+        : "";
+    const shortDesc = String(card.shortDescription || "").trim();
+    const includes = Array.isArray(card.includes) ? card.includes : [];
+    const prepMust = Array.isArray(card.prepMust) ? card.prepMust : [];
+    const prepAvoid = Array.isArray(card.prepAvoid) ? card.prepAvoid : [];
+    const addons = Array.isArray(card.addons) ? card.addons : [];
+    const depositPct =
+      card.depositPercent != null
+        ? Number(card.depositPercent)
+        : s.depositPercent != null
+          ? Number(s.depositPercent)
+          : null;
+    const depositAmt =
+      depositPct != null && depositPct > 0
+        ? Math.round((priceNum * depositPct) / 100)
+        : null;
+    const extraMin = addons.reduce((acc, a) => acc + (Number(a.addMinutes) || 0), 0);
+
+    const includesBlock = includes.length
+      ? `<div class="sq-svc-block"><p class="sq-svc-block__title">✨ ${escapeHtml(
+          t("serviceIncludesTitle")
+        )}</p><div class="sq-svc-chips">${includes
+          .map((x) => `<span class="sq-svc-chip">${escapeHtml(x)}</span>`)
+          .join("")}</div></div>`
+      : "";
+
+    const prepBlock =
+      prepMust.length || prepAvoid.length
+        ? `<div class="sq-svc-block"><p class="sq-svc-block__title">📋 ${escapeHtml(
+            t("servicePrepTitle")
+          )}</p><div class="sq-svc-prep">${
+            prepMust.length
+              ? `<div><strong>${escapeHtml(t("servicePrepMust"))}</strong>${listHtml(
+                  prepMust,
+                  "☑ "
+                )}</div>`
+              : ""
+          }${
+            prepAvoid.length
+              ? `<div><strong>${escapeHtml(t("servicePrepAvoid"))}</strong>${listHtml(
+                  prepAvoid,
+                  "❌ "
+                )}</div>`
+              : ""
+          }</div></div>`
+        : "";
+
+    const inspirationBlock = card.inspirationPhotoEnabled
+      ? `<div class="sq-svc-block"><p class="sq-svc-block__title">📸 ${escapeHtml(
+          t("serviceInspirationTitle")
+        )}</p><p class="sq-svc-row__desc" style="-webkit-line-clamp:unset;display:block">${escapeHtml(
+          t("serviceInspirationHint")
+        )}</p></div>`
+      : "";
+
+    const addonsBlock = addons.length
+      ? `<div class="sq-svc-block"><p class="sq-svc-block__title">➕ ${escapeHtml(
+          t("serviceAddonsTitle")
+        )}</p><div class="sq-svc-addons">${addons
+          .map((a) => {
+            const addP = Number(a.addPrice) || 0;
+            const addM = Number(a.addMinutes) || 0;
+            const bits = [];
+            if (addP) bits.push(`+${escapeHtml(cfg.currency)}${addP}`);
+            if (addM) bits.push(`+${formatDurationLabel(addM)}`);
+            return `<label class="sq-svc-addon"><span>□</span> <span>${escapeHtml(
+              a.label || ""
+            )}${bits.length ? ` ${bits.join(" · ")}` : ""}</span></label>`;
+          })
+          .join("")}</div></div>`
+      : "";
+
+    const statsBlock = `<div class="sq-svc-stats">
+        <div class="sq-svc-stat"><strong>⏱️ ${escapeHtml(
+          t("serviceDurationTitle")
+        )}</strong>${escapeHtml(durLabel || "—")}${
+      extraMin
+        ? `<div style="font-size:0.75rem;color:var(--sk-text-muted)">${escapeHtml(
+            t("serviceAddonsTitle")
+          )}: +${escapeHtml(formatDurationLabel(extraMin))}</div>`
+        : ""
+    }</div>
+        <div class="sq-svc-stat"><strong>💰 ${escapeHtml(
+          t("servicePriceTitle")
+        )}</strong>${priceStr}</div>
+        ${
+          depositAmt != null
+            ? `<div class="sq-svc-stat"><strong>🔐 ${escapeHtml(
+                t("serviceDepositTitle")
+              )}</strong>${escapeHtml(cfg.currency)}${depositAmt}</div>`
+            : ""
+        }
+      </div>`;
+
+    const noteBlock = card.importantNote
+      ? `<div class="sq-svc-note">⚠️ ${escapeHtml(card.importantNote)}</div>`
+      : "";
+
+    return `<article class="sq-svc-row" data-service-id="${escapeHtml(String(s.id))}">
+      <button type="button" class="sq-svc-row__head" data-svc-toggle aria-expanded="false">
+        <div class="sq-svc-row__main">
+          <div class="sq-svc-row__top">
+            <span class="sq-svc-row__name">${escapeHtml(s.name)}</span>
+            <span class="sq-svc-row__meta">${metaLine}</span>
+          </div>
+          ${ratingBadge}
+          ${
+            shortDesc
+              ? `<p class="sq-svc-row__desc">${escapeHtml(shortDesc)}</p>`
+              : ""
+          }
+        </div>
+        <span class="sq-svc-row__chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="sq-svc-row__panel">
+        ${includesBlock}
+        ${prepBlock}
+        ${inspirationBlock}
+        ${addonsBlock}
+        ${statsBlock}
+        ${noteBlock}
+        <div class="sq-svc-row__actions">
+          <button type="button" class="sq-svc-row__book" data-svc-book>${escapeHtml(
+            t("bookNow")
+          )}</button>
+        </div>
+      </div>
+    </article>`;
+  }
+
   function bindServiceCardClicks(rootEl, onAfterToggle) {
     if (!rootEl) return;
     rootEl.querySelectorAll(".sq-service-card[data-service-id]").forEach((card) => {
       card.addEventListener("click", () => {
         toggleServiceSelection(card.getAttribute("data-service-id"));
         if (typeof onAfterToggle === "function") onAfterToggle();
+      });
+    });
+  }
+
+  function bindSalonPageServiceCards(rootEl) {
+    if (!rootEl) return;
+    rootEl.querySelectorAll(".sq-svc-row").forEach((row) => {
+      const toggle = row.querySelector("[data-svc-toggle]");
+      const bookBtn = row.querySelector("[data-svc-book]");
+      const sid = row.getAttribute("data-service-id");
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          const open = row.classList.toggle("is-open");
+          toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+      }
+      if (bookBtn) {
+        bookBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (sid && window.SalonBooking) {
+            window.SalonBooking.open({ serviceId: sid });
+          }
+        });
+      }
+    });
+  }
+
+  function initSalonMosaic() {
+    const root = document.querySelector(".sq-salon-detail__mosaic");
+    if (!root || root.classList.contains("sq-salon-detail__mosaic--placeholder")) return;
+    const shots = Array.from(root.querySelectorAll(".sq-salon-detail__mosaic-shot"));
+    if (shots.length <= 1) return;
+    let index = 0;
+    const dots = Array.from(root.querySelectorAll("[data-mosaic-dot]"));
+    const setIndex = (i) => {
+      index = (i + shots.length) % shots.length;
+      shots.forEach((el, n) => el.classList.toggle("is-active", n === index));
+      dots.forEach((el, n) => el.classList.toggle("is-active", n === index));
+    };
+    shots.forEach((el, n) => {
+      el.addEventListener("click", () => setIndex(n));
+    });
+    root.querySelector("[data-mosaic-prev]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      setIndex(index - 1);
+    });
+    root.querySelector("[data-mosaic-next]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      setIndex(index + 1);
+    });
+    dots.forEach((el) => {
+      el.addEventListener("click", () => {
+        const n = Number(el.getAttribute("data-mosaic-dot"));
+        if (!Number.isNaN(n)) setIndex(n);
       });
     });
   }
@@ -785,11 +1013,8 @@
       activeCategory === "all"
         ? cfg.services
         : cfg.services.filter((s) => s.categoryId === activeCategory);
-    gridEl.innerHTML = list.map((s) => buildServiceCardHtml(s)).join("");
-    bindServiceCardClicks(gridEl, () => {
-      renderServicesGrid();
-      handleSalonPageServiceSelection();
-    });
+    gridEl.innerHTML = list.map((s) => buildSalonPageServiceCardHtml(s)).join("");
+    bindSalonPageServiceCards(gridEl);
     renderSalonPageSelectionUI();
   }
 
@@ -858,7 +1083,13 @@
     const taxPct = Number(cfg.tax) || 0;
     const taxAmount = (sub * taxPct) / 100;
     const withTaxNum = parseFloat((taxAmount + sub).toFixed(2));
-    const discount = Number(state.couponDiscount) || 0;
+    if (state.applyLoyalty && Number(state.loyaltyPercent) > 0) {
+      state.loyaltyDiscount = parseFloat(
+        (((Number(sub) || 0) * Number(state.loyaltyPercent)) / 100).toFixed(2)
+      );
+    }
+    const discount =
+      (Number(state.couponDiscount) || 0) + (Number(state.loyaltyDiscount) || 0);
     const totalAfter = Math.max(0, withTaxNum - discount);
     state.withoutTax = Number(sub.toFixed(2));
     state.total = Number(totalAfter.toFixed(2));
@@ -903,8 +1134,15 @@
     if (state.couponId && state.couponDiscount > 0) {
       body.couponId = String(state.couponId);
     }
+    if (state.applyLoyalty && state.loyaltyDiscount > 0) {
+      body.applyLoyalty = true;
+    }
     if (state.afroDemand?.id || state.afroDemand?._id) {
       body.demandId = String(state.afroDemand.id || state.afroDemand._id);
+    }
+    if (state.policyAccepted) {
+      body.policyAccepted = true;
+      body.policyAcceptText = state.policyAcceptText || "";
     }
     return body;
   }
@@ -929,6 +1167,7 @@
       userId: String(userId),
       amount: String(Math.floor(sub)),
       type: "2",
+      salonId: String(cfg.salonId || ""),
     });
     const res = await fetch(`/api/public/booking/coupons?${params}`);
     const data = await res.json();
@@ -950,6 +1189,7 @@
         userId,
         code,
         amount: totals.sub,
+        salonId: cfg.salonId || undefined,
       }),
     });
     const data = await res.json();
@@ -1158,6 +1398,68 @@
     };
   }
 
+  function afroFieldVisible(field, answers) {
+    const when = field && field.showWhen;
+    if (!when || !when.variableId) return true;
+    const val = answers[when.variableId];
+    const hasVal = val !== undefined && val !== null && val !== "";
+    if (when.notEquals !== undefined && when.notEquals !== null) {
+      return hasVal && String(val) !== String(when.notEquals);
+    }
+    if (when.equals === undefined || when.equals === null) return hasVal;
+    return String(val) === String(when.equals);
+  }
+
+  function renderAfroFieldControl(f, answers) {
+    const val = answers[f.id] != null ? String(answers[f.id]) : "";
+    if (f.type === "select" && Array.isArray(f.options)) {
+      return `<label class="sq-booking-field" data-afro-field="${escapeHtml(f.id)}">${escapeHtml(f.label)}${
+        f.required ? " *" : ""
+      }
+            <select name="${escapeHtml(f.id)}" ${f.required ? "required" : ""}>
+              <option value="">—</option>
+              ${f.options
+                .map(
+                  (o) =>
+                    `<option value="${escapeHtml(o)}" ${
+                      val === String(o) ? "selected" : ""
+                    }>${escapeHtml(o)}</option>`
+                )
+                .join("")}
+            </select></label>`;
+    }
+    if (f.type === "boolean") {
+      return `<label class="sq-afro-accept" data-afro-field="${escapeHtml(f.id)}"><input type="checkbox" name="${escapeHtml(
+        f.id
+      )}" value="oui" ${val === "oui" ? "checked" : ""} /> <span>${escapeHtml(f.label)}</span></label>`;
+    }
+    return `<label class="sq-booking-field" data-afro-field="${escapeHtml(f.id)}">${escapeHtml(f.label)}${
+      f.required ? " *" : ""
+    }
+          <input name="${escapeHtml(f.id)}" value="${escapeHtml(val)}" ${f.required ? "required" : ""} /></label>`;
+  }
+
+  function collectAfroFormAnswers(form) {
+    const answers = {};
+    const addons = [];
+    form.querySelectorAll("[name]").forEach((el) => {
+      if (el.name === "__photoFile") return;
+      if (el.name === "addons" || el.name === "addons[]") {
+        if (el.checked) addons.push(String(el.value));
+        return;
+      }
+      if (el.type === "checkbox") {
+        if (el.checked) answers[el.name] = el.value || "oui";
+        return;
+      }
+      if (el.value !== undefined && el.value !== "") {
+        answers[el.name] = String(el.value);
+      }
+    });
+    if (addons.length) answers.addons = addons;
+    return answers;
+  }
+
   function renderStepAfroConfig() {
     hideBookingStickyBar();
     const primary = getPrimaryProjectService();
@@ -1167,9 +1469,10 @@
     }
     const schema = primary.meta.configSchema || [];
     const requirePhoto = Boolean(primary.meta.requirePhoto);
+    const addonDefs = primary.meta.addonDefs || [];
     const name = primary.service?.name || primary.meta.name || "";
 
-    if (!schema.length && !requirePhoto) {
+    if (!schema.length && !requirePhoto && !addonDefs.length) {
       stepsEl.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("loading"))}</p>`;
       createAfroDemandFromAnswers({}, [])
         .then(() => renderStepAfroQuote())
@@ -1181,62 +1484,155 @@
       return;
     }
 
-    const fieldsHtml = schema
-      .map((f) => {
-        if (f.type === "select" && Array.isArray(f.options)) {
-          return `<label class="sq-booking-field">${escapeHtml(f.label)}${f.required ? " *" : ""}
-            <select name="${escapeHtml(f.id)}" ${f.required ? "required" : ""}>
-              <option value="">—</option>
-              ${f.options
-                .map((o) => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`)
-                .join("")}
-            </select></label>`;
-        }
-        if (f.type === "boolean") {
-          return `<label class="sq-afro-accept"><input type="checkbox" name="${escapeHtml(f.id)}" value="oui" /> <span>${escapeHtml(f.label)}</span></label>`;
-        }
-        return `<label class="sq-booking-field">${escapeHtml(f.label)}${f.required ? " *" : ""}
-          <input name="${escapeHtml(f.id)}" ${f.required ? "required" : ""} /></label>`;
-      })
-      .join("");
+    if (!state.afroPrecisionFormOpen) {
+      stepsEl.innerHTML = `
+        <p class="sq-booking-step__lead">${escapeHtml(t("afroPrecisionChoiceTitle"))}</p>
+        <p class="sq-booking-step__hint">${escapeHtml(
+          tFmt("afroPrecisionChoiceHint", "__NAME__", name)
+        )}</p>
+        <p class="sq-booking-step__hint">${escapeHtml(name)}</p>
+        <button type="button" class="sq-booking-btn" id="btnAfroAddPrecision">${escapeHtml(
+          t("afroPrecisionAdd")
+        )}</button>
+        <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnAfroSkipPrecision">${escapeHtml(
+          t("afroPrecisionSkip")
+        )}</button>
+        <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnAfroBackSvcChoice">${escapeHtml(
+          t("back")
+        )}</button>
+      `;
+      document.getElementById("btnAfroAddPrecision").onclick = () => {
+        state.afroPrecisionFormOpen = true;
+        state.afroSkipPrecision = false;
+        renderStepAfroConfig();
+      };
+      document.getElementById("btnAfroSkipPrecision").onclick = () => {
+        clearAfroQuote();
+        state.afroSkipPrecision = true;
+        afterServicesContinue();
+      };
+      document.getElementById("btnAfroBackSvcChoice").onclick = () => {
+        clearAfroQuote();
+        renderStepServices();
+      };
+      if (stepsEl) stepsEl.scrollTop = 0;
+      return;
+    }
 
-    const photoHtml = requirePhoto
-      ? `<label class="sq-booking-field">${escapeHtml(t("afroPhotoLabel"))}
-          <input type="url" name="__photoUrl" placeholder="https://" /></label>
-         <p class="sq-booking-step__hint">${escapeHtml(t("afroPhotoHint"))}</p>`
-      : `<label class="sq-booking-field">${escapeHtml(t("afroPhotoOptional"))}
-          <input type="url" name="__photoUrl" placeholder="https://" /></label>`;
+    const answers = { ...(state.afroAnswers || {}) };
+    const visibleSchema = schema.filter((f) => afroFieldVisible(f, answers));
+    const fieldsHtml = visibleSchema.map((f) => renderAfroFieldControl(f, answers)).join("");
+    const addonDefs = primary.meta.addonDefs || [];
+    const selectedAddons = Array.isArray(answers.addons) ? answers.addons.map(String) : [];
+    const addonsHtml = addonDefs.length
+      ? `<fieldset class="sq-afro-addons"><legend>${escapeHtml(
+          t("afroAddonsTitle") || "Options"
+        )}</legend>${addonDefs
+          .map((a) => {
+            const checked = selectedAddons.includes(String(a.id)) ? "checked" : "";
+            const priceBit =
+              Number(a.addPrice) > 0
+                ? ` (+${escapeHtml(cfg.currency)}${Number(a.addPrice).toFixed(0)})`
+                : "";
+            const minBit =
+              Number(a.addMinutes) > 0 ? ` · +${Number(a.addMinutes)} min` : "";
+            return `<label class="sq-afro-addon"><input type="checkbox" name="addons" value="${escapeHtml(
+              String(a.id)
+            )}" ${checked} /> <span>${escapeHtml(a.label || a.id)}${priceBit}${minBit}</span></label>`;
+          })
+          .join("")}</fieldset>`
+      : "";
+    const materials = primary.meta.materials;
+    const materialsHtml = materials
+      ? `<p class="sq-booking-step__hint">${escapeHtml(
+          materials.packs
+            ? `Matières : ${materials.packs}`
+            : materials.note ||
+              (materials.salonProvides
+                ? "Mèches fournies par le salon"
+                : materials.clientBrings
+                  ? "Cliente apporte ses mèches"
+                  : "")
+        )}</p>`
+      : "";
+
+    const photoHtml = `<label class="sq-booking-field">${escapeHtml(
+      requirePhoto ? t("afroPhotoLabel") : t("afroPhotoOptional")
+    )}${requirePhoto ? " *" : ""}
+        <input type="file" name="__photoFile" id="afroPhotoFile" accept="image/*" capture="environment" ${
+          requirePhoto ? "required" : ""
+        } />
+      </label>
+      <div id="afroPhotoPreview" class="sq-afro-photo-preview sq-afro-photo-preview--hidden" aria-live="polite"></div>
+      <p class="sq-booking-step__hint">${escapeHtml(t("afroPhotoHint"))}</p>`;
 
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(t("afroConfigTitle"))}</p>
       <p class="sq-booking-step__hint">${escapeHtml(tFmt("afroConfigHint", "__NAME__", name))}</p>
       <form id="afroConfigForm" class="sq-afro-form">
         ${fieldsHtml}
+        ${addonsHtml}
+        ${materialsHtml}
         ${photoHtml}
         <button type="submit" class="sq-booking-btn">${escapeHtml(t("afroSeeQuote"))}</button>
       </form>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnAfroBackSvc">${escapeHtml(t("back"))}</button>
     `;
     document.getElementById("btnAfroBackSvc").onclick = () => {
-      clearAfroQuote();
-      renderStepServices();
+      state.afroPrecisionFormOpen = false;
+      renderStepAfroConfig();
     };
-    document.getElementById("afroConfigForm").onsubmit = async (e) => {
+    const form = document.getElementById("afroConfigForm");
+    const photoInput = document.getElementById("afroPhotoFile");
+    const previewEl = document.getElementById("afroPhotoPreview");
+    photoInput?.addEventListener("change", () => {
+      const file = photoInput.files && photoInput.files[0];
+      if (!previewEl) return;
+      if (!file || !file.type.startsWith("image/")) {
+        previewEl.innerHTML = "";
+        previewEl.classList.add("sq-afro-photo-preview--hidden");
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      previewEl.innerHTML = `<img src="${url}" alt="" class="sq-afro-photo-preview__img" />`;
+      previewEl.classList.remove("sq-afro-photo-preview--hidden");
+    });
+    form.querySelectorAll("select, input").forEach((el) => {
+      if (el.name === "__photoFile") return;
+      el.addEventListener("change", () => {
+        const next = collectAfroFormAnswers(form);
+        const before = schema
+          .map((f) => afroFieldVisible(f, state.afroAnswers || {}))
+          .join(",");
+        const after = schema.map((f) => afroFieldVisible(f, next)).join(",");
+        state.afroAnswers = next;
+        if (before !== after) renderStepAfroConfig();
+      });
+    });
+    form.onsubmit = async (e) => {
       e.preventDefault();
-      const fd = new FormData(e.target);
-      const answers = {};
-      fd.forEach((v, k) => {
-        if (k === "__photoUrl") return;
-        if (v) answers[k] = String(v);
-      });
+      const nextAnswers = collectAfroFormAnswers(form);
       schema.forEach((f) => {
-        if (f.type === "boolean" && answers[f.id] == null) answers[f.id] = "non";
+        if (!afroFieldVisible(f, nextAnswers)) {
+          delete nextAnswers[f.id];
+          return;
+        }
+        if (f.type === "boolean" && nextAnswers[f.id] == null) nextAnswers[f.id] = "non";
       });
-      const photoRaw = String(fd.get("__photoUrl") || "").trim();
-      const photoUrls = photoRaw ? [photoRaw] : [];
+      const file = photoInput?.files && photoInput.files[0];
+      if (requirePhoto && !file) {
+        showBookingNotice("error", t("afroPhotoRequired"), () => renderStepAfroConfig());
+        return;
+      }
       stepsEl.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("loading"))}</p>`;
       try {
-        await createAfroDemandFromAnswers(answers, photoUrls);
+        let photoUrls = [];
+        if (file) {
+          stepsEl.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("afroPhotoUploading"))}</p>`;
+          photoUrls = [await uploadAfroInspirationPhoto(file)];
+        }
+        state.afroAnswers = nextAnswers;
+        await createAfroDemandFromAnswers(nextAnswers, photoUrls);
         renderStepAfroQuote();
       } catch (err) {
         showBookingNotice("error", err.message || t("genericError"), () =>
@@ -1245,6 +1641,20 @@
       }
     };
     if (stepsEl) stepsEl.scrollTop = 0;
+  }
+
+  async function uploadAfroInspirationPhoto(file) {
+    const body = new FormData();
+    body.append("photo", file);
+    const res = await fetch("/api/public/demand/upload-photo", {
+      method: "POST",
+      body,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.status || !data.url) {
+      throw new Error(data.message || t("afroPhotoUploadFailed"));
+    }
+    return String(data.url);
   }
 
   function renderStepServices() {
@@ -1379,7 +1789,11 @@
       <h3 class="sq-booking-slots-title">${escapeHtml(t("availableSlots"))}</h3>
       <div id="slotGroups" class="sq-slot-groups"></div>
       <p id="slotPickHint" class="sq-slot-pick-hint${state.slotPickHint ? "" : " sq-slot-pick-hint--hidden"}">${escapeHtml(state.slotPickHint)}</p>
-      <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>${escapeHtml(t("continue"))}</button>
+      <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>${escapeHtml(
+        state.manageReschedule
+          ? t("manageRescheduleConfirm") || "Confirmer le nouveau créneau"
+          : t("continue")
+      )}</button>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackExp">${escapeHtml(t("back"))}</button>
     `;
 
@@ -1534,8 +1948,62 @@
       };
     }
 
-    document.getElementById("btnBackExp").onclick = backFromDateTime;
-    btnNext.onclick = renderStepContact;
+    document.getElementById("btnBackExp").onclick = () => {
+      if (state.manageReschedule) {
+        state.manageReschedule = null;
+        closeModal();
+        return;
+      }
+      backFromDateTime();
+    };
+    btnNext.onclick = async () => {
+      if (state.manageReschedule) {
+        const { bookingId, token, expertId } = state.manageReschedule;
+        if (!state.date || !state.timeSlots?.length) return;
+        btnNext.disabled = true;
+        try {
+          const res = await fetch("/api/public/booking/reschedule", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              bookingId,
+              token,
+              date: state.date,
+              startTime: state.timeSlots[0],
+              expertId: expertId || state.expertId,
+            }),
+          });
+          const data = await res.json();
+          if (!data.status) {
+            btnNext.disabled = false;
+            showBookingNotice("error", data.message || t("genericError"), () =>
+              renderStepDateTime()
+            );
+            return;
+          }
+          state.manageReschedule = null;
+          stepsEl.innerHTML = `
+            <div class="sq-booking-notice sq-booking-notice--success">
+              <p class="sq-booking-notice__message">${escapeHtml(
+                data.message || "Créneau mis à jour"
+              )}</p>
+              <p>${escapeHtml(String(data.booking?.date || state.date))} · ${escapeHtml(
+                String(data.booking?.startTime || state.timeSlots[0])
+              )}</p>
+              <button type="button" class="sq-booking-btn" id="btnBookingDone">${escapeHtml(
+                t("afroClose")
+              )}</button>
+            </div>`;
+          document.getElementById("btnBookingDone").onclick = closeModal;
+          void loadUpcomingBookingsBanner();
+        } catch (e) {
+          btnNext.disabled = false;
+          showBookingNotice("error", e.message || t("genericError"));
+        }
+        return;
+      }
+      renderStepContact();
+    };
     refreshMonthUi();
     loadSlots();
   }
@@ -1553,7 +2021,13 @@
       html += `<p>${escapeHtml(cfg.copy.taxLabel)} : ${escapeHtml(cfg.currency)}${totals.tax.toFixed(2)}</p>`;
     }
     if (totals.discount > 0) {
-      html += `<p class="sq-booking-summary__discount">${escapeHtml(cfg.copy.discount)} : −${escapeHtml(cfg.currency)}${totals.discount.toFixed(2)}</p>`;
+      const loyaltyBit =
+        state.applyLoyalty && state.loyaltyDiscount > 0
+          ? ` <span class="sq-loyalty-tag">${escapeHtml(
+              state.loyaltyLabel || "Fidélité"
+            )}</span>`
+          : "";
+      html += `<p class="sq-booking-summary__discount">${escapeHtml(cfg.copy.discount)} : −${escapeHtml(cfg.currency)}${totals.discount.toFixed(2)}${loyaltyBit}</p>`;
     }
     if (totals.quoted && totals.depositAmount > 0) {
       html += `<p>${escapeHtml(t("afroDeposit"))} : <strong>${escapeHtml(cfg.currency)}${totals.depositAmount.toFixed(2)}</strong></p>`;
@@ -1729,6 +2203,20 @@
         )
       : cfg.copy.confirmBooking;
 
+    const pol = cfg.cancellationPolicy || {};
+    const policyBlock = pol.enabled
+      ? `<label class="sq-policy-accept"><input type="checkbox" id="bkPolicyAccept" ${
+          state.policyAccepted ? "checked" : ""
+        }> <span>${escapeHtml(
+          t("policyAcceptLabel") || cfg.copy.policyAcceptLabel || ""
+        )}</span></label>
+         <p class="sq-booking-step__hint">${escapeHtml(
+           (t("lateArrivalHint") || cfg.copy.lateArrivalHint || "")
+             .split("__M__")
+             .join(String(pol.lateArrivalMinutes ?? 15))
+         )}</p>`
+      : "";
+
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.paymentTitle)}</p>
       <div class="sq-booking-summary">${renderPriceBreakdown(totals)}</div>
@@ -1738,6 +2226,7 @@
           : ""
       }
       ${couponBlock}
+      ${policyBlock}
       <p class="sq-booking-step__label">${escapeHtml(cfg.copy.selectPayment)}</p>
       <div class="sq-payment-methods">
         ${paymentOptionsHtml || `<p class="sq-booking-step__hint">${escapeHtml(t("stripeUnavailable"))}</p>`}
@@ -1781,10 +2270,25 @@
 
     document.getElementById("btnBackContact").onclick = renderStepContact;
 
+    document.getElementById("bkPolicyAccept")?.addEventListener("change", (e) => {
+      state.policyAccepted = Boolean(e.target.checked);
+      state.policyAcceptText = t("policyAcceptLabel") || cfg.copy.policyAcceptLabel || "";
+    });
+
     document.getElementById("btnConfirm").onclick = async () => {
       const userId = state.userId;
       if (!userId) {
         showBookingNotice("error", t("sessionExpired"), () => renderStepContact());
+        return;
+      }
+
+      const pol = cfg.cancellationPolicy || {};
+      if (pol.enabled && !state.policyAccepted) {
+        showBookingNotice(
+          "error",
+          t("policyAcceptRequired") || cfg.copy.policyAcceptRequired || "",
+          () => renderStepPayment()
+        );
         return;
       }
 
@@ -1862,13 +2366,29 @@
     const pendingHint = state.afroDemand?.needsSalonReview
       ? `<p class="sq-booking-step__hint">${escapeHtml(t("afroReviewHint"))}</p>`
       : "";
-    const checklist = state.afroDemand
-      ? `<ul class="sq-afro-breakdown">
+    const checklist = (() => {
+      const primary = getPrimaryProjectService();
+      const card =
+        primary?.service?.detailCard ||
+        (cfg.services || []).find(
+          (s) => normalizeServiceId(s.id || s.serviceId) === primary?.id
+        )?.detailCard ||
+        {};
+      const must = Array.isArray(card.prepMust) ? card.prepMust : [];
+      const avoid = Array.isArray(card.prepAvoid) ? card.prepAvoid : [];
+      if (!must.length && !avoid.length) {
+        return state.afroDemand
+          ? `<ul class="sq-afro-breakdown">
           <li>${escapeHtml(t("afroPrep1"))}</li>
           <li>${escapeHtml(t("afroPrep2"))}</li>
           <li>${escapeHtml(t("afroPrep3"))}</li>
         </ul>`
-      : "";
+          : "";
+      }
+      return `<ul class="sq-afro-breakdown">${must
+        .map((x) => `<li>✓ ${escapeHtml(x)}</li>`)
+        .join("")}${avoid.map((x) => `<li>✕ ${escapeHtml(x)}</li>`).join("")}</ul>`;
+    })();
     const quoteLine =
       state.afroDemand && totals.quoted
         ? `<p>${escapeHtml(t("afroQuoteLocked"))} · ${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)} · ${totals.dur} ${escapeHtml(t("min"))}</p>
@@ -1878,11 +2398,17 @@
                : ""
            }`
         : "";
+    // Cancel / edit live in confirmation email + upcoming history — not in the booking tunnel.
+    const emailHint = `<p class="sq-booking-step__hint">${escapeHtml(
+      t("bookingCancelEmailHint") ||
+        "Un email de confirmation vous a été envoyé (lien pour annuler si besoin)."
+    )}</p>`;
     stepsEl.innerHTML = `
       <div class="sq-booking-notice sq-booking-notice--success">
         <p class="sq-booking-notice__message">${escapeHtml(t("afroConfirmUnified") || cfg.copy.bookingSuccess)}</p>
         ${bookingId ? `<p><strong>N° ${escapeHtml(String(bookingId))}</strong></p>` : ""}
         ${quoteLine}
+        ${emailHint}
         ${pendingHint}
         ${checklist ? `<p class="sq-booking-step__lead">${escapeHtml(t("afroPrepTitle"))}</p>${checklist}` : ""}
         <button type="button" class="sq-booking-btn" id="btnBookingDone">${escapeHtml(t("afroClose"))}</button>
@@ -1890,6 +2416,161 @@
     `;
     document.getElementById("btnBookingDone").onclick = closeModal;
     clearAfroQuote();
+  }
+
+  async function cancelManagedBooking(bookingId, token, evaluation) {
+    const lateWarn =
+      evaluation?.mode === "late"
+        ? `\n\n${evaluation.message || ""}`
+        : evaluation?.enabled && evaluation?.mode !== "free"
+          ? `\n\n${evaluation.message || ""}`
+          : "";
+    if (
+      !window.confirm(
+        (t("manageCancelConfirm") ||
+          "Confirmer l’annulation de cette réservation ?") + lateWarn
+      )
+    ) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/public/booking/cancel-json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId, token }),
+      });
+      const data = await res.json();
+      if (!data.status) {
+        showBookingNotice("error", data.message || t("genericError"), () =>
+          showBookingSuccess({
+            status: true,
+            data: { _id: bookingId, bookingId: "" },
+            manageToken: token,
+            evaluation,
+          })
+        );
+        return;
+      }
+      stepsEl.innerHTML = `
+        <div class="sq-booking-notice sq-booking-notice--success">
+          <p class="sq-booking-notice__message">${escapeHtml(data.message || "Réservation annulée")}</p>
+          <button type="button" class="sq-booking-btn" id="btnBookingDone">${escapeHtml(t("afroClose"))}</button>
+        </div>`;
+      document.getElementById("btnBookingDone").onclick = closeModal;
+    } catch (e) {
+      showBookingNotice("error", e.message || t("genericError"));
+    }
+  }
+
+  async function openRescheduleFlow(bookingId, token, bookingSnap) {
+    const expertId = bookingSnap?.expertId || state.expertId;
+    if (!expertId) {
+      showBookingNotice("error", t("selectExpert") || "Expert requis");
+      return;
+    }
+    state.manageReschedule = { bookingId, token, expertId: String(expertId) };
+    state.expertId = String(expertId);
+    state.date = "";
+    state.timeSlots = [];
+    state.slotPickHint = "";
+    openModal();
+    await renderStepDateTime();
+  }
+
+  async function loadUpcomingBookingsBanner() {
+    if (!state.userId || !cfg.salonId) return;
+    try {
+      const res = await fetch(
+        `/api/public/client/upcoming?salonId=${encodeURIComponent(
+          cfg.salonId
+        )}&userId=${encodeURIComponent(state.userId)}`
+      );
+      const data = await res.json();
+      if (!data.status || !Array.isArray(data.bookings) || !data.bookings.length) {
+        return;
+      }
+      let banner = document.getElementById("sqUpcomingBanner");
+      if (!banner) {
+        banner = document.createElement("div");
+        banner.id = "sqUpcomingBanner";
+        banner.className = "sq-upcoming-banner";
+        const host =
+          document.querySelector(".sq-salon-detail__page .container") ||
+          document.querySelector(".content-wrapper") ||
+          document.body;
+        host.insertBefore(banner, host.firstChild);
+      }
+      const rows = data.bookings
+        .slice(0, 3)
+        .map((b) => {
+          const ev = b.evaluation || {};
+          const actions = [];
+          if (ev.canReschedule) {
+            actions.push(
+              `<button type="button" class="sq-upcoming-banner__link" data-act="reschedule" data-id="${escapeHtml(
+                String(b._id)
+              )}" data-token="${escapeHtml(String(b.manageToken))}" data-expert="${escapeHtml(
+                String(b.expertId || "")
+              )}">${escapeHtml(t("manageReschedule") || "Modifier")}</button>`
+            );
+          }
+          if (ev.canCancel) {
+            actions.push(
+              `<button type="button" class="sq-upcoming-banner__link" data-act="cancel" data-id="${escapeHtml(
+                String(b._id)
+              )}" data-token="${escapeHtml(String(b.manageToken))}" data-mode="${escapeHtml(
+                String(ev.mode || "")
+              )}" data-msg="${escapeHtml(String(ev.message || ""))}">${escapeHtml(
+                t("manageCancel") || "Annuler"
+              )}</button>`
+            );
+          }
+          return `<li>
+            <span>${escapeHtml(String(b.date))} · ${escapeHtml(
+              String(b.startTime || "")
+            )}</span>
+            <span class="sq-upcoming-banner__acts">${actions.join(" · ")}</span>
+            ${
+              ev.message
+                ? `<small class="sq-upcoming-banner__hint">${escapeHtml(ev.message)}</small>`
+                : ""
+            }
+          </li>`;
+        })
+        .join("");
+      banner.innerHTML = `<div class="sq-upcoming-banner__inner">
+        <strong>${escapeHtml(t("upcomingTitle") || "Vos prochains rendez-vous")}</strong>
+        <ul class="sq-upcoming-banner__list">${rows}</ul>
+        <button type="button" class="sq-upcoming-banner__cta" id="sqBookNewSlot">${escapeHtml(
+          t("bookNewSlot") || "Réserver un nouveau créneau"
+        )}</button>
+      </div>`;
+      document.getElementById("sqBookNewSlot")?.addEventListener("click", () => {
+        window.SalonBooking.open({});
+      });
+      banner.querySelectorAll("[data-act]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          const token = btn.getAttribute("data-token");
+          const act = btn.getAttribute("data-act");
+          if (act === "cancel") {
+            void cancelManagedBooking(id, token, {
+              mode: btn.getAttribute("data-mode"),
+              message: btn.getAttribute("data-msg"),
+              canCancel: true,
+            });
+            openModal();
+          } else if (act === "reschedule") {
+            openModal();
+            void openRescheduleFlow(id, token, {
+              expertId: btn.getAttribute("data-expert"),
+            });
+          }
+        });
+      });
+    } catch (e) {
+      console.warn("[upcoming] load failed", e);
+    }
   }
 
   let afroDepositElements = null;
@@ -2031,7 +2712,7 @@
       if (opts.expertId && !opts.serviceId) {
         state.selectedServiceIds = [];
       } else if (opts.serviceId) {
-        toggleServiceSelection(opts.serviceId);
+        state.selectedServiceIds = [normalizeServiceId(opts.serviceId)];
       }
 
       state.date = "";
@@ -2044,7 +2725,11 @@
       destroyStripeElement();
       renderServicesGrid();
       openModal();
-      renderStepServices();
+      if (opts.serviceId && state.selectedServiceIds.length) {
+        continueFromServices();
+      } else {
+        renderStepServices();
+      }
     },
     close: closeModal,
     saveDraft: saveBookingDraft,
@@ -2053,6 +2738,7 @@
   renderExpertsRow();
   renderServiceTabs();
   renderServicesGrid();
+  initSalonMosaic();
 
   stickyMobileBtn?.addEventListener("click", () => {
     if (state.selectedServiceIds.length > 0) {
@@ -2065,13 +2751,115 @@
 
   tryResumeBooking();
 
-  void loadAfroMeta().then(() => {
+  async function startRebookFromToken(token) {
+    try {
+      const res = await fetch(`/api/public/rebook/${encodeURIComponent(token)}`);
+      const data = await res.json();
+      if (!data.status || !data.rebook) return false;
+      const rb = data.rebook;
+      const banner = document.createElement("div");
+      banner.className = "sq-rebook-banner";
+      banner.innerHTML = `<div class="sq-rebook-banner__inner">
+        <strong>${escapeHtml(rb.headline || "")}</strong>
+        <p>${escapeHtml(rb.subline || "")}</p>
+        <ul class="sq-rebook-banner__meta">
+          ${rb.expertName ? `<li>Même coiffeuse : ${escapeHtml(rb.expertName)}</li>` : ""}
+          <li>Même configuration</li>
+          <li>Nouveau créneau</li>
+          ${
+            rb.loyalty?.eligible
+              ? `<li class="sq-rebook-banner__loyalty">Fidélité : −${escapeHtml(
+                  String(rb.loyalty.percent)
+                )}% (${escapeHtml(String(rb.loyalty.priorCount))} visite${
+                  Number(rb.loyalty.priorCount) > 1 ? "s" : ""
+                })</li>`
+              : ""
+          }
+          ${
+            Array.isArray(rb.history) && rb.history.length
+              ? `<li>${rb.history.length} prestation${
+                  rb.history.length > 1 ? "s" : ""
+                } dans votre historique ici</li>`
+              : ""
+          }
+        </ul>
+        <button type="button" class="sq-rebook-banner__cta" id="sqRebookCta">${escapeHtml(
+          rb.cta || "Réserver ma dernière coiffure"
+        )}</button>
+      </div>`;
+      const host =
+        document.querySelector(".sq-salon-detail__page .container") ||
+        document.querySelector(".content-wrapper") ||
+        document.body;
+      host.insertBefore(banner, host.firstChild);
+      const go = () => {
+        state.selectedServiceIds = [normalizeServiceId(rb.serviceId)];
+        state.expertId = rb.expertId || null;
+        state.bookingFromExpert = Boolean(rb.expertId);
+        state.afroAnswers = rb.answers || {};
+        state.afroPhotoUrls = rb.photoUrls || [];
+        state.afroConfigServiceId = normalizeServiceId(rb.serviceId);
+        state.afroSkipPrecision = false;
+        state.afroPrecisionFormOpen = false;
+        if (rb.loyalty?.eligible && Number(rb.loyalty.amount) > 0) {
+          state.applyLoyalty = true;
+          state.loyaltyPercent = Number(rb.loyalty.percent) || 0;
+          state.loyaltyDiscount = Number(rb.loyalty.amount) || 0;
+          state.loyaltyLabel = rb.loyalty.label || "";
+        } else {
+          state.applyLoyalty = false;
+          state.loyaltyPercent = 0;
+          state.loyaltyDiscount = 0;
+          state.loyaltyLabel = "";
+        }
+        state.clientHistory = Array.isArray(rb.history) ? rb.history : [];
+        openModal();
+        if (needsAfroConfigStep()) {
+          void (async () => {
+            try {
+              await createAfroDemandFromAnswers(rb.answers || {}, rb.photoUrls || []);
+              renderStepAfroQuote();
+            } catch (e) {
+              console.warn("[rebook] create demand failed", e);
+              renderStepAfroConfig();
+            }
+          })();
+        } else {
+          continueFromServices();
+        }
+      };
+      document.getElementById("sqRebookCta")?.addEventListener("click", go);
+      return true;
+    } catch (e) {
+      console.warn("[rebook] load failed", e);
+      return false;
+    }
+  }
+
+  void loadAfroMeta().then(async () => {
     renderServicesGrid();
+    const wu = getWebUser();
+    if (wu?.id) {
+      state.userId = String(wu.id);
+      void loadUpcomingBookingsBanner();
+    }
     if (/[?&]flow=devis(?:&|$)/.test(location.search)) {
       setTimeout(() => {
         openModal();
         renderStepServices();
       }, 350);
+    }
+    const q = new URLSearchParams(location.search);
+    const rebookToken = q.get("rebook");
+    if (rebookToken) {
+      await startRebookFromToken(rebookToken);
+      return;
+    }
+    const sid = q.get("serviceId");
+    if (sid) {
+      setTimeout(() => {
+        window.SalonBooking.open({ serviceId: sid });
+      }, 400);
     }
   });
 

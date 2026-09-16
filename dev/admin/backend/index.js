@@ -97,6 +97,7 @@ const Attendance = require("./models/attendance.model");
 const Setting = require("./models/setting.model");
 const User = require("./models/user.model");
 const { sendAppointmentReminder } = require("./services/sms.service");
+const { processDueRebookReminders } = require("./services/rebooking.service");
 
 
 const settingJson = require("./setting");
@@ -210,6 +211,41 @@ app.get(["/blog", "/blog/", "/blog.html"], (req, res) => {
     res.status(200).sendFile(path.resolve(filePath));
   } else {
     res.status(404).send(`<h1>404 - Blog not found</h1><p><a href="/">Return to Skedisy</a></p>`);
+  }
+});
+
+// Help Center — StyleSeat-style guides (/aide + /help alias)
+app.get(["/aide", "/help", "/help/"], (req, res) => res.redirect(301, "/aide/"));
+app.get("/aide/", (req, res) => {
+  const filePath = path.join(salonportalPath, "aide", "index.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(path.resolve(filePath));
+  } else {
+    res.status(404).send(`<h1>404 - Centre d'aide introuvable</h1><p><a href="/">Retour à Skedisy</a></p>`);
+  }
+});
+app.get(["/aide/clientes", "/aide/clientes.html"], (req, res) => {
+  const filePath = path.join(salonportalPath, "aide", "clientes.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(path.resolve(filePath));
+  } else {
+    res.status(404).send(`<h1>404</h1><p><a href="/aide/">Centre d'aide</a></p>`);
+  }
+});
+app.get(["/aide/salon", "/aide/salon.html"], (req, res) => {
+  const filePath = path.join(salonportalPath, "aide", "salon.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(path.resolve(filePath));
+  } else {
+    res.status(404).send(`<h1>404</h1><p><a href="/aide/">Centre d'aide</a></p>`);
+  }
+});
+app.get(["/aide/professionnel", "/aide/professionnel.html"], (req, res) => {
+  const filePath = path.join(salonportalPath, "aide", "professionnel.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(path.resolve(filePath));
+  } else {
+    res.status(404).send(`<h1>404</h1><p><a href="/aide/">Centre d'aide</a></p>`);
   }
 });
 
@@ -328,15 +364,57 @@ app.post("/api/public/booking/validate-coupon", publicWebBooking.publicValidateC
 app.post("/api/public/booking/stripe-intent", publicWebBooking.publicCreateStripePaymentIntent);
 app.post("/api/public/booking/create", publicWebBooking.publicCreateBooking);
 app.get("/api/public/booking/cancel", publicWebBooking.publicCancelBooking);
+app.get("/api/public/booking/lifecycle", publicWebBooking.publicBookingLifecycle);
+app.post("/api/public/booking/cancel-json", publicWebBooking.publicCancelBookingJson);
+app.post("/api/public/booking/reschedule", publicWebBooking.publicRescheduleBooking);
 
 const publicAfroDemand = require("./controller/user/publicAfroDemand.controller");
+const multer = require("multer");
+const storage = require("./middleware/multer");
+const demandPhotoUpload = multer({
+  storage,
+  limits: { fileSize: 8 * 1024 * 1024 },
+});
 app.get("/api/public/demand/services", publicAfroDemand.publicListDemandServices);
 app.post("/api/public/demand/quote", publicAfroDemand.publicQuoteDemand);
 app.post("/api/public/demand/create", publicAfroDemand.publicCreateDemand);
+app.post(
+  "/api/public/demand/upload-photo",
+  demandPhotoUpload.single("photo"),
+  publicAfroDemand.publicUploadDemandPhoto
+);
 app.post("/api/public/demand/stripe-intent", publicAfroDemand.publicDemandStripeIntent);
 app.post("/api/public/demand/confirm-deposit", publicAfroDemand.publicConfirmDeposit);
 app.post("/api/public/demand/convert", publicAfroDemand.publicConvertDemand);
 app.get("/api/public/demand/:id", publicAfroDemand.publicGetDemand);
+
+const publicRebook = require("./controller/user/publicRebook.controller");
+app.get("/api/public/rebook/:token", publicRebook.publicGetRebookContext);
+
+const publicClientHistory = require("./controller/user/publicClientHistory.controller");
+app.get("/api/public/client/salon-history", publicClientHistory.publicClientSalonHistory);
+app.get("/api/public/client/upcoming", publicClientHistory.publicClientUpcoming);
+
+const publicBeautyProfile = require("./controller/user/publicBeautyProfile.controller");
+app.get("/api/public/client/beauty-profile", publicBeautyProfile.publicGetBeautyProfile);
+app.patch("/api/public/client/beauty-profile", publicBeautyProfile.publicUpdateBeautyProfile);
+app.post("/api/public/client/prep-confirm", publicBeautyProfile.publicConfirmPrep);
+
+const multerMessaging = require("multer");
+const messagingStorage = require("./middleware/multer");
+const messagingUpload = multerMessaging({ storage: messagingStorage });
+app.get("/api/public/messaging/thread", (req, res, next) => {
+  const publicMessaging = require("./controller/user/publicMessaging.controller");
+  return publicMessaging.publicGetThread(req, res, next);
+});
+app.post(
+  "/api/public/messaging/send",
+  messagingUpload.fields([{ name: "photos", maxCount: 4 }]),
+  (req, res, next) => {
+    const publicMessaging = require("./controller/user/publicMessaging.controller");
+    return publicMessaging.publicSendMessage(req, res, next);
+  }
+);
 
 const publicWebProduct = require("./controller/user/publicWebProduct.controller");
 app.get("/api/public/product/detail", publicWebProduct.publicProductDetail);
@@ -555,8 +633,9 @@ cron.schedule("0 * * * *", async () => {
       isDelete: false,
     })
       .populate("userId", "fname lname mobile")
-      .populate("salonId", "name")
-      .populate("expertId", "fname lname");
+      .populate("salonId", "name serviceIds")
+      .populate("expertId", "fname lname")
+      .populate("serviceId", "_id");
 
     console.log(`[SMS Cron] Found ${bookings.length} bookings for 24-hour SMS reminders on ${tomorrowDate}`);
 
@@ -622,8 +701,9 @@ cron.schedule("*/15 * * * *", async () => {
       isDelete: false,
     })
       .populate("userId", "fname lname mobile")
-      .populate("salonId", "name")
-      .populate("expertId", "fname lname");
+      .populate("salonId", "name serviceIds")
+      .populate("expertId", "fname lname")
+      .populate("serviceId", "_id");
 
     // Filter bookings where the start time is close to 2 hours from now
     const filteredBookings = bookings.filter((booking) => {
@@ -663,6 +743,19 @@ cron.schedule("*/15 * * * *", async () => {
     }
   } catch (error) {
     console.error("Error executing 2-hour SMS reminder cron job:", error);
+  }
+});
+
+// Protective-style rebooking nudges (StyleSeat-inspired) — daily 09:00
+cron.schedule("0 9 * * *", async () => {
+  try {
+    console.log("[Rebook Cron] Starting due rebook reminders…");
+    const result = await processDueRebookReminders(new Date());
+    console.log(
+      `[Rebook Cron] scanned=${result.scanned} sent=${result.sent} skipped=${result.skipped}`
+    );
+  } catch (error) {
+    console.error("[Rebook Cron] failed:", error);
   }
 });
 

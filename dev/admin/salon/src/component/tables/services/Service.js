@@ -98,7 +98,21 @@ const Service = () => {
               <p className="sq-service-panel__hint">{ui.servicesPage.salonListHint}</p>
             </div>
             <div className="sq-service-panel__body sq-service-panel__body--y">
-              {particular?.map((item) => (
+              {particular?.map((item) => {
+                const dc = item?.detailCard;
+                const hasDetail =
+                  Boolean(dc) &&
+                  Boolean(
+                    (dc.shortDescription && String(dc.shortDescription).trim()) ||
+                      (Array.isArray(dc.includes) && dc.includes.length) ||
+                      (Array.isArray(dc.prepMust) && dc.prepMust.length) ||
+                      (Array.isArray(dc.prepAvoid) && dc.prepAvoid.length) ||
+                      (Array.isArray(dc.addons) && dc.addons.length) ||
+                      dc.inspirationPhotoEnabled ||
+                      (dc.importantNote && String(dc.importantNote).trim()) ||
+                      (dc.depositPercent != null && dc.depositPercent !== "")
+                  );
+                return (
                 <div key={item?.id?._id || item?._id} className="sq-service-salon-item">
                   <img
                     src={item?.id?.image}
@@ -111,12 +125,29 @@ const Service = () => {
                       {setting?.currencySymbol} {item?.price} · {item?.id?.duration}{" "}
                       {ui.servicesPage.minutes}
                     </span>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        marginTop: 4,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: hasDetail ? "#1b7a3d" : "#8a6a00",
+                        background: hasDetail ? "#e8f7ee" : "#fff7e0",
+                        borderRadius: 999,
+                        padding: "2px 8px",
+                      }}
+                    >
+                      {hasDetail
+                        ? ui.servicesPage.detailCardConfigured
+                        : ui.servicesPage.detailCardEmpty}
+                    </span>
                   </div>
                   <div className="sq-service-salon-item__actions">
                     <button
                       type="button"
                       className="sq-service-salon-item__btn sq-service-salon-item__btn--edit"
-                      aria-label="Modifier"
+                      aria-label={ui.servicesPage.editService}
+                      title={ui.servicesPage.editService}
                       onClick={() =>
                         dispatch(
                           openDialog({
@@ -127,6 +158,7 @@ const Service = () => {
                               price: item?.price,
                               duration: item?.id?.duration,
                               cities: item?.allowCities || [],
+                              detailCard: item?.detailCard || null,
                             },
                           })
                         )
@@ -144,7 +176,8 @@ const Service = () => {
                     </button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

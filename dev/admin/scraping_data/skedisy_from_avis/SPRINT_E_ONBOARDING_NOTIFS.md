@@ -1,7 +1,8 @@
 # Sprint E — Onboarding + notifs + polish bookings
 
 **Statut :** livré (dev) · 2026-09-12  
-**Suite de :** `SPRINT_C_PANEL_CONFIG.md`
+**Suite de :** `SPRINT_C_PANEL_CONFIG.md`  
+**Suite plan (non codé) :** `STYLESEAT_LEARNINGS_PLAN.md` — prep forms, add-ons, politiques, Beauty Profile / rebooking en backlog L1–L2.
 
 ## Livré
 

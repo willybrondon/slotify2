@@ -30,6 +30,10 @@ const salonSchema = new mongoose.Schema(
     ],
     mobile: { type: String, default: "" },
     about: { type: String, default: "" },
+    /** Public Instagram profile URL (https://instagram.com/…) */
+    instagramUrl: { type: String, default: "" },
+    /** Allow clients to Message the salon from the public profile */
+    messagingEnabled: { type: Boolean, default: true },
 
     platformFee: { type: Number, default: 0 },
     /** Override global minSalonWalletBalance; null = use platform default */
@@ -64,6 +68,42 @@ const salonSchema = new mongoose.Schema(
     /** Auto-confirm new bookings (Planity/Fresha-style). false = expert must confirm pending */
     autoConfirmBookings: { type: Boolean, default: true },
 
+    /**
+     * No-show / late cancellation policy (StyleSeat-inspired).
+     * Free for now (commission model); later can gate behind premium.
+     */
+    cancellationPolicy: {
+      enabled: { type: Boolean, default: false },
+      lateCancelPercent: { type: Number, default: 50 },
+      noShowPercent: { type: Number, default: 100 },
+      freeCancelHours: { type: Number, default: 24 },
+      /** Minutes of grace before marking client late (display + reminders) */
+      lateArrivalMinutes: { type: Number, default: 15 },
+    },
+
+    /**
+     * Multi-visit packages (lite) — retention without full prepaid wallet.
+     * [{ id, name, description, visitCount, serviceIds[], priceHint, active }]
+     */
+    servicePackages: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: [],
+    },
+
+    /**
+     * Fidélité liée au rebooking (même presta chez le même salon).
+     * Pas de points génériques — réduction % à partir de la Nᵉ visite completed.
+     */
+    loyaltyProgram: {
+      enabled: { type: Boolean, default: false },
+      /** % off HT when rebooking the same service */
+      sameServiceRebookPercent: { type: Number, default: 10 },
+      /** Need this many completed same-service visits before discount applies (1 = 2nd visit) */
+      minCompletedCount: { type: Number, default: 1 },
+      /** Cap in currency units; 0 = no cap */
+      maxDiscountAmount: { type: Number, default: 0 },
+    },
+
     /** Salon-level payment preferences for customer bookings */
     paymentMethods: {
       acceptCash: { type: Boolean, default: true },
@@ -97,6 +137,14 @@ const salonSchema = new mongoose.Schema(
          * Absent or empty → treat as S0 (catalogue booking classique).
          */
         afroConfig: {
+          type: mongoose.Schema.Types.Mixed,
+          default: null,
+        },
+        /**
+         * Public service card (StyleSeat-inspired) — salon-owned copy.
+         * shortDescription, includes, prepMust, prepAvoid, addons, deposit, etc.
+         */
+        detailCard: {
           type: mongoose.Schema.Types.Mixed,
           default: null,
         },

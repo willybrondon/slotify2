@@ -26,6 +26,32 @@ const userSchema = new mongoose.Schema(
     longitude: { type: String, default: "" },
     salonRequestSent: { type: Boolean, default: false },
     amount: { type: Number, default: 0 }, //wallet balance
+
+    /**
+     * Beauty Profile (server) — StyleSeat-inspired client hair dossier.
+     * Synced from booking answers / salon notes; used for rebook.
+     */
+    beautyProfile: {
+      hairType: { type: String, default: "" },
+      hairLength: { type: String, default: "" },
+      density: { type: String, default: "" },
+      sensitivity: { type: String, default: "" },
+      preferences: { type: String, default: "" },
+      lastConfig: { type: mongoose.Schema.Types.Mixed, default: null },
+      lastSalonId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Salon",
+        default: null,
+      },
+      lastServiceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Service",
+        default: null,
+      },
+      inspirationPhotoUrls: [{ type: String }],
+      resultPhotoUrls: [{ type: String }],
+      updatedAt: { type: Date, default: null },
+    },
   },
   {
     timestamps: true,

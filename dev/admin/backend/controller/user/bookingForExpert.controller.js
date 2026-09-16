@@ -25,6 +25,7 @@ const {
   notifyUserPushAndInApp,
   notifyExpertPushAndInApp,
 } = require("../../services/pushNotification.service");
+const { scheduleRebookOnComplete } = require("../../services/rebooking.service");
 
 function getStatusFilter(status) {
   return getBookingListStatusFilter(status);
@@ -498,13 +499,57 @@ exports.completeBooking = async (req, res) => {
           },
         }
       ),
-      Booking.updateOne(
-        { _id: booking._id },
-        {
+      (async () => {
+        const {
+          durationMinutesFromCheckTimes,
+          syncBeautyProfileFromBooking,
+        } = require("../../services/beautyProfile.service");
+        const planned =
+          booking.plannedDurationMinutes ||
+          booking.estimatedDuration ||
+          booking.duration ||
+          null;
+        const actual =
+          durationMinutesFromCheckTimes(
+            booking.checkInTime,
+            currentTime,
+            booking.date
+          ) ||
+          (Number(req.body?.actualDurationMinutes) > 0
+            ? Number(req.body.actualDurationMinutes)
+            : null);
+        const update = {
           status: "completed",
           checkOutTime: currentTime,
+        };
+        if (planned) update.plannedDurationMinutes = planned;
+        if (actual) {
+          update.actualDurationMinutes = actual;
+          const delta = planned ? actual - Number(planned) : null;
+          if (delta != null && Math.abs(delta) >= 10) {
+            update.actualVarianceNote =
+              delta > 0
+                ? `+${delta} min vs prévu`
+                : `${delta} min vs prévu`;
+          }
         }
-      ),
+        if (req.body?.actualPrice != null) {
+          update.actualPrice = Number(req.body.actualPrice);
+        }
+        if (Array.isArray(req.body?.resultPhotoUrls)) {
+          update.resultPhotoUrls = req.body.resultPhotoUrls.slice(0, 6);
+        }
+        if (req.body?.resultPhotoNote) {
+          update.resultPhotoNote = String(req.body.resultPhotoNote).slice(0, 400);
+        }
+        await Booking.updateOne({ _id: booking._id }, update);
+        const fresh = await Booking.findById(booking._id);
+        try {
+          await syncBeautyProfileFromBooking(fresh);
+        } catch (bpErr) {
+          console.warn("[completeBooking] beauty profile:", bpErr.message);
+        }
+      })(),
       Expert.updateOne(
         { _id: salon._id, earning: { $gt: 0 } },
         {
@@ -564,6 +609,11 @@ exports.completeBooking = async (req, res) => {
         });
       } catch (notifyErr) {
         console.error("[Complete booking] push failed:", notifyErr.message);
+      }
+      try {
+        await scheduleRebookOnComplete(booking._id);
+      } catch (rebookErr) {
+        console.error("[Complete booking] rebook schedule failed:", rebookErr.message);
       }
     });
   } catch (error) {

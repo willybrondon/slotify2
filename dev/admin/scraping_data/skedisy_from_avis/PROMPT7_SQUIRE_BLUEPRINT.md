@@ -15,9 +15,13 @@
 Nous **décidons volontairement** de construire le blueprint à partir des données publiques déjà extraites.  
 Les réseaux sociaux serviront ensuite à **commercialiser**, observer les réactions, et créer une boucle d’amélioration — pas à retarder le design du wedge.
 
-**Ce que Skedisy ne sera pas :** clone Planity / Fresha / Booksy · simple agenda · marketplace · CRM générique · IA gadget.
+**Ce que Skedisy ne sera pas :** clone Planity / Fresha / Booksy / StyleSeat · simple agenda · marketplace en V1 · CRM générique · IA gadget.
 
-**Ce que Skedisy doit devenir :** le système métier quotidien qui convertit une demande Afro complexe en **prestation configurée + prix + durée + acompte**, puis en créneau tenu.
+**Ce que Skedisy doit devenir :** le système qui transforme une prestation Afro complexe en **rendez-vous parfaitement préparé** —  
+`config → prix → durée → prep → acompte → créneau → historique → rebooking`  
+(voir `STYLESEAT_LEARNINGS_PLAN.md` · roadmap L1–L4).
+
+> **MAJ 2026-09-15 :** StyleSeat (braiders + help client) intégré aux **plans** uniquement — pas d’implémentation. Le Service devient objet métier (variantes + add-ons + prep + politiques). Marketplace = L3.
 
 ---
 

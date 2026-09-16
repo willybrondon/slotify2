@@ -14,6 +14,13 @@ const couponSchema = new mongoose.Schema(
     type: { type: Number, default: 1, enum: COUPON_TYPE }, //1.wallet 2.appoinment 3.order
     discountType: { type: Number, default: 1, enum: DISCOUNT_TYPE }, //1.flat 2.percentage
     isActive: { type: Boolean, default: true },
+    /** If set, coupon only applies at this salon (marketing auto / salon promos) */
+    salonId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Salon",
+      default: null,
+      index: true,
+    },
     usedBy: [
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

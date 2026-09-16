@@ -16,6 +16,11 @@ Cette mission est donc cadrée ainsi :
 > Contenu ciblé + lecture des réactions pour alimenter le produit (wedge SQUIRE),  
 > pas un calendrier éditorial pour remplir les réseaux.
 
+**Angle produit (StyleSeat × avis — 2026-09-15) :**  
+Skedisy ne vend pas un agenda — il enlève les **micro-problèmes** autour d’une presta complexe (prix, durée, prep, mèches, acompte, rebooking).  
+Deux valeurs salon : **(1)** garder / structurer IG·WA·Google → résa préparée · **(2)** plus tard apporter des clientes (marketplace L3).  
+Canon : `STYLESEAT_LEARNINGS_PLAN.md` · `FONDATEUR_WEDGE_DECISION.md`.
+
 ---
 
 ## Mission — 3 mois — 1 000 € TTC

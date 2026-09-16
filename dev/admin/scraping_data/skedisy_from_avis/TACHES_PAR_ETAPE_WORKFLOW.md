@@ -12,13 +12,13 @@ Légende : **Existant** · **À ajouter** · **Custom salon** (toujours possible
 | Étape | Tâches clés à ajouter |
 |---|---|
 | **E0 Entrée** | Canal d’origine · reprendre presta · message salon |
-| **E1 Prestations** | Infos durée/prix · questions · photo · estimation · custom |
+| **E1 Prestations** | Infos durée/prix · questions · **add-ons** · photo · estimation · fiche inclus/prep · custom |
 | **E2 Pro** | Filtre config · junior/senior · any · custom |
 | **E3 Créneau** | Durée = estimation · plage affichée · soft-hold · custom |
 | **E4 Contact** | Mémoire config · consentement · custom |
-| **E5 Paiement** | Acompte · reste dû · annulation · custom |
-| **E6 Confirm** | Récap unifié · checklist prep · PDF · custom |
-| **P Post-résa** | Question salon · réponse cliente · jour J (retard/durée/solde) · rappels |
+| **E5 Paiement** | Acompte · reste dû · **acceptation politiques** · custom |
+| **E6 Confirm** | Récap unifié · **checklist prep** · PDF · custom |
+| **P Post-résa** | Question salon · réponse · jour J · rappels prep · **rebooking** · Beauty Profile |
 
 ---
 
@@ -53,6 +53,9 @@ Légende : **Existant** · **À ajouter** · **Custom salon** (toujours possible
 | E1.12 | Estimation prix + durée (inline, non bloquante) | Partiel / **à finaliser wording** |
 | E1.13 | Breakdown prix / durée | Partiel |
 | E1.14 | Soft pending si salon doit valider (pas de cul-de-sac) | Partiel |
+| E1.15 | **Add-ons** cochables (prix + durée) — StyleSeat | **À ajouter** (plan) |
+| E1.16 | Fiche presta structurée : inclus / avant de venir / important / politique | **À ajouter** (plan) |
+| E1.17 | Choix « Ajouter des précisions » vs continuer | Partiel |
 | E1.C | Infos / questions / photos **custom salon** | **Custom salon** |
 
 ---
@@ -141,6 +144,9 @@ Légende : **Existant** · **À ajouter** · **Custom salon** (toujours possible
 | P.8 | Jour J : ajuster **durée réelle** | Pendant / fin presta | **À ajouter** |
 | P.9 | Jour J : ajuster **solde / prix** | Fin presta | **À ajouter** |
 | P.10 | Messages custom dans rappels | Après confirm | **Custom salon** |
+| P.11 | Rappels avec **instructions prep** (J-2 / J0) — StyleSeat | Après confirm | **À ajouter** (plan) |
+| P.12 | **Rebooking** « reprendre ma dernière config » | Post-presta / échéance | **À ajouter** (plan L2) |
+| P.13 | **Beauty Profile** (préférences + historique configs) | Compte cliente / salon | **À ajouter** (plan L2) |
 
 ---
 
@@ -152,6 +158,7 @@ Le salon peut ajouter sur **n’importe quelle étape** :
 |---|---|
 | Texte info | « Prévoir 4–6 h » |
 | Question | Longueur, qui apporte les mèches |
+| Add-on | Curly ends +€ / +min |
 | Photo | Inspiration |
 | Case obligatoire | Acceptation conditions acompte |
 | Lien | IG, FAQ parking |
@@ -160,4 +167,4 @@ Ciblage : tous services **ou** liste de services · ordre · activé/désactivé
 
 ---
 
-Doc lié : `CATALOGUE_TACHES_FLOW_RESERVATION_SKEDISY.md` · `DECISION_RESERVATION_SANS_FRICTION.md`
+Doc lié : `CATALOGUE_TACHES_FLOW_RESERVATION_SKEDISY.md` · `DECISION_RESERVATION_SANS_FRICTION.md` · `STYLESEAT_LEARNINGS_PLAN.md`
