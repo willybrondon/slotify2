@@ -85,14 +85,18 @@
     }
 
     function renderSalonCard(salon) {
+        const avatar = salon.avatarImage || salon.mainImage || "";
         const realizations =
             salon.realizations && salon.realizations.length
                 ? salon.realizations
-                : salon.mainImage
-                  ? [salon.mainImage]
-                  : [];
+                : avatar
+                  ? [avatar]
+                  : salon.mainImage
+                    ? [salon.mainImage]
+                    : [];
         const salonUrl = salon.shareUrl || "#";
         const multi = realizations.length > 1;
+        const fallbackShot = avatar || salon.mainImage || "";
 
         const shotsHtml = realizations.length
             ? realizations
@@ -103,7 +107,9 @@
                           }" data-shot-index="${i}" tabindex="${i === 0 ? "0" : "-1"}">
               <img src="${escapeHtml(url)}" alt="" class="sq-salon-card-v3__shot" loading="${
                               i === 0 ? "eager" : "lazy"
-                          }" onerror="this.closest('.sq-salon-card-v3__shot-link')?.remove()">
+                          }" onerror="(function(img){var fb=${JSON.stringify(
+                              fallbackShot
+                          )};if(fb&&img.src!==fb){img.onerror=null;img.src=fb;}else{img.closest('.sq-salon-card-v3__shot-link')?.remove();}})(this)">
             </a>`
                   )
                   .join("")
@@ -122,7 +128,6 @@
            .join("")}</div>`
             : "";
 
-        const avatar = salon.avatarImage || salon.mainImage || "";
         const avatarHtml = avatar
             ? `<img src="${escapeHtml(avatar)}" alt="" class="sq-salon-card-v3__avatar-img" loading="lazy" onerror="this.parentElement.classList.add('sq-salon-card-v3__avatar--fallback')">`
             : `<span class="sq-salon-card-v3__avatar-fallback" aria-hidden="true">${escapeHtml(
@@ -137,59 +142,72 @@
                 : "";
 
         const services = Array.isArray(salon.topServices) ? salon.topServices : [];
-        let servicesHtml = "";
-        if (services.length) {
-            servicesHtml = `<ul class="sq-salon-card-v3__services">${services
-                .map((svc) => {
-                    const svcUrl = svc.id
-                        ? `${salonUrl}?serviceId=${encodeURIComponent(svc.id)}&book=1`
-                        : salonUrl;
-                    const price =
-                        svc.price != null
-                            ? `<span class="sq-salon-card-v3__svc-price">${escapeHtml(currency)}${svc.price}</span>`
+        const servicesHtml = services.length
+            ? `<ul class="sq-salon-card-v3__services">${services
+                  .map((svc) => {
+                      const svcUrl = svc.id
+                          ? `${salonUrl}?serviceId=${encodeURIComponent(svc.id)}&book=1`
+                          : salonUrl;
+                      const price =
+                          svc.price != null
+                              ? `<span class="sq-salon-card-v3__svc-price">${escapeHtml(currency)}${svc.price}</span>`
+                              : "";
+                      const dur = svc.durationLabel
+                          ? `<span class="sq-salon-card-v3__svc-dur">${escapeHtml(svc.durationLabel)}</span>`
+                          : "";
+                      const next = svc.nextAvailable
+                          ? `<span class="sq-salon-card-v3__svc-next">${escapeHtml(svc.nextAvailable)}</span>`
+                          : salon.nextAvailable
+                            ? `<span class="sq-salon-card-v3__svc-next">${escapeHtml(salon.nextAvailable)}</span>`
                             : "";
-                    return `<li><a href="${escapeHtml(svcUrl)}"><span class="sq-salon-card-v3__svc-name">${escapeHtml(
-                        svc.name
-                    )}</span>${price}</a></li>`;
-                })
-                .join("")}</ul>`;
-        }
-
-        const nextHtml = salon.nextAvailable
-            ? `<p class="sq-salon-card-v3__next">${escapeHtml(salon.nextAvailable)}</p>`
-            : "";
-        const addressHtml = salon.address
-            ? `<p class="sq-salon-card-v3__address">${escapeHtml(salon.address)}</p>`
-            : "";
-        const distHtml =
-            salon.distance != null
-                ? `<span class="sq-salon-card-v3__dist">${salon.distance.toFixed(1)} km</span>`
-                : "";
-        const priceHtml =
-            salon.minPrice != null
-                ? `<span class="sq-salon-card-v3__from">${escapeHtml(priceFromLabel)} ${escapeHtml(
-                      currency
-                  )}${salon.minPrice}</span>`
-                : "";
+                      return `<li>
+            <a class="sq-salon-card-v3__svc" href="${escapeHtml(svcUrl)}">
+              <span class="sq-salon-card-v3__svc-name">${escapeHtml(svc.name)}</span>
+              ${dur}
+              ${price}
+              ${next}
+            </a>
+          </li>`;
+                  })
+                  .join("")}</ul>`
+            : salon.minPrice != null
+              ? `<p class="sq-salon-card-v3__from">${escapeHtml(priceFromLabel)} ${escapeHtml(
+                    currency
+                )}${salon.minPrice}</p>`
+              : "";
 
         return `
-      <article class="salon-card sq-salon-card-v3" data-salon-id="${escapeHtml(salon._id)}">
-        <div class="sq-salon-card-v3__media">
-          <div class="sq-salon-card-v3__shots">${shotsHtml}</div>
-          ${carouselNav}
+    <article class="salon-card sq-salon-card-v2 sq-salon-card-v3" data-salon-id="${escapeHtml(
+        salon._id
+    )}">
+      <div class="sq-salon-card-v3__media${multi ? " sq-salon-card-v3__media--carousel" : ""}${
+            realizations.length ? "" : " sq-salon-card-v2__media--fallback"
+        }" data-carousel ${
+            multi ? `data-carousel-count="${realizations.length}" data-carousel-index="0"` : ""
+        }>
+        ${shotsHtml}
+        ${carouselNav}
+      </div>
+      <div class="sq-salon-card-v3__body">
+        <div class="sq-salon-card-v3__identity">
           <a href="${escapeHtml(salonUrl)}" class="sq-salon-card-v3__avatar">${avatarHtml}</a>
-        </div>
-        <div class="sq-salon-card-v3__body">
-          <div class="sq-salon-card-v3__title-row">
-            <h3 class="sq-salon-card-v3__name"><a href="${escapeHtml(salonUrl)}">${escapeHtml(salon.name)}</a></h3>
+          <div class="sq-salon-card-v3__identity-text">
+            <h3 class="salon-card-name sq-salon-card-v3__name">
+              <a href="${escapeHtml(salonUrl)}">${escapeHtml(salon.name)}</a>
+            </h3>
+            ${
+                salon.address
+                    ? `<p class="salon-card-address sq-salon-card-v3__address">${escapeHtml(
+                          salon.address
+                      )}</p>`
+                    : ""
+            }
             ${ratingHtml}
           </div>
-          <div class="sq-salon-card-v3__meta">${priceHtml}${distHtml}</div>
-          ${addressHtml}
-          ${nextHtml}
-          ${servicesHtml}
         </div>
-      </article>`;
+        ${servicesHtml}
+      </div>
+    </article>`;
     }
 
     function bindCarousels() {

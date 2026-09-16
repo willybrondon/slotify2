@@ -120,11 +120,8 @@ const DAY_SHORT_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const formatDurationLabel = (minutes, language = "fr") => {
   const m = Number(minutes) || 0;
   if (m <= 0) return "";
-  if (m < 60) return language === "fr" ? `${m} min` : `${m} min`;
-  const h = Math.floor(m / 60);
-  const rest = m % 60;
-  if (rest === 0) return language === "fr" ? `${h} h` : `${h} hr`;
-  return language === "fr" ? `${h} h ${rest}` : `${h} hr ${rest}m`;
+  // StyleSeat-style: always minutes ("15 Mins", "120 Mins")
+  return language === "fr" ? `${m} min` : `${m} Mins`;
 };
 
 const normalizeOpenTime = (openTime) => {
@@ -199,19 +196,19 @@ const getNextAvailabilityHint = (salonTime, language = "fr") => {
     const clock = formatBookClock(slotMins, language);
     if (offset === 0) {
       return language === "fr"
-        ? `Réserver aujourd’hui ${clock}`
-        : `Book today ${clock}`;
+        ? `Aujourd’hui, ${clock}`
+        : `Book Today, ${clock}`;
     }
     if (offset === 1) {
       return language === "fr"
-        ? `Réserver demain ${clock}`
-        : `Book tomorrow ${clock}`;
+        ? `Demain, ${clock}`
+        : `Book Tomorrow, ${clock}`;
     }
     const short =
       language === "fr" ? DAY_SHORT_FR[d.getDay()] : DAY_SHORT_EN[d.getDay()];
     return language === "fr"
-      ? `Réserver ${short} ${clock}`
-      : `Book ${short} ${clock}`;
+      ? `${short} ${clock}`
+      : `Book ${short}, ${clock}`;
   }
   return "";
 };
@@ -233,9 +230,12 @@ const pickSalonRealizations = (salon, avatar) => {
   (salon.image || []).forEach(push);
   push(salon.heroImage);
   push(salon.mainImage);
-  // Gallery for carousel — keep as many realization shots as available (cap 12)
+  // Prefer realization gallery (exclude avatar), else reuse salon photo
   let shots = pool.filter((u) => u !== avatar);
-  if (!shots.length) shots = pool.slice();
+  if (!shots.length) {
+    if (avatar) shots = [avatar];
+    else shots = pool.slice();
+  }
   return shots.slice(0, 12);
 };
 
@@ -486,13 +486,17 @@ const fetchExpertsForCategory = async ({
 };
 
 const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) => {
+  const avatar = salon.avatarImage || salon.mainImage || "";
   const realizations = salon.realizations?.length
     ? salon.realizations
-    : salon.mainImage
-      ? [salon.mainImage]
-      : [];
+    : avatar
+      ? [avatar]
+      : salon.mainImage
+        ? [salon.mainImage]
+        : [];
   const salonUrl = salon.shareUrl || "#";
   const multi = realizations.length > 1;
+  const fallbackShot = avatar || salon.mainImage || "";
 
   const shotsHtml = realizations.length
     ? realizations
@@ -503,7 +507,9 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
             }" data-shot-index="${i}" tabindex="${i === 0 ? "0" : "-1"}">
               <img src="${escapeHtml(url)}" alt="" class="sq-salon-card-v3__shot" loading="${
               i === 0 ? "eager" : "lazy"
-            }" onerror="this.closest('.sq-salon-card-v3__shot-link')?.remove()">
+            }" onerror="(function(img){var fb=${JSON.stringify(
+              fallbackShot
+            )};if(fb&&img.src!==fb){img.onerror=null;img.src=fb;}else{img.closest('.sq-salon-card-v3__shot-link')?.remove();}})(this)">
             </a>`
         )
         .join("")
@@ -520,7 +526,6 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
          .join("")}</div>`
     : "";
 
-  const avatar = salon.avatarImage || salon.mainImage || "";
   const avatarHtml = avatar
     ? `<img src="${escapeHtml(avatar)}" alt="" class="sq-salon-card-v3__avatar-img" loading="lazy" onerror="this.parentElement.classList.add('sq-salon-card-v3__avatar--fallback')">`
     : `<span class="sq-salon-card-v3__avatar-fallback" aria-hidden="true">${escapeHtml(
@@ -554,7 +559,8 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
           return `<li>
             <a class="sq-salon-card-v3__svc" href="${escapeHtml(svcUrl)}">
               <span class="sq-salon-card-v3__svc-name">${escapeHtml(svc.name)}</span>
-              <span class="sq-salon-card-v3__svc-meta">${dur}${price}</span>
+              ${dur}
+              ${price}
               ${next}
             </a>
           </li>`;

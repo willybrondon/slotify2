@@ -1369,8 +1369,8 @@ exports.serveSalonWebPage = async (req, res) => {
             <div class="container">
                 ${salonCoverHtml}
 
-                <div class="sq-salon-detail__head">
-                    <div class="sq-salon-detail__meta">
+                <div class="sq-salon-detail__head content-grid">
+                    <div class="sq-salon-detail__meta main-content">
                         <div class="sq-salon-detail__identity">
                             <div class="sq-salon-detail__avatar">${avatarHtml}</div>
                             <div class="sq-salon-detail__identity-text">
@@ -1379,20 +1379,14 @@ exports.serveSalonWebPage = async (req, res) => {
                                 ${salonAddressBlock}
                             </div>
                         </div>
-                        </div>
-                    <aside class="sq-salon-detail__aside sidebar-content">
-                        ${bookingCardHtml}
-                    </aside>
-        </div>
-        
-                <div class="sq-salon-detail__body content-grid">
-                    <div class="main-content">
                         ${staffHtml}
                         ${servicesHtml}
                         ${productsHtml}
                         ${reviewsHtml}
                     </div>
-                    <div class="sq-salon-detail__rail" aria-hidden="true"></div>
+                    <aside class="sq-salon-detail__aside sidebar-content">
+                        ${bookingCardHtml}
+                    </aside>
                 </div>
             </div>
         </div>
