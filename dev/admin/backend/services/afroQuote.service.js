@@ -280,6 +280,36 @@ const KNOTLESS_S2_DEMO_CONFIG = {
   depositPolicy: { enabled: true, type: "percent", value: 30 },
 };
 
+/** Public detailCard seeded with Knotless demo (success checklist + addons) */
+const KNOTLESS_DETAIL_CARD = {
+  shortDescription:
+    "Knotless braids — devis selon longueur, finesse et mèches. Options curly ends, human hair, takedown, lavage.",
+  includes: ["Nattes knotless", "Finition soignée", "Conseils d’entretien"],
+  prepMust: [
+    "Cheveux lavés, séchés et démêlés (pas de gel / huile lourde)",
+    "Si vous apportez les mèches : quantité et couleur OK (sinon le salon fournit)",
+    "Confirmer / envoyer une photo d’inspiration",
+    "Prévoir une durée longue (boisson, charge téléphone, repas léger)",
+    "Arriver à l’heure (retard = impact créneau / finition)",
+  ],
+  prepAvoid: [
+    "Huile, leave-in ou gel lourds la veille",
+    "Arriver avec cheveux sales ou emmêlés",
+    "Changer de modèle sans photo le jour J",
+  ],
+  inspirationPhotoEnabled: true,
+  addons: [
+    { id: "curly_ends", label: "Curly ends", addPrice: 30, addMinutes: 30 },
+    { id: "human_hair", label: "Human hair", addPrice: 80, addMinutes: 15 },
+    { id: "takedown", label: "Takedown", addPrice: 45, addMinutes: 45 },
+    { id: "lavage", label: "Lavage", addPrice: 20, addMinutes: 20 },
+  ],
+  materials: KNOTLESS_S2_DEMO_CONFIG.materials,
+  prepFamilyId: "braids_knotless",
+  depositPercent: 30,
+  importantNote: "Créneau long : prévoir 4h+ selon longueur / finesse.",
+};
+
 module.exports = {
   getSalonServiceEntry,
   getAfroConfig,
@@ -289,4 +319,5 @@ module.exports = {
   resolveAddonCatalog,
   normalizeAddonList,
   KNOTLESS_S2_DEMO_CONFIG,
+  KNOTLESS_DETAIL_CARD,
 };

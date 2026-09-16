@@ -115,6 +115,19 @@
         });
     }
 
+    window.skedisyHomeMap = {
+        setSalons: function (salons) {
+            if (!mapInstance) initMap();
+            refreshMarkers(Array.isArray(salons) ? salons : []);
+            setTimeout(function () {
+                if (mapInstance) mapInstance.invalidateSize();
+            }, 200);
+        },
+        invalidate: function () {
+            if (mapInstance) mapInstance.invalidateSize();
+        },
+    };
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

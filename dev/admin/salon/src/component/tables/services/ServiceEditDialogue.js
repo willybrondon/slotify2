@@ -67,6 +67,7 @@ const ServiceEditDialogue = () => {
     addons: "",
     importantNote: "",
     depositPercent: "",
+    prepBufferMinutes: "",
     prepFamilyId: "",
     recommendedProductIds: [],
   });
@@ -124,18 +125,23 @@ const ServiceEditDialogue = () => {
         selectedCities: formattedSelectedCities,
       });
       const dc = dialogueData?.detailCard || {};
+      const afro = dialogueData?.afroConfig || {};
       setDetail({
         shortDescription: dc.shortDescription || "",
         includes: linesToText(dc.includes),
         prepMust: linesToText(dc.prepMust),
         prepAvoid: linesToText(dc.prepAvoid),
         inspirationPhotoEnabled: Boolean(dc.inspirationPhotoEnabled),
-        addons: addonsToText(dc.addons),
+        addons: addonsToText(dc.addons || afro.addonDefs),
         importantNote: dc.importantNote || "",
         depositPercent:
           dc.depositPercent === null || dc.depositPercent === undefined
             ? ""
             : String(dc.depositPercent),
+        prepBufferMinutes:
+          afro.prepBufferMinutes === null || afro.prepBufferMinutes === undefined
+            ? ""
+            : String(afro.prepBufferMinutes),
         prepFamilyId: dc.prepFamilyId || "",
         recommendedProductIds: Array.isArray(dc.recommendedProductIds)
           ? dc.recommendedProductIds.map(String)
@@ -290,6 +296,10 @@ const ServiceEditDialogue = () => {
             importantNote: detail.importantNote,
             depositPercent:
               detail.depositPercent === "" ? null : Number(detail.depositPercent),
+            prepBufferMinutes:
+              detail.prepBufferMinutes === ""
+                ? undefined
+                : Number(detail.prepBufferMinutes),
             prepFamilyId: detail.prepFamilyId || null,
             recommendedProductIds: selectedProducts.map((p) => p.id).slice(0, 12),
           },
@@ -502,7 +512,21 @@ const ServiceEditDialogue = () => {
                 }
               />
             </div>
-            <div className="col-md-8 mb-3 d-flex align-items-center justify-content-between p-3 rounded" style={{ background: "#f8f9fa" }}>
+            <div className="col-md-4 mb-3">
+              <ExInput
+                type="number"
+                value={detail.prepBufferMinutes}
+                label={ui.servicesPage.prepBufferMinutes}
+                placeholder="15"
+                onChange={(e) =>
+                  setDetail({ ...detail, prepBufferMinutes: e.target.value })
+                }
+              />
+              <p style={{ fontSize: 12, color: "#666" }}>
+                {ui.servicesPage.prepBufferMinutesHint}
+              </p>
+            </div>
+            <div className="col-12 mb-3 d-flex align-items-center justify-content-between p-3 rounded" style={{ background: "#f8f9fa" }}>
               <span style={{ fontWeight: 600 }}>{ui.servicesPage.inspirationPhoto}</span>
               <ToggleSwitch
                 value={detail.inspirationPhotoEnabled}

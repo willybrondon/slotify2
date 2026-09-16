@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { openDialog } from "../../../redux/slice/dialogueSlice";
 import CancelBookingDialog from "./CancelBookingDialog";
 import CancleDetails from "./CancleDetails";
+import ResultPhotosDialog from "./ResultPhotosDialog";
 import { col } from "../../../constants/tableHeaders";
 import { SKEDISY_SALON_UI as ui } from "../../../constants/skedisyUiCopy";
 
@@ -203,9 +204,25 @@ const Booking = () => {
       Header: col.status,
       Cell: ({ row }) =>
         row?.status === "completed" ? (
-          <div className="d-flex justify-content-center">
-            <div className="me-2 mt-1 dot-status bg-success"> </div>
-            <span>{st.completed}</span>
+          <div className="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+            <div className="d-flex justify-content-center">
+              <div className="me-2 mt-1 dot-status bg-success"> </div>
+              <span>{st.completed}</span>
+            </div>
+            <button
+              type="button"
+              className="text-white p12-x p4-y fs-12 br-5"
+              style={{
+                backgroundColor: "#111",
+                cursor: "pointer",
+                border: "none",
+              }}
+              onClick={() =>
+                dispatch(openDialog({ type: "resultPhotos", data: row }))
+              }
+            >
+              {ui.booking.resultPhotosBtn}
+            </button>
           </div>
         ) : row?.status === "confirm" ? (
           <div className="d-flex justify-content-center">
@@ -295,6 +312,7 @@ const Booking = () => {
       {dialogue && dialogueType === "cancel" && (
         <CancleDetails setData={setData} data={data} />
       )}
+      {dialogue && dialogueType === "resultPhotos" && <ResultPhotosDialog />}
 
       <div className="row">
         <div className="col-2">

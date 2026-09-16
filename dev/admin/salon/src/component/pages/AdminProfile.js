@@ -514,7 +514,15 @@ export const AdminProfile = () => {
                     </p>
                   </div>
                 </div>
-                <div className="row mt-2">
+                <div className="row mt-3">
+                  <div className="col-12">
+                    <h5 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>
+                      {portalCopy.socialSectionTitle}
+                    </h5>
+                    <p style={{ fontSize: 13, color: "#666", marginBottom: 12 }}>
+                      {portalCopy.socialSectionHint}
+                    </p>
+                  </div>
                   <div className="col-12">
                     <ExInput
                       type={`text`}

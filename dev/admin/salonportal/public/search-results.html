@@ -142,10 +142,6 @@
             <i class="fas fa-sliders-h" aria-hidden="true"></i>
             <span data-translate="searchResults.filter">Filtrer</span>
           </button>
-          <div class="sq-category-discover__view-toggle" role="group">
-            <button type="button" class="sq-view-btn sq-view-btn--active" id="btnListView" data-translate="searchResults.listView">Liste</button>
-            <button type="button" class="sq-view-btn" id="btnMapView" data-translate="searchResults.mapView">Carte</button>
-          </div>
         </div>
       </div>
 
@@ -173,13 +169,13 @@
         </div>
       </div>
 
-      <div class="sq-category-discover__main sq-category-discover__main--list" id="categoryMain">
-        <div id="categoryMap" class="sq-category-discover__map" aria-hidden="true"></div>
+      <div class="sq-category-discover__main sq-category-discover__main--split" id="categoryMain">
         <div class="sq-category-discover__list-wrap">
-          <div class="salons-grid sq-salons-grid--3" id="salonsGrid">
+          <div class="salons-grid sq-salons-grid--split" id="salonsGrid">
             <p class="sq-home-discovery-loading" data-translate="homeProduct.salonsLoading">Chargement des salons…</p>
           </div>
         </div>
+        <div id="categoryMap" class="sq-category-discover__map" aria-hidden="false"></div>
       </div>
     </div>
   </main>

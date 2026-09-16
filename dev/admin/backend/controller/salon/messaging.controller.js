@@ -23,10 +23,22 @@ exports.listConversations = async (req, res) => {
       return res.status(401).json({ status: false, message: "Unauthorized" });
     }
 
-    const conversations = await Conversation.find({ salonId })
-      .sort({ lastMessageAt: -1 })
-      .limit(100)
-      .lean();
+    let conversations = [];
+    try {
+      conversations = await Conversation.find({ salonId })
+        .sort({ lastMessageAt: -1 })
+        .limit(100)
+        .lean();
+    } catch (dbErr) {
+      // Collection / index missing on older deploys — soft empty list
+      console.warn("[listConversations] soft-fail", dbErr.message);
+      return res.status(200).json({
+        status: true,
+        conversations: [],
+        unreadTotal: 0,
+        message: "Messaging not fully initialized yet",
+      });
+    }
 
     const userIds = conversations.map((c) => c.userId);
     const users = await User.find({ _id: { $in: userIds } })

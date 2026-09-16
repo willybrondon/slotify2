@@ -11,8 +11,6 @@
     const categoryStats = document.getElementById("categoryStats");
     const categorySearchMessage = document.getElementById("categorySearchMessage");
     const categoryMain = document.getElementById("categoryMain");
-    const btnListView = document.getElementById("btnListView");
-    const btnMapView = document.getElementById("btnMapView");
     const mapEl = document.getElementById("categoryMap");
     const filterBtn = document.getElementById("btnFilter");
     const filterPanel = document.getElementById("filterPanel");
@@ -177,7 +175,7 @@
               : "";
 
         return `
-    <article class="salon-card sq-salon-card-v2 sq-salon-card-v3" data-salon-id="${escapeHtml(
+    <article class="salon-card sq-salon-card-v2 sq-salon-card-v3 sq-salon-card-v3--split" data-salon-id="${escapeHtml(
         salon._id
     )}">
       <div class="sq-salon-card-v3__media${multi ? " sq-salon-card-v3__media--carousel" : ""}${
@@ -328,21 +326,6 @@
         markersLayer = L.layerGroup().addTo(mapInstance);
         refreshMapMarkers();
         setTimeout(() => mapInstance.invalidateSize(), 200);
-    }
-
-    function setViewMode(mode) {
-        if (!categoryMain) return;
-        const isMap = mode === "map";
-        categoryMain.classList.toggle("sq-category-discover__main--map", isMap);
-        categoryMain.classList.toggle("sq-category-discover__main--list", !isMap);
-        if (mapEl) mapEl.setAttribute("aria-hidden", isMap ? "false" : "true");
-        btnListView?.classList.toggle("sq-view-btn--active", !isMap);
-        btnMapView?.classList.toggle("sq-view-btn--active", isMap);
-        if (isMap) {
-            initMap();
-            refreshMapMarkers();
-            setTimeout(() => mapInstance?.invalidateSize(), 300);
-        }
     }
 
     function requestLocation() {
@@ -508,13 +491,12 @@
         setTimeout(() => fetchResults(), 50);
     });
 
-    btnListView?.addEventListener("click", () => setViewMode("list"));
-    btnMapView?.addEventListener("click", () => setViewMode("map"));
-
     updateStats();
     updateSearchMessage(cfg.initialSearchCity);
     renderSalons();
     renderExperts();
+    initMap();
+    if (mapEl) mapEl.setAttribute("aria-hidden", "false");
     requestLocation().then(() => {
         if (clientCoords.lat != null) fetchResults();
     });

@@ -47,11 +47,18 @@ exports.publicListDemandServices = async (req, res) => {
           image: svc.image,
           basePrice: entry.price,
           baseDuration: afro?.baseDurationMinutes || svc.duration,
+          prepBufferMinutes: Math.max(0, Number(afro?.prepBufferMinutes) || 0),
           complexityTier: tier,
           requirePhoto: Boolean(afro?.requirePhoto),
           configSchema: afro?.configSchema || [],
           addonDefs: addons,
           materials: afro?.materials || entry.detailCard?.materials || null,
+          prepMust: Array.isArray(entry.detailCard?.prepMust)
+            ? entry.detailCard.prepMust.slice(0, 5)
+            : [],
+          prepAvoid: Array.isArray(entry.detailCard?.prepAvoid)
+            ? entry.detailCard.prepAvoid.slice(0, 5)
+            : [],
           depositPolicy: afro?.depositPolicy || { enabled: false },
           usesProjectFlow: tier !== "S0" && Boolean(afro),
         };

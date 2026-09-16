@@ -282,8 +282,18 @@ app.get(["/salon/claim", "/salon/rejoindre", "/rejoindre"], serveSalonOnboarding
 
 // Public web route for salon pages (for sharing and deep linking)
 // New format: /salon/slug-shortId (e.g., /salon/coiffure-beaute-brasil-6885e2)
+// Never return HTML for panel API clients (key/Authorization) — that caused
+// "API unreachable (404 HTML)" when a route was missing.
 const salonController = require("./controller/user/salon.controller");
-app.get("/salon/:slugWithId", salonController.serveSalonWebPage);
+app.get("/salon/:slugWithId", function (req, res, next) {
+  if (req.headers.key || req.headers.authorization) {
+    return res.status(404).json({
+      status: false,
+      message: `API route not found: ${req.method} ${req.path}`,
+    });
+  }
+  return salonController.serveSalonWebPage(req, res, next);
+});
 
 // Public web route for category pages
 // New format: /category/category-name-shortId (e.g., /category/body-care-spa-68af94)
@@ -399,6 +409,8 @@ const publicBeautyProfile = require("./controller/user/publicBeautyProfile.contr
 app.get("/api/public/client/beauty-profile", publicBeautyProfile.publicGetBeautyProfile);
 app.patch("/api/public/client/beauty-profile", publicBeautyProfile.publicUpdateBeautyProfile);
 app.post("/api/public/client/prep-confirm", publicBeautyProfile.publicConfirmPrep);
+app.get("/p/:token", publicBeautyProfile.servePrepConfirmPage);
+app.get("/api/public/client/prep-confirm/:token", publicBeautyProfile.servePrepConfirmPage);
 
 const multerMessaging = require("multer");
 const messagingStorage = require("./middleware/multer");
@@ -661,6 +673,9 @@ cron.schedule("0 * * * *", async () => {
 
             if (result.success) {
               booking.smsReminder24hSent = true;
+              if (result.prepChecklistIncluded) {
+                booking.smsPrepChecklistSent = true;
+              }
               await booking.save();
               console.log(`24h SMS reminder sent successfully for booking ${booking.bookingId}`);
             } else {
@@ -838,16 +853,19 @@ if (fs.existsSync(salonIndexPath)) {
   app.use("/salonPanel", express.static(salonPath)); // Handle /salonPanel/ (capital P)
   app.use("/SalonPanel", express.static(salonPath)); // Handle /SalonPanel/ (both capital)
   
-  // Direct route for salon panel (all case variations)
-  app.get("/salonpanel/*", function (req, res) {
+  // SPA fallback — never swallow API-looking requests as HTML (panel clients send key/Authorization)
+  const salonPanelSpaFallback = function (req, res) {
+    if (req.headers.key || req.headers.authorization) {
+      return res.status(404).json({
+        status: false,
+        message: `API route not found: ${req.method} ${req.path}`,
+      });
+    }
     res.status(200).sendFile(salonIndexPath);
-  });
-  app.get("/salonPanel/*", function (req, res) {
-    res.status(200).sendFile(salonIndexPath);
-  });
-  app.get("/SalonPanel/*", function (req, res) {
-    res.status(200).sendFile(salonIndexPath);
-  });
+  };
+  app.get("/salonpanel/*", salonPanelSpaFallback);
+  app.get("/salonPanel/*", salonPanelSpaFallback);
+  app.get("/SalonPanel/*", salonPanelSpaFallback);
 } else {
   // Salon panel not built - show helpful error message
   console.warn(`[Salon Panel] Salon panel not found at ${salonIndexPath}. Please build and deploy the salon frontend.`);

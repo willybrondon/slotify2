@@ -196,18 +196,18 @@ const getNextAvailabilityHint = (salonTime, language = "fr") => {
     const clock = formatBookClock(slotMins, language);
     if (offset === 0) {
       return language === "fr"
-        ? `Aujourd’hui, ${clock}`
+        ? `Réservez aujourd’hui, ${clock}`
         : `Book Today, ${clock}`;
     }
     if (offset === 1) {
       return language === "fr"
-        ? `Demain, ${clock}`
+        ? `Réservez demain, ${clock}`
         : `Book Tomorrow, ${clock}`;
     }
     const short =
       language === "fr" ? DAY_SHORT_FR[d.getDay()] : DAY_SHORT_EN[d.getDay()];
     return language === "fr"
-      ? `${short} ${clock}`
+      ? `Réservez ${short}, ${clock}`
       : `Book ${short}, ${clock}`;
   }
   return "";
@@ -266,7 +266,7 @@ const buildTopServices = (salon, { language, nextAvailable }) => {
     if ((b.price || 0) !== (a.price || 0)) return (b.price || 0) - (a.price || 0);
     return (b.duration || 0) - (a.duration || 0);
   });
-  return rows.slice(0, 3);
+  return rows.slice(0, 4);
 };
 
 const formatSalonAddress = (addressDetails) => {
@@ -555,7 +555,9 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
             : "";
           const next = svc.nextAvailable
             ? `<span class="sq-salon-card-v3__svc-next">${escapeHtml(svc.nextAvailable)}</span>`
-            : "";
+            : salon.nextAvailable
+              ? `<span class="sq-salon-card-v3__svc-next">${escapeHtml(salon.nextAvailable)}</span>`
+              : "";
           return `<li>
             <a class="sq-salon-card-v3__svc" href="${escapeHtml(svcUrl)}">
               <span class="sq-salon-card-v3__svc-name">${escapeHtml(svc.name)}</span>
@@ -573,7 +575,7 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
       : "";
 
   return `
-    <article class="salon-card sq-salon-card-v2 sq-salon-card-v3" data-salon-id="${escapeHtml(
+    <article class="salon-card sq-salon-card-v2 sq-salon-card-v3 sq-salon-card-v3--split" data-salon-id="${escapeHtml(
       salon._id
     )}">
       <div class="sq-salon-card-v3__media${multi ? " sq-salon-card-v3__media--carousel" : ""}${
@@ -1272,10 +1274,6 @@ exports.serveCategoryPage = async (req, res) => {
                 <i class="fas fa-sliders-h" aria-hidden="true"></i>
                 <span>${copy.filterBtn}</span>
               </button>
-              <div class="sq-category-discover__view-toggle" role="group" aria-label="Affichage">
-                  <button type="button" class="sq-view-btn sq-view-btn--active" id="btnListView" data-view="list">${copy.listView}</button>
-                  <button type="button" class="sq-view-btn" id="btnMapView" data-view="map">${copy.mapView}</button>
-              </div>
             </div>
         </div>
 
@@ -1307,14 +1305,14 @@ exports.serveCategoryPage = async (req, res) => {
           </div>
         </div>
     
-        <div class="sq-category-discover__main sq-category-discover__main--list" id="categoryMain">
-            <div id="categoryMap" class="sq-category-discover__map" aria-hidden="true"></div>
+        <div class="sq-category-discover__main sq-category-discover__main--split" id="categoryMain">
             <div class="sq-category-discover__list-wrap">
         <p class="price-disclaimer">${priceDisclaimer}</p>
-                <div class="salons-grid sq-salons-grid--3" id="salonsGrid">
+                <div class="salons-grid sq-salons-grid--split" id="salonsGrid">
             ${salonsHtml}
                 </div>
         </div>
+            <div id="categoryMap" class="sq-category-discover__map" aria-hidden="false"></div>
     </div>
 
         <section class="sq-category-discover__experts" aria-labelledby="expertsHeading">

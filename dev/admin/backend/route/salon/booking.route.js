@@ -16,6 +16,10 @@ route.post(
   "/result-photos",
   checkAccessWithSecretKey(),
   salon,
+  require("multer")({ storage: require("../../middleware/multer") }).fields([
+    { name: "photos", maxCount: 6 },
+    { name: "resultPhotos", maxCount: 6 },
+  ]),
   require("../../controller/user/publicBeautyProfile.controller").salonAttachResultPhotos
 );
 

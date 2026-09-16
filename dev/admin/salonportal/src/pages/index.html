@@ -11,12 +11,13 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="cookie-consent.css">
     <link rel="stylesheet" href="intent-hub.css">
+    <link rel="stylesheet" href="public-pages.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <script src="language.js" defer></script>
 </head>
-<body class="client-page sq-page" data-page="client">
+<body class="client-page sq-page sk-public-page" data-page="client">
     <div class="login-above-qr header-actions-above-qr">
         <a href="/professionnel/" class="btn-nav-above btn-pro-above" data-translate="nav.pro">Pro</a>
         <a href="/compte/connexion" class="btn-login-above" data-translate="nav.login">Connexion</a>
@@ -112,7 +113,7 @@
                                     <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
                                 </div>
                             </div>
-                            <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
+                            <a href="/recherche" class="sq-view-map-link" id="homeViewMapLink">
                                 <i class="fas fa-map" aria-hidden="true"></i>
                                 <span data-translate="homeProduct.viewMap">Voir la carte</span>
                             </a>
@@ -140,9 +141,15 @@
                                 <i class="fas fa-arrow-right" aria-hidden="true"></i>
                             </button>
                         </form>
+
+                        <div id="homeSearchResults" class="sq-home-search-results" hidden>
+                            <p class="sq-home-search-results__stats" id="homeSearchResultsStats"></p>
+                            <div id="homeSearchResultsGrid" class="sq-home-search-results__grid salons-grid sq-salons-grid--split"></div>
+                            <a href="/recherche" class="sq-home-search-results__more" id="homeSearchResultsMore" hidden data-translate="client.browseSalons">Parcourir les prestations</a>
+                        </div>
                     </div>
 
-                    <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search">
+                    <a href="partager-un-look.html" class="sq-share-look-banner sq-share-look-banner--hub sq-share-look-banner--below-search" id="homeShareLookBanner">
                         <span class="sq-share-look-banner__icon" aria-hidden="true"><i class="fas fa-share-from-square"></i></span>
                         <span class="sq-share-look-banner__body">
                             <strong data-translate="intentHub.captureTitle">Partager un look</strong>
@@ -151,13 +158,13 @@
                         <i class="fas fa-chevron-right sq-share-look-banner__chevron" aria-hidden="true"></i>
                     </a>
 
-                    <div class="sq-hair-strip-mount" data-hair-profile-strip></div>
+                    <div class="sq-hair-strip-mount" data-hair-profile-strip id="homeHairStrip"></div>
                 </div>
                 </div>
 
                 <aside class="sq-home-landing__map desktop-only" aria-label="Carte des salons">
                     <div id="homeSalonMap" class="sq-home-landing__map-el"></div>
-                    <a href="/recherche?view=map" class="sq-home-map-panel__link" id="homeMapPanelLink">
+                    <a href="/recherche" class="sq-home-map-panel__link" id="homeMapPanelLink">
                         <i class="fas fa-map" aria-hidden="true"></i>
                         <span data-translate="homeProduct.viewMap">Voir la carte</span>
                     </a>

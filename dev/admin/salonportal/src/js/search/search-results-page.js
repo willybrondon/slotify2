@@ -22,8 +22,6 @@
     const categoryStats = document.getElementById("categoryStats");
     const categorySearchMessage = document.getElementById("categorySearchMessage");
     const categoryMain = document.getElementById("categoryMain");
-    const btnListView = document.getElementById("btnListView");
-    const btnMapView = document.getElementById("btnMapView");
     const mapEl = document.getElementById("categoryMap");
     const filterBtn = document.getElementById("btnFilter");
     const filterPanel = document.getElementById("filterPanel");
@@ -63,34 +61,154 @@
     }
 
     function renderSalonCard(salon) {
-        const imageHtml = salon.mainImage
-            ? `<div class="sq-salon-card-v2__media"><img src="${escapeHtml(salon.mainImage)}" alt="${escapeHtml(salon.name)}" class="salon-card-image" loading="lazy" onerror="this.closest('.sq-salon-card-v2__media')?.classList.add('sq-salon-card-v2__media--fallback')"></div>`
-            : `<div class="sq-salon-card-v2__media sq-salon-card-v2__media--fallback"><div class="salon-card-image-placeholder">${escapeHtml(noImageLabel)}</div></div>`;
-        const pricePart =
-            salon.minPrice != null
-                ? `<span class="salon-card-price">${escapeHtml(priceFromLabel)} ${escapeHtml(currency)}${salon.minPrice}</span>`
-                : "";
-        const ratingPart =
+        const avatar = salon.avatarImage || salon.mainImage || "";
+        const realizations =
+            salon.realizations && salon.realizations.length
+                ? salon.realizations
+                : avatar
+                  ? [avatar]
+                  : salon.mainImage
+                    ? [salon.mainImage]
+                    : [];
+        const salonUrl = salon.shareUrl || "#";
+        const multi = realizations.length > 1;
+        const fallbackShot = avatar || salon.mainImage || "";
+
+        const shotsHtml = realizations.length
+            ? realizations
+                  .map(
+                      (url, i) =>
+                          `<a href="${escapeHtml(salonUrl)}" class="sq-salon-card-v3__shot-link${
+                              i === 0 ? " is-active" : ""
+                          }" data-shot-index="${i}" tabindex="${i === 0 ? "0" : "-1"}">
+              <img src="${escapeHtml(url)}" alt="" class="sq-salon-card-v3__shot" loading="${
+                              i === 0 ? "eager" : "lazy"
+                          }" onerror="(function(img){var fb=${JSON.stringify(
+                              fallbackShot
+                          )};if(fb&&img.src!==fb){img.onerror=null;img.src=fb;}else{img.closest('.sq-salon-card-v3__shot-link')?.remove();}})(this)">
+            </a>`
+                  )
+                  .join("")
+            : `<div class="salon-card-image-placeholder">${escapeHtml(noImageLabel)}</div>`;
+
+        const carouselNav = multi
+            ? `<button type="button" class="sq-salon-card-v3__nav sq-salon-card-v3__nav--prev" aria-label="Previous" data-carousel-prev>‹</button>
+       <button type="button" class="sq-salon-card-v3__nav sq-salon-card-v3__nav--next" aria-label="Next" data-carousel-next>›</button>
+       <div class="sq-salon-card-v3__dots" aria-hidden="true">${realizations
+           .map(
+               (_, i) =>
+                   `<span class="sq-salon-card-v3__dot${
+                       i === 0 ? " is-active" : ""
+                   }" data-dot="${i}"></span>`
+           )
+           .join("")}</div>`
+            : "";
+
+        const avatarHtml = avatar
+            ? `<img src="${escapeHtml(avatar)}" alt="" class="sq-salon-card-v3__avatar-img" loading="lazy" onerror="this.parentElement.classList.add('sq-salon-card-v3__avatar--fallback')">`
+            : `<span class="sq-salon-card-v3__avatar-fallback" aria-hidden="true">${escapeHtml(
+                  (salon.name || "?").charAt(0)
+              )}</span>`;
+
+        const ratingHtml =
             salon.review > 0
-                ? `<span class="salon-card-rating"><span class="rating-stars" aria-hidden="true">★</span> ${salon.review.toFixed(1)} (${salon.reviewCount})</span>`
-                : "";
-        const metaRow = pricePart || ratingPart ? `<div class="salon-card-meta">${pricePart}${ratingPart}</div>` : "";
-        const addressHtml = salon.address ? `<p class="salon-card-address">${escapeHtml(salon.address)}</p>` : "";
-        const distHtml =
-            salon.distance != null
-                ? `<p class="salon-card-distance">${salon.distance.toFixed(1)} km</p>`
+                ? `<span class="sq-salon-card-v3__rating"><span aria-hidden="true">★</span> ${salon.review.toFixed(1)}${
+                      salon.reviewCount ? ` (${salon.reviewCount})` : ""
+                  }</span>`
                 : "";
 
+        const services = Array.isArray(salon.topServices) ? salon.topServices : [];
+        const servicesHtml = services.length
+            ? `<ul class="sq-salon-card-v3__services">${services
+                  .map((svc) => {
+                      const svcUrl = svc.id
+                          ? `${salonUrl}?serviceId=${encodeURIComponent(svc.id)}&book=1`
+                          : salonUrl;
+                      const price =
+                          svc.price != null
+                              ? `<span class="sq-salon-card-v3__svc-price">${escapeHtml(currency)}${svc.price}</span>`
+                              : "";
+                      const dur = svc.durationLabel
+                          ? `<span class="sq-salon-card-v3__svc-dur">${escapeHtml(svc.durationLabel)}</span>`
+                          : "";
+                      const next = svc.nextAvailable
+                          ? `<span class="sq-salon-card-v3__svc-next">${escapeHtml(svc.nextAvailable)}</span>`
+                          : salon.nextAvailable
+                            ? `<span class="sq-salon-card-v3__svc-next">${escapeHtml(salon.nextAvailable)}</span>`
+                            : "";
+                      return `<li>
+            <a class="sq-salon-card-v3__svc" href="${escapeHtml(svcUrl)}">
+              <span class="sq-salon-card-v3__svc-name">${escapeHtml(svc.name)}</span>
+              ${dur}
+              ${price}
+              ${next}
+            </a>
+          </li>`;
+                  })
+                  .join("")}</ul>`
+            : salon.minPrice != null
+              ? `<p class="sq-salon-card-v3__from">${escapeHtml(priceFromLabel)} ${escapeHtml(
+                    currency
+                )}${salon.minPrice}</p>`
+              : "";
+
         return `
-      <a href="${escapeHtml(salon.shareUrl)}" class="salon-card sq-salon-card-v2" data-salon-id="${escapeHtml(salon._id)}">
-        ${imageHtml}
-        <div class="salon-card-content">
-          <h3 class="salon-card-name">${escapeHtml(salon.name)}</h3>
-          ${metaRow}
-          ${addressHtml}
-          ${distHtml}
+    <article class="salon-card sq-salon-card-v2 sq-salon-card-v3 sq-salon-card-v3--split" data-salon-id="${escapeHtml(
+        salon._id
+    )}">
+      <div class="sq-salon-card-v3__media${multi ? " sq-salon-card-v3__media--carousel" : ""}${
+            realizations.length ? "" : " sq-salon-card-v2__media--fallback"
+        }" data-carousel ${
+            multi ? `data-carousel-count="${realizations.length}" data-carousel-index="0"` : ""
+        }>
+        ${shotsHtml}
+        ${carouselNav}
+      </div>
+      <div class="sq-salon-card-v3__body">
+        <div class="sq-salon-card-v3__identity">
+          <a href="${escapeHtml(salonUrl)}" class="sq-salon-card-v3__avatar">${avatarHtml}</a>
+          <div class="sq-salon-card-v3__identity-text">
+            <h3 class="salon-card-name sq-salon-card-v3__name">
+              <a href="${escapeHtml(salonUrl)}">${escapeHtml(salon.name)}</a>
+            </h3>
+            ${
+                salon.address
+                    ? `<p class="salon-card-address sq-salon-card-v3__address">${escapeHtml(
+                          salon.address
+                      )}</p>`
+                    : ""
+            }
+            ${ratingHtml}
+          </div>
         </div>
-      </a>`;
+        ${servicesHtml}
+      </div>
+    </article>`;
+    }
+
+    function bindCarousels() {
+        salonsGrid?.querySelectorAll(".sq-salon-card-v3").forEach((card) => {
+            const links = [...card.querySelectorAll(".sq-salon-card-v3__shot-link")];
+            const dots = [...card.querySelectorAll(".sq-salon-card-v3__dot")];
+            if (links.length < 2) return;
+            let idx = 0;
+            const show = (i) => {
+                idx = (i + links.length) % links.length;
+                links.forEach((l, n) => {
+                    l.classList.toggle("is-active", n === idx);
+                    l.tabIndex = n === idx ? 0 : -1;
+                });
+                dots.forEach((d, n) => d.classList.toggle("is-active", n === idx));
+            };
+            card.querySelector("[data-carousel-prev]")?.addEventListener("click", (e) => {
+                e.preventDefault();
+                show(idx - 1);
+            });
+            card.querySelector("[data-carousel-next]")?.addEventListener("click", (e) => {
+                e.preventDefault();
+                show(idx + 1);
+            });
+        });
     }
 
     function updateStats() {
@@ -106,6 +224,7 @@
             return;
         }
         salonsGrid.innerHTML = salons.map(renderSalonCard).join("");
+        bindCarousels();
     }
 
     function refreshMapMarkers() {
@@ -147,21 +266,6 @@
         markersLayer = L.layerGroup().addTo(mapInstance);
         refreshMapMarkers();
         setTimeout(() => mapInstance.invalidateSize(), 200);
-    }
-
-    function setViewMode(mode) {
-        if (!categoryMain) return;
-        const isMap = mode === "map";
-        categoryMain.classList.toggle("sq-category-discover__main--map", isMap);
-        categoryMain.classList.toggle("sq-category-discover__main--list", !isMap);
-        if (mapEl) mapEl.setAttribute("aria-hidden", isMap ? "false" : "true");
-        btnListView?.classList.toggle("sq-view-btn--active", !isMap);
-        btnMapView?.classList.toggle("sq-view-btn--active", isMap);
-        if (isMap) {
-            initMap();
-            refreshMapMarkers();
-            setTimeout(() => mapInstance?.invalidateSize(), 300);
-        }
     }
 
     function requestLocation() {
@@ -261,9 +365,6 @@
         });
     });
 
-    btnListView?.addEventListener("click", () => setViewMode("list"));
-    btnMapView?.addEventListener("click", () => setViewMode("map"));
-
     document.addEventListener("DOMContentLoaded", () => {
         const legacySalon = params.get("salon") || "";
         const legacyService = params.get("service") || "";
@@ -276,7 +377,8 @@
         if (urlLocation && typeof window.skedisySetLocationLabel === "function") {
             window.skedisySetLocationLabel(urlLocation);
         }
-        if (params.get("view") === "map") setViewMode("map");
+        initMap();
+        if (mapEl) mapEl.setAttribute("aria-hidden", "false");
         requestLocation().then(fetchResults);
     });
 })();

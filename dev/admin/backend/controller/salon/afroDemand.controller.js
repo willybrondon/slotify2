@@ -1,7 +1,7 @@
 const Salon = require("../../models/salon.model");
 const Service = require("../../models/service.model");
 const ServiceDemand = require("../../models/serviceDemand.model");
-const { KNOTLESS_S2_DEMO_CONFIG, getAfroConfig } = require("../../services/afroQuote.service");
+const { KNOTLESS_S2_DEMO_CONFIG, KNOTLESS_DETAIL_CARD, getAfroConfig } = require("../../services/afroQuote.service");
 
 /**
  * GET /salon/demand/getAll?status=
@@ -196,6 +196,12 @@ exports.updateAfroConfig = async (req, res) => {
         entry.afroConfig = undefined;
       } else if (body.seedKnotlessDemo) {
         entry.afroConfig = { ...KNOTLESS_S2_DEMO_CONFIG };
+        entry.detailCard = {
+          ...(entry.detailCard && typeof entry.detailCard === "object"
+            ? entry.detailCard
+            : {}),
+          ...KNOTLESS_DETAIL_CARD,
+        };
       } else if (body.afroConfig !== undefined) {
         entry.afroConfig = body.afroConfig;
       } else if (body.depositPercent != null) {

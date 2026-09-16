@@ -1140,6 +1140,57 @@ body.sq-capture-mode .btn-upload:hover {
   margin: 0;
 }
 
+/* Accueil — résultats recherche StyleSeat (cards horizontales) */
+.sq-home-search-results {
+  margin-top: 1rem;
+  max-height: min(62vh, 640px);
+  overflow-y: auto;
+  padding-right: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sq-home-search-results__stats {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sk-text, #111);
+}
+
+.sq-home-search-results__grid {
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  width: 100%;
+}
+
+.sq-home-search-results__more {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--sk-brand, #c45c26);
+  text-decoration: none;
+}
+
+.sq-home-search-results__more:hover {
+  text-decoration: underline;
+}
+
+body.sq-home-search-active .sq-home-landing__left {
+  min-height: 0;
+}
+
+body.sq-home-search-active .sq-home-landing__map-el {
+  min-height: min(70vh, 720px);
+}
+
+@media (max-width: 900px) {
+  .sq-home-search-results {
+    max-height: none;
+  }
+}
+
 .sq-discovery-card {
   flex: 0 0 min(78vw, 300px);
   scroll-snap-align: start;

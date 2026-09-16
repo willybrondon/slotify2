@@ -161,6 +161,7 @@ const Service = () => {
                               duration: item?.id?.duration,
                               cities: item?.allowCities || [],
                               detailCard: item?.detailCard || null,
+                              afroConfig: item?.afroConfig || null,
                               categoryId: item?.id?.categoryId || null,
                               categoryName:
                                 item?.id?.categoryId?.nameFr ||

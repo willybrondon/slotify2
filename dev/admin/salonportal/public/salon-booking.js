@@ -1116,7 +1116,8 @@
     const useQuote =
       demand &&
       Number(demand.estimatedPrice) >= 0 &&
-      hasAcceptedAfroQuote();
+      hasAcceptedAfroQuote() &&
+      !state.afroSkipPrecision;
 
     if (useQuote) {
       sub = Number(demand.estimatedPrice) || 0;
@@ -1124,7 +1125,19 @@
     } else {
       serviceList.forEach((s) => {
         sub += Number(s.price) || 0;
-        dur += Number(s.duration) || 0;
+        const sid = normalizeServiceId(s.id || s._id);
+        const meta = state.afroByServiceId?.[sid];
+        // Skip-precision (or no quote): prefer afro baseDuration + prep buffer over catalogue minutes
+        let serviceDur = Number(s.duration) || 0;
+        if (meta) {
+          const base =
+            Number(meta.baseDuration) > 0
+              ? Number(meta.baseDuration)
+              : serviceDur;
+          const buffer = Math.max(0, Number(meta.prepBufferMinutes) || 0);
+          serviceDur = base + buffer;
+        }
+        dur += serviceDur;
       });
     }
     const taxPct = Number(cfg.tax) || 0;
@@ -2420,8 +2433,21 @@
           (s) => normalizeServiceId(s.id || s.serviceId) === primary?.id
         )?.detailCard ||
         {};
-      const must = Array.isArray(card.prepMust) ? card.prepMust : [];
-      const avoid = Array.isArray(card.prepAvoid) ? card.prepAvoid : [];
+      const meta = primary?.meta || {};
+      const must = (
+        Array.isArray(card.prepMust) && card.prepMust.length
+          ? card.prepMust
+          : Array.isArray(meta.prepMust)
+            ? meta.prepMust
+            : []
+      ).slice(0, 5);
+      const avoid = (
+        Array.isArray(card.prepAvoid) && card.prepAvoid.length
+          ? card.prepAvoid
+          : Array.isArray(meta.prepAvoid)
+            ? meta.prepAvoid
+            : []
+      ).slice(0, 5);
       if (!must.length && !avoid.length) {
         return state.afroDemand
           ? `<ul class="sq-afro-breakdown">
@@ -2803,6 +2829,26 @@
       const data = await res.json();
       if (!data.status || !data.rebook) return false;
       const rb = data.rebook;
+      const slots = Array.isArray(rb.suggestedSlots) ? rb.suggestedSlots.slice(0, 3) : [];
+      const slotsHtml = slots.length
+        ? `<div class="sq-rebook-slots" role="group" aria-label="Créneaux suggérés">
+            <p class="sq-rebook-slots__label">3 créneaux suggérés</p>
+            ${slots
+              .map(
+                (s, i) =>
+                  `<button type="button" class="sq-rebook-slot" data-rebook-slot="${i}">
+                    <strong>${escapeHtml(String(s.date || ""))}</strong>
+                    <span>${escapeHtml(String(s.time || s.startTime || ""))}</span>
+                    ${
+                      s.expertName
+                        ? `<em>${escapeHtml(String(s.expertName))}</em>`
+                        : ""
+                    }
+                  </button>`
+              )
+              .join("")}
+          </div>`
+        : "";
       const banner = document.createElement("div");
       banner.className = "sq-rebook-banner";
       banner.innerHTML = `<div class="sq-rebook-banner__inner">
@@ -2829,6 +2875,7 @@
               : ""
           }
         </ul>
+        ${slotsHtml}
         <button type="button" class="sq-rebook-banner__cta" id="sqRebookCta">${escapeHtml(
           rb.cta || "Réserver ma dernière coiffure"
         )}</button>
@@ -2838,15 +2885,30 @@
         document.querySelector(".content-wrapper") ||
         document.body;
       host.insertBefore(banner, host.firstChild);
-      const go = () => {
+
+      const applySlot = (slot) => {
+        if (!slot) return;
+        if (slot.date) state.date = String(slot.date);
+        const t = slot.time || slot.startTime;
+        if (t) {
+          state.timeSlots = [String(t)];
+        }
+        if (slot.expertId) {
+          state.expertId = String(slot.expertId);
+          state.bookingFromExpert = true;
+        }
+      };
+
+      const go = (slot) => {
         state.selectedServiceIds = [normalizeServiceId(rb.serviceId)];
-        state.expertId = rb.expertId || null;
-        state.bookingFromExpert = Boolean(rb.expertId);
+        state.expertId = (slot && slot.expertId) || rb.expertId || null;
+        state.bookingFromExpert = Boolean(state.expertId);
         state.afroAnswers = rb.answers || {};
         state.afroPhotoUrls = rb.photoUrls || [];
         state.afroConfigServiceId = normalizeServiceId(rb.serviceId);
         state.afroSkipPrecision = false;
         state.afroPrecisionFormOpen = false;
+        applySlot(slot);
         if (rb.loyalty?.eligible && Number(rb.loyalty.amount) > 0) {
           state.applyLoyalty = true;
           state.loyaltyPercent = Number(rb.loyalty.percent) || 0;
@@ -2864,7 +2926,12 @@
           void (async () => {
             try {
               await createAfroDemandFromAnswers(rb.answers || {}, rb.photoUrls || []);
-              renderStepAfroQuote();
+              if (slot?.date) {
+                // Quote accepted path then jump toward datetime with prefilled slot
+                afterServicesContinue();
+              } else {
+                renderStepAfroQuote();
+              }
             } catch (e) {
               console.warn("[rebook] create demand failed", e);
               renderStepAfroConfig();
@@ -2874,7 +2941,13 @@
           continueFromServices();
         }
       };
-      document.getElementById("sqRebookCta")?.addEventListener("click", go);
+      document.getElementById("sqRebookCta")?.addEventListener("click", () => go(null));
+      banner.querySelectorAll("[data-rebook-slot]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.getAttribute("data-rebook-slot"));
+          go(slots[idx] || null);
+        });
+      });
       return true;
     } catch (e) {
       console.warn("[rebook] load failed", e);

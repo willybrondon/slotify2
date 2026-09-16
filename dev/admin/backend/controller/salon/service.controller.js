@@ -76,18 +76,26 @@ exports.getAll = async (req, res) => {
 exports.getSalonBasedServiceForExpert = async (req, res) => {
   try {
     const salon = await Salon.findById(req.salon._id).populate({
-      path: "serviceIds",
-      populate: {
-        path: "id",
-        populate: { path: "categoryId", select: "name nameFr nameEn" },
-      },
+      path: "serviceIds.id",
+      populate: { path: "categoryId", select: "name nameFr nameEn" },
     });
 
     if (!salon) {
       return res.status(200).json({ status: false, message: "Salon Not Found" });
     }
 
-    return res.status(200).json({ status: true, data: salon.serviceIds });
+    // Keep nested shape expected by salon panel (item.id.name, allowCities, detailCard…)
+    const data = (salon.serviceIds || [])
+      .filter((entry) => entry && entry.id)
+      .map((entry) => ({
+        id: entry.id,
+        price: entry.price,
+        allowCities: entry.allowCities || [],
+        detailCard: entry.detailCard || null,
+        afroConfig: entry.afroConfig || null,
+      }));
+
+    return res.status(200).json({ status: true, data });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, message: "Internal Server Error" });
@@ -96,18 +104,15 @@ exports.getSalonBasedServiceForExpert = async (req, res) => {
 
 exports.getNotAddedServices = async (req, res) => {
   try {
-    const salon = await Salon.findById(req.salon._id).populate({
-      path: "serviceIds",
-      populate: {
-        path: "id",
-      },
-    });
+    const salon = await Salon.findById(req.salon._id).select("serviceIds.id").lean();
 
     if (!salon) {
       return res.status(200).json({ status: false, message: "Salon Not Found" });
     }
 
-    const salonServiceIds = salon.serviceIds.map((service) => service.id._id);
+    const salonServiceIds = (salon.serviceIds || [])
+      .map((service) => service?.id)
+      .filter(Boolean);
 
     const notAddedServices = await Service.find({
       _id: { $nin: salonServiceIds },

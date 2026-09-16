@@ -65,19 +65,28 @@ exports.publicUpdateBeautyProfile = async (req, res) => {
 
 /**
  * POST /api/public/client/prep-confirm
- * body: { bookingId, userId }
+ * body: { token } OR { bookingId, userId }
  */
 exports.publicConfirmPrep = async (req, res) => {
   try {
-    const { bookingId, userId } = req.body || {};
-    if (!bookingId || !userId) {
-      return res.status(400).json({ status: false, message: "bookingId and userId required" });
+    const { bookingId, userId, token } = req.body || {};
+    let booking = null;
+    if (token) {
+      booking = await Booking.findOne({
+        prepConfirmToken: String(token).trim(),
+        status: { $in: ["pending", "confirm"] },
+      });
+    } else if (bookingId && userId) {
+      booking = await Booking.findOne({
+        _id: bookingId,
+        userId,
+        status: { $in: ["pending", "confirm"] },
+      });
+    } else {
+      return res
+        .status(400)
+        .json({ status: false, message: "token or bookingId+userId required" });
     }
-    const booking = await Booking.findOne({
-      _id: bookingId,
-      userId,
-      status: { $in: ["pending", "confirm"] },
-    });
     if (!booking) {
       return res.status(404).json({ status: false, message: "Booking not found" });
     }
@@ -91,8 +100,63 @@ exports.publicConfirmPrep = async (req, res) => {
 };
 
 /**
+ * GET /p/:token — one-tap prep confirm from SMS (HTML).
+ */
+exports.servePrepConfirmPage = async (req, res) => {
+  try {
+    const token = String(req.params.token || "").trim();
+    if (!token) {
+      return res.status(400).type("html").send("<p>Lien invalide.</p>");
+    }
+    const booking = await Booking.findOne({
+      prepConfirmToken: token,
+      status: { $in: ["pending", "confirm"] },
+    });
+    if (!booking) {
+      return res
+        .status(404)
+        .type("html")
+        .send(
+          `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prep</title></head><body style="font-family:system-ui;padding:2rem;text-align:center"><h1>Lien expiré</h1><p>Ce lien de confirmation n’est plus valide.</p></body></html>`
+        );
+    }
+    if (!booking.prepConfirmedAt) {
+      booking.prepConfirmedAt = new Date();
+      await booking.save();
+    }
+    return res.type("html").send(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Préparation confirmée — Skedisy</title>
+  <style>
+    body{font-family:DM Sans,system-ui,sans-serif;background:#f7f3ef;color:#111;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{background:#fff;border-radius:16px;padding:28px 24px;max-width:420px;box-shadow:0 8px 30px rgba(0,0,0,.08);text-align:center}
+    h1{font-size:1.35rem;margin:0 0 8px}
+    p{color:#555;line-height:1.45;margin:0 0 16px}
+    .ok{display:inline-flex;width:56px;height:56px;border-radius:50%;background:#e8f7ee;color:#1b7a3d;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="ok" aria-hidden="true">✓</div>
+    <h1>Préparation confirmée</h1>
+    <p>Merci ! Le salon a bien reçu votre confirmation pour le RDV de demain.</p>
+    <p style="font-size:13px;color:#888">Vous pouvez fermer cette page.</p>
+  </div>
+</body>
+</html>`);
+  } catch (error) {
+    console.error("[servePrepConfirmPage]", error);
+    return res.status(500).type("html").send("<p>Erreur serveur.</p>");
+  }
+};
+
+/**
  * POST /salon/booking/result-photos
- * body: { bookingId, resultPhotoUrls[], resultPhotoNote?, actualDurationMinutes?, actualPrice?, actualVarianceNote? }
+ * body (JSON or multipart): bookingId, resultPhotoUrls[], resultPhotoNote?,
+ * actualDurationMinutes?, actualPrice?, actualVarianceNote?, photos[] files
  */
 exports.salonAttachResultPhotos = async (req, res) => {
   try {
@@ -105,16 +169,45 @@ exports.salonAttachResultPhotos = async (req, res) => {
     if (!booking) {
       return res.status(404).json({ status: false, message: "Booking not found" });
     }
-    if (Array.isArray(req.body.resultPhotoUrls)) {
-      booking.resultPhotoUrls = req.body.resultPhotoUrls.slice(0, 6);
+
+    const fileList = req.files?.photos || req.files?.resultPhotos || [];
+    const uploaded = [];
+    if (Array.isArray(fileList) && fileList.length) {
+      const base = (process.env.baseURL || "").replace(/\/+$/, "");
+      fileList.slice(0, 6).forEach((f) => {
+        if (f?.path) {
+          uploaded.push(`${base}/${String(f.path).replace(/\\/g, "/")}`);
+        }
+      });
     }
+
+    let urls = [];
+    if (Array.isArray(req.body.resultPhotoUrls)) {
+      urls = req.body.resultPhotoUrls;
+    } else if (typeof req.body.resultPhotoUrls === "string" && req.body.resultPhotoUrls.trim()) {
+      try {
+        const parsed = JSON.parse(req.body.resultPhotoUrls);
+        urls = Array.isArray(parsed) ? parsed : [req.body.resultPhotoUrls];
+      } catch (e) {
+        urls = req.body.resultPhotoUrls
+          .split(/[\n,]+/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+    }
+    const merged = [...(booking.resultPhotoUrls || []), ...urls, ...uploaded]
+      .map((u) => String(u || "").trim())
+      .filter(Boolean)
+      .slice(0, 6);
+    if (merged.length) booking.resultPhotoUrls = merged;
+
     if (req.body.resultPhotoNote) {
       booking.resultPhotoNote = String(req.body.resultPhotoNote).slice(0, 400);
     }
     if (Number(req.body.actualDurationMinutes) > 0) {
       booking.actualDurationMinutes = Number(req.body.actualDurationMinutes);
     }
-    if (req.body.actualPrice != null) {
+    if (req.body.actualPrice != null && req.body.actualPrice !== "") {
       booking.actualPrice = Number(req.body.actualPrice);
     }
     if (req.body.actualVarianceNote) {

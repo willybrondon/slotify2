@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { apiInstance, apiInstanceFetch } from "../../component/api/axiosApi";
+import { apiInstance, apiInstanceFetch, buildApiUrl } from "../../component/api/axiosApi";
 import { Success } from "../../component/api/toastServices";
 import { SKEDISY_SALON_UI as ui } from "../../constants/skedisyUiCopy";
 
@@ -48,6 +48,31 @@ export const acceptPendingBooking = createAsyncThunk(
   "salon/booking/acceptPendingBooking",
   async (payload) => {
     return apiInstanceFetch.put(`salon/booking/acceptPendingBooking`, payload);
+  }
+);
+
+export const attachResultPhotos = createAsyncThunk(
+  "salon/booking/result-photos",
+  async (formData) => {
+    const url = buildApiUrl("salon/booking/result-photos");
+    const key =
+      sessionStorage.getItem("key") ||
+      (typeof window !== "undefined" && window.__SKEDISY_SALON__?.apiKey) ||
+      "";
+    const token = sessionStorage.getItem("token") || "";
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        key,
+        Authorization: token,
+      },
+      body: formData,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.status === false) {
+      throw data;
+    }
+    return data;
   }
 );
 

@@ -42,24 +42,32 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Check if salon is claimed (for newly claimed salons)
-    // Allow admin bypass using secret key for support purposes
-    const adminBypass = req.headers.key === process.env.secretKey || req.body.key === process.env.secretKey || req.query.key === process.env.secretKey;
-    
-    if (!salon.isClaimed && !adminBypass) {
-      console.log(`[Salon Login] Salon not yet claimed: ${salon.email}`);
-      return res.status(200).send({
-        status: false,
-        message: "Please claim your salon profile first using the invitation link.",
-      });
-    }
-    
-    if (!salon.isClaimed && adminBypass) {
-      console.log(`[Salon Login] Admin bypass used for unclaimed salon: ${salon.email}`);
+    // Legacy admin-created salons may have isClaimed=false after the claim feature shipped.
+    // If they can authenticate with email/password, treat them as claimed going forward.
+    if (!salon.isClaimed) {
+      const adminBypass =
+        req.headers.key === process.env.secretKey ||
+        req.body.key === process.env.secretKey ||
+        req.query.key === process.env.secretKey;
+      if (!adminBypass) {
+        console.log(`[Salon Login] Salon not yet claimed: ${salon.email}`);
+        return res.status(200).send({
+          status: false,
+          message: "Please claim your salon profile first using the invitation link.",
+        });
+      }
+      console.log(`[Salon Login] Auto-claim legacy salon on login: ${salon.email}`);
+      salon.isClaimed = true;
+      try {
+        await salon.save();
+      } catch (e) {
+        console.warn("[Salon Login] auto-claim save failed", e.message);
+      }
     }
 
+    // Keep JWT small — full salon doc blows header size / breaks some proxies (HTML 404/413)
     const payload = {
-      salon: salon,
+      salon: { _id: salon._id, email: salon.email, name: salon.name },
     };
 
     const key = process.env.JWT_SECRET;
@@ -126,23 +134,40 @@ exports.update = async (req, res) => {
     if (req.body.instagramUrl !== undefined) {
       let ig = String(req.body.instagramUrl || "").trim();
       if (ig && !/^https?:\/\//i.test(ig)) {
-        const handle = ig.replace(/^@/, "").replace(/^instagram\.com\//i, "").replace(/^\//, "");
-        ig = handle ? `https://instagram.com/${handle}` : "";
+        const handle = ig
+          .replace(/^@/, "")
+          .replace(/^(www\.)?instagram\.com\//i, "")
+          .replace(/^\//, "")
+          .split(/[/?#]/)[0];
+        ig = handle ? `https://www.instagram.com/${handle}` : "";
       }
       salon.instagramUrl = ig;
     }
     if (req.body.facebookUrl !== undefined) {
       let fb = String(req.body.facebookUrl || "").trim();
       if (fb && !/^https?:\/\//i.test(fb)) {
-        const handle = fb.replace(/^@/, "").replace(/^(www\.)?facebook\.com\//i, "").replace(/^\//, "");
-        fb = handle ? `https://facebook.com/${handle}` : "";
+        if (/^\d+$/.test(fb) || /^profile\.php/i.test(fb)) {
+          fb = `https://www.facebook.com/${fb.replace(/^\//, "")}`;
+        } else {
+          const handle = fb
+            .replace(/^@/, "")
+            .replace(/^(www\.)?facebook\.com\//i, "")
+            .replace(/^(www\.)?fb\.com\//i, "")
+            .replace(/^\//, "")
+            .split(/[/?#]/)[0];
+          fb = handle ? `https://www.facebook.com/${handle}` : "";
+        }
       }
       salon.facebookUrl = fb;
     }
     if (req.body.tiktokUrl !== undefined) {
       let tt = String(req.body.tiktokUrl || "").trim();
       if (tt && !/^https?:\/\//i.test(tt)) {
-        const handle = tt.replace(/^@/, "").replace(/^(www\.)?tiktok\.com\/@?/i, "").replace(/^\//, "");
+        const handle = tt
+          .replace(/^@/, "")
+          .replace(/^(www\.)?tiktok\.com\/@?/i, "")
+          .replace(/^\//, "")
+          .split(/[/?#]/)[0];
         tt = handle ? `https://www.tiktok.com/@${handle}` : "";
       }
       salon.tiktokUrl = tt;
@@ -434,6 +459,7 @@ const cleanList = (arr, max = 5) =>
             label: String(a.label || "").trim(),
             addPrice: Number(a.addPrice) || 0,
             addMinutes: Number(a.addMinutes) || 0,
+            prepNote: a.prepNote ? String(a.prepNote).slice(0, 200) : "",
           }))
           .filter((a) => a.label)
           .slice(0, 15)
@@ -464,11 +490,29 @@ const cleanList = (arr, max = 5) =>
         : entry.detailCard?.prepFamilyId || null,
     };
 
+    // Keep afroConfig.addonDefs / prepBuffer in sync so computeQuote + tunnel use the same catalog
+    const afro = entry.afroConfig && typeof entry.afroConfig === "object"
+      ? { ...entry.afroConfig }
+      : {};
+    if (addons.length) {
+      afro.addonDefs = addons;
+    }
+    if (detailCard.prepBufferMinutes !== undefined && detailCard.prepBufferMinutes !== "") {
+      afro.prepBufferMinutes = Math.max(
+        0,
+        Math.min(120, Number(detailCard.prepBufferMinutes) || 0)
+      );
+    }
+    if (Object.keys(afro).length) {
+      entry.afroConfig = afro;
+    }
+
     await salon.save();
     return res.status(200).json({
       status: true,
       message: "Service detail card updated",
       detailCard: entry.detailCard,
+      afroConfig: entry.afroConfig || null,
     });
   } catch (error) {
     console.error("[updateServiceDetailCard]", error);

@@ -10,7 +10,13 @@ function initHomeSalonSearch() {
             || (typeof window.skedisyGetLocationLabel === 'function' ? window.skedisyGetLocationLabel() : '');
 
         if (!query && !location) {
-            window.location.href = '/recherche?view=map';
+            window.location.href = '/recherche';
+            return;
+        }
+
+        // Accueil : résultats StyleSeat horizontaux + carte (sans quitter la page)
+        if (typeof window.homeSearchSalons === 'function' && document.getElementById('homeSearchResults')) {
+            window.homeSearchSalons(query, location);
             return;
         }
 

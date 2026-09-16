@@ -17,21 +17,48 @@ exports.getInsights = async (req, res) => {
       return res.status(401).json({ status: false, message: "Unauthorized" });
     }
 
-    const [occupancy, rebook] = await Promise.all([
-      getOccupancyInsight(salon),
-      getRebookDueInsight(salon._id),
-    ]);
+    let occupancy = null;
+    let rebook = null;
+    try {
+      [occupancy, rebook] = await Promise.all([
+        getOccupancyInsight(salon),
+        getRebookDueInsight(salon._id),
+      ]);
+    } catch (e) {
+      console.warn("[marketing] insights soft-fail", e.message);
+      occupancy = {
+        dayLabel: "",
+        suggestedDiscount: 15,
+        suggestedPromoTitle: "Offre spéciale",
+        message: "Insights temporairement indisponibles",
+      };
+      rebook = { dueCount: 0, clients: [] };
+    }
 
     const base = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
     const slug = salonPublicSlug(salon);
     const publicUrl = `${base}/salon/${slug}`;
-    const loyalty = getLoyaltyProgram(salon);
+    let loyalty;
+    try {
+      loyalty = getLoyaltyProgram(salon);
+    } catch (e) {
+      loyalty = {
+        enabled: false,
+        sameServiceRebookPercent: 10,
+        minCompletedCount: 1,
+      };
+    }
 
-    const recentPromos = await Coupon.find({ salonId: salon._id })
-      .sort({ createdAt: -1 })
-      .limit(8)
-      .select("code title discountPercent expiryDate isActive createdAt")
-      .lean();
+    let recentPromos = [];
+    try {
+      recentPromos = await Coupon.find({ salonId: salon._id })
+        .sort({ createdAt: -1 })
+        .limit(8)
+        .select("code title discountPercent expiryDate isActive createdAt")
+        .lean();
+    } catch (e) {
+      console.warn("[marketing] promos soft-fail", e.message);
+    }
 
     const packages = Array.isArray(salon.servicePackages)
       ? salon.servicePackages.filter((p) => p && p.active !== false)

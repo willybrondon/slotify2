@@ -98,6 +98,9 @@ export const SKEDISY_SALON_PORTAL_COPY = {
   aboutRequired: "La description est requise.",
   aboutPhoneHint:
     "Vous pouvez y indiquer votre numéro d’appel si vous souhaitez être joint par téléphone.",
+  socialSectionTitle: "Réseaux sociaux (fiche publique)",
+  socialSectionHint:
+    "Les logos Instagram, Facebook et TikTok apparaîtront à côté de Message sur votre fiche salon.",
   instagramLabel: "Page Instagram",
   instagramHint: "URL ou @pseudo — logo Instagram sur votre fiche publique.",
   facebookLabel: "Page Facebook",

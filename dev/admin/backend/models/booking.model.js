@@ -65,6 +65,8 @@ const bookingSchema = new mongoose.Schema(
     smsPrepChecklistSent: { type: Boolean, default: false },
     /** Client confirmed prep done (optional) */
     prepConfirmedAt: { type: Date, default: null },
+    /** Opaque token for one-tap prep confirm from SMS */
+    prepConfirmToken: { type: String, default: "", index: true },
     /** Inspiration photo missing flag for checklist */
     inspirationPhotoRequired: { type: Boolean, default: false },
     inspirationPhotoUrls: [{ type: String }],

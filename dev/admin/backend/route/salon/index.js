@@ -26,8 +26,14 @@ const expertWithdrawRequest = require("./expertWithdrawRequest.route");
 const afroDemand = require("./afroDemand.route");
 const messaging = require("./messaging.route");
 const marketing = require("./marketing.route");
+const category = require("./category.route");
+const tax = require("./tax.route");
+const payment = require("./payment.route");
 
 route.use("/", salon);
+route.use("/category", category);
+route.use("/tax", tax);
+route.use("/payment", payment);
 route.use("/product", product);
 route.use("/productRequest", salonMiddleware, productRequest);
 route.use("/productCategory", salonMiddleware, productCategory);

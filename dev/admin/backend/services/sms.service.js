@@ -267,6 +267,7 @@ function buildAppointmentReminderMessage({
   bookingId,
   prepMust = [],
   prepAvoid = [],
+  prepConfirmUrl = "",
 }) {
   const first = String(customerName || "Cliente")
     .trim()
@@ -275,6 +276,7 @@ function buildAppointmentReminderMessage({
   const salon = String(salonName || "Salon").trim().slice(0, 22);
   const time = String(appointmentTime || "").trim();
   const id = String(bookingId || "").trim();
+  const confirmUrl = String(prepConfirmUrl || "").trim();
 
   // Core (no accents — normalizeForGSM7 also strips them)
   let core;
@@ -291,27 +293,46 @@ function buildAppointmentReminderMessage({
     );
   }
 
-  // Budget for prep: keep total near 1 SMS segment
+  // Budget for prep + confirm link: keep total near 1 SMS segment
   const idPart = id ? ` #${id}` : "";
   const maxTotal = 153;
+  const linkPart =
+    confirmUrl && (reminderType === "24h" || reminderType === "j1" || reminderType === "prep")
+      ? ` PrepOK ${confirmUrl}`
+      : "";
   const prepBudget = Math.max(
     0,
-    maxTotal - core.length - idPart.length - 1
+    maxTotal - core.length - idPart.length - linkPart.length - 1
   );
   const prep =
     prepBudget >= 12
-      ? buildShortPrepSnippet(prepMust, prepAvoid, Math.min(52, prepBudget))
+      ? buildShortPrepSnippet(prepMust, prepAvoid, Math.min(48, prepBudget))
       : "";
 
-  let message = prep ? `${core} ${prep}${idPart}` : `${core}${idPart}`;
+  let message = [core, prep, linkPart.trim(), idPart.trim()]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
   // Drop booking id first if still too long
   if (message.length > maxTotal && idPart) {
-    message = prep ? `${core} ${prep}` : core;
+    message = [core, prep, linkPart.trim()]
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  // Drop prep before link (link is actionable)
+  if (message.length > maxTotal && prep) {
+    message = [core, linkPart.trim()]
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
   }
   if (message.length > maxTotal) {
     message = `${message.slice(0, maxTotal - 3)}...`;
   }
-  // first name unused in ultra-short template to save chars; keep param for future
   void first;
   return message.trim();
 }
@@ -360,6 +381,32 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
       booking
     );
 
+    // One-tap prep confirm link for J-1
+    let prepConfirmUrl = "";
+    let prepChecklistIncluded = false;
+    if (reminderType === "24h" || reminderType === "j1" || reminderType === "prep") {
+      const crypto = require("crypto");
+      if (!booking.prepConfirmToken) {
+        booking.prepConfirmToken = crypto.randomBytes(12).toString("hex");
+        try {
+          await booking.save();
+        } catch (e) {
+          console.warn("[SMS Reminder] prepConfirmToken save failed", e.message);
+        }
+      }
+      if (booking.prepConfirmToken && !booking.prepConfirmedAt) {
+        const base = (process.env.baseURL || "https://skedisy.com").replace(
+          /\/+$/,
+          ""
+        );
+        prepConfirmUrl = `${base}/p/${booking.prepConfirmToken}`;
+        prepChecklistIncluded = true;
+      }
+      if (prepMust.length || prepAvoid.length) {
+        prepChecklistIncluded = true;
+      }
+    }
+
     let message = buildAppointmentReminderMessage({
       reminderType,
       customerName,
@@ -369,10 +416,14 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
       bookingId,
       prepMust,
       prepAvoid,
+      prepConfirmUrl,
     });
 
-    // J-1 checklist: photo / prep (soft, short)
-    if (reminderType === "24h" || reminderType === "j1") {
+    // Soft checklist text only if no URL room / no confirm link
+    if (
+      (reminderType === "24h" || reminderType === "j1") &&
+      !prepConfirmUrl
+    ) {
       const checks = [];
       const hasPhoto =
         Array.isArray(booking.inspirationPhotoUrls) &&
@@ -386,6 +437,7 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
       if (checks.length && message.length < 120) {
         const extra = checks.join(" / ").slice(0, 40);
         message = `${message} ${extra}`.trim().slice(0, 153);
+        prepChecklistIncluded = true;
       }
     }
 
@@ -397,6 +449,7 @@ async function sendAppointmentReminder(booking, reminderType = "24h") {
 
     if (result.success) {
       console.log(`[SMS Reminder] Successfully sent ${reminderType} reminder to ${user.mobile} for booking ${booking.bookingId || booking._id}`);
+      result.prepChecklistIncluded = prepChecklistIncluded;
     } else {
       console.error(`[SMS Reminder] Failed to send ${reminderType} reminder to ${user.mobile} for booking ${booking.bookingId || booking._id}: ${result.error}`);
     }
