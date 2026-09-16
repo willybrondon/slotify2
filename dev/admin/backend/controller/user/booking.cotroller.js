@@ -35,6 +35,148 @@ const {
   notifyUserPushAndInApp,
 } = require("../../services/pushNotification.service");
 const { getPlatformTax } = require("../../lib/platformTax");
+const {
+  computeQuote,
+  getSalonServiceEntry,
+  salonServiceRefId,
+} = require("../../services/afroQuote.service");
+
+/** Match salon.serviceIds entry whether `id` is ObjectId or populated Service. */
+function matchSalonServiceEntries(salon, serviceIdStrings) {
+  const wanted = new Set((serviceIdStrings || []).map(String));
+  return (salon?.serviceIds || []).filter((service) => {
+    const sid = salonServiceRefId(service);
+    return sid && wanted.has(sid);
+  });
+}
+
+function parseSalonClock(value) {
+  if (value == null || !String(value).trim()) return null;
+  const m = moment(
+    String(value).trim(),
+    ["hh:mm A", "h:mm A", "HH:mm", "H:mm", "hh:mm:ss A"],
+    true
+  );
+  return m.isValid() ? m : null;
+}
+
+/**
+ * Aligné sur generateTimeSlots : créneau dans [open, close),
+ * et hors pause [breakStart, breakEnd) si isBreak.
+ */
+function isBookingSlotWithinSalonHours(slotStr, salonTime) {
+  const slot = parseSalonClock(slotStr);
+  const open = parseSalonClock(salonTime?.openTime);
+  const close = parseSalonClock(salonTime?.closedTime);
+  if (!slot || !open || !close) return false;
+  if (slot.isBefore(open) || !slot.isBefore(close)) return false;
+
+  if (salonTime?.isBreak === true) {
+    const breakStart = parseSalonClock(salonTime.breakStartTime);
+    const breakEnd = parseSalonClock(salonTime.breakEndTime);
+    if (
+      breakStart &&
+      breakEnd &&
+      !slot.isBefore(breakStart) &&
+      slot.isBefore(breakEnd)
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+async function applyClientAnswersPricing({
+  salon,
+  serviceIds,
+  servicesData,
+  answers,
+  selectedProductIds,
+  bodyDuration,
+  totalServicePrice,
+  totalDuration,
+}) {
+  let price = totalServicePrice;
+  let duration = totalDuration;
+  const firstSid = Array.isArray(serviceIds) ? serviceIds[0] : serviceIds;
+  const entry = getSalonServiceEntry(salon, firstSid);
+  const serviceDoc =
+    (servicesData || []).find((s) => String(s._id) === String(firstSid)) ||
+    (servicesData || [])[0] ||
+    null;
+
+  const safeAnswers =
+    answers && typeof answers === "object" ? answers : {};
+
+  if (entry) {
+    const quoted = computeQuote({
+      salon,
+      service: serviceDoc,
+      serviceId: firstSid,
+      answers: safeAnswers,
+      photoUrls: [],
+      skipRequired: true,
+    });
+    if (quoted?.ok && quoted.quote) {
+      price = Number(quoted.quote.estimatedPrice) || price;
+      duration =
+        Number(quoted.quote.estimatedDurationMinutes) > 0
+          ? Number(quoted.quote.estimatedDurationMinutes)
+          : duration;
+    } else {
+      const { resolveAddonCatalog } = require("../../services/afroQuote.service");
+      const catalog = resolveAddonCatalog(entry, entry.afroConfig || null);
+      const chosen = Array.isArray(safeAnswers.addons)
+        ? safeAnswers.addons.map(String)
+        : [];
+      catalog.forEach((a) => {
+        if (!chosen.includes(String(a.id))) return;
+        price += Number(a.addPrice) || 0;
+        duration += Number(a.addMinutes) || 0;
+      });
+      const prepBuf = Math.max(
+        0,
+        Number(entry?.afroConfig?.prepBufferMinutes) || 0
+      );
+      if (prepBuf) duration += prepBuf;
+    }
+  }
+
+  const pids = new Set(
+    [
+      ...(Array.isArray(safeAnswers.selectedProductIds)
+        ? safeAnswers.selectedProductIds
+        : []),
+      ...(Array.isArray(selectedProductIds) ? selectedProductIds : []),
+    ].map(String)
+  );
+  if (pids.size) {
+    const Product = require("../../models/product.model");
+    const products = await Product.find({
+      _id: { $in: Array.from(pids) },
+      isDelete: { $ne: true },
+    })
+      .select("price isOutOfStock salon")
+      .lean();
+    products.forEach((p) => {
+      if (p.isOutOfStock) return;
+      // Produits recommandés de la fiche (même salon, ou legacy sans salon)
+      if (
+        p.salon &&
+        String(p.salon) !== String(salon._id)
+      ) {
+        return;
+      }
+      price += Number(p.price) || 0;
+    });
+  }
+
+  if (Number(bodyDuration) > 0) {
+    duration = Number(bodyDuration);
+  }
+
+  return { totalServicePrice: price, totalDuration: duration };
+}
 
 // Initialize SendGrid if API key is available
 if (process.env.SENDGRID_API_KEY) {
@@ -418,12 +560,10 @@ exports.newBooking = async (req, res, next) => {
     const services = req.body.serviceId.split(",").map(s => s.trim());
     const servicesDataForCheck = await Service.find({ _id: { $in: services } });
     const serviceIdStrings = services.map(id => id.toString());
-    const matchedServicesForCheck = salon.serviceIds.filter((service) => {
-      return service.id && service.id._id && serviceIdStrings.includes(service.id._id.toString());
-    });
+    const matchedServicesForCheck = matchSalonServiceEntries(salon, serviceIdStrings);
     let totalServicePriceForCheck = 0;
     matchedServicesForCheck.forEach((service) => {
-      totalServicePriceForCheck += parseInt(service.price);
+      totalServicePriceForCheck += Number(service.price) || 0;
     });
 
     const requiredBalance = computeRequiredSalonWalletBalance({
@@ -714,31 +854,10 @@ exports.newBooking = async (req, res, next) => {
       return res.status(200).send({ status: false, message: "Salon time not found" });
     }
 
-    const salonOpenTime = moment(salonTime.openTime, "hh:mm A");
-    const salonCloseTime = moment(salonTime.closedTime, "hh:mm A");
-    const breakStartTime = moment(salonTime.breakStartTime, "hh:mm A");
-    const breakEndTime = moment(salonTime.breakEndTime, "hh:mm A");
-
-    const isWithinSalonHours = timeArray.every((time) => {
-      const bookingStartTime = moment(String(time).trim(), "hh:mm A");
-      return (
-        bookingStartTime.isValid() &&
-        bookingStartTime.isSameOrAfter(salonOpenTime) &&
-        bookingStartTime.isSameOrBefore(salonCloseTime)
-      );
-    });
-
+    const timeArrayTrimmed = timeArray.map((t) => String(t).trim()).filter(Boolean);
     if (
-      !isWithinSalonHours ||
-      timeArray.some((time) => {
-        const bookingStartTime = moment(String(time).trim(), "hh:mm A");
-        return (
-          !bookingStartTime.isValid() ||
-          bookingStartTime.isSameOrBefore(salonOpenTime) ||
-          bookingStartTime.isSameOrAfter(salonCloseTime) ||
-          (bookingStartTime.isSameOrAfter(breakStartTime) && bookingStartTime.isSameOrBefore(breakEndTime))
-        );
-      })
+      !timeArrayTrimmed.length ||
+      timeArrayTrimmed.some((time) => !isBookingSlotWithinSalonHours(time, salonTime))
     ) {
       return res.status(200).send({
         status: false,
@@ -752,7 +871,7 @@ exports.newBooking = async (req, res, next) => {
 
     booking.userId = user._id;
     booking.expertId = expert._id;
-    booking.startTime = timeArray[0];
+    booking.startTime = timeArrayTrimmed[0];
 
     const bookingDate = moment(req.body.date, "YYYY-MM-DD");
     booking.date = bookingDate.format("YYYY-MM-DD");
@@ -765,20 +884,16 @@ exports.newBooking = async (req, res, next) => {
 
     const servicesData = await Service.find({ _id: { $in: services } });
 
-    // Convert service IDs to strings for proper comparison (serviceIdStrings is already defined above)
-    const matchedServices = salon.serviceIds.filter((service) => {
-      // Convert ObjectId to string and check if it's in the requested services array
-      return service.id && service.id._id && serviceIdStrings.includes(service.id._id.toString());
-    });
+    const matchedServices = matchSalonServiceEntries(salon, serviceIdStrings);
 
     let totalServicePrice = 0;
     let totalDuration = 0;
     servicesData.forEach((service) => {
-      totalDuration += service.duration;
+      totalDuration += Number(service.duration) || 0;
     });
 
     matchedServices.forEach((service) => {
-      totalServicePrice += parseInt(service.price);
+      totalServicePrice += Number(service.price) || 0;
     });
 
     if (linkedDemand) {
@@ -787,58 +902,36 @@ exports.newBooking = async (req, res, next) => {
         Number(linkedDemand.estimatedDurationMinutes) > 0
           ? Number(linkedDemand.estimatedDurationMinutes)
           : totalDuration;
-    } else if (req.body.clientAnswers && typeof req.body.clientAnswers === "object") {
-      // Options cochées sur la fiche presta (sans devis)
+    } else if (
+      (req.body.clientAnswers && typeof req.body.clientAnswers === "object") ||
+      (Array.isArray(req.body.selectedProductIds) && req.body.selectedProductIds.length)
+    ) {
       try {
-        const { resolveAddonCatalog } = require("../../services/afroQuote.service");
-        const answers = req.body.clientAnswers;
-        const rawAddons = Array.isArray(answers.addons) ? answers.addons.map(String) : [];
-        const firstSid = Array.isArray(serviceIds) ? serviceIds[0] : serviceIds;
-        const entry = (salon.serviceIds || []).find((s) => String(s.id) === String(firstSid));
-        if (entry && rawAddons.length) {
-          const catalog = resolveAddonCatalog(entry, entry.afroConfig || null);
-          catalog.forEach((a) => {
-            if (!rawAddons.includes(String(a.id))) return;
-            totalServicePrice += Number(a.addPrice) || 0;
-            totalDuration += Number(a.addMinutes) || 0;
-          });
-        }
-        if (Array.isArray(answers.selectedProductIds) || Array.isArray(req.body.selectedProductIds)) {
-          const pids = new Set(
-            [
-              ...(answers.selectedProductIds || []),
-              ...(req.body.selectedProductIds || []),
-            ].map(String)
-          );
-          const Product = require("../../models/product.model");
-          if (pids.size) {
-            const products = await Product.find({
-              _id: { $in: Array.from(pids) },
-              salon: salon._id,
-              isDelete: { $ne: true },
-            })
-              .select("price isOutOfStock")
-              .lean();
-            products.forEach((p) => {
-              if (!p.isOutOfStock) totalServicePrice += Number(p.price) || 0;
-            });
-          }
-        }
-        const prepBuf = Math.max(0, Number(entry?.afroConfig?.prepBufferMinutes) || 0);
-        if (prepBuf && entry?.afroConfig?.baseDurationMinutes) {
-          // duration already from service; if afro base used client-side, trust body.duration when close
-        }
+        const adjusted = await applyClientAnswersPricing({
+          salon,
+          serviceIds: services,
+          servicesData,
+          answers:
+            req.body.clientAnswers && typeof req.body.clientAnswers === "object"
+              ? req.body.clientAnswers
+              : {},
+          selectedProductIds: req.body.selectedProductIds,
+          bodyDuration: req.body.duration,
+          totalServicePrice,
+          totalDuration,
+        });
+        totalServicePrice = adjusted.totalServicePrice;
+        totalDuration = adjusted.totalDuration;
       } catch (e) {
         console.warn("[Booking] clientAnswers price adjust", e.message);
       }
-      if (Number(req.body.duration) > 0) {
-        totalDuration = Number(req.body.duration);
-      }
+    } else if (Number(req.body.duration) > 0) {
+      totalDuration = Number(req.body.duration);
     }
 
     const totalSlots = Math.ceil(totalDuration / 15);
     const resultOfGreater = totalDuration / totalSlots;
-    const result = totalDuration / timeArray.length;
+    const result = totalDuration / timeArrayTrimmed.length;
 
     if (result > 15 || result < 1 || resultOfGreater !== result) {
       return res.status(200).send({ status: false, message: "Slots not correctly booked" });
@@ -1017,7 +1110,7 @@ exports.newBooking = async (req, res, next) => {
     booking.salonEarning = parseInt(req.body.withoutTax - platformFee).toFixed(2);
     booking.expertEarning = (req.body.withoutTax - (platformFee + salonCommission)).toFixed(2);
     booking.duration = totalDuration;
-    booking.time = timeArray;
+    booking.time = timeArrayTrimmed;
 
     if (linkedDemand) {
       booking.demandId = linkedDemand._id;
@@ -1437,26 +1530,10 @@ exports.checkSlots = async (req, res, next) => {
       return res.status(200).send({ status: false, message: "Salon time not found" });
     }
 
-    const salonOpenTime = moment(salonTime.openTime, "hh:mm A");
-    const salonCloseTime = moment(salonTime.closedTime, "hh:mm A");
-
-    const breakStartTime = moment(salonTime.breakStartTime, "hh:mm A");
-    const breakEndTime = moment(salonTime.breakEndTime, "hh:mm A");
-    const isWithinSalonHours = timeArray.every((time) => {
-      const bookingStartTime = moment(time, "hh:mm:ss A");
-      return bookingStartTime.isSameOrAfter(salonOpenTime) && bookingStartTime.isSameOrBefore(salonCloseTime);
-    });
-
+    const timeArrayTrimmed = timeArray.map((t) => String(t).trim()).filter(Boolean);
     if (
-      !isWithinSalonHours ||
-      timeArray.some((time) => {
-        const bookingStartTime = moment(time, "hh:mm A");
-        return (
-          bookingStartTime.isSameOrBefore(salonOpenTime) ||
-          bookingStartTime.isSameOrAfter(salonCloseTime) ||
-          (bookingStartTime.isSameOrAfter(breakStartTime) && bookingStartTime.isSameOrBefore(breakEndTime))
-        );
-      })
+      !timeArrayTrimmed.length ||
+      timeArrayTrimmed.some((time) => !isBookingSlotWithinSalonHours(time, salonTime))
     ) {
       return res.status(200).send({
         status: false,
@@ -1466,38 +1543,61 @@ exports.checkSlots = async (req, res, next) => {
 
     const servicesData = await Service.find({ _id: { $in: services } });
 
-    // Convert service IDs to strings for proper comparison
-    const serviceIdStringsForCheck = services.map(id => id.toString());
-    const matchedServices = salon.serviceIds.filter((service) => {
-      // Convert ObjectId to string and check if it's in the requested services array
-      return service.id && service.id._id && serviceIdStringsForCheck.includes(service.id._id.toString());
-    });
+    const serviceIdStringsForCheck = services.map((id) => id.toString());
+    const matchedServices = matchSalonServiceEntries(salon, serviceIdStringsForCheck);
 
     let totalServicePrice = 0;
     let totalDuration = 0;
     servicesData.forEach((service) => {
-      totalDuration += service.duration;
+      totalDuration += Number(service.duration) || 0;
     });
 
     matchedServices.forEach((service) => {
-      totalServicePrice += parseInt(service.price);
+      totalServicePrice += Number(service.price) || 0;
     });
+
+    if (
+      (req.body.clientAnswers && typeof req.body.clientAnswers === "object") ||
+      (Array.isArray(req.body.selectedProductIds) && req.body.selectedProductIds.length)
+    ) {
+      try {
+        const adjusted = await applyClientAnswersPricing({
+          salon,
+          serviceIds: services,
+          servicesData,
+          answers:
+            req.body.clientAnswers && typeof req.body.clientAnswers === "object"
+              ? req.body.clientAnswers
+              : {},
+          selectedProductIds: req.body.selectedProductIds,
+          bodyDuration: req.body.duration,
+          totalServicePrice,
+          totalDuration,
+        });
+        totalServicePrice = adjusted.totalServicePrice;
+        totalDuration = adjusted.totalDuration;
+      } catch (e) {
+        console.warn("[Booking] validate clientAnswers price", e.message);
+      }
+    } else if (Number(req.body.duration) > 0) {
+      totalDuration = Number(req.body.duration);
+    }
 
     const totalSlots = Math.ceil(totalDuration / 15);
     const resultOfGreater = totalDuration / totalSlots;
-    const result = totalDuration / timeArray.length;
+    const result = totalDuration / timeArrayTrimmed.length;
 
     if (result > 15 || result < 1 || resultOfGreater !== result) {
       return res.status(200).send({ status: false, message: "Slots not correctly booked" });
     }
 
-    const servicePrice = totalServicePrice.toFixed(2);
+    const servicePrice = Number(totalServicePrice).toFixed(2);
 
     console.log("totalServicePrice", totalServicePrice);
     console.log("servicePrice", servicePrice);
     console.log("req.body.withoutTax", req.body.withoutTax);
 
-    if (servicePrice !== req.body.withoutTax.toFixed(2)) {
+    if (Math.abs(Number(servicePrice) - Number(req.body.withoutTax)) > 0.5) {
       return res.status(200).send({ status: false, message: "Invalid Service Price" });
     }
 

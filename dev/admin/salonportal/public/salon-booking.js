@@ -219,7 +219,8 @@
     const bs = parseTime12h(breakStart);
     const be = parseTime12h(breakEnd);
     if (t == null || bs == null || be == null) return false;
-    return t > bs && t < be;
+    // Aligné backend / generateTimeSlots : pause = [breakStart, breakEnd)
+    return t >= bs && t < be;
   }
 
   /** Même logique que l'app : start + créneaux tous les salonSlotMinutes jusqu'à la durée prestation. */
@@ -235,11 +236,12 @@
     let currentMin = startMin;
     for (let i = 0; i < iterations; i++) {
       currentMin += interval;
-      const label = formatTime12h(currentMin);
-      if (isBreakTime(label, state.breakStartTime, state.breakEndTime)) {
-        continue;
-      }
       if (currentMin >= targetMin) break;
+      const label = formatTime12h(currentMin);
+      // Ne pas sauter la pause : un RDV ne peut pas traverser la coupure
+      if (isBreakTime(label, state.breakStartTime, state.breakEndTime)) {
+        return slots;
+      }
       slots.push(label);
     }
     return slots;
@@ -290,10 +292,49 @@
   }
 
   function needsAfroConfigStep() {
-    if (!afroEnabled()) return false;
-    const primary = getPrimaryProjectService();
-    if (!primary) return false;
-    return !hasAcceptedAfroQuote();
+    // Plus d’étape « précisions / devis » dans le tunnel — options sur la fiche presta
+    return false;
+  }
+
+  /** Reprend options / produits / photo déjà cochés sur les cartes presta de la page. */
+  function applyPageDraftsToBookingState() {
+    const answers = {
+      ...(state.afroAnswers && typeof state.afroAnswers === "object"
+        ? state.afroAnswers
+        : {}),
+    };
+    delete answers._skipPrecision;
+    const productIds = new Set(
+      (state.selectedProductIds || []).map(String)
+    );
+    const photoUrls = Array.isArray(state.afroPhotoUrls)
+      ? [...state.afroPhotoUrls]
+      : [];
+
+    state.selectedServiceIds.forEach((sid) => {
+      const draft = state.pageSvcDraft?.[normalizeServiceId(sid)];
+      if (!draft) return;
+      if (Array.isArray(draft.addons) && draft.addons.length) {
+        const prev = Array.isArray(answers.addons) ? answers.addons.map(String) : [];
+        answers.addons = Array.from(new Set([...prev, ...draft.addons.map(String)]));
+      }
+      if (Array.isArray(draft.productIds) && draft.productIds.length) {
+        draft.productIds.forEach((pid) => productIds.add(String(pid)));
+        answers.selectedProductIds = Array.from(productIds);
+      }
+    });
+
+    if (Object.keys(answers).length) {
+      state.afroAnswers = answers;
+    }
+    state.selectedProductIds = Array.from(productIds);
+    state.afroPhotoUrls = photoUrls;
+    if (state.selectedServiceIds.length === 1) {
+      state.afroConfigServiceId = normalizeServiceId(state.selectedServiceIds[0]);
+    }
+    state.afroSkipPrecision = true;
+    state.afroPrecisionFormOpen = false;
+    state.afroDemand = null;
   }
 
   async function loadAfroMeta() {
@@ -1020,11 +1061,7 @@
       return;
     }
     hideBookingStickyBar();
-    // Pas d’écran devis : config afro optionnelle puis expert / créneau
-    if (needsAfroConfigStep()) {
-      renderStepAfroConfig();
-      return;
-    }
+    applyPageDraftsToBookingState();
     afterServicesContinue();
   }
 

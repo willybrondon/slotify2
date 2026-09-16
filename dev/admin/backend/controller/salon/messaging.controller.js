@@ -8,9 +8,29 @@ const {
 } = require("../../services/salonMessaging.service");
 
 function photoUrlsFromFiles(files) {
-  if (!files || !files.length) return [];
-  const base = process.env.baseURL || "";
-  return files.slice(0, 4).map((f) => base + f.path.replace(/\\/g, "/"));
+  const list = Array.isArray(files)
+    ? files
+    : files?.photos && Array.isArray(files.photos)
+      ? files.photos
+      : [];
+  if (!list.length) return [];
+  const base = (process.env.baseURL || "").replace(/\/+$/, "");
+  return list
+    .slice(0, 4)
+    .map((f) => {
+      const rel = f?.path || f?.filename || "";
+      if (!rel) return "";
+      const normalized = String(rel).replace(/\\/g, "/").replace(/^\/+/, "");
+      return base ? `${base}/${normalized}` : `/${normalized}`;
+    })
+    .filter(Boolean);
+}
+
+function filesFromRequest(req) {
+  if (!req?.files) return [];
+  if (Array.isArray(req.files)) return req.files.filter(Boolean);
+  if (Array.isArray(req.files.photos)) return req.files.photos.filter(Boolean);
+  return [];
 }
 
 /**
@@ -144,9 +164,7 @@ exports.sendMessage = async (req, res) => {
       return res.status(404).json({ status: false, message: "Conversation not found" });
     }
 
-    const files = req.files?.photos || req.files || [];
-    const fileList = Array.isArray(files) ? files : [files].filter(Boolean);
-    const photoUrls = photoUrlsFromFiles(fileList);
+    const photoUrls = photoUrlsFromFiles(filesFromRequest(req));
 
     const msg = await postMessage({
       conversation,
@@ -176,9 +194,7 @@ exports.sendToUser = async (req, res) => {
     }
 
     const conversation = await getOrCreateConversation(salonId, userId);
-    const files = req.files?.photos || req.files || [];
-    const fileList = Array.isArray(files) ? files : [files].filter(Boolean);
-    const photoUrls = photoUrlsFromFiles(fileList);
+    const photoUrls = photoUrlsFromFiles(filesFromRequest(req));
 
     const msg = await postMessage({
       conversation,

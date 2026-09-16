@@ -515,10 +515,37 @@ body.sk-public-page .main-wrapper {
 }
 
 .sq-msg-photo-btn {
-    font-size: 0.85rem;
-    color: #444;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    font-weight: 560;
+    color: #1a1a1a;
+    background: #fafafa;
+    border: 1.5px dashed #b8b8b8;
+    border-radius: 10px;
     cursor: pointer;
-    width: fit-content;
+    text-align: center;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.sq-msg-photo-btn:hover,
+.sq-msg-photo-btn:focus-within {
+    border-color: #111;
+    border-style: solid;
+    background: #f3f3f3;
+    color: #000;
+}
+
+.sq-msg-photo-btn span::before {
+    content: "+";
+    display: inline-block;
+    margin-right: 6px;
+    font-weight: 700;
 }
 
 .sq-msg-photo-chip {
@@ -1511,7 +1538,7 @@ body.sk-public-page .main-wrapper {
     aspect-ratio: auto;
     min-height: 168px;
     height: 100%;
-    border-radius: 0;
+    border-radius: 14px 0 0 14px;
 }
 
 .sk-public-page .sq-salon-card-v3__shot-link {
@@ -2109,6 +2136,7 @@ body.sk-public-page .main-wrapper {
         aspect-ratio: 16 / 10;
         min-height: 0;
         height: auto;
+        border-radius: 14px 14px 0 0;
     }
 
     .sk-public-page .sq-salon-card-v3__svc {

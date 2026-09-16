@@ -5,10 +5,20 @@
  * Add-ons from afroConfig.addonDefs or entry.detailCard.addons
  */
 
+function salonServiceRefId(entry) {
+  if (!entry || entry.id == null) return null;
+  const raw = entry.id;
+  // populated Service doc
+  if (typeof raw === "object" && raw._id != null) return String(raw._id);
+  return String(raw);
+}
+
 function getSalonServiceEntry(salon, serviceId) {
   if (!salon || !salon.serviceIds) return null;
   const sid = String(serviceId);
-  return salon.serviceIds.find((s) => String(s.id) === sid) || null;
+  return (
+    salon.serviceIds.find((s) => salonServiceRefId(s) === sid) || null
+  );
 }
 
 function getAfroConfig(entry) {
@@ -322,6 +332,7 @@ module.exports = {
   computeQuote,
   fieldIsVisible,
   ruleMatches,
+  salonServiceRefId,
   resolveAddonCatalog,
   normalizeAddonList,
   KNOTLESS_S2_DEMO_CONFIG,

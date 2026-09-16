@@ -196,19 +196,19 @@ const getNextAvailabilityHint = (salonTime, language = "fr") => {
     const clock = formatBookClock(slotMins, language);
     if (offset === 0) {
       return language === "fr"
-        ? `Réservez aujourd’hui, ${clock}`
-        : `Book Today, ${clock}`;
+        ? `Aujourd’hui, ${clock}`
+        : `Today, ${clock}`;
     }
     if (offset === 1) {
       return language === "fr"
-        ? `Réservez demain, ${clock}`
-        : `Book Tomorrow, ${clock}`;
+        ? `Demain, ${clock}`
+        : `Tomorrow, ${clock}`;
     }
     const short =
       language === "fr" ? DAY_SHORT_FR[d.getDay()] : DAY_SHORT_EN[d.getDay()];
     return language === "fr"
-      ? `Réservez ${short}, ${clock}`
-      : `Book ${short}, ${clock}`;
+      ? `${short}, ${clock}`
+      : `${short}, ${clock}`;
   }
   return "";
 };
