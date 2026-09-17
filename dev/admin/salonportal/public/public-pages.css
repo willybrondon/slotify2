@@ -136,6 +136,76 @@ body.sk-public-page .main-wrapper {
     margin-bottom: 8px;
 }
 
+.sk-public-page .sq-salon-detail__tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 8px 0 4px;
+    padding: 4px 0 8px;
+    border-bottom: 1px solid var(--sk-border-light, #eee);
+    position: sticky;
+    top: 72px;
+    z-index: 5;
+    background: var(--sk-bg, #fff);
+}
+
+.sk-public-page .sq-salon-detail__tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.sk-public-page .sq-salon-detail__tab {
+    flex: 0 0 auto;
+    border: 0;
+    background: transparent;
+    color: var(--sk-text-muted, #666);
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.sk-public-page .sq-salon-detail__tab.is-active {
+    background: #111;
+    color: #fff;
+}
+
+.sk-public-page .sq-salon-detail__tab--mobile {
+    display: none;
+}
+
+.sk-public-page .sq-salon-detail__panels {
+    min-width: 0;
+}
+
+.sk-public-page .sq-salon-detail__panel[hidden] {
+    display: none !important;
+}
+
+.sk-public-page .sq-salon-detail__panel .section {
+    padding-top: 20px;
+    padding-bottom: 28px;
+    margin-top: 0;
+    border-bottom: none;
+}
+
+.sk-public-page .sq-salon-detail__panel .section-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .sk-public-page .sq-salon-detail__meta > .section {
     padding-top: 24px;
     padding-bottom: 32px;
@@ -158,6 +228,19 @@ body.sk-public-page .main-wrapper {
 .sk-public-page .sq-salon-detail__aside {
     position: sticky;
     top: 100px;
+}
+
+.sk-public-page .sq-salon-detail__book-card .sq-salon-detail__book-desc {
+    display: none;
+}
+
+.sk-public-page .sq-salon-about-block .sq-salon-detail__hours,
+.sk-public-page .sq-salon-about-block .sq-salon-detail__policy {
+    margin-top: 20px;
+}
+
+.sk-public-page .sq-salon-message-block .sq-salon-contact-actions {
+    margin-top: 16px;
 }
 
 .sk-public-page .sq-salon-detail__cover {
@@ -1046,7 +1129,15 @@ body.sk-public-page .main-wrapper {
 
     .sk-public-page .sidebar-content,
     .sk-public-page .sq-salon-detail__aside {
-        position: static;
+        display: none;
+    }
+
+    .sk-public-page .sq-salon-detail__tab--mobile {
+        display: inline-flex;
+    }
+
+    .sk-public-page .sq-salon-detail__tabs {
+        top: 56px;
     }
 
     .sk-public-page .sq-salon-detail__cover {
@@ -1522,6 +1613,8 @@ body.sk-public-page .main-wrapper {
     display: grid;
     grid-template-columns: minmax(130px, 36%) minmax(0, 1fr);
     align-items: stretch;
+    gap: 12px;
+    padding: 10px;
 }
 
 .sk-public-page .sq-salon-card-v3__media {
@@ -1538,7 +1631,7 @@ body.sk-public-page .main-wrapper {
     aspect-ratio: auto;
     min-height: 168px;
     height: 100%;
-    border-radius: 14px 0 0 14px;
+    border-radius: 14px;
 }
 
 .sk-public-page .sq-salon-card-v3__shot-link {
@@ -2136,7 +2229,7 @@ body.sk-public-page .main-wrapper {
         aspect-ratio: 16 / 10;
         min-height: 0;
         height: auto;
-        border-radius: 14px 14px 0 0;
+        border-radius: 14px;
     }
 
     .sk-public-page .sq-salon-card-v3__svc {

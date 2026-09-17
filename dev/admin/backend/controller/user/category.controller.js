@@ -1314,13 +1314,6 @@ exports.serveCategoryPage = async (req, res) => {
         </div>
             <div id="categoryMap" class="sq-category-discover__map" aria-hidden="false"></div>
     </div>
-
-        <section class="sq-category-discover__experts" aria-labelledby="expertsHeading">
-            <h2 id="expertsHeading" class="sq-category-discover__experts-title">${copy.categoryExpertsTitle}</h2>
-            <div class="sq-experts-scroll" id="expertsRow">
-                ${expertsHtml}
-            </div>
-        </section>
     </main>
 
     <div class="sked-app-banner">

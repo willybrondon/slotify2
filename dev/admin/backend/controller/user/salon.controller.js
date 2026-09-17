@@ -1201,22 +1201,73 @@ exports.serveSalonWebPage = async (req, res) => {
       }
     </div>`;
 
+    // Aside desktop : CTA réserver (description / horaires / policy → onglet À propos)
     const bookingCardHtml = `<div class="booking-card sq-salon-detail__book-card">
                             <h3>${copy.bookingCardTitle}</h3>
-                            <p class="sq-salon-detail__book-desc">${esc(salonDescription)}</p>
-                            ${hoursBlock}
-                            ${policyHtml}
                             <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonBookingAsideSummary" aria-live="polite"></div>
                             <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
                                 <i class="fas fa-calendar-check"></i> ${copy.bookNow}
                             </button>
-                            ${contactActionsHtml}
+                            <div class="sq-salon-detail__aside-contact sq-salon-detail__aside-contact--desktop">
+                              ${contactActionsHtml}
+                            </div>
                             <div id="download-section" class="sq-salon-download">
                                 <p class="sq-salon-download__lead">${copy.noAppDesc}</p>
                                 <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill sq-salon-download__cta">${copy.downloadAppCta}</a>
                                 <div class="sq-store-badges-mount" data-app="customer" data-center="true"></div>
                     </div>
                         </div>`;
+
+    const aboutPanelHtml = `<div class="section sq-salon-about-block">
+        <h3 class="section-title">${esc(copy.aboutSalonShort || copy.aboutTab || "À propos")}</h3>
+        ${
+          salonDescription
+            ? `<p class="sq-salon-detail__desc">${esc(salonDescription)}</p>`
+            : `<p class="empty-state">${esc(copy.defaultSalonDesc(salonName))}</p>`
+        }
+        ${hoursBlock}
+        ${policyHtml}
+      </div>`;
+
+    const messagePanelHtml = messagingOn || socialLinks
+      ? `<div class="section sq-salon-message-block">
+        <h3 class="section-title">${esc(copy.messageTab || copy.messageSalon || "Message")}</h3>
+        <p class="sq-salon-detail__desc">${esc(
+          copy.messagePanelHint ||
+            "Écrivez au salon : texte et photos d’inspiration, comme sur l’app."
+        )}</p>
+        ${contactActionsHtml}
+      </div>`
+      : "";
+
+    const showMessageTab = Boolean(messagePanelHtml);
+
+    const tabsNavHtml = `<nav class="sq-salon-detail__tabs" id="salonDetailTabs" role="tablist" aria-label="${esc(
+      salonName
+    )}">
+        <button type="button" class="sq-salon-detail__tab is-active" role="tab" aria-selected="true" data-tab="services">${esc(
+          copy.services
+        )}</button>
+        <button type="button" class="sq-salon-detail__tab" role="tab" aria-selected="false" data-tab="staff">${esc(
+          copy.staff || copy.salonExpertsTitle
+        )}</button>
+        ${
+          showMessageTab
+            ? `<button type="button" class="sq-salon-detail__tab sq-salon-detail__tab--mobile" role="tab" aria-selected="false" data-tab="message">${esc(
+                copy.messageTab || copy.messageSalon || "Message"
+              )}</button>`
+            : ""
+        }
+        <button type="button" class="sq-salon-detail__tab" role="tab" aria-selected="false" data-tab="products">${esc(
+          copy.products
+        )}</button>
+        <button type="button" class="sq-salon-detail__tab" role="tab" aria-selected="false" data-tab="reviews">${esc(
+          copy.reviews
+        )}</button>
+        <button type="button" class="sq-salon-detail__tab sq-salon-detail__tab--mobile" role="tab" aria-selected="false" data-tab="about">${esc(
+          copy.aboutTab || copy.aboutSalonShort || "À propos"
+        )}</button>
+      </nav>`;
 
     const returnPath =
       `/salon/${salonSlugWithId}` + (pageLang !== "fr" ? `?lang=${pageLang}` : "");
@@ -1458,10 +1509,19 @@ exports.serveSalonWebPage = async (req, res) => {
                                 ${salonAddressBlock}
                             </div>
                         </div>
-                        ${staffHtml}
-                        ${servicesHtml}
-                        ${productsHtml}
-                        ${reviewsHtml}
+                        ${tabsNavHtml}
+                        <div class="sq-salon-detail__panels" id="salonDetailPanels">
+                          <div class="sq-salon-detail__panel is-active" role="tabpanel" data-panel="services">${servicesHtml}</div>
+                          <div class="sq-salon-detail__panel" role="tabpanel" data-panel="staff" hidden>${staffHtml}</div>
+                          ${
+                            showMessageTab
+                              ? `<div class="sq-salon-detail__panel sq-salon-detail__panel--mobile" role="tabpanel" data-panel="message" hidden>${messagePanelHtml}</div>`
+                              : ""
+                          }
+                          <div class="sq-salon-detail__panel" role="tabpanel" data-panel="products" hidden>${productsHtml}</div>
+                          <div class="sq-salon-detail__panel" role="tabpanel" data-panel="reviews" hidden>${reviewsHtml}</div>
+                          <div class="sq-salon-detail__panel sq-salon-detail__panel--mobile" role="tabpanel" data-panel="about" hidden>${aboutPanelHtml}</div>
+                        </div>
                     </div>
                     <aside class="sq-salon-detail__aside sidebar-content">
                         ${bookingCardHtml}
@@ -1797,6 +1857,51 @@ exports.serveSalonWebPage = async (req, res) => {
     <script src="${baseURL}/salon-product.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
+    <script>
+      (function () {
+        const tabs = document.getElementById("salonDetailTabs");
+        const panelsRoot = document.getElementById("salonDetailPanels");
+        if (!tabs || !panelsRoot) return;
+
+        function activate(name) {
+          const tabBtns = tabs.querySelectorAll("[data-tab]");
+          const panels = panelsRoot.querySelectorAll("[data-panel]");
+          tabBtns.forEach((btn) => {
+            const on = btn.getAttribute("data-tab") === name;
+            btn.classList.toggle("is-active", on);
+            btn.setAttribute("aria-selected", on ? "true" : "false");
+          });
+          panels.forEach((panel) => {
+            const on = panel.getAttribute("data-panel") === name;
+            panel.classList.toggle("is-active", on);
+            if (on) panel.removeAttribute("hidden");
+            else panel.setAttribute("hidden", "");
+          });
+          if (name === "message" && window.innerWidth <= 968) {
+            /* panel visible — user taps Message CTA */
+          }
+        }
+
+        tabs.addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-tab]");
+          if (!btn || !tabs.contains(btn)) return;
+          activate(btn.getAttribute("data-tab"));
+        });
+
+        // Si un onglet mobile est actif au resize desktop → revenir aux prestations
+        window.addEventListener("resize", () => {
+          const active = tabs.querySelector(".sq-salon-detail__tab.is-active");
+          if (!active) return;
+          const name = active.getAttribute("data-tab");
+          if (
+            window.innerWidth > 968 &&
+            active.classList.contains("sq-salon-detail__tab--mobile")
+          ) {
+            activate("services");
+          }
+        });
+      })();
+    </script>
 </body>
 </html>`;
 
