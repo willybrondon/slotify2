@@ -685,7 +685,8 @@
     }
   }
 
-  function buildSalonPageServiceCardHtml(s) {
+  function buildSalonPageServiceCardHtml(s, opts = {}) {
+    const mode = opts.mode === "modal" ? "modal" : "page";
     const card = s.detailCard || {};
     const afro = getAfroMeta(s.id);
     const draft = getPageSvcDraft(s.id);
@@ -694,6 +695,7 @@
     const priceNum = Number(live.price) || 0;
     const priceStr = `${escapeHtml(cfg.currency)}${priceNum.toFixed(0)}`;
     const metaLine = [durLabel, priceStr].filter(Boolean).join(" · ");
+    const selected = isServiceSelected(s.id);
     const svcReview = Number(s.review) || 0;
     const svcReviewCount = Number(s.reviewCount) || 0;
     const ratingBadge =
@@ -865,12 +867,31 @@
       ? `<div class="sq-svc-note">⚠️ ${escapeHtml(card.importantNote)}</div>`
       : "";
 
-    return `<article class="sq-svc-row" data-service-id="${escapeHtml(String(s.id))}">
-      <button type="button" class="sq-svc-row__head" data-svc-toggle aria-expanded="false">
+    const actionLabel =
+      mode === "modal"
+        ? selected
+          ? t("serviceRemoveFromSelection") || "Retirer"
+          : t("serviceAddToSelection") || "Ajouter"
+        : t("bookNow");
+    const actionAttr = mode === "modal" ? "data-svc-select" : "data-svc-book";
+    const selectedBadge =
+      mode === "modal" && selected
+        ? `<span class="sq-svc-row__selected-badge">${escapeHtml(
+            t("serviceSelectedBadge") || "Sélectionnée"
+          )}</span>`
+        : "";
+
+    return `<article class="sq-svc-row${
+      mode === "modal" && selected ? " is-selected" : ""
+    }${opts.forceOpen ? " is-open" : ""}" data-service-id="${escapeHtml(String(s.id))}">
+      <button type="button" class="sq-svc-row__head" data-svc-toggle aria-expanded="${
+        opts.forceOpen ? "true" : "false"
+      }">
         <div class="sq-svc-row__main">
           <div class="sq-svc-row__top">
             <span class="sq-svc-row__name">${escapeHtml(s.name)}</span>
             <span class="sq-svc-row__meta">${metaLine}</span>
+            ${selectedBadge}
           </div>
           ${ratingBadge}
           ${
@@ -890,9 +911,9 @@
         ${statsBlock}
         ${noteBlock}
         <div class="sq-svc-row__actions">
-          <button type="button" class="sq-svc-row__book" data-svc-book>${escapeHtml(
-            t("bookNow")
-          )}</button>
+          <button type="button" class="sq-svc-row__book${
+            mode === "modal" && selected ? " sq-svc-row__book--selected" : ""
+          }" ${actionAttr}>${escapeHtml(actionLabel)}</button>
         </div>
       </div>
     </article>`;
@@ -908,11 +929,17 @@
     });
   }
 
-  function bindSalonPageServiceCards(rootEl) {
+  function bindSalonPageServiceCards(rootEl, opts = {}) {
     if (!rootEl) return;
+    const mode = opts.mode === "modal" ? "modal" : "page";
+    const onSelectionChange =
+      typeof opts.onSelectionChange === "function"
+        ? opts.onSelectionChange
+        : null;
     rootEl.querySelectorAll(".sq-svc-row").forEach((row) => {
       const toggle = row.querySelector("[data-svc-toggle]");
       const bookBtn = row.querySelector("[data-svc-book]");
+      const selectBtn = row.querySelector("[data-svc-select]");
       const sid = row.getAttribute("data-service-id");
       if (toggle) {
         toggle.addEventListener("click", () => {
@@ -937,6 +964,9 @@
         el.addEventListener("change", (e) => {
           e.stopPropagation();
           syncDraftFromDom();
+          if (mode === "modal" && isServiceSelected(sid)) {
+            applyPageDraftsToBookingState();
+          }
         });
       });
 
@@ -973,6 +1003,35 @@
         }
         if (labelEl) labelEl.textContent = t("serviceInspirationChange");
       });
+
+      if (selectBtn) {
+        selectBtn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          syncDraftFromDom();
+          const wasSelected = isServiceSelected(sid);
+          toggleServiceSelection(sid);
+          if (!wasSelected) {
+            applyPageDraftsToBookingState();
+            const draft = getPageSvcDraft(sid);
+            if (draft.photoFile) {
+              try {
+                selectBtn.disabled = true;
+                const url = await uploadAfroInspirationPhoto(draft.photoFile);
+                state.afroPhotoUrls = Array.from(
+                  new Set([...(state.afroPhotoUrls || []), String(url)])
+                );
+              } catch (err) {
+                console.warn("[svc-select-photo]", err);
+              } finally {
+                selectBtn.disabled = false;
+              }
+            }
+          }
+          applyPageDraftsToBookingState();
+          if (onSelectionChange) onSelectionChange();
+        });
+      }
 
       if (bookBtn) {
         bookBtn.addEventListener("click", async (e) => {
@@ -1941,7 +2000,10 @@
     return String(data.url);
   }
 
-  function renderStepServices() {
+  function renderStepServices(opts = {}) {
+    const expandId = opts.expandServiceId
+      ? normalizeServiceId(opts.expandServiceId)
+      : null;
     const list =
       state.expertId != null
         ? servicesForExpert(state.expertId)
@@ -1960,7 +2022,7 @@
       ${expertHint}
       <p class="sq-booking-step__hint">${escapeHtml(t("servicesMultiHint"))}</p>
       <div class="sq-service-tabs sq-service-tabs--modal" id="bookingServiceTabs"></div>
-      <div class="sq-services-grid-4" id="bookingServicesGrid"></div>
+      <div class="sq-services-list sq-services-list--modal" id="bookingServicesGrid"></div>
     `;
     const bTabs = document.getElementById("bookingServiceTabs");
     const bGrid = document.getElementById("bookingServicesGrid");
@@ -1969,8 +2031,8 @@
     function paint() {
       bTabs.innerHTML = cats
         .map(
-          (t) =>
-            `<button type="button" class="sq-service-tab${cat === t.id ? " sq-service-tab--active" : ""}" data-cat="${t.id}">${escapeHtml(t.name)}</button>`
+          (tab) =>
+            `<button type="button" class="sq-service-tab${cat === tab.id ? " sq-service-tab--active" : ""}" data-cat="${tab.id}">${escapeHtml(tab.name)}</button>`
         )
         .join("");
       bTabs.querySelectorAll(".sq-service-tab").forEach((b) => {
@@ -1981,14 +2043,32 @@
       });
       const filtered =
         cat === "all" ? list : list.filter((s) => s.categoryId === cat);
-      bGrid.innerHTML = filtered.map((s) => buildServiceCardHtml(s)).join("");
-      bindServiceCardClicks(bGrid, () => {
-        paint();
-        renderSalonPageSelectionUI();
-        renderServicesStickyBar();
+      bGrid.innerHTML = filtered
+        .map((s) =>
+          buildSalonPageServiceCardHtml(s, {
+            mode: "modal",
+            forceOpen:
+              expandId &&
+              normalizeServiceId(s.id) === expandId,
+          })
+        )
+        .join("");
+      bindSalonPageServiceCards(bGrid, {
+        mode: "modal",
+        onSelectionChange: () => {
+          paint();
+          renderSalonPageSelectionUI();
+          renderServicesStickyBar();
+        },
       });
       renderSalonPageSelectionUI();
       renderServicesStickyBar();
+      if (expandId) {
+        const openRow = bGrid.querySelector(
+          `.sq-svc-row[data-service-id="${CSS.escape(expandId)}"]`
+        );
+        openRow?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
     }
     paint();
     if (stepsEl) stepsEl.scrollTop = 0;
@@ -3018,8 +3098,9 @@
         return;
       }
 
+      // Depuis catégorie / deep-link : montrer le détail presta avant de continuer
       if (opts.serviceId && state.selectedServiceIds.length) {
-        continueFromServices();
+        renderStepServices({ expandServiceId: opts.serviceId });
       } else {
         renderStepServices();
       }
