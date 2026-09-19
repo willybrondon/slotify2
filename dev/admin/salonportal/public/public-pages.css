@@ -230,8 +230,10 @@ body.sk-public-page .main-wrapper {
     top: 100px;
 }
 
-.sk-public-page .sq-salon-detail__book-card .sq-salon-detail__book-desc {
-    display: none;
+.sk-public-page .sq-salon-detail__book-card .sq-salon-detail__hours,
+.sk-public-page .sq-salon-detail__book-card .sq-salon-detail__policy {
+    margin-top: 14px;
+    margin-bottom: 14px;
 }
 
 .sk-public-page .sq-salon-about-block .sq-salon-detail__hours,

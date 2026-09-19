@@ -1201,9 +1201,12 @@ exports.serveSalonWebPage = async (req, res) => {
       }
     </div>`;
 
-    // Aside desktop : CTA réserver (description / horaires / policy → onglet À propos)
+    // Aside desktop : description + horaires + policy + CTA réserver
     const bookingCardHtml = `<div class="booking-card sq-salon-detail__book-card">
                             <h3>${copy.bookingCardTitle}</h3>
+                            <p class="sq-salon-detail__book-desc">${esc(salonDescription)}</p>
+                            ${hoursBlock}
+                            ${policyHtml}
                             <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonBookingAsideSummary" aria-live="polite"></div>
                             <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
                                 <i class="fas fa-calendar-check"></i> ${copy.bookNow}
