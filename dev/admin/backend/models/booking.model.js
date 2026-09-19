@@ -135,6 +135,22 @@ const bookingSchema = new mongoose.Schema(
     depositAmount: { type: Number, default: 0 },
     depositPaidAt: { type: Date, default: null },
     balanceDue: { type: Number, default: 0 },
+
+    /**
+     * Monetization attribution (MODELE_ECONOMIQUE_SKEDISY).
+     * channel: web | app | link | guest | salon_panel | unknown
+     */
+    channel: { type: String, default: "unknown" },
+    acquisitionAttributed: { type: Boolean, default: false },
+    /** acquisition_first | none | legacy_flat */
+    commissionReason: { type: String, default: "legacy_flat" },
+    acquiredBy: { type: String, default: "unknown" },
+    /** One-shot 2nd-visit incentive applied on this booking */
+    secondVisitIncentive: {
+      amount: { type: Number, default: 0 },
+      funder: { type: String, default: "" },
+      type: { type: String, default: "" },
+    },
   },
   {
     timestamps: true,

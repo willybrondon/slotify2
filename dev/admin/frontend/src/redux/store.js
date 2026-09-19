@@ -29,6 +29,7 @@ import orderSlice from "./slice/orderSlice"
 import withDrawSlice from "./slice/withDrawSlice"
 import couponSlice from "./slice/couponSlice";
 import teamScheduleSlice from "./slice/teamScheduleSlice";
+import subscriptionSlice from "./slice/subscriptionSlice";
 
 const persistConfig = {
   key: 'root',
@@ -68,6 +69,7 @@ const store = configureStore({
     withDraw:withDrawSlice,
     coupon:couponSlice,
     teamSchedule: teamScheduleSlice,
+    subscription: subscriptionSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -53,6 +53,22 @@ exports.publicUpdateBeautyProfile = async (req, res) => {
     ].forEach((k) => {
       if (patch[k] !== undefined) bp[k] = String(patch[k] || "").slice(0, 200);
     });
+    if (patch.scalpSensitivity !== undefined) {
+      bp.sensitivity = String(patch.scalpSensitivity || "").slice(0, 200);
+    }
+    const quizBits = [
+      patch.hairCondition,
+      patch.styleInterest,
+      patch.bookingGoal,
+    ]
+      .map((x) => (x != null ? String(x).trim() : ""))
+      .filter(Boolean);
+    if (quizBits.length) {
+      bp.preferences = [bp.preferences, ...quizBits]
+        .filter(Boolean)
+        .join(" · ")
+        .slice(0, 200);
+    }
     bp.updatedAt = new Date();
     user.beautyProfile = bp;
     await user.save();

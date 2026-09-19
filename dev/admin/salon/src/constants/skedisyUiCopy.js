@@ -223,6 +223,7 @@ export const SKEDISY_SALON_UI = {
     filterCancelled: "Annulées",
     resultPhotosTitle: "Résultat & durée réelle",
     resultPhotosBtn: "Photos / écart",
+    resultPhotosAddBtn: "Ajouter photos résultat",
     resultPhotosUpload: "Photos résultat (max 6)",
     resultPhotoNote: "Note photo",
     actualDuration: "Durée réelle (min)",

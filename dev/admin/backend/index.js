@@ -128,6 +128,17 @@ initializeSettings().catch((error) => {
   global.settingJSON = settingJson; // Fallback to default
 });
 
+// Seed Free / Basic / Premium / Enterprise subscription plans (admin-editable)
+(async () => {
+  try {
+    const { ensureDefaultPlans } = require("./services/subscription.service");
+    await ensureDefaultPlans();
+    console.log("Subscription plans ready (Free / Basic / Premium / Enterprise)");
+  } catch (err) {
+    console.warn("[subscription] seed skipped:", err.message);
+  }
+})();
+
 //Declare the function as a global variable to update the setting.js file
 global.updateSettingFile = (settingData) => {
   const settingJSON = JSON.stringify(settingData, null, 2);
@@ -624,7 +635,7 @@ cron.schedule("55 23 28-31 * *", async () => {
   }
 });
 
-// SMS Reminder: Send 24-hour appointment reminders
+// SMS Reminder: Send 24-hour appointment reminders (≈ J-1)
 // Runs every hour at minute 0 to check for appointments 24 hours from now
 cron.schedule("0 * * * *", async () => {
   try {
@@ -691,6 +702,69 @@ cron.schedule("0 * * * *", async () => {
     }
   } catch (error) {
     console.error("Error executing 24-hour SMS reminder cron job:", error);
+  }
+});
+
+// Prep J-1 evening catch-up: all tomorrow bookings not yet reminded (calendar day-before @ 18:00)
+cron.schedule("0 18 * * *", async () => {
+  try {
+    if (
+      !process.env.TWILIO_ACCOUNT_SID ||
+      !process.env.TWILIO_AUTH_TOKEN ||
+      !process.env.TWILIO_PHONE_NUMBER
+    ) {
+      console.log("[SMS Cron] J-1 prep job skipped - Twilio not configured");
+      return;
+    }
+
+    const tomorrowDate = moment().add(1, "day").format("YYYY-MM-DD");
+    const bookings = await Booking.find({
+      date: tomorrowDate,
+      status: { $in: ["pending", "confirm"] },
+      smsReminder24hSent: false,
+      isDelete: false,
+    })
+      .populate("userId", "fname lname mobile")
+      .populate("salonId", "name serviceIds")
+      .populate("expertId", "fname lname")
+      .populate("serviceId", "_id");
+
+    console.log(
+      `[SMS Cron] J-1 evening prep: ${bookings.length} bookings for ${tomorrowDate}`
+    );
+
+    for (const booking of bookings) {
+      try {
+        if (
+          !booking.userId ||
+          !booking.userId.mobile ||
+          !String(booking.userId.mobile).trim()
+        ) {
+          continue;
+        }
+        const result = await sendAppointmentReminder(booking, "j1");
+        if (result.success) {
+          booking.smsReminder24hSent = true;
+          if (result.prepChecklistIncluded) {
+            booking.smsPrepChecklistSent = true;
+          }
+          await booking.save();
+          console.log(`J-1 prep SMS sent for booking ${booking.bookingId}`);
+        } else {
+          console.error(
+            `Failed J-1 prep SMS for ${booking.bookingId}:`,
+            result.error
+          );
+        }
+      } catch (error) {
+        console.error(
+          `Error processing J-1 prep for booking ${booking.bookingId}:`,
+          error
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Error executing J-1 prep SMS cron job:", error);
   }
 });
 

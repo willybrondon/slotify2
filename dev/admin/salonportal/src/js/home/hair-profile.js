@@ -52,6 +52,68 @@
 
   function save(profile) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    void syncToServer(profile);
+  }
+
+  function getWebUserId() {
+    try {
+      const raw =
+        sessionStorage.getItem('skedisy_web_user') ||
+        localStorage.getItem('skedisy_web_user');
+      if (!raw) return null;
+      const u = JSON.parse(raw);
+      return u?.id || u?._id || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function syncToServer(profile) {
+    const userId = getWebUserId();
+    if (!userId || !isComplete(profile)) return;
+    const fields = getApiFieldsFrom(profile);
+    try {
+      await fetch('/api/public/client/beauty-profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: String(userId),
+          beautyProfile: {
+            hairType: fields.hairType || '',
+            sensitivity: fields.scalpSensitivity || '',
+            hairCondition: fields.hairCondition || '',
+            styleInterest: fields.styleInterest || '',
+            bookingGoal: fields.bookingGoal || '',
+            preferences: [
+              fields.hairCondition,
+              fields.styleInterest,
+              fields.bookingGoal,
+            ]
+              .filter(Boolean)
+              .join(' · '),
+          },
+        }),
+      });
+    } catch (_) {
+      /* offline / guest — localStorage remains source of truth */
+    }
+  }
+
+  function getApiFieldsFrom(p) {
+    const out = {};
+    if (p.hairType) out.hairType = t('hairProfile.' + p.hairType);
+    if (p.hairCondition) out.hairCondition = t('hairProfile.' + p.hairCondition);
+    if (p.styleInterest) out.styleInterest = t('hairProfile.' + p.styleInterest);
+    if (p.scalpSensitivity) out.scalpSensitivity = t('hairProfile.' + p.scalpSensitivity);
+    if (p.bookingGoal) {
+      out.bookingGoal = t('hairProfile.' + p.bookingGoal);
+      out.occasion = out.bookingGoal;
+    }
+    return out;
+  }
+
+  function getApiFields() {
+    return getApiFieldsFrom(load());
   }
 
   function isComplete(profile) {
@@ -65,20 +127,6 @@
 
   function markPrompted() {
     localStorage.setItem(PROMPTED_KEY, '1');
-  }
-
-  function getApiFields() {
-    const p = load();
-    const out = {};
-    if (p.hairType) out.hairType = t('hairProfile.' + p.hairType);
-    if (p.hairCondition) out.hairCondition = t('hairProfile.' + p.hairCondition);
-    if (p.styleInterest) out.styleInterest = t('hairProfile.' + p.styleInterest);
-    if (p.scalpSensitivity) out.scalpSensitivity = t('hairProfile.' + p.scalpSensitivity);
-    if (p.bookingGoal) {
-      out.bookingGoal = t('hairProfile.' + p.bookingGoal);
-      out.occasion = out.bookingGoal;
-    }
-    return out;
   }
 
   function appendToFormData(formData) {
@@ -207,6 +255,7 @@
     hasBeenPrompted,
     markPrompted,
     getApiFields,
+    syncToServer,
     appendToFormData,
     renderStrip,
     mountProfilePage,
@@ -219,6 +268,8 @@
     const pageRoot = document.getElementById('hairProfilePageRoot');
     if (pageRoot) mountProfilePage(pageRoot);
     maybePromptOnHome();
+    // Re-sync if user logged in after completing the quiz offline
+    if (isComplete() && getWebUserId()) void syncToServer(load());
   });
 
   document.addEventListener('skedisy:language-changed', () => {

@@ -14,8 +14,14 @@ function ctrl() {
 route.get("/conversations", checkAccessWithSecretKey(), salon, (req, res, next) =>
   ctrl().listConversations(req, res, next)
 );
+route.get("/experts", checkAccessWithSecretKey(), salon, (req, res, next) =>
+  ctrl().listExperts(req, res, next)
+);
 route.get("/messages", checkAccessWithSecretKey(), salon, (req, res, next) =>
   ctrl().getMessages(req, res, next)
+);
+route.post("/assign", checkAccessWithSecretKey(), salon, (req, res, next) =>
+  ctrl().assignExpert(req, res, next)
 );
 route.post(
   "/send",

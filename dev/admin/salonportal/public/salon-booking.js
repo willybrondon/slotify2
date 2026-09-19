@@ -272,6 +272,61 @@
     return null;
   }
 
+  function getServiceDepositPercent(svc) {
+    if (!svc) return 0;
+    const card = svc.detailCard || {};
+    const pct =
+      card.depositPercent != null
+        ? Number(card.depositPercent)
+        : svc.depositPercent != null
+          ? Number(svc.depositPercent)
+          : 0;
+    return Number.isFinite(pct) && pct > 0 ? Math.min(100, pct) : 0;
+  }
+
+  /** First selected service that needs an acompte (or project flow primary). */
+  function getDemandTargetService() {
+    const project = getPrimaryProjectService();
+    if (project) return project;
+    for (const sid of state.selectedServiceIds) {
+      const svc = cfg.services.find(
+        (s) => normalizeServiceId(s.id) === normalizeServiceId(sid)
+      );
+      if (getServiceDepositPercent(svc) > 0) {
+        return {
+          id: normalizeServiceId(sid),
+          service: svc,
+          meta: getAfroMeta(sid) || {},
+        };
+      }
+    }
+    return null;
+  }
+
+  function selectedNeedsDeposit() {
+    if (demandNeedsDeposit(state.afroDemand)) return true;
+    if (Number(state.afroDemand?.depositAmount) > 0) {
+      return state.afroDemand.depositStatus === "unpaid";
+    }
+    return getSelectedServices().some((s) => getServiceDepositPercent(s) > 0);
+  }
+
+  async function ensureAfroDemandForDeposit() {
+    if (state.afroDemand && Number(state.afroDemand.depositAmount) > 0) {
+      return state.afroDemand;
+    }
+    if (!selectedNeedsDeposit()) return null;
+    const answers = {
+      ...(state.afroAnswers && typeof state.afroAnswers === "object"
+        ? state.afroAnswers
+        : {}),
+      _skipPrecision: true,
+    };
+    return createAfroDemandFromAnswers(answers, state.afroPhotoUrls || [], {
+      skipPrecision: true,
+    });
+  }
+
   function clearAfroQuote() {
     state.afroAnswers = {};
     state.afroPhotoUrls = [];
@@ -914,6 +969,13 @@
           <button type="button" class="sq-svc-row__book${
             mode === "modal" && selected ? " sq-svc-row__book--selected" : ""
           }" ${actionAttr}>${escapeHtml(actionLabel)}</button>
+          ${
+            mode === "page"
+              ? `<button type="button" class="sq-svc-row__ask" data-svc-ask>${escapeHtml(
+                  t("messageAskAboutService") || "Poser une question"
+                )}</button>`
+              : ""
+          }
         </div>
       </div>
     </article>`;
@@ -932,19 +994,26 @@
   function bindSalonPageServiceCards(rootEl, opts = {}) {
     if (!rootEl) return;
     const mode = opts.mode === "modal" ? "modal" : "page";
+    if (window.SKEDISY_SALON_MESSAGING?.messagingEnabled === false) {
+      rootEl.querySelectorAll("[data-svc-ask]").forEach((el) => el.remove());
+    }
     const onSelectionChange =
       typeof opts.onSelectionChange === "function"
         ? opts.onSelectionChange
         : null;
+    const onToggleOpen =
+      typeof opts.onToggleOpen === "function" ? opts.onToggleOpen : null;
     rootEl.querySelectorAll(".sq-svc-row").forEach((row) => {
       const toggle = row.querySelector("[data-svc-toggle]");
       const bookBtn = row.querySelector("[data-svc-book]");
       const selectBtn = row.querySelector("[data-svc-select]");
+      const askBtn = row.querySelector("[data-svc-ask]");
       const sid = row.getAttribute("data-service-id");
       if (toggle) {
         toggle.addEventListener("click", () => {
           const open = row.classList.toggle("is-open");
           toggle.setAttribute("aria-expanded", open ? "true" : "false");
+          if (onToggleOpen) onToggleOpen(sid, open);
         });
       }
 
@@ -1029,7 +1098,7 @@
             }
           }
           applyPageDraftsToBookingState();
-          if (onSelectionChange) onSelectionChange();
+          if (onSelectionChange) onSelectionChange(sid);
         });
       }
 
@@ -1068,6 +1137,22 @@
             bookBtn.disabled = false;
             bookBtn.textContent = prevText;
           }
+        });
+      }
+
+      if (askBtn) {
+        askBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!sid || !window.SalonMessaging) return;
+          const svc = cfg.services.find(
+            (s) => normalizeServiceId(s.id) === normalizeServiceId(sid)
+          );
+          window.SalonMessaging.open({
+            serviceId: sid,
+            serviceName: svc?.name || "",
+            topic: "technical",
+          });
         });
       }
     });
@@ -1320,13 +1405,33 @@
 
   function renderServicesGrid() {
     if (!gridEl) return;
+    const openIds = new Set();
+    gridEl.querySelectorAll(".sq-svc-row.is-open").forEach((row) => {
+      const id = normalizeServiceId(row.getAttribute("data-service-id"));
+      if (id) openIds.add(id);
+    });
+    state.selectedServiceIds.forEach((id) =>
+      openIds.add(normalizeServiceId(id))
+    );
     const list =
       activeCategory === "all"
         ? cfg.services
         : cfg.services.filter((s) => s.categoryId === activeCategory);
-    gridEl.innerHTML = list.map((s) => buildSalonPageServiceCardHtml(s)).join("");
-    bindSalonPageServiceCards(gridEl);
+    const scrollTop = gridEl.scrollTop;
+    gridEl.innerHTML = list
+      .map((s) =>
+        buildSalonPageServiceCardHtml(s, {
+          forceOpen: openIds.has(normalizeServiceId(s.id)),
+        })
+      )
+      .join("");
+    bindSalonPageServiceCards(gridEl, {
+      onToggleOpen: (sid, isOpen) => {
+        /* page: open state re-collected on next renderServicesGrid */
+      },
+    });
     renderSalonPageSelectionUI();
+    gridEl.scrollTop = scrollTop;
   }
 
   function openModal() {
@@ -1430,6 +1535,20 @@
     state.withoutTax = Number(sub.toFixed(2));
     state.total = Number(totalAfter.toFixed(2));
     state.duration = dur;
+
+    let depositAmount = 0;
+    if (state.afroDemand && Number(state.afroDemand.depositAmount) > 0) {
+      depositAmount = Number(state.afroDemand.depositAmount);
+    } else {
+      const primary =
+        getDemandTargetService()?.service || serviceList[0] || null;
+      const pct = getServiceDepositPercent(primary);
+      if (pct > 0) {
+        depositAmount = Math.round((state.withoutTax * pct) / 100);
+      }
+    }
+    const balanceDue = Math.max(0, state.withoutTax - depositAmount);
+
     return {
       sub: state.withoutTax,
       tax: Number(taxAmount.toFixed(2)),
@@ -1437,9 +1556,9 @@
       total: state.total,
       discount,
       dur,
-      depositAmount: 0,
-      balanceDue: state.withoutTax,
-      quoted: false,
+      depositAmount,
+      balanceDue,
+      quoted: Boolean(state.afroDemand),
     };
   }
 
@@ -1485,6 +1604,10 @@
     if (state.policyAccepted) {
       body.policyAccepted = true;
       body.policyAcceptText = state.policyAcceptText || "";
+    }
+    const demandId = state.afroDemand?.id || state.afroDemand?._id;
+    if (demandId) {
+      body.demandId = String(demandId);
     }
     return body;
   }
@@ -1671,7 +1794,7 @@
   }
 
   async function createAfroDemandFromAnswers(answers, photoUrls, opts = {}) {
-    const primary = getPrimaryProjectService();
+    const primary = getDemandTargetService() || getPrimaryProjectService();
     if (!primary) throw new Error(t("selectOneService"));
     const payload = {
       salonId: cfg.salonId,
@@ -2028,7 +2151,33 @@
     const bGrid = document.getElementById("bookingServicesGrid");
     const cats = [{ id: "all", name: cfg.copy.allCategoriesTab }, ...cfg.categories];
     let cat = "all";
-    function paint() {
+    /** Keep accordion panels open across re-paints (selected + manually opened). */
+    const openServiceIds = new Set();
+    if (expandId) openServiceIds.add(expandId);
+    state.selectedServiceIds.forEach((id) =>
+      openServiceIds.add(normalizeServiceId(id))
+    );
+
+    function collectOpenIdsFromDom() {
+      if (!bGrid) return;
+      bGrid.querySelectorAll(".sq-svc-row.is-open").forEach((row) => {
+        const id = normalizeServiceId(row.getAttribute("data-service-id"));
+        if (id) openServiceIds.add(id);
+      });
+    }
+
+    function paint(optsPaint = {}) {
+      const scrollTop = bGrid ? bGrid.scrollTop : 0;
+      if (optsPaint.keepOpenFromDom !== false) {
+        collectOpenIdsFromDom();
+      }
+      if (optsPaint.focusServiceId) {
+        openServiceIds.add(normalizeServiceId(optsPaint.focusServiceId));
+      }
+      state.selectedServiceIds.forEach((id) =>
+        openServiceIds.add(normalizeServiceId(id))
+      );
+
       bTabs.innerHTML = cats
         .map(
           (tab) =>
@@ -2038,39 +2187,53 @@
       bTabs.querySelectorAll(".sq-service-tab").forEach((b) => {
         b.onclick = () => {
           cat = b.getAttribute("data-cat");
-          paint();
+          paint({ keepOpenFromDom: true });
         };
       });
       const filtered =
         cat === "all" ? list : list.filter((s) => s.categoryId === cat);
       bGrid.innerHTML = filtered
-        .map((s) =>
-          buildSalonPageServiceCardHtml(s, {
+        .map((s) => {
+          const sid = normalizeServiceId(s.id);
+          return buildSalonPageServiceCardHtml(s, {
             mode: "modal",
-            forceOpen:
-              expandId &&
-              normalizeServiceId(s.id) === expandId,
-          })
-        )
+            forceOpen: openServiceIds.has(sid),
+          });
+        })
         .join("");
       bindSalonPageServiceCards(bGrid, {
         mode: "modal",
-        onSelectionChange: () => {
-          paint();
+        onToggleOpen: (sid, isOpen) => {
+          const id = normalizeServiceId(sid);
+          if (isOpen) openServiceIds.add(id);
+          else openServiceIds.delete(id);
+        },
+        onSelectionChange: (sid) => {
+          paint({
+            keepOpenFromDom: true,
+            focusServiceId: sid || null,
+          });
           renderSalonPageSelectionUI();
           renderServicesStickyBar();
+          if (sid && bGrid) {
+            const row = bGrid.querySelector(
+              `.sq-svc-row[data-service-id="${CSS.escape(normalizeServiceId(sid))}"]`
+            );
+            row?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
         },
       });
       renderSalonPageSelectionUI();
       renderServicesStickyBar();
-      if (expandId) {
+      if (bGrid) bGrid.scrollTop = scrollTop;
+      if (optsPaint.scrollToExpand && expandId) {
         const openRow = bGrid.querySelector(
           `.sq-svc-row[data-service-id="${CSS.escape(expandId)}"]`
         );
         openRow?.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
     }
-    paint();
+    paint({ keepOpenFromDom: false, scrollToExpand: Boolean(expandId) });
     if (stepsEl) stepsEl.scrollTop = 0;
   }
 
@@ -2386,6 +2549,10 @@
           : "";
       html += `<p class="sq-booking-summary__discount">${escapeHtml(cfg.copy.discount)} : −${escapeHtml(cfg.currency)}${totals.discount.toFixed(2)}${loyaltyBit}</p>`;
     }
+    if (Number(totals.depositAmount) > 0) {
+      html += `<p>${escapeHtml(t("afroDeposit") || "Acompte")} : <strong>${escapeHtml(cfg.currency)}${Number(totals.depositAmount).toFixed(2)}</strong></p>`;
+      html += `<p>${escapeHtml(t("afroBalanceDue") || "Reste à régler")} : ${escapeHtml(cfg.currency)}${Number(totals.balanceDue || 0).toFixed(2)}</p>`;
+    }
     html += `<p class="sq-booking-summary__total"><strong>${escapeHtml(cfg.copy.totalLabel)} : ${escapeHtml(cfg.currency)}${totals.total.toFixed(2)}</strong></p>`;
     return html;
   }
@@ -2504,9 +2671,21 @@
   async function renderStepPayment() {
     hideBookingStickyBar();
     await refreshPaymentSettings();
+
+    if (selectedNeedsDeposit()) {
+      try {
+        stepsEl.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("loading"))}</p>`;
+        await ensureAfroDemandForDeposit();
+      } catch (err) {
+        showBookingNotice("error", err.message || t("genericError"), () =>
+          renderStepContact()
+        );
+        return;
+      }
+    }
+
     const totals = calcTotals(getSelectedServices());
-    // Plus d’acompte via devis — paiement classique à la confirmation
-    const needDeposit = false;
+    const needDeposit = demandNeedsDeposit(state.afroDemand);
     const methods = getAvailablePaymentMethods();
     const showStripe = methods.some((m) => m.value === "Stripe");
 
@@ -3050,6 +3229,17 @@
   }
 
   window.SalonBooking = {
+    getSelectedServiceContext() {
+      const sid = state.selectedServiceIds?.[0];
+      if (!sid) return null;
+      const svc = cfg.services.find(
+        (s) => normalizeServiceId(s.id) === normalizeServiceId(sid)
+      );
+      return {
+        serviceId: normalizeServiceId(sid),
+        serviceName: svc?.name || "",
+      };
+    },
     async open(opts = {}) {
       state.bookingFromExpert = Boolean(opts.expertId);
       state.returnToExpertStep = false;

@@ -164,7 +164,22 @@ function computeQuote({ salon, service, serviceId, answers = {}, photoUrls = [],
     durationBreakdown.push({ label: "Buffer préparation", minutes: prepBuffer });
   }
 
-  const depositPolicy = afro.depositPolicy || { enabled: false, type: "percent", value: 0 };
+  const cardDepositPct =
+    entry?.detailCard?.depositPercent != null
+      ? Number(entry.detailCard.depositPercent)
+      : null;
+  let depositPolicy = afro.depositPolicy || { enabled: false, type: "percent", value: 0 };
+  if (
+    (!depositPolicy.enabled || !(Number(depositPolicy.value) > 0)) &&
+    cardDepositPct != null &&
+    cardDepositPct > 0
+  ) {
+    depositPolicy = {
+      enabled: true,
+      type: "percent",
+      value: Math.min(100, cardDepositPct),
+    };
+  }
   let depositAmount = 0;
   let depositStatus = "not_required";
   if (depositPolicy.enabled && Number(depositPolicy.value) > 0) {

@@ -11,6 +11,22 @@ function resolveSalonCommissionPercent(salon, setting) {
   return Number.isNaN(globalFee) ? 0 : globalFee;
 }
 
+/**
+ * Effective % to charge on this booking.
+ * When acquisitionCommissionOnly: 0 unless monetization.chargePlatformFee.
+ */
+function resolveEffectiveCommissionPercent(salon, setting, monetization) {
+  const base = resolveSalonCommissionPercent(salon, setting);
+  if (!monetization) return base;
+  try {
+    const { isAcquisitionCommissionMode } = require("./acquisition.service");
+    if (!isAcquisitionCommissionMode(setting)) return base;
+  } catch (_) {
+    return base;
+  }
+  return monetization.chargePlatformFee ? base : 0;
+}
+
 /** Minimum wallet floor — per-salon override, else global admin default */
 function resolveMinWalletBalance(salon, setting) {
   if (salon?.minWalletBalance != null && salon.minWalletBalance !== "") {
@@ -30,8 +46,17 @@ function isSalonWalletCommissionEnabled(setting) {
   return s.isSalonWalletRecharge === true;
 }
 
-function computeExpectedPlatformFee(salon, setting, servicePriceWithoutTax) {
-  const commissionPercent = resolveSalonCommissionPercent(salon, setting);
+function computeExpectedPlatformFee(
+  salon,
+  setting,
+  servicePriceWithoutTax,
+  monetization
+) {
+  const commissionPercent = resolveEffectiveCommissionPercent(
+    salon,
+    setting,
+    monetization
+  );
   const base = parseFloat(servicePriceWithoutTax) || 0;
   return (commissionPercent * base) / 100;
 }
@@ -39,10 +64,20 @@ function computeExpectedPlatformFee(salon, setting, servicePriceWithoutTax) {
 /**
  * Skedisy commission is always prepaid from salon.wallet (never deducted from client card payment).
  */
-function computeRequiredSalonWalletBalance({ salon, setting, servicePriceWithoutTax }) {
+function computeRequiredSalonWalletBalance({
+  salon,
+  setting,
+  servicePriceWithoutTax,
+  monetization,
+}) {
   if (!isSalonWalletCommissionEnabled(setting)) return 0;
   const minBalance = resolveMinWalletBalance(salon, setting);
-  const expectedPlatformFee = computeExpectedPlatformFee(salon, setting, servicePriceWithoutTax);
+  const expectedPlatformFee = computeExpectedPlatformFee(
+    salon,
+    setting,
+    servicePriceWithoutTax,
+    monetization
+  );
   return minBalance + expectedPlatformFee;
 }
 
@@ -53,6 +88,7 @@ function shouldDebitSalonWalletForCommission(setting) {
 module.exports = {
   isSalonWalletCommissionEnabled,
   resolveSalonCommissionPercent,
+  resolveEffectiveCommissionPercent,
   resolveMinWalletBalance,
   computeExpectedPlatformFee,
   computeRequiredSalonWalletBalance,

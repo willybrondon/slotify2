@@ -31,6 +31,7 @@ export const SKEDISY_ADMIN_UI = {
     userRecharge: "Rechargements",
     expertEarnings: "Gains pros",
     coupon: "Codes promo",
+    subscriptions: "Abonnements SaaS",
     salonPayment: "Paiements salons",
     expertPayments: "Paiements experts",
     expertWithdrawHistory: "Historique retraits pros",

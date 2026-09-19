@@ -61,6 +61,27 @@ const settingSchema = new mongoose.Schema(
     /** Global default for auto-confirm bookings when salon has no override */
     autoConfirmBookings: { type: Boolean, default: true },
 
+    /**
+     * Monetization model (Skedisy):
+     * false = legacy flat % on every booking
+     * true  = commission only on 1st Skedisy-acquired client booking per salon
+     */
+    acquisitionCommissionOnly: { type: Boolean, default: false },
+
+    /**
+     * One-shot 2nd-visit client incentive (after 1st completed Skedisy-acquired visit).
+     * Prefer flat €5 OR 10% — take the lower when both set.
+     */
+    secondVisitIncentive: {
+      enabled: { type: Boolean, default: true },
+      flatAmount: { type: Number, default: 5 },
+      percent: { type: Number, default: 10 },
+      /** salon | skedisy | shared */
+      funder: { type: String, default: "skedisy" },
+      expiresDays: { type: Number, default: 90 },
+      skedisyMaxPerMonth: { type: Number, default: 500 },
+    },
+
     /** Comma-separated emails: receive new-booking approve/decline links + customer cancellation notices */
     reservationNotificationEmails: { type: String, default: "" },
   },

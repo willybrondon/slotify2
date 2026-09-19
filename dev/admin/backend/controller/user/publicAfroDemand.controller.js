@@ -12,6 +12,14 @@ async function loadSalon(salonId) {
   return Salon.findOne({ _id: salonId, isDelete: false, isActive: true }).lean();
 }
 
+function entryAllowsDepositWithoutAfroFlow(entry) {
+  if (!entry) return false;
+  const pct = Number(entry.detailCard?.depositPercent);
+  if (pct > 0) return true;
+  const policy = entry.afroConfig?.depositPolicy;
+  return Boolean(policy?.enabled && Number(policy.value) > 0);
+}
+
 /**
  * GET /api/public/demand/services?salonId=
  * Lists services with afroConfig when afroProjectFlowEnabled.
@@ -125,13 +133,19 @@ exports.publicCreateDemand = async (req, res) => {
     const { salonId, serviceId } = body;
     const salon = await loadSalon(salonId);
     if (!salon) return bad(res, "Salon not found", 404);
-    if (!salon.afroProjectFlowEnabled) return bad(res, "Afro project flow not enabled", 403);
 
     const service = await Service.findById(serviceId).lean();
     if (!service || service.isDelete) return bad(res, "Service not found", 404);
 
     const entry = getSalonServiceEntry(salon, serviceId);
     if (!entry) return bad(res, "Service not offered by this salon");
+
+    if (
+      !salon.afroProjectFlowEnabled &&
+      !entryAllowsDepositWithoutAfroFlow(entry)
+    ) {
+      return bad(res, "Afro project flow not enabled", 403);
+    }
 
     const result = computeQuote({
       salon,
@@ -403,6 +417,11 @@ exports.publicConvertDemand = async (req, res) => {
         withoutTax,
         amount,
         paymentType: body.paymentType || "cashAfterService",
+        channel:
+          body.channel ||
+          demand.channelHint ||
+          demand.source ||
+          "web",
       },
     };
 

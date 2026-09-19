@@ -16,13 +16,16 @@ const {
   getSalonSlotsForDay,
 } = require("./teamSchedule.service");
 const {
-  resolveSalonCommissionPercent,
+  resolveEffectiveCommissionPercent,
   computeRequiredSalonWalletBalance,
-  resolveMinWalletBalance,
   shouldDebitSalonWalletForCommission,
   isSalonWalletCommissionEnabled,
 } = require("./salonBookingWallet.service");
 const { resolveInitialBookingStatus } = require("./bookingStatus.service");
+const {
+  resolveBookingMonetization,
+  recordBookingAttribution,
+} = require("./acquisition.service");
 
 const SLOT_MINUTES = 15;
 
@@ -196,10 +199,17 @@ async function createPlanningBooking(salon, body) {
   await assertSlotsAvailable({ expertId: expert._id, date, timeArray });
 
   const setting = global.settingJSON || {};
+  const monetization = await resolveBookingMonetization({
+    userId: user._id,
+    salonId: salon._id,
+    channel: body.channel || "salon_panel",
+    setting,
+  });
   const requiredWallet = computeRequiredSalonWalletBalance({
     salon,
     setting,
     servicePriceWithoutTax: withoutTax,
+    monetization,
   });
   if (isSalonWalletCommissionEnabled(setting) && (salon.wallet || 0) < requiredWallet) {
     throw new Error("Solde portefeuille salon insuffisant pour la commission");
@@ -208,7 +218,11 @@ async function createPlanningBooking(salon, body) {
   const taxPercent = parseFloat(setting.tax) || 0;
   const taxAmount = parseFloat(((withoutTax * taxPercent) / 100).toFixed(2));
   const amount = parseFloat((withoutTax + taxAmount).toFixed(2));
-  const salonCommissionPercent = resolveSalonCommissionPercent(salon, setting);
+  const salonCommissionPercent = resolveEffectiveCommissionPercent(
+    salon,
+    setting,
+    monetization
+  );
   const customerCommissionPercent = parseFloat(setting.customerCommissionCharges) || 0;
   const platformFee = parseFloat(((salonCommissionPercent * withoutTax) / 100).toFixed(2));
   const customerCommission =
@@ -246,7 +260,17 @@ async function createPlanningBooking(salon, body) {
     expertEarning: parseFloat((withoutTax - platformFee - salonCommission).toFixed(2)),
     bookingId: await generateUniqueBookingId(),
     coupon: {},
+    channel: monetization.channel,
+    acquisitionAttributed: Boolean(monetization.acquisitionAttributed),
+    commissionReason: monetization.commissionReason,
+    acquiredBy: monetization.acquiredBy,
   });
+
+  try {
+    await recordBookingAttribution(monetization.relation, booking, monetization);
+  } catch (attrErr) {
+    console.warn("[teamSchedule createBooking] attribution", attrErr.message);
+  }
 
   if (platformFee > 0 && shouldDebitSalonWalletForCommission(setting)) {
     salon.wallet = (salon.wallet || 0) - platformFee;
@@ -384,7 +408,19 @@ function applyBookingFinancials(booking, expert, salon, withoutTax, setting) {
   const taxPercent = parseFloat(setting.tax) || 0;
   const taxAmount = parseFloat(((withoutTax * taxPercent) / 100).toFixed(2));
   const amount = parseFloat((withoutTax + taxAmount).toFixed(2));
-  const salonCommissionPercent = resolveSalonCommissionPercent(salon, setting);
+  // Preserve acquisition gate from original booking attribution
+  const monetizationHint = {
+    chargePlatformFee:
+      booking.commissionReason !== "none" &&
+      (booking.commissionReason === "acquisition_first" ||
+        booking.commissionReason === "legacy_flat" ||
+        !booking.commissionReason),
+  };
+  const salonCommissionPercent = resolveEffectiveCommissionPercent(
+    salon,
+    setting,
+    monetizationHint
+  );
   const customerCommissionPercent = parseFloat(setting.customerCommissionCharges) || 0;
   const platformFee = parseFloat(((salonCommissionPercent * withoutTax) / 100).toFixed(2));
   const customerCommission =
@@ -507,10 +543,14 @@ async function updatePlanningBookingServices(salon, body) {
   const oldPlatformFee = booking.platformFee || 0;
   const { platformFee } = applyBookingFinancials(booking, expert, salon, withoutTax, setting);
 
+  const monetizationHint = {
+    chargePlatformFee: booking.commissionReason !== "none",
+  };
   const requiredWallet = computeRequiredSalonWalletBalance({
     salon,
     setting,
     servicePriceWithoutTax: withoutTax,
+    monetization: monetizationHint,
   });
   if (isSalonWalletCommissionEnabled(setting)) {
     const projectedWallet = (salon.wallet || 0) - Math.max(0, platformFee - oldPlatformFee);

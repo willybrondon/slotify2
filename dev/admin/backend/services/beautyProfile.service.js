@@ -16,7 +16,22 @@ async function syncBeautyProfileFromBooking(booking) {
     if (answers.finesse_nattes) bp.hairType = bp.hairType || String(answers.finesse_nattes);
     if (answers.longueur) bp.hairLength = String(answers.longueur);
   }
+  if (answers.hairType) bp.hairType = String(answers.hairType);
+  if (answers.hairLength) bp.hairLength = String(answers.hairLength);
+  if (answers.sensitivity || answers.scalpSensitivity) {
+    bp.sensitivity = String(answers.sensitivity || answers.scalpSensitivity);
+  }
   if (answers.preferences) bp.preferences = String(answers.preferences);
+  const quizBits = [
+    answers.hairCondition,
+    answers.styleInterest,
+    answers.bookingGoal || answers.occasion,
+  ]
+    .map((x) => (x != null ? String(x).trim() : ""))
+    .filter(Boolean);
+  if (quizBits.length) {
+    bp.preferences = [bp.preferences, ...quizBits].filter(Boolean).join(" · ").slice(0, 200);
+  }
 
   bp.lastConfig = {
     answers,

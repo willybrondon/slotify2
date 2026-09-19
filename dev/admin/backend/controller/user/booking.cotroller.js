@@ -544,17 +544,35 @@ exports.newBooking = async (req, res, next) => {
 
     const {
       resolveSalonCommissionPercent,
+      resolveEffectiveCommissionPercent,
       computeRequiredSalonWalletBalance,
       shouldDebitSalonWalletForCommission,
     } = require("../../services/salonBookingWallet.service");
     const { salonPaymentOptions } = require("../../services/stripeConnect.service");
+    const {
+      resolveBookingMonetization,
+      recordBookingAttribution,
+      computeSecondVisitIncentiveAmount,
+    } = require("../../services/acquisition.service");
 
     const setting = await Setting.findOne().sort({ createdAt: -1 });
+    const monetization = await resolveBookingMonetization({
+      userId: user._id,
+      salonId: salon._id,
+      channel: req.body.channel || req.body.bookingChannel || "",
+      setting,
+      demandSource: linkedDemand?.source || linkedDemand?.channelHint || "",
+    });
+
     const minUserWalletBalance = setting?.minUserWalletBalance || 0;
     const salonWalletBalance = salon.wallet || 0;
     const userWalletBalance = user.amount || 0;
 
-    const salonCommissionPercent = resolveSalonCommissionPercent(salon, setting);
+    const salonCommissionPercent = resolveEffectiveCommissionPercent(
+      salon,
+      setting,
+      monetization
+    );
     const customerCommissionPercent = setting?.customerCommissionCharges || 0;
 
     const services = req.body.serviceId.split(",").map(s => s.trim());
@@ -570,6 +588,7 @@ exports.newBooking = async (req, res, next) => {
       salon,
       setting,
       servicePriceWithoutTax: totalServicePriceForCheck,
+      monetization,
     });
 
     if (requiredBalance > 0 && salonWalletBalance < requiredBalance) {
@@ -1093,10 +1112,32 @@ exports.newBooking = async (req, res, next) => {
     booking.amount = req.body.amount;
     booking.tax = taxAmount.toFixed(2);
 
-    // Calculate salon commission (from settings or salon.platformFee as fallback)
+    // Calculate salon commission (acquisition-gated when flag on)
     const platformFee = (salonCommissionPercent * req.body.withoutTax) / 100;
     booking.platformFee = parseInt(platformFee);
     booking.platformFeePercent = salonCommissionPercent.toFixed(2);
+    booking.channel = monetization.channel;
+    booking.acquisitionAttributed = Boolean(monetization.acquisitionAttributed);
+    booking.commissionReason = monetization.commissionReason;
+    booking.acquiredBy = monetization.acquiredBy;
+
+    // One-shot 2nd-visit incentive snapshot (amount applied in checkout Phase B / wallet credit)
+    if (monetization.secondVisitIncentiveApplicable) {
+      const incentiveAmt = computeSecondVisitIncentiveAmount(
+        req.body.withoutTax,
+        setting
+      );
+      if (incentiveAmt > 0) {
+        booking.secondVisitIncentive = {
+          amount: incentiveAmt,
+          funder: setting?.secondVisitIncentive?.funder || "skedisy",
+          type:
+            Number(setting?.secondVisitIncentive?.percent) > 0
+              ? "percent_capped"
+              : "flat",
+        };
+      }
+    }
     
     // Calculate and store customer commission (from settings)
     const customerCommission = customerCommissionPercent > 0 ? (customerCommissionPercent * req.body.withoutTax) / 100 : 0;
@@ -1208,6 +1249,23 @@ exports.newBooking = async (req, res, next) => {
 
     // Save booking first to get a valid _id
     await booking.save();
+
+    try {
+      await recordBookingAttribution(
+        monetization.relation,
+        booking,
+        monetization
+      );
+    } catch (attrErr) {
+      console.warn("[newBooking] attribution", attrErr.message);
+    }
+
+    try {
+      const { syncBeautyProfileFromBooking } = require("../../services/beautyProfile.service");
+      await syncBeautyProfileFromBooking(booking);
+    } catch (bpErr) {
+      console.warn("[newBooking] beautyProfile sync", bpErr.message);
+    }
 
     if (linkedDemand) {
       linkedDemand.bookingId = booking._id;

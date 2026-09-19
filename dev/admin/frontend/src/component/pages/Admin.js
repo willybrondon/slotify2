@@ -62,6 +62,7 @@ import OrderDetails from "../tables/order/OrderDetails";
 import UserOrderHistory from "../tables/User/UserOrderHistory";
 import SalonOrder from "../tables/salon/SalonOrder";
 import Coupon from "../tables/coupon/Coupon";
+import SubscriptionPlans from "../tables/subscription/SubscriptionPlans";
 import AdminTeamCalendar from "../tables/calendar/AdminTeamCalendar";
 
 const Admin = () => {
@@ -155,6 +156,7 @@ const Admin = () => {
               element={<ParticularSalonSettlementInfo />}
             />
             <Route path="/coupon" element={<Coupon />} />
+            <Route path="/subscriptions" element={<SubscriptionPlans />} />
           </Routes>
         </div>
       </div>

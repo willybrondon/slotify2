@@ -22,11 +22,20 @@ const salonMessageSchema = new mongoose.Schema(
     },
     sender: {
       type: String,
-      enum: ["user", "salon"],
+      enum: ["user", "salon", "system", "expert"],
       required: true,
+    },
+    /** When sender is expert — who wrote the reply. */
+    expertId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Expert",
+      default: null,
     },
     body: { type: String, default: "" },
     photoUrls: [{ type: String }],
+    isQueueAck: { type: Boolean, default: false },
+    isAutoReply: { type: Boolean, default: false },
+    autoReplyTopic: { type: String, default: null },
   },
   { timestamps: true, versionKey: false }
 );

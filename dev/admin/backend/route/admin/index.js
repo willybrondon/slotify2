@@ -32,6 +32,7 @@ const order = require("./order.route");
 const expertWithdrawRequest = require("./expertWithdrawRequest.route");
 const salonWithdrawRequest = require("./salonWithdrawRequest.route");
 const teamSchedule = require("./teamSchedule.route");
+const subscriptionPlan = require("./subscriptionPlan.route");
 
 route.use("/address", address);
 route.use("/login", login);
@@ -44,6 +45,7 @@ route.use("/notification", notification);
 route.use("/expert", expert);
 route.use("/booking", booking);
 route.use("/teamSchedule", teamSchedule);
+route.use("/subscription", subscriptionPlan);
 route.use("/review", review);
 route.use("/salonClose", salonClose);
 route.use("/", admin);

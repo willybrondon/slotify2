@@ -6,6 +6,9 @@ const User = require("../../models/user.model");
 const {
   getOrCreateConversation,
   postMessage,
+  resolveConversationContext,
+  oidOrNull,
+  normalizeTopic,
 } = require("../../services/salonMessaging.service");
 
 function photoUrlsFromFiles(files) {
@@ -34,8 +37,17 @@ function filesFromRequest(req) {
   return [];
 }
 
+function contextFromReq(src = {}) {
+  return {
+    serviceId: oidOrNull(src.serviceId),
+    demandId: oidOrNull(src.demandId),
+    bookingId: oidOrNull(src.bookingId),
+    topic: normalizeTopic(src.topic),
+  };
+}
+
 /**
- * GET /api/public/messaging/thread?salonId=&userId=
+ * GET /api/public/messaging/thread?salonId=&userId=&serviceId=&demandId=&bookingId=&topic=
  * Returns conversation + recent messages (creates empty thread if needed).
  */
 exports.publicGetThread = async (req, res) => {
@@ -50,7 +62,8 @@ exports.publicGetThread = async (req, res) => {
     }
 
     const salon = await Salon.findById(salonId)
-      .select("name mobile messagingEnabled instagramUrl")
+      .select("name mobile messagingEnabled instagramUrl serviceIds")
+      .populate("serviceIds.id", "name duration")
       .lean();
     if (!salon) {
       return res.status(404).json({ status: false, message: "Salon not found" });
@@ -68,7 +81,8 @@ exports.publicGetThread = async (req, res) => {
       return res.status(404).json({ status: false, message: "User not found" });
     }
 
-    const conversation = await getOrCreateConversation(salonId, userId);
+    const context = contextFromReq(req.query);
+    const conversation = await getOrCreateConversation(salonId, userId, context);
     conversation.unreadUser = 0;
     await conversation.save();
 
@@ -76,6 +90,8 @@ exports.publicGetThread = async (req, res) => {
       .sort({ createdAt: 1 })
       .limit(100)
       .lean();
+
+    const contextOut = await resolveConversationContext(conversation, salon);
 
     return res.status(200).json({
       status: true,
@@ -90,7 +106,9 @@ exports.publicGetThread = async (req, res) => {
         _id: conversation._id,
         lastMessageAt: conversation.lastMessageAt,
         lastPreview: conversation.lastPreview,
+        ...contextOut,
       },
+      context: contextOut,
       messages,
     });
   } catch (error) {
@@ -101,7 +119,7 @@ exports.publicGetThread = async (req, res) => {
 
 /**
  * POST /api/public/messaging/send
- * body: salonId, userId, body ; files: photos[]
+ * body: salonId, userId, body, serviceId?, demandId?, bookingId?, topic? ; files: photos[]
  */
 exports.publicSendMessage = async (req, res) => {
   try {
@@ -130,16 +148,36 @@ exports.publicSendMessage = async (req, res) => {
     }
 
     const photoUrls = photoUrlsFromFiles(filesFromRequest(req));
+    const context = contextFromReq(req.body);
+    const lang = String(req.body?.lang || req.query?.lang || "fr")
+      .toLowerCase()
+      .startsWith("en")
+      ? "en"
+      : "fr";
 
-    const conversation = await getOrCreateConversation(salonId, userId);
+    const conversation = await getOrCreateConversation(salonId, userId, context);
     const msg = await postMessage({
       conversation,
       sender: "user",
       body,
       photoUrls,
+      hintTopic: context.topic || null,
+      lang,
     });
 
-    return res.status(200).json({ status: true, message: msg });
+    // Reload after qualify/auto-reply may have mutated the conversation
+    const fresh = await Conversation.findById(conversation._id);
+    const contextOut = await resolveConversationContext(fresh || conversation);
+
+    return res.status(200).json({
+      status: true,
+      message: msg,
+      qualification: msg.qualification || null,
+      conversation: {
+        _id: (fresh || conversation)._id,
+        ...contextOut,
+      },
+    });
   } catch (error) {
     console.error("[publicSendMessage]", error);
     return res.status(500).json({ status: false, message: error.message });

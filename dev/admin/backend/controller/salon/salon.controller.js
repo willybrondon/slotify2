@@ -490,7 +490,7 @@ const cleanList = (arr, max = 5) =>
         : entry.detailCard?.prepFamilyId || null,
     };
 
-    // Keep afroConfig.addonDefs / prepBuffer in sync so computeQuote + tunnel use the same catalog
+    // Keep afroConfig.addonDefs / prepBuffer / depositPolicy in sync so computeQuote + tunnel match
     const afro = entry.afroConfig && typeof entry.afroConfig === "object"
       ? { ...entry.afroConfig }
       : {};
@@ -502,6 +502,16 @@ const cleanList = (arr, max = 5) =>
         0,
         Math.min(120, Number(detailCard.prepBufferMinutes) || 0)
       );
+    }
+    const depPct = entry.detailCard.depositPercent;
+    if (depPct != null && Number(depPct) > 0) {
+      afro.depositPolicy = {
+        enabled: true,
+        type: "percent",
+        value: Math.min(100, Math.max(0, Number(depPct) || 0)),
+      };
+    } else if (depPct === 0 || depPct === null) {
+      afro.depositPolicy = { enabled: false, type: "percent", value: 0 };
     }
     if (Object.keys(afro).length) {
       entry.afroConfig = afro;

@@ -318,6 +318,10 @@ exports.publicCreateBooking = async (req, res) => {
     if (req.body.withoutTax !== undefined && req.body.withoutTax !== null) {
       req.body.withoutTax = parseFloat(req.body.withoutTax);
     }
+    // Skedisy public web / guest funnel → acquisition channel
+    if (!req.body.channel && !req.body.bookingChannel) {
+      req.body.channel = req.body.guestId || req.body.isGuest ? "guest" : "web";
+    }
 
     const result = await runController(bookingController.newBooking, req, res);
     const payload = result.payload;

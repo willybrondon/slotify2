@@ -24,11 +24,17 @@ import { ReactComponent as Delete } from "../../../assets/icon/delete.svg";
 import dayjs from "dayjs";
 import Pagination from "../../extras/Pagination";
 import { toast } from "react-toastify";
+import Button from "../../extras/Button";
+import {
+  getSubscriptionPlans,
+  getSalonSubscription,
+  assignSalonSubscription,
+} from "../../../redux/slice/subscriptionSlice";
 
 const SalonProfile = () => {
   const { salonDetail, review, salonProduct, total, shareLink } = useSelector((state) => state.salon);
   const { setting } = useSelector((state) => state.setting);
-;
+  const { plans, salonSubscription } = useSelector((state) => state.subscription);
   const loader = useSelector(isLoading);
 
   const state = useLocation();
@@ -50,13 +56,40 @@ const SalonProfile = () => {
   const dispatch = useDispatch();
   const [serviceData, setServiceData] = useState([]);
   const [productData, setProductData] = useState([]);
+  const [subPlanId, setSubPlanId] = useState("free");
+  const [subStatus, setSubStatus] = useState("none");
 
   useEffect(() => {
     dispatch(getSalonDetail(state?.state?.id));
     dispatch(getSalonReview(state?.state?.id));
     dispatch(getSalonProductDetails({ salonId: state?.state?.id, start: page, limit: rowsPerPage }));
     dispatch(getSalonShareLink(state?.state?.id));
+    dispatch(getSubscriptionPlans());
+    if (state?.state?.id) {
+      dispatch(getSalonSubscription(state.state.id));
+    }
   }, [dispatch, state, page, rowsPerPage, type]);
+
+  useEffect(() => {
+    if (salonSubscription) {
+      setSubPlanId(salonSubscription.planId || "free");
+      setSubStatus(salonSubscription.status || "none");
+    } else if (salonDetail?.subscription) {
+      setSubPlanId(salonDetail.subscription.planId || "free");
+      setSubStatus(salonDetail.subscription.status || "none");
+    }
+  }, [salonSubscription, salonDetail]);
+
+  const handleAssignSubscription = () => {
+    if (!state?.state?.id) return;
+    dispatch(
+      assignSalonSubscription({
+        salonId: state.state.id,
+        planId: subPlanId,
+        status: subStatus,
+      })
+    );
+  };
   // useEffect(() => {
   //   dispatch(getSalonOrderDetails({ salonId: state?.state?.id, start: page, limit: rowsPerPage, status: orderType }))
 
@@ -408,6 +441,59 @@ const SalonProfile = () => {
                       readOnly
                     />
                   )}
+                </div>
+                <div className="col-12 mt-2 mb-3">
+                  <div className="border rounded p-3 bg-light">
+                    <h6 className="mb-2">Abonnement Skedisy (SaaS)</h6>
+                    <div className="row g-2 align-items-end">
+                      <div className="col-md-4">
+                        <label className="form-label">Plan</label>
+                        <select
+                          className="form-select"
+                          value={subPlanId}
+                          onChange={(e) => setSubPlanId(e.target.value)}
+                        >
+                          {(plans || []).map((p) => (
+                            <option key={p._id} value={p.planId}>
+                              {p.name} ({p.priceMonthly}€/mo)
+                            </option>
+                          ))}
+                          {!plans?.length && (
+                            <option value="free">Free</option>
+                          )}
+                        </select>
+                      </div>
+                      <div className="col-md-3">
+                        <label className="form-label">Statut</label>
+                        <select
+                          className="form-select"
+                          value={subStatus}
+                          onChange={(e) => setSubStatus(e.target.value)}
+                        >
+                          <option value="none">none</option>
+                          <option value="trialing">trialing</option>
+                          <option value="active">active</option>
+                          <option value="past_due">past_due</option>
+                          <option value="canceled">canceled</option>
+                          <option value="unpaid">unpaid</option>
+                        </select>
+                      </div>
+                      <div className="col-md-3">
+                        <Button
+                          text="Attribuer le plan"
+                          className="bg-theme text-white"
+                          onClick={handleAssignSubscription}
+                        />
+                      </div>
+                      <div className="col-12">
+                        <small className="text-muted">
+                          Features actives :{" "}
+                          {(salonSubscription?.features || []).join(", ") ||
+                            "—"}
+                        </small>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="col-md-6">
                   {loader === true ? (

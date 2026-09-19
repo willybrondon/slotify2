@@ -39,6 +39,31 @@ const salonSchema = new mongoose.Schema(
     /** Allow clients to Message the salon from the public profile */
     messagingEnabled: { type: Boolean, default: true },
 
+    /**
+     * Software subscription (Skedisy SaaS).
+     * Plans catalog: SubscriptionPlan (admin). Features gated via subscription.service.
+     */
+    subscription: {
+      planId: { type: String, default: "free" },
+      status: {
+        type: String,
+        enum: ["none", "trialing", "active", "past_due", "canceled", "unpaid"],
+        default: "none",
+      },
+      stripeCustomerId: { type: String, default: "" },
+      stripeSubscriptionId: { type: String, default: "" },
+      currentPeriodEnd: { type: Date, default: null },
+      cancelAtPeriodEnd: { type: Boolean, default: false },
+      /**
+       * StyleSeat-style opt-in/out on top of plan matrix.
+       * { marketplace_discovery: false } disables a Premium feature.
+       */
+      featureOverrides: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {},
+      },
+    },
+
     platformFee: { type: Number, default: 0 },
     /** Override global minSalonWalletBalance; null = use platform default */
     minWalletBalance: { type: Number, default: null },
@@ -103,7 +128,8 @@ const salonSchema = new mongoose.Schema(
       /** % off HT when rebooking the same service */
       sameServiceRebookPercent: { type: Number, default: 10 },
       /** Need this many completed same-service visits before discount applies (1 = 2nd visit) */
-      minCompletedCount: { type: Number, default: 1 },
+      /** 2 = loyalty from 3rd completed visit (2nd = Skedisy incentive window) */
+      minCompletedCount: { type: Number, default: 2 },
       /** Cap in currency units; 0 = no cap */
       maxDiscountAmount: { type: Number, default: 0 },
     },

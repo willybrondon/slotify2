@@ -549,6 +549,18 @@ exports.completeBooking = async (req, res) => {
         } catch (bpErr) {
           console.warn("[completeBooking] beauty profile:", bpErr.message);
         }
+        try {
+          const {
+            onBookingCompletedForAcquisition,
+          } = require("../../services/acquisition.service");
+          const Setting = require("../../models/setting.model");
+          const setting =
+            global.settingJSON ||
+            (await Setting.findOne().sort({ createdAt: -1 }).lean());
+          await onBookingCompletedForAcquisition(fresh, setting);
+        } catch (acqErr) {
+          console.warn("[completeBooking] acquisition:", acqErr.message);
+        }
       })(),
       Expert.updateOne(
         { _id: salon._id, earning: { $gt: 0 } },

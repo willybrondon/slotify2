@@ -42,8 +42,10 @@
           <h3 id="sqMsgTitle">${escapeHtml(t("messageTitle"))}</h3>
           <p class="sq-msg-modal__sub" id="sqMsgSub"></p>
         </div>
+        <div class="sq-msg-context" id="sqMsgContext" hidden></div>
         <div class="sq-msg-modal__body" id="sqMsgBody"></div>
         <div class="sq-msg-modal__compose" id="sqMsgCompose" hidden>
+          <div class="sq-msg-topics" id="sqMsgTopics" role="group" aria-label="Sujet"></div>
           <div class="sq-msg-photos" id="sqMsgPhotos"></div>
           <label class="sq-msg-photo-btn">
             <input type="file" id="sqMsgFile" accept="image/*" multiple hidden />
@@ -63,15 +65,128 @@
       renderPendingPhotos();
     });
     root.querySelector("#sqMsgSend").addEventListener("click", send);
+    renderTopicChips();
     return root;
   }
+
+  const TOPIC_CHIPS = [
+    { id: "price", labelKey: "messageTopicPrice", fallback: "Prix / durée" },
+    { id: "booking", labelKey: "messageTopicBooking", fallback: "Réservation" },
+    { id: "prep", labelKey: "messageTopicPrep", fallback: "Préparation" },
+    { id: "technical", labelKey: "messageTopicTechnical", fallback: "Technique" },
+    { id: "cancel", labelKey: "messageTopicCancel", fallback: "Annulation" },
+    { id: "payment", labelKey: "messageTopicPayment", fallback: "Paiement" },
+  ];
 
   const state = {
     open: false,
     messages: [],
     pendingFiles: [],
     sending: false,
+    context: {
+      serviceId: "",
+      serviceName: "",
+      demandId: "",
+      bookingId: "",
+      topic: "",
+    },
   };
+
+  function renderTopicChips() {
+    const el = document.getElementById("sqMsgTopics");
+    if (!el) return;
+    el.innerHTML = TOPIC_CHIPS.map((chip) => {
+      const label = t(chip.labelKey);
+      const text = label === chip.labelKey ? chip.fallback : label;
+      const on = state.context.topic === chip.id;
+      return `<button type="button" class="sq-msg-topic${on ? " is-active" : ""}" data-topic="${chip.id}">${escapeHtml(text)}</button>`;
+    }).join("");
+    el.querySelectorAll("[data-topic]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-topic");
+        state.context.topic = state.context.topic === id ? "" : id;
+        renderTopicChips();
+      });
+    });
+  }
+
+  function setContext(opts = {}) {
+    state.context = {
+      serviceId: opts.serviceId ? String(opts.serviceId) : state.context.serviceId || "",
+      serviceName: opts.serviceName
+        ? String(opts.serviceName)
+        : state.context.serviceName || "",
+      demandId: opts.demandId ? String(opts.demandId) : state.context.demandId || "",
+      bookingId: opts.bookingId ? String(opts.bookingId) : state.context.bookingId || "",
+      topic: opts.topic ? String(opts.topic) : state.context.topic || "",
+    };
+  }
+
+  function contextQuery() {
+    const q = [];
+    if (state.context.serviceId) {
+      q.push(`serviceId=${encodeURIComponent(state.context.serviceId)}`);
+    }
+    if (state.context.demandId) {
+      q.push(`demandId=${encodeURIComponent(state.context.demandId)}`);
+    }
+    if (state.context.bookingId) {
+      q.push(`bookingId=${encodeURIComponent(state.context.bookingId)}`);
+    }
+    if (state.context.topic) {
+      q.push(`topic=${encodeURIComponent(state.context.topic)}`);
+    }
+    return q.length ? `&${q.join("&")}` : "";
+  }
+
+  function appendContextToFormData(fd) {
+    if (state.context.serviceId) fd.append("serviceId", state.context.serviceId);
+    if (state.context.demandId) fd.append("demandId", state.context.demandId);
+    if (state.context.bookingId) fd.append("bookingId", state.context.bookingId);
+    if (state.context.topic) fd.append("topic", state.context.topic);
+  }
+
+  function renderContextBanner(serverContext) {
+    const el = document.getElementById("sqMsgContext");
+    if (!el) return;
+    const ctx = serverContext || state.context;
+    const name = ctx.serviceName || state.context.serviceName || "";
+    const sid = ctx.serviceId || state.context.serviceId || "";
+    if (!sid && !name) {
+      el.hidden = true;
+      el.innerHTML = "";
+      return;
+    }
+    if (name) state.context.serviceName = name;
+    if (sid) state.context.serviceId = String(sid);
+
+    const priceBit =
+      ctx.servicePrice != null && Number(ctx.servicePrice) > 0
+        ? ` · ${Number(ctx.servicePrice).toFixed(0)}`
+        : "";
+    const durBit =
+      ctx.serviceDuration != null && Number(ctx.serviceDuration) > 0
+        ? ` · ${Number(ctx.serviceDuration)} min`
+        : "";
+
+    el.hidden = false;
+    el.innerHTML = `
+      <div class="sq-msg-context__card">
+        <p class="sq-msg-context__label">${escapeHtml(t("messageAboutService") || "À propos de")}</p>
+        <p class="sq-msg-context__name"><strong>${escapeHtml(name || "Prestation")}</strong>${escapeHtml(priceBit)}${escapeHtml(durBit)}</p>
+        <button type="button" class="sq-msg-context__cta" id="sqMsgBookCta">${escapeHtml(
+          t("messageBookCta") || t("bookNow") || "Réserver"
+        )}</button>
+      </div>`;
+    document.getElementById("sqMsgBookCta")?.addEventListener("click", () => {
+      close();
+      if (window.SalonBooking && typeof window.SalonBooking.open === "function") {
+        window.SalonBooking.open({
+          serviceId: state.context.serviceId || undefined,
+        });
+      }
+    });
+  }
 
   function renderPendingPhotos() {
     const el = document.getElementById("sqMsgPhotos");
@@ -89,18 +204,37 @@
     const body = document.getElementById("sqMsgBody");
     if (!body) return;
     if (!state.messages.length) {
-      body.innerHTML = `<p class="sq-msg-empty">${escapeHtml(t("messageEmpty"))}</p>`;
+      const hint = state.context.serviceName
+        ? t("messageEmptyWithService") || t("messageEmpty")
+        : t("messageEmpty");
+      body.innerHTML = `<p class="sq-msg-empty">${escapeHtml(
+        String(hint).split("__SERVICE__").join(state.context.serviceName || "")
+      )}</p>`;
       return;
     }
     body.innerHTML = state.messages
       .map((m) => {
         const mine = m.sender === "user";
+        const isSystem = m.sender === "system";
         const photos = (m.photoUrls || [])
           .map(
             (u) =>
               `<a href="${escapeHtml(u)}" target="_blank" rel="noopener"><img src="${escapeHtml(u)}" alt="" class="sq-msg-thumb"/></a>`
           )
           .join("");
+        if (isSystem) {
+          const auto = m.isAutoReply
+            ? `<span class="sq-msg-auto-tag">${escapeHtml(
+                t("messageAutoReplyTag") || "Auto"
+              )}</span>`
+            : "";
+          return `<div class="sq-msg-bubble sq-msg-bubble--system${
+            m.isAutoReply ? " sq-msg-bubble--auto" : ""
+          }">
+            ${auto}
+            ${m.body ? `<p>${escapeHtml(m.body)}</p>` : ""}
+          </div>`;
+        }
         return `<div class="sq-msg-bubble ${mine ? "sq-msg-bubble--mine" : "sq-msg-bubble--salon"}">
           ${m.body ? `<p>${escapeHtml(m.body)}</p>` : ""}
           ${photos ? `<div class="sq-msg-thumbs">${photos}</div>` : ""}
@@ -113,11 +247,18 @@
   async function loadThread(userId) {
     const body = document.getElementById("sqMsgBody");
     if (body) body.innerHTML = `<p class="sq-msg-empty">${escapeHtml(t("loading"))}</p>`;
-    const url = `/api/public/messaging/thread?salonId=${encodeURIComponent(cfg().salonId)}&userId=${encodeURIComponent(userId)}`;
+    const url = `/api/public/messaging/thread?salonId=${encodeURIComponent(cfg().salonId)}&userId=${encodeURIComponent(userId)}${contextQuery()}`;
     const res = await fetch(url);
     const data = await res.json();
     if (!data.status) throw new Error(data.message || "error");
     state.messages = data.messages || [];
+    const ctx = data.context || data.conversation || {};
+    if (ctx.serviceId) state.context.serviceId = String(ctx.serviceId);
+    if (ctx.serviceName) state.context.serviceName = ctx.serviceName;
+    if (ctx.demandId) state.context.demandId = String(ctx.demandId);
+    if (ctx.bookingId) state.context.bookingId = String(ctx.bookingId);
+    if (ctx.topic) state.context.topic = ctx.topic;
+    renderContextBanner(ctx);
     renderMessages();
   }
 
@@ -141,6 +282,8 @@
       fd.append("salonId", cfg().salonId);
       fd.append("userId", userId);
       fd.append("body", text);
+      appendContextToFormData(fd);
+      fd.append("lang", cfg().language === "en" ? "en" : "fr");
       state.pendingFiles.forEach((f) => fd.append("photos", f));
       const res = await fetch("/api/public/messaging/send", { method: "POST", body: fd });
       const data = await res.json();
@@ -175,12 +318,27 @@
     }
   }
 
-  async function open() {
+  /**
+   * @param {{ serviceId?: string, serviceName?: string, demandId?: string, bookingId?: string, topic?: string }} [opts]
+   */
+  async function open(opts = {}) {
     if (!cfg().messagingEnabled) return;
+    if (opts && (opts.serviceId || opts.serviceName || opts.demandId || opts.bookingId || opts.topic)) {
+      setContext(opts);
+    } else if (
+      !state.context.serviceId &&
+      window.SalonBooking &&
+      typeof window.SalonBooking.getSelectedServiceContext === "function"
+    ) {
+      const sel = window.SalonBooking.getSelectedServiceContext();
+      if (sel?.serviceId) setContext(sel);
+    }
     const root = ensureModal();
     root.classList.add("sq-msg-modal--open");
     state.open = true;
     document.getElementById("sqMsgSub").textContent = cfg().salonName || "";
+    renderContextBanner();
+    renderTopicChips();
     const user = getWebUser();
     const userId = userIdOf(user);
     const compose = document.getElementById("sqMsgCompose");
@@ -202,5 +360,5 @@
     state.open = false;
   }
 
-  window.SalonMessaging = { open, close };
+  window.SalonMessaging = { open, close, setContext };
 })();

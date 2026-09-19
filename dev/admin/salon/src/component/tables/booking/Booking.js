@@ -213,7 +213,10 @@ const Booking = () => {
               type="button"
               className="text-white p12-x p4-y fs-12 br-5"
               style={{
-                backgroundColor: "#111",
+                backgroundColor:
+                  Array.isArray(row?.resultPhotoUrls) && row.resultPhotoUrls.length
+                    ? "#555"
+                    : "#111",
                 cursor: "pointer",
                 border: "none",
               }}
@@ -221,7 +224,11 @@ const Booking = () => {
                 dispatch(openDialog({ type: "resultPhotos", data: row }))
               }
             >
-              {ui.booking.resultPhotosBtn}
+              {Array.isArray(row?.resultPhotoUrls) && row.resultPhotoUrls.length
+                ? ui.booking.resultPhotosBtn
+                : ui.booking.resultPhotosAddBtn ||
+                  ui.booking.resultPhotosBtn ||
+                  "Photos résultat"}
             </button>
           </div>
         ) : row?.status === "confirm" ? (
