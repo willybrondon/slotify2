@@ -4172,6 +4172,39 @@ body.sk-public-page .main-wrapper {
     padding: 4px 6px 16px 2px;
     -webkit-overflow-scrolling: touch;
 }
+@media (max-width: 640px) {
+    .sk-public-page .sq-services-list--modal {
+        max-height: min(52vh, 480px);
+        gap: 10px;
+        padding: 2px 4px 20px 0;
+    }
+    .sk-public-page .sq-svc-row__head {
+        padding: 12px 14px;
+        min-height: 52px;
+    }
+    .sk-public-page .sq-svc-row__name {
+        font-size: 0.95rem;
+    }
+    .sk-public-page .sq-svc-row__meta {
+        font-size: 0.8rem;
+        white-space: normal;
+    }
+    .sk-public-page .sq-booking-modal .sq-svc-row__selected-badge {
+        font-size: 0.65rem;
+        padding: 2px 7px;
+    }
+    .sk-public-page .sq-svc-row__panel {
+        padding: 0 14px 14px;
+    }
+    .sk-public-page .sq-svc-row__actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .sk-public-page .sq-svc-row__book {
+        width: 100%;
+    }
+}
 .sk-public-page .sq-services-list--modal::-webkit-scrollbar {
     width: 8px;
 }
@@ -4190,13 +4223,16 @@ body.sk-public-page .main-wrapper {
 .sk-public-page .sq-booking-modal .sq-svc-row__selected-badge {
     display: inline-flex;
     align-items: center;
-    margin-left: 8px;
+    flex: 0 0 auto;
+    margin-left: 6px;
     padding: 2px 8px;
     border-radius: 999px;
     background: #111;
     color: #fff;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 600;
+    white-space: nowrap;
+    line-height: 1.2;
 }
 .sk-public-page .sq-booking-modal .sq-svc-row__book--selected {
     background: #fff;
@@ -4207,11 +4243,13 @@ body.sk-public-page .main-wrapper {
     border: 1px solid var(--sk-border);
     border-radius: 12px;
     background: var(--sk-bg);
-    overflow: hidden;
+    overflow: visible;
+    min-height: 56px;
 }
 .sk-public-page .sq-svc-row.is-open {
     border-color: var(--sk-primary);
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--sk-primary) 35%, transparent);
+    overflow: hidden;
 }
 .sk-public-page .sq-svc-row__head {
     width: 100%;
@@ -4225,6 +4263,8 @@ body.sk-public-page .main-wrapper {
     cursor: pointer;
     font-family: inherit;
     color: inherit;
+    min-height: 56px;
+    box-sizing: border-box;
 }
 .sk-public-page .sq-svc-row__main {
     flex: 1;
@@ -4233,19 +4273,29 @@ body.sk-public-page .main-wrapper {
 .sk-public-page .sq-svc-row__top {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 8px 16px;
+    gap: 6px 12px;
+}
+.sk-public-page .sq-svc-row__name-wrap {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1 1 160px;
 }
 .sk-public-page .sq-svc-row__name {
     font-size: 1rem;
     font-weight: 700;
     color: var(--sk-text);
+    word-break: break-word;
 }
 .sk-public-page .sq-svc-row__meta {
     font-size: 0.88rem;
     color: var(--sk-text-muted);
     white-space: nowrap;
+    flex: 0 0 auto;
 }
 .sk-public-page .sq-svc-row__rating {
     display: inline-flex;
@@ -4517,20 +4567,6 @@ body.sk-public-page .main-wrapper {
 }
 .sk-public-page .sq-svc-row__book:hover {
     background: var(--sk-primary-hover);
-}
-.sk-public-page .sq-svc-row__ask {
-    border: 1.5px solid var(--sk-border);
-    border-radius: 10px;
-    padding: 10px 18px;
-    background: #fff;
-    color: #111;
-    font-weight: 700;
-    font-size: 0.88rem;
-    cursor: pointer;
-    font-family: inherit;
-}
-.sk-public-page .sq-svc-row__ask:hover {
-    border-color: #111;
 }
 .sk-public-page .sq-svc-note {
     margin-top: 10px;

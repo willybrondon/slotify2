@@ -351,44 +351,42 @@
     return false;
   }
 
-  /** Reprend options / produits / photo déjà cochés sur les cartes presta de la page. */
+  /**
+   * Rebuild options / products from currently selected service drafts only.
+   * Deselect must drop that service's addons/products from cart totals.
+   */
   function applyPageDraftsToBookingState() {
-    const answers = {
-      ...(state.afroAnswers && typeof state.afroAnswers === "object"
-        ? state.afroAnswers
-        : {}),
-    };
-    delete answers._skipPrecision;
-    const productIds = new Set(
-      (state.selectedProductIds || []).map(String)
-    );
-    const photoUrls = Array.isArray(state.afroPhotoUrls)
-      ? [...state.afroPhotoUrls]
-      : [];
+    if (!state.selectedServiceIds.length) {
+      state.afroAnswers = {};
+      state.selectedProductIds = [];
+      state.afroConfigServiceId = null;
+      state.afroDemand = null;
+      state.afroSkipPrecision = false;
+      state.afroPrecisionFormOpen = false;
+      return;
+    }
+
+    const addons = new Set();
+    const productIds = new Set();
 
     state.selectedServiceIds.forEach((sid) => {
       const draft = state.pageSvcDraft?.[normalizeServiceId(sid)];
       if (!draft) return;
-      if (Array.isArray(draft.addons) && draft.addons.length) {
-        const prev = Array.isArray(answers.addons) ? answers.addons.map(String) : [];
-        answers.addons = Array.from(new Set([...prev, ...draft.addons.map(String)]));
-      }
-      if (Array.isArray(draft.productIds) && draft.productIds.length) {
-        draft.productIds.forEach((pid) => productIds.add(String(pid)));
-        answers.selectedProductIds = Array.from(productIds);
-      }
+      (draft.addons || []).forEach((id) => addons.add(String(id)));
+      (draft.productIds || []).forEach((pid) => productIds.add(String(pid)));
     });
 
-    if (Object.keys(answers).length) {
-      state.afroAnswers = answers;
-    }
+    const answers = {};
+    if (addons.size) answers.addons = Array.from(addons);
+    if (productIds.size) answers.selectedProductIds = Array.from(productIds);
+
+    state.afroAnswers = answers;
     state.selectedProductIds = Array.from(productIds);
-    state.afroPhotoUrls = photoUrls;
-    if (state.selectedServiceIds.length === 1) {
-      state.afroConfigServiceId = normalizeServiceId(state.selectedServiceIds[0]);
-    }
+    // Demand/deposit may still target one primary — never collapse multi-select.
+    state.afroConfigServiceId = normalizeServiceId(state.selectedServiceIds[0]);
     state.afroSkipPrecision = true;
     state.afroPrecisionFormOpen = false;
+    // Invalidate stale demand when selection changes (recomputed at payment if needed)
     state.afroDemand = null;
   }
 
@@ -613,13 +611,17 @@
     } else {
       state.selectedServiceIds = [...state.selectedServiceIds, sid];
     }
+    // Keep cart totals / sticky count in sync with selection
+    applyPageDraftsToBookingState();
     if (
       state.afroConfigServiceId &&
+      state.selectedServiceIds.length &&
       !state.selectedServiceIds.some(
         (x) => normalizeServiceId(x) === normalizeServiceId(state.afroConfigServiceId)
       )
     ) {
-      clearAfroQuote();
+      state.afroConfigServiceId = normalizeServiceId(state.selectedServiceIds[0]);
+      state.afroDemand = null;
     }
   }
 
@@ -944,9 +946,11 @@
       }">
         <div class="sq-svc-row__main">
           <div class="sq-svc-row__top">
-            <span class="sq-svc-row__name">${escapeHtml(s.name)}</span>
+            <span class="sq-svc-row__name-wrap">
+              <span class="sq-svc-row__name">${escapeHtml(s.name)}</span>
+              ${selectedBadge}
+            </span>
             <span class="sq-svc-row__meta">${metaLine}</span>
-            ${selectedBadge}
           </div>
           ${ratingBadge}
           ${
@@ -969,13 +973,6 @@
           <button type="button" class="sq-svc-row__book${
             mode === "modal" && selected ? " sq-svc-row__book--selected" : ""
           }" ${actionAttr}>${escapeHtml(actionLabel)}</button>
-          ${
-            mode === "page"
-              ? `<button type="button" class="sq-svc-row__ask" data-svc-ask>${escapeHtml(
-                  t("messageAskAboutService") || "Poser une question"
-                )}</button>`
-              : ""
-          }
         </div>
       </div>
     </article>`;
@@ -994,9 +991,6 @@
   function bindSalonPageServiceCards(rootEl, opts = {}) {
     if (!rootEl) return;
     const mode = opts.mode === "modal" ? "modal" : "page";
-    if (window.SKEDISY_SALON_MESSAGING?.messagingEnabled === false) {
-      rootEl.querySelectorAll("[data-svc-ask]").forEach((el) => el.remove());
-    }
     const onSelectionChange =
       typeof opts.onSelectionChange === "function"
         ? opts.onSelectionChange
@@ -1007,7 +1001,6 @@
       const toggle = row.querySelector("[data-svc-toggle]");
       const bookBtn = row.querySelector("[data-svc-book]");
       const selectBtn = row.querySelector("[data-svc-select]");
-      const askBtn = row.querySelector("[data-svc-ask]");
       const sid = row.getAttribute("data-service-id");
       if (toggle) {
         toggle.addEventListener("click", () => {
@@ -1137,22 +1130,6 @@
             bookBtn.disabled = false;
             bookBtn.textContent = prevText;
           }
-        });
-      }
-
-      if (askBtn) {
-        askBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!sid || !window.SalonMessaging) return;
-          const svc = cfg.services.find(
-            (s) => normalizeServiceId(s.id) === normalizeServiceId(sid)
-          );
-          window.SalonMessaging.open({
-            serviceId: sid,
-            serviceName: svc?.name || "",
-            topic: "technical",
-          });
         });
       }
     });
@@ -1495,9 +1472,13 @@
         const buffer = Math.max(0, Number(meta.prepBufferMinutes) || 0);
         serviceDur = base + buffer;
       }
-      const chosen = Array.isArray(state.afroAnswers?.addons)
-        ? state.afroAnswers.addons.map(String)
-        : [];
+      // Prefer per-service draft addons so multi-select sums correctly
+      const draft = state.pageSvcDraft?.[sid];
+      const chosen = Array.isArray(draft?.addons)
+        ? draft.addons.map(String)
+        : Array.isArray(state.afroAnswers?.addons)
+          ? state.afroAnswers.addons.map(String)
+          : [];
       if (chosen.length) {
         const catalog = getServiceAddonCatalog(s);
         catalog.forEach((a) => {
@@ -1506,17 +1487,36 @@
           serviceDur += Number(a.addMinutes) || 0;
         });
       }
+      const draftProducts = Array.isArray(draft?.productIds)
+        ? draft.productIds.map(String)
+        : [];
+      (s.recommendedProducts || []).forEach((p) => {
+        if (p.isOutOfStock) return;
+        if (draftProducts.includes(String(p.id))) {
+          sub += Number(p.price) || 0;
+        }
+      });
       dur += serviceDur;
     });
+    // Products selected without a draft (legacy / shared) — avoid double-count
     if (state.selectedProductIds?.length) {
+      const alreadyCounted = new Set();
+      serviceList.forEach((s) => {
+        const sid = normalizeServiceId(s.id || s._id);
+        const draft = state.pageSvcDraft?.[sid];
+        (draft?.productIds || []).forEach((pid) => alreadyCounted.add(String(pid)));
+      });
       const svcPool = serviceList.length ? serviceList : cfg.services || [];
       svcPool.forEach((s) => {
         (s.recommendedProducts || []).forEach((p) => {
+          const pid = String(p.id);
           if (
-            state.selectedProductIds.includes(String(p.id)) &&
+            state.selectedProductIds.includes(pid) &&
+            !alreadyCounted.has(pid) &&
             !p.isOutOfStock
           ) {
             sub += Number(p.price) || 0;
+            alreadyCounted.add(pid);
           }
         });
       });
@@ -1564,10 +1564,8 @@
 
   function buildBookingPayload(userId, totals) {
     const timeStr = state.timeSlots.filter(Boolean).join(",");
-    const serviceIds =
-      state.afroConfigServiceId
-        ? [String(state.afroConfigServiceId)]
-        : state.selectedServiceIds.map(String);
+    // Always book every selected service (deposit demand may still reference primary)
+    const serviceIds = state.selectedServiceIds.map(String).filter(Boolean);
     const body = {
       userId: String(userId),
       expertId: String(state.expertId),
@@ -1822,7 +1820,17 @@
     state.afroPhotoUrls = photoUrls || [];
     state.afroConfigServiceId = primary.id;
     state.afroDemand = data.demand;
-    state.selectedServiceIds = [primary.id];
+    // Keep multi-service selection — demand is only for deposit primary
+    if (
+      !state.selectedServiceIds.some(
+        (x) => normalizeServiceId(x) === normalizeServiceId(primary.id)
+      )
+    ) {
+      state.selectedServiceIds = [
+        primary.id,
+        ...state.selectedServiceIds.map(normalizeServiceId),
+      ];
+    }
     return data.demand;
   }
 
@@ -2151,12 +2159,9 @@
     const bGrid = document.getElementById("bookingServicesGrid");
     const cats = [{ id: "all", name: cfg.copy.allCategoriesTab }, ...cfg.categories];
     let cat = "all";
-    /** Keep accordion panels open across re-paints (selected + manually opened). */
+    /** Keep accordion panels open across re-paints (manually opened + last focused). */
     const openServiceIds = new Set();
     if (expandId) openServiceIds.add(expandId);
-    state.selectedServiceIds.forEach((id) =>
-      openServiceIds.add(normalizeServiceId(id))
-    );
 
     function collectOpenIdsFromDom() {
       if (!bGrid) return;
@@ -2172,11 +2177,20 @@
         collectOpenIdsFromDom();
       }
       if (optsPaint.focusServiceId) {
-        openServiceIds.add(normalizeServiceId(optsPaint.focusServiceId));
+        const fid = normalizeServiceId(optsPaint.focusServiceId);
+        if (isServiceSelected(fid)) openServiceIds.add(fid);
+        else openServiceIds.delete(fid);
       }
-      state.selectedServiceIds.forEach((id) =>
-        openServiceIds.add(normalizeServiceId(id))
-      );
+      // Drop open ids that are no longer selected (deselect sync)
+      Array.from(openServiceIds).forEach((id) => {
+        if (
+          optsPaint.focusServiceId &&
+          normalizeServiceId(optsPaint.focusServiceId) === id &&
+          !isServiceSelected(id)
+        ) {
+          openServiceIds.delete(id);
+        }
+      });
 
       bTabs.innerHTML = cats
         .map(
@@ -2192,7 +2206,19 @@
       });
       const filtered =
         cat === "all" ? list : list.filter((s) => s.categoryId === cat);
-      bGrid.innerHTML = filtered
+      // Keep selected services visible (with badge) even if another category tab is active
+      const filteredIds = new Set(
+        filtered.map((s) => normalizeServiceId(s.id))
+      );
+      const selectedPinned =
+        cat === "all"
+          ? []
+          : list.filter((s) => {
+              const sid = normalizeServiceId(s.id);
+              return isServiceSelected(sid) && !filteredIds.has(sid);
+            });
+      const displayList = [...selectedPinned, ...filtered];
+      bGrid.innerHTML = displayList
         .map((s) => {
           const sid = normalizeServiceId(s.id);
           return buildSalonPageServiceCardHtml(s, {
@@ -2209,15 +2235,17 @@
           else openServiceIds.delete(id);
         },
         onSelectionChange: (sid) => {
+          const id = normalizeServiceId(sid);
+          if (!isServiceSelected(id)) openServiceIds.delete(id);
           paint({
             keepOpenFromDom: true,
-            focusServiceId: sid || null,
+            focusServiceId: id || null,
           });
           renderSalonPageSelectionUI();
           renderServicesStickyBar();
-          if (sid && bGrid) {
+          if (id && isServiceSelected(id) && bGrid) {
             const row = bGrid.querySelector(
-              `.sq-svc-row[data-service-id="${CSS.escape(normalizeServiceId(sid))}"]`
+              `.sq-svc-row[data-service-id="${CSS.escape(id)}"]`
             );
             row?.scrollIntoView({ block: "nearest", behavior: "smooth" });
           }

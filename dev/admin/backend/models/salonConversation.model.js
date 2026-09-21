@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 /**
- * One thread per salon × client.
- * P0 messagerie métier: optional context links the thread to a service / demand / booking.
+ * One thread per salon × client (StyleSeat-style people inbox).
+ * Optional demandId / bookingId for operational context — not a per-service inbox.
  */
 const salonConversationSchema = new mongoose.Schema(
   {
@@ -18,7 +18,7 @@ const salonConversationSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    /** Active prestation context (latest ask-about-this-service). */
+    /** Legacy optional service hint (not used for inbox scoping). */
     serviceId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Service",
