@@ -1267,8 +1267,26 @@ body.sk-public-page .main-wrapper {
         padding: 0.65rem 0;
     }
 
-    body.sk-public-page.sq-page .hamburger.mobile-only {
+    body.sk-public-page.sq-page .mobile-menu-wrapper {
         display: flex !important;
+        align-items: center;
+        justify-content: flex-end;
+        position: relative;
+        z-index: 1200;
+        flex-shrink: 0;
+    }
+
+    body.sk-public-page.sq-page .hamburger.mobile-only,
+    body.sk-public-page.sq-page .hamburger {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    body.sk-public-page.sq-page .navbar.sq-navbar .nav-container {
+        position: relative;
+        z-index: 1200;
     }
 
     .sk-public-page .sticky-booking-btn {
@@ -4216,11 +4234,13 @@ body.sk-public-page .main-wrapper {
     background: #f0f0f0;
     border-radius: 8px;
 }
-.sk-public-page .sq-booking-modal .sq-svc-row.is-selected {
+.sk-public-page .sq-booking-modal .sq-svc-row.is-selected,
+.sk-public-page .sq-services-list .sq-svc-row.is-selected {
     border-color: #111;
     box-shadow: 0 0 0 1px #111;
 }
-.sk-public-page .sq-booking-modal .sq-svc-row__selected-badge {
+.sk-public-page .sq-booking-modal .sq-svc-row__selected-badge,
+.sk-public-page .sq-services-list .sq-svc-row__selected-badge {
     display: inline-flex;
     align-items: center;
     flex: 0 0 auto;
@@ -4234,7 +4254,8 @@ body.sk-public-page .main-wrapper {
     white-space: nowrap;
     line-height: 1.2;
 }
-.sk-public-page .sq-booking-modal .sq-svc-row__book--selected {
+.sk-public-page .sq-booking-modal .sq-svc-row__book--selected,
+.sk-public-page .sq-services-list .sq-svc-row__book--selected {
     background: #fff;
     color: #111;
     border: 1.5px solid #111;

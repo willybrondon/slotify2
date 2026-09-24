@@ -2160,6 +2160,12 @@ body.sq-search-focus-active {
   overscroll-behavior: none;
 }
 
+/* Hide floating share/download so they don't cover the search field on mobile */
+body.sq-search-focus-active .sq-mobile-float-bar {
+  display: none !important;
+  pointer-events: none !important;
+}
+
 body.sq-search-focus-active .sq-home-landing,
 body.sq-search-focus-active .sq-home-landing__grid,
 body.sq-search-focus-active .sq-home-landing__left,
@@ -2169,7 +2175,12 @@ body.sq-search-focus-active .sq-search-bar-unified {
   overflow: visible;
 }
 
-body.sq-search-focus-active .sq-search-bar-unified {
+body.sq-search-focus-active .sq-search-bar-unified,
+body.sq-search-focus-active .sq-search-hero-wrap,
+body.sq-search-focus-active .sq-category-discover__search-bar,
+body.sq-search-focus-active .sq-category-discover__search,
+body.sq-search-focus-active .sq-search-wrap {
+  position: relative;
   z-index: 100040;
 }
 

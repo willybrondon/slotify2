@@ -420,6 +420,24 @@
     }
 
     if (searchInput) {
+        let savedScrollY = 0;
+        const lockSearchFocus = () => {
+            if (document.body.classList.contains("sq-search-focus-active")) return;
+            savedScrollY = window.scrollY || window.pageYOffset || 0;
+            document.body.classList.add("sq-search-focus-active");
+            document.body.style.top = `-${savedScrollY}px`;
+            searchInput.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        };
+        const unlockSearchFocus = () => {
+            if (!document.body.classList.contains("sq-search-focus-active")) return;
+            document.body.classList.remove("sq-search-focus-active");
+            document.body.style.top = "";
+            window.scrollTo(0, savedScrollY);
+        };
+        searchInput.addEventListener("focus", lockSearchFocus);
+        searchInput.addEventListener("blur", () => {
+            window.setTimeout(unlockSearchFocus, 150);
+        });
         searchInput.addEventListener("input", function () {
             clearTimeout(searchTimeout);
             const term = this.value.trim();
@@ -433,6 +451,7 @@
             if (e.key === "Enter") {
                 e.preventDefault();
                 clearTimeout(searchTimeout);
+                unlockSearchFocus();
                 fetchResults(searchInput.value.trim());
             }
         });

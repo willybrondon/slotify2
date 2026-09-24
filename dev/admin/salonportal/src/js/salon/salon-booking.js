@@ -743,7 +743,6 @@
   }
 
   function buildSalonPageServiceCardHtml(s, opts = {}) {
-    const mode = opts.mode === "modal" ? "modal" : "page";
     const card = s.detailCard || {};
     const afro = getAfroMeta(s.id);
     const draft = getPageSvcDraft(s.id);
@@ -924,22 +923,19 @@
       ? `<div class="sq-svc-note">⚠️ ${escapeHtml(card.importantNote)}</div>`
       : "";
 
-    const actionLabel =
-      mode === "modal"
-        ? selected
-          ? t("serviceRemoveFromSelection") || "Retirer"
-          : t("serviceAddToSelection") || "Ajouter"
-        : t("bookNow");
-    const actionAttr = mode === "modal" ? "data-svc-select" : "data-svc-book";
-    const selectedBadge =
-      mode === "modal" && selected
-        ? `<span class="sq-svc-row__selected-badge">${escapeHtml(
-            t("serviceSelectedBadge") || "Sélectionnée"
-          )}</span>`
-        : "";
+    // Page + modal: same multi-select (StyleSeat) — badge + Ajouter/Retirer
+    const actionLabel = selected
+      ? t("serviceRemoveFromSelection") || "Retirer"
+      : t("serviceAddToSelection") || "Ajouter";
+    const actionAttr = "data-svc-select";
+    const selectedBadge = selected
+      ? `<span class="sq-svc-row__selected-badge">${escapeHtml(
+          t("serviceSelectedBadge") || "Sélectionnée"
+        )}</span>`
+      : "";
 
     return `<article class="sq-svc-row${
-      mode === "modal" && selected ? " is-selected" : ""
+      selected ? " is-selected" : ""
     }${opts.forceOpen ? " is-open" : ""}" data-service-id="${escapeHtml(String(s.id))}">
       <button type="button" class="sq-svc-row__head" data-svc-toggle aria-expanded="${
         opts.forceOpen ? "true" : "false"
@@ -971,7 +967,7 @@
         ${noteBlock}
         <div class="sq-svc-row__actions">
           <button type="button" class="sq-svc-row__book${
-            mode === "modal" && selected ? " sq-svc-row__book--selected" : ""
+            selected ? " sq-svc-row__book--selected" : ""
           }" ${actionAttr}>${escapeHtml(actionLabel)}</button>
         </div>
       </div>
@@ -994,12 +990,13 @@
     const onSelectionChange =
       typeof opts.onSelectionChange === "function"
         ? opts.onSelectionChange
-        : null;
+        : mode === "page"
+          ? () => handleSalonPageServiceSelection()
+          : null;
     const onToggleOpen =
       typeof opts.onToggleOpen === "function" ? opts.onToggleOpen : null;
     rootEl.querySelectorAll(".sq-svc-row").forEach((row) => {
       const toggle = row.querySelector("[data-svc-toggle]");
-      const bookBtn = row.querySelector("[data-svc-book]");
       const selectBtn = row.querySelector("[data-svc-select]");
       const sid = row.getAttribute("data-service-id");
       if (toggle) {
@@ -1026,8 +1023,10 @@
         el.addEventListener("change", (e) => {
           e.stopPropagation();
           syncDraftFromDom();
-          if (mode === "modal" && isServiceSelected(sid)) {
+          if (isServiceSelected(sid)) {
             applyPageDraftsToBookingState();
+            renderSalonPageSelectionUI();
+            if (isModalOpen()) renderServicesStickyBar();
           }
         });
       });
@@ -1091,45 +1090,11 @@
             }
           }
           applyPageDraftsToBookingState();
-          if (onSelectionChange) onSelectionChange(sid);
-        });
-      }
-
-      if (bookBtn) {
-        bookBtn.addEventListener("click", async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!sid || !window.SalonBooking) return;
-          syncDraftFromDom();
-          const draft = getPageSvcDraft(sid);
-          bookBtn.disabled = true;
-          const prevText = bookBtn.textContent;
-          bookBtn.textContent = t("loading") || "…";
-          try {
-            let photoUrls = [];
-            if (draft.photoFile) {
-              photoUrls = [await uploadAfroInspirationPhoto(draft.photoFile)];
-            }
-            await window.SalonBooking.open({
-              serviceId: sid,
-              skipPrecision: true,
-              addons: draft.addons || [],
-              productIds: draft.productIds || [],
-              photoUrls,
-              afroAnswers: {
-                ...(draft.addons?.length ? { addons: draft.addons } : {}),
-                ...(draft.productIds?.length
-                  ? { selectedProductIds: draft.productIds }
-                  : {}),
-              },
-            });
-          } catch (err) {
-            console.warn("[svc-book]", err);
-            alert(err.message || t("genericError"));
-          } finally {
-            bookBtn.disabled = false;
-            bookBtn.textContent = prevText;
+          // Refresh page cards so every selected row shows badge + live totals
+          if (mode === "page") {
+            renderServicesGrid();
           }
+          if (onSelectionChange) onSelectionChange(sid);
         });
       }
     });
@@ -1235,9 +1200,15 @@
   function handleSalonPageServiceSelection() {
     renderSalonPageSelectionUI();
     if (state.selectedServiceIds.length > 0) {
-      openBookingForSelection();
+      // Keep sticky/aside totals in sync; open modal services step for multi-add
+      if (isModalOpen()) {
+        renderServicesStickyBar();
+      } else {
+        openBookingForSelection();
+      }
     } else if (isModalOpen()) {
-      renderServicesStickyBar();
+      hideBookingStickyBar();
+      renderStepServices();
     }
   }
 
@@ -1451,8 +1422,12 @@
   }
 
   function getSelectedServices() {
-    const ids = new Set(state.selectedServiceIds.map(String));
-    return cfg.services.filter((s) => ids.has(String(s.id)));
+    const ids = new Set(
+      state.selectedServiceIds.map((id) => normalizeServiceId(id))
+    );
+    return cfg.services.filter((s) =>
+      ids.has(normalizeServiceId(s.id || s._id))
+    );
   }
 
   function calcTotals(serviceList) {

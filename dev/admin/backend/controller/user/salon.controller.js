@@ -1482,15 +1482,28 @@ exports.serveSalonWebPage = async (req, res) => {
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
-                <h3>Menu</h3>
-                <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
-            </div>
-            <div class="mobile-menu-content">
-                <!-- Mobile Login Button -->
-                <a href="${clientAuth.login}" class="btn-login-mobile-menu">${copy.headerLogin}</a>
-                <div class="mobile-categories" id="mobileCategories">
-                    <!-- Categories will be loaded dynamically -->
+                <h3>${esc(copy.forClients || "Pour les clientes")}</h3>
+                <div class="mobile-menu-header-right">
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
                 </div>
+            </div>
+            <div class="mobile-menu-content mobile-menu-content--client">
+                <a href="${clientAuth.login}" class="btn-login-mobile-menu">${esc(copy.headerLogin)}</a>
+                <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer">${esc(copy.downloadAppCta || copy.bookOnApp || "Télécharger l'app")}</button>
+                <div class="mobile-categories-panel">
+                    <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">
+                        <span>${esc(copy.allCategoriesTab || copy.services || "Toutes les catégories")}</span>
+                        <i class="fas fa-chevron-down mobile-categories-toggle__icon" aria-hidden="true"></i>
+                    </button>
+                    <div class="mobile-categories-drawer" id="mobileCategoriesDrawer" hidden>
+                        <div class="mobile-categories-drawer__head">
+                            <span>${esc(copy.allCategoriesTab || "Toutes les catégories")}</span>
+                            <button type="button" class="mobile-categories-drawer__close" id="mobileCategoriesClose" aria-label="Fermer">&times;</button>
+                        </div>
+                        <div class="mobile-categories" id="mobileCategories"></div>
+                    </div>
+                </div>
+                <a href="${baseURL}/professionnel/" class="btn-login-mobile-menu btn-for-business-mobile">${esc(copy.forBusiness || "Pour les professionnels")}</a>
             </div>
         </div>
     </nav>

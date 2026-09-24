@@ -2824,6 +2824,13 @@ html {
         display: flex !important;
     }
 
+    body.sq-search-focus-active .sq-mobile-float-bar,
+    body.sq-search-focus-active .sq-mobile-float-bar.mobile-only {
+        display: none !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+    }
+
     .sq-page:not(.menu-open) {
         padding-bottom: calc(80px + env(safe-area-inset-bottom));
     }
@@ -5053,6 +5060,7 @@ html {
 .sk-public-page .fa-map-marker-alt {
     color: var(--sk-icon-accent);
 }
+ 
 
 /* Help Center — /aide/ */
 .sq-help-page {
