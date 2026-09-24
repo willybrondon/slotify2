@@ -975,8 +975,8 @@ exports.serveSalonWebPage = async (req, res) => {
         <h3 class="section-title">${copy.services}</h3>
         <p class="sq-booking-step__hint sq-salon-services-hint">${copy.servicesMultiHint}</p>
         <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
-        <div class="sq-services-list" id="salonServicesGrid"></div>
         <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonServicesSummary" aria-live="polite"></div>
+        <div class="sq-services-list" id="salonServicesGrid"></div>
             </div>`;
     } else {
       servicesHtml = `<div class="section"><h3 class="section-title">${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
@@ -1201,16 +1201,17 @@ exports.serveSalonWebPage = async (req, res) => {
       }
     </div>`;
 
-    // Aside desktop : description + horaires + policy + CTA réserver
+    // Aside desktop : sélection + CTA en haut (totaux visibles), puis infos salon
     const bookingCardHtml = `<div class="booking-card sq-salon-detail__book-card">
                             <h3>${copy.bookingCardTitle}</h3>
+                            <div class="sq-booking-services-summary sq-booking-services-summary--hidden sq-booking-services-summary--aside" id="salonBookingAsideSummary" aria-live="polite"></div>
+                            <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn" id="salonAsideBookBtn">
+                                <span class="open-app-btn__label"><i class="fas fa-calendar-check"></i> ${copy.bookNow}</span>
+                                <span class="open-app-btn__meta" id="salonAsideBookMeta" hidden></span>
+                            </button>
                             <p class="sq-salon-detail__book-desc">${esc(salonDescription)}</p>
                             ${hoursBlock}
                             ${policyHtml}
-                            <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonBookingAsideSummary" aria-live="polite"></div>
-                            <button type="button" onclick="window.SalonBooking && SalonBooking.open()" class="open-app-btn">
-                                <i class="fas fa-calendar-check"></i> ${copy.bookNow}
-                            </button>
                             <div class="sq-salon-detail__aside-contact sq-salon-detail__aside-contact--desktop">
                               ${contactActionsHtml}
                             </div>

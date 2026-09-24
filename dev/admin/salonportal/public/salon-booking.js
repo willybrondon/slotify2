@@ -593,17 +593,29 @@
   }
 
   function normalizeServiceId(id) {
-    return String(id);
+    return String(id == null ? "" : id).trim();
+  }
+
+  function toMoneyNumber(v) {
+    if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+    const s = String(v ?? "")
+      .trim()
+      .replace(/\s/g, "")
+      .replace(",", ".");
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : 0;
   }
 
   function isServiceSelected(id) {
     const sid = normalizeServiceId(id);
+    if (!sid) return false;
     return state.selectedServiceIds.some((x) => normalizeServiceId(x) === sid);
   }
 
   /** Sélection multiple comme l'app : clic = ajouter/retirer une prestation. */
   function toggleServiceSelection(id) {
     const sid = normalizeServiceId(id);
+    if (!sid) return;
     if (isServiceSelected(sid)) {
       state.selectedServiceIds = state.selectedServiceIds.filter(
         (x) => normalizeServiceId(x) !== sid
@@ -701,24 +713,24 @@
 
   function estimateServiceLiveTotals(s, draft) {
     const afro = getAfroMeta(s.id);
-    let price = Number(s.price) || 0;
+    let price = toMoneyNumber(s.price);
     let dur =
-      Number(afro?.baseDuration) > 0
-        ? Number(afro.baseDuration)
-        : Number(s.duration) || 0;
-    dur += Math.max(0, Number(afro?.prepBufferMinutes) || 0);
+      toMoneyNumber(afro?.baseDuration) > 0
+        ? toMoneyNumber(afro.baseDuration)
+        : toMoneyNumber(s.duration);
+    dur += Math.max(0, toMoneyNumber(afro?.prepBufferMinutes));
     const catalog = getServiceAddonCatalog(s);
     const chosen = new Set((draft?.addons || []).map(String));
     catalog.forEach((a) => {
       if (!chosen.has(String(a.id || a._id))) return;
-      price += Number(a.addPrice) || 0;
-      dur += Number(a.addMinutes) || 0;
+      price += toMoneyNumber(a.addPrice);
+      dur += toMoneyNumber(a.addMinutes);
     });
     (draft?.productIds || []).forEach((pid) => {
       const p = (s.recommendedProducts || []).find(
         (x) => String(x.id) === String(pid)
       );
-      if (p && !p.isOutOfStock) price += Number(p.price) || 0;
+      if (p && !p.isOutOfStock) price += toMoneyNumber(p.price);
     });
     return { price, dur };
   }
@@ -1088,12 +1100,17 @@
                 selectBtn.disabled = false;
               }
             }
+          } else {
+            applyPageDraftsToBookingState();
           }
-          applyPageDraftsToBookingState();
-          // Refresh page cards so every selected row shows badge + live totals
+          // Page: stay on salon detail so user can add another service;
+          // refresh badges + summed price/duration. Modal only if already open.
           if (mode === "page") {
             renderServicesGrid();
+            handleSalonPageServiceSelection();
+            return;
           }
+          applyPageDraftsToBookingState();
           if (onSelectionChange) onSelectionChange(sid);
         });
       }
@@ -1197,36 +1214,81 @@
     }
   }
 
+  /**
+   * Salon detail page: multi-select stays on the page (StyleSeat).
+   * Modal opens only when the user taps Réserver / sticky Continuer.
+   */
   function handleSalonPageServiceSelection() {
     renderSalonPageSelectionUI();
-    if (state.selectedServiceIds.length > 0) {
-      // Keep sticky/aside totals in sync; open modal services step for multi-add
-      if (isModalOpen()) {
+    if (isModalOpen()) {
+      if (state.selectedServiceIds.length > 0) {
         renderServicesStickyBar();
       } else {
-        openBookingForSelection();
+        hideBookingStickyBar();
+        renderStepServices();
       }
-    } else if (isModalOpen()) {
-      hideBookingStickyBar();
-      renderStepServices();
+      return;
+    }
+    // Stay on salon detail: show summed récap (mobile: scroll to list summary)
+    if (
+      state.selectedServiceIds.length &&
+      servicesSummaryEl &&
+      window.innerWidth <= 968
+    ) {
+      servicesSummaryEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }
 
   function updateBookButtons() {
-    const count = state.selectedServiceIds.length;
+    const selected = getSelectedServices();
+    const count = selected.length;
+    const totals = count ? calcTotals(selected) : null;
     const bookLabel =
       count > 0
         ? tFmt("bookNowWithCount", "{n}", String(count))
         : t("bookNow");
     const stickyLabel = count > 0 ? t("continue") : t("bookNow");
+    const metaText =
+      totals && count > 0
+        ? `${cfg.currency}${totals.sub.toFixed(2)} · ${totals.dur} ${t("min")}`
+        : "";
+
     document.querySelectorAll(".open-app-btn").forEach((btn) => {
-      const icon = btn.querySelector("i");
-      if (icon) {
-        btn.innerHTML = `${icon.outerHTML} ${escapeHtml(bookLabel)}`;
+      const labelEl = btn.querySelector(".open-app-btn__label");
+      const metaEl = btn.querySelector(".open-app-btn__meta");
+      if (labelEl) {
+        labelEl.innerHTML = `<i class="fas fa-calendar-check"></i> ${escapeHtml(bookLabel)}`;
       } else {
-        btn.textContent = bookLabel;
+        const icon = btn.querySelector("i");
+        if (icon) {
+          btn.innerHTML = `${icon.outerHTML} ${escapeHtml(bookLabel)}`;
+        } else {
+          btn.textContent = bookLabel;
+        }
+      }
+      if (metaEl) {
+        if (metaText) {
+          metaEl.hidden = false;
+          metaEl.textContent = metaText;
+        } else {
+          metaEl.hidden = true;
+          metaEl.textContent = "";
+        }
       }
     });
+
+    // Dedicated aside meta (in case structure differs)
+    const asideMeta = document.getElementById("salonAsideBookMeta");
+    if (asideMeta) {
+      if (metaText) {
+        asideMeta.hidden = false;
+        asideMeta.textContent = metaText;
+      } else {
+        asideMeta.hidden = true;
+        asideMeta.textContent = "";
+      }
+    }
+
     document.querySelectorAll(".sticky-booking-btn button").forEach((btn) => {
       const icon = btn.querySelector("i");
       if (icon) {
@@ -1235,6 +1297,31 @@
         btn.textContent = stickyLabel;
       }
     });
+    // Mobile sticky: show summed price + duration (aside is hidden on small screens)
+    const stickyBar = document.getElementById("salonStickyBookingBar");
+    if (stickyBar) {
+      let sumEl = document.getElementById("salonStickyBookingSummary");
+      if (!sumEl) {
+        sumEl = document.createElement("div");
+        sumEl.id = "salonStickyBookingSummary";
+        sumEl.className = "sticky-booking-btn__summary";
+        stickyBar.insertBefore(sumEl, stickyBar.firstChild);
+      }
+      if (totals && count > 0) {
+        const names = selected.map((s) => s.name).join(", ");
+        sumEl.hidden = false;
+        sumEl.innerHTML = `
+          <p class="sticky-booking-btn__count">${escapeHtml(
+            tFmt("servicesSelectedCount", "{n}", String(count))
+          )}</p>
+          <p class="sticky-booking-btn__names">${escapeHtml(names)}</p>
+          <p class="sticky-booking-btn__meta">${escapeHtml(metaText)}</p>
+        `;
+      } else {
+        sumEl.hidden = true;
+        sumEl.innerHTML = "";
+      }
+    }
   }
 
   function renderSalonPageSelectionUI() {
@@ -1353,14 +1440,13 @@
 
   function renderServicesGrid() {
     if (!gridEl) return;
+    // Keep only panels the user opened — do NOT auto-expand selected
+    // (keeps card heights equal while multi-selecting)
     const openIds = new Set();
     gridEl.querySelectorAll(".sq-svc-row.is-open").forEach((row) => {
       const id = normalizeServiceId(row.getAttribute("data-service-id"));
       if (id) openIds.add(id);
     });
-    state.selectedServiceIds.forEach((id) =>
-      openIds.add(normalizeServiceId(id))
-    );
     const list =
       activeCategory === "all"
         ? cfg.services
@@ -1374,9 +1460,7 @@
       )
       .join("");
     bindSalonPageServiceCards(gridEl, {
-      onToggleOpen: (sid, isOpen) => {
-        /* page: open state re-collected on next renderServicesGrid */
-      },
+      onToggleOpen: () => {},
     });
     renderSalonPageSelectionUI();
     gridEl.scrollTop = scrollTop;
@@ -1422,44 +1506,46 @@
   }
 
   function getSelectedServices() {
-    const ids = new Set(
-      state.selectedServiceIds.map((id) => normalizeServiceId(id))
-    );
-    return cfg.services.filter((s) =>
-      ids.has(normalizeServiceId(s.id || s._id))
-    );
+    const byId = new Map();
+    (cfg.services || []).forEach((s) => {
+      const id = normalizeServiceId(s.id || s._id);
+      if (id) byId.set(id, s);
+    });
+    // Preserve selection order so totals / names stay stable
+    return state.selectedServiceIds
+      .map((id) => byId.get(normalizeServiceId(id)))
+      .filter(Boolean);
   }
 
   function calcTotals(serviceList) {
     let sub = 0;
     let dur = 0;
-    // Plus de devis : prix/durée = catalogue + options/produits cochés sur la presta
-    serviceList.forEach((s) => {
-      sub += Number(s.price) || 0;
+    const list = Array.isArray(serviceList) ? serviceList : [];
+    // Sum every selected service (catalogue + per-service options only)
+    list.forEach((s) => {
       const sid = normalizeServiceId(s.id || s._id);
+      sub += toMoneyNumber(s.price);
       const meta = state.afroByServiceId?.[sid];
-      let serviceDur = Number(s.duration) || 0;
+      let serviceDur = toMoneyNumber(s.duration);
       if (meta) {
         const base =
-          Number(meta.baseDuration) > 0
-            ? Number(meta.baseDuration)
+          toMoneyNumber(meta.baseDuration) > 0
+            ? toMoneyNumber(meta.baseDuration)
             : serviceDur;
-        const buffer = Math.max(0, Number(meta.prepBufferMinutes) || 0);
+        const buffer = Math.max(0, toMoneyNumber(meta.prepBufferMinutes));
         serviceDur = base + buffer;
       }
-      // Prefer per-service draft addons so multi-select sums correctly
+      // Never fall back to shared afroAnswers — that broke multi-select sums
       const draft = state.pageSvcDraft?.[sid];
       const chosen = Array.isArray(draft?.addons)
         ? draft.addons.map(String)
-        : Array.isArray(state.afroAnswers?.addons)
-          ? state.afroAnswers.addons.map(String)
-          : [];
+        : [];
       if (chosen.length) {
         const catalog = getServiceAddonCatalog(s);
         catalog.forEach((a) => {
           if (!chosen.includes(String(a.id || a._id))) return;
-          sub += Number(a.addPrice) || 0;
-          serviceDur += Number(a.addMinutes) || 0;
+          sub += toMoneyNumber(a.addPrice);
+          serviceDur += toMoneyNumber(a.addMinutes);
         });
       }
       const draftProducts = Array.isArray(draft?.productIds)
@@ -1468,7 +1554,7 @@
       (s.recommendedProducts || []).forEach((p) => {
         if (p.isOutOfStock) return;
         if (draftProducts.includes(String(p.id))) {
-          sub += Number(p.price) || 0;
+          sub += toMoneyNumber(p.price);
         }
       });
       dur += serviceDur;
@@ -1476,12 +1562,12 @@
     // Products selected without a draft (legacy / shared) — avoid double-count
     if (state.selectedProductIds?.length) {
       const alreadyCounted = new Set();
-      serviceList.forEach((s) => {
+      list.forEach((s) => {
         const sid = normalizeServiceId(s.id || s._id);
         const draft = state.pageSvcDraft?.[sid];
         (draft?.productIds || []).forEach((pid) => alreadyCounted.add(String(pid)));
       });
-      const svcPool = serviceList.length ? serviceList : cfg.services || [];
+      const svcPool = list.length ? list : cfg.services || [];
       svcPool.forEach((s) => {
         (s.recommendedProducts || []).forEach((p) => {
           const pid = String(p.id);
@@ -1490,13 +1576,13 @@
             !alreadyCounted.has(pid) &&
             !p.isOutOfStock
           ) {
-            sub += Number(p.price) || 0;
+            sub += toMoneyNumber(p.price);
             alreadyCounted.add(pid);
           }
         });
       });
     }
-    const taxPct = Number(cfg.tax) || 0;
+    const taxPct = toMoneyNumber(cfg.tax);
     const taxAmount = (sub * taxPct) / 100;
     const withTaxNum = parseFloat((taxAmount + sub).toFixed(2));
     if (state.applyLoyalty && Number(state.loyaltyPercent) > 0) {
@@ -1516,7 +1602,7 @@
       depositAmount = Number(state.afroDemand.depositAmount);
     } else {
       const primary =
-        getDemandTargetService()?.service || serviceList[0] || null;
+        getDemandTargetService()?.service || list[0] || null;
       const pct = getServiceDepositPercent(primary);
       if (pct > 0) {
         depositAmount = Math.round((state.withoutTax * pct) / 100);
@@ -2153,8 +2239,8 @@
       }
       if (optsPaint.focusServiceId) {
         const fid = normalizeServiceId(optsPaint.focusServiceId);
-        if (isServiceSelected(fid)) openServiceIds.add(fid);
-        else openServiceIds.delete(fid);
+        // Keep equal card heights while adding: only close on deselect, never auto-open
+        if (!isServiceSelected(fid)) openServiceIds.delete(fid);
       }
       // Drop open ids that are no longer selected (deselect sync)
       Array.from(openServiceIds).forEach((id) => {
@@ -3308,12 +3394,25 @@
   initSalonMosaic();
 
   stickyMobileBtn?.addEventListener("click", () => {
+    applyPageDraftsToBookingState();
     if (state.selectedServiceIds.length > 0) {
       openBookingForSelection();
       return;
     }
     openModal();
     renderStepServices();
+  });
+
+  // Aside « Réserver (n) » — keep multi-selection, open tunnel
+  document.querySelectorAll(".open-app-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      // Prefer programmatic multi-select open over empty SalonBooking.open()
+      if (!state.selectedServiceIds.length) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      applyPageDraftsToBookingState();
+      openBookingForSelection();
+    }, true);
   });
 
   tryResumeBooking();
