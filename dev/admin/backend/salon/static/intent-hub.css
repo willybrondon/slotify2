@@ -2308,10 +2308,6 @@ body.sq-search-focus-active .sq-search-suggestions {
   body.sq-search-sheet-open .sq-hair-strip-mount {
     display: none !important;
   }
-
-  body.sq-search-sheet-open .sq-location-popover {
-    z-index: 100090;
-  }
 }
 
 .sq-search-hero-toolbar {

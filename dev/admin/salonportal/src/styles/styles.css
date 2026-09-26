@@ -2825,7 +2825,9 @@ html {
     }
 
     body.sq-search-focus-active .sq-mobile-float-bar,
-    body.sq-search-focus-active .sq-mobile-float-bar.mobile-only {
+    body.sq-search-focus-active .sq-mobile-float-bar.mobile-only,
+    body.sq-search-sheet-open .sq-mobile-float-bar,
+    body.sq-search-sheet-open .sq-mobile-float-bar.mobile-only {
         display: none !important;
         pointer-events: none !important;
         visibility: hidden !important;

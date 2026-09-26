@@ -1,5 +1,6 @@
 /**
- * Barre de recherche — suggestions (top catégories + prestations) au focus.
+ * Barre de recherche — suggestions au focus.
+ * Mobile accueil : ouvre une « page » plein écran (position + recherche visibles au-dessus du clavier).
  */
 (function () {
     function escapeHtml(str) {
@@ -19,6 +20,10 @@
         return localStorage.getItem("skedisy-language") || "fr";
     }
 
+    function isMobileViewport() {
+        return window.matchMedia("(max-width: 768px)").matches;
+    }
+
     function filterByQuery(items, query) {
         const q = (query || "").trim().toLowerCase();
         if (!q) return items;
@@ -36,16 +41,92 @@
         const servicesList = form.querySelector("[data-suggest-services]");
         if (!queryInput || !panel || !categoriesList || !servicesList) return;
 
+        const hero =
+            form.closest(".sq-search-hero") ||
+            form.closest(".sq-search-hero-wrap");
+        const heroWrap =
+            form.closest(".sq-search-hero-wrap") ||
+            (hero && hero.closest(".sq-search-hero-wrap")) ||
+            hero;
+
         let categories = [];
         let services = [];
         let loaded = false;
         let loading = false;
         let savedScrollY = 0;
         let pageLocked = false;
+        let sheetOpen = false;
         let ignoreNextDocClick = false;
+
+        function ensureSheetBackBtn() {
+            if (!hero) return null;
+            let btn = hero.querySelector("[data-search-sheet-back]");
+            if (!btn) {
+                btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "sq-search-sheet__back";
+                btn.setAttribute("data-search-sheet-back", "");
+                btn.setAttribute("aria-label", t("intentHub.searchBack") || "Retour");
+                btn.innerHTML = "‹";
+                const toolbar = hero.querySelector(".sq-search-hero-toolbar");
+                if (toolbar) {
+                    toolbar.classList.add("sq-search-hero-toolbar--sheet");
+                    toolbar.insertBefore(btn, toolbar.firstChild);
+                } else {
+                    hero.insertBefore(btn, hero.firstChild);
+                }
+            }
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closePanelAndUnlock();
+                queryInput.blur();
+            };
+            return btn;
+        }
+
+        function openMobileSheet() {
+            if (!heroWrap || !isMobileViewport()) return false;
+            ensureSheetBackBtn();
+            savedScrollY = window.scrollY || window.pageYOffset || 0;
+            sheetOpen = true;
+            pageLocked = true;
+            document.body.classList.add(
+                "sq-search-sheet-open",
+                "sq-search-focus-active"
+            );
+            document.body.style.overflow = "hidden";
+            document.body.style.top = "";
+            heroWrap.classList.add("is-search-sheet");
+            if (hero) hero.classList.add("is-search-sheet-hero");
+            // Keep fields at top of the sheet (visible above the keyboard)
+            requestAnimationFrame(() => {
+                try {
+                    heroWrap.scrollTop = 0;
+                    queryInput.focus({ preventScroll: true });
+                } catch (_) {
+                    queryInput.focus();
+                }
+            });
+            return true;
+        }
+
+        function closeMobileSheet() {
+            if (!sheetOpen) return;
+            sheetOpen = false;
+            document.body.classList.remove(
+                "sq-search-sheet-open",
+                "sq-search-focus-active"
+            );
+            document.body.style.overflow = "";
+            if (heroWrap) heroWrap.classList.remove("is-search-sheet");
+            if (hero) hero.classList.remove("is-search-sheet-hero");
+            window.scrollTo(0, savedScrollY);
+        }
 
         function lockPagePosition() {
             if (pageLocked || document.body.classList.contains("menu-open")) return;
+            if (openMobileSheet()) return;
             savedScrollY = window.scrollY || window.pageYOffset || 0;
             document.body.classList.add("sq-search-focus-active");
             document.body.style.top = `-${savedScrollY}px`;
@@ -54,6 +135,11 @@
 
         function unlockPagePosition() {
             if (!pageLocked || document.body.classList.contains("menu-open")) return;
+            if (sheetOpen) {
+                closeMobileSheet();
+                pageLocked = false;
+                return;
+            }
             document.body.classList.remove("sq-search-focus-active");
             document.body.style.top = "";
             pageLocked = false;
@@ -61,6 +147,7 @@
         }
 
         function restoreScrollPosition() {
+            if (sheetOpen) return;
             window.scrollTo(0, savedScrollY);
             requestAnimationFrame(() => window.scrollTo(0, savedScrollY));
         }
@@ -167,6 +254,18 @@
 
         queryInput.addEventListener("blur", () => {
             window.setTimeout(() => {
+                if (sheetOpen) {
+                    // Keep sheet open while interacting with location / suggestions
+                    if (
+                        heroWrap &&
+                        heroWrap.contains(document.activeElement)
+                    ) {
+                        return;
+                    }
+                    // Don't close immediately if focus moved to suggestion buttons inside sheet
+                    if (panel.contains(document.activeElement)) return;
+                    return;
+                }
                 if (!form.contains(document.activeElement)) {
                     closePanelAndUnlock();
                 }
@@ -175,11 +274,23 @@
 
         document.addEventListener("click", (e) => {
             if (ignoreNextDocClick) return;
+            if (sheetOpen) {
+                if (heroWrap && !heroWrap.contains(e.target)) {
+                    closePanelAndUnlock();
+                }
+                return;
+            }
             if (!form.contains(e.target)) closePanelAndUnlock();
         });
 
         form.addEventListener("keydown", (e) => {
             if (e.key === "Escape") closePanelAndUnlock();
+        });
+
+        window.addEventListener("resize", () => {
+            if (sheetOpen && !isMobileViewport()) {
+                closePanelAndUnlock();
+            }
         });
     }
 
