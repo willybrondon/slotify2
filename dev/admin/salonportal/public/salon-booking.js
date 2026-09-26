@@ -994,9 +994,7 @@
     return `<article class="sq-svc-row${
       selected ? " is-selected" : ""
     }${opts.forceOpen ? " is-open" : ""}" data-service-id="${escapeHtml(String(s.id))}">
-      <button type="button" class="sq-svc-row__head" data-svc-toggle aria-expanded="${
-        opts.forceOpen ? "true" : "false"
-      }">
+      <div class="sq-svc-row__head">
         <div class="sq-svc-row__main">
           <div class="sq-svc-row__top">
             <span class="sq-svc-row__name-wrap">
@@ -1012,8 +1010,21 @@
               : ""
           }
         </div>
-        <span class="sq-svc-row__chevron" aria-hidden="true">›</span>
-      </button>
+        <div class="sq-svc-row__side">
+          <button type="button" class="sq-svc-row__book sq-svc-row__book--icon${
+            selected ? " sq-svc-row__book--selected" : ""
+          }" ${actionAttr} aria-label="${escapeHtml(
+      selected
+        ? t("serviceRemoveFromSelection") || "Retirer"
+        : t("serviceAddToSelection") || "Ajouter"
+    )}">${actionHtml}</button>
+          <button type="button" class="sq-svc-row__expand" data-svc-toggle aria-expanded="${
+            opts.forceOpen ? "true" : "false"
+          }" aria-label="${escapeHtml(t("serviceExpandDetails") || "Détails")}">
+            <span class="sq-svc-row__chevron" aria-hidden="true">›</span>
+          </button>
+        </div>
+      </div>
       <div class="sq-svc-row__panel">
         ${includesBlock}
         ${prepBlock}
@@ -1022,15 +1033,6 @@
         ${inspirationBlock}
         ${statsBlock}
         ${noteBlock}
-        <div class="sq-svc-row__actions">
-          <button type="button" class="sq-svc-row__book sq-svc-row__book--icon${
-            selected ? " sq-svc-row__book--selected" : ""
-          }" ${actionAttr} aria-label="${escapeHtml(
-      selected
-        ? t("serviceRemoveFromSelection") || "Retirer"
-        : t("serviceAddToSelection") || "Ajouter"
-    )}">${actionHtml}</button>
-        </div>
       </div>
     </article>`;
   }
@@ -1517,7 +1519,9 @@
     if (!modal) return;
     modal.classList.add("sq-booking-modal--open");
     modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("sq-booking-modal-open");
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     setModalTitle(t("bookNow"));
   }
 
@@ -1525,7 +1529,9 @@
     if (!modal) return;
     modal.classList.remove("sq-booking-modal--open");
     modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("sq-booking-modal-open");
     document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
     hideBookingStickyBar();
     setModalBack(null);
     setModalTitle(t("bookNow"));
@@ -1540,7 +1546,7 @@
     const params = new URLSearchParams({
       date: state.date,
       salonId: cfg.salonId,
-      expertId: state.expertId,
+      expertId: String(state.expertId || ""),
     });
     const res = await fetch(`/api/public/booking/slots?${params}`);
     return res.json();
@@ -2436,7 +2442,7 @@
     const monthLabel = formatMonthYear(state.calendarYear, state.calendarMonth);
     stepsEl.innerHTML = `
       <div class="sq-booking-datetime">
-        <div class="sq-booking-datetime__static">
+        <div class="sq-booking-datetime__scroll">
           <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectDateTime)}</p>
           <section class="sq-booking-calendar" aria-label="${escapeHtml(t("selectDate"))}">
             <p class="sq-booking-calendar__label">${escapeHtml(t("selectDate"))}</p>
@@ -2447,7 +2453,11 @@
             </div>
             <div class="sq-booking-calendar__days" id="bookingCalendarDays"></div>
           </section>
-          <p class="sq-booking-datetime__selected" id="bookingSelectedDate">${escapeHtml(
+          <h3 class="sq-booking-slots-title">${escapeHtml(t("availableSlots"))}</h3>
+          <div id="slotGroups" class="sq-slot-groups"></div>
+        </div>
+        <div class="sq-booking-datetime__footer">
+          <p class="sq-booking-datetime__selected" id="bookingSelectedSummary">${escapeHtml(
             formatDisplayDate(state.date)
           )}</p>
           <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>${escapeHtml(
@@ -2456,36 +2466,28 @@
               : t("continue")
           )}</button>
         </div>
-        <div class="sq-booking-datetime__scroll">
-          <h3 class="sq-booking-slots-title">${escapeHtml(t("availableSlots"))}</h3>
-          <div id="slotGroups" class="sq-slot-groups"></div>
-          <p id="slotPickHint" class="sq-slot-pick-hint${state.slotPickHint ? "" : " sq-slot-pick-hint--hidden"}">${escapeHtml(state.slotPickHint)}</p>
-        </div>
       </div>
     `;
 
     const daysEl = document.getElementById("bookingCalendarDays");
     const monthLabelEl = document.getElementById("calMonthLabel");
-    const selectedDateEl = document.getElementById("bookingSelectedDate");
+    const selectedSummaryEl = document.getElementById("bookingSelectedSummary");
     const slotGroups = document.getElementById("slotGroups");
-    const slotPickHint = document.getElementById("slotPickHint");
     const btnNext = document.getElementById("btnDateNext");
 
-    function syncSelectedDateLabel() {
-      if (selectedDateEl) {
-        selectedDateEl.textContent = formatDisplayDate(state.date);
+    function syncSelectedSummary() {
+      if (!selectedSummaryEl) return;
+      const dateLabel = formatDisplayDate(state.date);
+      if (state.timeSlots?.length) {
+        const start = state.timeSlots[0];
+        const end = state.timeSlots[state.timeSlots.length - 1];
+        selectedSummaryEl.textContent =
+          state.timeSlots.length > 1
+            ? `${dateLabel} · ${start} → ${end}`
+            : `${dateLabel} · ${start}`;
+      } else {
+        selectedSummaryEl.textContent = dateLabel;
       }
-    }
-
-    function updateSlotHint() {
-      if (!slotPickHint) return;
-      if (!state.slotPickHint) {
-        slotPickHint.classList.add("sq-slot-pick-hint--hidden");
-        slotPickHint.textContent = "";
-        return;
-      }
-      slotPickHint.textContent = state.slotPickHint;
-      slotPickHint.classList.remove("sq-slot-pick-hint--hidden");
     }
 
     function refreshMonthUi() {
@@ -2493,10 +2495,10 @@
         monthLabelEl.textContent = formatMonthYear(state.calendarYear, state.calendarMonth);
       }
       renderCalendarDays(daysEl, () => {
-        syncSelectedDateLabel();
+        syncSelectedSummary();
         loadSlots();
       });
-      syncSelectedDateLabel();
+      syncSelectedSummary();
     }
 
     function selectStartSlot(startSlot) {
@@ -2519,13 +2521,9 @@
         return;
       }
       state.timeSlots = built;
-      const endSlot = built[built.length - 1];
-      state.slotPickHint =
-        built.length > 1
-          ? `${t("slotSelectedRange")} : ${built[0]} → ${endSlot} (${durationMin} ${t("min")})`
-          : `${t("slotSelectedRange")} : ${built[0]} (${durationMin} ${t("min")})`;
+      state.slotPickHint = "";
       markPickedSlots(slotGroups);
-      updateSlotHint();
+      syncSelectedSummary();
       btnNext.disabled = false;
     }
 
@@ -2535,15 +2533,23 @@
         initCalendarFromStateDate();
         refreshMonthUi();
       }
-      syncSelectedDateLabel();
+      if (!state.expertId) {
+        slotGroups.innerHTML = `<p>${escapeHtml(t("noExpertForService") || t("slotsClosed"))}</p>`;
+        syncSelectedSummary();
+        return;
+      }
+      syncSelectedSummary();
       state.timeSlots = [];
       state.slotPickHint = "";
       btnNext.disabled = true;
-      updateSlotHint();
       slotGroups.innerHTML = `<p class="sq-booking-loading">${escapeHtml(t("loading"))}</p>`;
       const data = await fetchSlots();
-      if (!data.status || !data.isOpen) {
-        slotGroups.innerHTML = `<p>${escapeHtml(t("slotsClosed"))}</p>`;
+      if (!data.status) {
+        slotGroups.innerHTML = `<p>${escapeHtml(data.message || t("slotsClosed"))}</p>`;
+        return;
+      }
+      if (!data.isOpen) {
+        slotGroups.innerHTML = `<p>${escapeHtml(data.message || t("slotsClosed"))}</p>`;
         return;
       }
       busySlotsRef = new Set(data.timeSlots || []);
@@ -2591,7 +2597,6 @@
       );
       const today = todayYmd();
       if (state.date >= firstOfMonth && state.date <= lastOfMonth) return;
-      // Prefer today when browsing the current month — never jump to day 1 if today is available
       if (today >= firstOfMonth && today <= lastOfMonth) {
         state.date = today;
       } else {
@@ -2737,8 +2742,8 @@
       <p class="sq-booking-connected">${escapeHtml(t("connectedAs"))} <strong>${escapeHtml(displayName)}</strong></p>
       <button type="button" class="sq-booking-btn" id="btnToPayment">${escapeHtml(t("continue"))}</button>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnAuthSwitch">${escapeHtml(t("authUseOtherAccount"))}</button>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackDate">${escapeHtml(t("back"))}</button>
     `;
+      setModalBack(() => renderStepDateTime());
       document.getElementById("btnToPayment").onclick = async () => {
         await loadCouponsForUser(state.userId);
         await renderStepPayment();
@@ -2748,7 +2753,6 @@
         state.userId = null;
         renderStepContact();
       };
-      document.getElementById("btnBackDate").onclick = renderStepDateTime;
       return;
     }
 
@@ -2770,8 +2774,8 @@
       <label class="sq-booking-field">${escapeHtml(t("otpLabel"))} <input type="text" id="bkOtp" inputmode="numeric" maxlength="6" placeholder="${escapeHtml(t("otpPlaceholder"))}"></label>
       <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnSendOtp">${escapeHtml(t("sendOtp"))}</button>
       <button type="button" class="sq-booking-btn" id="btnToPayment">${escapeHtml(t("continue"))}</button>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackDate">${escapeHtml(t("back"))}</button>
     `;
+    setModalBack(() => renderStepDateTime());
     bindAuthNavLinks(stepsEl);
     document.getElementById("btnSendOtp").onclick = async () => {
       state.email = document.getElementById("bkEmail").value.trim();
@@ -2787,7 +2791,6 @@
         renderStepContact()
       );
     };
-    document.getElementById("btnBackDate").onclick = renderStepDateTime;
     document.getElementById("btnToPayment").onclick = async () => {
       state.email = document.getElementById("bkEmail").value.trim();
       state.mobile = document.getElementById("bkMobile").value.trim();
@@ -2924,8 +2927,8 @@
         <div id="sq-stripe-element"></div>
       </div>
       <button type="button" class="sq-booking-btn" id="btnConfirm">${escapeHtml(confirmLabel)}</button>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackContact">${escapeHtml(t("back"))}</button>
     `;
+    setModalBack(() => renderStepContact());
 
     if (!needDeposit) {
       stepsEl.querySelectorAll('input[name="payMethod"]').forEach((radio) => {
@@ -2955,8 +2958,6 @@
       );
       document.getElementById("btnRemoveCoupon")?.addEventListener("click", clearCoupon);
     }
-
-    document.getElementById("btnBackContact").onclick = renderStepContact;
 
     document.getElementById("bkPolicyAccept")?.addEventListener("change", (e) => {
       state.policyAccepted = Boolean(e.target.checked);

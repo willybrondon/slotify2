@@ -99,7 +99,12 @@
             document.body.style.top = "";
             heroWrap.classList.add("is-search-sheet");
             if (hero) hero.classList.add("is-search-sheet-hero");
-            // Keep fields at top of the sheet (visible above the keyboard)
+            // Keep search bar chrome clean: suggestions below the form (like home layout)
+            if (panel && hero && panel.parentElement !== hero) {
+                panel.dataset.suggestHost = "moved";
+                hero.appendChild(panel);
+            }
+            if (panel) panel.classList.add("sq-search-sheet-suggestions");
             requestAnimationFrame(() => {
                 try {
                     heroWrap.scrollTop = 0;
@@ -121,6 +126,14 @@
             document.body.style.overflow = "";
             if (heroWrap) heroWrap.classList.remove("is-search-sheet");
             if (hero) hero.classList.remove("is-search-sheet-hero");
+            if (panel) {
+                panel.classList.remove("sq-search-sheet-suggestions");
+                if (panel.dataset.suggestHost === "moved") {
+                    const wrap = form.querySelector(".sq-search-bar-unified__query-wrap");
+                    if (wrap) wrap.appendChild(panel);
+                    delete panel.dataset.suggestHost;
+                }
+            }
             window.scrollTo(0, savedScrollY);
         }
 

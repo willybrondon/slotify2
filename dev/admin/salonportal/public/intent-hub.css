@@ -2278,29 +2278,59 @@ body.sq-search-focus-active .sq-search-suggestions {
 
   body.sq-search-sheet-open .sq-search-bar-unified--home,
   body.sq-search-sheet-open .sq-search-bar-unified--full {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 2;
-    background: var(--sk-bg, #fff);
     flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    background: var(--sk-white, #fff);
+    border: 1px solid rgba(196, 92, 38, 0.28);
+    border-radius: 14px;
+    box-shadow: none;
+    padding: 0.35rem 0.45rem 0.35rem 0.4rem;
+    min-height: 48px;
+    gap: 0.4rem;
   }
 
   body.sq-search-sheet-open .sq-search-bar-unified__input--query {
     font-size: 16px; /* avoid iOS zoom */
   }
 
-  body.sq-search-sheet-open .sq-search-suggestions {
-    position: static;
-    top: auto;
-    left: auto;
-    right: auto;
+  body.sq-search-sheet-open .sq-search-bar-unified__submit {
+    background: var(--sk-black, #111) !important;
+    color: #fff !important;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Suggestions live below the bar (not inside the chrome) */
+  body.sq-search-sheet-open .sq-search-suggestions,
+  body.sq-search-sheet-open .sq-search-sheet-suggestions {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
     width: 100%;
     max-width: 100%;
     max-height: none;
-    margin-top: 0.35rem;
+    margin-top: 0.75rem;
     box-shadow: none;
-    border: 1px solid var(--sk-border, #e8e8e8);
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
     z-index: 1;
+  }
+
+  body.sq-search-sheet-open .sq-search-suggestions__section {
+    background: var(--sk-white, #fff);
+    border: 1px solid var(--sk-border, #e8e8e8);
+    border-radius: 14px;
+    padding: 0.65rem 0.5rem 0.75rem;
+    margin-bottom: 0.65rem;
   }
 
   body.sq-search-sheet-open .sq-home-search-results,

@@ -347,22 +347,32 @@ exports.getBookingBasedDate = async (req, res) => {
       return res.status(200).send({ status: false, message: "Invalid Expert ID format!!" });
     }
 
-    const dayOfWeek = moment(req.query.date).format("dddd");
+    // Parse calendar date without timezone shift (YYYY-MM-DD → weekday)
+    const bookingDate = String(req.query.date || "").trim();
+    const dayMoment = moment(bookingDate, "YYYY-MM-DD", true);
+    if (!dayMoment.isValid()) {
+      return res.status(200).send({ status: false, message: "Invalid date format!!" });
+    }
+    const dayOfWeek = dayMoment.format("dddd");
     const salon = await Salon.findById(req.query.salonId);
     if (!salon) {
       return res.status(200).send({ status: false, message: "Salon Not Found!!!" });
     }
 
-    const [holiday, salonTime, expert] = await Promise.all([
-      Holiday.findOne({ date: req.query.date, salonId: salon._id }),
-      salon.salonTime.find((time) => time.day == dayOfWeek),
+    const [holiday, expert] = await Promise.all([
+      Holiday.findOne({ date: bookingDate, salonId: salon._id }),
       Expert.findById(expertId),
     ]);
+
+    const salonTime = (salon.salonTime || []).find(
+      (time) => String(time.day || "").trim().toLowerCase() === dayOfWeek.toLowerCase()
+    );
 
     if (holiday) {
       return res.status(200).send({
         status: true,
         timeSlots: [],
+        allSlots: { morning: [], evening: [] },
         isOpen: false,
         message: "Salon Closed!!!",
       });
@@ -372,13 +382,17 @@ exports.getBookingBasedDate = async (req, res) => {
       return res.status(200).send({ status: false, message: "Expert Not Found!!!" });
     }
 
-    if (!salonTime) {
-      return res.status(200).send({ status: false, message: "Salon Closed!!!" });
+    if (!salonTime || salonTime.isActive === false) {
+      return res.status(200).send({
+        status: true,
+        timeSlots: [],
+        allSlots: { morning: [], evening: [] },
+        isOpen: false,
+        message: "Salon Closed!!!",
+      });
     }
 
-    const bookingDate = req.query.date;
-
-    console.log("bookingDate", bookingDate);
+    console.log("bookingDate", bookingDate, "day", dayOfWeek);
     const bookings = await Booking.aggregate([
       {
         $match: {
@@ -391,21 +405,39 @@ exports.getBookingBasedDate = async (req, res) => {
 
     const generateTimeSlots = (startTime, endTime, slotSize) => {
       const slots = [];
-      let start = moment(startTime, "hh:mm A");
-      const end = moment(endTime, "hh:mm A");
-
-      while (start < end) {
-        slots.push(start.format("hh:mm A"));
-        start.add(slotSize, "minutes");
+      const start = moment(String(startTime || "").trim(), ["hh:mm A", "h:mm A", "HH:mm"]);
+      const end = moment(String(endTime || "").trim(), ["hh:mm A", "h:mm A", "HH:mm"]);
+      if (!start.isValid() || !end.isValid() || !start.isBefore(end)) return slots;
+      const step = Math.max(1, parseInt(slotSize, 10) || 15);
+      let cursor = start.clone();
+      while (cursor.isBefore(end)) {
+        slots.push(cursor.format("hh:mm A"));
+        cursor.add(step, "minutes");
       }
       return slots;
     };
 
-    const { openTime, closedTime, breakStartTime, breakEndTime, time, isBreak } = salonTime;
+    const {
+      openTime,
+      closedTime,
+      breakStartTime,
+      breakEndTime,
+      time,
+      isBreak,
+    } = salonTime;
 
-    const morningSlots = isBreak === true ? generateTimeSlots(openTime, breakStartTime.trim(), time) : generateTimeSlots(openTime, closedTime.trim(), time);
+    const breakOn =
+      isBreak === true &&
+      String(breakStartTime || "").trim() &&
+      String(breakEndTime || "").trim();
 
-    const eveningSlots = isBreak === true ? generateTimeSlots(breakEndTime.trim(), closedTime, time) : [];
+    const morningSlots = breakOn
+      ? generateTimeSlots(openTime, breakStartTime, time)
+      : generateTimeSlots(openTime, closedTime, time);
+
+    const eveningSlots = breakOn
+      ? generateTimeSlots(breakEndTime, closedTime, time)
+      : [];
 
     const managedSlots = {
       morning: morningSlots,
@@ -416,7 +448,7 @@ exports.getBookingBasedDate = async (req, res) => {
 
     const busyExpert = await BusyExpert.findOne({
       expertId: expertId,
-      date: req.query.date,
+      date: bookingDate,
     });
 
     const mergedTimeSlots = busyExpert ? [...timeSlots, ...busyExpert.time] : timeSlots;
