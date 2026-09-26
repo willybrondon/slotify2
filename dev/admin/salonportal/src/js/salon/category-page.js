@@ -144,7 +144,7 @@
             ? `<ul class="sq-salon-card-v3__services">${services
                   .map((svc) => {
                       const svcUrl = svc.id
-                          ? `${salonUrl}?serviceId=${encodeURIComponent(svc.id)}&book=1`
+                          ? `${salonUrl}?serviceId=${encodeURIComponent(svc.id)}`
                           : salonUrl;
                       const price =
                           svc.price != null

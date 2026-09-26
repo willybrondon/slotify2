@@ -3623,9 +3623,28 @@
     }
     const sid = q.get("serviceId");
     if (sid) {
+      const normalized = normalizeServiceId(sid);
       setTimeout(() => {
-        window.SalonBooking.open({ serviceId: sid });
-      }, 400);
+        // Deep-link from category/home: land on salon detail with + already selected
+        // (no auto-open of the old booking modal / services step)
+        if (!isServiceSelected(normalized)) {
+          state.selectedServiceIds = [normalized];
+        }
+        renderServicesGrid();
+        renderSalonPageSelectionUI();
+        const row = gridEl?.querySelector(
+          `.sq-svc-row[data-service-id="${CSS.escape(normalized)}"]`
+        );
+        row?.scrollIntoView({ block: "center", behavior: "smooth" });
+        try {
+          const clean = new URL(window.location.href);
+          clean.searchParams.delete("book");
+          clean.searchParams.set("serviceId", normalized);
+          window.history.replaceState({}, "", clean.pathname + clean.search);
+        } catch (_) {
+          /* ignore */
+        }
+      }, 200);
     }
   });
 

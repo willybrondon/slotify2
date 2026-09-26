@@ -164,8 +164,7 @@
                       const svcUrl = svc.id
                           ? salonUrl +
                             "?serviceId=" +
-                            encodeURIComponent(svc.id) +
-                            "&book=1"
+                            encodeURIComponent(svc.id)
                           : salonUrl;
                       const price =
                           svc.price != null
