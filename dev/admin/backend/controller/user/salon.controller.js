@@ -1550,7 +1550,7 @@ exports.serveSalonWebPage = async (req, res) => {
         ${footerHtml}
     </div>
     
-    <!-- Sticky Booking Button (Mobile Only) -->
+    <!-- Sticky booking bar: mobile always; desktop when services selected -->
     <div class="sticky-booking-btn" id="salonStickyBookingBar">
         <button type="button" id="salonStickyBookingBtn">
             <i class="fas fa-calendar-check"></i> ${copy.bookNow}
@@ -1561,8 +1561,9 @@ exports.serveSalonWebPage = async (req, res) => {
         <div class="sq-booking-modal__backdrop" data-close-booking></div>
         <div class="sq-booking-modal__panel" role="dialog" aria-labelledby="bookingModalTitle">
             <div class="sq-booking-modal__head">
-                <button type="button" class="sq-booking-modal__close" data-close-booking aria-label="Fermer">&times;</button>
+                <button type="button" class="sq-booking-modal__back" id="bookingModalBack" hidden aria-label="Retour">‹</button>
                 <h2 id="bookingModalTitle" class="sq-booking-modal__title">${copy.bookNow}</h2>
+                <button type="button" class="sq-booking-modal__close" data-close-booking aria-label="Fermer">&times;</button>
             </div>
             <div id="salonBookingStickyBar" class="sq-booking-sticky-bar sq-booking-sticky-bar--hidden" aria-live="polite"></div>
             <div id="salonBookingSteps" class="sq-booking-steps"></div>

@@ -131,16 +131,14 @@ async function sendSalonDemandEmail(demand, { event }) {
   console.log(`[Demand Email] ${event} → ${to} demand=${demand._id}`);
 }
 
-function notifySalonDemandCreated(demand) {
-  Promise.resolve(sendSalonDemandEmail(demand, { event: "created" })).catch((err) =>
-    console.error("[Demand Email] created failed", err.message)
-  );
+function notifySalonDemandCreated(_demand) {
+  // Devis / demand-created emails retired — options live on service & salon profile.
+  return;
 }
 
-function notifySalonDepositPaid(demand) {
-  Promise.resolve(sendSalonDemandEmail(demand, { event: "deposit_paid" })).catch((err) =>
-    console.error("[Demand Email] deposit_paid failed", err.message)
-  );
+function notifySalonDepositPaid(_demand) {
+  // Devis-flow emails retired (including deposit_paid templates that mentioned devis).
+  return;
 }
 
 module.exports = {

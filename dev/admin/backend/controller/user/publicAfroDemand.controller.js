@@ -183,12 +183,7 @@ exports.publicCreateDemand = async (req, res) => {
       channelHint: body.channelHint || "",
     });
 
-    try {
-      const { notifySalonDemandCreated } = require("../../services/afroDemandEmail.service");
-      notifySalonDemandCreated(demand);
-    } catch (mailErr) {
-      console.warn("[publicCreateDemand] email hook", mailErr.message);
-    }
+    // Devis emails retired — no notifySalonDemandCreated
 
     return res.status(201).json({
       status: true,
@@ -324,13 +319,6 @@ exports.publicConfirmDeposit = async (req, res) => {
     demand.status = "deposit_paid";
     demand.balanceDue = Math.max(0, demand.estimatedPrice - (demand.depositAmount || 0));
     await demand.save();
-
-    try {
-      const { notifySalonDepositPaid } = require("../../services/afroDemandEmail.service");
-      notifySalonDepositPaid(demand);
-    } catch (mailErr) {
-      console.warn("[publicConfirmDeposit] email hook", mailErr.message);
-    }
 
     return res.status(200).json({ status: true, demand });
   } catch (error) {

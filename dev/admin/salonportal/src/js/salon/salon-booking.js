@@ -304,6 +304,8 @@
   }
 
   function selectedNeedsDeposit() {
+    // Online deposit requires Stripe Connect — otherwise book pay-at-salon only
+    if (cfg.salonAcceptsStripe === false) return false;
     if (demandNeedsDeposit(state.afroDemand)) return true;
     if (Number(state.afroDemand?.depositAmount) > 0) {
       return state.afroDemand.depositStatus === "unpaid";
@@ -312,6 +314,8 @@
   }
 
   async function ensureAfroDemandForDeposit() {
+    // No online deposit / devis create when salon has no Stripe Connect
+    if (cfg.salonAcceptsStripe === false) return null;
     if (state.afroDemand && Number(state.afroDemand.depositAmount) > 0) {
       return state.afroDemand;
     }
@@ -538,6 +542,13 @@
         if (onDayChange) onDayChange();
       };
     });
+    // Keep selected day in view (not stuck on day 1)
+    const active = container.querySelector(".sq-cal-day--active");
+    if (active && typeof active.scrollIntoView === "function") {
+      requestAnimationFrame(() => {
+        active.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+      });
+    }
   }
 
   function renderSlotGrid(slots, groupEl, onPick) {
@@ -580,6 +591,36 @@
   const servicesSummaryEl = document.getElementById("salonServicesSummary");
   const asideSummaryEl = document.getElementById("salonBookingAsideSummary");
   let activeCategory = "all";
+
+  function setModalBack(handler) {
+    const btn = document.getElementById("bookingModalBack");
+    if (!btn) return;
+    btn.onclick = null;
+    if (typeof handler === "function") {
+      btn.hidden = false;
+      btn.onclick = (e) => {
+        e.preventDefault();
+        handler();
+      };
+    } else {
+      btn.hidden = true;
+    }
+  }
+
+  function setModalTitle(text) {
+    const el = document.getElementById("bookingModalTitle");
+    if (el) el.textContent = text || t("bookNow");
+  }
+
+  function formatDisplayDate(ymd) {
+    const d = parseDateYmd(ymd);
+    if (!d) return ymd || "";
+    return d.toLocaleDateString(localeTag, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+  }
 
   function $(sel) {
     return modal ? modal.querySelector(sel) : null;
@@ -935,11 +976,15 @@
       ? `<div class="sq-svc-note">⚠️ ${escapeHtml(card.importantNote)}</div>`
       : "";
 
-    // Page + modal: same multi-select (StyleSeat) — badge + Ajouter/Retirer
-    const actionLabel = selected
-      ? t("serviceRemoveFromSelection") || "Retirer"
-      : t("serviceAddToSelection") || "Ajouter";
+    // Page + modal: + / check like customer app (bold name only when selected)
     const actionAttr = "data-svc-select";
+    const actionHtml = selected
+      ? `<i class="fas fa-check-circle" aria-hidden="true"></i><span class="sq-sr-only">${escapeHtml(
+          t("serviceRemoveFromSelection") || "Retirer"
+        )}</span>`
+      : `<i class="fas fa-plus-circle" aria-hidden="true"></i><span class="sq-sr-only">${escapeHtml(
+          t("serviceAddToSelection") || "Ajouter"
+        )}</span>`;
     const selectedBadge = selected
       ? `<span class="sq-svc-row__selected-badge">${escapeHtml(
           t("serviceSelectedBadge") || "Sélectionnée"
@@ -978,9 +1023,13 @@
         ${statsBlock}
         ${noteBlock}
         <div class="sq-svc-row__actions">
-          <button type="button" class="sq-svc-row__book${
+          <button type="button" class="sq-svc-row__book sq-svc-row__book--icon${
             selected ? " sq-svc-row__book--selected" : ""
-          }" ${actionAttr}>${escapeHtml(actionLabel)}</button>
+          }" ${actionAttr} aria-label="${escapeHtml(
+      selected
+        ? t("serviceRemoveFromSelection") || "Retirer"
+        : t("serviceAddToSelection") || "Ajouter"
+    )}">${actionHtml}</button>
         </div>
       </div>
     </article>`;
@@ -1200,18 +1249,15 @@
   }
 
   function openBookingForSelection() {
-    if (!state.selectedServiceIds.length) {
-      openModal();
-      renderStepServices();
+    applyPageDraftsToBookingState();
+    openModal();
+    // Skip redundant "services again" step → go straight to expert
+    if (state.selectedServiceIds.length) {
+      afterServicesContinue();
       return;
     }
-    if (!isModalOpen()) {
-      openModal();
-      renderStepServices();
-      if (stepsEl) stepsEl.scrollTop = 0;
-    } else {
-      renderServicesStickyBar();
-    }
+    renderStepServices();
+    if (stepsEl) stepsEl.scrollTop = 0;
   }
 
   /**
@@ -1297,9 +1343,10 @@
         btn.textContent = stickyLabel;
       }
     });
-    // Mobile sticky: show summed price + duration (aside is hidden on small screens)
+    // Mobile + desktop sticky: show summed price + duration when selecting
     const stickyBar = document.getElementById("salonStickyBookingBar");
     if (stickyBar) {
+      stickyBar.classList.toggle("sticky-booking-btn--active", count > 0);
       let sumEl = document.getElementById("salonStickyBookingSummary");
       if (!sumEl) {
         sumEl = document.createElement("div");
@@ -1471,6 +1518,7 @@
     modal.classList.add("sq-booking-modal--open");
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    setModalTitle(t("bookNow"));
   }
 
   function closeModal() {
@@ -1479,6 +1527,8 @@
     modal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
     hideBookingStickyBar();
+    setModalBack(null);
+    setModalTitle(t("bookNow"));
     renderServicesGrid();
   }
 
@@ -2328,11 +2378,13 @@
 
   async function renderStepExperts() {
     hideBookingStickyBar();
+    setModalTitle(t("bookNow"));
+    setModalBack(() => closeModal());
     stepsEl.innerHTML = `<p>${escapeHtml(cfg.copy.selectExpert)}</p><div class="sq-booking-loading">…</div>`;
     const data = await fetchExpertsForService();
     if (!data.status || !data.data?.length) {
-      stepsEl.innerHTML = `<p>${escapeHtml(t("noExpertForService"))}</p><button type="button" class="sq-booking-btn" id="btnBackSvc">${escapeHtml(t("back"))}</button>`;
-      document.getElementById("btnBackSvc").onclick = renderStepServices;
+      stepsEl.innerHTML = `<p>${escapeHtml(t("noExpertForService"))}</p>`;
+      setModalBack(() => closeModal());
       return;
     }
     state.matchedServices = data.matchedServices || [];
@@ -2342,19 +2394,8 @@
     }
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectExpert)}</p>
-      <div class="sq-booking-services-summary" id="expertStepServicesSummary" aria-live="polite"></div>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost sq-booking-btn--compact" id="btnAddMoreServices">${escapeHtml(t("addOrChangeServices"))}</button>
       <div class="sq-experts-row sq-experts-row--modal" id="bookingExpertsPick"></div>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackSvc">${escapeHtml(t("back"))}</button>
     `;
-    renderServicesSelectionSummary(
-      document.getElementById("expertStepServicesSummary")
-    );
-    document.getElementById("btnAddMoreServices").onclick = () => {
-      state.returnToExpertStep = true;
-      clearAfroQuote();
-      renderStepServices();
-    };
     const row = document.getElementById("bookingExpertsPick");
     row.innerHTML = data.data
       .map((ex) => {
@@ -2374,13 +2415,19 @@
         renderStepDateTime();
       };
     });
-    document.getElementById("btnBackSvc").onclick = () => {
-      renderStepServices();
-    };
   }
 
   async function renderStepDateTime() {
     hideBookingStickyBar();
+    setModalTitle(t("bookNow"));
+    setModalBack(() => {
+      if (state.manageReschedule) {
+        state.manageReschedule = null;
+        closeModal();
+        return;
+      }
+      backFromDateTime();
+    });
     if (!state.date || isDateBeforeToday(state.date)) {
       state.date = todayYmd();
     }
@@ -2388,32 +2435,47 @@
 
     const monthLabel = formatMonthYear(state.calendarYear, state.calendarMonth);
     stepsEl.innerHTML = `
-      <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectDateTime)}</p>
-      <section class="sq-booking-calendar" aria-label="${escapeHtml(t("selectDate"))}">
-        <p class="sq-booking-calendar__label">${escapeHtml(t("selectDate"))}</p>
-        <div class="sq-booking-calendar__header">
-          <button type="button" class="sq-cal-nav" id="calPrevMonth" aria-label="${escapeHtml(t("monthPrev"))}">‹</button>
-          <span class="sq-booking-calendar__month" id="calMonthLabel">${escapeHtml(monthLabel)}</span>
-          <button type="button" class="sq-cal-nav" id="calNextMonth" aria-label="${escapeHtml(t("monthNext"))}">›</button>
+      <div class="sq-booking-datetime">
+        <div class="sq-booking-datetime__static">
+          <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectDateTime)}</p>
+          <section class="sq-booking-calendar" aria-label="${escapeHtml(t("selectDate"))}">
+            <p class="sq-booking-calendar__label">${escapeHtml(t("selectDate"))}</p>
+            <div class="sq-booking-calendar__header">
+              <button type="button" class="sq-cal-nav" id="calPrevMonth" aria-label="${escapeHtml(t("monthPrev"))}">‹</button>
+              <span class="sq-booking-calendar__month" id="calMonthLabel">${escapeHtml(monthLabel)}</span>
+              <button type="button" class="sq-cal-nav" id="calNextMonth" aria-label="${escapeHtml(t("monthNext"))}">›</button>
+            </div>
+            <div class="sq-booking-calendar__days" id="bookingCalendarDays"></div>
+          </section>
+          <p class="sq-booking-datetime__selected" id="bookingSelectedDate">${escapeHtml(
+            formatDisplayDate(state.date)
+          )}</p>
+          <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>${escapeHtml(
+            state.manageReschedule
+              ? t("manageRescheduleConfirm") || "Confirmer le nouveau créneau"
+              : t("continue")
+          )}</button>
         </div>
-        <div class="sq-booking-calendar__days" id="bookingCalendarDays"></div>
-      </section>
-      <h3 class="sq-booking-slots-title">${escapeHtml(t("availableSlots"))}</h3>
-      <div id="slotGroups" class="sq-slot-groups"></div>
-      <p id="slotPickHint" class="sq-slot-pick-hint${state.slotPickHint ? "" : " sq-slot-pick-hint--hidden"}">${escapeHtml(state.slotPickHint)}</p>
-      <button type="button" class="sq-booking-btn" id="btnDateNext" disabled>${escapeHtml(
-        state.manageReschedule
-          ? t("manageRescheduleConfirm") || "Confirmer le nouveau créneau"
-          : t("continue")
-      )}</button>
-      <button type="button" class="sq-booking-btn sq-booking-btn--ghost" id="btnBackExp">${escapeHtml(t("back"))}</button>
+        <div class="sq-booking-datetime__scroll">
+          <h3 class="sq-booking-slots-title">${escapeHtml(t("availableSlots"))}</h3>
+          <div id="slotGroups" class="sq-slot-groups"></div>
+          <p id="slotPickHint" class="sq-slot-pick-hint${state.slotPickHint ? "" : " sq-slot-pick-hint--hidden"}">${escapeHtml(state.slotPickHint)}</p>
+        </div>
+      </div>
     `;
 
     const daysEl = document.getElementById("bookingCalendarDays");
     const monthLabelEl = document.getElementById("calMonthLabel");
+    const selectedDateEl = document.getElementById("bookingSelectedDate");
     const slotGroups = document.getElementById("slotGroups");
     const slotPickHint = document.getElementById("slotPickHint");
     const btnNext = document.getElementById("btnDateNext");
+
+    function syncSelectedDateLabel() {
+      if (selectedDateEl) {
+        selectedDateEl.textContent = formatDisplayDate(state.date);
+      }
+    }
 
     function updateSlotHint() {
       if (!slotPickHint) return;
@@ -2430,7 +2492,11 @@
       if (monthLabelEl) {
         monthLabelEl.textContent = formatMonthYear(state.calendarYear, state.calendarMonth);
       }
-      renderCalendarDays(daysEl, loadSlots);
+      renderCalendarDays(daysEl, () => {
+        syncSelectedDateLabel();
+        loadSlots();
+      });
+      syncSelectedDateLabel();
     }
 
     function selectStartSlot(startSlot) {
@@ -2466,8 +2532,10 @@
     async function loadSlots() {
       if (!state.date || isDateBeforeToday(state.date)) {
         state.date = todayYmd();
+        initCalendarFromStateDate();
         refreshMonthUi();
       }
+      syncSelectedDateLabel();
       state.timeSlots = [];
       state.slotPickHint = "";
       btnNext.disabled = true;
@@ -2514,6 +2582,23 @@
       }
     }
 
+    function clampDateToVisibleMonth() {
+      const firstOfMonth = formatDateYmd(
+        new Date(state.calendarYear, state.calendarMonth, 1)
+      );
+      const lastOfMonth = formatDateYmd(
+        new Date(state.calendarYear, state.calendarMonth + 1, 0)
+      );
+      const today = todayYmd();
+      if (state.date >= firstOfMonth && state.date <= lastOfMonth) return;
+      // Prefer today when browsing the current month — never jump to day 1 if today is available
+      if (today >= firstOfMonth && today <= lastOfMonth) {
+        state.date = today;
+      } else {
+        state.date = firstOfMonth >= today ? firstOfMonth : today;
+      }
+    }
+
     const prevBtn = document.getElementById("calPrevMonth");
     const nextBtn = document.getElementById("calNextMonth");
     if (prevBtn) {
@@ -2528,12 +2613,7 @@
           new Date(state.calendarYear, state.calendarMonth + 1, 0)
         );
         if (lastOfMonth < todayYmd()) return;
-        const firstOfMonth = formatDateYmd(
-          new Date(state.calendarYear, state.calendarMonth, 1)
-        );
-        if (state.date < firstOfMonth || state.date > lastOfMonth) {
-          state.date = firstOfMonth >= todayYmd() ? firstOfMonth : todayYmd();
-        }
+        clampDateToVisibleMonth();
         refreshMonthUi();
         loadSlots();
       };
@@ -2546,28 +2626,12 @@
         } else {
           state.calendarMonth += 1;
         }
-        const firstOfMonth = formatDateYmd(
-          new Date(state.calendarYear, state.calendarMonth, 1)
-        );
-        const lastOfMonth = formatDateYmd(
-          new Date(state.calendarYear, state.calendarMonth + 1, 0)
-        );
-        if (state.date < firstOfMonth || state.date > lastOfMonth) {
-          state.date = firstOfMonth;
-        }
+        clampDateToVisibleMonth();
         refreshMonthUi();
         loadSlots();
       };
     }
 
-    document.getElementById("btnBackExp").onclick = () => {
-      if (state.manageReschedule) {
-        state.manageReschedule = null;
-        closeModal();
-        return;
-      }
-      backFromDateTime();
-    };
     btnNext.onclick = async () => {
       if (state.manageReschedule) {
         const { bookingId, token, expertId } = state.manageReschedule;
@@ -2617,7 +2681,8 @@
       renderStepContact();
     };
     refreshMonthUi();
-    loadSlots();
+    await loadSlots();
+    if (stepsEl) stepsEl.scrollTop = 0;
   }
 
   function renderPriceBreakdown(totals) {
@@ -2774,7 +2839,8 @@
     }
 
     const totals = calcTotals(getSelectedServices());
-    const needDeposit = demandNeedsDeposit(state.afroDemand);
+    const needDeposit =
+      cfg.salonAcceptsStripe !== false && demandNeedsDeposit(state.afroDemand);
     const methods = getAvailablePaymentMethods();
     const showStripe = methods.some((m) => m.value === "Stripe");
 
