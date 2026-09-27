@@ -5024,6 +5024,111 @@ html {
     justify-content: center;
 }
 
+.sq-blog-card-cover {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.sq-blog-card-meta {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--sk-text-muted);
+    margin: 0.5rem 0 0.35rem;
+}
+
+.sq-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+}
+
+.sq-article-back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--sk-text-muted);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.sq-article-back:hover {
+    color: var(--sk-accent, #c45c26);
+}
+
+.sq-article-header .sq-display {
+    margin: 0.35rem 0 0.75rem;
+    font-size: clamp(1.85rem, 4vw, 2.6rem);
+    line-height: 1.15;
+}
+
+.sq-article-by {
+    color: var(--sk-text-muted);
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+}
+
+.sq-article-cover {
+    margin: 0 0 1.75rem;
+}
+
+.sq-article-cover img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
+}
+
+.sq-article-body {
+    font-size: 1.08rem;
+    line-height: 1.75;
+    color: var(--sk-text);
+}
+
+.sq-article-body h1,
+.sq-article-body h2,
+.sq-article-body h3 {
+    margin: 1.6rem 0 0.7rem;
+    line-height: 1.25;
+}
+
+.sq-article-body p {
+    margin: 0 0 1rem;
+}
+
+.sq-article-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin: 1rem 0;
+}
+
+.sq-article-body blockquote {
+    margin: 1.25rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid var(--sk-accent, #c45c26);
+    background: rgba(196, 92, 38, 0.06);
+    color: var(--sk-text-muted);
+}
+
+.sq-article-body ul,
+.sq-article-body ol {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+}
+
+.sq-article-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 .nav-link--active {
     font-weight: 700;
     text-decoration: underline;

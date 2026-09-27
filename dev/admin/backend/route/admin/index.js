@@ -33,6 +33,8 @@ const expertWithdrawRequest = require("./expertWithdrawRequest.route");
 const salonWithdrawRequest = require("./salonWithdrawRequest.route");
 const teamSchedule = require("./teamSchedule.route");
 const subscriptionPlan = require("./subscriptionPlan.route");
+const blogAdmin = require("./blogAdmin.route");
+const blogPost = require("./blogPost.route");
 
 route.use("/address", address);
 route.use("/login", login);
@@ -64,5 +66,7 @@ route.use("/productRequest", adminMiddleware, productRequest);
 route.use("/order", adminMiddleware, order);
 route.use("/expertWithdrawRequest", adminMiddleware, expertWithdrawRequest);
 route.use("/salonWithdrawRequest", adminMiddleware, salonWithdrawRequest);
+route.use("/blogAdmin", adminMiddleware, blogAdmin);
+route.use("/blogPost", adminMiddleware, blogPost);
 
 module.exports = route;

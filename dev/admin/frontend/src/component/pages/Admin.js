@@ -64,6 +64,8 @@ import SalonOrder from "../tables/salon/SalonOrder";
 import Coupon from "../tables/coupon/Coupon";
 import SubscriptionPlans from "../tables/subscription/SubscriptionPlans";
 import AdminTeamCalendar from "../tables/calendar/AdminTeamCalendar";
+import BlogAuthors from "../tables/blog/BlogAuthors";
+import BlogPosts from "../tables/blog/BlogPosts";
 
 const Admin = () => {
   const location = useLocation();
@@ -157,6 +159,8 @@ const Admin = () => {
             />
             <Route path="/coupon" element={<Coupon />} />
             <Route path="/subscriptions" element={<SubscriptionPlans />} />
+            <Route path="/blogAuthors" element={<BlogAuthors />} />
+            <Route path="/blogPosts" element={<BlogPosts />} />
           </Routes>
         </div>
       </div>

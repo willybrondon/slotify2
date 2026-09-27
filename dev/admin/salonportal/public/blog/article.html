@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article — Blog Skedisy</title>
+    <meta name="description" content="Article du blog Skedisy — beauté afro en Île-de-France.">
+    <link rel="canonical" href="https://skedisy.com/blog/">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <meta name="theme-color" content="#c45c26">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../cookie-consent.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <script src="../language.js" defer></script>
+</head>
+<body class="client-page sq-page sq-blog-page sq-article-page" data-page="client">
+    <div class="login-above-qr header-actions-above-qr">
+        <a href="/professionnel/" class="btn-nav-above btn-pro-above" data-translate="nav.pro">Pro</a>
+        <a href="https://skedisy.com/salonpanel/" class="btn-login-above" data-translate="nav.login">Login</a>
+    </div>
+
+    <nav class="navbar sq-navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/" style="text-decoration: none; color: inherit;"><h2>Skedisy</h2></a>
+            </div>
+            <div class="nav-menu-center desktop-only" id="categoriesMenu"></div>
+            <div class="mobile-menu-wrapper">
+                <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3 data-translate="nav.forClients">Pour les clientes</h3>
+                <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Passer en anglais"><i class="fas fa-globe"></i> <span>FR</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
+                </div>
+            </div>
+            <div class="mobile-menu-content mobile-menu-content--client">
+                <a href="/compte/connexion" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
+                <a href="/blog/" class="btn-login-mobile-menu">Blog</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="sq-blog-main">
+        <div class="container" id="sq-article-root"></div>
+    </main>
+
+    <footer class="footer sq-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p data-translate="footer.rights">&copy; 2024 Skedisy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../cookie-consent.js"></script>
+    <script src="../script.js"></script>
+    <script src="../blog-article.js"></script>
+</body>
+</html>

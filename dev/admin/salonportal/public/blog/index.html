@@ -84,7 +84,8 @@
         <section class="sq-blog-grid-section">
             <div class="container">
                 <h2 class="sq-section-title" data-translate="blog.guidesTitle">Guides &amp; parcours</h2>
-                <div class="sq-blog-grid">
+                <div class="sq-blog-grid" id="sq-blog-dynamic-grid"></div>
+                <div class="sq-blog-grid" id="sq-blog-static-grid">
                     <a href="/#categories-browse" class="sq-blog-card">
                         <span class="sq-blog-card-label" data-translate="blog.card1Label">Salons</span>
                         <h3 data-translate="blog.card1Title">Parcourir les prestations en IDF</h3>
@@ -131,7 +132,7 @@
             </div>
         </section>
 
-        <section class="sq-blog-soon">
+        <section class="sq-blog-soon" id="sq-blog-soon-section">
             <div class="container sq-blog-soon-inner">
                 <h2 data-translate="blog.soonTitle">Articles à venir</h2>
                 <p data-translate="blog.soonDesc">Nous préparons des contenus sur l'entretien des tresses et locks, choisir son salon en IDF, et le parcours réservation Skedisy.</p>
@@ -220,5 +221,6 @@
 
     <script src="../cookie-consent.js"></script>
     <script src="../script.js"></script>
+    <script src="../blog-listing.js"></script>
 </body>
 </html>

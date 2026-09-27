@@ -224,6 +224,14 @@ app.get(["/blog", "/blog/", "/blog.html"], (req, res) => {
     res.status(404).send(`<h1>404 - Blog not found</h1><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
+app.get("/blog/:slug", (req, res) => {
+  const filePath = path.join(salonportalPath, "blog", "article.html");
+  if (fs.existsSync(filePath)) {
+    res.status(200).sendFile(path.resolve(filePath));
+  } else {
+    res.status(404).send(`<h1>404 - Article not found</h1><p><a href="/blog/">Blog Skedisy</a></p>`);
+  }
+});
 
 // Help Center — StyleSeat-style guides (/aide + /help alias)
 app.get(["/aide", "/help", "/help/"], (req, res) => res.redirect(301, "/aide/"));
@@ -451,6 +459,10 @@ app.get("/compte/connexion", publicClientAuth.serveLoginPage);
 app.get("/compte/inscription", publicClientAuth.serveSignupPage);
 app.post("/api/public/auth/login", publicClientAuth.publicLogin);
 app.post("/api/public/auth/register", publicClientAuth.publicRegister);
+
+const publicBlog = require("./controller/user/publicBlog.controller");
+app.get("/api/public/blog", publicBlog.listPublished);
+app.get("/api/public/blog/:slug", publicBlog.getBySlug);
 
 // SEO: Sitemap and Robots.txt
 const sitemapController = require("./controller/user/sitemap.controller");
@@ -916,6 +928,34 @@ app.get("/salonpanel/runtime-config.js", (req, res) => {
     `window.__SKEDISY_SALON__=${JSON.stringify({ apiBase, apiKey })};`
   );
 });
+
+// Blog author panel — same auth pattern as salon panel
+app.get("/blogadmin/runtime-config.js", (req, res) => {
+  const host = req.get("host") || "skedisy.com";
+  const proto = req.get("x-forwarded-proto") || req.protocol || "https";
+  const apiBase = `${proto}://${host}/`;
+  const apiKey = process.env.secretKey || "";
+  res.type("application/javascript");
+  res.set("Cache-Control", "no-store");
+  res.send(
+    `window.__SKEDISY_BLOG__=${JSON.stringify({ apiBase, apiKey })};`
+  );
+});
+
+const blogadminPath = path.join(__dirname, "blogadmin");
+const blogadminIndex = path.join(blogadminPath, "index.html");
+if (fs.existsSync(blogadminIndex)) {
+  app.use("/blogadmin", express.static(blogadminPath));
+  app.get(["/blogadmin", "/blogadmin/", "/blogadmin/*"], (req, res) => {
+    if (req.headers.key || req.headers.authorization) {
+      return res.status(404).json({
+        status: false,
+        message: `API route not found: ${req.method} ${req.path}`,
+      });
+    }
+    res.status(200).sendFile(blogadminIndex);
+  });
+}
 
 // Serve static files for salon panel at /salonpanel/ path
 const salonPath = path.join(__dirname, "salon");

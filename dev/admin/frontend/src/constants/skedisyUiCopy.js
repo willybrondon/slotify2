@@ -32,6 +32,8 @@ export const SKEDISY_ADMIN_UI = {
     expertEarnings: "Gains pros",
     coupon: "Codes promo",
     subscriptions: "Abonnements SaaS",
+    blogAuthors: "Auteurs blog",
+    blogPosts: "Articles blog",
     salonPayment: "Paiements salons",
     expertPayments: "Paiements experts",
     expertWithdrawHistory: "Historique retraits pros",
