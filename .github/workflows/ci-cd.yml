@@ -41,11 +41,12 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        # Lockfile lives in the backend package, not repo root
+        cache-dependency-path: ${{ matrix.environment }}/admin/backend/package-lock.json
 
     - name: Install dependencies ${{ matrix.environment }}
-      run: |
-        cd "${{ matrix.environment }}/admin/backend"
-        npm ci
+      working-directory: ${{ matrix.environment }}/admin/backend
+      run: npm ci
     - name: Install dos2unix
       run: sudo apt-get update && sudo apt-get install -y dos2unix
 

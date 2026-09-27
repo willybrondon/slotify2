@@ -82,10 +82,12 @@ a { color: var(--ba-accent); }
   padding: 10px 12px; margin-bottom: 14px; font-size: 0.9rem;
 }
 .ba-toast {
-  position: fixed; right: 18px; bottom: 18px; z-index: 50;
+  position: fixed; right: 18px; bottom: 18px; z-index: 100;
   background: var(--ba-ink); color: #fff; padding: 12px 16px; border-radius: 12px;
   box-shadow: var(--ba-shadow); max-width: min(360px, calc(100% - 24px));
+  pointer-events: none;
 }
+.ba-toast[hidden] { display: none !important; }
 
 .ba-toolbar-row {
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
@@ -123,14 +125,23 @@ a { color: var(--ba-accent); }
 .ba-editor-layout {
   display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start;
 }
+.ba-editor-col { min-width: 0; }
 @media (max-width: 900px) {
   .ba-editor-layout { grid-template-columns: 1fr; }
   .ba-card { grid-template-columns: 1fr; }
+  .ba-panel-side { position: static; }
 }
 
 .ba-panel {
   background: var(--ba-bg-2); border: 1px solid var(--ba-line); border-radius: var(--ba-radius);
   padding: 16px; box-shadow: var(--ba-shadow);
+}
+.ba-panel-side {
+  position: sticky;
+  top: 84px;
+  max-height: calc(100vh - 100px);
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 .ba-panel h2 { margin: 0 0 12px; font-size: 0.95rem; }
 .ba-title-input {
@@ -155,8 +166,23 @@ a { color: var(--ba-accent); }
 .ba-cover {
   border: 1px dashed var(--ba-line); border-radius: 12px; padding: 12px; text-align: center;
   background: #fff; margin-bottom: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
-.ba-cover img { max-width: 100%; border-radius: 10px; margin-bottom: 8px; max-height: 160px; object-fit: cover; }
+.ba-cover img,
+.ba-cover-img {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 10px;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+  background: #f0e8e0;
+}
+.ql-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
 .ba-hint { font-size: 0.8rem; color: var(--ba-muted); margin-top: 6px; }
 .ba-reject-box {
   background: #fff1f0; border: 1px solid #f3c4c0; color: var(--ba-danger);
