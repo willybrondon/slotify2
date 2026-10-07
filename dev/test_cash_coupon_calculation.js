@@ -1,6 +1,6 @@
 /**
  * Test script to verify cash service with coupon calculation
- * Run with: node dev/test_cash_coupon_calculation.js
+ * Run with: node dev/test_cash_coupon_calculation.js okay
  */
 
 // Test configuration
