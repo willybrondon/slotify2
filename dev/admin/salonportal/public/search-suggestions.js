@@ -1,6 +1,8 @@
 /**
  * Barre de recherche — suggestions au focus.
- * Mobile accueil : ouvre une « page » plein écran (position + recherche visibles au-dessus du clavier).
+ * - Vide : catégories / prestations populaires
+ * - Texte saisi : uniquement salons correspondants (plus de populaires)
+ * Mobile accueil : sheet plein écran scrollable.
  */
 (function () {
     function escapeHtml(str) {
@@ -34,12 +36,38 @@
         );
     }
 
+    function slugify(name) {
+        return String(name || "salon")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "");
+    }
+
+    function salonHref(salon) {
+        if (salon.shareUrl) return salon.shareUrl;
+        const id = salon._id || salon.id;
+        if (!id) return "#";
+        const shortId = salon.shortId || String(id).substring(0, 6);
+        return (
+            window.location.origin.replace(/\/+$/, "") +
+            "/salon/" +
+            slugify(salon.name) +
+            "-" +
+            shortId
+        );
+    }
+
     function initSearchSuggestions(form) {
         const queryInput = form.querySelector("[data-search-query]");
         const panel = form.querySelector(".sq-search-suggestions");
         const categoriesList = form.querySelector("[data-suggest-categories]");
         const servicesList = form.querySelector("[data-suggest-services]");
-        if (!queryInput || !panel || !categoriesList || !servicesList) return;
+        const salonsList = form.querySelector("[data-suggest-salons]");
+        const popularSections = form.querySelectorAll("[data-suggest-popular]");
+        const salonsSection = form.querySelector("[data-suggest-salons-section]");
+        if (!queryInput || !panel || !categoriesList || !servicesList || !salonsList) {
+            return;
+        }
 
         const hero =
             form.closest(".sq-search-hero") ||
@@ -57,6 +85,9 @@
         let pageLocked = false;
         let sheetOpen = false;
         let ignoreNextDocClick = false;
+        let salonFetchTimer = null;
+        let salonFetchSeq = 0;
+        let lastSalonQuery = "";
 
         function ensureSheetBackBtn() {
             if (!hero) return null;
@@ -66,7 +97,10 @@
                 btn.type = "button";
                 btn.className = "sq-search-sheet__back";
                 btn.setAttribute("data-search-sheet-back", "");
-                btn.setAttribute("aria-label", t("intentHub.searchBack") || "Retour");
+                btn.setAttribute(
+                    "aria-label",
+                    t("intentHub.searchBack") || "Retour"
+                );
                 btn.innerHTML = "‹";
                 const toolbar = hero.querySelector(".sq-search-hero-toolbar");
                 if (toolbar) {
@@ -99,7 +133,6 @@
             document.body.style.top = "";
             heroWrap.classList.add("is-search-sheet");
             if (hero) hero.classList.add("is-search-sheet-hero");
-            // Keep search bar chrome clean: suggestions below the form (like home layout)
             if (panel && hero && panel.parentElement !== hero) {
                 panel.dataset.suggestHost = "moved";
                 hero.appendChild(panel);
@@ -129,7 +162,9 @@
             if (panel) {
                 panel.classList.remove("sq-search-sheet-suggestions");
                 if (panel.dataset.suggestHost === "moved") {
-                    const wrap = form.querySelector(".sq-search-bar-unified__query-wrap");
+                    const wrap = form.querySelector(
+                        ".sq-search-bar-unified__query-wrap"
+                    );
                     if (wrap) wrap.appendChild(panel);
                     delete panel.dataset.suggestHost;
                 }
@@ -138,7 +173,8 @@
         }
 
         function lockPagePosition() {
-            if (pageLocked || document.body.classList.contains("menu-open")) return;
+            if (pageLocked || document.body.classList.contains("menu-open"))
+                return;
             if (openMobileSheet()) return;
             savedScrollY = window.scrollY || window.pageYOffset || 0;
             document.body.classList.add("sq-search-focus-active");
@@ -147,7 +183,8 @@
         }
 
         function unlockPagePosition() {
-            if (!pageLocked || document.body.classList.contains("menu-open")) return;
+            if (!pageLocked || document.body.classList.contains("menu-open"))
+                return;
             if (sheetOpen) {
                 closeMobileSheet();
                 pageLocked = false;
@@ -165,48 +202,155 @@
             requestAnimationFrame(() => window.scrollTo(0, savedScrollY));
         }
 
-        function renderLists() {
-            const query = queryInput.value;
-            const visibleCategories = filterByQuery(categories, query).slice(0, 5);
-            const visibleServices = filterByQuery(services, query).slice(0, 10);
+        function setMode(hasQuery) {
+            popularSections.forEach((el) => {
+                el.hidden = !!hasQuery;
+            });
+            if (salonsSection) salonsSection.hidden = !hasQuery;
+        }
+
+        function renderPopularLists() {
+            const visibleCategories = filterByQuery(categories, "").slice(0, 8);
+            const visibleServices = filterByQuery(services, "").slice(0, 12);
 
             categoriesList.innerHTML = visibleCategories.length
                 ? visibleCategories
                       .map(
                           (cat) =>
-                              `<li><a href="${escapeHtml(cat.url)}" class="sq-search-suggestions__item sq-search-suggestions__item--category" data-suggest-type="category">` +
+                              `<li><a href="${escapeHtml(
+                                  cat.url
+                              )}" class="sq-search-suggestions__item sq-search-suggestions__item--category" data-suggest-type="category">` +
                               `<span class="sq-search-suggestions__item-icon" aria-hidden="true"><i class="fas fa-layer-group"></i></span>` +
-                              `<span class="sq-search-suggestions__item-label">${escapeHtml(cat.name)}</span>` +
+                              `<span class="sq-search-suggestions__item-label">${escapeHtml(
+                                  cat.name
+                              )}</span>` +
                               `</a></li>`
                       )
                       .join("")
-                : `<li class="sq-search-suggestions__empty">${escapeHtml(t("intentHub.suggestNoCategories"))}</li>`;
+                : `<li class="sq-search-suggestions__empty">${escapeHtml(
+                      t("intentHub.suggestNoCategories")
+                  )}</li>`;
 
             servicesList.innerHTML = visibleServices.length
                 ? visibleServices
                       .map(
                           (svc) =>
-                              `<li><button type="button" class="sq-search-suggestions__item sq-search-suggestions__item--service" data-suggest-type="service" data-suggest-name="${escapeHtml(svc.name)}">` +
+                              `<li><button type="button" class="sq-search-suggestions__item sq-search-suggestions__item--service" data-suggest-type="service" data-suggest-name="${escapeHtml(
+                                  svc.name
+                              )}">` +
                               `<span class="sq-search-suggestions__item-icon" aria-hidden="true"><i class="fas fa-scissors"></i></span>` +
-                              `<span class="sq-search-suggestions__item-label">${escapeHtml(svc.name)}</span>` +
+                              `<span class="sq-search-suggestions__item-label">${escapeHtml(
+                                  svc.name
+                              )}</span>` +
                               `</button></li>`
                       )
                       .join("")
-                : `<li class="sq-search-suggestions__empty">${escapeHtml(t("intentHub.suggestNoServices"))}</li>`;
+                : `<li class="sq-search-suggestions__empty">${escapeHtml(
+                      t("intentHub.suggestNoServices")
+                  )}</li>`;
+        }
 
+        function renderSalonList(salons, query) {
+            if (!salons.length) {
+                salonsList.innerHTML = `<li class="sq-search-suggestions__empty">${escapeHtml(
+                    t("intentHub.suggestNoSalons")
+                )} « ${escapeHtml(query)} »</li>`;
+                return;
+            }
+            salonsList.innerHTML = salons
+                .map((salon) => {
+                    const city = salon.city || "";
+                    const meta = city
+                        ? `<span class="sq-search-suggestions__item-meta">${escapeHtml(
+                              city
+                          )}</span>`
+                        : "";
+                    return (
+                        `<li><a href="${escapeHtml(
+                            salonHref(salon)
+                        )}" class="sq-search-suggestions__item sq-search-suggestions__item--salon" data-suggest-type="salon">` +
+                        `<span class="sq-search-suggestions__item-icon" aria-hidden="true"><i class="fas fa-store"></i></span>` +
+                        `<span class="sq-search-suggestions__item-text">` +
+                        `<span class="sq-search-suggestions__item-label">${escapeHtml(
+                            salon.name
+                        )}</span>` +
+                        meta +
+                        `</span></a></li>`
+                    );
+                })
+                .join("");
+        }
+
+        async function fetchSalons(query) {
+            const q = (query || "").trim();
+            if (!q) return;
+            if (q === lastSalonQuery && salonsList.children.length) return;
+            const seq = ++salonFetchSeq;
+            salonsList.innerHTML = `<li class="sq-search-suggestions__empty">${escapeHtml(
+                t("intentHub.suggestLoading")
+            )}</li>`;
+            try {
+                const params = new URLSearchParams({
+                    q,
+                    language: getLang(),
+                });
+                const res = await fetch(
+                    "/api/public/search-salons?" + params.toString()
+                );
+                const data = await res.json();
+                if (seq !== salonFetchSeq) return;
+                lastSalonQuery = q;
+                const salons = (data.status && data.salons) || [];
+                renderSalonList(salons.slice(0, 10), q);
+            } catch (e) {
+                if (seq !== salonFetchSeq) return;
+                console.error("search salon suggestions:", e);
+                salonsList.innerHTML = `<li class="sq-search-suggestions__empty">${escapeHtml(
+                    t("intentHub.suggestNoSalons")
+                )}</li>`;
+            }
+        }
+
+        function scheduleSalonFetch(query) {
+            clearTimeout(salonFetchTimer);
+            salonFetchTimer = setTimeout(() => fetchSalons(query), 220);
+        }
+
+        function renderLists() {
+            const query = (queryInput.value || "").trim();
+            const hasQuery = query.length > 0;
+            setMode(hasQuery);
             panel.hidden = false;
+
+            if (!hasQuery) {
+                lastSalonQuery = "";
+                clearTimeout(salonFetchTimer);
+                renderPopularLists();
+                salonsList.innerHTML = "";
+                return;
+            }
+
+            scheduleSalonFetch(query);
         }
 
         async function ensureLoaded() {
             if (loaded || loading) return;
             loading = true;
             panel.hidden = false;
-            categoriesList.innerHTML = `<li class="sq-search-suggestions__empty">${escapeHtml(t("intentHub.suggestLoading"))}</li>`;
-            servicesList.innerHTML = "";
+            const query = (queryInput.value || "").trim();
+            if (!query) {
+                setMode(false);
+                categoriesList.innerHTML = `<li class="sq-search-suggestions__empty">${escapeHtml(
+                    t("intentHub.suggestLoading")
+                )}</li>`;
+                servicesList.innerHTML = "";
+            }
 
             try {
                 const res = await fetch(
-                    `/api/public/search-suggestions?language=${encodeURIComponent(getLang())}`
+                    `/api/public/search-suggestions?language=${encodeURIComponent(
+                        getLang()
+                    )}`
                 );
                 const data = await res.json();
                 if (data.status) {
@@ -253,7 +397,7 @@
             openPanel();
         });
         queryInput.addEventListener("input", () => {
-            if (!panel.hidden || loaded) renderLists();
+            renderLists();
         });
 
         panel.addEventListener("click", (e) => {
@@ -263,19 +407,18 @@
             queryInput.value = btn.getAttribute("data-suggest-name") || "";
             closePanel();
             queryInput.focus();
+            renderLists();
         });
 
         queryInput.addEventListener("blur", () => {
             window.setTimeout(() => {
                 if (sheetOpen) {
-                    // Keep sheet open while interacting with location / suggestions
                     if (
                         heroWrap &&
                         heroWrap.contains(document.activeElement)
                     ) {
                         return;
                     }
-                    // Don't close immediately if focus moved to suggestion buttons inside sheet
                     if (panel.contains(document.activeElement)) return;
                     return;
                 }
@@ -308,7 +451,9 @@
     }
 
     function initAll() {
-        document.querySelectorAll("form[data-search-unified]").forEach(initSearchSuggestions);
+        document
+            .querySelectorAll("form[data-search-unified]")
+            .forEach(initSearchSuggestions);
     }
 
     if (document.readyState === "loading") {

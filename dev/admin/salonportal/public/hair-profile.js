@@ -172,6 +172,22 @@
       .replace(/"/g, '&quot;');
   }
 
+  function resolveReturnUrl() {
+    const raw = new URLSearchParams(window.location.search).get('return') || '';
+    // Only allow same-site relative paths (no protocol / open redirect)
+    if (!raw || /^(https?:|\/\/)/i.test(raw) || raw.includes('..')) {
+      return '/';
+    }
+    if (raw === 'index.html' || raw === '/' || raw === '') return '/';
+    if (raw.startsWith('/')) return raw;
+    return '/' + raw.replace(/^\.\//, '');
+  }
+
+  function leaveProfilePage() {
+    markPrompted();
+    window.location.href = resolveReturnUrl();
+  }
+
   function maybePromptOnHome() {
     if (isComplete() || hasBeenPrompted()) return;
     if (!document.body.classList.contains('sq-page') || document.body.dataset.page !== 'client') return;
@@ -184,7 +200,14 @@
   function mountProfilePage(root) {
     if (!root) return;
     const profile = load();
-    let html = `<p class="sq-hair-lead">${escapeHtml(t('hairProfile.lead'))}</p>`;
+    let html = `
+      <div class="sq-hair-page-top">
+        <button type="button" class="sq-hair-close" id="hairProfileCloseBtn" aria-label="${escapeHtml(t('hairProfile.close'))}">
+          <i class="fas fa-times" aria-hidden="true"></i>
+          <span>${escapeHtml(t('hairProfile.close'))}</span>
+        </button>
+      </div>
+      <p class="sq-hair-lead">${escapeHtml(t('hairProfile.lead'))}</p>`;
 
     Object.entries(FIELDS).forEach(([field, cfg]) => {
       html += `
@@ -204,6 +227,9 @@
 
     html += `
       <div class="sq-hair-actions">
+        <button type="button" class="sq-btn sq-btn-ghost" id="hairProfileSkipBtn">
+          ${escapeHtml(t('hairProfile.skip'))}
+        </button>
         <button type="button" class="sq-btn sq-btn-fill" id="hairProfileSaveBtn" disabled>
           ${escapeHtml(t('hairProfile.save'))}
         </button>
@@ -236,9 +262,11 @@
     document.getElementById('hairProfileSaveBtn')?.addEventListener('click', () => {
       if (!isComplete(state)) return;
       save(state);
-      const back = new URLSearchParams(window.location.search).get('return') || 'index.html';
-      window.location.href = back;
+      leaveProfilePage();
     });
+
+    document.getElementById('hairProfileSkipBtn')?.addEventListener('click', leaveProfilePage);
+    document.getElementById('hairProfileCloseBtn')?.addEventListener('click', leaveProfilePage);
 
     updateSaveBtn();
   }

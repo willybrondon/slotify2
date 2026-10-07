@@ -102,13 +102,17 @@
               <label class="sq-sr-only" for="searchQueryInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
               <input type="search" id="searchQueryInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off" enterkeyhint="search">
               <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
-                <div class="sq-search-suggestions__section">
+                <div class="sq-search-suggestions__section" data-suggest-popular>
                   <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
                   <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
                 </div>
-                <div class="sq-search-suggestions__section">
+                <div class="sq-search-suggestions__section" data-suggest-popular>
                   <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
                   <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+                </div>
+                <div class="sq-search-suggestions__section" data-suggest-salons-section hidden>
+                  <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestSalonsTitle">Salons</p>
+                  <ul class="sq-search-suggestions__list" data-suggest-salons></ul>
                 </div>
               </div>
             </div>

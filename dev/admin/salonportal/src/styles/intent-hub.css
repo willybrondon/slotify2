@@ -395,13 +395,43 @@
   font-weight: 600;
 }
 
+.sq-hair-page-top {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 0.75rem;
+}
+
+.sq-hair-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--sk-text-muted);
+  background: transparent;
+  border: 1px solid var(--sk-border);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+}
+
+.sq-hair-close:hover {
+  color: var(--sk-text);
+  border-color: var(--sk-text-muted);
+}
+
 .sq-hair-actions {
   margin-top: 2rem;
   padding-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 .sq-hair-actions .sq-btn {
-  min-width: 12rem;
+  min-width: 10rem;
 }
 
 .sq-hair-actions .sq-btn:disabled {
@@ -1669,6 +1699,27 @@ body.sq-home-search-active .sq-home-landing__map-el {
   white-space: nowrap;
 }
 
+.sq-search-suggestions__item-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.sq-search-suggestions__item-text .sq-search-suggestions__item-label {
+  flex: none;
+  white-space: nowrap;
+}
+
+.sq-search-suggestions__item-meta {
+  font-size: 0.75rem;
+  color: var(--sk-text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sq-search-suggestions__empty {
   padding: 0.45rem 0.5rem;
   font-size: 0.85rem;
@@ -2253,8 +2304,10 @@ body.sq-search-focus-active .sq-search-suggestions {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    /* Grow with suggestions so the sheet itself scrolls (like desktop panel) */
     min-height: 100%;
-    height: 100%;
+    height: auto;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
   }
 
   body.sq-search-sheet-open .sq-search-sheet__back {
@@ -2327,24 +2380,24 @@ body.sq-search-focus-active .sq-search-suggestions {
     order: 2;
   }
 
-  /* Categories + prestations scroll below the bar (desktop home content) */
+  /* Categories + prestations scroll below the bar (full list on mobile) */
   body.sq-search-sheet-open .sq-search-suggestions,
   body.sq-search-sheet-open .sq-search-sheet-suggestions {
     position: static !important;
     top: auto !important;
     left: auto !important;
     right: auto !important;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     width: 100%;
     max-width: 100%;
-    max-height: none;
+    max-height: none !important;
     margin-top: 0.25rem;
-    padding: 0 0 1.5rem;
+    padding: 0 0 2.5rem;
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
     background: transparent !important;
-    overflow: visible;
+    overflow: visible !important;
     z-index: 1;
   }
 
