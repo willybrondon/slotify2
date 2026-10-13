@@ -6,6 +6,12 @@
   const soon = document.getElementById("sq-blog-soon-section");
   if (!grid) return;
 
+  // Server already injected article cards for SEO
+  if (grid.getAttribute("data-ssr") === "1" && grid.children.length) {
+    if (soon) soon.hidden = true;
+    return;
+  }
+
   const CAT_LABEL = {
     guides: "Guides",
     coiffure: "Coiffure",

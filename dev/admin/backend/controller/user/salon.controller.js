@@ -35,6 +35,8 @@ const generateSlug = (name) => {
   return name
     .toLowerCase()
     .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^\w\s-]/g, "") // Remove special characters except spaces and hyphens
     .replace(/\s+/g, "-") // Replace spaces with hyphens
     .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
@@ -56,18 +58,30 @@ const getTranslatedCategoryName = (category, language = 'fr') => {
   return translationMap[language] || category.name || 'Other Services';
 };
 
-// Find salon by short ID (first 6 characters of ObjectId)
-const findSalonByShortId = async (shortId) => {
+// Find salon by ObjectId prefix (6–24 hex). If several match, prefer slug.
+const findSalonByShortId = async (shortId, preferredSlug) => {
   try {
-    // Try to find salon where ObjectId starts with shortId
+    const prefix = String(shortId || "").toLowerCase();
+    if (!/^[0-9a-f]{6,24}$/.test(prefix)) return null;
+
     const salons = await Salon.find({
       isActive: true,
       isDelete: false,
     }).select("_id name");
-    
-    // Find salon where _id starts with shortId
-    const salon = salons.find(s => s._id.toString().startsWith(shortId));
-    return salon ? salon._id.toString() : null;
+
+    const matches = salons.filter((s) =>
+      s._id.toString().toLowerCase().startsWith(prefix)
+    );
+    if (!matches.length) return null;
+
+    if (preferredSlug && matches.length > 1) {
+      const bySlug = matches.find(
+        (s) => generateSlug(s.name) === preferredSlug
+      );
+      if (bySlug) return bySlug._id.toString();
+    }
+
+    return matches[0]._id.toString();
   } catch (error) {
     console.error("[Find Salon By Short ID] Error:", error);
     return null;
@@ -266,8 +280,9 @@ exports.salonData = async (req, res) => {
       const parts = salonId.split("-");
       const shortId = parts[parts.length - 1];
       
-      if (/^[0-9a-fA-F]{6}$/.test(shortId)) {
-        const fullSalonId = await findSalonByShortId(shortId);
+      if (/^[0-9a-fA-F]{6,24}$/.test(shortId)) {
+        const preferredSlug = parts.slice(0, -1).join("-");
+        const fullSalonId = await findSalonByShortId(shortId, preferredSlug);
         if (fullSalonId) {
           salonId = fullSalonId;
         } else {
@@ -669,11 +684,18 @@ exports.getSalonShareUrl = async (req, res) => {
       });
     }
 
-    // Generate slug from salon name
+    // Generate slug from salon name + unique short id when 6-char prefixes collide
     const slug = generateSlug(salon.name);
-    // Get short ID (first 6 characters of ObjectId)
-    const shortId = salon._id.toString().substring(0, 6);
-    // Combine slug and short ID
+    const idStr = salon._id.toString();
+    const prefix6 = idStr.substring(0, 6);
+    const prefixPeers = await Salon.find({ isActive: true, isDelete: false })
+      .select("_id")
+      .lean()
+      .then((rows) =>
+        rows.filter((s) => s._id.toString().startsWith(prefix6)).length
+      )
+      .catch(() => 1);
+    const shortId = prefixPeers > 1 ? idStr.substring(0, 10) : prefix6;
     const slugWithId = `${slug}-${shortId}`;
 
     // Ensure baseURL doesn't have trailing slash to avoid double slashes
@@ -712,16 +734,16 @@ exports.serveSalonWebPage = async (req, res) => {
     }
 
     // New format: slug with short ID (e.g., "coiffure-beaute-brasil-6885e2")
-    // Extract short ID (last part after hyphen, should be 6 hex characters)
+    // Short ID: 6 hex by default, up to 10 when 6-char prefixes collide
     const parts = slugWithId.split("-");
     const shortId = parts[parts.length - 1];
-    
-    // Validate short ID format (6 hex characters)
-    if (!/^[0-9a-fA-F]{6}$/.test(shortId)) {
+    const preferredSlug = parts.slice(0, -1).join("-");
+
+    if (!/^[0-9a-fA-F]{6,24}$/.test(shortId)) {
       return res.status(404).send("Salon not found");
     }
-    
-    const fullSalonId = await findSalonByShortId(shortId);
+
+    const fullSalonId = await findSalonByShortId(shortId, preferredSlug);
     
     if (!fullSalonId) {
       return res.status(404).send("Salon not found");
@@ -836,11 +858,20 @@ exports.serveSalonWebPage = async (req, res) => {
       ])
     );
 
-    // Generate the new slug format for share URL
+    // Generate slug + short id (10 chars if several salons share the same 6-char prefix)
     const salonSlug = generateSlug(salon.name);
-    const salonShortId = salon._id.toString().substring(0, 6);
+    const idStr = salon._id.toString();
+    const prefix6 = idStr.substring(0, 6);
+    const prefixPeers = await Salon.find({ isActive: true, isDelete: false })
+      .select("_id")
+      .lean()
+      .then((rows) =>
+        rows.filter((s) => s._id.toString().startsWith(prefix6)).length
+      )
+      .catch(() => 1);
+    const salonShortId = prefixPeers > 1 ? idStr.substring(0, 10) : prefix6;
     const salonSlugWithId = `${salonSlug}-${salonShortId}`;
-    
+
     // Ensure baseURL doesn't have trailing slash to avoid double slashes
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, '');
     const shareUrl = `${baseURL}/salon/${salonSlugWithId}`;
@@ -1290,6 +1321,7 @@ exports.serveSalonWebPage = async (req, res) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${copy.metaSalonTitle(salonName).replace(/"/g, '&quot;')}</title>
     <meta name="description" content="${(salon.about ? salonDescription : copy.metaSalonDesc(salonName)).replace(/"/g, '&quot;')}">
+    <meta name="robots" content="index,follow,max-image-preview:large">
     <meta name="keywords" content="${salonName}, ${copy.metaKeywords}${salonAddress ? ', ' + salonAddress.split(',').join(', ') : ''}">
     <link rel="canonical" href="${shareUrl}">
     

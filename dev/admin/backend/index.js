@@ -216,22 +216,9 @@ app.get("/documentation.html", (req, res) => {
     res.status(404).send(`<h1>404 - Documentation not found</h1><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
-app.get(["/blog", "/blog/", "/blog.html"], (req, res) => {
-  const filePath = path.join(salonportalPath, "blog", "index.html");
-  if (fs.existsSync(filePath)) {
-    res.status(200).sendFile(path.resolve(filePath));
-  } else {
-    res.status(404).send(`<h1>404 - Blog not found</h1><p><a href="/">Return to Skedisy</a></p>`);
-  }
-});
-app.get("/blog/:slug", (req, res) => {
-  const filePath = path.join(salonportalPath, "blog", "article.html");
-  if (fs.existsSync(filePath)) {
-    res.status(200).sendFile(path.resolve(filePath));
-  } else {
-    res.status(404).send(`<h1>404 - Article not found</h1><p><a href="/blog/">Blog Skedisy</a></p>`);
-  }
-});
+const publicBlog = require("./controller/user/publicBlog.controller");
+app.get(["/blog", "/blog/", "/blog.html"], publicBlog.serveBlogIndexPage);
+app.get("/blog/:slug", publicBlog.serveBlogArticlePage);
 
 // Help Center — StyleSeat-style guides (/aide + /help alias)
 app.get(["/aide", "/help", "/help/"], (req, res) => res.redirect(301, "/aide/"));
@@ -460,7 +447,6 @@ app.get("/compte/inscription", publicClientAuth.serveSignupPage);
 app.post("/api/public/auth/login", publicClientAuth.publicLogin);
 app.post("/api/public/auth/register", publicClientAuth.publicRegister);
 
-const publicBlog = require("./controller/user/publicBlog.controller");
 app.get("/api/public/blog", publicBlog.listPublished);
 app.get("/api/public/blog/:slug", publicBlog.getBySlug);
 

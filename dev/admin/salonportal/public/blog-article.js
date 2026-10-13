@@ -5,6 +5,11 @@
   const root = document.getElementById("sq-article-root");
   if (!root) return;
 
+  // Server already rendered full article HTML for SEO crawlers
+  if (root.getAttribute("data-ssr") === "1" && root.querySelector("article")) {
+    return;
+  }
+
   const parts = window.location.pathname.replace(/\/+$/, "").split("/");
   const slug = decodeURIComponent(parts[parts.length - 1] || "").toLowerCase();
   if (!slug || slug === "blog") {
