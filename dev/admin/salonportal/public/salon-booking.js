@@ -1252,14 +1252,14 @@
 
   function openBookingForSelection() {
     applyPageDraftsToBookingState();
-    openModal();
+      openModal();
     // Skip redundant "services again" step → go straight to expert
     if (state.selectedServiceIds.length) {
       afterServicesContinue();
       return;
     }
-    renderStepServices();
-    if (stepsEl) stepsEl.scrollTop = 0;
+      renderStepServices();
+      if (stepsEl) stepsEl.scrollTop = 0;
   }
 
   /**
@@ -1269,8 +1269,8 @@
   function handleSalonPageServiceSelection() {
     renderSalonPageSelectionUI();
     if (isModalOpen()) {
-      if (state.selectedServiceIds.length > 0) {
-        renderServicesStickyBar();
+    if (state.selectedServiceIds.length > 0) {
+      renderServicesStickyBar();
       } else {
         hideBookingStickyBar();
         renderStepServices();
@@ -1307,11 +1307,11 @@
       if (labelEl) {
         labelEl.innerHTML = `<i class="fas fa-calendar-check"></i> ${escapeHtml(bookLabel)}`;
       } else {
-        const icon = btn.querySelector("i");
-        if (icon) {
-          btn.innerHTML = `${icon.outerHTML} ${escapeHtml(bookLabel)}`;
-        } else {
-          btn.textContent = bookLabel;
+      const icon = btn.querySelector("i");
+      if (icon) {
+        btn.innerHTML = `${icon.outerHTML} ${escapeHtml(bookLabel)}`;
+      } else {
+        btn.textContent = bookLabel;
         }
       }
       if (metaEl) {
@@ -2358,8 +2358,8 @@
             keepOpenFromDom: true,
             focusServiceId: id || null,
           });
-          renderSalonPageSelectionUI();
-          renderServicesStickyBar();
+        renderSalonPageSelectionUI();
+        renderServicesStickyBar();
           if (id && isServiceSelected(id) && bGrid) {
             const row = bGrid.querySelector(
               `.sq-svc-row[data-service-id="${CSS.escape(id)}"]`
@@ -2443,18 +2443,18 @@
     stepsEl.innerHTML = `
       <div class="sq-booking-datetime">
         <div class="sq-booking-datetime__scroll">
-          <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectDateTime)}</p>
-          <section class="sq-booking-calendar" aria-label="${escapeHtml(t("selectDate"))}">
-            <p class="sq-booking-calendar__label">${escapeHtml(t("selectDate"))}</p>
-            <div class="sq-booking-calendar__header">
-              <button type="button" class="sq-cal-nav" id="calPrevMonth" aria-label="${escapeHtml(t("monthPrev"))}">‹</button>
-              <span class="sq-booking-calendar__month" id="calMonthLabel">${escapeHtml(monthLabel)}</span>
-              <button type="button" class="sq-cal-nav" id="calNextMonth" aria-label="${escapeHtml(t("monthNext"))}">›</button>
-            </div>
-            <div class="sq-booking-calendar__days" id="bookingCalendarDays"></div>
-          </section>
-          <h3 class="sq-booking-slots-title">${escapeHtml(t("availableSlots"))}</h3>
-          <div id="slotGroups" class="sq-slot-groups"></div>
+      <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectDateTime)}</p>
+      <section class="sq-booking-calendar" aria-label="${escapeHtml(t("selectDate"))}">
+        <p class="sq-booking-calendar__label">${escapeHtml(t("selectDate"))}</p>
+        <div class="sq-booking-calendar__header">
+          <button type="button" class="sq-cal-nav" id="calPrevMonth" aria-label="${escapeHtml(t("monthPrev"))}">‹</button>
+          <span class="sq-booking-calendar__month" id="calMonthLabel">${escapeHtml(monthLabel)}</span>
+          <button type="button" class="sq-cal-nav" id="calNextMonth" aria-label="${escapeHtml(t("monthNext"))}">›</button>
+        </div>
+        <div class="sq-booking-calendar__days" id="bookingCalendarDays"></div>
+      </section>
+      <h3 class="sq-booking-slots-title">${escapeHtml(t("availableSlots"))}</h3>
+      <div id="slotGroups" class="sq-slot-groups"></div>
         </div>
         <div class="sq-booking-datetime__footer">
           <p class="sq-booking-datetime__selected" id="bookingSelectedSummary">${escapeHtml(
@@ -2854,11 +2854,11 @@
     const paymentOptionsHtml = needDeposit
       ? `<p class="sq-booking-step__hint">${escapeHtml(t("afroDepositPayHint"))}</p>`
       : methods
-          .map(
-            (m) =>
-              `<label class="sq-payment-option"><input type="radio" name="payMethod" value="${escapeHtml(m.value)}" ${state.paymentMethod === m.value ? "checked" : ""}> <span>${escapeHtml(m.label)}</span></label>`
-          )
-          .join("");
+      .map(
+        (m) =>
+          `<label class="sq-payment-option"><input type="radio" name="payMethod" value="${escapeHtml(m.value)}" ${state.paymentMethod === m.value ? "checked" : ""}> <span>${escapeHtml(m.label)}</span></label>`
+      )
+      .join("");
 
     const couponBlock = needDeposit
       ? ""
@@ -2870,18 +2870,18 @@
           </div>
         </label>
         ${
-          state.availableCoupons.length > 0
-            ? `<div class="sq-coupon-list">${state.availableCoupons
-                .map(
-                  (c) =>
-                    `<button type="button" class="sq-coupon-pick" data-code="${escapeHtml(c.code)}">${escapeHtml(c.code)}${c.title ? ` — ${escapeHtml(c.title)}` : ""}</button>`
-                )
-                .join("")}</div>`
+      state.availableCoupons.length > 0
+        ? `<div class="sq-coupon-list">${state.availableCoupons
+            .map(
+              (c) =>
+                `<button type="button" class="sq-coupon-pick" data-code="${escapeHtml(c.code)}">${escapeHtml(c.code)}${c.title ? ` — ${escapeHtml(c.title)}` : ""}</button>`
+            )
+            .join("")}</div>`
             : ""
         }
         ${
-          state.couponDiscount > 0
-            ? `<p class="sq-coupon-applied">${escapeHtml(cfg.copy.couponApplied)} : <strong>${escapeHtml(state.couponCode)}</strong> (−${escapeHtml(cfg.currency)}${state.couponDiscount.toFixed(2)}) <button type="button" class="sq-coupon-remove" id="btnRemoveCoupon">${escapeHtml(cfg.copy.removeCoupon)}</button></p>`
+      state.couponDiscount > 0
+        ? `<p class="sq-coupon-applied">${escapeHtml(cfg.copy.couponApplied)} : <strong>${escapeHtml(state.couponCode)}</strong> (−${escapeHtml(cfg.currency)}${state.couponDiscount.toFixed(2)}) <button type="button" class="sq-coupon-remove" id="btnRemoveCoupon">${escapeHtml(cfg.copy.removeCoupon)}</button></p>`
             : ""
         }
       </div>`;
@@ -2906,7 +2906,7 @@
              .split("__M__")
              .join(String(pol.lateArrivalMinutes ?? 15))
          )}</p>`
-      : "";
+        : "";
 
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.paymentTitle)}</p>
@@ -2931,32 +2931,32 @@
     setModalBack(() => renderStepContact());
 
     if (!needDeposit) {
-      stepsEl.querySelectorAll('input[name="payMethod"]').forEach((radio) => {
-        radio.onchange = async () => {
-          state.paymentMethod = radio.value;
-          destroyStripeElement();
-          const wrap = document.getElementById("sq-stripe-wrap");
-          if (wrap) {
-            wrap.classList.toggle("sq-stripe-wrap--hidden", state.paymentMethod !== "Stripe");
-          }
-          if (state.paymentMethod === "Stripe" && state.userId) {
-            await mountStripePaymentElement(state.userId);
-          }
-        };
-      });
+    stepsEl.querySelectorAll('input[name="payMethod"]').forEach((radio) => {
+      radio.onchange = async () => {
+        state.paymentMethod = radio.value;
+        destroyStripeElement();
+        const wrap = document.getElementById("sq-stripe-wrap");
+        if (wrap) {
+          wrap.classList.toggle("sq-stripe-wrap--hidden", state.paymentMethod !== "Stripe");
+        }
+        if (state.paymentMethod === "Stripe" && state.userId) {
+          await mountStripePaymentElement(state.userId);
+        }
+      };
+    });
 
-      stepsEl.querySelectorAll(".sq-coupon-pick").forEach((btn) => {
-        btn.onclick = () => {
-          const inp = document.getElementById("bkCouponCode");
-          if (inp) inp.value = btn.getAttribute("data-code");
-          applyCouponCode(state.userId);
-        };
-      });
+    stepsEl.querySelectorAll(".sq-coupon-pick").forEach((btn) => {
+      btn.onclick = () => {
+        const inp = document.getElementById("bkCouponCode");
+        if (inp) inp.value = btn.getAttribute("data-code");
+        applyCouponCode(state.userId);
+      };
+    });
 
-      document.getElementById("btnApplyCoupon")?.addEventListener("click", () =>
-        applyCouponCode(state.userId)
-      );
-      document.getElementById("btnRemoveCoupon")?.addEventListener("click", clearCoupon);
+    document.getElementById("btnApplyCoupon")?.addEventListener("click", () =>
+      applyCouponCode(state.userId)
+    );
+    document.getElementById("btnRemoveCoupon")?.addEventListener("click", clearCoupon);
     }
 
     document.getElementById("bkPolicyAccept")?.addEventListener("change", (e) => {
@@ -3000,22 +3000,22 @@
           state.paymentMethod = "cashAfterService";
           result = await createBooking(userId);
         } else if (state.paymentMethod === "Stripe") {
-          result = await confirmStripePayment(userId);
-        } else if (state.paymentMethod === "wallet") {
-          const totalsNow = calcTotals(getSelectedServices());
-          if (state.walletBalance < totalsNow.total) {
-            showBookingNotice(
-              "error",
-              cfg.copy.walletInsufficient || t("walletInsufficient"),
-              () => renderStepPayment()
-            );
-            btn.disabled = false;
-            btn.textContent = cfg.copy.confirmBooking;
-            return;
-          }
-          result = await createBooking(userId);
-        } else {
-          result = await createBooking(userId);
+        result = await confirmStripePayment(userId);
+      } else if (state.paymentMethod === "wallet") {
+        const totalsNow = calcTotals(getSelectedServices());
+        if (state.walletBalance < totalsNow.total) {
+          showBookingNotice(
+            "error",
+            cfg.copy.walletInsufficient || t("walletInsufficient"),
+            () => renderStepPayment()
+          );
+          btn.disabled = false;
+          btn.textContent = cfg.copy.confirmBooking;
+          return;
+        }
+        result = await createBooking(userId);
+      } else {
+        result = await createBooking(userId);
         }
       } catch (err) {
         result = { status: false, message: err.message || t("bookingFailed") };
@@ -3448,7 +3448,7 @@
       if (opts.serviceId && state.selectedServiceIds.length) {
         renderStepServices({ expandServiceId: opts.serviceId });
       } else {
-        renderStepServices();
+      renderStepServices();
       }
     },
     close: closeModal,
