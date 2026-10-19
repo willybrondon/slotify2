@@ -84,7 +84,14 @@ function build() {
   if (fs.existsSync(path.join(assetsDir, "images"))) {
     copyDir(path.join(assetsDir, "images"), path.join(PUBLIC, "images"));
   }
-  for (const fav of ["favicon.ico", "favicon.svg"]) {
+  for (const fav of [
+    "favicon.ico",
+    "favicon.svg",
+    "favicon-16.png",
+    "favicon-32.png",
+    "apple-touch-icon.png",
+    "logo192.png",
+  ]) {
     const favPath = path.join(assetsDir, fav);
     if (fs.existsSync(favPath)) {
       copyFile(favPath, path.join(PUBLIC, fav));

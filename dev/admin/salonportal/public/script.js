@@ -361,10 +361,12 @@ function initProNavigation() {
     const currentLang = localStorage.getItem('skedisy-language') || 'fr';
     const switchToLang = currentLang === 'fr' ? 'en' : 'fr';
     const displayLang = currentLang === 'fr' ? 'FR' : 'EN';
-    const blogHref = '/blog/';
+    const blogHref = '/blog/?for=pro';
+    const helpHref = '/aide/salon.html';
     const navBits =
         '<span class="nav-menu-actions">' +
         '<a href="' + blogHref + '" class="nav-btn" data-translate="nav.blog">Blog</a>' +
+        '<a href="' + helpHref + '" class="nav-btn" data-translate="nav.help">Aide</a>' +
         '<a href="/professionnel/" class="nav-btn nav-btn--active" data-translate="nav.pro">Pro</a>' +
         '<button type="button" class="nav-btn lang-switcher desktop-only" data-lang="' + switchToLang + '">' +
         '<i class="fas fa-globe"></i> <span>' + displayLang + '</span></button>' +
@@ -480,6 +482,7 @@ function renderCategories(categories) {
         desktopMenu.innerHTML = categoriesHtml +
             '<span class="nav-menu-actions">' +
             '<a href="/blog/" class="nav-btn" data-translate="nav.blog">Blog</a>' +
+            '<a href="/aide/" class="nav-btn" data-translate="nav.help">Aide</a>' +
             `<button type="button" class="nav-btn lang-switcher desktop-only" data-lang="${switchToLang}">` +
             `<i class="fas fa-globe"></i> <span>${displayLang}</span></button>` +
             '</span>';

@@ -168,20 +168,37 @@ function renderListingCards(posts) {
     .join("");
 }
 
+function audienceFilter(forAudience) {
+  const a = String(forAudience || "client").toLowerCase();
+  if (a === "all") return {};
+  // Legacy posts without `audience` stay on the client blog
+  if (a === "pro") {
+    return { audience: { $in: ["pro", "both"] } };
+  }
+  return {
+    $or: [
+      { audience: { $in: ["client", "both"] } },
+      { audience: { $exists: false } },
+      { audience: null },
+    ],
+  };
+}
+
 exports.listPublished = async (req, res) => {
   try {
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
     const category = (req.query.category || "").trim();
-    const filter = { status: "published" };
+    const forAudience = (req.query.for || req.query.audience || "client").trim();
+    const filter = { status: "published", ...audienceFilter(forAudience) };
     if (category) filter.category = category;
     const posts = await BlogPost.find(filter)
       .select(
-        "title slug excerpt coverImage category tags authorName readingMinutes publishedAt seoTitle seoDescription"
+        "title slug excerpt coverImage category audience tags authorName readingMinutes publishedAt seoTitle seoDescription"
       )
       .sort({ publishedAt: -1 })
       .limit(limit)
       .lean();
-    return res.status(200).json({ status: true, posts });
+    return res.status(200).json({ status: true, posts, audience: forAudience });
   } catch (error) {
     return res.status(500).json({ status: false, message: error.message });
   }
@@ -327,19 +344,48 @@ exports.serveBlogIndexPage = async (req, res) => {
     }
 
     let html = fs.readFileSync(templatePath, "utf8");
-    const posts = await BlogPost.find({ status: "published" })
+    const forAudience = String(req.query.for || req.query.audience || "client")
+      .trim()
+      .toLowerCase();
+    const isPro = forAudience === "pro";
+    const posts = await BlogPost.find({
+      status: "published",
+      ...audienceFilter(isPro ? "pro" : "client"),
+    })
       .select(
-        "title slug excerpt coverImage category readingMinutes publishedAt"
+        "title slug excerpt coverImage category audience readingMinutes publishedAt"
       )
       .sort({ publishedAt: -1 })
       .limit(24)
       .lean();
 
+    if (isPro) {
+      html = html.replace(
+        /data-translate="blog\.heroTitle"[^>]*>[^<]</i,
+        `data-translate="blog.forProsTitle">Blog pro<`
+      );
+      html = html.replace(
+        /data-translate="blog\.heroLead"[^>]*>[\s\S]*?<\/p>/i,
+        `data-translate="blog.forProsLead">Articles pour salons et expertes : visibilité, réservations et gestion sur Skedisy.</p>`
+      );
+    }
+
+    html = html.replace(
+      /id="sq-blog-audience-switch"[^>]*>[\s\S]*?<\/div>/i,
+      `id="sq-blog-audience-switch" data-audience="${isPro ? "pro" : "client"}">${
+        isPro
+          ? `<a href="/blog/" class="sq-link" data-translate="blog.switchToClient">← Articles clientes</a>`
+          : `<a href="/blog/?for=pro" class="sq-link" data-translate="blog.switchToPro">Articles pro →</a>`
+      }</div>`
+    );
+
     if (posts.length) {
       const cards = renderListingCards(posts);
       html = html.replace(
         /<div class="sq-blog-grid" id="sq-blog-dynamic-grid"><\/div>/i,
-        `<div class="sq-blog-grid" id="sq-blog-dynamic-grid" data-ssr="1">${cards}</div>`
+        `<div class="sq-blog-grid" id="sq-blog-dynamic-grid" data-ssr="1" data-audience="${
+          isPro ? "pro" : "client"
+        }">${cards}</div>`
       );
       html = html.replace(
         /id="sq-blog-soon-section"/i,

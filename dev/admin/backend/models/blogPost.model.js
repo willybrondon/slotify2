@@ -12,6 +12,12 @@ const blogPostSchema = new mongoose.Schema(
       default: "guides",
       enum: ["guides", "coiffure", "salons", "app", "pro", "tendances", "autre"],
     },
+    /** Who the article is written for: client marketplace, pro/salon, or both */
+    audience: {
+      type: String,
+      default: "client",
+      enum: ["client", "pro", "both"],
+    },
     tags: [{ type: String, trim: true }],
     seoTitle: { type: String, default: "" },
     seoDescription: { type: String, default: "" },
@@ -32,6 +38,7 @@ const blogPostSchema = new mongoose.Schema(
 );
 
 blogPostSchema.index({ status: 1, publishedAt: -1 });
+blogPostSchema.index({ status: 1, audience: 1, publishedAt: -1 });
 blogPostSchema.index({ slug: 1 });
 blogPostSchema.index({ author: 1, status: 1 });
 

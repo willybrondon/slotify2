@@ -74,6 +74,9 @@ exports.create = async (req, res) => {
       contentHtml,
       coverImage: String(req.body.coverImage || "").trim(),
       category: req.body.category || "guides",
+      audience: ["client", "pro", "both"].includes(req.body.audience)
+        ? req.body.audience
+        : "client",
       tags: Array.isArray(req.body.tags)
         ? req.body.tags.map(String).map((t) => t.trim()).filter(Boolean)
         : String(req.body.tags || "")
@@ -118,6 +121,9 @@ exports.update = async (req, res) => {
     }
     if (req.body.coverImage != null) post.coverImage = String(req.body.coverImage).trim();
     if (req.body.category != null) post.category = req.body.category;
+    if (req.body.audience != null && ["client", "pro", "both"].includes(req.body.audience)) {
+      post.audience = req.body.audience;
+    }
     if (req.body.tags != null) {
       post.tags = Array.isArray(req.body.tags)
         ? req.body.tags.map(String).map((t) => t.trim()).filter(Boolean)

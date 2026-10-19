@@ -1,4 +1,4 @@
-const { getWebCopy, resolveLang, idfBannerHtml, skedisyFooterHtml } = require("./webPageCopy");
+const { getWebCopy, resolveLang } = require("./webPageCopy");
 
 function safeReturnPath(raw) {
   const path = String(raw || "").trim();
@@ -28,6 +28,7 @@ function renderAuthPage(req, res, mode) {
 
   const title = isLogin ? copy.authLoginTitle : copy.authSignupTitle;
   const lead = isLogin ? copy.authLoginLead : copy.authSignupLead;
+  const badge = lang === "en" ? "Client space" : "Espace cliente";
   const switchHtml = isLogin
     ? `<p class="sq-auth-switch">${copy.authNoAccount} <a href="${urls.signup}">${copy.authCreateAccount}</a></p>`
     : `<p class="sq-auth-switch">${copy.authHasAccount} <a href="${urls.login}">${copy.authSignIn}</a></p>`;
@@ -35,10 +36,10 @@ function renderAuthPage(req, res, mode) {
   const signupFields = isLogin
     ? ""
     : `
-      <label class="sq-booking-field">${copy.authFirstName}
+      <label class="sq-auth-field">${copy.authFirstName}
         <input type="text" id="authFname" name="fname" autocomplete="given-name" required>
       </label>
-      <label class="sq-booking-field">${copy.authLastName}
+      <label class="sq-auth-field">${copy.authLastName}
         <input type="text" id="authLname" name="lname" autocomplete="family-name">
       </label>`;
 
@@ -49,44 +50,47 @@ function renderAuthPage(req, res, mode) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title} | Skedisy</title>
     <meta name="robots" content="noindex">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="${baseURL}/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="${baseURL}/favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="${baseURL}/apple-touch-icon.png">
+    <meta name="theme-color" content="#c45c26">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/public-pages.css">
 </head>
-<body class="sk-public-page sq-page sq-auth-page">
-    <nav class="navbar sq-navbar sq-auth-nav">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <a href="${baseURL}/"><h2>Skedisy</h2></a>
+<body class="sq-auth-page sq-auth-page--portal">
+    <main class="sq-auth-portal">
+        <div class="sq-auth-portal-card">
+            <div class="sq-auth-portal-logo">
+                <a href="${baseURL}/">
+                    <img src="${baseURL}/images/skedisy-logo-auth.png" alt="Skedisy" width="72" height="72">
+                </a>
             </div>
-            <a href="${returnPath}" class="sq-auth-back">${copy.authBackToBooking}</a>
-        </div>
-    </nav>
-    ${idfBannerHtml(copy)}
-    <main class="sq-auth-main">
-        <div class="sq-auth-card">
-            <h1 class="sq-auth-card__title">${title}</h1>
-            <p class="sq-auth-card__lead">${lead}</p>
+            <h1 class="sq-auth-portal-title">${title}</h1>
+            <p class="sq-auth-portal-badge">${badge}</p>
+            <p class="sq-auth-portal-lead">${lead}</p>
             <div id="authNotice" class="sq-auth-notice sq-auth-notice--hidden" role="alert"></div>
             <form id="authForm" class="sq-auth-form" novalidate>
                 ${signupFields}
-                <label class="sq-booking-field">${copy.emailLabel}
+                <label class="sq-auth-field">${copy.emailLabel}
                     <input type="email" id="authEmail" name="email" autocomplete="email" required>
                 </label>
-                <label class="sq-booking-field">${copy.phoneLabel}
+                <label class="sq-auth-field">${copy.phoneLabel}
                     <input type="tel" id="authMobile" name="mobile" autocomplete="tel" ${isLogin ? "" : "required"}>
                 </label>
-                <label class="sq-booking-field">${copy.authPassword}
+                <label class="sq-auth-field">${copy.authPassword}
                     <input type="password" id="authPassword" name="password" autocomplete="${isLogin ? "current-password" : "new-password"}" required minlength="6">
                 </label>
-                <button type="submit" class="sq-booking-btn" id="authSubmit">${isLogin ? copy.authSignIn : copy.authCreateAccount}</button>
+                <button type="submit" class="sq-auth-submit" id="authSubmit">${isLogin ? copy.authSignIn : copy.authCreateAccount}</button>
             </form>
             ${switchHtml}
-            <p class="sq-auth-pro"><a href="${baseURL}/salonpanel/">${copy.authSalonPro}</a></p>
+            <p class="sq-auth-portal-footer">
+                <a href="${returnPath}">${copy.authBackToBooking}</a>
+                ·
+                <a href="${baseURL}/salonpanel/">${copy.authSalonPro}</a>
+            </p>
         </div>
     </main>
-    ${skedisyFooterHtml(baseURL, copy)}
     <script>
         window.SKEDISY_CLIENT_AUTH = {
             mode: ${JSON.stringify(mode)},

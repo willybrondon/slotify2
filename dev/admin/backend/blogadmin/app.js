@@ -16,6 +16,12 @@
     { id: "autre", label: "Autre" },
   ];
 
+  const AUDIENCES = [
+    { id: "client", label: "Clientes (blog public)" },
+    { id: "pro", label: "Professionnels (blog pro)" },
+    { id: "both", label: "Les deux" },
+  ];
+
   const STATUS_LABEL = {
     draft: "Brouillon",
     pending: "En validation",
@@ -160,6 +166,7 @@
       contentHtml: "",
       coverImage: "",
       category: "guides",
+      audience: "client",
       tags: [],
       seoTitle: "",
       seoDescription: "",
@@ -185,6 +192,7 @@
     const excerptEl = document.getElementById("ba-excerpt");
     const slugEl = document.getElementById("ba-slug");
     const categoryEl = document.getElementById("ba-category");
+    const audienceEl = document.getElementById("ba-audience");
     const tagsEl = document.getElementById("ba-tags");
     const seoTitleEl = document.getElementById("ba-seo-title");
     const seoDescEl = document.getElementById("ba-seo-desc");
@@ -192,6 +200,7 @@
     if (excerptEl) state.editing.excerpt = excerptEl.value;
     if (slugEl) state.editing.slug = slugEl.value;
     if (categoryEl) state.editing.category = categoryEl.value;
+    if (audienceEl) state.editing.audience = audienceEl.value;
     if (tagsEl) {
       state.editing.tags = String(tagsEl.value || "")
         .split(",")
@@ -213,6 +222,7 @@
       excerpt: String(p.excerpt || "").trim(),
       slug: String(p.slug || "").trim(),
       category: p.category || "guides",
+      audience: p.audience || "client",
       tags: Array.isArray(p.tags) ? p.tags : [],
       seoTitle: String(p.seoTitle || "").trim(),
       seoDescription: String(p.seoDescription || "").trim(),
@@ -743,6 +753,18 @@
                 </select>
               </div>
               <div class="ba-field">
+                <label>Public (clientes / pro)</label>
+                <select id="ba-audience">
+                  ${AUDIENCES.map(
+                    (a) =>
+                      `<option value="${a.id}" ${
+                        (p.audience || "client") === a.id ? "selected" : ""
+                      }>${a.label}</option>`
+                  ).join("")}
+                </select>
+                <p class="ba-hint">Clientes → /blog/ · Pro → /blog/?for=pro · Les deux = visible partout</p>
+              </div>
+              <div class="ba-field">
                 <label>Tags (virgules)</label>
                 <input id="ba-tags" value="${esc(tags)}" placeholder="tresses, locks, IDF" />
               </div>
@@ -880,7 +902,7 @@
     }
 
     // Persist field edits into state without remount
-    ["ba-title", "ba-excerpt", "ba-slug", "ba-category", "ba-tags", "ba-seo-title", "ba-seo-desc"].forEach(
+    ["ba-title", "ba-excerpt", "ba-slug", "ba-category", "ba-audience", "ba-tags", "ba-seo-title", "ba-seo-desc"].forEach(
       (id) => {
         const el = document.getElementById(id);
         if (!el) return;
