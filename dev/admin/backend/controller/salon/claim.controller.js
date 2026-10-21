@@ -1,4 +1,7 @@
 const Salon = require("../../models/salon.model");
+const Expert = require("../../models/expert.model");
+const Service = require("../../models/service.model");
+const mongoose = require("mongoose");
 const sgMail = require('@sendgrid/mail');
 
 // Initialize SendGrid only if API key is configured
@@ -12,9 +15,191 @@ if (process.env.SENDGRID_API_KEY) {
 
 const { sendSMS } = require("../../services/sms.service");
 
+const DEFAULT_SERVICE_PRICE = 50;
+const DAY_KEYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+function capitalize(str) {
+  const s = String(str || "").trim();
+  if (!s) return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function buildDefaultSalonTime(overrides = {}) {
+  const openTime = overrides.openTime || "09:00 AM";
+  const closedTime = overrides.closedTime || "07:00 PM";
+  const activeDays = Array.isArray(overrides.activeDays) && overrides.activeDays.length
+    ? overrides.activeDays
+    : ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+  const slot = {
+    openTime,
+    closedTime,
+    isActive: true,
+    breakStartTime: overrides.breakStartTime || "01:00 PM",
+    breakEndTime: overrides.breakEndTime || "02:00 PM",
+    time: 15,
+    isBreak: true,
+  };
+
+  return DAY_KEYS.map((day) => ({
+    day,
+    ...slot,
+    isActive: activeDays.includes(day),
+  }));
+}
+
+async function reserveUniqueSalonId() {
+  for (let i = 0; i < 20; i++) {
+    const uniqueId = Math.floor(Math.random() * 10000000) + 100000;
+    const clash = await Salon.findOne({ uniqueId }).select("_id").lean();
+    if (!clash) return uniqueId;
+  }
+  return Date.now() % 100000000;
+}
+
+async function reserveUniqueExpertId() {
+  for (let i = 0; i < 20; i++) {
+    const uniqueId = Math.floor(Math.random() * 1000000) + 999999;
+    const clash = await Expert.findOne({ uniqueId }).select("_id").lean();
+    if (!clash) return uniqueId;
+  }
+  return Date.now() % 10000000;
+}
+
+async function resolveServiceEntries(rawServices) {
+  let list = rawServices;
+  if (typeof list === "string") {
+    try {
+      list = JSON.parse(list);
+    } catch (_) {
+      list = list.split(",").map((id) => ({ id: id.trim() }));
+    }
+  }
+  if (!Array.isArray(list)) list = [];
+
+  const entries = [];
+  for (const item of list) {
+    const id = String(item?.id || item?.serviceId || item || "").trim();
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) continue;
+    const priceNum = Number(item?.price);
+    entries.push({
+      id: new mongoose.Types.ObjectId(id),
+      price:
+        Number.isFinite(priceNum) && priceNum > 0
+          ? priceNum
+          : DEFAULT_SERVICE_PRICE,
+    });
+  }
+
+  if (!entries.length) return [];
+
+  const found = await Service.find({
+    _id: { $in: entries.map((e) => e.id) },
+    isDelete: { $ne: true },
+    status: { $ne: false },
+  })
+    .select("_id")
+    .lean();
+
+  const ok = new Set(found.map((s) => String(s._id)));
+  return entries
+    .filter((e) => ok.has(String(e.id)))
+    .map((e) => ({
+      id: e.id,
+      price: e.price,
+      allowCities: [],
+      afroConfig: null,
+      detailCard: {
+        shortDescription: "",
+        includes: [],
+        prepMust: [],
+        prepAvoid: [],
+        addons: [],
+        recommendedProductIds: [],
+      },
+    }));
+}
+
+/**
+ * Create (or refresh) an owner expert = same person as salon account.
+ */
+async function ensureOwnerExpert(salon, password, serviceObjectIds = []) {
+  const baseURL = (process.env.baseURL || "https://skedisy.com").replace(
+    /\/?$/,
+    "/"
+  );
+  const defaultImage = `${baseURL}storage/male.png`;
+
+  let expertEmail = String(salon.email || "").trim().toLowerCase();
+  const emailTaken = await Expert.findOne({
+    email: expertEmail,
+    salonId: { $ne: salon._id },
+    isDelete: { $ne: true },
+  })
+    .select("_id")
+    .lean();
+  if (emailTaken) {
+    expertEmail = `staff-${salon.uniqueId || String(salon._id).slice(-8)}@skedisy-temp.com`;
+  }
+
+  const nameParts = String(salon.name || "Salon")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  const fname = capitalize(nameParts[0] || "Proprietaire");
+  const lname = capitalize(
+    (nameParts.slice(1).join(" ") || salon.name || "Salon").slice(0, 40)
+  );
+
+  let expert = await Expert.findOne({
+    salonId: salon._id,
+    isDelete: { $ne: true },
+  });
+
+  if (expert) {
+    expert.password = password;
+    expert.mobile = salon.mobile || expert.mobile;
+    expert.email = expertEmail;
+    if (serviceObjectIds.length) {
+      expert.serviceId = serviceObjectIds;
+    }
+    expert.isBlock = false;
+    expert.isDelete = false;
+    await expert.save();
+    return expert;
+  }
+
+  expert = new Expert();
+  expert.fname = fname;
+  expert.lname = lname;
+  expert.email = expertEmail;
+  expert.age = 30;
+  expert.gender = "Other";
+  expert.mobile = salon.mobile || "";
+  expert.commission = 0;
+  expert.password = password;
+  expert.uniqueId = await reserveUniqueExpertId();
+  expert.salonId = salon._id;
+  expert.serviceId = serviceObjectIds;
+  expert.image = salon.mainImage || defaultImage;
+  expert.isBlock = false;
+  expert.isDelete = false;
+  await expert.save();
+  return expert;
+}
+
 /**
  * Claim salon profile using token and email
- * POST /api/salon/claim
+ * POST /salon/claim
+ * Also creates owner expert + keeps (or seeds) services so the salon can take bookings.
  */
 exports.claimSalon = async (req, res) => {
   try {
@@ -56,9 +241,41 @@ exports.claimSalon = async (req, res) => {
     salon.isDelete = false; // Ensure salon is not marked as deleted
     salon.password = password;
     salon.claimToken = ""; // Clear token after claiming
+
+    // Optional services from claim completion form
+    const serviceEntries = await resolveServiceEntries(
+      req.body?.services || req.body?.serviceIds
+    );
+    if (serviceEntries.length) {
+      const existingIds = new Set(
+        (salon.serviceIds || []).map((s) => String(s.id))
+      );
+      for (const entry of serviceEntries) {
+        if (!existingIds.has(String(entry.id))) {
+          salon.serviceIds.push(entry);
+        }
+      }
+    }
+
+    // Seed hours if missing
+    if (!Array.isArray(salon.salonTime) || salon.salonTime.length === 0) {
+      salon.salonTime = buildDefaultSalonTime({
+        openTime: req.body?.openTime,
+        closedTime: req.body?.closedTime,
+        activeDays: req.body?.activeDays,
+      });
+    }
+
     await salon.save();
-    
-    console.log(`[Claim] Salon ${salon.name} (${salon.email}) claimed successfully. isDelete set to false.`);
+
+    const serviceObjectIds = (salon.serviceIds || [])
+      .map((s) => s.id)
+      .filter(Boolean);
+    const expert = await ensureOwnerExpert(salon, password, serviceObjectIds);
+
+    console.log(
+      `[Claim] Salon ${salon.name} (${salon.email}) claimed. Expert ${expert._id}. Services=${serviceObjectIds.length}`
+    );
 
     return res.status(200).json({
       status: true,
@@ -68,7 +285,9 @@ exports.claimSalon = async (req, res) => {
         name: salon.name,
         email: salon.email,
         isActive: salon.isActive,
-        isClaimed: salon.isClaimed
+        isClaimed: salon.isClaimed,
+        expertId: expert._id,
+        servicesCount: serviceObjectIds.length,
       }
     });
   } catch (error) {
@@ -488,10 +707,67 @@ exports.bulkSendInvitations = async (req, res) => {
 };
 
 /**
- * Public self-registration for ads / organic signup (3-step form).
- * Creates an active claimed salon so the owner can log into the salon panel.
+ * Public catalogue for onboarding multi-select.
+ * GET /api/public/onboarding/services
+ */
+exports.listOnboardingServices = async (req, res) => {
+  try {
+    const language = String(req.query.language || "fr").toLowerCase();
+    const services = await Service.find({
+      isDelete: { $ne: true },
+      status: { $ne: false },
+    })
+      .select("name nameEn nameFr namePt duration categoryId image")
+      .populate("categoryId", "name nameFr nameEn")
+      .sort({ name: 1 })
+      .lean();
+
+    const data = services.map((s) => {
+      let name = s.name;
+      if (language === "en" && s.nameEn) name = s.nameEn;
+      else if (language === "fr" && s.nameFr) name = s.nameFr;
+      else if (language === "pt" && s.namePt) name = s.namePt;
+
+      const cat = s.categoryId;
+      let categoryName = "";
+      if (cat) {
+        categoryName =
+          (language === "fr" && cat.nameFr) ||
+          (language === "en" && cat.nameEn) ||
+          cat.name ||
+          "";
+      }
+
+      return {
+        _id: s._id,
+        name,
+        duration: s.duration || 60,
+        categoryName,
+        image: s.image || "",
+        defaultPrice: DEFAULT_SERVICE_PRICE,
+      };
+    });
+
+    return res.status(200).json({ status: true, data });
+  } catch (error) {
+    console.error("[OnboardingServices] error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+/**
+ * Public self-registration (3-step form) — same UX as rejoindre/claim without token.
+ * Creates claimed salon + services + owner expert (same login person).
  * POST /salon/self-register
- * Body: { name, mobile, city, email, password, address, about?, utmSource?, utmMedium?, utmCampaign? }
+ * Body: {
+ *   name, mobile, city, email, password, address, about?,
+ *   services: [{ id, price? }],
+ *   openTime?, closedTime?, activeDays?: string[],
+ *   utmSource?, utmMedium?, utmCampaign?
+ * }
  */
 exports.selfRegister = async (req, res) => {
   try {
@@ -502,6 +778,11 @@ exports.selfRegister = async (req, res) => {
     const password = String(req.body?.password || "");
     const address = String(req.body?.address || "").trim();
     const about = String(req.body?.about || "").trim();
+    const landMark = String(req.body?.landMark || city).trim();
+    const state = String(req.body?.state || "Île-de-France").trim();
+    const country = String(req.body?.country || "France").trim();
+    const latitude = String(req.body?.latitude || "").trim();
+    const longitude = String(req.body?.longitude || "").trim();
     const utmSource = String(req.body?.utmSource || "").trim();
     const utmMedium = String(req.body?.utmMedium || "").trim();
     const utmCampaign = String(req.body?.utmCampaign || "").trim();
@@ -509,7 +790,8 @@ exports.selfRegister = async (req, res) => {
     if (!name || !mobile || !city || !email || !password || !address) {
       return res.status(200).json({
         status: false,
-        message: "Nom du salon, téléphone, ville, e-mail, mot de passe et adresse sont requis.",
+        message:
+          "Nom du salon, téléphone, ville, e-mail, mot de passe et adresse sont requis.",
       });
     }
 
@@ -527,13 +809,23 @@ exports.selfRegister = async (req, res) => {
       });
     }
 
+    const serviceEntries = await resolveServiceEntries(
+      req.body?.services || req.body?.serviceIds
+    );
+    if (!serviceEntries.length) {
+      return res.status(200).json({
+        status: false,
+        message: "Choisissez au moins une prestation.",
+      });
+    }
+
     const existing = await Salon.findOne({
       isDelete: false,
       $or: [{ email }, { mobile }],
     });
 
     if (existing) {
-      if (existing.email === email) {
+      if (String(existing.email || "").toLowerCase() === email) {
         return res.status(200).json({
           status: false,
           message: existing.isClaimed
@@ -547,21 +839,10 @@ exports.selfRegister = async (req, res) => {
       });
     }
 
-    const capitalize = (str) => {
-      const s = String(str || "").trim();
-      if (!s) return "";
-      return s.charAt(0).toUpperCase() + s.slice(1);
-    };
-
-    let uniqueId;
-    let isUnique = false;
-    while (!isUnique) {
-      uniqueId = Math.floor(Math.random() * 10000000) + 100000;
-      const clash = await Salon.findOne({ uniqueId });
-      isUnique = !clash;
-    }
-
-    const baseURL = (process.env.baseURL || "").replace(/\/?$/, "/");
+    const baseURL = (process.env.baseURL || "https://skedisy.com").replace(
+      /\/?$/,
+      "/"
+    );
     const defaultImage = `${baseURL}storage/male.png`;
 
     const sourceParts = ["self_register"];
@@ -569,36 +850,33 @@ exports.selfRegister = async (req, res) => {
     if (utmMedium) sourceParts.push(utmMedium);
     if (utmCampaign) sourceParts.push(utmCampaign);
 
-    const defaultSalonTime = {
-      openTime: "09:00 AM",
-      closedTime: "07:00 PM",
-      isActive: true,
-      breakStartTime: "01:00 PM",
-      breakEndTime: "02:00 PM",
-      time: 15,
-      isBreak: true,
-    };
+    const activeDays = Array.isArray(req.body?.activeDays)
+      ? req.body.activeDays
+      : undefined;
 
     const salon = new Salon();
     salon.name = name;
     salon.email = email;
     salon.mobile = mobile;
     salon.password = password;
-    salon.uniqueId = uniqueId;
+    salon.uniqueId = await reserveUniqueSalonId();
     salon.addressDetails = {
       addressLine1: capitalize(address),
-      landMark: capitalize(city),
+      landMark: capitalize(landMark),
       city: capitalize(city),
-      state: "Île-de-France",
-      country: "France",
+      state: capitalize(state),
+      country: capitalize(country),
     };
-    salon.locationCoordinates = { latitude: "", longitude: "" };
+    salon.locationCoordinates = {
+      latitude: latitude || "",
+      longitude: longitude || "",
+    };
     salon.about =
       about ||
       `${name} — salon partenaire Skedisy à ${capitalize(city)}.`;
     salon.platformFee = 0;
     salon.wallet = 0;
-    salon.minWalletBalance = 0;
+    salon.minWalletBalance = null;
     salon.paymentMethods = { acceptCash: true, acceptStripe: false };
     salon.image = [defaultImage];
     salon.mainImage = defaultImage;
@@ -608,20 +886,20 @@ exports.selfRegister = async (req, res) => {
     salon.claimToken = "";
     salon.source = sourceParts.join(":");
     salon.autoConfirmBookings = true;
-    salon.salonTime = [
-      { day: "Monday", ...defaultSalonTime },
-      { day: "Tuesday", ...defaultSalonTime },
-      { day: "Wednesday", ...defaultSalonTime },
-      { day: "Thursday", ...defaultSalonTime },
-      { day: "Friday", ...defaultSalonTime },
-      { day: "Saturday", ...defaultSalonTime },
-      { day: "Sunday", ...defaultSalonTime, isActive: false },
-    ];
+    salon.serviceIds = serviceEntries;
+    salon.salonTime = buildDefaultSalonTime({
+      openTime: req.body?.openTime,
+      closedTime: req.body?.closedTime,
+      activeDays,
+    });
 
     await salon.save();
 
+    const serviceObjectIds = serviceEntries.map((s) => s.id);
+    const expert = await ensureOwnerExpert(salon, password, serviceObjectIds);
+
     console.log(
-      `[SelfRegister] Salon created: ${salon.name} (${salon.email}) source=${salon.source}`
+      `[SelfRegister] Salon ${salon.name} (${salon.email}) expert=${expert._id} services=${serviceObjectIds.length} source=${salon.source}`
     );
 
     return res.status(200).json({
@@ -633,12 +911,15 @@ exports.selfRegister = async (req, res) => {
         email: salon.email,
         isActive: salon.isActive,
         isClaimed: salon.isClaimed,
+        expertId: expert._id,
+        servicesCount: serviceObjectIds.length,
       },
     });
   } catch (error) {
     console.error("[SelfRegister] error:", error);
     return res.status(500).json({
       status: false,
+      message: error.message || "Internal Server Error",
       error: error.message || "Internal Server Error",
     });
   }

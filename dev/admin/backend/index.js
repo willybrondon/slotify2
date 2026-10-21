@@ -319,6 +319,12 @@ app.get("/category/:slugWithId", categoryController.serveCategoryPage);
 const serviceController = require("./controller/user/service.controller");
 app.get("/service/:slugWithId", serviceController.serveServicePage);
 
+// Public onboarding catalogue (salon join / claim 3-step form)
+app.get(
+  "/api/public/onboarding/services",
+  claimControllerPublic.listOnboardingServices
+);
+
 // Public API endpoint for categories (for frontend)
 app.get("/api/public/categories", async (req, res) => {
   try {

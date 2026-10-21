@@ -7,7 +7,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="theme-color" content="#c45c26">
-    <meta name="description" content="Inscrivez votre salon sur Skedisy en 3 étapes. Gratuit. Recevez des réservations en ligne.">
+    <meta name="description" content="Inscrivez votre salon sur Skedisy en 3 etapes. Gratuit. Prestations, horaires, reservations en ligne.">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,12 +21,9 @@
             --sk-muted: rgba(17, 17, 17, 0.62);
             --sk-border: rgba(17, 17, 17, 0.12);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--sk-black);
             background: linear-gradient(180deg, rgba(196, 92, 38, 0.32) 0%, rgba(196, 92, 38, 0.1) 14%, var(--sk-black) 38%, var(--sk-black) 100%);
             min-height: 100vh;
             display: flex;
@@ -35,19 +32,16 @@
             padding: 20px;
             color: var(--sk-white);
         }
-
         .container {
             background: var(--sk-white);
             border-radius: 20px;
             box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
-            max-width: 480px;
+            max-width: 520px;
             width: 100%;
             padding: 36px 28px;
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
         .logo { text-align: center; margin-bottom: 24px; }
-
         .logo .kicker {
             font-size: 0.8rem;
             font-weight: 600;
@@ -56,7 +50,6 @@
             color: var(--sk-brand);
             margin-bottom: 0.65rem;
         }
-
         .logo h1 {
             color: var(--sk-black);
             font-size: 1.65rem;
@@ -64,9 +57,7 @@
             font-weight: 700;
             line-height: 1.25;
         }
-
         .logo p { color: var(--sk-muted); font-size: 14px; line-height: 1.45; }
-
         .steps {
             display: flex;
             gap: 8px;
@@ -74,7 +65,6 @@
             align-items: center;
             justify-content: center;
         }
-
         .step-dot {
             width: 28px;
             height: 28px;
@@ -88,27 +78,19 @@
             color: var(--sk-muted);
             border: 2px solid transparent;
         }
-
-        .step-dot.active {
-            background: var(--sk-brand);
-            color: var(--sk-white);
-        }
-
+        .step-dot.active { background: var(--sk-brand); color: var(--sk-white); }
         .step-dot.done {
             background: var(--sk-brand-light);
             color: var(--sk-brand);
             border-color: var(--sk-brand);
         }
-
         .step-line {
             flex: 1;
             height: 2px;
             background: rgba(17, 17, 17, 0.1);
             max-width: 40px;
         }
-
         .step-line.done { background: var(--sk-brand); }
-
         .step-label {
             text-align: center;
             font-size: 13px;
@@ -116,12 +98,9 @@
             color: var(--sk-black);
             margin-bottom: 18px;
         }
-
         .panel { display: none; }
         .panel.active { display: block; }
-
-        .form-group { margin-bottom: 16px; }
-
+        .form-group { margin-bottom: 14px; }
         label {
             display: block;
             margin-bottom: 6px;
@@ -129,8 +108,7 @@
             font-weight: 600;
             font-size: 14px;
         }
-
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             padding: 12px 14px;
             border: 2px solid var(--sk-border);
@@ -141,18 +119,13 @@
             background: var(--sk-white);
             color: var(--sk-black);
         }
-
-        textarea { min-height: 72px; resize: vertical; }
-
-        input:focus, textarea:focus {
+        textarea { min-height: 64px; resize: vertical; }
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--sk-brand);
         }
-
         input[readonly] { background: #f7f7f7; color: var(--sk-muted); }
-
         .hint { font-size: 12px; color: var(--sk-muted); margin-top: 4px; }
-
         .error {
             background: #fee;
             color: #c33;
@@ -162,7 +135,6 @@
             font-size: 14px;
             display: none;
         }
-
         .success {
             background: #efe;
             color: #2a7a2a;
@@ -172,7 +144,6 @@
             font-size: 14px;
             display: none;
         }
-
         .info {
             background: var(--sk-brand-light);
             padding: 14px;
@@ -183,11 +154,8 @@
             border-left: 3px solid var(--sk-brand);
             line-height: 1.45;
         }
-
         .info strong { color: var(--sk-brand); }
-
         .btn-row { display: flex; gap: 10px; margin-top: 8px; }
-
         .btn {
             flex: 1;
             padding: 14px;
@@ -201,28 +169,19 @@
             transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
             font-family: inherit;
         }
-
         .btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 8px 16px rgba(17, 17, 17, 0.2);
             background: var(--sk-btn-hover);
         }
-
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-
         .btn-ghost {
             background: transparent;
             color: var(--sk-black);
             border: 2px solid var(--sk-border);
         }
-
-        .btn-ghost:hover {
-            background: rgba(17, 17, 17, 0.04);
-            box-shadow: none;
-        }
-
+        .btn-ghost:hover { background: rgba(17, 17, 17, 0.04); box-shadow: none; }
         .loading { display: none; text-align: center; margin-top: 16px; }
-
         .spinner {
             border: 3px solid rgba(17, 17, 17, 0.08);
             border-top: 3px solid var(--sk-brand);
@@ -232,40 +191,98 @@
             animation: spin 1s linear infinite;
             margin: 0 auto;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .footer-link {
             text-align: center;
             margin-top: 20px;
             font-size: 13px;
             color: var(--sk-muted);
         }
-
         .footer-link a { color: var(--sk-brand); font-weight: 600; text-decoration: none; }
-
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-height: 260px;
+            overflow-y: auto;
+            padding: 2px;
+            margin-bottom: 8px;
+        }
+        .service-chip {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 10px;
+            border: 2px solid var(--sk-border);
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--sk-black);
+            font-size: 13px;
+            line-height: 1.3;
+            user-select: none;
+            background: #fff;
+        }
+        .service-chip input { width: auto; margin-top: 2px; accent-color: var(--sk-brand); }
+        .service-chip.selected {
+            border-color: var(--sk-brand);
+            background: var(--sk-brand-light);
+        }
+        .service-chip small { display: block; color: var(--sk-muted); font-size: 11px; margin-top: 2px; }
+        .days {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .day-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border: 2px solid var(--sk-border);
+            border-radius: 999px;
+            color: var(--sk-black);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #fff;
+        }
+        .day-chip input { width: auto; accent-color: var(--sk-brand); }
+        .day-chip.selected {
+            border-color: var(--sk-brand);
+            background: var(--sk-brand-light);
+            color: var(--sk-brand);
+        }
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
         .summary {
             background: #fafafa;
             border-radius: 10px;
             padding: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             font-size: 14px;
             color: var(--sk-black);
             line-height: 1.55;
         }
-
         .summary span { color: var(--sk-muted); }
+        @media (max-width: 480px) {
+            .service-grid { grid-template-columns: 1fr; }
+            .row-2 { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">
             <p class="kicker">Skedisy · Espace pro</p>
-            <h1 id="pageTitle">Créer mon salon</h1>
-            <p id="pageSubtitle">Gratuit · 3 étapes · prêt en 2 minutes</p>
+            <h1 id="pageTitle">Creer mon salon</h1>
+            <p id="pageSubtitle">Gratuit · 3 etapes · pret en 2 minutes</p>
         </div>
 
         <div class="error" id="error"></div>
@@ -274,27 +291,27 @@
         <!-- CLAIM MODE (invitation token) -->
         <div id="claimMode" style="display:none;">
             <div class="info">
-                <strong>Votre salon a été ajouté sur Skedisy !</strong><br>
-                Créez un mot de passe pour réclamer votre profil et gérer vos réservations.
+                <strong>Votre salon a ete ajoute sur Skedisy !</strong><br>
+                Creez un mot de passe pour reclamer votre profil. Un expert (vous) sera cree automatiquement.
             </div>
-            <form id="claimForm">
+            <form id="claimForm" novalidate>
                 <div class="form-group">
                     <label for="claimEmail">Email</label>
                     <input type="email" id="claimEmail" name="email" required readonly>
                 </div>
                 <div class="form-group">
                     <label for="claimPassword">Nouveau mot de passe</label>
-                    <input type="password" id="claimPassword" name="password" required minlength="6" placeholder="Minimum 6 caractères" autocomplete="new-password">
+                    <input type="password" id="claimPassword" name="password" required minlength="6" placeholder="Minimum 6 caracteres" autocomplete="new-password">
                 </div>
                 <div class="form-group">
                     <label for="claimConfirmPassword">Confirmer le mot de passe</label>
-                    <input type="password" id="claimConfirmPassword" name="confirmPassword" required minlength="6" placeholder="Répétez le mot de passe" autocomplete="new-password">
+                    <input type="password" id="claimConfirmPassword" name="confirmPassword" required minlength="6" placeholder="Repetez le mot de passe" autocomplete="new-password">
                 </div>
-                <button type="submit" class="btn" id="claimSubmitBtn">Réclamer mon profil</button>
+                <button type="submit" class="btn" id="claimSubmitBtn">Reclamer mon profil</button>
             </form>
         </div>
 
-        <!-- REGISTER MODE (ads / organic — 3 steps) -->
+        <!-- REGISTER MODE — same for /salon/rejoindre and /salon/claim -->
         <div id="registerMode" style="display:none;">
             <div class="steps" aria-hidden="true">
                 <div class="step-dot active" id="dot1">1</div>
@@ -303,58 +320,89 @@
                 <div class="step-line" id="line2"></div>
                 <div class="step-dot" id="dot3">3</div>
             </div>
-            <p class="step-label" id="stepLabel">Étape 1 — Votre salon</p>
+            <p class="step-label" id="stepLabel">Etape 1 — Salon & compte</p>
 
             <form id="registerForm" novalidate>
+                <!-- STEP 1: salon + login (admin-mapped essentials) -->
                 <div class="panel active" id="step1">
                     <div class="form-group">
                         <label for="salonName">Nom du salon</label>
                         <input type="text" id="salonName" name="salonName" required placeholder="Ex. Tresses Paris 18" autocomplete="organization">
                     </div>
-                    <div class="form-group">
-                        <label for="city">Ville / arrondissement</label>
-                        <input type="text" id="city" name="city" required placeholder="Ex. Paris 18" autocomplete="address-level2">
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label for="city">Ville</label>
+                            <input type="text" id="city" name="city" required placeholder="Paris 18" autocomplete="address-level2">
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile">Telephone</label>
+                            <input type="tel" id="mobile" name="mobile" required placeholder="06 12 34 56 78" autocomplete="tel">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="mobile">Téléphone</label>
-                        <input type="tel" id="mobile" name="mobile" required placeholder="06 12 34 56 78" autocomplete="tel">
-                    </div>
-                    <button type="submit" class="btn" id="toStep2" data-next="2">Continuer</button>
-                </div>
-
-                <div class="panel" id="step2">
-                    <div class="form-group">
-                        <label for="email">E-mail professionnel</label>
-                        <input type="email" id="email" name="email" required placeholder="salon@email.com" autocomplete="email">
-                        <p class="hint">Servira d'identifiant de connexion</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Mot de passe</label>
-                        <input type="password" id="password" name="password" required minlength="6" placeholder="Minimum 6 caracteres" autocomplete="new-password">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirmer le mot de passe</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Repetez le mot de passe" autocomplete="new-password">
-                    </div>
-                    <div class="btn-row">
-                        <button type="button" class="btn btn-ghost" id="backTo1">Retour</button>
-                        <button type="submit" class="btn" id="toStep3" data-next="3">Continuer</button>
-                    </div>
-                </div>
-
-                <div class="panel" id="step3">
-                    <div class="summary" id="summaryBox"></div>
-                    <div class="form-group">
-                        <label for="address">Adresse du salon</label>
+                        <label for="address">Adresse</label>
                         <input type="text" id="address" name="address" required placeholder="12 rue Exemple" autocomplete="street-address">
                     </div>
                     <div class="form-group">
-                        <label for="about">A propos <span style="font-weight:400;color:var(--sk-muted)">(optionnel)</span></label>
-                        <textarea id="about" name="about" placeholder="Specialites, ambiance…"></textarea>
+                        <label for="email">E-mail (connexion)</label>
+                        <input type="email" id="email" name="email" required placeholder="salon@email.com" autocomplete="email">
                     </div>
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label for="password">Mot de passe</label>
+                            <input type="password" id="password" name="password" required minlength="6" placeholder="Min. 6 caracteres" autocomplete="new-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirmer</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Repeter" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <p class="hint">Vous serez aussi cree comme expert du salon (meme compte).</p>
+                    <button type="submit" class="btn">Continuer</button>
+                </div>
+
+                <!-- STEP 2: prestations -->
+                <div class="panel" id="step2">
+                    <div class="info" style="margin-bottom:12px;">
+                        Selectionnez vos prestations. Prix de base 50 € — modifiable plus tard dans votre espace.
+                    </div>
+                    <div id="servicesLoading" class="hint" style="margin-bottom:10px;">Chargement des prestations…</div>
+                    <div class="service-grid" id="serviceGrid"></div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-ghost" id="backTo1">Retour</button>
+                        <button type="submit" class="btn">Continuer</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: horaires + confirmation -->
+                <div class="panel" id="step3">
+                    <div class="summary" id="summaryBox"></div>
+                    <label>Jours d'ouverture</label>
+                    <div class="days" id="daysRow"></div>
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label for="openTime">Ouverture</label>
+                            <select id="openTime">
+                                <option value="08:00 AM">08:00</option>
+                                <option value="09:00 AM" selected>09:00</option>
+                                <option value="10:00 AM">10:00</option>
+                                <option value="11:00 AM">11:00</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="closedTime">Fermeture</label>
+                            <select id="closedTime">
+                                <option value="06:00 PM">18:00</option>
+                                <option value="07:00 PM" selected>19:00</option>
+                                <option value="08:00 PM">20:00</option>
+                                <option value="09:00 PM">21:00</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="hint">Pause dejeuner 13h–14h activee par defaut (comme l'admin).</p>
                     <div class="btn-row">
                         <button type="button" class="btn btn-ghost" id="backTo2">Retour</button>
-                        <button type="submit" class="btn" id="createSalonBtn">Créer mon salon</button>
+                        <button type="submit" class="btn" id="createSalonBtn">Creer mon salon</button>
                     </div>
                 </div>
             </form>
@@ -362,27 +410,39 @@
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p style="margin-top: 10px; color: var(--sk-muted);">Traitement en cours…</p>
+            <p style="margin-top: 10px; color: var(--sk-muted);">Inscription en cours…</p>
         </div>
 
         <p class="footer-link" id="footerLink">
-            Déjà un compte ? <a href="/salonpanel/login">Se connecter</a>
+            Deja un compte ? <a href="/salonpanel/login">Se connecter</a>
         </p>
     </div>
 
     <script>
         (function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = (urlParams.get('token') || '').trim();
-            const emailParam = (urlParams.get('email') || '').trim();
-            const utmSource = urlParams.get('utm_source') || '';
-            const utmMedium = urlParams.get('utm_medium') || '';
-            const utmCampaign = urlParams.get('utm_campaign') || '';
+            var urlParams = new URLSearchParams(window.location.search);
+            var token = (urlParams.get('token') || '').trim();
+            var emailParam = (urlParams.get('email') || '').trim();
+            var utmSource = urlParams.get('utm_source') || '';
+            var utmMedium = urlParams.get('utm_medium') || '';
+            var utmCampaign = urlParams.get('utm_campaign') || '';
+            var baseURL = window.location.origin;
 
-            const errorEl = document.getElementById('error');
-            const successEl = document.getElementById('success');
-            const loadingEl = document.getElementById('loading');
-            const baseURL = window.location.origin;
+            var errorEl = document.getElementById('error');
+            var successEl = document.getElementById('success');
+            var loadingEl = document.getElementById('loading');
+
+            var DAY_DEFS = [
+                { key: 'Monday', label: 'Lun' },
+                { key: 'Tuesday', label: 'Mar' },
+                { key: 'Wednesday', label: 'Mer' },
+                { key: 'Thursday', label: 'Jeu' },
+                { key: 'Friday', label: 'Ven' },
+                { key: 'Saturday', label: 'Sam' },
+                { key: 'Sunday', label: 'Dim' }
+            ];
+            var DEFAULT_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            var POPULAR = /tresse|braid|knotless|lock|twist|vanille|perruque|wig|coupe|homme|barb|color|soin|nappy|afro/i;
 
             function showError(msg) {
                 errorEl.textContent = msg || 'Une erreur est survenue.';
@@ -390,34 +450,25 @@
                 successEl.style.display = 'none';
                 try { errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
             }
-
-            function hideError() {
-                errorEl.style.display = 'none';
-            }
-
-            function setLoading(on) {
-                loadingEl.style.display = on ? 'block' : 'none';
-            }
+            function hideError() { errorEl.style.display = 'none'; }
+            function setLoading(on) { loadingEl.style.display = on ? 'block' : 'none'; }
 
             async function postJson(paths, body) {
-                let lastErr = null;
-                for (const path of paths) {
+                var lastErr = null;
+                for (var i = 0; i < paths.length; i++) {
                     try {
-                        const response = await fetch(baseURL + path, {
+                        var response = await fetch(baseURL + paths[i], {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                             body: JSON.stringify(body)
                         });
-                        const text = await response.text();
-                        let data = null;
-                        try { data = text ? JSON.parse(text) : null; } catch (parseErr) {
+                        var text = await response.text();
+                        var data = null;
+                        try { data = text ? JSON.parse(text) : null; } catch (e) {
                             lastErr = new Error('Reponse invalide (' + response.status + ')');
                             continue;
                         }
-                        return { response, data };
+                        return { response: response, data: data };
                     } catch (err) {
                         lastErr = err;
                     }
@@ -430,23 +481,29 @@
                 return data.message || data.error || 'Une erreur est survenue.';
             }
 
-            // --- Claim mode (invitation link) ---
+            function escapeHtml(s) {
+                return String(s)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            }
+
+            // --- Claim with invitation token ---
             if (token && emailParam) {
                 document.getElementById('claimMode').style.display = 'block';
                 document.getElementById('pageTitle').textContent = 'Reclamer mon salon';
-                document.getElementById('pageSubtitle').textContent = 'Creez votre mot de passe pour activer votre profil';
+                document.getElementById('pageSubtitle').textContent = 'Activez votre profil et votre expert';
                 document.getElementById('claimEmail').value = decodeURIComponent(emailParam);
 
-                const claimForm = document.getElementById('claimForm');
-                const claimBtn = document.getElementById('claimSubmitBtn');
+                var claimForm = document.getElementById('claimForm');
+                var claimBtn = document.getElementById('claimSubmitBtn');
 
                 claimForm.addEventListener('submit', async function (e) {
                     e.preventDefault();
                     hideError();
-
-                    const password = document.getElementById('claimPassword').value;
-                    const confirmPassword = document.getElementById('claimConfirmPassword').value;
-
+                    var password = document.getElementById('claimPassword').value;
+                    var confirmPassword = document.getElementById('claimConfirmPassword').value;
                     if (password !== confirmPassword) {
                         showError('Les mots de passe ne correspondent pas.');
                         return;
@@ -455,27 +512,21 @@
                         showError('Le mot de passe doit contenir au moins 6 caracteres.');
                         return;
                     }
-
                     claimBtn.disabled = true;
                     setLoading(true);
-
                     try {
-                        const { data } = await postJson(
-                            ['/salon/claim', '/api/salon/claim'],
-                            {
-                                token: token,
-                                email: decodeURIComponent(emailParam),
-                                password: password
-                            }
-                        );
-
-                        if (data && data.status === true) {
-                            successEl.textContent = 'Profil reclame avec succes ! Redirection…';
+                        var result = await postJson(['/salon/claim', '/api/salon/claim'], {
+                            token: token,
+                            email: decodeURIComponent(emailParam),
+                            password: password
+                        });
+                        if (result.data && result.data.status === true) {
+                            successEl.textContent = 'Profil reclame ! Redirection…';
                             successEl.style.display = 'block';
                             claimForm.style.display = 'none';
-                            setTimeout(function () { window.location.href = '/salonpanel/login'; }, 2000);
+                            setTimeout(function () { window.location.href = '/salonpanel/login'; }, 1600);
                         } else {
-                            showError(messageFromData(data));
+                            showError(messageFromData(result.data));
                             claimBtn.disabled = false;
                         }
                     } catch (err) {
@@ -488,19 +539,12 @@
                 return;
             }
 
-            // --- Register mode (3 steps) ---
+            // --- Register (rejoindre = claim without token) ---
             document.getElementById('registerMode').style.display = 'block';
 
             var currentStep = 1;
             var submitting = false;
-
-            function escapeHtml(s) {
-                return String(s)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;');
-            }
+            var servicesLoaded = false;
 
             function goToStep(n) {
                 currentStep = n;
@@ -513,22 +557,111 @@
                 });
                 document.getElementById('line1').classList.toggle('done', n > 1);
                 document.getElementById('line2').classList.toggle('done', n > 2);
-
-                var labels = {
-                    1: 'Etape 1 — Votre salon',
-                    2: 'Etape 2 — Votre compte',
-                    3: 'Etape 3 — Adresse & confirmation'
-                };
-                document.getElementById('stepLabel').textContent = labels[n];
+                document.getElementById('stepLabel').textContent = ({
+                    1: 'Etape 1 — Salon & compte',
+                    2: 'Etape 2 — Prestations',
+                    3: 'Etape 3 — Horaires & confirmation'
+                })[n];
                 hideError();
 
+                if (n === 2) loadServices();
                 if (n === 3) {
+                    var selected = getSelectedServices();
                     document.getElementById('summaryBox').innerHTML =
                         '<strong>' + escapeHtml(document.getElementById('salonName').value.trim()) + '</strong><br>' +
                         '<span>Ville</span> ' + escapeHtml(document.getElementById('city').value.trim()) + '<br>' +
-                        '<span>Tel.</span> ' + escapeHtml(document.getElementById('mobile').value.trim()) + '<br>' +
-                        '<span>E-mail</span> ' + escapeHtml(document.getElementById('email').value.trim());
+                        '<span>Adresse</span> ' + escapeHtml(document.getElementById('address').value.trim()) + '<br>' +
+                        '<span>E-mail</span> ' + escapeHtml(document.getElementById('email').value.trim()) + '<br>' +
+                        '<span>Prestations</span> ' + selected.length + ' selectionnee(s)';
                 }
+            }
+
+            function renderDays() {
+                var row = document.getElementById('daysRow');
+                row.innerHTML = '';
+                DAY_DEFS.forEach(function (d) {
+                    var label = document.createElement('label');
+                    label.className = 'day-chip' + (DEFAULT_DAYS.indexOf(d.key) >= 0 ? ' selected' : '');
+                    var input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.value = d.key;
+                    input.checked = DEFAULT_DAYS.indexOf(d.key) >= 0;
+                    input.addEventListener('change', function () {
+                        label.classList.toggle('selected', input.checked);
+                    });
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(d.label));
+                    row.appendChild(label);
+                });
+            }
+            renderDays();
+
+            async function loadServices() {
+                if (servicesLoaded) return;
+                var grid = document.getElementById('serviceGrid');
+                var loading = document.getElementById('servicesLoading');
+                try {
+                    var res = await fetch(baseURL + '/api/public/onboarding/services?language=fr', {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    var json = await res.json();
+                    if (!json || !json.status || !Array.isArray(json.data)) {
+                        loading.textContent = 'Impossible de charger les prestations.';
+                        return;
+                    }
+                    loading.style.display = 'none';
+                    grid.innerHTML = '';
+                    json.data.forEach(function (svc, idx) {
+                        var id = String(svc._id);
+                        var pre = POPULAR.test(svc.name || '') || idx < 4;
+                        var label = document.createElement('label');
+                        label.className = 'service-chip' + (pre ? ' selected' : '');
+                        label.dataset.id = id;
+                        label.dataset.price = String(svc.defaultPrice || 50);
+                        var input = document.createElement('input');
+                        input.type = 'checkbox';
+                        input.value = id;
+                        input.checked = pre;
+                        input.addEventListener('change', function () {
+                            label.classList.toggle('selected', input.checked);
+                        });
+                        var text = document.createElement('span');
+                        text.innerHTML = escapeHtml(svc.name || 'Prestation') +
+                            (svc.categoryName ? '<small>' + escapeHtml(svc.categoryName) + '</small>' : '');
+                        label.appendChild(input);
+                        label.appendChild(text);
+                        grid.appendChild(label);
+                    });
+                    servicesLoaded = true;
+                    if (!grid.children.length) {
+                        loading.style.display = 'block';
+                        loading.textContent = 'Aucune prestation catalogue. Contactez le support.';
+                    }
+                } catch (err) {
+                    loading.textContent = 'Erreur reseau au chargement des prestations.';
+                }
+            }
+
+            function getSelectedServices() {
+                var out = [];
+                document.querySelectorAll('#serviceGrid .service-chip').forEach(function (chip) {
+                    var input = chip.querySelector('input');
+                    if (input && input.checked) {
+                        out.push({
+                            id: chip.dataset.id,
+                            price: Number(chip.dataset.price) || 50
+                        });
+                    }
+                });
+                return out;
+            }
+
+            function getActiveDays() {
+                var days = [];
+                document.querySelectorAll('#daysRow input[type="checkbox"]').forEach(function (cb) {
+                    if (cb.checked) days.push(cb.value);
+                });
+                return days;
             }
 
             function validateStep(n) {
@@ -536,16 +669,14 @@
                     var name = document.getElementById('salonName').value.trim();
                     var city = document.getElementById('city').value.trim();
                     var mobile = document.getElementById('mobile').value.trim();
-                    if (!name || !city || !mobile) {
-                        showError('Renseignez le nom, la ville et le telephone.');
-                        return false;
-                    }
-                    return true;
-                }
-                if (n === 2) {
+                    var address = document.getElementById('address').value.trim();
                     var email = document.getElementById('email').value.trim();
                     var password = document.getElementById('password').value;
                     var confirmPassword = document.getElementById('confirmPassword').value;
+                    if (!name || !city || !mobile || !address) {
+                        showError('Renseignez le nom, la ville, le telephone et l\'adresse.');
+                        return false;
+                    }
                     if (!email || email.indexOf('@') < 1) {
                         showError('Indiquez une adresse e-mail valide.');
                         return false;
@@ -560,10 +691,16 @@
                     }
                     return true;
                 }
+                if (n === 2) {
+                    if (!getSelectedServices().length) {
+                        showError('Choisissez au moins une prestation.');
+                        return false;
+                    }
+                    return true;
+                }
                 if (n === 3) {
-                    var address = document.getElementById('address').value.trim();
-                    if (!address) {
-                        showError('Indiquez l\'adresse du salon.');
+                    if (!getActiveDays().length) {
+                        showError('Selectionnez au moins un jour d\'ouverture.');
                         return false;
                     }
                     return true;
@@ -580,10 +717,16 @@
                     name: document.getElementById('salonName').value.trim(),
                     city: document.getElementById('city').value.trim(),
                     mobile: document.getElementById('mobile').value.trim(),
+                    address: document.getElementById('address').value.trim(),
                     email: document.getElementById('email').value.trim(),
                     password: document.getElementById('password').value,
-                    address: document.getElementById('address').value.trim(),
-                    about: document.getElementById('about').value.trim(),
+                    landMark: document.getElementById('city').value.trim(),
+                    state: 'Ile-de-France',
+                    country: 'France',
+                    services: getSelectedServices(),
+                    openTime: document.getElementById('openTime').value,
+                    closedTime: document.getElementById('closedTime').value,
+                    activeDays: getActiveDays(),
                     utmSource: utmSource,
                     utmMedium: utmMedium,
                     utmCampaign: utmCampaign
@@ -599,19 +742,16 @@
                         ['/salon/self-register', '/api/salon/self-register'],
                         payload
                     );
-                    var data = result.data;
-
-                    if (data && data.status === true) {
-                        successEl.textContent = 'Salon cree ! Redirection vers la connexion…';
+                    if (result.data && result.data.status === true) {
+                        successEl.textContent = 'Salon inscrit ! Redirection vers la connexion…';
                         successEl.style.display = 'block';
                         document.getElementById('registerMode').style.display = 'none';
                         setTimeout(function () {
                             window.location.href = '/salonpanel/login?email=' + encodeURIComponent(payload.email);
-                        }, 1500);
+                        }, 1400);
                         return;
                     }
-
-                    showError(messageFromData(data));
+                    showError(messageFromData(result.data));
                     goToStep(3);
                 } catch (err) {
                     showError('Erreur de connexion. Reessayez dans un instant.');
