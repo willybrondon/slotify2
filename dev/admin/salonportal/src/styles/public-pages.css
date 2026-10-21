@@ -3354,15 +3354,28 @@ body.sk-public-page .main-wrapper {
     margin-top: 0.85rem;
 }
 
+.sq-blog-audience-switch .sq-btn {
+    text-decoration: none;
+    border-bottom: none;
+}
+
 .sq-blog-help-hint {
     margin: 0.75rem 0 0;
     font-size: 0.85rem;
     color: #7a6e64;
 }
 
-.sq-blog-help-hint a {
+.sq-blog-help-hint a,
+.sq-blog-help-link {
     color: #c45c26;
     font-weight: 600;
+    text-decoration: none;
+    border-bottom: none;
+}
+
+.sq-blog-help-hint a:hover,
+.sq-blog-help-link:hover {
+    color: #a84d1f;
     text-decoration: none;
 }
 

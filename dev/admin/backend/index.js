@@ -221,15 +221,18 @@ app.get(["/blog", "/blog/", "/blog.html"], publicBlog.serveBlogIndexPage);
 app.get("/blog/:slug", publicBlog.serveBlogArticlePage);
 
 // Help Center — StyleSeat-style guides (/aide + /help alias)
-app.get(["/aide", "/help", "/help/"], (req, res) => res.redirect(301, "/aide/"));
-app.get("/aide/", (req, res) => {
+// IMPORTANT: do not redirect /aide → /aide/ while strict routing is off (Express
+// treats them as the same path → infinite 301 loop).
+function serveAideIndex(req, res) {
   const filePath = path.join(salonportalPath, "aide", "index.html");
   if (fs.existsSync(filePath)) {
-    res.status(200).sendFile(path.resolve(filePath));
-  } else {
-    res.status(404).send(`<h1>404 - Centre d'aide introuvable</h1><p><a href="/">Retour à Skedisy</a></p>`);
+    return res.status(200).sendFile(path.resolve(filePath));
   }
-});
+  return res
+    .status(404)
+    .send(`<h1>404 - Centre d'aide introuvable</h1><p><a href="/">Retour à Skedisy</a></p>`);
+}
+app.get(["/aide", "/aide/", "/help", "/help/"], serveAideIndex);
 app.get(["/aide/clientes", "/aide/clientes.html"], (req, res) => {
   const filePath = path.join(salonportalPath, "aide", "clientes.html");
   if (fs.existsSync(filePath)) {
@@ -288,10 +291,25 @@ app.get(["/salon/claim", "/salon/rejoindre", "/rejoindre"], serveSalonOnboarding
 
 // Explicit public POST endpoints (belt-and-suspenders vs router mount + /api alias)
 const claimControllerPublic = require("./controller/salon/claim.controller");
+const multerOnboarding = require("multer");
+const onboardingUpload = multerOnboarding({
+  storage: require("./middleware/multer"),
+  limits: { fileSize: 8 * 1024 * 1024 },
+});
+const selfRegisterUpload = onboardingUpload.fields([
+  { name: "salonImage", maxCount: 1 },
+  { name: "expertImage", maxCount: 1 },
+  { name: "image", maxCount: 1 },
+]);
 app.post(["/salon/claim", "/api/salon/claim"], claimControllerPublic.claimSalon);
 app.post(
   ["/salon/self-register", "/api/salon/self-register"],
+  selfRegisterUpload,
   claimControllerPublic.selfRegister
+);
+app.post(
+  ["/salon/check-register", "/api/salon/check-register"],
+  claimControllerPublic.checkRegisterAvailability
 );
 
 // Public web route for salon pages (for sharing and deep linking)

@@ -48,6 +48,9 @@ function build() {
 
   copyDir(path.join(SRC, "pages"), PUBLIC);
 
+  // Help center pages live outside pages/ (URL: /aide/)
+  copyDir(path.join(SRC, "aide"), path.join(PUBLIC, "aide"));
+
   const stylesDir = path.join(SRC, "styles");
   if (fs.existsSync(stylesDir)) {
     for (const name of fs.readdirSync(stylesDir)) {

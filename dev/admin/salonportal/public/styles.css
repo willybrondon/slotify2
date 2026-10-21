@@ -1,4 +1,4 @@
-/* Skedisy — palette 3 couleurs : noir, blanc, terracotta (web ↔ app Flutter) */
+/* Skedisy â palette 3 couleurs : noir, blanc, terracotta (web â app Flutter) */
 :root {
     --sk-brand: #c45c26;
     --sk-brand-hover: #a84d1f;
@@ -618,7 +618,7 @@ html {
     box-sizing: border-box;
 }
 
-/* Blog (et liens nav directs) — alignés sur Pro / Connexion */
+/* Blog (et liens nav directs) â alignÃ©s sur Pro / Connexion */
 .mobile-menu-content > .category-link {
     display: block !important;
     background: #111 !important;
@@ -1136,7 +1136,7 @@ html {
 }
 
 .feature-card li::before {
-    content: "✓";
+    content: "â";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1182,7 +1182,7 @@ html {
 }
 
 .clients-content li::before {
-    content: "✓";
+    content: "â";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1249,7 +1249,7 @@ html {
 }
 
 .benefit-content li::before {
-    content: "✓";
+    content: "â";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1300,7 +1300,7 @@ html {
 }
 
 .payment-content li::before {
-    content: "✓";
+    content: "â";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1520,7 +1520,7 @@ html {
     margin-right: auto;
 }
 
-/* Footer — noir & blanc */
+/* Footer â noir & blanc */
 .footer {
     background: #111;
     color: #fff;
@@ -2757,7 +2757,7 @@ html {
   }
 } 
 
-/* Floating actions — mobile sticky on scroll */
+/* Floating actions â mobile sticky on scroll */
 .sq-mobile-float-bar {
     display: none;
     position: fixed;
@@ -3571,7 +3571,7 @@ html {
     margin-bottom: 1.5rem;
 }
 
-/* ——— Client homepage (skedisy.com) ——— */
+/* âââ Client homepage (skedisy.com) âââ */
 .client-hero {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
     color: #fff;
@@ -3828,7 +3828,7 @@ html {
     background: #f0f0f0;
 }
 
-/* AI Concierge = client journey only — never show on /professionnel/ */
+/* AI Concierge = client journey only â never show on /professionnel/ */
 .pro-page .floating-ai-btn,
 .pro-page .btn-ai-concierge-mobile,
 .pro-page a[href*="ai-concierge"]:not(.sq-mobile-float-bar a) {
@@ -3840,7 +3840,7 @@ html {
     box-shadow: none !important;
 }
 
-/* ——— Squire-inspired landing (Skedisy · noir & blanc) ——— */
+/* âââ Squire-inspired landing (Skedisy Â· noir & blanc) âââ */
 .sq-page .btn-primary,
 .sq-page .sq-btn-fill {
     background: #111;
@@ -4557,7 +4557,7 @@ html {
     margin-top: 0;
 }
 
-/* Pied de page : même fond que .sq-final-cta (#111), séparé par la bordure */
+/* Pied de page : mÃªme fond que .sq-final-cta (#111), sÃ©parÃ© par la bordure */
 .sq-page .footer,
 .sq-page .sq-footer {
     background: #111 !important;
@@ -4650,7 +4650,7 @@ html {
 }
 
 .sq-problem-list li::before {
-    content: "—";
+    content: "â";
     position: absolute;
     left: 0;
     color: rgba(255, 255, 255, 0.4);
@@ -4742,7 +4742,7 @@ html {
 }
 
 .sq-acquisition-flow li:not(:last-child)::after {
-  content: "↓";
+  content: "â";
   display: block;
   text-align: center;
   opacity: 0.5;
@@ -4904,7 +4904,7 @@ html {
     }
 }
 
-/* Blog hub — /blog/ */
+/* Blog hub â /blog/ */
 .sq-blog-page {
     padding-top: 80px;
 }
@@ -5040,6 +5040,35 @@ html {
     margin: 0.5rem 0 0.35rem;
 }
 
+.sq-blog-audience-switch {
+    margin-top: 0.85rem;
+}
+
+.sq-blog-audience-switch .sq-btn {
+    text-decoration: none;
+    border-bottom: none;
+}
+
+.sq-blog-help-hint {
+    margin: 0.75rem 0 0;
+    font-size: 0.85rem;
+    color: var(--sk-text-muted, #7a6e64);
+}
+
+.sq-blog-help-hint a,
+.sq-blog-help-link {
+    color: var(--sk-primary, #c45c26);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: none;
+}
+
+.sq-blog-help-hint a:hover,
+.sq-blog-help-link:hover {
+    color: var(--sk-primary-hover, #a84d1f);
+    text-decoration: none;
+}
+
 .sq-article {
     max-width: 720px;
     margin: 0 auto;
@@ -5160,7 +5189,7 @@ html {
     }
 }
 
-/* Icônes décoratives (localisation, recherche) — terracotta */
+/* IcÃ´nes dÃ©coratives (localisation, recherche) â terracotta */
 .sk-public-page .sq-search-bar-unified__loc-icon,
 .sk-public-page .sq-salon-detail__address i,
 .sk-public-page .fa-location-dot,
@@ -5169,7 +5198,7 @@ html {
 }
  
 
-/* Help Center — /aide/ */
+/* Help Center â /aide/ */
 .sq-help-page {
     padding-top: 80px;
     background: var(--sk-bg);
@@ -5349,6 +5378,15 @@ html {
     color: var(--sk-primary);
 }
 
+.sq-help-toc-static {
+    display: block;
+    margin: 0 0 1rem;
+    color: var(--sk-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    pointer-events: none;
+}
+
 .sq-help-toc-title {
     font-size: 0.72rem;
     font-weight: 700;
@@ -5470,7 +5508,7 @@ html {
     }
 }
  
-/* �� Comparatif Skedisy vs concurrents �� */
+/*  Comparatif Skedisy vs concurrents  */
 .sq-compare {
   padding: 3.5rem 0 3rem;
   background: linear-gradient(180deg, #faf7f4 0%, #fff 40%);

@@ -271,9 +271,44 @@
             line-height: 1.55;
         }
         .summary span { color: var(--sk-muted); }
+        .photo-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 14px 0 8px;
+        }
+        .photo-card {
+            border: 2px dashed var(--sk-border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            color: var(--sk-black);
+            background: #fafafa;
+        }
+        .photo-card strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .photo-card .hint { margin-bottom: 8px; }
+        .photo-preview {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: none;
+            margin-bottom: 8px;
+            background: #eee;
+        }
+        .photo-preview.visible { display: block; }
+        .photo-card input[type="file"] {
+            font-size: 12px;
+            padding: 8px;
+            border: 1px solid var(--sk-border);
+        }
         @media (max-width: 480px) {
             .service-grid { grid-template-columns: 1fr; }
-            .row-2 { grid-template-columns: 1fr; }
+            .row-2, .photo-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -325,6 +360,10 @@
             <form id="registerForm" novalidate>
                 <!-- STEP 1: salon + login (admin-mapped essentials) -->
                 <div class="panel active" id="step1">
+                    <div class="info" style="margin-bottom:12px;">
+                        La coiffeuse / styliste du salon utilise les <strong>memes identifiants</strong> que le salon
+                        (e-mail, telephone et mot de passe). Modifiable plus tard dans votre espace.
+                    </div>
                     <div class="form-group">
                         <label for="salonName">Nom du salon</label>
                         <input type="text" id="salonName" name="salonName" required placeholder="Ex. Tresses Paris 18" autocomplete="organization">
@@ -344,7 +383,7 @@
                         <input type="text" id="address" name="address" required placeholder="12 rue Exemple" autocomplete="street-address">
                     </div>
                     <div class="form-group">
-                        <label for="email">E-mail (connexion)</label>
+                        <label for="email">E-mail (connexion salon &amp; styliste)</label>
                         <input type="email" id="email" name="email" required placeholder="salon@email.com" autocomplete="email">
                     </div>
                     <div class="row-2">
@@ -357,8 +396,8 @@
                             <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Repeter" autocomplete="new-password">
                         </div>
                     </div>
-                    <p class="hint">Vous serez aussi cree comme expert du salon (meme compte).</p>
-                    <button type="submit" class="btn">Continuer</button>
+                    <p class="hint">Meme e-mail, telephone et mot de passe pour le salon et la coiffeuse / styliste — modifiable plus tard dans votre espace.</p>
+                    <button type="submit" class="btn" id="step1ContinueBtn">Continuer</button>
                 </div>
 
                 <!-- STEP 2: prestations -->
@@ -400,6 +439,23 @@
                         </div>
                     </div>
                     <p class="hint">Pause dejeuner 13h–14h activee par defaut (comme l'admin).</p>
+
+                    <label style="margin-top:8px;">Photos <span style="font-weight:400;color:var(--sk-muted)">(optionnel)</span></label>
+                    <div class="photo-row">
+                        <div class="photo-card">
+                            <strong>Photo du salon</strong>
+                            <p class="hint">Sur desktop, elle sera aussi utilisee en 2e image du carousel.</p>
+                            <img id="salonImagePreview" class="photo-preview" alt="Apercu salon">
+                            <input type="file" id="salonImage" name="salonImage" accept="image/*">
+                        </div>
+                        <div class="photo-card">
+                            <strong>Photo de la coiffeuse / styliste</strong>
+                            <p class="hint">Sinon, la photo du salon sera reutilisee.</p>
+                            <img id="expertImagePreview" class="photo-preview" alt="Apercu expert">
+                            <input type="file" id="expertImage" name="expertImage" accept="image/*">
+                        </div>
+                    </div>
+
                     <div class="btn-row">
                         <button type="button" class="btn btn-ghost" id="backTo2">Retour</button>
                         <button type="submit" class="btn" id="createSalonBtn">Creer mon salon</button>
@@ -453,15 +509,23 @@
             function hideError() { errorEl.style.display = 'none'; }
             function setLoading(on) { loadingEl.style.display = on ? 'block' : 'none'; }
 
-            async function postJson(paths, body) {
+            async function postRequest(paths, body, asFormData) {
                 var lastErr = null;
                 for (var i = 0; i < paths.length; i++) {
                     try {
-                        var response = await fetch(baseURL + paths[i], {
+                        var opts = {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify(body)
-                        });
+                            headers: { 'Accept': 'application/json' },
+                            body: null
+                        };
+                        if (asFormData) {
+                            opts.body = body;
+                            // Let the browser set multipart boundary (do not set Content-Type)
+                        } else {
+                            opts.headers['Content-Type'] = 'application/json';
+                            opts.body = JSON.stringify(body);
+                        }
+                        var response = await fetch(baseURL + paths[i], opts);
                         var text = await response.text();
                         var data = null;
                         try { data = text ? JSON.parse(text) : null; } catch (e) {
@@ -474,6 +538,10 @@
                     }
                 }
                 throw lastErr || new Error('Erreur de connexion');
+            }
+
+            function postJson(paths, body) {
+                return postRequest(paths, body, false);
             }
 
             function messageFromData(data) {
@@ -596,6 +664,37 @@
             }
             renderDays();
 
+            function bindPhotoPreview(inputId, previewId) {
+                var input = document.getElementById(inputId);
+                var preview = document.getElementById(previewId);
+                if (!input || !preview) return;
+                input.addEventListener('change', function () {
+                    var file = input.files && input.files[0];
+                    if (!file) {
+                        preview.src = '';
+                        preview.classList.remove('visible');
+                        return;
+                    }
+                    if (!file.type || file.type.indexOf('image/') !== 0) {
+                        showError('Choisissez une image (JPG, PNG, WEBP…).');
+                        input.value = '';
+                        preview.classList.remove('visible');
+                        return;
+                    }
+                    if (file.size > 8 * 1024 * 1024) {
+                        showError('Image trop lourde (max 8 Mo).');
+                        input.value = '';
+                        preview.classList.remove('visible');
+                        return;
+                    }
+                    var url = URL.createObjectURL(file);
+                    preview.src = url;
+                    preview.classList.add('visible');
+                });
+            }
+            bindPhotoPreview('salonImage', 'salonImagePreview');
+            bindPhotoPreview('expertImage', 'expertImagePreview');
+
             async function loadServices() {
                 if (servicesLoaded) return;
                 var grid = document.getElementById('serviceGrid');
@@ -678,7 +777,8 @@
                         return false;
                     }
                     if (!email || email.indexOf('@') < 1) {
-                        showError('Indiquez une adresse e-mail valide.');
+                        showError('Indiquez une adresse e-mail valide. Modifiez votre e-mail.');
+                        try { document.getElementById('email').focus(); } catch (e) {}
                         return false;
                     }
                     if (password.length < 6) {
@@ -708,29 +808,54 @@
                 return true;
             }
 
+            function focusConflictField(field) {
+                try {
+                    if (field === 'mobile') document.getElementById('mobile').focus();
+                    else document.getElementById('email').focus();
+                } catch (e) {}
+            }
+
+            async function ensureCredentialsAvailable() {
+                var email = document.getElementById('email').value.trim();
+                var mobile = document.getElementById('mobile').value.trim();
+                var result = await postJson(
+                    ['/salon/check-register', '/api/salon/check-register'],
+                    { email: email, mobile: mobile }
+                );
+                if (result.data && result.data.status === true) return true;
+                showError(messageFromData(result.data) || 'Cet e-mail ou ce numero existe deja. Modifiez vos identifiants.');
+                focusConflictField(result.data && result.data.field);
+                return false;
+            }
+
             async function createSalon() {
                 if (submitting) return;
                 if (!validateStep(3)) return;
 
                 var createBtn = document.getElementById('createSalonBtn');
-                var payload = {
-                    name: document.getElementById('salonName').value.trim(),
-                    city: document.getElementById('city').value.trim(),
-                    mobile: document.getElementById('mobile').value.trim(),
-                    address: document.getElementById('address').value.trim(),
-                    email: document.getElementById('email').value.trim(),
-                    password: document.getElementById('password').value,
-                    landMark: document.getElementById('city').value.trim(),
-                    state: 'Ile-de-France',
-                    country: 'France',
-                    services: getSelectedServices(),
-                    openTime: document.getElementById('openTime').value,
-                    closedTime: document.getElementById('closedTime').value,
-                    activeDays: getActiveDays(),
-                    utmSource: utmSource,
-                    utmMedium: utmMedium,
-                    utmCampaign: utmCampaign
-                };
+                var email = document.getElementById('email').value.trim();
+                var formData = new FormData();
+                formData.append('name', document.getElementById('salonName').value.trim());
+                formData.append('city', document.getElementById('city').value.trim());
+                formData.append('mobile', document.getElementById('mobile').value.trim());
+                formData.append('address', document.getElementById('address').value.trim());
+                formData.append('email', email);
+                formData.append('password', document.getElementById('password').value);
+                formData.append('landMark', document.getElementById('city').value.trim());
+                formData.append('state', 'Ile-de-France');
+                formData.append('country', 'France');
+                formData.append('services', JSON.stringify(getSelectedServices()));
+                formData.append('openTime', document.getElementById('openTime').value);
+                formData.append('closedTime', document.getElementById('closedTime').value);
+                formData.append('activeDays', JSON.stringify(getActiveDays()));
+                formData.append('utmSource', utmSource);
+                formData.append('utmMedium', utmMedium);
+                formData.append('utmCampaign', utmCampaign);
+
+                var salonFile = document.getElementById('salonImage').files[0];
+                var expertFile = document.getElementById('expertImage').files[0];
+                if (salonFile) formData.append('salonImage', salonFile);
+                if (expertFile) formData.append('expertImage', expertFile);
 
                 submitting = true;
                 createBtn.disabled = true;
@@ -738,21 +863,27 @@
                 setLoading(true);
 
                 try {
-                    var result = await postJson(
+                    var result = await postRequest(
                         ['/salon/self-register', '/api/salon/self-register'],
-                        payload
+                        formData,
+                        true
                     );
                     if (result.data && result.data.status === true) {
                         successEl.textContent = 'Salon inscrit ! Redirection vers la connexion…';
                         successEl.style.display = 'block';
                         document.getElementById('registerMode').style.display = 'none';
                         setTimeout(function () {
-                            window.location.href = '/salonpanel/login?email=' + encodeURIComponent(payload.email);
+                            window.location.href = '/salonpanel/login?email=' + encodeURIComponent(email);
                         }, 1400);
                         return;
                     }
                     showError(messageFromData(result.data));
-                    goToStep(3);
+                    if (result.data && (result.data.field === 'email' || result.data.field === 'mobile')) {
+                        goToStep(1);
+                        focusConflictField(result.data.field);
+                    } else {
+                        goToStep(3);
+                    }
                 } catch (err) {
                     showError('Erreur de connexion. Reessayez dans un instant.');
                     goToStep(3);
@@ -763,10 +894,22 @@
                 }
             }
 
-            document.getElementById('registerForm').addEventListener('submit', function (e) {
+            document.getElementById('registerForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
                 if (currentStep === 1) {
-                    if (validateStep(1)) goToStep(2);
+                    if (!validateStep(1)) return;
+                    var btn = document.getElementById('step1ContinueBtn');
+                    if (btn) btn.disabled = true;
+                    setLoading(true);
+                    try {
+                        var ok = await ensureCredentialsAvailable();
+                        if (ok) goToStep(2);
+                    } catch (err) {
+                        showError('Erreur de connexion. Reessayez.');
+                    } finally {
+                        if (btn) btn.disabled = false;
+                        setLoading(false);
+                    }
                     return;
                 }
                 if (currentStep === 2) {

@@ -128,15 +128,35 @@ async function resolveServiceEntries(rawServices) {
     }));
 }
 
+function publicFileUrl(file) {
+  if (!file || !file.path) return "";
+  const baseURL = (process.env.baseURL || "https://skedisy.com").replace(
+    /\/?$/,
+    "/"
+  );
+  const rel = String(file.path).replace(/\\/g, "/");
+  // multer stores under storage/… — expose as absolute URL
+  if (/^https?:\/\//i.test(rel)) return rel;
+  return baseURL + rel.replace(/^\//, "");
+}
+
 /**
  * Create (or refresh) an owner expert = same person as salon account.
+ * @param {string|null} expertImageUrl optional photo for the first expert
  */
-async function ensureOwnerExpert(salon, password, serviceObjectIds = []) {
+async function ensureOwnerExpert(
+  salon,
+  password,
+  serviceObjectIds = [],
+  expertImageUrl = null
+) {
   const baseURL = (process.env.baseURL || "https://skedisy.com").replace(
     /\/?$/,
     "/"
   );
   const defaultImage = `${baseURL}storage/male.png`;
+  const resolvedImage =
+    expertImageUrl || salon.mainImage || defaultImage;
 
   let expertEmail = String(salon.email || "").trim().toLowerCase();
   const emailTaken = await Expert.findOne({
@@ -171,6 +191,9 @@ async function ensureOwnerExpert(salon, password, serviceObjectIds = []) {
     if (serviceObjectIds.length) {
       expert.serviceId = serviceObjectIds;
     }
+    if (expertImageUrl || !expert.image) {
+      expert.image = resolvedImage;
+    }
     expert.isBlock = false;
     expert.isDelete = false;
     await expert.save();
@@ -189,7 +212,7 @@ async function ensureOwnerExpert(salon, password, serviceObjectIds = []) {
   expert.uniqueId = await reserveUniqueExpertId();
   expert.salonId = salon._id;
   expert.serviceId = serviceObjectIds;
-  expert.image = salon.mainImage || defaultImage;
+  expert.image = resolvedImage;
   expert.isBlock = false;
   expert.isDelete = false;
   await expert.save();
@@ -706,6 +729,124 @@ exports.bulkSendInvitations = async (req, res) => {
   }
 };
 
+function digitsOnly(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+/**
+ * Shared duplicate check for email / mobile on self-register.
+ * Returns { field, message } or null if free.
+ */
+async function findRegisterConflict(email, mobile) {
+  const emailNorm = String(email || "").trim().toLowerCase();
+  const mobileNorm = String(mobile || "").trim();
+  const mobileDigits = digitsOnly(mobileNorm);
+  if (!emailNorm && !mobileNorm) return null;
+
+  // Email exact match (case-insensitive) + common mobile formats
+  const or = [];
+  if (emailNorm) or.push({ email: emailNorm });
+  if (mobileNorm) {
+    or.push({ mobile: mobileNorm });
+    if (mobileDigits) {
+      or.push({ mobile: mobileDigits });
+      // 0612345678 vs 06 12 34 56 78
+      if (mobileDigits.length === 10) {
+        or.push({
+          mobile:
+            mobileDigits.slice(0, 2) +
+            " " +
+            mobileDigits.slice(2, 4) +
+            " " +
+            mobileDigits.slice(4, 6) +
+            " " +
+            mobileDigits.slice(6, 8) +
+            " " +
+            mobileDigits.slice(8, 10),
+        });
+      }
+    }
+  }
+
+  const existing = or.length
+    ? await Salon.findOne({ isDelete: false, $or: or })
+    : null;
+
+  if (!existing) return null;
+
+  if (
+    emailNorm &&
+    String(existing.email || "").trim().toLowerCase() === emailNorm
+  ) {
+    return {
+      field: "email",
+      message: existing.isClaimed
+        ? "Cet e-mail existe déjà. Modifiez votre e-mail, ou connectez-vous à votre espace salon."
+        : "Cet e-mail existe déjà sur Skedisy. Modifiez votre e-mail, ou utilisez le lien d'invitation pour réclamer le salon.",
+    };
+  }
+
+  if (
+    mobileDigits &&
+    digitsOnly(existing.mobile) === mobileDigits
+  ) {
+    return {
+      field: "mobile",
+      message:
+        "Ce numéro de téléphone existe déjà. Modifiez votre numéro de téléphone.",
+    };
+  }
+
+  return {
+    field: "email",
+    message: "Cet e-mail ou ce numéro existe déjà. Modifiez vos identifiants.",
+  };
+}
+
+/**
+ * Quick check before leaving step 1 (email / mobile free?).
+ * POST /salon/check-register
+ * Body: { email, mobile }
+ */
+exports.checkRegisterAvailability = async (req, res) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const mobile = String(req.body?.mobile || "").trim();
+
+    if (!email && !mobile) {
+      return res.status(200).json({
+        status: false,
+        message: "Indiquez un e-mail ou un numéro de téléphone.",
+      });
+    }
+
+    if (email && !email.includes("@")) {
+      return res.status(200).json({
+        status: false,
+        field: "email",
+        message: "Adresse e-mail invalide. Modifiez votre e-mail.",
+      });
+    }
+
+    const conflict = await findRegisterConflict(email, mobile);
+    if (conflict) {
+      return res.status(200).json({
+        status: false,
+        field: conflict.field,
+        message: conflict.message,
+      });
+    }
+
+    return res.status(200).json({ status: true, message: "Disponible." });
+  } catch (error) {
+    console.error("[CheckRegister] error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
 /**
  * Public catalogue for onboarding multi-select.
  * GET /api/public/onboarding/services
@@ -819,23 +960,12 @@ exports.selfRegister = async (req, res) => {
       });
     }
 
-    const existing = await Salon.findOne({
-      isDelete: false,
-      $or: [{ email }, { mobile }],
-    });
-
-    if (existing) {
-      if (String(existing.email || "").toLowerCase() === email) {
-        return res.status(200).json({
-          status: false,
-          message: existing.isClaimed
-            ? "Cet e-mail est déjà utilisé. Connectez-vous à votre espace salon."
-            : "Ce salon existe déjà sur Skedisy. Utilisez le lien d'invitation pour le réclamer.",
-        });
-      }
+    const conflict = await findRegisterConflict(email, mobile);
+    if (conflict) {
       return res.status(200).json({
         status: false,
-        message: "Ce numéro de téléphone est déjà associé à un salon.",
+        field: conflict.field,
+        message: conflict.message,
       });
     }
 
@@ -850,9 +980,20 @@ exports.selfRegister = async (req, res) => {
     if (utmMedium) sourceParts.push(utmMedium);
     if (utmCampaign) sourceParts.push(utmCampaign);
 
-    const activeDays = Array.isArray(req.body?.activeDays)
-      ? req.body.activeDays
-      : undefined;
+    let activeDays = req.body?.activeDays;
+    if (typeof activeDays === "string") {
+      try {
+        activeDays = JSON.parse(activeDays);
+      } catch (_) {
+        activeDays = activeDays
+          .split(",")
+          .map((d) => d.trim())
+          .filter(Boolean);
+      }
+    }
+    if (!Array.isArray(activeDays) || !activeDays.length) {
+      activeDays = undefined;
+    }
 
     const salon = new Salon();
     salon.name = name;
@@ -878,8 +1019,30 @@ exports.selfRegister = async (req, res) => {
     salon.wallet = 0;
     salon.minWalletBalance = null;
     salon.paymentMethods = { acceptCash: true, acceptStripe: false };
-    salon.image = [defaultImage];
-    salon.mainImage = defaultImage;
+
+    // Photos (optional): salon carousel + first expert
+    const salonFile =
+      (req.files && req.files.salonImage && req.files.salonImage[0]) ||
+      (req.files && req.files.image && req.files.image[0]) ||
+      null;
+    const expertFile =
+      (req.files && req.files.expertImage && req.files.expertImage[0]) || null;
+
+    const salonPhotoUrl = publicFileUrl(salonFile) || defaultImage;
+    // Desktop carousel: if one photo, duplicate it in 2nd slot
+    salon.mainImage = salonPhotoUrl;
+    salon.image =
+      salonPhotoUrl && salonPhotoUrl !== defaultImage
+        ? [salonPhotoUrl, salonPhotoUrl]
+        : [defaultImage];
+    if (salonPhotoUrl && salonPhotoUrl !== defaultImage) {
+      salon.heroImage = salonPhotoUrl;
+    }
+
+    const expertPhotoUrl =
+      publicFileUrl(expertFile) ||
+      (salonPhotoUrl !== defaultImage ? salonPhotoUrl : null);
+
     salon.isActive = true;
     salon.isDelete = false;
     salon.isClaimed = true;
@@ -896,7 +1059,12 @@ exports.selfRegister = async (req, res) => {
     await salon.save();
 
     const serviceObjectIds = serviceEntries.map((s) => s.id);
-    const expert = await ensureOwnerExpert(salon, password, serviceObjectIds);
+    const expert = await ensureOwnerExpert(
+      salon,
+      password,
+      serviceObjectIds,
+      expertPhotoUrl
+    );
 
     console.log(
       `[SelfRegister] Salon ${salon.name} (${salon.email}) expert=${expert._id} services=${serviceObjectIds.length} source=${salon.source}`

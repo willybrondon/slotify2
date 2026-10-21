@@ -45,8 +45,8 @@
   if (switchEl) {
     switchEl.setAttribute("data-audience", isPro ? "pro" : "client");
     switchEl.innerHTML = isPro
-      ? `<a href="/blog/" class="sq-link" data-translate="blog.switchToClient">← Articles clientes</a>`
-      : `<a href="/blog/?for=pro" class="sq-link" data-translate="blog.switchToPro">Articles pro →</a>`;
+      ? `<a href="/blog/" class="sq-btn sq-btn-ghost sq-btn-sm" data-translate="blog.switchToClient">Articles clientes</a>`
+      : `<a href="/blog/?for=pro" class="sq-btn sq-btn-ghost sq-btn-sm" data-translate="blog.switchToPro">Articles pro</a>`;
   }
   const heroTitle = document.querySelector('[data-translate="blog.heroTitle"], [data-translate="blog.forProsTitle"], [data-translate="blog.forClientsTitle"]');
   const heroLead = document.querySelector('[data-translate="blog.heroLead"], [data-translate="blog.forProsLead"], [data-translate="blog.forClientsLead"]');
