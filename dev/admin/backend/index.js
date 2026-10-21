@@ -286,6 +286,14 @@ function serveSalonOnboardingPage(req, res) {
 
 app.get(["/salon/claim", "/salon/rejoindre", "/rejoindre"], serveSalonOnboardingPage);
 
+// Explicit public POST endpoints (belt-and-suspenders vs router mount + /api alias)
+const claimControllerPublic = require("./controller/salon/claim.controller");
+app.post(["/salon/claim", "/api/salon/claim"], claimControllerPublic.claimSalon);
+app.post(
+  ["/salon/self-register", "/api/salon/self-register"],
+  claimControllerPublic.selfRegister
+);
+
 // Public web route for salon pages (for sharing and deep linking)
 // New format: /salon/slug-shortId (e.g., /salon/coiffure-beaute-brasil-6885e2)
 // Never return HTML for panel API clients (key/Authorization) — that caused

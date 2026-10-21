@@ -305,57 +305,59 @@
             </div>
             <p class="step-label" id="stepLabel">Étape 1 — Votre salon</p>
 
-            <div class="panel active" id="step1">
-                <div class="form-group">
-                    <label for="salonName">Nom du salon</label>
-                    <input type="text" id="salonName" required placeholder="Ex. Tresses Paris 18" autocomplete="organization">
+            <form id="registerForm" novalidate>
+                <div class="panel active" id="step1">
+                    <div class="form-group">
+                        <label for="salonName">Nom du salon</label>
+                        <input type="text" id="salonName" name="salonName" required placeholder="Ex. Tresses Paris 18" autocomplete="organization">
+                    </div>
+                    <div class="form-group">
+                        <label for="city">Ville / arrondissement</label>
+                        <input type="text" id="city" name="city" required placeholder="Ex. Paris 18" autocomplete="address-level2">
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Téléphone</label>
+                        <input type="tel" id="mobile" name="mobile" required placeholder="06 12 34 56 78" autocomplete="tel">
+                    </div>
+                    <button type="submit" class="btn" id="toStep2" data-next="2">Continuer</button>
                 </div>
-                <div class="form-group">
-                    <label for="city">Ville / arrondissement</label>
-                    <input type="text" id="city" required placeholder="Ex. Paris 18" autocomplete="address-level2">
-                </div>
-                <div class="form-group">
-                    <label for="mobile">Téléphone</label>
-                    <input type="tel" id="mobile" required placeholder="06 12 34 56 78" autocomplete="tel">
-                </div>
-                <button type="button" class="btn" id="toStep2">Continuer</button>
-            </div>
 
-            <div class="panel" id="step2">
-                <div class="form-group">
-                    <label for="email">E-mail professionnel</label>
-                    <input type="email" id="email" required placeholder="salon@email.com" autocomplete="email">
-                    <p class="hint">Servira d’identifiant de connexion</p>
+                <div class="panel" id="step2">
+                    <div class="form-group">
+                        <label for="email">E-mail professionnel</label>
+                        <input type="email" id="email" name="email" required placeholder="salon@email.com" autocomplete="email">
+                        <p class="hint">Servira d'identifiant de connexion</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+                        <input type="password" id="password" name="password" required minlength="6" placeholder="Minimum 6 caracteres" autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmer le mot de passe</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Repetez le mot de passe" autocomplete="new-password">
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-ghost" id="backTo1">Retour</button>
+                        <button type="submit" class="btn" id="toStep3" data-next="3">Continuer</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="password">Mot de passe</label>
-                    <input type="password" id="password" required minlength="6" placeholder="Minimum 6 caractères" autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="confirmPassword">Confirmer le mot de passe</label>
-                    <input type="password" id="confirmPassword" required minlength="6" placeholder="Répétez le mot de passe" autocomplete="new-password">
-                </div>
-                <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" id="backTo1">Retour</button>
-                    <button type="button" class="btn" id="toStep3">Continuer</button>
-                </div>
-            </div>
 
-            <div class="panel" id="step3">
-                <div class="summary" id="summaryBox"></div>
-                <div class="form-group">
-                    <label for="address">Adresse du salon</label>
-                    <input type="text" id="address" required placeholder="12 rue Exemple" autocomplete="street-address">
+                <div class="panel" id="step3">
+                    <div class="summary" id="summaryBox"></div>
+                    <div class="form-group">
+                        <label for="address">Adresse du salon</label>
+                        <input type="text" id="address" name="address" required placeholder="12 rue Exemple" autocomplete="street-address">
+                    </div>
+                    <div class="form-group">
+                        <label for="about">A propos <span style="font-weight:400;color:var(--sk-muted)">(optionnel)</span></label>
+                        <textarea id="about" name="about" placeholder="Specialites, ambiance…"></textarea>
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-ghost" id="backTo2">Retour</button>
+                        <button type="submit" class="btn" id="createSalonBtn">Créer mon salon</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="about">À propos <span style="font-weight:400;color:var(--sk-muted)">(optionnel)</span></label>
-                    <textarea id="about" placeholder="Spécialités, ambiance…"></textarea>
-                </div>
-                <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" id="backTo2">Retour</button>
-                    <button type="button" class="btn" id="createSalonBtn">Créer mon salon</button>
-                </div>
-            </div>
+            </form>
         </div>
 
         <div class="loading" id="loading">
@@ -369,119 +371,128 @@
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const emailParam = urlParams.get('email');
-        const utmSource = urlParams.get('utm_source') || '';
-        const utmMedium = urlParams.get('utm_medium') || '';
-        const utmCampaign = urlParams.get('utm_campaign') || '';
+        (function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = (urlParams.get('token') || '').trim();
+            const emailParam = (urlParams.get('email') || '').trim();
+            const utmSource = urlParams.get('utm_source') || '';
+            const utmMedium = urlParams.get('utm_medium') || '';
+            const utmCampaign = urlParams.get('utm_campaign') || '';
 
-        const errorEl = document.getElementById('error');
-        const successEl = document.getElementById('success');
-        const loadingEl = document.getElementById('loading');
-        const baseURL = window.location.origin;
+            const errorEl = document.getElementById('error');
+            const successEl = document.getElementById('success');
+            const loadingEl = document.getElementById('loading');
+            const baseURL = window.location.origin;
 
-        function showError(msg) {
-            errorEl.textContent = msg;
-            errorEl.style.display = 'block';
-            successEl.style.display = 'none';
-        }
+            function showError(msg) {
+                errorEl.textContent = msg || 'Une erreur est survenue.';
+                errorEl.style.display = 'block';
+                successEl.style.display = 'none';
+                try { errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+            }
 
-        function hideError() {
-            errorEl.style.display = 'none';
-        }
+            function hideError() {
+                errorEl.style.display = 'none';
+            }
 
-        function setLoading(on) {
-            loadingEl.style.display = on ? 'block' : 'none';
-        }
+            function setLoading(on) {
+                loadingEl.style.display = on ? 'block' : 'none';
+            }
 
-        // ——— Claim mode ———
-        if (token && emailParam) {
-            document.getElementById('claimMode').style.display = 'block';
-            document.getElementById('pageTitle').textContent = 'Réclamer mon salon';
-            document.getElementById('pageSubtitle').textContent = 'Créez votre mot de passe pour activer votre profil';
-            document.getElementById('claimEmail').value = decodeURIComponent(emailParam);
-
-            document.getElementById('claimForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideError();
-
-                const password = document.getElementById('claimPassword').value;
-                const confirmPassword = document.getElementById('claimConfirmPassword').value;
-
-                if (password !== confirmPassword) {
-                    showError('Les mots de passe ne correspondent pas.');
-                    return;
-                }
-                if (password.length < 6) {
-                    showError('Le mot de passe doit contenir au moins 6 caractères.');
-                    return;
-                }
-
-                document.getElementById('claimForm').style.display = 'none';
-                setLoading(true);
-
-                try {
-                    const response = await fetch(`${baseURL}/salon/claim`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            token,
-                            email: decodeURIComponent(emailParam),
-                            password
-                        })
-                    });
-                    const data = await response.json();
-                    setLoading(false);
-
-                    if (data.status === true) {
-                        successEl.textContent = 'Profil réclamé avec succès ! Redirection…';
-                        successEl.style.display = 'block';
-                        setTimeout(() => { window.location.href = '/salonpanel/login'; }, 2500);
-                    } else {
-                        showError(data.message || 'Une erreur est survenue.');
-                        document.getElementById('claimForm').style.display = 'block';
+            async function postJson(paths, body) {
+                let lastErr = null;
+                for (const path of paths) {
+                    try {
+                        const response = await fetch(baseURL + path, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(body)
+                        });
+                        const text = await response.text();
+                        let data = null;
+                        try { data = text ? JSON.parse(text) : null; } catch (parseErr) {
+                            lastErr = new Error('Reponse invalide (' + response.status + ')');
+                            continue;
+                        }
+                        return { response, data };
+                    } catch (err) {
+                        lastErr = err;
                     }
-                } catch (err) {
-                    setLoading(false);
-                    showError('Erreur de connexion. Réessayez.');
-                    document.getElementById('claimForm').style.display = 'block';
                 }
-            });
-        } else {
-            // ——— Register mode (3 steps) ———
+                throw lastErr || new Error('Erreur de connexion');
+            }
+
+            function messageFromData(data) {
+                if (!data) return 'Une erreur est survenue.';
+                return data.message || data.error || 'Une erreur est survenue.';
+            }
+
+            // --- Claim mode (invitation link) ---
+            if (token && emailParam) {
+                document.getElementById('claimMode').style.display = 'block';
+                document.getElementById('pageTitle').textContent = 'Reclamer mon salon';
+                document.getElementById('pageSubtitle').textContent = 'Creez votre mot de passe pour activer votre profil';
+                document.getElementById('claimEmail').value = decodeURIComponent(emailParam);
+
+                const claimForm = document.getElementById('claimForm');
+                const claimBtn = document.getElementById('claimSubmitBtn');
+
+                claimForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    hideError();
+
+                    const password = document.getElementById('claimPassword').value;
+                    const confirmPassword = document.getElementById('claimConfirmPassword').value;
+
+                    if (password !== confirmPassword) {
+                        showError('Les mots de passe ne correspondent pas.');
+                        return;
+                    }
+                    if (password.length < 6) {
+                        showError('Le mot de passe doit contenir au moins 6 caracteres.');
+                        return;
+                    }
+
+                    claimBtn.disabled = true;
+                    setLoading(true);
+
+                    try {
+                        const { data } = await postJson(
+                            ['/salon/claim', '/api/salon/claim'],
+                            {
+                                token: token,
+                                email: decodeURIComponent(emailParam),
+                                password: password
+                            }
+                        );
+
+                        if (data && data.status === true) {
+                            successEl.textContent = 'Profil reclame avec succes ! Redirection…';
+                            successEl.style.display = 'block';
+                            claimForm.style.display = 'none';
+                            setTimeout(function () { window.location.href = '/salonpanel/login'; }, 2000);
+                        } else {
+                            showError(messageFromData(data));
+                            claimBtn.disabled = false;
+                        }
+                    } catch (err) {
+                        showError('Erreur de connexion. Reessayez.');
+                        claimBtn.disabled = false;
+                    } finally {
+                        setLoading(false);
+                    }
+                });
+                return;
+            }
+
+            // --- Register mode (3 steps) ---
             document.getElementById('registerMode').style.display = 'block';
 
-            let currentStep = 1;
-
-            function goToStep(n) {
-                currentStep = n;
-                [1, 2, 3].forEach((i) => {
-                    document.getElementById('step' + i).classList.toggle('active', i === n);
-                    const dot = document.getElementById('dot' + i);
-                    dot.classList.remove('active', 'done');
-                    if (i < n) dot.classList.add('done');
-                    if (i === n) dot.classList.add('active');
-                });
-                document.getElementById('line1').classList.toggle('done', n > 1);
-                document.getElementById('line2').classList.toggle('done', n > 2);
-
-                const labels = {
-                    1: 'Étape 1 — Votre salon',
-                    2: 'Étape 2 — Votre compte',
-                    3: 'Étape 3 — Adresse & confirmation'
-                };
-                document.getElementById('stepLabel').textContent = labels[n];
-                hideError();
-
-                if (n === 3) {
-                    document.getElementById('summaryBox').innerHTML =
-                        '<strong>' + escapeHtml(document.getElementById('salonName').value.trim()) + '</strong><br>' +
-                        '<span>Ville</span> ' + escapeHtml(document.getElementById('city').value.trim()) + '<br>' +
-                        '<span>Tél.</span> ' + escapeHtml(document.getElementById('mobile').value.trim()) + '<br>' +
-                        '<span>E-mail</span> ' + escapeHtml(document.getElementById('email').value.trim());
-                }
-            }
+            var currentStep = 1;
+            var submitting = false;
 
             function escapeHtml(s) {
                 return String(s)
@@ -491,92 +502,143 @@
                     .replace(/"/g, '&quot;');
             }
 
-            document.getElementById('toStep2').addEventListener('click', () => {
-                const name = document.getElementById('salonName').value.trim();
-                const city = document.getElementById('city').value.trim();
-                const mobile = document.getElementById('mobile').value.trim();
-                if (!name || !city || !mobile) {
-                    showError('Renseignez le nom, la ville et le téléphone.');
-                    return;
-                }
-                goToStep(2);
-            });
+            function goToStep(n) {
+                currentStep = n;
+                [1, 2, 3].forEach(function (i) {
+                    document.getElementById('step' + i).classList.toggle('active', i === n);
+                    var dot = document.getElementById('dot' + i);
+                    dot.classList.remove('active', 'done');
+                    if (i < n) dot.classList.add('done');
+                    if (i === n) dot.classList.add('active');
+                });
+                document.getElementById('line1').classList.toggle('done', n > 1);
+                document.getElementById('line2').classList.toggle('done', n > 2);
 
-            document.getElementById('backTo1').addEventListener('click', () => goToStep(1));
-
-            document.getElementById('toStep3').addEventListener('click', () => {
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-                if (!email || !email.includes('@')) {
-                    showError('Indiquez une adresse e-mail valide.');
-                    return;
-                }
-                if (password.length < 6) {
-                    showError('Le mot de passe doit contenir au moins 6 caractères.');
-                    return;
-                }
-                if (password !== confirmPassword) {
-                    showError('Les mots de passe ne correspondent pas.');
-                    return;
-                }
-                goToStep(3);
-            });
-
-            document.getElementById('backTo2').addEventListener('click', () => goToStep(2));
-
-            document.getElementById('createSalonBtn').addEventListener('click', async () => {
-                const address = document.getElementById('address').value.trim();
-                if (!address) {
-                    showError('Indiquez l’adresse du salon.');
-                    return;
-                }
-
+                var labels = {
+                    1: 'Etape 1 — Votre salon',
+                    2: 'Etape 2 — Votre compte',
+                    3: 'Etape 3 — Adresse & confirmation'
+                };
+                document.getElementById('stepLabel').textContent = labels[n];
                 hideError();
-                document.getElementById('registerMode').style.display = 'none';
-                setLoading(true);
 
-                const payload = {
+                if (n === 3) {
+                    document.getElementById('summaryBox').innerHTML =
+                        '<strong>' + escapeHtml(document.getElementById('salonName').value.trim()) + '</strong><br>' +
+                        '<span>Ville</span> ' + escapeHtml(document.getElementById('city').value.trim()) + '<br>' +
+                        '<span>Tel.</span> ' + escapeHtml(document.getElementById('mobile').value.trim()) + '<br>' +
+                        '<span>E-mail</span> ' + escapeHtml(document.getElementById('email').value.trim());
+                }
+            }
+
+            function validateStep(n) {
+                if (n === 1) {
+                    var name = document.getElementById('salonName').value.trim();
+                    var city = document.getElementById('city').value.trim();
+                    var mobile = document.getElementById('mobile').value.trim();
+                    if (!name || !city || !mobile) {
+                        showError('Renseignez le nom, la ville et le telephone.');
+                        return false;
+                    }
+                    return true;
+                }
+                if (n === 2) {
+                    var email = document.getElementById('email').value.trim();
+                    var password = document.getElementById('password').value;
+                    var confirmPassword = document.getElementById('confirmPassword').value;
+                    if (!email || email.indexOf('@') < 1) {
+                        showError('Indiquez une adresse e-mail valide.');
+                        return false;
+                    }
+                    if (password.length < 6) {
+                        showError('Le mot de passe doit contenir au moins 6 caracteres.');
+                        return false;
+                    }
+                    if (password !== confirmPassword) {
+                        showError('Les mots de passe ne correspondent pas.');
+                        return false;
+                    }
+                    return true;
+                }
+                if (n === 3) {
+                    var address = document.getElementById('address').value.trim();
+                    if (!address) {
+                        showError('Indiquez l\'adresse du salon.');
+                        return false;
+                    }
+                    return true;
+                }
+                return true;
+            }
+
+            async function createSalon() {
+                if (submitting) return;
+                if (!validateStep(3)) return;
+
+                var createBtn = document.getElementById('createSalonBtn');
+                var payload = {
                     name: document.getElementById('salonName').value.trim(),
                     city: document.getElementById('city').value.trim(),
                     mobile: document.getElementById('mobile').value.trim(),
                     email: document.getElementById('email').value.trim(),
                     password: document.getElementById('password').value,
-                    address,
+                    address: document.getElementById('address').value.trim(),
                     about: document.getElementById('about').value.trim(),
-                    utmSource,
-                    utmMedium,
-                    utmCampaign
+                    utmSource: utmSource,
+                    utmMedium: utmMedium,
+                    utmCampaign: utmCampaign
                 };
 
-                try {
-                    const response = await fetch(`${baseURL}/salon/self-register`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await response.json();
-                    setLoading(false);
+                submitting = true;
+                createBtn.disabled = true;
+                hideError();
+                setLoading(true);
 
-                    if (data.status === true) {
-                        successEl.textContent = 'Salon créé ! Redirection vers la connexion…';
+                try {
+                    var result = await postJson(
+                        ['/salon/self-register', '/api/salon/self-register'],
+                        payload
+                    );
+                    var data = result.data;
+
+                    if (data && data.status === true) {
+                        successEl.textContent = 'Salon cree ! Redirection vers la connexion…';
                         successEl.style.display = 'block';
-                        setTimeout(() => {
+                        document.getElementById('registerMode').style.display = 'none';
+                        setTimeout(function () {
                             window.location.href = '/salonpanel/login?email=' + encodeURIComponent(payload.email);
-                        }, 2000);
-                    } else {
-                        showError(data.message || 'Une erreur est survenue.');
-                        document.getElementById('registerMode').style.display = 'block';
-                        goToStep(3);
+                        }, 1500);
+                        return;
                     }
-                } catch (err) {
-                    setLoading(false);
-                    showError('Erreur de connexion. Réessayez.');
-                    document.getElementById('registerMode').style.display = 'block';
+
+                    showError(messageFromData(data));
                     goToStep(3);
+                } catch (err) {
+                    showError('Erreur de connexion. Reessayez dans un instant.');
+                    goToStep(3);
+                } finally {
+                    submitting = false;
+                    createBtn.disabled = false;
+                    setLoading(false);
                 }
+            }
+
+            document.getElementById('registerForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (currentStep === 1) {
+                    if (validateStep(1)) goToStep(2);
+                    return;
+                }
+                if (currentStep === 2) {
+                    if (validateStep(2)) goToStep(3);
+                    return;
+                }
+                createSalon();
             });
-        }
+
+            document.getElementById('backTo1').addEventListener('click', function () { goToStep(1); });
+            document.getElementById('backTo2').addEventListener('click', function () { goToStep(2); });
+        })();
     </script>
 </body>
 </html>
