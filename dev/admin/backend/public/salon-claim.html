@@ -306,6 +306,59 @@
             padding: 8px;
             border: 1px solid var(--sk-border);
         }
+        .plan-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+        .plan-card {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 14px;
+            border: 2px solid var(--sk-border);
+            border-radius: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: var(--sk-black);
+            text-align: left;
+        }
+        .plan-card input { width: auto; margin-top: 3px; accent-color: var(--sk-brand); }
+        .plan-card.selected {
+            border-color: var(--sk-brand);
+            background: var(--sk-brand-light);
+        }
+        .plan-card .plan-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+        .plan-card .plan-price {
+            font-weight: 700;
+            color: var(--sk-brand);
+            font-size: 14px;
+        }
+        .plan-card .plan-tag {
+            font-size: 12px;
+            color: var(--sk-muted);
+            line-height: 1.4;
+            margin-top: 4px;
+        }
+        .plan-card .plan-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--sk-brand);
+            background: var(--sk-brand-light);
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-left: 6px;
+        }
         @media (max-width: 480px) {
             .service-grid { grid-template-columns: 1fr; }
             .row-2, .photo-row { grid-template-columns: 1fr; }
@@ -317,7 +370,7 @@
         <div class="logo">
             <p class="kicker">Skedisy · Espace pro</p>
             <h1 id="pageTitle">Creer mon salon</h1>
-            <p id="pageSubtitle">Gratuit · 3 etapes · pret en 2 minutes</p>
+            <p id="pageSubtitle">Gratuit · 4 etapes · pret en quelques minutes</p>
         </div>
 
         <div class="error" id="error"></div>
@@ -354,6 +407,8 @@
                 <div class="step-dot" id="dot2">2</div>
                 <div class="step-line" id="line2"></div>
                 <div class="step-dot" id="dot3">3</div>
+                <div class="step-line" id="line3"></div>
+                <div class="step-dot" id="dot4">4</div>
             </div>
             <p class="step-label" id="stepLabel">Etape 1 — Salon & compte</p>
 
@@ -458,6 +513,20 @@
 
                     <div class="btn-row">
                         <button type="button" class="btn btn-ghost" id="backTo2">Retour</button>
+                        <button type="submit" class="btn" id="toStep4">Continuer</button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: abonnement (Free first) + create -->
+                <div class="panel" id="step4">
+                    <div class="info" style="margin-bottom:12px;">
+                        Choisissez votre formule. <strong>Free / Essai</strong> est selectionne par defaut —
+                        modifiable plus tard dans votre espace.
+                    </div>
+                    <div id="plansLoading" class="hint" style="margin-bottom:10px;">Chargement des formules…</div>
+                    <div class="plan-list" id="planList" role="radiogroup" aria-label="Formules"></div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-ghost" id="backTo3">Retour</button>
                         <button type="submit" class="btn" id="createSalonBtn">Creer mon salon</button>
                     </div>
                 </div>
@@ -613,22 +682,29 @@
             var currentStep = 1;
             var submitting = false;
             var servicesLoaded = false;
+            var plansLoaded = false;
+            var selectedPlanId = 'free';
 
             function goToStep(n) {
                 currentStep = n;
-                [1, 2, 3].forEach(function (i) {
-                    document.getElementById('step' + i).classList.toggle('active', i === n);
+                [1, 2, 3, 4].forEach(function (i) {
+                    var panel = document.getElementById('step' + i);
+                    if (panel) panel.classList.toggle('active', i === n);
                     var dot = document.getElementById('dot' + i);
+                    if (!dot) return;
                     dot.classList.remove('active', 'done');
                     if (i < n) dot.classList.add('done');
                     if (i === n) dot.classList.add('active');
                 });
                 document.getElementById('line1').classList.toggle('done', n > 1);
                 document.getElementById('line2').classList.toggle('done', n > 2);
+                var line3 = document.getElementById('line3');
+                if (line3) line3.classList.toggle('done', n > 3);
                 document.getElementById('stepLabel').textContent = ({
                     1: 'Etape 1 — Salon & compte',
                     2: 'Etape 2 — Prestations',
-                    3: 'Etape 3 — Horaires & confirmation'
+                    3: 'Etape 3 — Horaires & photos',
+                    4: 'Etape 4 — Abonnement'
                 })[n];
                 hideError();
 
@@ -642,6 +718,7 @@
                         '<span>E-mail</span> ' + escapeHtml(document.getElementById('email').value.trim()) + '<br>' +
                         '<span>Prestations</span> ' + selected.length + ' selectionnee(s)';
                 }
+                if (n === 4) loadPlans();
             }
 
             function renderDays() {
@@ -763,6 +840,70 @@
                 return days;
             }
 
+            async function loadPlans() {
+                if (plansLoaded) return;
+                var list = document.getElementById('planList');
+                var loading = document.getElementById('plansLoading');
+                try {
+                    var res = await fetch(baseURL + '/api/public/onboarding/plans', {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    var json = await res.json();
+                    if (!json || !json.status || !Array.isArray(json.data) || !json.data.length) {
+                        // Fallback Free-only if API empty
+                        json = {
+                            status: true,
+                            data: [{
+                                planId: 'free',
+                                name: 'Free / Essai',
+                                tagline: 'Decouvrir Skedisy — agenda + page publique',
+                                priceMonthly: 0,
+                                isDefault: true
+                            }]
+                        };
+                    }
+                    if (loading) loading.style.display = 'none';
+                    list.innerHTML = '';
+                    selectedPlanId = 'free';
+                    json.data.forEach(function (plan, idx) {
+                        var id = String(plan.planId || 'free');
+                        var isFree = id === 'free' || idx === 0;
+                        var checked = isFree || (!selectedPlanId && plan.isDefault);
+                        if (checked) selectedPlanId = id;
+                        var price = Number(plan.priceMonthly) || 0;
+                        var priceLabel = price <= 0 ? 'Gratuit' : (price + ' € / mois');
+                        var label = document.createElement('label');
+                        label.className = 'plan-card' + (checked ? ' selected' : '');
+                        label.dataset.planId = id;
+                        var input = document.createElement('input');
+                        input.type = 'radio';
+                        input.name = 'planId';
+                        input.value = id;
+                        input.checked = checked;
+                        input.addEventListener('change', function () {
+                            selectedPlanId = id;
+                            document.querySelectorAll('#planList .plan-card').forEach(function (c) {
+                                c.classList.toggle('selected', c.dataset.planId === id);
+                            });
+                        });
+                        var body = document.createElement('div');
+                        body.innerHTML =
+                            '<div class="plan-name">' + escapeHtml(plan.name || id) +
+                            (isFree || plan.isDefault ? '<span class="plan-badge">Recommande</span>' : '') +
+                            '</div>' +
+                            '<div class="plan-price">' + escapeHtml(priceLabel) + '</div>' +
+                            '<div class="plan-tag">' + escapeHtml(plan.tagline || '') + '</div>';
+                        label.appendChild(input);
+                        label.appendChild(body);
+                        list.appendChild(label);
+                    });
+                    plansLoaded = true;
+                } catch (err) {
+                    if (loading) loading.textContent = 'Impossible de charger les formules. Free sera utilise.';
+                    selectedPlanId = 'free';
+                }
+            }
+
             function validateStep(n) {
                 if (n === 1) {
                     var name = document.getElementById('salonName').value.trim();
@@ -801,6 +942,13 @@
                 if (n === 3) {
                     if (!getActiveDays().length) {
                         showError('Selectionnez au moins un jour d\'ouverture.');
+                        return false;
+                    }
+                    return true;
+                }
+                if (n === 4) {
+                    if (!selectedPlanId) {
+                        showError('Choisissez une formule d\'abonnement.');
                         return false;
                     }
                     return true;
@@ -851,6 +999,7 @@
                 formData.append('utmSource', utmSource);
                 formData.append('utmMedium', utmMedium);
                 formData.append('utmCampaign', utmCampaign);
+                formData.append('planId', selectedPlanId || 'free');
 
                 var salonFile = document.getElementById('salonImage').files[0];
                 var expertFile = document.getElementById('expertImage').files[0];
@@ -882,11 +1031,11 @@
                         goToStep(1);
                         focusConflictField(result.data.field);
                     } else {
-                        goToStep(3);
+                        goToStep(4);
                     }
                 } catch (err) {
                     showError('Erreur de connexion. Reessayez dans un instant.');
-                    goToStep(3);
+                    goToStep(4);
                 } finally {
                     submitting = false;
                     createBtn.disabled = false;
@@ -916,11 +1065,16 @@
                     if (validateStep(2)) goToStep(3);
                     return;
                 }
+                if (currentStep === 3) {
+                    if (validateStep(3)) goToStep(4);
+                    return;
+                }
                 createSalon();
             });
 
             document.getElementById('backTo1').addEventListener('click', function () { goToStep(1); });
             document.getElementById('backTo2').addEventListener('click', function () { goToStep(2); });
+            document.getElementById('backTo3').addEventListener('click', function () { goToStep(3); });
         })();
     </script>
 </body>

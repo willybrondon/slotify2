@@ -20,6 +20,7 @@ const mongoose = require("mongoose");
 
 const admin = require("../../firebase");
 const moment = require("moment");
+const { getEnglishDayName } = require("../../services/teamSchedule.service");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
 const { sendAdminNewBookingEmail, sendAdminCustomerCancelledBookingEmail, sendCustomerBookingConfirmationEmail, sendExpertNewBookingEmail } = require("../../services/bookingAdminEmail.service");
 const {
@@ -348,12 +349,13 @@ exports.getBookingBasedDate = async (req, res) => {
     }
 
     // Parse calendar date without timezone shift (YYYY-MM-DD → weekday)
+    // Always English day names (Monday…) — matches salonTime.day; ignore global moment.locale('fr')
     const bookingDate = String(req.query.date || "").trim();
     const dayMoment = moment(bookingDate, "YYYY-MM-DD", true);
     if (!dayMoment.isValid()) {
       return res.status(200).send({ status: false, message: "Invalid date format!!" });
     }
-    const dayOfWeek = dayMoment.format("dddd");
+    const dayOfWeek = getEnglishDayName(bookingDate);
     const salon = await Salon.findById(req.query.salonId);
     if (!salon) {
       return res.status(200).send({ status: false, message: "Salon Not Found!!!" });
@@ -897,11 +899,13 @@ exports.newBooking = async (req, res, next) => {
       });
     }
 
-    const bookingDates = moment(req.body.date, "YYYY-MM-DD");
-    const dayOfWeek = bookingDates.format("dddd");
-    const salonTime = salon.salonTime.find((time) => time.day == dayOfWeek);
+    const bookingDateStr = String(req.body.date || "").trim();
+    const dayOfWeek = getEnglishDayName(bookingDateStr);
+    const salonTime = (salon.salonTime || []).find(
+      (time) => String(time.day || "").trim().toLowerCase() === String(dayOfWeek).toLowerCase()
+    );
 
-    if (!salonTime) {
+    if (!salonTime || salonTime.isActive === false) {
       return res.status(200).send({ status: false, message: "Salon time not found" });
     }
 
@@ -1612,11 +1616,13 @@ exports.checkSlots = async (req, res, next) => {
       });
     }
 
-    const bookingDates = moment(req.body.date, "YYYY-MM-DD");
-    const dayOfWeek = bookingDates.format("dddd");
-    const salonTime = salon.salonTime.find((time) => time.day == dayOfWeek);
+    const bookingDateStr = String(req.body.date || "").trim();
+    const dayOfWeek = getEnglishDayName(bookingDateStr);
+    const salonTime = (salon.salonTime || []).find(
+      (time) => String(time.day || "").trim().toLowerCase() === String(dayOfWeek).toLowerCase()
+    );
 
-    if (!salonTime) {
+    if (!salonTime || salonTime.isActive === false) {
       return res.status(200).send({ status: false, message: "Salon time not found" });
     }
 

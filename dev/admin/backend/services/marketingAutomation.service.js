@@ -1,6 +1,7 @@
 const moment = require("moment");
 require("moment/locale/fr");
-moment.locale("fr");
+// Do NOT set moment.locale("fr") globally — it breaks booking day matching
+// (salonTime.day is English "Monday"; format("dddd") would become "lundi").
 const crypto = require("crypto");
 const Booking = require("../models/booking.model");
 const Coupon = require("../models/coupon.model");

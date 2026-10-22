@@ -378,8 +378,11 @@ exports.publicConvertDemand = async (req, res) => {
     let timeStr = String(body.time || "").trim();
     if (timeStr && !timeStr.includes(",")) {
       const salon = await Salon.findById(demand.salonId).select("salonTime").lean();
-      const dayName = require("moment")(body.date, "YYYY-MM-DD").format("dddd");
-      const dayCfg = (salon?.salonTime || []).find((t) => t.day === dayName);
+      const { getEnglishDayName } = require("../../services/teamSchedule.service");
+      const dayName = getEnglishDayName(String(body.date || "").trim());
+      const dayCfg = (salon?.salonTime || []).find(
+        (t) => String(t.day || "").trim().toLowerCase() === String(dayName).toLowerCase()
+      );
       const slotMin = parseInt(dayCfg?.time, 10) || 15;
       timeStr = expandSlotsForDuration(
         timeStr,

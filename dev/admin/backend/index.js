@@ -337,10 +337,14 @@ app.get("/category/:slugWithId", categoryController.serveCategoryPage);
 const serviceController = require("./controller/user/service.controller");
 app.get("/service/:slugWithId", serviceController.serveServicePage);
 
-// Public onboarding catalogue (salon join / claim 3-step form)
+// Public onboarding catalogue (salon join / claim form)
 app.get(
   "/api/public/onboarding/services",
   claimControllerPublic.listOnboardingServices
+);
+app.get(
+  "/api/public/onboarding/plans",
+  claimControllerPublic.listOnboardingPlans
 );
 
 // Public API endpoint for categories (for frontend)

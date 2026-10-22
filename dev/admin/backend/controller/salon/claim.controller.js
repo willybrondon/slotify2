@@ -848,6 +848,56 @@ exports.checkRegisterAvailability = async (req, res) => {
 };
 
 /**
+ * Public subscription plans for onboarding step 4 (Free first).
+ * GET /api/public/onboarding/plans
+ */
+exports.listOnboardingPlans = async (req, res) => {
+  try {
+    const {
+      ensureDefaultPlans,
+    } = require("../../services/subscription.service");
+    await ensureDefaultPlans();
+    const SubscriptionPlan = require("../../models/subscriptionPlan.model");
+    const plans = await SubscriptionPlan.find({ isActive: true })
+      .select(
+        "planId name tagline tier priceMonthly priceYearly trialDays sortOrder isDefault isHighlighted limits features"
+      )
+      .sort({ sortOrder: 1 })
+      .lean();
+
+    // Free / Essai always first
+    plans.sort((a, b) => {
+      if (a.planId === "free") return -1;
+      if (b.planId === "free") return 1;
+      return (a.sortOrder || 0) - (b.sortOrder || 0);
+    });
+
+    return res.status(200).json({
+      status: true,
+      data: plans.map((p) => ({
+        planId: p.planId,
+        name: p.name,
+        tagline: p.tagline || "",
+        tier: p.tier,
+        priceMonthly: p.priceMonthly || 0,
+        priceYearly: p.priceYearly || 0,
+        trialDays: p.trialDays || 0,
+        isDefault: !!p.isDefault,
+        isHighlighted: !!p.isHighlighted,
+        limits: p.limits || {},
+        featureCount: Array.isArray(p.features) ? p.features.length : 0,
+      })),
+    });
+  } catch (error) {
+    console.error("[OnboardingPlans] error:", error);
+    return res.status(500).json({
+      status: false,
+      error: error.message || "Internal Server Error",
+    });
+  }
+};
+
+/**
  * Public catalogue for onboarding multi-select.
  * GET /api/public/onboarding/services
  */
@@ -1056,6 +1106,14 @@ exports.selfRegister = async (req, res) => {
       activeDays,
     });
 
+    // Subscription plan chosen on step 4 (default Free)
+    const requestedPlanId = String(req.body?.planId || "free")
+      .toLowerCase()
+      .trim();
+    salon.subscription = salon.subscription || {};
+    salon.subscription.planId = requestedPlanId || "free";
+    salon.subscription.status = "none";
+
     await salon.save();
 
     const serviceObjectIds = serviceEntries.map((s) => s.id);
@@ -1066,8 +1124,24 @@ exports.selfRegister = async (req, res) => {
       expertPhotoUrl
     );
 
+    let assignedPlanId = "free";
+    try {
+      const { assignPlanToSalon, getPlanByPlanId } = require("../../services/subscription.service");
+      const plan = (await getPlanByPlanId(requestedPlanId)) || (await getPlanByPlanId("free"));
+      const planId = plan?.planId || "free";
+      const status = plan?.tier === "free" ? "active" : "trialing";
+      await assignPlanToSalon(salon._id, { planId, status });
+      assignedPlanId = planId;
+    } catch (planErr) {
+      console.warn("[SelfRegister] plan assign fallback free:", planErr.message);
+      try {
+        const { assignPlanToSalon } = require("../../services/subscription.service");
+        await assignPlanToSalon(salon._id, { planId: "free", status: "active" });
+      } catch (_) {}
+    }
+
     console.log(
-      `[SelfRegister] Salon ${salon.name} (${salon.email}) expert=${expert._id} services=${serviceObjectIds.length} source=${salon.source}`
+      `[SelfRegister] Salon ${salon.name} (${salon.email}) expert=${expert._id} services=${serviceObjectIds.length} plan=${assignedPlanId} source=${salon.source}`
     );
 
     return res.status(200).json({
@@ -1081,6 +1155,7 @@ exports.selfRegister = async (req, res) => {
         isClaimed: salon.isClaimed,
         expertId: expert._id,
         servicesCount: serviceObjectIds.length,
+        planId: assignedPlanId,
       },
     });
   } catch (error) {
