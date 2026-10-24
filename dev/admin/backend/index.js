@@ -25,9 +25,75 @@ app.post(
   require("./controller/stripeConnectWebhook.controller").handleConnectWebhook
 );
 
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cors());
 app.use(logger("dev"));
+
+// SEO: force https + apex host + collapse /index.html (GSC “Page with redirect”)
+const CANONICAL_HOST = "skedisy.com";
+function seoRequestHost(req) {
+  return (req.get("x-forwarded-host") || req.get("host") || "")
+    .split(",")[0]
+    .trim()
+    .toLowerCase()
+    .replace(/:\d+$/, "");
+}
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+
+  const pathname = req.path || "/";
+  if (
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/stripe/") ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
+    pathname.startsWith("/.well-known/")
+  ) {
+    return next();
+  }
+
+  const host = seoRequestHost(req);
+  const isSkedisyHost = host === CANONICAL_HOST || host === "www.skedisy.com";
+  if (!isSkedisyHost) return next();
+
+  let needRedirect = false;
+  let targetPath = pathname;
+  let dropQuery = false;
+
+  if (host === "www.skedisy.com") needRedirect = true;
+  // Only when proxy explicitly says http (avoids loop if nginx→node is plain http)
+  const forwardedProto = (req.get("x-forwarded-proto") || "")
+    .split(",")[0]
+    .trim()
+    .toLowerCase();
+  if (forwardedProto === "http") needRedirect = true;
+
+  if (pathname.toLowerCase() === "/index.html") {
+    needRedirect = true;
+    targetPath = "/";
+  }
+
+  // Duplicate hair-profile URLs (?return=) → canonical path without query
+  if (
+    pathname.toLowerCase() === "/hair-profile.html" &&
+    req.query &&
+    Object.prototype.hasOwnProperty.call(req.query, "return")
+  ) {
+    needRedirect = true;
+    targetPath = "/hair-profile.html";
+    dropQuery = true;
+  }
+
+  if (needRedirect) {
+    const qs =
+      dropQuery || !req.url.includes("?")
+        ? ""
+        : req.url.slice(req.url.indexOf("?"));
+    return res.redirect(301, `https://${CANONICAL_HOST}${targetPath}${qs}`);
+  }
+  return next();
+});
 
 const PLAY_APP_SIGNING_SHA256 =
   "87:D2:14:4D:A8:06:1F:D1:16:80:33:8F:2E:24:2B:DD:10:98:A5:1D:0B:08:E1:D0:DD:C4:3D:5C:8A:11:A5:12";
@@ -175,16 +241,28 @@ app.use(indexRoute);
 
 // Docs — /docs/ and /docs must serve the same content as /docs/index.html (cucumber-style docs folder)
 app.get("/docs", (req, res) => res.redirect(301, "/docs/"));
+app.get("/docs/index.html", (req, res) => res.redirect(301, "https://skedisy.com/docs/"));
+// Broken relative links from /docs/ pointed here; real page is at site root
+app.get("/docs/ai-concierge.html", (req, res) =>
+  res.redirect(301, "https://skedisy.com/ai-concierge.html")
+);
 app.get("/docs/", (req, res) => {
   const docsIndex = path.join(salonportalPath, "docs", "index.html");
   const docHtml = path.join(salonportalPath, "documentation.html");
   const filePath = fs.existsSync(docsIndex) ? docsIndex : docHtml;
   if (fs.existsSync(filePath)) {
+    // Docs are Disallow in robots.txt — reinforce if crawled via old links
+    res.setHeader("X-Robots-Tag", "noindex, nofollow");
     res.status(200).sendFile(path.resolve(filePath));
   } else {
     res.status(404).send(`<h1>404 - Documentation not found</h1><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
+// Legacy “request adding salon” → onboarding
+app.get(
+  ["/request-adding-salon.html", "/request-adding-salon"],
+  (req, res) => res.redirect(301, "https://skedisy.com/salon/rejoindre")
+);
 // Pages légales — servir le fichier directement (évite boucle /cookies/ ↔ /cookies.html avec nginx/static)
 const serveSalonportalLegalPage = (indexRelPath, flatRelPath) => (req, res) => {
   const indexPath = path.join(salonportalPath, indexRelPath);
@@ -204,9 +282,12 @@ const serveTermsPage = serveSalonportalLegalPage("terms/index.html", "terms.html
 const servePrivacyPage = serveSalonportalLegalPage("privacy/index.html", "privacy.html");
 const serveCookiesPage = serveSalonportalLegalPage("cookies/index.html", "cookies.html");
 
-app.get(["/terms", "/terms/", "/terms.html"], serveTermsPage);
-app.get(["/privacy", "/privacy/", "/privacy.html"], servePrivacyPage);
-app.get(["/cookies", "/cookies/", "/cookies.html"], serveCookiesPage);
+app.get("/terms.html", (req, res) => res.redirect(301, "https://skedisy.com/terms/"));
+app.get("/privacy.html", (req, res) => res.redirect(301, "https://skedisy.com/privacy/"));
+app.get("/cookies.html", (req, res) => res.redirect(301, "https://skedisy.com/cookies/"));
+app.get(["/terms", "/terms/"], serveTermsPage);
+app.get(["/privacy", "/privacy/"], servePrivacyPage);
+app.get(["/cookies", "/cookies/"], serveCookiesPage);
 // Serve documentation.html directly (no redirect) - was working before
 app.get("/documentation.html", (req, res) => {
   const filePath = path.join(salonportalPath, "documentation.html");
@@ -265,6 +346,7 @@ function serveSalonOnboardingPage(req, res) {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
+  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
 
   const filePath = path.join(__dirname, "public", "salon-claim.html");
   try {
@@ -478,6 +560,11 @@ app.patch("/api/public/product/address/select", publicWebProduct.publicSelectAdd
 app.post("/api/public/product/order", publicWebProduct.publicCreateOrder);
 
 const publicClientAuth = require("./controller/user/publicClientAuth.controller");
+// Belt-and-suspenders: never index auth / private account flows
+app.use(["/compte", "/compte/"], (req, res, next) => {
+  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+  next();
+});
 app.get("/compte/connexion", publicClientAuth.serveLoginPage);
 app.get("/compte/inscription", publicClientAuth.serveSignupPage);
 app.post("/api/public/auth/login", publicClientAuth.publicLogin);
@@ -997,6 +1084,8 @@ if (fs.existsSync(salonIndexPath)) {
         message: `API route not found: ${req.method} ${req.path}`,
       });
     }
+    // Login/panel is Disallow in robots.txt — reinforce noindex if ever crawled
+    res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
     res.status(200).sendFile(salonIndexPath);
   };
   app.get("/salonpanel/*", salonPanelSpaFallback);

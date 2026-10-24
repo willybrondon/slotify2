@@ -75,8 +75,12 @@
   }
 
   function authHref(base) {
-    const url = new URL(base, window.location.origin);
-    url.searchParams.set("return", window.location.pathname + window.location.search);
+    const url = new URL(base || "/compte/connexion", window.location.origin);
+    const cfg = window.SKEDISY_SALON_PRODUCTS || {};
+    const ret =
+      (cfg.authUrls && cfg.authUrls.returnPath) ||
+      window.location.pathname + window.location.search;
+    if (ret && ret !== "/") url.searchParams.set("return", ret);
     return url.pathname + url.search;
   }
 

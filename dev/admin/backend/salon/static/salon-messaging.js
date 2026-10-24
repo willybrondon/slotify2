@@ -263,13 +263,27 @@
     const compose = document.getElementById("sqMsgCompose");
     if (compose) compose.hidden = true;
     const auth = cfg().authUrls || {};
+    function withAuthReturn(base) {
+      try {
+        const u = new URL(base || "/compte/connexion", window.location.origin);
+        const ret =
+          auth.returnPath ||
+          window.location.pathname + window.location.search;
+        if (ret && ret !== "/") u.searchParams.set("return", ret);
+        return u.pathname + u.search;
+      } catch (_) {
+        return base || "/compte/connexion";
+      }
+    }
+    const loginHref = withAuthReturn(auth.login || "/compte/connexion");
+    const signupHref = withAuthReturn(auth.signup || "/compte/inscription");
     if (body) {
       body.innerHTML = `
         <p class="sq-msg-empty">${escapeHtml(t("messageLoginHint"))}</p>
         <div class="sq-msg-auth">
-          <a class="sq-btn sq-btn-fill" href="${escapeHtml(auth.login || "/compte/connexion")}">${escapeHtml(t("authSignInLink"))}</a>
+          <a class="sq-btn sq-btn-fill" rel="nofollow" href="${escapeHtml(loginHref)}">${escapeHtml(t("authSignInLink"))}</a>
           <span>${escapeHtml(t("authOr") || "ou")}</span>
-          <a href="${escapeHtml(auth.signup || "/compte/inscription")}">${escapeHtml(t("authSignUpLink"))}</a>
+          <a rel="nofollow" href="${escapeHtml(signupHref)}">${escapeHtml(t("authSignUpLink"))}</a>
         </div>`;
     }
   }

@@ -27,9 +27,28 @@ function initHomeSalonSearch() {
     });
 }
 
+/** Append ?return= current path on auth links (keeps SSR hrefs crawl-clean). */
+function initAuthReturnLinks() {
+    document.querySelectorAll('a[data-auth-return]').forEach((a) => {
+        a.addEventListener('click', (e) => {
+            try {
+                const href = a.getAttribute('href') || '/compte/connexion';
+                const url = new URL(href, window.location.origin);
+                const ret = window.location.pathname + window.location.search;
+                if (ret && ret !== '/') url.searchParams.set('return', ret);
+                e.preventDefault();
+                window.location.href = url.pathname + url.search + url.hash;
+            } catch (_) {
+                /* fall through to default navigation */
+            }
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     mountStoreBadges();
     initHomeSalonSearch();
+    initAuthReturnLinks();
 
     if (typeof setLanguage === 'function') {
         const savedLang = localStorage.getItem('skedisy-language') || 'fr';

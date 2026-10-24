@@ -14,29 +14,81 @@ const {
 const { authUrls } = require("../../lib/publicAuthPage");
 
 // Generate slug from name
+const { uniqueShortId } = require("../../lib/seoShortId");
+
 const generateSlug = (name) => {
   if (!name) return "";
   return name
     .toLowerCase()
     .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-+|-+$/g, "");
 };
 
+let _categoryIdPoolCache = { at: 0, ids: null };
+async function getActiveCategoryIdPool() {
+  const now = Date.now();
+  if (_categoryIdPoolCache.ids && now - _categoryIdPoolCache.at < 60_000) {
+    return _categoryIdPoolCache.ids;
+  }
+  const rows = await Category.find({ isDelete: false, status: true })
+    .select("_id")
+    .lean();
+  const ids = rows.map((r) => r._id.toString());
+  _categoryIdPoolCache = { at: now, ids };
+  return ids;
+}
+
+let _salonIdPoolCache = { at: 0, ids: null };
+async function getActiveSalonIdPool() {
+  const now = Date.now();
+  if (_salonIdPoolCache.ids && now - _salonIdPoolCache.at < 60_000) {
+    return _salonIdPoolCache.ids;
+  }
+  const rows = await Salon.find({ isActive: true, isDelete: false })
+    .select("_id")
+    .lean();
+  const ids = rows.map((r) => r._id.toString());
+  _salonIdPoolCache = { at: now, ids };
+  return ids;
+}
+
+async function canonicalCategoryShortId(categoryId) {
+  const pool = await getActiveCategoryIdPool().catch(() => [
+    String(categoryId),
+  ]);
+  return uniqueShortId(categoryId, pool);
+}
+
 // Find category by short ID (first 6 characters of ObjectId)
-const findCategoryByShortId = async (shortId) => {
+const findCategoryByShortId = async (shortId, preferredSlug) => {
   try {
-    // Get all active categories and find one where ObjectId starts with shortId
+    const prefix = String(shortId || "").toLowerCase();
     const categories = await Category.find({
       isDelete: false,
       status: true,
-    }).select("_id");
-    
-    // Find category where _id starts with shortId
-    const category = categories.find(c => c._id.toString().toLowerCase().startsWith(shortId.toLowerCase()));
-    return category ? category._id : null;
+    }).select("_id name nameEn nameFr namePt");
+
+    const matches = categories.filter((c) =>
+      c._id.toString().toLowerCase().startsWith(prefix)
+    );
+    if (!matches.length) return null;
+
+    if (preferredSlug) {
+      const bySlug = matches.find((c) => {
+        const names = [c.name, c.nameEn, c.nameFr, c.namePt].filter(Boolean);
+        return names.some((n) => generateSlug(n) === preferredSlug);
+      });
+      if (bySlug) return bySlug._id;
+    }
+
+    if (matches.length === 1) return matches[0]._id;
+    // Ambiguous collision without matching slug — avoid wrong category
+    return null;
   } catch (error) {
     console.error("Error finding category by short ID:", error);
     return null;
@@ -281,9 +333,11 @@ const formatSalonAddress = (addressDetails) => {
   return line.replace(/,\s*,/g, ",").replace(/^,|,$/g, "");
 };
 
-const buildSalonShareUrl = (salon, baseURL) => {
+const buildSalonShareUrl = (salon, baseURL, salonIdPool) => {
   const slug = generateSlug(salon.name);
-  const shortId = salon._id.toString().substring(0, 6);
+  const shortId = salonIdPool
+    ? uniqueShortId(salon._id, salonIdPool)
+    : salon._id.toString().substring(0, 6);
   return `${baseURL}/salon/${slug}-${shortId}`;
 };
 
@@ -360,7 +414,7 @@ const applySalonDiscoveryFilters = (
   return list;
 };
 
-const formatSalonForCategory = (salon, { baseURL, language, copy }) => {
+const formatSalonForCategory = (salon, { baseURL, language, copy, salonIdPool }) => {
   const categoryServices = (salon.serviceIds || [])
     .filter((s) => s.id && s.price !== null && s.price !== undefined)
     .map((s) => s.price);
@@ -393,7 +447,7 @@ const formatSalonForCategory = (salon, { baseURL, language, copy }) => {
     longitude: salon.locationCoordinates?.longitude
       ? parseFloat(salon.locationCoordinates.longitude)
       : null,
-    shareUrl: buildSalonShareUrl(salon, baseURL),
+    shareUrl: buildSalonShareUrl(salon, baseURL, salonIdPool),
   };
 };
 
@@ -801,8 +855,11 @@ exports.getSalonsByCategory = async (req, res) => {
     salons = attachSalonDistances(salons, latitude, longitude);
 
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
+    const salonIdPoolApi = await getActiveSalonIdPool().catch(() =>
+      salons.map((s) => String(s._id))
+    );
     let formattedSalons = salons.map((salon) =>
-      formatSalonForCategory(salon, { baseURL, language })
+      formatSalonForCategory(salon, { baseURL, language, salonIdPool: salonIdPoolApi })
     );
 
     formattedSalons = applySalonDiscoveryFilters(formattedSalons, {
@@ -918,15 +975,20 @@ exports.serveCategoryPage = async (req, res) => {
     // Extract short ID (last part after hyphen, should be 6 hex characters)
     const parts = slugWithId.split("-");
     const shortId = parts[parts.length - 1];
+    const preferredSlug = parts.slice(0, -1).join("-");
     
-    // Validate short ID format (6 hex characters)
-    if (!/^[0-9a-fA-F]{6}$/.test(shortId)) {
+    // Validate short ID format (6–24 hex; longer when ObjectId prefixes collide)
+    if (!/^[0-9a-fA-F]{6,24}$/.test(shortId)) {
       console.log("[Category Page] Invalid short ID format:", shortId, "from slug:", slugWithId);
       return res.status(404).send("Category not found");
     }
     
     console.log("[Category Page] Looking for category with short ID:", shortId);
-    const fullCategoryId = await findCategoryByShortId(shortId);
+    // Resolve by shortId first (slug may be outdated EN vs FR), then 301 to canonical
+    let fullCategoryId = await findCategoryByShortId(shortId, preferredSlug);
+    if (!fullCategoryId) {
+      fullCategoryId = await findCategoryByShortId(shortId);
+    }
     
     if (!fullCategoryId) {
       console.log("[Category Page] Category not found for short ID:", shortId);
@@ -1035,8 +1097,11 @@ exports.serveCategoryPage = async (req, res) => {
     salons = attachSalonDistances(salons, latitude, longitude);
 
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
+    const salonIdPool = await getActiveSalonIdPool().catch(() =>
+      salons.map((s) => String(s._id))
+    );
     let formattedSalons = salons.map((salon) =>
-      formatSalonForCategory(salon, { baseURL, language })
+      formatSalonForCategory(salon, { baseURL, language, salonIdPool })
     );
     formattedSalons = applySalonDiscoveryFilters(formattedSalons, {
       minRating,
@@ -1048,9 +1113,37 @@ exports.serveCategoryPage = async (req, res) => {
     const copy = getWebCopy(language);
     const categoryDisplayName = getTranslatedName(category, language) || category.name;
     const categorySlug = generateSlug(categoryDisplayName);
-    const categoryShortId = category._id.toString().substring(0, 6);
+    const categoryShortId = await canonicalCategoryShortId(category._id);
     const categorySlugWithId = `${categorySlug}-${categoryShortId}`;
     const categoryUrl = `${baseURL}/category/${categorySlugWithId}`;
+
+    // Old EN slugs / short-id collisions (e.g. /category/locks-68af94) → canonical
+    if (slugWithId.toLowerCase() !== categorySlugWithId.toLowerCase()) {
+      const keep = [];
+      for (const key of [
+        "search",
+        "location",
+        "serviceId",
+        "lang",
+        "language",
+        "minRating",
+        "minPrice",
+        "maxPrice",
+        "sort",
+        "availableToday",
+        "latitude",
+        "longitude",
+      ]) {
+        if (req.query[key] != null && req.query[key] !== "") {
+          keep.push(
+            `${key}=${encodeURIComponent(String(req.query[key]))}`
+          );
+        }
+      }
+      const qs = keep.length ? `?${keep.join("&")}` : "";
+      return res.redirect(301, `${categoryUrl}${qs}`);
+    }
+
     const currency = global.settingJSON?.currencySymbol || "€";
     const priceFromLabel = language === "fr" ? "À partir de" : "From";
     const priceDisclaimer =
@@ -1162,7 +1255,7 @@ exports.serveCategoryPage = async (req, res) => {
 <body class="sk-public-page sq-page">
     <!-- Login Button Above QR Code -->
     <div class="login-above-qr">
-        <a href="${clientAuth.login}" class="btn-login-above">${copy.headerLogin}</a>
+        <a href="${clientAuth.login}" class="btn-login-above" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
     </div>
     
     <div class="qr-topright qr-topright--client">
@@ -1208,7 +1301,7 @@ exports.serveCategoryPage = async (req, res) => {
                 </div>
             </div>
             <div class="mobile-menu-content mobile-menu-content--client">
-                <a href="${clientAuth.login}" class="btn-login-mobile-menu">${copy.headerLogin}</a>
+                <a href="${clientAuth.login}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
                 <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer">${copy.downloadAppCta || copy.bookOnApp || "Télécharger l'app"}</button>
                 <div class="mobile-categories-panel">
                     <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">
@@ -1407,6 +1500,7 @@ const buildServiceNameRegex = (term) => ({
 exports.getSearchSuggestions = async (req, res) => {
   try {
     const language = resolveLang(req.query.lang || req.query.language);
+    const categoryIdPoolSuggest = await getActiveCategoryIdPool().catch(() => []);
 
     const topServicesAgg = await Booking.aggregate([
       { $match: { isDelete: false, status: { $in: COUNTABLE_BOOKING_STATUSES } } },
@@ -1514,9 +1608,10 @@ exports.getSearchSuggestions = async (req, res) => {
             name: translated,
             image: category.image || "",
             bookings: stats?.bookings || 0,
-            url: `/category/${generateSlug(translated)}-${category._id
-              .toString()
-              .substring(0, 6)}`,
+            url: `/category/${generateSlug(translated)}-${uniqueShortId(
+              category._id,
+              categoryIdPoolSuggest
+            )}`,
           };
         });
     }
@@ -1540,9 +1635,10 @@ exports.getSearchSuggestions = async (req, res) => {
             name: translated,
             image: category.image || "",
             bookings: 0,
-            url: `/category/${generateSlug(translated)}-${category._id
-              .toString()
-              .substring(0, 6)}`,
+            url: `/category/${generateSlug(translated)}-${uniqueShortId(
+              category._id,
+              categoryIdPoolSuggest
+            )}`,
           };
         })
       );
@@ -1650,8 +1746,16 @@ exports.searchSalonsPublic = async (req, res) => {
 
     salons = attachSalonDistances(salons, latitude, longitude);
 
+    const salonIdPoolSearch = await getActiveSalonIdPool().catch(() =>
+      salons.map((s) => String(s._id))
+    );
     let formattedSalons = salons.map((salon) =>
-      formatSalonForCategory(salon, { baseURL, language, copy: {} })
+      formatSalonForCategory(salon, {
+        baseURL,
+        language,
+        copy: {},
+        salonIdPool: salonIdPoolSearch,
+      })
     );
     formattedSalons = applySalonDiscoveryFilters(formattedSalons, {
       minRating,

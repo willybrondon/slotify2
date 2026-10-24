@@ -172,8 +172,19 @@
       .replace(/"/g, '&quot;');
   }
 
+  const RETURN_STORAGE_KEY = 'skedisy_hair_profile_return';
+
   function resolveReturnUrl() {
-    const raw = new URLSearchParams(window.location.search).get('return') || '';
+    let raw = '';
+    try {
+      raw = sessionStorage.getItem(RETURN_STORAGE_KEY) || '';
+    } catch (e) {
+      raw = '';
+    }
+    // Legacy query links (301 strips ?return= server-side; keep fallback for old tabs)
+    if (!raw) {
+      raw = new URLSearchParams(window.location.search).get('return') || '';
+    }
     // Only allow same-site relative paths (no protocol / open redirect)
     if (!raw || /^(https?:|\/\/)/i.test(raw) || raw.includes('..')) {
       return '/';
@@ -185,7 +196,11 @@
 
   function leaveProfilePage() {
     markPrompted();
-    window.location.href = resolveReturnUrl();
+    const dest = resolveReturnUrl();
+    try {
+      sessionStorage.removeItem(RETURN_STORAGE_KEY);
+    } catch (e) { /* ignore */ }
+    window.location.href = dest;
   }
 
   function maybePromptOnHome() {
@@ -194,7 +209,10 @@
     if (!document.getElementById('sqIntentHub')) return;
 
     markPrompted();
-    window.location.href = 'hair-profile.html?return=' + encodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
+    try {
+      sessionStorage.setItem(RETURN_STORAGE_KEY, window.location.pathname || '/');
+    } catch (e) { /* ignore */ }
+    window.location.href = '/hair-profile.html';
   }
 
   function mountProfilePage(root) {
@@ -209,7 +227,7 @@
       </div>
       <p class="sq-hair-lead">${escapeHtml(t('hairProfile.lead'))}</p>`;
 
-    Object.entries(FIELDS).forEach(([field, cfg]) => {
+    Object.entries(FIELDS).forEach(([field, cfg) => {
       html += `
         <div class="sq-hair-section" data-field="${field}">
           <h2 class="sq-hair-section__title">${escapeHtml(t(cfg.questionKey))}</h2>

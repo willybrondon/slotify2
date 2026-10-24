@@ -74,19 +74,46 @@ const findSalonByShortId = async (shortId, preferredSlug) => {
     );
     if (!matches.length) return null;
 
-    if (preferredSlug && matches.length > 1) {
+    // Prefer exact slug match (avoids serving the wrong salon on 6-char collisions)
+    if (preferredSlug) {
       const bySlug = matches.find(
         (s) => generateSlug(s.name) === preferredSlug
       );
       if (bySlug) return bySlug._id.toString();
     }
 
-    return matches[0]._id.toString();
+    // Unique prefix only — never pick an arbitrary collision victim
+    if (matches.length === 1) return matches[0]._id.toString();
+
+    return null;
   } catch (error) {
     console.error("[Find Salon By Short ID] Error:", error);
     return null;
   }
 };
+
+const { uniqueShortId } = require("../../lib/seoShortId");
+
+let _salonIdPoolCache = { at: 0, ids: null };
+async function getActiveSalonIdPool() {
+  const now = Date.now();
+  if (_salonIdPoolCache.ids && now - _salonIdPoolCache.at < 60_000) {
+    return _salonIdPoolCache.ids;
+  }
+  const rows = await Salon.find({ isActive: true, isDelete: false })
+    .select("_id")
+    .lean();
+  const ids = rows.map((r) => r._id.toString());
+  _salonIdPoolCache = { at: now, ids };
+  return ids;
+}
+
+async function canonicalSalonShortId(salonId) {
+  const pool = await getActiveSalonIdPool().catch(() => [
+    String(salonId),
+  ]);
+  return uniqueShortId(salonId, pool);
+}
 
 exports.getAll = async (req, res) => {
   try {
@@ -686,16 +713,7 @@ exports.getSalonShareUrl = async (req, res) => {
 
     // Generate slug from salon name + unique short id when 6-char prefixes collide
     const slug = generateSlug(salon.name);
-    const idStr = salon._id.toString();
-    const prefix6 = idStr.substring(0, 6);
-    const prefixPeers = await Salon.find({ isActive: true, isDelete: false })
-      .select("_id")
-      .lean()
-      .then((rows) =>
-        rows.filter((s) => s._id.toString().startsWith(prefix6)).length
-      )
-      .catch(() => 1);
-    const shortId = prefixPeers > 1 ? idStr.substring(0, 10) : prefix6;
+    const shortId = await canonicalSalonShortId(salon._id);
     const slugWithId = `${slug}-${shortId}`;
 
     // Ensure baseURL doesn't have trailing slash to avoid double slashes
@@ -747,6 +765,38 @@ exports.serveSalonWebPage = async (req, res) => {
     
     if (!fullSalonId) {
       return res.status(404).send("Salon not found");
+    }
+
+    // Canonical redirect before heavy populate (wrong slug / short 6-char id / serviceId-only stay below)
+    const salonMeta = await Salon.findOne({
+      _id: fullSalonId,
+      isActive: true,
+      isDelete: false,
+    })
+      .select("name")
+      .lean();
+    if (!salonMeta) {
+      return res.status(404).send("Salon not found");
+    }
+    const baseURLEarly = (process.env.baseURL || "https://skedisy.com").replace(
+      /\/+$/,
+      ""
+    );
+    const canonSlug = generateSlug(salonMeta.name);
+    const canonShort = await canonicalSalonShortId(fullSalonId);
+    const canonPath = `/salon/${canonSlug}-${canonShort}`;
+    if (`/salon/${slugWithId}`.toLowerCase() !== canonPath.toLowerCase()) {
+      const keep = [];
+      if (req.query.lang) keep.push(`lang=${encodeURIComponent(String(req.query.lang))}`);
+      if (req.query.language) {
+        keep.push(`language=${encodeURIComponent(String(req.query.language))}`);
+      }
+      // Keep service deep-link for UX; Google already consolidates via canonical
+      if (req.query.serviceId) {
+        keep.push(`serviceId=${encodeURIComponent(String(req.query.serviceId))}`);
+      }
+      const qs = keep.length ? `?${keep.join("&")}` : "";
+      return res.redirect(301, `${baseURLEarly}${canonPath}${qs}`);
     }
     
     const salon = await Salon.findOne({
@@ -860,16 +910,7 @@ exports.serveSalonWebPage = async (req, res) => {
 
     // Generate slug + short id (10 chars if several salons share the same 6-char prefix)
     const salonSlug = generateSlug(salon.name);
-    const idStr = salon._id.toString();
-    const prefix6 = idStr.substring(0, 6);
-    const prefixPeers = await Salon.find({ isActive: true, isDelete: false })
-      .select("_id")
-      .lean()
-      .then((rows) =>
-        rows.filter((s) => s._id.toString().startsWith(prefix6)).length
-      )
-      .catch(() => 1);
-    const salonShortId = prefixPeers > 1 ? idStr.substring(0, 10) : prefix6;
+    const salonShortId = await canonicalSalonShortId(salon._id);
     const salonSlugWithId = `${salonSlug}-${salonShortId}`;
 
     // Ensure baseURL doesn't have trailing slash to avoid double slashes
@@ -1474,7 +1515,7 @@ exports.serveSalonWebPage = async (req, res) => {
 <body class="sk-public-page sq-page">
     <!-- Login Button Above QR Code -->
     <div class="login-above-qr">
-        <a href="${clientAuth.login}" class="btn-login-above">${copy.headerLogin}</a>
+        <a href="${clientAuth.login}" class="btn-login-above" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
     </div>
     
     <!-- QR Code — app cliente uniquement -->
@@ -1521,7 +1562,7 @@ exports.serveSalonWebPage = async (req, res) => {
                 </div>
             </div>
             <div class="mobile-menu-content mobile-menu-content--client">
-                <a href="${clientAuth.login}" class="btn-login-mobile-menu">${esc(copy.headerLogin)}</a>
+                <a href="${clientAuth.login}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${esc(copy.headerLogin)}</a>
                 <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer">${esc(copy.downloadAppCta || copy.bookOnApp || "Télécharger l'app")}</button>
                 <div class="mobile-categories-panel">
                     <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">
@@ -1802,7 +1843,8 @@ exports.serveSalonWebPage = async (req, res) => {
             },
             authUrls: {
                 login: ${JSON.stringify(clientAuth.login)},
-                signup: ${JSON.stringify(clientAuth.signup)}
+                signup: ${JSON.stringify(clientAuth.signup)},
+                returnPath: ${JSON.stringify(clientAuth.returnPath || returnPath)}
             },
             salonAcceptsStripe: ${!!salonPayOpts.acceptStripe},
             salonAcceptsCash: ${salonPayOpts.acceptCash !== false},
@@ -1871,7 +1913,8 @@ exports.serveSalonWebPage = async (req, res) => {
             },
             authUrls: {
                 login: ${JSON.stringify(clientAuth.login)},
-                signup: ${JSON.stringify(clientAuth.signup)}
+                signup: ${JSON.stringify(clientAuth.signup)},
+                returnPath: ${JSON.stringify(clientAuth.returnPath || returnPath)}
             },
             payment: {
                 isWalletPay: ${!!global.settingJSON?.isWalletPay}
@@ -1885,7 +1928,8 @@ exports.serveSalonWebPage = async (req, res) => {
             language: ${JSON.stringify(pageLang)},
             authUrls: {
                 login: ${JSON.stringify(clientAuth.login)},
-                signup: ${JSON.stringify(clientAuth.signup)}
+                signup: ${JSON.stringify(clientAuth.signup)},
+                returnPath: ${JSON.stringify(clientAuth.returnPath || returnPath)}
             },
             copy: {
                 messageTitle: ${JSON.stringify(copy.messageTitle)},

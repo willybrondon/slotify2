@@ -7,14 +7,19 @@ function safeReturnPath(raw) {
   return path;
 }
 
+/**
+ * Crawlable auth URLs must NOT include ?return=… (Google was indexing
+ * /compte/connexion?return=/salon/… and /category/…).
+ * Clients append return on click via JS / data-auth-return.
+ */
 function authUrls(baseURL, returnPath, lang) {
   const q = new URLSearchParams();
-  if (returnPath && returnPath !== "/") q.set("return", returnPath);
   if (lang && lang !== "fr") q.set("lang", lang);
   const qs = q.toString() ? `?${q.toString()}` : "";
   return {
     login: `${baseURL}/compte/connexion${qs}`,
     signup: `${baseURL}/compte/inscription${qs}`,
+    returnPath: safeReturnPath(returnPath),
   };
 }
 
@@ -43,13 +48,17 @@ function renderAuthPage(req, res, mode) {
         <input type="text" id="authLname" name="lname" autocomplete="family-name">
       </label>`;
 
+  const canonicalPath = isLogin ? "/compte/connexion" : "/compte/inscription";
+
   const html = `<!DOCTYPE html>
 <html lang="${lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title} | Skedisy</title>
-    <meta name="robots" content="noindex">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="googlebot" content="noindex, nofollow, noarchive">
+    <link rel="canonical" href="${baseURL}${canonicalPath}">
     <link rel="icon" href="${baseURL}/favicon.ico" type="image/x-icon">
     <link rel="icon" href="${baseURL}/favicon-32.png" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="${baseURL}/apple-touch-icon.png">
@@ -113,6 +122,8 @@ function renderAuthPage(req, res, mode) {
 </html>`;
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
   return res.status(200).send(html);
 }
 

@@ -2721,8 +2721,20 @@
     const totals = calcTotals(getSelectedServices());
     const webUser = getWebUser();
     const auth = cfg.authUrls || {};
-    const loginHref = auth.login || "/compte/connexion";
-    const signupHref = auth.signup || "/compte/inscription";
+    function withAuthReturn(base) {
+      try {
+        const u = new URL(base || "/compte/connexion", window.location.origin);
+        const ret =
+          auth.returnPath ||
+          window.location.pathname + window.location.search;
+        if (ret && ret !== "/") u.searchParams.set("return", ret);
+        return u.pathname + u.search;
+      } catch (_) {
+        return base || "/compte/connexion";
+      }
+    }
+    const loginHref = withAuthReturn(auth.login || "/compte/connexion");
+    const signupHref = withAuthReturn(auth.signup || "/compte/inscription");
 
     if (webUser) {
       state.userId = String(webUser.id);
