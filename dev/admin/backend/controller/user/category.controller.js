@@ -1255,7 +1255,22 @@ exports.serveCategoryPage = async (req, res) => {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/intent-hub.css">
-    <link rel="stylesheet" href="${baseURL}/public-pages.css">
+    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat2col">
+    <style>
+      /* Max 2 salons per row on category pages */
+      .sk-public-page .sq-category-discover .salons-grid,
+      .sk-public-page .sq-category-discover #salonsGrid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+      }
+      @media (max-width: 720px) {
+        .sk-public-page .sq-category-discover .salons-grid,
+        .sk-public-page .sq-category-discover #salonsGrid {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    </style>
 </head>
 <body class="sk-public-page sq-page client-page">
     <div class="qr-topright qr-topright--client desktop-only">

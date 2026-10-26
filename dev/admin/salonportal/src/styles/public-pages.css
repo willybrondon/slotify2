@@ -1188,8 +1188,23 @@ body.sk-public-page .main-wrapper {
     margin-top: 24px;
 }
 
-.sk-public-page .salons-grid.sq-salons-grid--cards2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Category pages: always max 2 salons per row (override auto-fill) */
+.sk-public-page .sq-category-discover .salons-grid,
+.sk-public-page .sq-category-discover #salonsGrid,
+.sk-public-page .salons-grid.sq-salons-grid--cards2,
+.sk-public-page .salons-grid.sq-salons-grid--3 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px;
+}
+
+@media (max-width: 720px) {
+    .sk-public-page .sq-category-discover .salons-grid,
+    .sk-public-page .sq-category-discover #salonsGrid,
+    .sk-public-page .salons-grid.sq-salons-grid--cards2,
+    .sk-public-page .salons-grid.sq-salons-grid--3 {
+        grid-template-columns: 1fr !important;
+    }
 }
 
 .sk-public-page .salon-card {
@@ -1464,7 +1479,7 @@ body.sk-public-page .main-wrapper {
         flex: 1;
     }
 
-    .sk-public-page .salons-grid:not(.sq-salons-grid--3) {
+    .sk-public-page .salons-grid:not(.sq-salons-grid--3):not(.sq-salons-grid--cards2):not(#salonsGrid) {
         grid-template-columns: 1fr;
     }
 }
