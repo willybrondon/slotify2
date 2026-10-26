@@ -13,17 +13,13 @@
     <meta name="theme-color" content="#c45c26">
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../cookie-consent.css">
+    <link rel="stylesheet" href="../public-pages.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <script src="../language.js" defer></script>
 </head>
-<body class="pro-page sq-page" data-page="pro">
-    <div class="login-above-qr header-actions-above-qr">
-        <a href="/" class="btn-nav-above btn-clients-above" data-translate="nav.forClients">Clients</a>
-        <a href="https://skedisy.com/salonpanel/" class="btn-login-above" data-translate="nav.login">Login</a>
-    </div>
-
-    <div class="qr-topright qr-topright-pro">
+<body class="pro-page sq-page sk-public-page" data-page="pro">
+    <div class="qr-topright qr-topright-pro desktop-only">
         <div class="qr-top-flex">
             <div class="qr-top-block" id="download-expert" data-app-type="expert" onclick="openPhoneSelection('expert')">
                 <div class="qr-code-wrapper"><div id="qr-expert-top"></div></div>
@@ -32,12 +28,24 @@
         </div>
     </div>
 
-    <nav class="navbar sq-navbar">
-        <div class="nav-container">
+    <nav class="navbar sq-navbar sq-navbar--adencer">
+        <div class="nav-container sq-adencer-header">
             <div class="nav-logo">
-                <a href="/" style="text-decoration: none; color: inherit;"><h2>Skedisy</h2></a>
+                <a href="/" style="text-decoration: none; color: inherit; display:inline-flex; align-items:center; gap:8px;">
+                    <img class="sq-nav-logo-img" src="/images/logo.png" alt="Skedisy" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                    <h2 style="margin:0;">Skedisy</h2>
+                </a>
             </div>
-            <div class="nav-menu-center desktop-only" id="proNavMenu"></div>
+            <div class="sq-adencer-header__links desktop-only">
+                <a href="/blog/?for=pro" data-translate="nav.blog">Blog</a>
+                <a href="/aide/salon.html" data-translate="nav.help">Aide</a>
+                <a href="/" data-translate="nav.forClients">Clients</a>
+                <button type="button" class="lang-switcher" data-lang="en" title="Language"><i class="fas fa-globe"></i> <span>FR</span></button>
+            </div>
+            <div class="sq-adencer-header__cta desktop-only">
+                <a href="https://skedisy.com/salonpanel/" class="sq-btn sq-btn-ghost" data-translate="nav.login">Connexion</a>
+                <a href="/salon/rejoindre" class="sq-btn sq-btn-fill" data-translate="hero.joinFree">Rejoindre gratuitement</a>
+            </div>
             <div class="mobile-menu-wrapper">
                 <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
             </div>
@@ -53,9 +61,9 @@
             </div>
             <div class="mobile-menu-content mobile-menu-content--pro">
                 <a href="https://skedisy.com/salonpanel/" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
+                <a href="/salon/rejoindre" class="btn-login-mobile-menu" data-translate="hero.joinFree">Rejoindre gratuitement</a>
                 <a href="/blog/?for=pro" class="btn-login-mobile-menu" data-translate="nav.blog">Blog</a>
                 <a href="/aide/salon.html" class="btn-login-mobile-menu" data-translate="nav.help">Aide</a>
-                <a href="/salon/rejoindre" class="btn-login-mobile-menu" data-translate="hero.joinFree">Rejoindre gratuitement</a>
                 <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="expert" data-translate="qr.expertApp">Télécharger l'app Expert</button>
                 <a href="/" class="btn-login-mobile-menu btn-for-clients-mobile" data-translate="nav.forClients">Pour les clientes</a>
             </div>
@@ -71,15 +79,11 @@
             <div class="sq-hero-copy">
                 <p class="sq-kicker" data-translate="pro.heroEyebrow">Espace professionnel</p>
                 <h1 class="sq-display" data-translate="hero.afroHeadline">Attirez plus de clientes pour votre salon afro en Île-de-France</h1>
-                <p class="sq-lead" data-translate="hero.afroSubheadline">
-                    La plateforme dédiée aux salons coiffure afro.<br>
-                    Nouveaux clients — gratuit pour commencer.
-                </p>
+                <p class="sq-lead" data-translate="hero.afroSubheadline">La plateforme dédiée aux salons coiffure afro.<br>Nouveaux clients — gratuit pour commencer.</p>
                 <div class="sq-cta-row">
                     <a href="/salon/rejoindre" class="sq-btn sq-btn-fill" data-translate="hero.joinFree">Rejoindre gratuitement</a>
-                    <a href="/salon/claim" class="sq-btn sq-btn-ghost" data-translate="pro.claimSalon">Réclamer mon salon</a>
                 </div>
-                <p class="sq-note" data-translate="pro.downloadExpertNote">App Expert pour votre équipe (agenda &amp; réservations) :</p>
+                <p class="sq-note" data-translate="pro.downloadExpertNote">App Expert pour votre équipe (agenda & réservations) :</p>
                 <div class="sq-store-badges-mount" data-app="expert"></div>
             </div>
             <div class="sq-hero-visual">
@@ -246,9 +250,9 @@
                         </tr>
                         <tr>
                             <th scope="row" data-translate="compare.p.com">Commission nouveaux clients (marketplace)</th>
-                            <td class="sq-compare-highlight" data-translate="compare.p.com.sk">0 € en phase lancement ; modèle cible = 1 fois sur la 1ʳᵉ cliente Skedisy, puis 0 %</td>
+                            <td class="sq-compare-highlight" data-translate="compare.p.com.sk">0 € en phase lancement ; modèle cible = 1 fois sur la 1ère cliente Skedisy, puis 0 %</td>
                             <td data-translate="compare.p.com.pl">0 % sur les rendez-vous (offre officielle)</td>
-                            <td data-translate="compare.p.com.tw">25 % sur la 1ʳᵉ résa d’un nouveau client marketplace, puis 0 % ; +2 % si prépaiement</td>
+                            <td data-translate="compare.p.com.tw">25 % sur la 1ère résa d'un nouveau client marketplace, puis 0 % ; +2 % si prépaiement</td>
                             <td data-translate="compare.p.com.bk">0 % sur les nouveaux clients (offre officielle)</td>
                             <td data-translate="compare.p.com.fr">20 % une seule fois sur un nouveau client marketplace</td>
                         </tr>
@@ -372,12 +376,6 @@
                         <p data-translate="pro.faqPanelDesc">Connectez-vous au <a href="https://skedisy.com/salonpanel/">Salon Panel</a> pour gérer experts, prestations, réservations et fiche salon.</p>
                     </div>
                 </div>
-                <div class="faq-item collapsible">
-                    <h3 data-translate="pro.faqClaim">Mon salon est déjà en ligne — comment le réclamer ?</h3>
-                    <div class="faq-content">
-                        <p data-translate="pro.faqClaimDesc">Utilisez le lien reçu par e-mail ou rendez-vous sur <a href="/salon/claim">skedisy.com/salon/claim</a>. Pour créer un nouveau salon : <a href="/salon/rejoindre">skedisy.com/salon/rejoindre</a>.</p>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -386,7 +384,7 @@
         <div class="container sq-final-cta-inner">
             <h2 data-translate="ctaAgain.title">Commencez à recevoir de nouvelles clientes</h2>
             <a href="/salon/rejoindre" class="sq-btn sq-btn-fill" data-translate="ctaAgain.button">Rejoindre Skedisy gratuitement</a>
-            <p class="sq-note sq-note--on-dark" data-translate="pro.downloadExpertNote">App Expert pour votre équipe (agenda &amp; réservations) :</p>
+            <p class="sq-note sq-note--on-dark" data-translate="pro.downloadExpertNote">App Expert pour votre équipe (agenda & réservations) :</p>
             <div class="sq-store-badges-mount" data-app="expert" data-variant="on-dark" data-center="true"></div>
         </div>
     </section>

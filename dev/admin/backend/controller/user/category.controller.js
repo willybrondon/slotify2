@@ -1257,13 +1257,8 @@ exports.serveCategoryPage = async (req, res) => {
     <link rel="stylesheet" href="${baseURL}/intent-hub.css">
     <link rel="stylesheet" href="${baseURL}/public-pages.css">
 </head>
-<body class="sk-public-page sq-page">
-    <!-- Login Button Above QR Code -->
-    <div class="login-above-qr">
-        <a href="${clientAuth.login}" class="btn-login-above" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
-    </div>
-    
-    <div class="qr-topright qr-topright--client">
+<body class="sk-public-page sq-page client-page">
+    <div class="qr-topright qr-topright--client desktop-only">
         <div class="qr-top-flex">
             <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
                 <div class="qr-code-wrapper">
@@ -1274,20 +1269,25 @@ exports.serveCategoryPage = async (req, res) => {
             </div>
         </div>
     </div>
-    
-    <!-- Navigation -->
-    <nav class="navbar sq-navbar">
-        <div class="nav-container">
+
+    <nav class="navbar sq-navbar sq-navbar--adencer">
+        <div class="nav-container sq-adencer-header">
             <div class="nav-logo">
-                <a href="${baseURL}" style="text-decoration: none; color: inherit;">
-                    <h2>Skedisy</h2>
+                <a href="${baseURL}/" style="text-decoration: none; color: inherit; display:inline-flex; align-items:center; gap:8px;">
+                    <img class="sq-nav-logo-img" src="${baseURL}/images/logo.png" alt="Skedisy" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                    <h2 style="margin:0;">Skedisy</h2>
                 </a>
             </div>
-            <!-- Desktop Categories Menu -->
-            <div class="nav-menu-center desktop-only" id="categoriesMenu">
-                <!-- Categories will be loaded dynamically -->
+            <div class="sq-adencer-header__links desktop-only">
+                <a href="${baseURL}/blog/">${language === "fr" ? "Blog" : "Blog"}</a>
+                <a href="${baseURL}/aide/">${language === "fr" ? "Aide" : "Help"}</a>
+                <a href="${baseURL}/professionnel/">Pro</a>
+                <button type="button" class="lang-switcher" data-lang="${language === "fr" ? "en" : "fr"}" title="Language"><i class="fas fa-globe"></i> <span>${language === "fr" ? "FR" : "EN"}</span></button>
             </div>
-            <!-- Mobile Menu - Hamburger positioned where login button was -->
+            <div class="sq-adencer-header__cta desktop-only">
+                <a href="${clientAuth.login}" class="sq-btn sq-btn-ghost" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
+                <a href="${clientAuth.signup || clientAuth.register || `${baseURL}/compte/inscription`}" class="sq-btn sq-btn-fill" rel="nofollow" data-auth-return>${copy.createAccount || (language === "fr" ? "Créer un compte" : "Create account")}</a>
+            </div>
             <div class="mobile-menu-wrapper">
                 <div class="hamburger mobile-only" id="mobileMenuToggle">
                     <span></span>
@@ -1296,17 +1296,20 @@ exports.serveCategoryPage = async (req, res) => {
                 </div>
             </div>
         </div>
-        <!-- Mobile Slide-in Menu -->
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
                 <h3>${(copy.forClients || "Pour les clientes").replace(/</g, "&lt;")}</h3>
                 <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="${language === "fr" ? "en" : "fr"}" title="Language"><i class="fas fa-globe"></i> <span>${language === "fr" ? "FR" : "EN"}</span></button>
                     <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
                 </div>
             </div>
             <div class="mobile-menu-content mobile-menu-content--client">
                 <a href="${clientAuth.login}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
+                <a href="${clientAuth.signup || clientAuth.register || `${baseURL}/compte/inscription`}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${copy.createAccount || (language === "fr" ? "Créer un compte" : "Create account")}</a>
+                <a href="${baseURL}/blog/" class="btn-login-mobile-menu">Blog</a>
+                <a href="${baseURL}/aide/" class="btn-login-mobile-menu">${language === "fr" ? "Aide" : "Help"}</a>
                 <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer">${copy.downloadAppCta || copy.bookOnApp || "Télécharger l'app"}</button>
                 <div class="mobile-categories-panel">
                     <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">

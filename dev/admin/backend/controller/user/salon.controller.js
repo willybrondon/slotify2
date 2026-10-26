@@ -1175,7 +1175,12 @@ exports.serveSalonWebPage = async (req, res) => {
         </div>`
       : `<div class="sq-salon-detail__mosaic sq-salon-detail__mosaic--placeholder" aria-hidden="true"></div>`;
 
-    const salonCoverHtml = mosaicHtml;
+    const salonCoverHtml = `<div class="sq-salon-detail__cover-wrap">
+      <a href="${baseURL}/" class="sq-salon-detail__back" id="salonDetailBack" aria-label="${esc(copy.back || "Retour")}">
+        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+      </a>
+      ${mosaicHtml}
+    </div>`;
 
     const salonRatingBlock = ratingBadgeHtml
       ? `<div class="sq-salon-detail__rating">${ratingBadgeHtml}</div>`
@@ -1548,14 +1553,8 @@ exports.serveSalonWebPage = async (req, res) => {
     <link rel="stylesheet" href="${baseURL}/public-pages.css">
     ${global.settingJSON?.isStripePay && global.settingJSON?.stripePublishableKey ? `<script src="https://js.stripe.com/v3/"></script>` : ""}
 </head>
-<body class="sk-public-page sq-page">
-    <!-- Login Button Above QR Code -->
-    <div class="login-above-qr">
-        <a href="${clientAuth.login}" class="btn-login-above" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
-    </div>
-    
-    <!-- QR Code — app cliente uniquement -->
-    <div class="qr-topright qr-topright--client">
+<body class="sk-public-page sq-page client-page">
+    <div class="qr-topright qr-topright--client desktop-only">
         <div class="qr-top-flex">
             <div class="qr-top-block" data-app-type="customer" onclick="openPhoneSelection('customer')">
                 <div class="qr-code-wrapper">
@@ -1566,20 +1565,25 @@ exports.serveSalonWebPage = async (req, res) => {
             </div>
         </div>
     </div>
-    
-    <!-- Navigation -->
-    <nav class="navbar sq-navbar">
-        <div class="nav-container">
+
+    <nav class="navbar sq-navbar sq-navbar--adencer">
+        <div class="nav-container sq-adencer-header">
             <div class="nav-logo">
-                <a href="${baseURL}" style="text-decoration: none; color: inherit;">
-                    <h2>Skedisy</h2>
+                <a href="${baseURL}/" style="text-decoration: none; color: inherit; display:inline-flex; align-items:center; gap:8px;">
+                    <img class="sq-nav-logo-img" src="${baseURL}/images/logo.png" alt="Skedisy" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                    <h2 style="margin:0;">Skedisy</h2>
                 </a>
             </div>
-            <!-- Desktop Categories Menu -->
-            <div class="nav-menu-center desktop-only" id="categoriesMenu">
-                <!-- Categories will be loaded dynamically -->
+            <div class="sq-adencer-header__links desktop-only">
+                <a href="${baseURL}/blog/">Blog</a>
+                <a href="${baseURL}/aide/">${pageLang === "fr" ? "Aide" : "Help"}</a>
+                <a href="${baseURL}/professionnel/">Pro</a>
+                <button type="button" class="lang-switcher" data-lang="${pageLang === "fr" ? "en" : "fr"}" title="Language"><i class="fas fa-globe"></i> <span>${pageLang === "fr" ? "FR" : "EN"}</span></button>
             </div>
-            <!-- Mobile Menu - Hamburger positioned where login button was -->
+            <div class="sq-adencer-header__cta desktop-only">
+                <a href="${clientAuth.login}" class="sq-btn sq-btn-ghost" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
+                <a href="${clientAuth.signup || `${baseURL}/compte/inscription`}" class="sq-btn sq-btn-fill" rel="nofollow" data-auth-return>${copy.createAccount || (pageLang === "fr" ? "Créer un compte" : "Create account")}</a>
+            </div>
             <div class="mobile-menu-wrapper">
                 <div class="hamburger mobile-only" id="mobileMenuToggle">
                     <span></span>
@@ -1588,17 +1592,20 @@ exports.serveSalonWebPage = async (req, res) => {
                 </div>
             </div>
         </div>
-        <!-- Mobile Slide-in Menu -->
         <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-header">
                 <h3>${esc(copy.forClients || "Pour les clientes")}</h3>
                 <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="${pageLang === "fr" ? "en" : "fr"}" title="Language"><i class="fas fa-globe"></i> <span>${pageLang === "fr" ? "FR" : "EN"}</span></button>
                     <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
                 </div>
             </div>
             <div class="mobile-menu-content mobile-menu-content--client">
                 <a href="${clientAuth.login}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${esc(copy.headerLogin)}</a>
+                <a href="${clientAuth.signup || `${baseURL}/compte/inscription`}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${esc(copy.createAccount || (pageLang === "fr" ? "Créer un compte" : "Create account"))}</a>
+                <a href="${baseURL}/blog/" class="btn-login-mobile-menu">Blog</a>
+                <a href="${baseURL}/aide/" class="btn-login-mobile-menu">${pageLang === "fr" ? "Aide" : "Help"}</a>
                 <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer">${esc(copy.downloadAppCta || copy.bookOnApp || "Télécharger l'app")}</button>
                 <div class="mobile-categories-panel">
                     <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">
@@ -2008,6 +2015,20 @@ exports.serveSalonWebPage = async (req, res) => {
     <script src="${baseURL}/script.js"></script>
     <script>
       (function () {
+        const backBtn = document.getElementById("salonDetailBack");
+        if (backBtn) {
+          backBtn.addEventListener("click", function (e) {
+            try {
+              const ref = document.referrer || "";
+              const sameHost = ref && ref.indexOf(location.host) !== -1;
+              if (sameHost && window.history.length > 1) {
+                e.preventDefault();
+                window.history.back();
+              }
+            } catch (_) {}
+          });
+        }
+
         const tabs = document.getElementById("salonDetailTabs");
         const panelsRoot = document.getElementById("salonDetailPanels");
         if (!tabs || !panelsRoot) return;

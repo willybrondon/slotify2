@@ -327,9 +327,9 @@ const translations = {
         'compare.p.sub.bk': '€59 excl. VAT/month + €10 excl. VAT/month per extra staff',
         'compare.p.sub.fr': 'Software subscription (e.g. ~14.95–19.95 / month depending on plan shown)',
         'compare.p.com': 'New-client marketplace commission',
-        'compare.p.com.sk': '€0 during launch; target model = once on 1st Skedisy client, then 0%',
+        'compare.p.com.sk': '€0 during launch; target model = once on the first Skedisy client, then 0%',
         'compare.p.com.pl': '0% on appointments (official offer)',
-        'compare.p.com.tw': '25% on 1st booking of a marketplace new client, then 0%; +2% if prepaid',
+        'compare.p.com.tw': '25% on the first booking of a marketplace new client, then 0%; +2% if prepaid',
         'compare.p.com.bk': '0% on new clients (official offer)',
         'compare.p.com.fr': '20% one-time on a marketplace new client',
         'compare.p.fixed': 'Typical fixed monthly cost',
@@ -576,15 +576,15 @@ const translations = {
         'pro.quote2': '"We are listed for what we actually do: braids, weaves, locs."',
         'pro.quote2Author': 'Salon · Paris',
         'pro.faqStep1': 'Download the Skedisy Customer app and sign up.',
-        'pro.faqStep2': 'Profile → Register your salon.',
+        'pro.faqStep2': 'Profile → <strong>Register your salon</strong>.',
         'pro.faqStep3': 'Enter your salon details and number of stylists.',
         'pro.faqStep4': 'After approval, you receive Expert credentials.',
         'pro.faqExpertDesc': 'The owner creates stylist accounts at registration. Each stylist receives their login.',
-        'pro.faqAppClient': 'Customer App: booking for your clients.',
-        'pro.faqAppExpert': 'Expert App: schedule and bookings for your team.',
+        'pro.faqAppClient': '<strong>Customer App:</strong> booking for your clients.',
+        'pro.faqAppExpert': '<strong>Expert App:</strong> schedule and bookings for your team.',
         'pro.faqExpertDownload': 'Download Skedisy Expert (iPhone or Android):',
         'pro.downloadExpertNote': 'Expert app for your team (schedule & bookings):',
-        'pro.faqPanelDesc': 'Log in to the Salon Panel to manage stylists, services, bookings, and your profile.',
+        'pro.faqPanelDesc': 'Log in to the <a href="https://skedisy.com/salonpanel/">Salon Panel</a> to manage stylists, services, bookings, and your profile.',
         'hero.addSalon': 'Add My Salon',
         'hero.tryAI': 'Share a look',
         'hero.trustBadge': '4.8/5 on Trustpilot',
@@ -1187,6 +1187,7 @@ const translations = {
         'nav.help': 'Aide',
         'nav.menu': 'Menu',
         'nav.login': 'Connexion',
+        'nav.createAccount': 'Créer un compte',
         'nav.pro': 'Pro',
         'nav.forClients': 'Pour les clientes',
         'nav.forProfessionals': 'Pour les professionnels',
@@ -1505,9 +1506,9 @@ const translations = {
         'compare.p.sub.bk': '59 € HT/mois + 10 € HT/mois par collab. supp.',
         'compare.p.sub.fr': 'Abonnement logiciel (ex. ~14,95–19,95 / mois selon formule affichée)',
         'compare.p.com': 'Commission nouveaux clients (marketplace)',
-        'compare.p.com.sk': '0 € en phase lancement ; modèle cible = 1 fois sur la 1ʳᵉ cliente Skedisy, puis 0 %',
+        'compare.p.com.sk': '0 € en phase lancement ; modèle cible = 1 fois sur la 1ère cliente Skedisy, puis 0 %',
         'compare.p.com.pl': '0 % sur les rendez-vous (offre officielle)',
-        'compare.p.com.tw': '25 % sur la 1ʳᵉ résa d’un nouveau client marketplace, puis 0 % ; +2 % si prépaiement',
+        'compare.p.com.tw': '25 % sur la 1ère résa d\'un nouveau client marketplace, puis 0 % ; +2 % si prépaiement',
         'compare.p.com.bk': '0 % sur les nouveaux clients (offre officielle)',
         'compare.p.com.fr': '20 % une seule fois sur un nouveau client marketplace',
         'compare.p.fixed': 'Coût fixe mensuel typique',
@@ -1752,15 +1753,15 @@ const translations = {
         'pro.quote2': '« On est référencées sur les prestations qu\'on fait vraiment : braids, tissage, locks. »',
         'pro.quote2Author': 'Salon · Paris',
         'pro.faqStep1': 'Téléchargez l\'app Skedisy Client et créez un compte.',
-        'pro.faqStep2': 'Profil → Enregistrer votre salon.',
+        'pro.faqStep2': 'Profil → <strong>Enregistrer votre salon</strong>.',
         'pro.faqStep3': 'Renseignez votre salon et le nombre d\'expertes.',
         'pro.faqStep4': 'Après validation, vous recevez les accès Expert.',
         'pro.faqExpertDesc': 'La gérante crée les comptes expertes à l\'inscription. Chaque experte reçoit ses identifiants.',
-        'pro.faqAppClient': 'App Client : réservation pour vos clientes.',
-        'pro.faqAppExpert': 'App Expert : agenda et réservations pour votre équipe.',
+        'pro.faqAppClient': '<strong>App Client :</strong> réservation pour vos clientes.',
+        'pro.faqAppExpert': '<strong>App Expert :</strong> agenda et réservations pour votre équipe.',
         'pro.faqExpertDownload': 'Téléchargez Skedisy Expert (iPhone ou Android) :',
         'pro.downloadExpertNote': 'App Expert pour votre équipe (agenda & réservations) :',
-        'pro.faqPanelDesc': 'Connectez-vous au Salon Panel pour gérer expertes, prestations, réservations et fiche salon.',
+        'pro.faqPanelDesc': 'Connectez-vous au <a href="https://skedisy.com/salonpanel/">Salon Panel</a> pour gérer experts, prestations, réservations et fiche salon.',
         'hero.addSalon': 'Ajouter mon<br>salon',
         'hero.tryAI': 'Partager un look',
         'hero.trustBadge': '4,8/5 sur Trustpilot',
@@ -2379,6 +2380,10 @@ function getTranslation(key) {
     return translations[currentLanguage]?.[key] || translations['fr'][key] || translations['en'][key] || key;
 }
 
+function translationHasHtml(str) {
+    return typeof str === 'string' && /<\/?[a-z][\s\S]*>/i.test(str);
+}
+
 function translatePage() {
     // Find all elements with data-translate attribute (excludes data-translate-html only)
     document.querySelectorAll('[data-translate]:not([data-translate-html])').forEach(element => {
@@ -2387,6 +2392,9 @@ function translatePage() {
         
         if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
             element.placeholder = translation;
+        } else if (translationHasHtml(translation)) {
+            // Trusted static copy may include <br>, <strong>, <a>…
+            element.innerHTML = translation;
         } else {
             // Use textContent for clean single replacement - prevents any duplication
             element.textContent = translation;

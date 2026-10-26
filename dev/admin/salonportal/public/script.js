@@ -376,6 +376,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Pro page nav (no category browse, no AI Concierge — client-only feature)
 function initProNavigation() {
+    // Adencer-style header already has Blog / Aide / Clients / lang + CTAs
+    if (document.querySelector('.sq-navbar--adencer')) {
+        if (typeof updateLanguageSwitcher === 'function') updateLanguageSwitcher();
+        if (typeof translatePage === 'function') translatePage();
+        return;
+    }
     const desktopMenu = document.getElementById('proNavMenu');
     const currentLang = localStorage.getItem('skedisy-language') || 'fr';
     const switchToLang = currentLang === 'fr' ? 'en' : 'fr';

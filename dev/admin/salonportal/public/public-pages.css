@@ -1188,6 +1188,10 @@ body.sk-public-page .main-wrapper {
     margin-top: 24px;
 }
 
+.sk-public-page .salons-grid.sq-salons-grid--cards2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .sk-public-page .salon-card {
     background: var(--sk-bg);
     border: 1px solid var(--sk-border);
@@ -1661,19 +1665,35 @@ body.sk-public-page .main-wrapper {
     max-height: calc(100vh - 110px);
 }
 
-.sq-salons-grid--cards2 {
+.sq-salons-grid--cards2,
+.sk-public-page .salons-grid.sq-salons-grid--cards2,
+.sk-public-page .sq-category-discover .sq-salons-grid--cards2 {
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 16px;
     margin-top: 8px;
     width: 100%;
     box-sizing: border-box;
+    flex-direction: unset !important;
+}
+
+.sq-salons-grid--cards2 > .salon-card,
+.sk-public-page .sq-salons-grid--cards2 > .salon-card {
+    width: 100%;
+    max-width: none;
 }
 
 @media (max-width: 720px) {
-    .sq-salons-grid--cards2 {
-        grid-template-columns: 1fr;
+    .sq-salons-grid--cards2,
+    .sk-public-page .salons-grid.sq-salons-grid--cards2,
+    .sk-public-page .sq-category-discover .sq-salons-grid--cards2 {
+        grid-template-columns: 1fr !important;
     }
+}
+
+/* Never show 3+ columns on category discovery */
+.sk-public-page .sq-category-discover .sq-salons-grid--3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 
 .sq-map-toggle-btn {
@@ -1947,14 +1967,14 @@ body.sk-public-page .main-wrapper {
 
 @media (min-width: 640px) {
     .sk-public-page .sq-salons-grid--3 {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 16px;
     }
 }
 
 @media (min-width: 1025px) {
     .sk-public-page .sq-salons-grid--3 {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 18px;
     }
 }
@@ -4584,6 +4604,46 @@ body.sk-public-page .main-wrapper {
 }
 
 /* Salon detail StyleSeat: mosaic / identity / policy / expandable services */
+.sk-public-page .sq-salon-detail__cover-wrap {
+    position: relative;
+    margin: 0 0 28px;
+}
+
+.sk-public-page .sq-salon-detail__back {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 6;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.96);
+    color: #111;
+    text-decoration: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.sk-public-page .sq-salon-detail__back:hover {
+    background: #fff;
+    transform: scale(1.04);
+    color: #111;
+}
+
+.sk-public-page .sq-salon-detail__back i {
+    font-size: 0.95rem;
+    line-height: 1;
+    margin-left: -1px;
+}
+
+.sk-public-page .sq-salon-detail__cover-wrap .sq-salon-detail__mosaic {
+    margin-bottom: 0;
+}
+
 .sk-public-page .sq-salon-detail__mosaic {
     position: relative;
     display: grid;
