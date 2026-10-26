@@ -1273,7 +1273,25 @@ exports.serveSalonWebPage = async (req, res) => {
       }
     </div>`;
 
-    // Aside desktop : sélection + CTA en haut (totaux visibles), puis infos salon
+    const cityPart = [salon.addressDetails?.city, salon.addressDetails?.landMark]
+      .filter(Boolean)
+      .join(" ");
+    const aboutTeaser = cityPart
+      ? `${salonName} — Coiffure afro à ${cityPart}`
+      : salonDescription || copy.defaultSalonDesc(salonName);
+
+    const offerServiceOptions = bookingServices
+      .map(
+        (s) =>
+          `<option value="${esc(String(s.id))}" data-price="${esc(
+            String(s.price != null ? s.price : "")
+          )}">${esc(s.name)}${
+            s.price != null ? ` — ${esc(String(currency))}${esc(String(s.price))}` : ""
+          }</option>`
+      )
+      .join("");
+
+    // Aside desktop : Réserver → Faire une offre → À propos → horaires
     const bookingCardHtml = `<div class="booking-card sq-salon-detail__book-card">
                             <h3>${copy.bookingCardTitle}</h3>
                             <div class="sq-booking-services-summary sq-booking-services-summary--hidden sq-booking-services-summary--aside" id="salonBookingAsideSummary" aria-live="polite"></div>
@@ -1281,7 +1299,25 @@ exports.serveSalonWebPage = async (req, res) => {
                                 <span class="open-app-btn__label"><i class="fas fa-calendar-check"></i> ${copy.bookNow}</span>
                                 <span class="open-app-btn__meta" id="salonAsideBookMeta" hidden></span>
                             </button>
-                            <p class="sq-salon-detail__book-desc">${esc(salonDescription)}</p>
+                            <button type="button" class="sq-btn sq-btn-ghost sq-make-offer-toggle" id="salonMakeOfferToggle" aria-expanded="false" aria-controls="salonMakeOfferPanel">
+                                <i class="fas fa-tag" aria-hidden="true"></i> ${esc(copy.makeOffer || "Faire une offre")}
+                            </button>
+                            <div class="sq-make-offer-panel" id="salonMakeOfferPanel" hidden>
+                                <p class="sq-make-offer-panel__hint">${esc(copy.makeOfferHint || "")}</p>
+                                <label class="sq-make-offer-panel__label" for="salonOfferService">${esc(copy.makeOfferService || "Prestation")}</label>
+                                <select id="salonOfferService" class="sq-make-offer-panel__select">
+                                    <option value="">${esc(copy.makeOfferSelectService || "Sélectionne une prestation")}</option>
+                                    ${offerServiceOptions}
+                                </select>
+                                <label class="sq-make-offer-panel__label" for="salonOfferPrice">${esc(copy.makeOfferPrice || "Ton prix (€)")}</label>
+                                <input type="number" id="salonOfferPrice" class="sq-make-offer-panel__input" min="1" step="1" inputmode="decimal" placeholder="ex. 80">
+                                <button type="button" class="sq-btn sq-btn-fill sq-make-offer-panel__go" id="salonMakeOfferGo">${esc(copy.makeOfferContinue || "Continuer avec mon offre")}</button>
+                                <p class="sq-make-offer-panel__err" id="salonMakeOfferErr" hidden></p>
+                            </div>
+                            <div class="sq-salon-detail__aside-about">
+                                <h4 class="sq-salon-detail__aside-about-title">${esc(copy.aboutLabel || copy.aboutSalonShort || "À propos")}</h4>
+                                <p class="sq-salon-detail__book-desc">${esc(aboutTeaser)}</p>
+                            </div>
                             ${hoursBlock}
                             ${policyHtml}
                             <div class="sq-salon-detail__aside-contact sq-salon-detail__aside-contact--desktop">
@@ -1583,8 +1619,6 @@ exports.serveSalonWebPage = async (req, res) => {
     </nav>
     
     <div class="main-wrapper sq-salon-detail">
-        ${idfBanner}
-
         <div class="content-wrapper sq-salon-detail__page">
             <div class="container">
                 ${salonCoverHtml}
@@ -1609,7 +1643,13 @@ exports.serveSalonWebPage = async (req, res) => {
                               : ""
                           }
                           <div class="sq-salon-detail__panel" role="tabpanel" data-panel="products" hidden>${productsHtml}</div>
-                          <div class="sq-salon-detail__panel" role="tabpanel" data-panel="reviews" hidden>${reviewsHtml}</div>
+                          <div class="sq-salon-detail__panel" role="tabpanel" data-panel="reviews" hidden>${reviewsHtml}${
+                            socialLinks
+                              ? `<div class="sq-salon-social-after-reviews"><p class="sq-salon-social-after-reviews__label">${esc(
+                                  pageLang === "fr" ? "Suivre le salon" : "Follow the salon"
+                                )}</p>${socialLinks}</div>`
+                              : ""
+                          }</div>
                           <div class="sq-salon-detail__panel sq-salon-detail__panel--mobile" role="tabpanel" data-panel="about" hidden>${aboutPanelHtml}</div>
                         </div>
                     </div>
@@ -1711,6 +1751,8 @@ exports.serveSalonWebPage = async (req, res) => {
                 bookingCancelEmailHint: ${JSON.stringify(copy.bookingCancelEmailHint)},
                 min: ${JSON.stringify(copy.min)},
                 bookNow: ${JSON.stringify(copy.bookNow)},
+                makeOfferSelectService: ${JSON.stringify(copy.makeOfferSelectService)},
+                makeOfferInvalidPrice: ${JSON.stringify(copy.makeOfferInvalidPrice)},
                 continue: ${JSON.stringify(copy.continue)},
                 back: ${JSON.stringify(copy.back)},
                 enterCouponCode: ${JSON.stringify(copy.enterCouponCode)},

@@ -3496,6 +3496,64 @@
 
   tryResumeBooking();
 
+  // Faire une offre (select service + proposed price → booking)
+  (function initMakeOffer() {
+    const toggle = document.getElementById("salonMakeOfferToggle");
+    const panel = document.getElementById("salonMakeOfferPanel");
+    const goBtn = document.getElementById("salonMakeOfferGo");
+    const svcEl = document.getElementById("salonOfferService");
+    const priceEl = document.getElementById("salonOfferPrice");
+    const errEl = document.getElementById("salonMakeOfferErr");
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener("click", () => {
+      const open = panel.hasAttribute("hidden");
+      if (open) panel.removeAttribute("hidden");
+      else panel.setAttribute("hidden", "");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    goBtn?.addEventListener("click", () => {
+      const serviceId = (svcEl?.value || "").trim();
+      const price = parseFloat(String(priceEl?.value || "").replace(",", "."));
+      if (!serviceId) {
+        if (errEl) {
+          errEl.hidden = false;
+          errEl.textContent =
+            cfg.copy?.makeOfferSelectService || "Sélectionne une prestation";
+        }
+        return;
+      }
+      if (!Number.isFinite(price) || price <= 0) {
+        if (errEl) {
+          errEl.hidden = false;
+          errEl.textContent =
+            cfg.copy?.makeOfferInvalidPrice || "Indique un prix valide";
+        }
+        return;
+      }
+      if (errEl) errEl.hidden = true;
+      try {
+        sessionStorage.setItem(
+          "skedisy_client_offer",
+          JSON.stringify({
+            salonId: cfg.salonId,
+            serviceId,
+            offerPrice: price,
+            at: Date.now(),
+          })
+        );
+      } catch (_) { /* ignore */ }
+      state.clientOfferPrice = price;
+      state.afroAnswers = {
+        ...(state.afroAnswers || {}),
+        clientOfferPrice: price,
+        clientOfferNote: `Offre cliente: ${price}€`,
+      };
+      window.SalonBooking.open({ serviceId });
+    });
+  })();
+
   async function startRebookFromToken(token) {
     try {
       const res = await fetch(`/api/public/rebook/${encodeURIComponent(token)}`);

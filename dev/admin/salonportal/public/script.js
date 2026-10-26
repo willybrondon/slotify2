@@ -482,6 +482,7 @@ function renderHomeCategoriesGrid(categories) {
 function renderCategories(categories) {
     const desktopMenu = document.getElementById('categoriesMenu');
     const mobileMenu = document.getElementById('mobileCategories');
+    const homeCatsRow = document.getElementById('homeCatsRow');
 
     renderHomeCategoriesGrid(categories);
 
@@ -491,6 +492,15 @@ function renderCategories(categories) {
         const categoryUrl = `/category/${slug}-${shortId}`;
         return `<a href="${categoryUrl}" class="category-link">${category.name}</a>`;
     }).join('');
+
+    if (homeCatsRow) {
+        homeCatsRow.innerHTML = categories.map(category => {
+            const slug = generateCategorySlug(category.name);
+            const shortId = category._id.toString().substring(0, 6);
+            const categoryUrl = `/category/${slug}-${shortId}`;
+            return `<a href="${categoryUrl}">${category.name}</a>`;
+        }).join('');
+    }
     
     // Get current language for the switcher button
     const currentLang = localStorage.getItem('skedisy-language') || 'fr';
@@ -498,7 +508,11 @@ function renderCategories(categories) {
     const displayLang = currentLang === 'fr' ? 'FR' : 'EN';
 
     if (desktopMenu) {
-        desktopMenu.innerHTML = categoriesHtml +
+        // Adencer-style header already has Blog/Aide/Pro/lang — only inject category chips
+        const isAdencerNav = Boolean(document.querySelector('.sq-navbar--adencer'));
+        desktopMenu.innerHTML = isAdencerNav
+            ? categoriesHtml
+            : categoriesHtml +
             '<span class="nav-menu-actions">' +
             '<a href="/blog/" class="nav-btn" data-translate="nav.blog">Blog</a>' +
             '<a href="/aide/" class="nav-btn" data-translate="nav.help">Aide</a>' +

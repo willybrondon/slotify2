@@ -202,10 +202,58 @@
             }
             ${ratingHtml}
           </div>
+          <button type="button" class="sq-salon-like-btn" data-like-salon="${escapeHtml(
+              String(salon._id)
+          )}" aria-pressed="false" aria-label="${escapeHtml(copy.likeSalon || "J'aime")}">
+            <i class="far fa-heart" aria-hidden="true"></i>
+          </button>
         </div>
         ${servicesHtml}
       </div>
     </article>`;
+    }
+
+    const PAGE_SIZE = Number(cfg.pageSize) || 10;
+    let currentPage = 1;
+    const likesKey = "skedisy_liked_salons";
+
+    function getLikedSet() {
+        try {
+            const raw = JSON.parse(localStorage.getItem(likesKey) || "[]");
+            return new Set(Array.isArray(raw) ? raw.map(String) : []);
+        } catch (_) {
+            return new Set();
+        }
+    }
+
+    function saveLikedSet(set) {
+        try {
+            localStorage.setItem(likesKey, JSON.stringify([...set]));
+        } catch (_) { /* ignore */ }
+    }
+
+    function bindLikes() {
+        const liked = getLikedSet();
+        salonsGrid?.querySelectorAll("[data-like-salon]").forEach((btn) => {
+            const id = String(btn.getAttribute("data-like-salon") || "");
+            const on = liked.has(id);
+            btn.classList.toggle("is-liked", on);
+            btn.setAttribute("aria-pressed", on ? "true" : "false");
+            const icon = btn.querySelector("i");
+            if (icon) icon.className = on ? "fas fa-heart" : "far fa-heart";
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const set = getLikedSet();
+                if (set.has(id)) set.delete(id);
+                else set.add(id);
+                saveLikedSet(set);
+                const nowOn = set.has(id);
+                btn.classList.toggle("is-liked", nowOn);
+                btn.setAttribute("aria-pressed", nowOn ? "true" : "false");
+                if (icon) icon.className = nowOn ? "fas fa-heart" : "far fa-heart";
+            });
+        });
     }
 
     function bindCarousels() {
@@ -250,14 +298,75 @@
         }
     }
 
+    function renderPagination() {
+        const nav = document.getElementById("categoryPagination");
+        if (!nav) return;
+        const totalPages = Math.max(1, Math.ceil(salons.length / PAGE_SIZE));
+        if (salons.length <= PAGE_SIZE) {
+            nav.hidden = true;
+            nav.innerHTML = "";
+            return;
+        }
+        nav.hidden = false;
+        if (currentPage > totalPages) currentPage = totalPages;
+        const label = (copy.pageOf || "Page {n} / {total}")
+            .replace("{n}", String(currentPage))
+            .replace("{total}", String(totalPages));
+        let pagesHtml = "";
+        for (let p = 1; p <= totalPages; p++) {
+            pagesHtml += `<button type="button" class="sq-page-num${
+                p === currentPage ? " is-active" : ""
+            }" data-page="${p}">${p}</button>`;
+        }
+        nav.innerHTML = `
+          <button type="button" class="sq-page-btn" data-page-prev ${
+              currentPage <= 1 ? "disabled" : ""
+          }>${escapeHtml(copy.pagePrev || "Précédent")}</button>
+          <div class="sq-page-nums">${pagesHtml}</div>
+          <span class="sq-page-label">${escapeHtml(label)}</span>
+          <button type="button" class="sq-page-btn" data-page-next ${
+              currentPage >= totalPages ? "disabled" : ""
+          }>${escapeHtml(copy.pageNext || "Suivant")}</button>`;
+        nav.querySelector("[data-page-prev]")?.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage -= 1;
+                renderSalons();
+                salonsGrid?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
+        nav.querySelector("[data-page-next]")?.addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                currentPage += 1;
+                renderSalons();
+                salonsGrid?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
+        nav.querySelectorAll("[data-page]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                currentPage = Number(btn.getAttribute("data-page")) || 1;
+                renderSalons();
+                salonsGrid?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+        });
+    }
+
     function renderSalons() {
         if (!salonsGrid) return;
         if (!salons.length) {
             salonsGrid.innerHTML = `<div class="no-results"><p>${escapeHtml(copy.noSalonsSearch)}</p></div>`;
+            const nav = document.getElementById("categoryPagination");
+            if (nav) {
+                nav.hidden = true;
+                nav.innerHTML = "";
+            }
             return;
         }
-        salonsGrid.innerHTML = salons.map(renderSalonCard).join("");
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = salons.slice(start, start + PAGE_SIZE);
+        salonsGrid.innerHTML = pageItems.map(renderSalonCard).join("");
         bindCarousels();
+        bindLikes();
+        renderPagination();
     }
 
     function renderExperts() {
@@ -328,6 +437,39 @@
         setTimeout(() => mapInstance.invalidateSize(), 200);
     }
 
+    function setMapVisible(visible) {
+        const panel = document.getElementById("categoryMapPanel");
+        const btn = document.getElementById("btnToggleMap");
+        const label = document.getElementById("btnToggleMapLabel");
+        const main = document.getElementById("categoryMain");
+        if (panel) {
+            if (visible) panel.removeAttribute("hidden");
+            else panel.setAttribute("hidden", "");
+        }
+        if (mapEl) mapEl.setAttribute("aria-hidden", visible ? "false" : "true");
+        if (btn) btn.setAttribute("aria-expanded", visible ? "true" : "false");
+        if (label) {
+            label.textContent = visible
+                ? copy.hideMap || "Masquer la carte"
+                : copy.showMap || "Voir la carte";
+        }
+        if (main) {
+            main.classList.toggle("sq-category-discover__main--split", visible);
+            main.classList.toggle("sq-category-discover__main--list", !visible);
+        }
+        if (visible) {
+            initMap();
+            setTimeout(() => mapInstance && mapInstance.invalidateSize(), 80);
+            refreshMapMarkers();
+        }
+    }
+
+    document.getElementById("btnToggleMap")?.addEventListener("click", () => {
+        const panel = document.getElementById("categoryMapPanel");
+        const open = panel?.hasAttribute("hidden");
+        setMapVisible(Boolean(open));
+    });
+
     function requestLocation() {
         return new Promise((resolve) => {
             if (!navigator.geolocation) return resolve();
@@ -380,12 +522,14 @@
 
             if (salonsData.status && salonsData.salons) {
                 salons = salonsData.salons;
+                currentPage = 1;
                 updateStats();
                 updateSearchMessage(salonsData.searchCity || null);
                 renderSalons();
                 refreshMapMarkers();
             } else {
                 salons = [];
+                currentPage = 1;
                 renderSalons();
                 updateStats();
             }
@@ -514,8 +658,7 @@
     updateSearchMessage(cfg.initialSearchCity);
     renderSalons();
     renderExperts();
-    initMap();
-    if (mapEl) mapEl.setAttribute("aria-hidden", "false");
+    setMapVisible(false);
     requestLocation().then(() => {
         if (clientCoords.lat != null) fetchResults();
     });

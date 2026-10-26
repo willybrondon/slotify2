@@ -654,6 +654,11 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
             }
             ${ratingHtml}
           </div>
+          <button type="button" class="sq-salon-like-btn" data-like-salon="${escapeHtml(
+            String(salon._id)
+          )}" aria-pressed="false" aria-label="J'aime">
+            <i class="far fa-heart" aria-hidden="true"></i>
+          </button>
         </div>
         ${servicesHtml}
       </div>
@@ -1321,9 +1326,8 @@ exports.serveCategoryPage = async (req, res) => {
         </div>
     </nav>
     
-    ${idfBanner}
-
     <main class="sq-category-discover">
+        <div class="container sq-category-discover__inner">
         <header class="sq-category-discover__head sq-category-discover__head--with-img">
             <div class="sq-category-discover__head-img">
                 <img src="${categoryImage}" alt="${categoryDisplayName.replace(/"/g, "&quot;")}" loading="lazy" onerror="this.style.display='none'">
@@ -1380,6 +1384,10 @@ exports.serveCategoryPage = async (req, res) => {
                 <i class="fas fa-sliders-h" aria-hidden="true"></i>
                 <span>${copy.filterBtn}</span>
               </button>
+              <button type="button" class="sq-map-toggle-btn" id="btnToggleMap" aria-expanded="false" aria-controls="categoryMapPanel">
+                <i class="fas fa-map" aria-hidden="true"></i>
+                <span id="btnToggleMapLabel">${copy.showMap || "Voir la carte"}</span>
+              </button>
             </div>
         </div>
 
@@ -1411,15 +1419,19 @@ exports.serveCategoryPage = async (req, res) => {
           </div>
         </div>
     
-        <div class="sq-category-discover__main sq-category-discover__main--split" id="categoryMain">
+        <div class="sq-category-discover__main sq-category-discover__main--list" id="categoryMain">
             <div class="sq-category-discover__list-wrap">
         <p class="price-disclaimer">${priceDisclaimer}</p>
-                <div class="salons-grid sq-salons-grid--split" id="salonsGrid">
+                <div class="salons-grid sq-salons-grid--cards2" id="salonsGrid">
             ${salonsHtml}
                 </div>
+                <nav class="sq-category-pagination" id="categoryPagination" aria-label="Pagination" hidden></nav>
         </div>
-            <div id="categoryMap" class="sq-category-discover__map" aria-hidden="false"></div>
+            <div id="categoryMapPanel" class="sq-category-discover__map-panel" hidden>
+              <div id="categoryMap" class="sq-category-discover__map" aria-hidden="true"></div>
+            </div>
     </div>
+        </div>
     </main>
 
     <div class="sked-app-banner">
@@ -1452,12 +1464,19 @@ exports.serveCategoryPage = async (req, res) => {
                 expertAtSalonTpl: ${JSON.stringify(copy.expertAtSalonTpl)},
                 mapView: ${JSON.stringify(copy.mapView)},
                 listView: ${JSON.stringify(copy.listView)},
+                showMap: ${JSON.stringify(copy.showMap || "Voir la carte")},
+                hideMap: ${JSON.stringify(copy.hideMap || "Masquer la carte")},
+                likeSalon: ${JSON.stringify(copy.likeSalon || "J'aime")},
+                pagePrev: ${JSON.stringify(copy.pagePrev || "Précédent")},
+                pageNext: ${JSON.stringify(copy.pageNext || "Suivant")},
+                pageOf: ${JSON.stringify(copy.pageOf || "Page {n} / {total}")},
                 noSalonsSearch: ${JSON.stringify(copy.noSalonsSearch)},
                 noExpertsCategory: ${JSON.stringify(copy.noExpertsCategory)},
                 filterBtn: ${JSON.stringify(copy.filterBtn)},
                 filterServicesAll: ${JSON.stringify(copy.filterServicesAll)},
                 salonsLoading: ${JSON.stringify(language === "fr" ? "Chargement des salons…" : "Loading salons…")}
             },
+            pageSize: 10,
             render: {
                 currency: ${JSON.stringify(currency)},
                 priceFromLabel: ${JSON.stringify(priceFromLabel)},

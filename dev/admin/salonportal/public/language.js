@@ -8,6 +8,7 @@ const translations = {
         'nav.help': 'Help',
         'nav.menu': 'Menu',
         'nav.login': 'Login',
+        'nav.createAccount': 'Create your account',
         'nav.pro': 'Pro',
         'nav.forClients': 'For clients',
         'nav.forProfessionals': 'For professionals',
