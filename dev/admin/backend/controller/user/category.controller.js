@@ -539,7 +539,17 @@ const fetchExpertsForCategory = async ({
     });
 };
 
-const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) => {
+const renderSalonCardHtml = (
+  salon,
+  {
+    currency,
+    priceFromLabel,
+    noImageLabel,
+    likeLabel = "J'aime",
+    badgeResponseLabel = "Réponse rapide",
+    badgeValueLabel = "Rapport Q/P",
+  }
+) => {
   const avatar = salon.avatarImage || salon.mainImage || "";
   const realizations = salon.realizations?.length
     ? salon.realizations
@@ -551,6 +561,8 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
   const salonUrl = salon.shareUrl || "#";
   const multi = realizations.length > 1;
   const fallbackShot = avatar || salon.mainImage || "";
+  const likeImage =
+    (realizations && realizations[0]) || salon.mainImage || avatar || "";
 
   const shotsHtml = realizations.length
     ? realizations
@@ -628,6 +640,29 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
         )}${salon.minPrice}</p>`
       : "";
 
+  const mediaBadges = `
+        <div class="sq-salon-card-v3__badges" aria-hidden="true">
+          <span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--response">
+            <span class="sq-salon-card-v3__badge-emoji">⚡</span>
+            <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeResponseLabel)}</span>
+          </span>
+          <span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--value">
+            <span class="sq-salon-card-v3__badge-emoji">💎</span>
+            <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeValueLabel)}</span>
+          </span>
+        </div>`;
+
+  const likeBtn = `
+        <button type="button" class="sq-salon-like-btn sq-salon-like-btn--on-media" data-like-salon="${escapeHtml(
+          String(salon._id)
+        )}" data-like-name="${escapeHtml(salon.name || "")}" data-like-url="${escapeHtml(
+          salonUrl
+        )}" data-like-image="${escapeHtml(likeImage)}" aria-pressed="false" aria-label="${escapeHtml(
+          likeLabel
+        )}">
+          <i class="far fa-heart" aria-hidden="true"></i>
+        </button>`;
+
   return `
     <article class="salon-card sq-salon-card-v2 sq-salon-card-v3 sq-salon-card-v3--split" data-salon-id="${escapeHtml(
       salon._id
@@ -637,6 +672,8 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
       }" data-carousel ${multi ? `data-carousel-count="${realizations.length}" data-carousel-index="0"` : ""}>
         ${shotsHtml}
         ${carouselNav}
+        ${likeBtn}
+        ${mediaBadges}
       </div>
       <div class="sq-salon-card-v3__body">
         <div class="sq-salon-card-v3__identity">
@@ -656,17 +693,6 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
           </div>
         </div>
         ${servicesHtml}
-        <div class="sq-salon-card-v3__actions">
-          <button type="button" class="sq-salon-like-btn" data-like-salon="${escapeHtml(
-            String(salon._id)
-          )}" data-like-name="${escapeHtml(salon.name || "")}" data-like-url="${escapeHtml(
-            salonUrl
-          )}" data-like-image="${escapeHtml(
-            (realizations && realizations[0]) || salon.mainImage || avatar || ""
-          )}" aria-pressed="false" aria-label="J'aime">
-            <i class="far fa-heart" aria-hidden="true"></i>
-          </button>
-        </div>
       </div>
     </article>
   `;
@@ -1175,6 +1201,11 @@ exports.serveCategoryPage = async (req, res) => {
       priceFromLabel,
       noImageLabel: copy.noImage,
       nextLabel: copy.nextAvailable || (language === "fr" ? "Prochain" : "Next"),
+      likeLabel: copy.likeSalon || (language === "fr" ? "J'aime" : "Like"),
+      badgeResponseLabel:
+        copy.badgeResponse || (language === "fr" ? "Réponse rapide" : "Quick reply"),
+      badgeValueLabel:
+        copy.badgeValue || (language === "fr" ? "Rapport Q/P" : "Value for money"),
     };
     const salonsHtml =
       formattedSalons.length > 0
@@ -1261,7 +1292,7 @@ exports.serveCategoryPage = async (req, res) => {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/intent-hub.css">
-    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat-map1-fav">
+    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat-fix-fix">
     <style>
       /* Max 2 salons per row on category pages */
       .sk-public-page .sq-category-discover .salons-grid,
@@ -1305,18 +1336,14 @@ exports.serveCategoryPage = async (req, res) => {
                 <a href="${baseURL}/professionnel/">Pro</a>
                 <button type="button" class="lang-switcher" data-lang="${language === "fr" ? "en" : "fr"}" title="Language"><i class="fas fa-globe"></i> <span>${language === "fr" ? "FR" : "EN"}</span></button>
             </div>
-            <div class="sq-adencer-header__cta desktop-only">
+            <div class="sq-adencer-header__cta">
                 <button type="button" class="sq-header-fav-btn" id="headerFavBtn" aria-label="${escapeHtml(copy.myFavorites || "Mes salons aimés")}" aria-expanded="false" aria-controls="favDrawer">
                   <i class="far fa-heart" aria-hidden="true"></i>
                   <span class="sq-header-fav-btn__count" id="headerFavCount" data-count="0"></span>
                 </button>
-                <a href="${clientAuth.login}" class="sq-btn sq-btn-ghost" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
-                <a href="${clientAuth.signup || clientAuth.register || `${baseURL}/compte/inscription`}" class="sq-btn sq-btn-fill" rel="nofollow" data-auth-return>${copy.createAccount || (language === "fr" ? "Créer un compte" : "Create account")}</a>
+                <a href="${clientAuth.login}" class="sq-btn sq-btn-ghost desktop-only" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
+                <a href="${clientAuth.signup || clientAuth.register || `${baseURL}/compte/inscription`}" class="sq-btn sq-btn-fill desktop-only" rel="nofollow" data-auth-return>${copy.createAccount || (language === "fr" ? "Créer un compte" : "Create account")}</a>
             </div>
-            <button type="button" class="sq-header-fav-btn mobile-only" id="headerFavBtnMobileIcon" aria-label="${escapeHtml(copy.myFavorites || "Mes salons aimés")}" aria-controls="favDrawer">
-              <i class="far fa-heart" aria-hidden="true"></i>
-              <span class="sq-header-fav-btn__count" id="headerFavCountMobile" data-count="0"></span>
-            </button>
             <div class="mobile-menu-wrapper">
                 <div class="hamburger mobile-only" id="mobileMenuToggle">
                     <span></span>
@@ -1335,7 +1362,6 @@ exports.serveCategoryPage = async (req, res) => {
                 </div>
             </div>
             <div class="mobile-menu-content mobile-menu-content--client">
-                <button type="button" class="btn-login-mobile-menu" id="headerFavBtnMobile" aria-controls="favDrawer">${escapeHtml(copy.myFavorites || "Mes salons aimés")}</button>
                 <a href="${clientAuth.login}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
                 <a href="${clientAuth.signup || clientAuth.register || `${baseURL}/compte/inscription`}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${copy.createAccount || (language === "fr" ? "Créer un compte" : "Create account")}</a>
                 <a href="${baseURL}/blog/" class="btn-login-mobile-menu">Blog</a>
@@ -1405,26 +1431,12 @@ exports.serveCategoryPage = async (req, res) => {
                 </div>
               </div>
             </div>
-            <form id="categorySearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
+            <form id="categorySearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-category-search>
               <div class="sq-search-bar-unified__inner sq-search-bar-unified__inner--query-only">
                 <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
                 <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
                   <label class="sq-sr-only" for="searchInput">${escapeHtml(copy.searchPlaceholder || "Salon ou prestation")}</label>
-                  <input type="search" id="searchInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query placeholder="${copy.searchPlaceholder.replace(/"/g, "&quot;")}" value="${search.replace(/"/g, "&quot;")}" autocomplete="off" enterkeyhint="search">
-                  <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
-                    <div class="sq-search-suggestions__section" data-suggest-popular>
-                      <p class="sq-search-suggestions__heading">${language === "fr" ? "Catégories populaires" : "Popular categories"}</p>
-                      <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
-                    </div>
-                    <div class="sq-search-suggestions__section" data-suggest-popular>
-                      <p class="sq-search-suggestions__heading">${language === "fr" ? "Prestations les plus réservées" : "Most booked services"}</p>
-                      <ul class="sq-search-suggestions__list" data-suggest-services></ul>
-                    </div>
-                    <div class="sq-search-suggestions__section" data-suggest-salons-section hidden>
-                      <p class="sq-search-suggestions__heading">${language === "fr" ? "Salons" : "Salons"}</p>
-                      <ul class="sq-search-suggestions__list" data-suggest-salons></ul>
-                    </div>
-                  </div>
+                  <input type="search" id="searchInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" placeholder="${copy.searchPlaceholder.replace(/"/g, "&quot;")}" value="${search.replace(/"/g, "&quot;")}" autocomplete="off" enterkeyhint="search">
                 </div>
               </div>
               <button type="submit" class="sq-search-bar-unified__submit" aria-label="${language === "fr" ? "Rechercher" : "Search"}">
@@ -1539,6 +1551,8 @@ exports.serveCategoryPage = async (req, res) => {
                 showMap: ${JSON.stringify(copy.showMap || "Voir la carte")},
                 hideMap: ${JSON.stringify(copy.hideMap || "Masquer la carte")},
                 likeSalon: ${JSON.stringify(copy.likeSalon || "J'aime")},
+                badgeResponse: ${JSON.stringify(copy.badgeResponse || (language === "fr" ? "Réponse rapide" : "Quick reply"))},
+                badgeValue: ${JSON.stringify(copy.badgeValue || (language === "fr" ? "Rapport Q/P" : "Value for money"))},
                 myFavorites: ${JSON.stringify(copy.myFavorites || (language === "fr" ? "Mes salons aimés" : "Liked salons"))},
                 favoritesEmpty: ${JSON.stringify(copy.favoritesEmpty || (language === "fr" ? "Aucun salon aimé pour le moment." : "No liked salons yet."))},
                 pagePrev: ${JSON.stringify(copy.pagePrev || "Précédent")},
@@ -1562,7 +1576,6 @@ exports.serveCategoryPage = async (req, res) => {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="${baseURL}/salon-map-ui.js"></script>
     <script src="${baseURL}/location-chip.js"></script>
-    <script src="${baseURL}/search-suggestions.js"></script>
     <script src="${baseURL}/category-page.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>

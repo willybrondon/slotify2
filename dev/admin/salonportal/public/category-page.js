@@ -174,6 +174,11 @@
                 )}${salon.minPrice}</p>`
               : "";
 
+        const badgeResponse = copy.badgeResponse || "Réponse rapide";
+        const badgeValue = copy.badgeValue || "Rapport Q/P";
+        const likeImage =
+            (realizations && realizations[0]) || salon.mainImage || salon.avatarImage || "";
+
         return `
     <article class="salon-card sq-salon-card-v2 sq-salon-card-v3 sq-salon-card-v3--split" data-salon-id="${escapeHtml(
         salon._id
@@ -185,6 +190,25 @@
         }>
         ${shotsHtml}
         ${carouselNav}
+        <button type="button" class="sq-salon-like-btn sq-salon-like-btn--on-media" data-like-salon="${escapeHtml(
+            String(salon._id)
+        )}" data-like-name="${escapeHtml(salon.name || "")}" data-like-url="${escapeHtml(
+            salonUrl
+        )}" data-like-image="${escapeHtml(likeImage)}" aria-pressed="false" aria-label="${escapeHtml(
+            copy.likeSalon || "J'aime"
+        )}">
+            <i class="far fa-heart" aria-hidden="true"></i>
+        </button>
+        <div class="sq-salon-card-v3__badges" aria-hidden="true">
+          <span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--response">
+            <span class="sq-salon-card-v3__badge-emoji">⚡</span>
+            <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeResponse)}</span>
+          </span>
+          <span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--value">
+            <span class="sq-salon-card-v3__badge-emoji">💎</span>
+            <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeValue)}</span>
+          </span>
+        </div>
       </div>
       <div class="sq-salon-card-v3__body">
         <div class="sq-salon-card-v3__identity">
@@ -204,17 +228,6 @@
           </div>
         </div>
         ${servicesHtml}
-        <div class="sq-salon-card-v3__actions">
-          <button type="button" class="sq-salon-like-btn" data-like-salon="${escapeHtml(
-              String(salon._id)
-          )}" data-like-name="${escapeHtml(salon.name || "")}" data-like-url="${escapeHtml(
-            salonUrl
-        )}" data-like-image="${escapeHtml(
-            (realizations && realizations[0]) || salon.mainImage || salon.avatarImage || ""
-        )}" aria-pressed="false" aria-label="${escapeHtml(copy.likeSalon || "J'aime")}">
-            <i class="far fa-heart" aria-hidden="true"></i>
-          </button>
-        </div>
       </div>
     </article>`;
     }
@@ -256,12 +269,10 @@
 
     function updateFavHeaderCount() {
         const count = getLikedSet().size;
-        ["headerFavCount", "headerFavCountMobile"].forEach((cid) => {
-            const el = document.getElementById(cid);
-            if (!el) return;
-            el.textContent = count > 0 ? String(count) : "";
-            el.setAttribute("data-count", String(count));
-        });
+        const el = document.getElementById("headerFavCount");
+        if (!el) return;
+        el.textContent = count > 0 ? String(count) : "";
+        el.setAttribute("data-count", String(count));
     }
 
     function renderFavDrawer() {
@@ -305,21 +316,10 @@
 
     function bindFavDrawer() {
         document.getElementById("headerFavBtn")?.addEventListener("click", openFavDrawer);
-        document.getElementById("headerFavBtnMobileIcon")?.addEventListener("click", openFavDrawer);
-        document.getElementById("headerFavBtnMobile")?.addEventListener("click", () => {
-            closeMobileMenuIfAny();
-            openFavDrawer();
-        });
         document.querySelectorAll("[data-close-fav]").forEach((el) => {
             el.addEventListener("click", closeFavDrawer);
         });
         updateFavHeaderCount();
-    }
-
-    function closeMobileMenuIfAny() {
-        document.getElementById("mobileMenu")?.classList.remove("active");
-        document.getElementById("mobileMenuOverlay")?.classList.remove("active");
-        document.body.classList.remove("menu-open");
     }
 
     function bindLikes() {
