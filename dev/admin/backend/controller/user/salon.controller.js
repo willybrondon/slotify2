@@ -1232,6 +1232,41 @@ exports.serveSalonWebPage = async (req, res) => {
     const salonFacebook = String(salon.facebookUrl || "").trim();
     const salonTiktok = String(salon.tiktokUrl || "").trim();
     const messagingOn = salon.messagingEnabled !== false;
+
+    const socialHandleFromUrl = (rawUrl, platform) => {
+      const raw = String(rawUrl || "").trim();
+      if (!raw) return "";
+      try {
+        const href = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+        const u = new URL(href);
+        const parts = u.pathname.split("/").filter(Boolean);
+        if (platform === "instagram") {
+          const h = (parts[0] || "").replace(/^@/, "");
+          return h && !["p", "reel", "stories", "explore"].includes(h.toLowerCase())
+            ? h
+            : "";
+        }
+        if (platform === "tiktok") {
+          const h = (parts[0] || "").replace(/^@/, "");
+          return h && !["video", "tag", "music"].includes(h.toLowerCase()) ? h : "";
+        }
+        if (platform === "facebook") {
+          const id = u.searchParams.get("id");
+          if (id) return id;
+          const skip = new Set(["profile.php", "people", "pages", "watch", "share"]);
+          const h = parts.find((p) => !skip.has(p.toLowerCase()));
+          return h || "";
+        }
+      } catch (_) {
+        /* ignore */
+      }
+      return "";
+    };
+
+    const igHandle = socialHandleFromUrl(salonInstagram, "instagram");
+    const ttHandle = socialHandleFromUrl(salonTiktok, "tiktok");
+    const fbHandle = socialHandleFromUrl(salonFacebook, "facebook");
+
     const socialLinks = [
       salonInstagram
         ? `<a class="sq-salon-social-btn sq-salon-social-btn--ig" href="${esc(
@@ -1263,6 +1298,49 @@ exports.serveSalonWebPage = async (req, res) => {
     ]
       .filter(Boolean)
       .join("");
+
+    // Adencer-style account chips under salon name
+    const socialAccountChips = [
+      salonInstagram
+        ? `<a class="sq-salon-account-chip sq-salon-account-chip--ig" href="${esc(
+            salonInstagram
+          )}" target="_blank" rel="noopener noreferrer" aria-label="${esc(
+            copy.instagramSalon || "Instagram"
+          )}${igHandle ? ` @${igHandle}` : ""}">
+            <i class="fab fa-instagram" aria-hidden="true"></i>
+            <span>${esc(igHandle ? `@${igHandle}` : copy.instagramSalon || "Instagram")}</span>
+          </a>`
+        : "",
+      salonTiktok
+        ? `<a class="sq-salon-account-chip sq-salon-account-chip--tt" href="${esc(
+            salonTiktok
+          )}" target="_blank" rel="noopener noreferrer" aria-label="${esc(
+            copy.tiktokSalon || "TikTok"
+          )}${ttHandle ? ` @${ttHandle}` : ""}">
+            <i class="fab fa-tiktok" aria-hidden="true"></i>
+            <span>${esc(ttHandle ? `@${ttHandle}` : copy.tiktokSalon || "TikTok")}</span>
+          </a>`
+        : "",
+      salonFacebook
+        ? `<a class="sq-salon-account-chip sq-salon-account-chip--fb" href="${esc(
+            salonFacebook
+          )}" target="_blank" rel="noopener noreferrer" aria-label="${esc(
+            copy.facebookSalon || "Facebook"
+          )}${fbHandle ? ` ${fbHandle}` : ""}">
+            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+            <span>${esc(fbHandle || copy.facebookSalon || "Facebook")}</span>
+          </a>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("");
+
+    const socialAccountsUnderNameHtml = socialAccountChips
+      ? `<div class="sq-salon-detail__socials" aria-label="${esc(
+          pageLang === "fr" ? "Réseaux du salon" : "Salon social accounts"
+        )}">${socialAccountChips}</div>`
+      : "";
+
     const contactActionsHtml = `<div class="sq-salon-contact-actions">
       ${
         messagingOn
@@ -1636,6 +1714,7 @@ exports.serveSalonWebPage = async (req, res) => {
                             <div class="sq-salon-detail__avatar">${avatarHtml}</div>
                             <div class="sq-salon-detail__identity-text">
                                 <h1 class="sq-salon-detail__title">${salonName.replace(/"/g, "&quot;").replace(/</g, "&lt;")}</h1>
+                                ${socialAccountsUnderNameHtml}
                                 ${salonRatingBlock}
                                 ${salonAddressBlock}
                             </div>

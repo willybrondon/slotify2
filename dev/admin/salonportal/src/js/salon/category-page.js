@@ -178,6 +178,23 @@
         const badgeValue = copy.badgeValue || "Rapport Q/P";
         const likeImage =
             (realizations && realizations[0]) || salon.mainImage || salon.avatarImage || "";
+        const badgeKeys = Array.isArray(salon.badges) ? salon.badges : [];
+        const badgeParts = [];
+        if (badgeKeys.includes("response")) {
+            badgeParts.push(`<span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--response">
+            <span class="sq-salon-card-v3__badge-emoji">⚡</span>
+            <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeResponse)}</span>
+          </span>`);
+        }
+        if (badgeKeys.includes("value")) {
+            badgeParts.push(`<span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--value">
+            <span class="sq-salon-card-v3__badge-emoji">💎</span>
+            <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeValue)}</span>
+          </span>`);
+        }
+        const mediaBadges = badgeParts.length
+            ? `<div class="sq-salon-card-v3__badges" aria-hidden="true">${badgeParts.join("")}</div>`
+            : "";
 
         return `
     <article class="salon-card sq-salon-card-v2 sq-salon-card-v3 sq-salon-card-v3--split" data-salon-id="${escapeHtml(
@@ -199,16 +216,7 @@
         )}">
             <i class="far fa-heart" aria-hidden="true"></i>
         </button>
-        <div class="sq-salon-card-v3__badges" aria-hidden="true">
-          <span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--response">
-            <span class="sq-salon-card-v3__badge-emoji">⚡</span>
-            <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeResponse)}</span>
-          </span>
-          <span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--value">
-            <span class="sq-salon-card-v3__badge-emoji">💎</span>
-            <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeValue)}</span>
-          </span>
-        </div>
+        ${mediaBadges}
       </div>
       <div class="sq-salon-card-v3__body">
         <div class="sq-salon-card-v3__identity">
@@ -562,6 +570,8 @@
             main.classList.toggle("sq-category-discover__main--split", visible);
             main.classList.toggle("sq-category-discover__main--list", !visible);
         }
+        const discover = document.querySelector(".sq-category-discover");
+        if (discover) discover.classList.toggle("sq-category-discover--map", visible);
         if (visible) {
             initMap();
             setTimeout(() => mapInstance && mapInstance.invalidateSize(), 80);

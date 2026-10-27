@@ -414,6 +414,32 @@ const applySalonDiscoveryFilters = (
   return list;
 };
 
+/**
+ * Badges catalogue (style Adencer) — seulement si le salon remplit la règle.
+ * - Réponse rapide : messaging ON + au moins 1 réseau social + dispo aujourd’hui
+ * - Rapport Q/P : note ≥ 4.5, ≥ 8 avis, prix affiché
+ * Sinon : aucun badge.
+ */
+const computeSalonCatalogBadges = (salon) => {
+  const badges = [];
+  const messagingOn = salon.messagingEnabled !== false;
+  const hasSocial = Boolean(
+    String(salon.instagramUrl || "").trim() ||
+      String(salon.facebookUrl || "").trim() ||
+      String(salon.tiktokUrl || "").trim()
+  );
+  const availableToday = /aujourd|today/i.test(String(salon.nextAvailable || ""));
+  if (messagingOn && hasSocial && availableToday) {
+    badges.push("response");
+  }
+  const review = Number(salon.review) || 0;
+  const reviewCount = Number(salon.reviewCount) || 0;
+  if (review >= 4.5 && reviewCount >= 8 && salon.minPrice != null) {
+    badges.push("value");
+  }
+  return badges;
+};
+
 const formatSalonForCategory = (salon, { baseURL, language, copy, salonIdPool }) => {
   const categoryServices = (salon.serviceIds || [])
     .filter((s) => s.id && s.price !== null && s.price !== undefined)
@@ -426,6 +452,20 @@ const formatSalonForCategory = (salon, { baseURL, language, copy, salonIdPool })
   const realizations = pickSalonRealizations(salon, avatarImage);
   const nextAvailable = getNextAvailabilityHint(salon.salonTime, language);
   const topServices = buildTopServices(salon, { language, nextAvailable });
+  const instagramUrl = String(salon.instagramUrl || "").trim();
+  const facebookUrl = String(salon.facebookUrl || "").trim();
+  const tiktokUrl = String(salon.tiktokUrl || "").trim();
+  const messagingEnabled = salon.messagingEnabled !== false;
+  const badges = computeSalonCatalogBadges({
+    messagingEnabled,
+    instagramUrl,
+    facebookUrl,
+    tiktokUrl,
+    nextAvailable,
+    review: salon.review || 0,
+    reviewCount: salon.reviewCount || 0,
+    minPrice,
+  });
 
   return {
     _id: salon._id,
@@ -440,6 +480,11 @@ const formatSalonForCategory = (salon, { baseURL, language, copy, salonIdPool })
     minPrice,
     topServices,
     nextAvailable,
+    messagingEnabled,
+    instagramUrl,
+    facebookUrl,
+    tiktokUrl,
+    badges,
     distance: salon.distance ?? null,
     latitude: salon.locationCoordinates?.latitude
       ? parseFloat(salon.locationCoordinates.latitude)
@@ -640,17 +685,23 @@ const renderSalonCardHtml = (
         )}${salon.minPrice}</p>`
       : "";
 
-  const mediaBadges = `
-        <div class="sq-salon-card-v3__badges" aria-hidden="true">
-          <span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--response">
+  const badgeKeys = Array.isArray(salon.badges) ? salon.badges : [];
+  const badgeParts = [];
+  if (badgeKeys.includes("response")) {
+    badgeParts.push(`<span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--response">
             <span class="sq-salon-card-v3__badge-emoji">⚡</span>
             <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeResponseLabel)}</span>
-          </span>
-          <span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--value">
+          </span>`);
+  }
+  if (badgeKeys.includes("value")) {
+    badgeParts.push(`<span class="sq-salon-card-v3__badge sq-salon-card-v3__badge--value">
             <span class="sq-salon-card-v3__badge-emoji">💎</span>
             <span class="sq-salon-card-v3__badge-label">${escapeHtml(badgeValueLabel)}</span>
-          </span>
-        </div>`;
+          </span>`);
+  }
+  const mediaBadges = badgeParts.length
+    ? `<div class="sq-salon-card-v3__badges" aria-hidden="true">${badgeParts.join("")}</div>`
+    : "";
 
   const likeBtn = `
         <button type="button" class="sq-salon-like-btn sq-salon-like-btn--on-media" data-like-salon="${escapeHtml(
@@ -872,7 +923,7 @@ exports.getSalonsByCategory = async (req, res) => {
         select: "name nameEn nameFr namePt duration categoryId price",
       })
       .select(
-        "name mainImage image heroImage review reviewCount addressDetails locationCoordinates about serviceIds salonTime"
+        "name mainImage image heroImage review reviewCount addressDetails locationCoordinates about serviceIds salonTime messagingEnabled instagramUrl facebookUrl tiktokUrl"
       )
       .limit(120)
       .lean();
@@ -1114,7 +1165,7 @@ exports.serveCategoryPage = async (req, res) => {
         select: "name nameEn nameFr namePt duration price",
       })
       .select(
-        "name mainImage image heroImage review reviewCount addressDetails locationCoordinates about serviceIds salonTime"
+        "name mainImage image heroImage review reviewCount addressDetails locationCoordinates about serviceIds salonTime messagingEnabled instagramUrl facebookUrl tiktokUrl"
       )
       .limit(120)
       .lean();
@@ -1844,7 +1895,7 @@ exports.searchSalonsPublic = async (req, res) => {
         select: "name nameEn nameFr namePt duration price",
       })
       .select(
-        "name mainImage image heroImage review reviewCount addressDetails locationCoordinates about serviceIds salonTime"
+        "name mainImage image heroImage review reviewCount addressDetails locationCoordinates about serviceIds salonTime messagingEnabled instagramUrl facebookUrl tiktokUrl"
       )
       .limit(100)
       .lean();
