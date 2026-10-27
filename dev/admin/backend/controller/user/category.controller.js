@@ -654,13 +654,19 @@ const renderSalonCardHtml = (salon, { currency, priceFromLabel, noImageLabel }) 
             }
             ${ratingHtml}
           </div>
+        </div>
+        ${servicesHtml}
+        <div class="sq-salon-card-v3__actions">
           <button type="button" class="sq-salon-like-btn" data-like-salon="${escapeHtml(
             String(salon._id)
+          )}" data-like-name="${escapeHtml(salon.name || "")}" data-like-url="${escapeHtml(
+            salonUrl
+          )}" data-like-image="${escapeHtml(
+            (realizations && realizations[0]) || salon.mainImage || avatar || ""
           )}" aria-pressed="false" aria-label="J'aime">
             <i class="far fa-heart" aria-hidden="true"></i>
           </button>
         </div>
-        ${servicesHtml}
       </div>
     </article>
   `;
@@ -1255,7 +1261,7 @@ exports.serveCategoryPage = async (req, res) => {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/intent-hub.css">
-    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat2col">
+    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat-map1-fav">
     <style>
       /* Max 2 salons per row on category pages */
       .sk-public-page .sq-category-discover .salons-grid,
@@ -1300,9 +1306,17 @@ exports.serveCategoryPage = async (req, res) => {
                 <button type="button" class="lang-switcher" data-lang="${language === "fr" ? "en" : "fr"}" title="Language"><i class="fas fa-globe"></i> <span>${language === "fr" ? "FR" : "EN"}</span></button>
             </div>
             <div class="sq-adencer-header__cta desktop-only">
+                <button type="button" class="sq-header-fav-btn" id="headerFavBtn" aria-label="${escapeHtml(copy.myFavorites || "Mes salons aimés")}" aria-expanded="false" aria-controls="favDrawer">
+                  <i class="far fa-heart" aria-hidden="true"></i>
+                  <span class="sq-header-fav-btn__count" id="headerFavCount" data-count="0"></span>
+                </button>
                 <a href="${clientAuth.login}" class="sq-btn sq-btn-ghost" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
                 <a href="${clientAuth.signup || clientAuth.register || `${baseURL}/compte/inscription`}" class="sq-btn sq-btn-fill" rel="nofollow" data-auth-return>${copy.createAccount || (language === "fr" ? "Créer un compte" : "Create account")}</a>
             </div>
+            <button type="button" class="sq-header-fav-btn mobile-only" id="headerFavBtnMobileIcon" aria-label="${escapeHtml(copy.myFavorites || "Mes salons aimés")}" aria-controls="favDrawer">
+              <i class="far fa-heart" aria-hidden="true"></i>
+              <span class="sq-header-fav-btn__count" id="headerFavCountMobile" data-count="0"></span>
+            </button>
             <div class="mobile-menu-wrapper">
                 <div class="hamburger mobile-only" id="mobileMenuToggle">
                     <span></span>
@@ -1321,6 +1335,7 @@ exports.serveCategoryPage = async (req, res) => {
                 </div>
             </div>
             <div class="mobile-menu-content mobile-menu-content--client">
+                <button type="button" class="btn-login-mobile-menu" id="headerFavBtnMobile" aria-controls="favDrawer">${escapeHtml(copy.myFavorites || "Mes salons aimés")}</button>
                 <a href="${clientAuth.login}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${copy.headerLogin}</a>
                 <a href="${clientAuth.signup || clientAuth.register || `${baseURL}/compte/inscription`}" class="btn-login-mobile-menu" rel="nofollow" data-auth-return>${copy.createAccount || (language === "fr" ? "Créer un compte" : "Create account")}</a>
                 <a href="${baseURL}/blog/" class="btn-login-mobile-menu">Blog</a>
@@ -1344,9 +1359,24 @@ exports.serveCategoryPage = async (req, res) => {
         </div>
     </nav>
     
+    <div class="sq-fav-drawer" id="favDrawer" hidden>
+      <div class="sq-fav-drawer__backdrop" data-close-fav></div>
+      <aside class="sq-fav-drawer__panel" role="dialog" aria-labelledby="favDrawerTitle">
+        <div class="sq-fav-drawer__head">
+          <h2 id="favDrawerTitle">${escapeHtml(copy.myFavorites || "Mes salons aimés")}</h2>
+          <button type="button" class="sq-fav-drawer__close" data-close-fav aria-label="Fermer">&times;</button>
+        </div>
+        <ul class="sq-fav-drawer__list" id="favDrawerList"></ul>
+        <p class="sq-fav-drawer__empty" id="favDrawerEmpty">${escapeHtml(copy.favoritesEmpty || (language === "fr" ? "Aucun salon aimé pour le moment." : "No liked salons yet."))}</p>
+      </aside>
+    </div>
+
     <main class="sq-category-discover">
         <div class="container sq-category-discover__inner">
         <header class="sq-category-discover__head sq-category-discover__head--with-img">
+            <a href="${baseURL}/" class="sq-category-discover__back" id="categoryDetailBack" aria-label="${escapeHtml(copy.back || "Retour")}">
+              <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            </a>
             <div class="sq-category-discover__head-img">
                 <img src="${categoryImage}" alt="${categoryDisplayName.replace(/"/g, "&quot;")}" loading="lazy" onerror="this.style.display='none'">
                 </div>
@@ -1356,27 +1386,51 @@ exports.serveCategoryPage = async (req, res) => {
             </div>
         </header>
 
-        <div class="sq-category-discover__search-bar">
-          <div class="sq-location-chip-wrap">
-            <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
-              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-              <span class="sq-location-chip__text">
-                <span class="sq-location-chip__label">${copy.yourLocation}</span>
-                <span class="sq-location-chip__value" id="homeLocationChipValue">${escapeHtml(locationTerm || "Paris")}</span>
-              </span>
-              <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
-            </button>
-            <div class="sq-location-popover" id="homeLocationPopover" hidden>
-              <label class="sq-sr-only" for="homeLocationSearchInput">${copy.yourLocation}</label>
-              <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" placeholder="${copy.locationPlaceholder.replace(/"/g, "&quot;")}" value="${escapeHtml(locationTerm)}" autocomplete="off">
-              <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply">${copy.applyLocation}</button>
+        <div class="sq-search-hero-wrap sq-category-discover__search-hero">
+          <div class="sq-search-hero">
+            <div class="sq-search-hero-toolbar">
+              <div class="sq-location-chip-wrap">
+                <button type="button" class="sq-location-chip" id="homeLocationChip" aria-expanded="false" aria-controls="homeLocationPopover">
+                  <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                  <span class="sq-location-chip__text">
+                    <span class="sq-location-chip__label">${copy.yourLocation}</span>
+                    <span class="sq-location-chip__value" id="homeLocationChipValue">${escapeHtml(locationTerm || "Paris")}</span>
+                  </span>
+                  <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
+                </button>
+                <div class="sq-location-popover" id="homeLocationPopover" hidden>
+                  <label class="sq-sr-only" for="homeLocationSearchInput">${copy.yourLocation}</label>
+                  <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" placeholder="${copy.locationPlaceholder.replace(/"/g, "&quot;")}" value="${escapeHtml(locationTerm)}" autocomplete="off">
+                  <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply">${copy.applyLocation}</button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="sq-category-discover__search search-section">
-            <div class="search-container sq-search-wrap">
-                <i class="fas fa-search sq-search-wrap__icon" aria-hidden="true"></i>
-                <input type="search" id="searchInput" class="search-input sq-search-wrap__input" placeholder="${copy.searchPlaceholder.replace(/"/g, "&quot;")}" value="${search.replace(/"/g, "&quot;")}" autocomplete="off">
-            </div>
+            <form id="categorySearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-search-unified>
+              <div class="sq-search-bar-unified__inner sq-search-bar-unified__inner--query-only">
+                <span class="sq-search-bar-unified__icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+                <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
+                  <label class="sq-sr-only" for="searchInput">${escapeHtml(copy.searchPlaceholder || "Salon ou prestation")}</label>
+                  <input type="search" id="searchInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query placeholder="${copy.searchPlaceholder.replace(/"/g, "&quot;")}" value="${search.replace(/"/g, "&quot;")}" autocomplete="off" enterkeyhint="search">
+                  <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
+                    <div class="sq-search-suggestions__section" data-suggest-popular>
+                      <p class="sq-search-suggestions__heading">${language === "fr" ? "Catégories populaires" : "Popular categories"}</p>
+                      <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
+                    </div>
+                    <div class="sq-search-suggestions__section" data-suggest-popular>
+                      <p class="sq-search-suggestions__heading">${language === "fr" ? "Prestations les plus réservées" : "Most booked services"}</p>
+                      <ul class="sq-search-suggestions__list" data-suggest-services></ul>
+                    </div>
+                    <div class="sq-search-suggestions__section" data-suggest-salons-section hidden>
+                      <p class="sq-search-suggestions__heading">${language === "fr" ? "Salons" : "Salons"}</p>
+                      <ul class="sq-search-suggestions__list" data-suggest-salons></ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="sq-search-bar-unified__submit" aria-label="${language === "fr" ? "Rechercher" : "Search"}">
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+              </button>
+            </form>
           </div>
         </div>
 
@@ -1485,6 +1539,8 @@ exports.serveCategoryPage = async (req, res) => {
                 showMap: ${JSON.stringify(copy.showMap || "Voir la carte")},
                 hideMap: ${JSON.stringify(copy.hideMap || "Masquer la carte")},
                 likeSalon: ${JSON.stringify(copy.likeSalon || "J'aime")},
+                myFavorites: ${JSON.stringify(copy.myFavorites || (language === "fr" ? "Mes salons aimés" : "Liked salons"))},
+                favoritesEmpty: ${JSON.stringify(copy.favoritesEmpty || (language === "fr" ? "Aucun salon aimé pour le moment." : "No liked salons yet."))},
                 pagePrev: ${JSON.stringify(copy.pagePrev || "Précédent")},
                 pageNext: ${JSON.stringify(copy.pageNext || "Suivant")},
                 pageOf: ${JSON.stringify(copy.pageOf || "Page {n} / {total}")},
@@ -1506,6 +1562,7 @@ exports.serveCategoryPage = async (req, res) => {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="${baseURL}/salon-map-ui.js"></script>
     <script src="${baseURL}/location-chip.js"></script>
+    <script src="${baseURL}/search-suggestions.js"></script>
     <script src="${baseURL}/category-page.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>

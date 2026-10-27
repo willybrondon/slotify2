@@ -202,13 +202,19 @@
             }
             ${ratingHtml}
           </div>
+        </div>
+        ${servicesHtml}
+        <div class="sq-salon-card-v3__actions">
           <button type="button" class="sq-salon-like-btn" data-like-salon="${escapeHtml(
               String(salon._id)
-          )}" aria-pressed="false" aria-label="${escapeHtml(copy.likeSalon || "J'aime")}">
+          )}" data-like-name="${escapeHtml(salon.name || "")}" data-like-url="${escapeHtml(
+            salonUrl
+        )}" data-like-image="${escapeHtml(
+            (realizations && realizations[0]) || salon.mainImage || salon.avatarImage || ""
+        )}" aria-pressed="false" aria-label="${escapeHtml(copy.likeSalon || "J'aime")}">
             <i class="far fa-heart" aria-hidden="true"></i>
           </button>
         </div>
-        ${servicesHtml}
       </div>
     </article>`;
     }
@@ -216,6 +222,7 @@
     const PAGE_SIZE = Number(cfg.pageSize) || 10;
     let currentPage = 1;
     const likesKey = "skedisy_liked_salons";
+    const likesMetaKey = "skedisy_liked_salons_meta";
 
     function getLikedSet() {
         try {
@@ -226,10 +233,93 @@
         }
     }
 
+    function getLikedMeta() {
+        try {
+            const raw = JSON.parse(localStorage.getItem(likesMetaKey) || "{}");
+            return raw && typeof raw === "object" ? raw : {};
+        } catch (_) {
+            return {};
+        }
+    }
+
     function saveLikedSet(set) {
         try {
             localStorage.setItem(likesKey, JSON.stringify([...set]));
         } catch (_) { /* ignore */ }
+    }
+
+    function saveLikedMeta(meta) {
+        try {
+            localStorage.setItem(likesMetaKey, JSON.stringify(meta || {}));
+        } catch (_) { /* ignore */ }
+    }
+
+    function updateFavHeaderCount() {
+        const count = getLikedSet().size;
+        ["headerFavCount", "headerFavCountMobile"].forEach((cid) => {
+            const el = document.getElementById(cid);
+            if (!el) return;
+            el.textContent = count > 0 ? String(count) : "";
+            el.setAttribute("data-count", String(count));
+        });
+    }
+
+    function renderFavDrawer() {
+        const list = document.getElementById("favDrawerList");
+        const empty = document.getElementById("favDrawerEmpty");
+        if (!list) return;
+        const set = getLikedSet();
+        const meta = getLikedMeta();
+        const ids = [...set];
+        list.innerHTML = ids
+            .map((id) => {
+                const m = meta[id] || {};
+                const name = escapeHtml(m.name || "Salon");
+                const url = escapeHtml(m.url || `/salon/${id}`);
+                const img = m.image
+                    ? `<img src="${escapeHtml(m.image)}" alt="" loading="lazy">`
+                    : `<img src="" alt="" aria-hidden="true">`;
+                return `<li><a class="sq-fav-drawer__item" href="${url}">${img}<span class="sq-fav-drawer__item-name">${name}</span></a></li>`;
+            })
+            .join("");
+        if (empty) empty.hidden = ids.length > 0;
+        updateFavHeaderCount();
+    }
+
+    function openFavDrawer() {
+        const drawer = document.getElementById("favDrawer");
+        if (!drawer) return;
+        renderFavDrawer();
+        drawer.hidden = false;
+        drawer.classList.add("is-open");
+        document.getElementById("headerFavBtn")?.setAttribute("aria-expanded", "true");
+    }
+
+    function closeFavDrawer() {
+        const drawer = document.getElementById("favDrawer");
+        if (!drawer) return;
+        drawer.classList.remove("is-open");
+        drawer.hidden = true;
+        document.getElementById("headerFavBtn")?.setAttribute("aria-expanded", "false");
+    }
+
+    function bindFavDrawer() {
+        document.getElementById("headerFavBtn")?.addEventListener("click", openFavDrawer);
+        document.getElementById("headerFavBtnMobileIcon")?.addEventListener("click", openFavDrawer);
+        document.getElementById("headerFavBtnMobile")?.addEventListener("click", () => {
+            closeMobileMenuIfAny();
+            openFavDrawer();
+        });
+        document.querySelectorAll("[data-close-fav]").forEach((el) => {
+            el.addEventListener("click", closeFavDrawer);
+        });
+        updateFavHeaderCount();
+    }
+
+    function closeMobileMenuIfAny() {
+        document.getElementById("mobileMenu")?.classList.remove("active");
+        document.getElementById("mobileMenuOverlay")?.classList.remove("active");
+        document.body.classList.remove("menu-open");
     }
 
     function bindLikes() {
@@ -245,13 +335,28 @@
                 e.preventDefault();
                 e.stopPropagation();
                 const set = getLikedSet();
-                if (set.has(id)) set.delete(id);
-                else set.add(id);
+                const meta = getLikedMeta();
+                if (set.has(id)) {
+                    set.delete(id);
+                    delete meta[id];
+                } else {
+                    set.add(id);
+                    meta[id] = {
+                        name: btn.getAttribute("data-like-name") || "Salon",
+                        url: btn.getAttribute("data-like-url") || "",
+                        image: btn.getAttribute("data-like-image") || "",
+                    };
+                }
                 saveLikedSet(set);
+                saveLikedMeta(meta);
                 const nowOn = set.has(id);
                 btn.classList.toggle("is-liked", nowOn);
                 btn.setAttribute("aria-pressed", nowOn ? "true" : "false");
                 if (icon) icon.className = nowOn ? "fas fa-heart" : "far fa-heart";
+                updateFavHeaderCount();
+                if (document.getElementById("favDrawer")?.classList.contains("is-open")) {
+                    renderFavDrawer();
+                }
             });
         });
     }
@@ -563,6 +668,12 @@
         window.history.replaceState({}, "", url);
     }
 
+    document.getElementById("categorySearchForm")?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        clearTimeout(searchTimeout);
+        fetchResults(searchInput?.value.trim() || "");
+    });
+
     if (searchInput) {
         let savedScrollY = 0;
         const lockSearchFocus = () => {
@@ -600,6 +711,18 @@
             }
         });
     }
+
+    document.getElementById("categoryDetailBack")?.addEventListener("click", (e) => {
+        try {
+            const ref = document.referrer || "";
+            if (ref && ref.indexOf(location.host) !== -1 && window.history.length > 1) {
+                e.preventDefault();
+                window.history.back();
+            }
+        } catch (_) { /* fall through to href */ }
+    });
+
+    bindFavDrawer();
 
     filterBtn?.addEventListener("click", () => {
         if (!filterPanel) return;
