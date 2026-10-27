@@ -13,11 +13,7 @@
   }
 
   const headerHtml = `
-    <div class="login-above-qr header-actions-above-qr">
-        <a href="/professionnel/" class="btn-nav-above btn-pro-above" data-translate="nav.pro">Pro</a>
-        <a href="/compte/connexion" class="btn-login-above" data-translate="nav.login">Connexion</a>
-    </div>
-    <div class="qr-topright qr-topright--client">
+    <div class="qr-topright qr-topright--client desktop-only">
         <div class="qr-top-flex">
             <div class="qr-top-block" id="download-customer" data-app-type="customer" onclick="openPhoneSelection('customer')">
                 <div class="qr-code-wrapper"><div id="qr-customer-top"></div></div>
@@ -25,12 +21,24 @@
             </div>
         </div>
     </div>
-    <nav class="navbar sq-navbar">
-        <div class="nav-container">
+    <nav class="navbar sq-navbar sq-navbar--adencer">
+        <div class="nav-container sq-adencer-header">
             <div class="nav-logo">
-                <a href="${home}" style="text-decoration: none; color: inherit;"><h2>Skedisy</h2></a>
+                <a href="${home}" style="text-decoration: none; color: inherit; display:inline-flex; align-items:center; gap:8px;">
+                    <img class="sq-nav-logo-img" src="/images/logo.png" alt="Skedisy" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                    <h2 style="margin:0;">Skedisy</h2>
+                </a>
             </div>
-            <div class="nav-menu-center desktop-only" id="categoriesMenu"></div>
+            <div class="sq-adencer-header__links desktop-only">
+                <a href="/blog/" data-translate="nav.blog">Blog</a>
+                <a href="/aide/" data-translate="nav.help">Aide</a>
+                <a href="/professionnel/" data-translate="nav.pro">Pro</a>
+                <button type="button" class="lang-switcher" data-lang="en" title="Language"><i class="fas fa-globe"></i> <span>FR</span></button>
+            </div>
+            <div class="sq-adencer-header__cta desktop-only">
+                <a href="/compte/connexion" class="sq-btn sq-btn-ghost" data-translate="nav.login">Connexion</a>
+                <a href="/compte/inscription" class="sq-btn sq-btn-fill" data-translate="nav.createAccount">Créer un compte</a>
+            </div>
             <div class="mobile-menu-wrapper">
                 <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
             </div>
@@ -46,6 +54,9 @@
             </div>
             <div class="mobile-menu-content mobile-menu-content--client">
                 <a href="/compte/connexion" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
+                <a href="/compte/inscription" class="btn-login-mobile-menu" data-translate="nav.createAccount">Créer un compte</a>
+                <a href="/blog/" class="btn-login-mobile-menu" data-translate="nav.blog">Blog</a>
+                <a href="/aide/" class="btn-login-mobile-menu" data-translate="nav.help">Aide</a>
                 <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer" data-translate="client.downloadAppCta">Télécharger l'app</button>
                 <div class="mobile-categories-panel">
                     <button type="button" class="btn-login-mobile-menu mobile-categories-toggle" id="mobileCategoriesToggle" aria-expanded="false" aria-controls="mobileCategoriesDrawer">

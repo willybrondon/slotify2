@@ -9,16 +9,51 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../cookie-consent.css">
+    <link rel="stylesheet" href="../public-pages.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <script src="../language.js" defer></script>
 </head>
-<body class="client-page sq-page sq-help-page sq-help-article" data-page="client">
-    <nav class="navbar sq-navbar">
-        <div class="nav-container">
-            <div class="nav-logo"><a href="/" style="text-decoration:none;color:inherit"><h2>Skedisy</h2></a></div>
-            <div class="nav-menu-center desktop-only"><a href="/aide/" class="nav-link" data-translate="footer.helpCenter">Centre d'Aide</a></div>
-            <div class="mobile-menu-wrapper"><div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div></div>
+<body class="client-page sq-page sk-public-page sq-help-page sq-help-article" data-page="client">
+    <nav class="navbar sq-navbar sq-navbar--adencer">
+        <div class="nav-container sq-adencer-header">
+            <div class="nav-logo">
+                <a href="/" style="text-decoration: none; color: inherit; display:inline-flex; align-items:center; gap:8px;">
+                    <img class="sq-nav-logo-img" src="/images/logo.png" alt="Skedisy" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                    <h2 style="margin:0;">Skedisy</h2>
+                </a>
+            </div>
+            <div class="sq-adencer-header__links desktop-only">
+                <a href="/blog/" data-translate="nav.blog">Blog</a>
+                <a href="/aide/" data-translate="nav.help">Aide</a>
+                <a href="/professionnel/" data-translate="nav.pro">Pro</a>
+                <button type="button" class="lang-switcher" data-lang="en" title="Language"><i class="fas fa-globe"></i> <span>FR</span></button>
+            </div>
+            <div class="sq-adencer-header__cta desktop-only">
+                <a href="/compte/connexion" class="sq-btn sq-btn-ghost" data-translate="nav.login">Connexion</a>
+                <a href="/compte/inscription" class="sq-btn sq-btn-fill" data-translate="nav.createAccount">Créer un compte</a>
+            </div>
+            <div class="mobile-menu-wrapper">
+                <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3 data-translate="nav.forClients">Pour les clientes</h3>
+                <div class="mobile-menu-header-right">
+                    <button class="lang-switcher mobile-only" data-lang="en" title="Passer en anglais"><i class="fas fa-globe"></i> <span>FR</span></button>
+                    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Fermer">&times;</button>
+                </div>
+            </div>
+            <div class="mobile-menu-content mobile-menu-content--client">
+                <a href="/compte/connexion" class="btn-login-mobile-menu" data-translate="nav.login">Connexion</a>
+                <a href="/compte/inscription" class="btn-login-mobile-menu" data-translate="nav.createAccount">Créer un compte</a>
+                <a href="/blog/" class="btn-login-mobile-menu" data-translate="nav.blog">Blog</a>
+                <a href="/aide/" class="btn-login-mobile-menu" data-translate="nav.help">Aide</a>
+                <button type="button" class="btn-login-mobile-menu btn-mobile-action" data-mobile-download="customer" data-translate="client.downloadAppCta">Télécharger l'app</button>
+                <a href="/professionnel/" class="btn-login-mobile-menu btn-for-business-mobile" data-translate="nav.forBusiness">Pour les professionnels</a>
+            </div>
         </div>
     </nav>
 
