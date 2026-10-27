@@ -42,9 +42,13 @@
                 <a href="/professionnel/" data-translate="nav.pro">Pro</a>
                 <button type="button" class="lang-switcher" data-lang="en" title="Language"><i class="fas fa-globe"></i> <span>FR</span></button>
             </div>
-            <div class="sq-adencer-header__cta desktop-only">
-                <a href="/compte/connexion" class="sq-btn sq-btn-ghost" data-translate="nav.login">Connexion</a>
-                <a href="/compte/inscription" class="sq-btn sq-btn-fill" data-translate="nav.createAccount">Créer un compte</a>
+            <div class="sq-adencer-header__cta">
+                <button type="button" class="sq-header-fav-btn" id="headerFavBtn" aria-label="Mes salons aimés" aria-expanded="false" aria-controls="favDrawer" data-translate-aria="nav.myFavorites">
+                  <i class="far fa-heart" aria-hidden="true"></i>
+                  <span class="sq-header-fav-btn__count" id="headerFavCount" data-count="0"></span>
+                </button>
+                <a href="/compte/connexion" class="sq-btn sq-btn-ghost desktop-only" data-translate="nav.login">Connexion</a>
+                <a href="/compte/inscription" class="sq-btn sq-btn-fill desktop-only" data-translate="nav.createAccount">Créer un compte</a>
             </div>
             <div class="mobile-menu-wrapper">
                 <div class="hamburger mobile-only" id="mobileMenuToggle"><span></span><span></span><span></span></div>
@@ -82,6 +86,18 @@
             </div>
         </div>
     </nav>
+
+    <div class="sq-fav-drawer" id="favDrawer" hidden>
+      <div class="sq-fav-drawer__backdrop" data-close-fav></div>
+      <aside class="sq-fav-drawer__panel" role="dialog" aria-labelledby="favDrawerTitle">
+        <div class="sq-fav-drawer__head">
+          <h2 id="favDrawerTitle" data-translate="nav.myFavorites">Mes salons aimés</h2>
+          <button type="button" class="sq-fav-drawer__close" data-close-fav aria-label="Fermer">&times;</button>
+        </div>
+        <ul class="sq-fav-drawer__list" id="favDrawerList"></ul>
+        <p class="sq-fav-drawer__empty" id="favDrawerEmpty" data-translate="nav.favoritesEmpty">Aucun salon aimé pour le moment.</p>
+      </aside>
+    </div>
 
   <section class="sq-home-product sq-home-product--compact" id="sqHomeProduct">
     <div class="container sq-home-product-inner">
@@ -205,16 +221,20 @@
 
       <div class="sq-category-discover__main sq-category-discover__main--split" id="categoryMain">
         <div class="sq-category-discover__list-wrap">
-          <div class="salons-grid sq-salons-grid--split" id="salonsGrid">
+          <div class="salons-grid sq-salons-grid--split sq-salons-grid--map-one" id="salonsGrid">
             <p class="sq-home-discovery-loading" data-translate="homeProduct.salonsLoading">Chargement des salons…</p>
           </div>
+          <nav class="sq-category-pagination" id="categoryPagination" aria-label="Pagination" hidden></nav>
         </div>
-        <div id="categoryMap" class="sq-category-discover__map" aria-hidden="false"></div>
+        <div id="categoryMapPanel" class="sq-category-discover__map-panel">
+          <div id="categoryMap" class="sq-category-discover__map" aria-hidden="false"></div>
+        </div>
       </div>
     </div>
   </main>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script type="module" src="qr-code-init.js"></script>
   <script src="script.js"></script>
   <script src="location-chip.js"></script>
   <script src="search-suggestions.js"></script>

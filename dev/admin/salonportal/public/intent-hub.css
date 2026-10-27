@@ -2018,6 +2018,20 @@ body.sq-home-search-active .sq-home-landing__map-el {
   padding-bottom: 1.5rem;
 }
 
+/* Leave room for fixed QR (desktop) on search page */
+@media (min-width: 769px) {
+  .sq-intent-hub--search-page .sq-search-hero-wrap,
+  .sq-category-discover--search > .container {
+    padding-right: 200px;
+    box-sizing: border-box;
+  }
+
+  body.sk-public-page .qr-topright--client {
+    display: block;
+    z-index: 2000;
+  }
+}
+
 /* Filtres page recherche */
 .sq-category-discover__toolbar-actions {
   display: flex;

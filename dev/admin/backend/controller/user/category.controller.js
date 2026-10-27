@@ -1343,7 +1343,7 @@ exports.serveCategoryPage = async (req, res) => {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/intent-hub.css">
-    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat-chips-align">
+    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat-search-640">
     <style>
       /* Max 2 salons per row on category pages (list mode) */
       .sk-public-page .sq-category-discover .salons-grid,

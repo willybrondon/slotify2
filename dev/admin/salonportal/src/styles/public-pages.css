@@ -2185,10 +2185,44 @@ body.sk-public-page .main-wrapper {
     font-size: 0.95rem;
 }
 
+/* Feature blocks without media (text only) */
+.sq-feature-inner--copy-only {
+    grid-template-columns: 1fr !important;
+    max-width: 720px;
+    padding-right: 24px;
+}
+
+.sq-feature-inner--copy-only .sq-feature-copy {
+    max-width: 40rem;
+}
+
+.sq-gallery-inner--ig {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 920px;
+    gap: 1.25rem;
+}
+
+.sq-gallery-inner--ig .sq-ig-post__media {
+    aspect-ratio: 4 / 5;
+}
+
+.sq-gallery-inner--ig .sq-ig-post__caption {
+    display: block;
+    margin-top: 0.55rem;
+}
+
+@media (max-width: 640px) {
+    .sq-gallery-inner--ig {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Search + prestations: narrower than salon grid (home-like left column) */
 .sq-category-discover__search-hero {
-    margin: 0 0 12px;
-    max-width: 100%;
-    padding-right: 0 !important; /* override intent-hub 200px offset */
+    margin: 0 0 10px;
+    width: 100%;
+    max-width: 640px;
+    padding-right: 0 !important;
 }
 
 .sq-category-discover__search-hero .sq-search-hero {
@@ -2196,10 +2230,9 @@ body.sk-public-page .main-wrapper {
     max-width: 100%;
 }
 
-/* Prestations chips: same left/right edge as search + catalog */
 .sq-category-discover .sq-service-chips {
-    max-width: 100%;
     width: 100%;
+    max-width: 640px; /* stop before salon catalog full width */
     margin: 0 0 12px;
     padding: 0 0 4px;
     box-sizing: border-box;
@@ -6322,34 +6355,28 @@ body.sq-booking-modal-open .content-wrapper {
   display: block;
 }
 
-.sq-ig-post__play {
+/* External open control (top-right square + arrow) — replaces center play */
+.sq-ig-post__open {
   position: absolute;
-  inset: 0;
-  display: flex;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.35) 100%);
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1410;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
   pointer-events: none;
+  font-size: 0.85rem;
 }
 
-.sq-ig-post__play::before {
-  content: "";
-  width: 3rem;
-  height: 3rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-.sq-ig-post__play::after {
-  content: "";
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 7px 0 7px 12px;
-  border-color: transparent transparent transparent #1a1410;
-  margin-left: 2px;
+.sq-ig-post:hover .sq-ig-post__open {
+  background: #fff;
+  transform: scale(1.04);
 }
 
 .sq-ig-post__caption {
@@ -6424,9 +6451,13 @@ body.sq-booking-modal-open .content-wrapper {
     font-size: 0.8rem;
   }
 
-  .sq-ig-post__play::before {
-    width: 2.4rem;
-    height: 2.4rem;
+  .sq-ig-post__open {
+    top: 8px;
+    right: 8px;
+    width: 1.9rem;
+    height: 1.9rem;
+    font-size: 0.75rem;
+    border-radius: 7px;
   }
 }
 
