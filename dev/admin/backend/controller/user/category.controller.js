@@ -1343,14 +1343,29 @@ exports.serveCategoryPage = async (req, res) => {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="${baseURL}/styles.css">
     <link rel="stylesheet" href="${baseURL}/intent-hub.css">
-    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat-fix-fix">
+    <link rel="stylesheet" href="${baseURL}/public-pages.css?v=cat-chips-align">
     <style>
-      /* Max 2 salons per row on category pages */
+      /* Max 2 salons per row on category pages (list mode) */
       .sk-public-page .sq-category-discover .salons-grid,
       .sk-public-page .sq-category-discover #salonsGrid {
         display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 16px !important;
+      }
+      /* Map mode: 1 salon column beside the map */
+      .sk-public-page .sq-category-discover__main--split .salons-grid,
+      .sk-public-page .sq-category-discover__main--split #salonsGrid,
+      .sk-public-page .sq-category-discover__main--split .sq-salons-grid--cards2,
+      .sk-public-page .sq-category-discover--map #salonsGrid {
+        grid-template-columns: 1fr !important;
+      }
+      @media (min-width: 901px) {
+        .sk-public-page .sq-category-discover__main--split {
+          display: grid !important;
+          grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) !important;
+          gap: 12px !important;
+          align-items: start;
+        }
       }
       @media (max-width: 720px) {
         .sk-public-page .sq-category-discover .salons-grid,

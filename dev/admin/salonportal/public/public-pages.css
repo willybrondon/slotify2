@@ -1493,22 +1493,12 @@ body.sk-public-page .main-wrapper {
 
 .sq-category-discover__inner.container,
 .sq-category-discover .container {
-    /* Align with home landing / « Partager un look » content width */
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-left: 20px;
-    padding-right: 20px;
-    box-sizing: border-box;
-}
-
-/* Map mode: use more width, tighter side gutters (like home share-look) */
-.sq-category-discover--map .sq-category-discover__inner.container,
-.sq-category-discover--map .container,
-.sq-category-discover:has(.sq-category-discover__main--split) .sq-category-discover__inner.container,
-.sq-category-discover:has(.sq-category-discover__main--split) .container {
+    /* Same left/right gutters with or without map (map spacing kept) */
     max-width: min(1320px, 100%);
+    margin: 0 auto;
     padding-left: 12px;
     padding-right: 12px;
+    box-sizing: border-box;
 }
 
 .sq-category-discover__head {
@@ -1813,6 +1803,21 @@ body.sk-public-page .main-wrapper {
     width: 100%;
     box-sizing: border-box;
     flex-direction: unset !important;
+}
+
+/* Map mode wins over cards2: exactly 1 salon column + map beside it */
+.sk-public-page .sq-category-discover__main--split .salons-grid,
+.sk-public-page .sq-category-discover__main--split #salonsGrid,
+.sk-public-page .sq-category-discover__main--split .sq-salons-grid--cards2,
+.sk-public-page .sq-category-discover__main--split .salons-grid.sq-salons-grid--cards2,
+.sk-public-page .sq-category-discover--map .salons-grid,
+.sk-public-page .sq-category-discover--map #salonsGrid,
+.sk-public-page .sq-category-discover--map .sq-salons-grid--cards2,
+.sk-public-page .sq-category-discover .salons-grid.sq-salons-grid--map-one,
+.sk-public-page .sq-category-discover #salonsGrid.sq-salons-grid--map-one,
+.sk-public-page .sq-salons-grid--cards2.sq-salons-grid--map-one {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
 }
 
 .sq-salons-grid--cards2 > .salon-card,
@@ -2181,13 +2186,23 @@ body.sk-public-page .main-wrapper {
 }
 
 .sq-category-discover__search-hero {
-    margin: 0 0 18px;
+    margin: 0 0 12px;
     max-width: 100%;
+    padding-right: 0 !important; /* override intent-hub 200px offset */
 }
 
 .sq-category-discover__search-hero .sq-search-hero {
     width: 100%;
-    max-width: 640px;
+    max-width: 100%;
+}
+
+/* Prestations chips: same left/right edge as search + catalog */
+.sq-category-discover .sq-service-chips {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 0 0 4px;
+    box-sizing: border-box;
 }
 
 .sq-make-offer-toggle {
@@ -3074,7 +3089,7 @@ body.sk-public-page .main-wrapper {
     font-size: 0.95rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
     .sq-category-discover__main,
     .sq-category-discover__main--list,
     .sq-category-discover__main--map,
@@ -6034,10 +6049,11 @@ body.sq-booking-modal-open .content-wrapper {
   gap: 0.45rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0 1rem 0.75rem;
-  max-width: 1100px;
-  margin: 0 auto;
+  padding: 0 0 0.75rem;
+  max-width: 100%;
+  margin: 0;
   scrollbar-width: thin;
+  box-sizing: border-box;
 }
 
 .sq-service-chip {

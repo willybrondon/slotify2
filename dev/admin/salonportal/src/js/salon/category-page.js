@@ -572,6 +572,9 @@
         }
         const discover = document.querySelector(".sq-category-discover");
         if (discover) discover.classList.toggle("sq-category-discover--map", visible);
+        if (salonsGrid) {
+            salonsGrid.classList.toggle("sq-salons-grid--map-one", visible);
+        }
         if (visible) {
             initMap();
             setTimeout(() => mapInstance && mapInstance.invalidateSize(), 80);
