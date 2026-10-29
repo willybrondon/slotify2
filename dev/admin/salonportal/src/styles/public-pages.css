@@ -797,38 +797,43 @@ body.sk-public-page .main-wrapper {
 }
 
 .sk-public-page .sq-salon-download {
-    margin-top: 4px;
+    margin-top: 12px;
     text-align: center;
 }
 
-.sk-public-page .sq-salon-download__lead {
+.sk-public-page .sq-salon-download__title {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--sk-text);
     text-align: center;
-    margin: 0 0 16px;
-    color: var(--sk-text-muted);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.sk-public-page .sq-salon-download__cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin-bottom: 16px;
-    box-sizing: border-box;
 }
 
 .sk-public-page .booking-card .sq-store-badges {
-    flex-direction: column;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: stretch;
-    gap: 10px;
+    justify-content: center;
+    gap: 8px;
     margin-top: 0;
 }
 
 .sk-public-page .booking-card .sq-store-badge {
-    width: 100%;
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
     box-sizing: border-box;
     justify-content: flex-start;
+    padding: 0.45rem 0.65rem 0.45rem 0.55rem;
+}
+
+.sk-public-page .booking-card .sq-store-badge-icon {
+    font-size: 1.45rem;
+}
+
+.sk-public-page .booking-card .sq-store-badge-text strong {
+    font-size: 0.92rem;
 }
 
 .sk-public-page .btn-primary {
@@ -4215,6 +4220,14 @@ body.sk-public-page .main-wrapper {
     border: 1px solid var(--sk-border-light);
 }
 
+.sq-booking-step__lead {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--sk-text, #111);
+    margin: 0 0 14px;
+    line-height: 1.35;
+}
+
 .sq-booking-step__hint {
     font-size: 0.9rem;
     color: var(--sk-text-muted, #6b7280);
@@ -5287,23 +5300,19 @@ body.sk-public-page .main-wrapper {
     flex-direction: column;
     gap: 10px;
 }
+/* Modal list scrolls with .sq-booking-steps so accordion details match the page */
 .sk-public-page .sq-services-list--modal {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: min(62vh, 580px);
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-    padding: 4px 6px 16px 2px;
-    -webkit-overflow-scrolling: touch;
+    max-height: none;
+    overflow: visible;
+    padding: 4px 2px 16px;
 }
 @media (max-width: 640px) {
     .sk-public-page .sq-services-list--modal {
-        max-height: min(52vh, 480px);
         gap: 10px;
-        padding: 2px 4px 20px 0;
+        padding: 2px 0 20px;
     }
     .sk-public-page .sq-svc-row__head {
         padding: 12px 14px;
@@ -5532,6 +5541,13 @@ body.sq-booking-modal-open .sq-salon-detail,
 body.sq-booking-modal-open .sq-salon-detail__page,
 body.sq-booking-modal-open .content-wrapper {
     overscroll-behavior: none;
+}
+/* Page Continuer bar must not sit over the booking modal (mobile always-on sticky) */
+body.sq-booking-modal-open .sticky-booking-btn,
+body.sq-booking-modal-open .sticky-booking-btn.sticky-booking-btn--active,
+.sk-public-page .sticky-booking-btn.sticky-booking-btn--modal-open {
+    display: none !important;
+    pointer-events: none !important;
 }
 .sk-public-page .sq-svc-row__meta {
     font-size: 0.88rem;

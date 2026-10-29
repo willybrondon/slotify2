@@ -1044,8 +1044,7 @@ exports.serveSalonWebPage = async (req, res) => {
     let servicesHtml = "";
     if (bookingServices.length > 0) {
       servicesHtml = `<div class="section sq-salon-services-block">
-        <h3 class="section-title">${copy.services}</h3>
-        <p class="sq-booking-step__hint sq-salon-services-hint">${copy.servicesMultiHint}</p>
+        <h3 class="section-title">${copy.selectServices || copy.services}</h3>
         <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
         <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonServicesSummary" aria-live="polite"></div>
         <div class="sq-services-list" id="salonServicesGrid"></div>
@@ -1407,8 +1406,7 @@ exports.serveSalonWebPage = async (req, res) => {
                               ${contactActionsHtml}
                             </div>
                             <div id="download-section" class="sq-salon-download">
-                                <p class="sq-salon-download__lead">${copy.noAppDesc}</p>
-                                <a href="#" onclick="openPhoneSelection('customer'); return false;" class="sq-btn sq-btn-fill sq-salon-download__cta">${copy.downloadAppCta}</a>
+                                <h4 class="sq-salon-download__title">${copy.downloadTitle || copy.downloadAppCta || "Télécharger"}</h4>
                                 <div class="sq-store-badges-mount" data-app="customer" data-center="true"></div>
                     </div>
                         </div>`;
@@ -1839,6 +1837,8 @@ exports.serveSalonWebPage = async (req, res) => {
                 bookNow: ${JSON.stringify(copy.bookNow)},
                 makeOfferSelectService: ${JSON.stringify(copy.makeOfferSelectService)},
                 makeOfferInvalidPrice: ${JSON.stringify(copy.makeOfferInvalidPrice)},
+                makeOfferNormalPrice: ${JSON.stringify(copy.makeOfferNormalPrice)},
+                makeOfferProposedPrice: ${JSON.stringify(copy.makeOfferProposedPrice)},
                 continue: ${JSON.stringify(copy.continue)},
                 back: ${JSON.stringify(copy.back)},
                 enterCouponCode: ${JSON.stringify(copy.enterCouponCode)},

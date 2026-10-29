@@ -56,7 +56,47 @@
     selectedProductIds: [],
     /** Sélections inline par prestation sur la page salon */
     pageSvcDraft: {},
+    /** Offre cliente (Faire une offre) : prix proposé pris en compte à la résa */
+    clientOffer: null,
   };
+
+  function getActiveClientOffer() {
+    const offer = state.clientOffer;
+    if (!offer || !offer.serviceId) return null;
+    const price = Number(offer.offerPrice);
+    if (!Number.isFinite(price) || price <= 0) return null;
+    return {
+      serviceId: normalizeServiceId(offer.serviceId),
+      offerPrice: price,
+      cataloguePrice: Number(offer.cataloguePrice) || 0,
+    };
+  }
+
+  function mergeClientOfferIntoAnswers(base) {
+    const answers =
+      base && typeof base === "object" ? { ...base } : {};
+    const offer = getActiveClientOffer();
+    if (!offer) {
+      delete answers.clientOfferPrice;
+      delete answers.cataloguePrice;
+      delete answers.normalPrice;
+      delete answers.clientOfferNote;
+      delete answers.isClientOffer;
+      delete answers.clientOfferServiceId;
+      return answers;
+    }
+    answers.clientOfferPrice = offer.offerPrice;
+    answers.cataloguePrice = offer.cataloguePrice;
+    answers.normalPrice = offer.cataloguePrice;
+    answers.clientOfferServiceId = offer.serviceId;
+    answers.isClientOffer = true;
+    answers.clientOfferNote = `Offre cliente: ${offer.offerPrice}€ (prix catalogue: ${offer.cataloguePrice}€)`;
+    return answers;
+  }
+
+  function clearClientOffer() {
+    state.clientOffer = null;
+  }
 
   const payCfg = { ...(cfg.payment || {}) };
 
@@ -338,6 +378,7 @@
     state.afroConfigServiceId = null;
     state.afroSkipPrecision = false;
     state.afroPrecisionFormOpen = false;
+    // clientOffer is preserved across open() unless cleared explicitly
   }
 
   function hasAcceptedAfroQuote() {
@@ -361,7 +402,7 @@
    */
   function applyPageDraftsToBookingState() {
     if (!state.selectedServiceIds.length) {
-      state.afroAnswers = {};
+      state.afroAnswers = mergeClientOfferIntoAnswers({});
       state.selectedProductIds = [];
       state.afroConfigServiceId = null;
       state.afroDemand = null;
@@ -384,7 +425,8 @@
     if (addons.size) answers.addons = Array.from(addons);
     if (productIds.size) answers.selectedProductIds = Array.from(productIds);
 
-    state.afroAnswers = answers;
+    // Keep client offer metadata so salon receives it with the booking
+    state.afroAnswers = mergeClientOfferIntoAnswers(answers);
     state.selectedProductIds = Array.from(productIds);
     // Demand/deposit may still target one primary — never collapse multi-select.
     state.afroConfigServiceId = normalizeServiceId(state.selectedServiceIds[0]);
@@ -1063,10 +1105,16 @@
       const selectBtn = row.querySelector("[data-svc-select]");
       const sid = row.getAttribute("data-service-id");
       if (toggle) {
-        toggle.addEventListener("click", () => {
+        toggle.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           const open = row.classList.toggle("is-open");
           toggle.setAttribute("aria-expanded", open ? "true" : "false");
           if (onToggleOpen) onToggleOpen(sid, open);
+          // Keep expanded panel in view inside the booking modal
+          if (open && mode === "modal") {
+            row.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
         });
       }
 
@@ -1345,10 +1393,13 @@
         btn.textContent = stickyLabel;
       }
     });
-    // Mobile + desktop sticky: show summed price + duration when selecting
+    // Page sticky Continuer: hide while booking modal is open; restore on close/back
     const stickyBar = document.getElementById("salonStickyBookingBar");
     if (stickyBar) {
-      stickyBar.classList.toggle("sticky-booking-btn--active", count > 0);
+      const showPageSticky = count > 0 && !isModalOpen();
+      stickyBar.classList.toggle("sticky-booking-btn--active", showPageSticky);
+      stickyBar.classList.toggle("sticky-booking-btn--modal-open", isModalOpen());
+      stickyBar.setAttribute("aria-hidden", isModalOpen() ? "true" : "false");
       let sumEl = document.getElementById("salonStickyBookingSummary");
       if (!sumEl) {
         sumEl = document.createElement("div");
@@ -1358,7 +1409,7 @@
       }
       if (totals && count > 0) {
         const names = selected.map((s) => s.name).join(", ");
-        sumEl.hidden = false;
+        sumEl.hidden = !showPageSticky;
         sumEl.innerHTML = `
           <p class="sticky-booking-btn__count">${escapeHtml(
             tFmt("servicesSelectedCount", "{n}", String(count))
@@ -1523,6 +1574,8 @@
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
     setModalTitle(t("bookNow"));
+    // Hide page « Continuer » box while the expert/booking modal is open
+    updateBookButtons();
   }
 
   function closeModal() {
@@ -1535,7 +1588,12 @@
     hideBookingStickyBar();
     setModalBack(null);
     setModalTitle(t("bookNow"));
+    // Closing abandons an in-progress offer tunnel (selection on page unchanged)
+    clearClientOffer();
+    state.afroAnswers = mergeClientOfferIntoAnswers(state.afroAnswers || {});
     renderServicesGrid();
+    // Restores page sticky Continuer if services are still selected
+    updateBookButtons();
   }
 
   modal?.querySelectorAll("[data-close-booking]").forEach((el) => {
@@ -1577,10 +1635,17 @@
     let sub = 0;
     let dur = 0;
     const list = Array.isArray(serviceList) ? serviceList : [];
+    const offer = getActiveClientOffer();
     // Sum every selected service (catalogue + per-service options only)
+    // Client offer replaces catalogue price for the offered service
     list.forEach((s) => {
       const sid = normalizeServiceId(s.id || s._id);
-      sub += toMoneyNumber(s.price);
+      const catalogue = toMoneyNumber(s.price);
+      if (offer && sid === offer.serviceId) {
+        sub += offer.offerPrice;
+      } else {
+        sub += catalogue;
+      }
       const meta = state.afroByServiceId?.[sid];
       let serviceDur = toMoneyNumber(s.duration);
       if (meta) {
@@ -1702,13 +1767,20 @@
     if (state.applyLoyalty && state.loyaltyDiscount > 0) {
       body.applyLoyalty = true;
     }
-    // Infos presta (options / photo / produits) → salon à la confirmation, sans étape devis
-    const answers = state.afroAnswers && typeof state.afroAnswers === "object"
-      ? { ...state.afroAnswers }
-      : {};
+    // Infos presta (options / photo / produits / offre cliente) → salon
+    const answers = mergeClientOfferIntoAnswers(
+      state.afroAnswers && typeof state.afroAnswers === "object"
+        ? state.afroAnswers
+        : {}
+    );
     delete answers._skipPrecision;
     if (Object.keys(answers).length) {
       body.clientAnswers = answers;
+    }
+    const offer = getActiveClientOffer();
+    if (offer) {
+      body.clientOfferPrice = offer.offerPrice;
+      body.cataloguePrice = offer.cataloguePrice;
     }
     if (Array.isArray(state.afroPhotoUrls) && state.afroPhotoUrls.length) {
       body.inspirationPhotoUrls = state.afroPhotoUrls;
@@ -2249,6 +2321,9 @@
   }
 
   function renderStepServices(opts = {}) {
+    hideBookingStickyBar();
+    setModalTitle(t("bookNow"));
+    setModalBack(() => closeModal());
     const expandId = opts.expandServiceId
       ? normalizeServiceId(opts.expandServiceId)
       : null;
@@ -2265,10 +2340,10 @@
           tFmt("expertPreselectedHint", "__NAME__", ex.name || "")
         )}</p>`
       : "";
+    // Same service boxes as salon page (+ / check + arrow for details)
     stepsEl.innerHTML = `
       <p class="sq-booking-step__lead">${escapeHtml(cfg.copy.selectServices)}</p>
       ${expertHint}
-      <p class="sq-booking-step__hint">${escapeHtml(t("servicesMultiHint"))}</p>
       <div class="sq-service-tabs sq-service-tabs--modal" id="bookingServiceTabs"></div>
       <div class="sq-services-list sq-services-list--modal" id="bookingServicesGrid"></div>
     `;
@@ -2692,6 +2767,29 @@
 
   function renderPriceBreakdown(totals) {
     let html = "";
+    const offer = getActiveClientOffer();
+    if (offer) {
+      const svc = (cfg.services || []).find(
+        (s) => normalizeServiceId(s.id) === offer.serviceId
+      );
+      const cat =
+        offer.cataloguePrice > 0
+          ? offer.cataloguePrice
+          : toMoneyNumber(svc?.price);
+      html += `<p class="sq-booking-offer-banner"><strong>${escapeHtml(
+        cfg.copy?.makeOffer || "Faire une offre"
+      )}</strong></p>`;
+      html += `<p>${escapeHtml(
+        cfg.copy?.makeOfferNormalPrice || "Prix catalogue"
+      )} : <span style="text-decoration:line-through;opacity:.75">${escapeHtml(
+        cfg.currency
+      )}${cat.toFixed(2)}</span></p>`;
+      html += `<p>${escapeHtml(
+        cfg.copy?.makeOfferProposedPrice || "Prix proposé"
+      )} : <strong>${escapeHtml(cfg.currency)}${offer.offerPrice.toFixed(
+        2
+      )}</strong></p>`;
+    }
     html += `<p>${escapeHtml(cfg.copy.subtotal)} : ${escapeHtml(cfg.currency)}${totals.sub.toFixed(2)}</p>`;
     if (totals.dur > 0) {
       html += `<p>${escapeHtml(t("afroEstimatedDuration") || t("serviceDurationTitle"))} : <strong>${totals.dur} ${escapeHtml(t("min"))}</strong></p>`;
@@ -3414,6 +3512,25 @@
       state.expertId = opts.expertId || null;
       clearAfroQuote();
 
+      // Offer from « Faire une offre » or cleared for a normal booking open
+      const offerPrice = Number(opts.offerPrice);
+      if (opts.serviceId && Number.isFinite(offerPrice) && offerPrice > 0) {
+        const sid = normalizeServiceId(opts.serviceId);
+        const svc = (cfg.services || []).find(
+          (s) => normalizeServiceId(s.id) === sid
+        );
+        state.clientOffer = {
+          serviceId: sid,
+          offerPrice,
+          cataloguePrice:
+            Number(opts.cataloguePrice) > 0
+              ? Number(opts.cataloguePrice)
+              : toMoneyNumber(svc?.price),
+        };
+      } else if (!opts.keepClientOffer) {
+        clearClientOffer();
+      }
+
       if (opts.expertId && !opts.serviceId) {
         state.selectedServiceIds = [];
       } else if (opts.serviceId) {
@@ -3437,9 +3554,9 @@
       // Options déjà cochées sur la fiche presta → réservation directe (pas de devis)
       if (opts.skipPrecision && opts.serviceId) {
         const sid = normalizeServiceId(opts.serviceId);
-        const answers = {
+        const answers = mergeClientOfferIntoAnswers({
           ...(opts.afroAnswers || {}),
-        };
+        });
         if (Array.isArray(opts.addons) && opts.addons.length) {
           answers.addons = opts.addons.map(String);
         }
@@ -3452,6 +3569,14 @@
         state.afroConfigServiceId = sid;
         state.afroPrecisionFormOpen = false;
         state.afroDemand = null;
+        afterServicesContinue();
+        return;
+      }
+
+      state.afroAnswers = mergeClientOfferIntoAnswers(state.afroAnswers || {});
+
+      // Offre cliente : enchaîner directement (expert / créneau) avec le prix proposé
+      if (getActiveClientOffer() && state.selectedServiceIds.length) {
         afterServicesContinue();
         return;
       }
@@ -3474,6 +3599,7 @@
 
   stickyMobileBtn?.addEventListener("click", () => {
     applyPageDraftsToBookingState();
+    // Page sticky Continuer → skip services list, go to expert
     if (state.selectedServiceIds.length > 0) {
       openBookingForSelection();
       return;
@@ -3482,19 +3608,85 @@
     renderStepServices();
   });
 
-  // Aside « Réserver (n) » — keep multi-selection, open tunnel
+  // Aside « Réserver » → always same prestation boxes as the page (expand arrow, +/check)
   document.querySelectorAll(".open-app-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      // Prefer programmatic multi-select open over empty SalonBooking.open()
-      if (!state.selectedServiceIds.length) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      applyPageDraftsToBookingState();
-      openBookingForSelection();
-    }, true);
+    btn.addEventListener(
+      "click",
+      (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        applyPageDraftsToBookingState();
+        openModal();
+        renderStepServices();
+        if (stepsEl) stepsEl.scrollTop = 0;
+      },
+      true
+    );
   });
 
   tryResumeBooking();
+
+  // Faire une offre (select service + proposed price → booking)
+  (function initMakeOffer() {
+    const toggle = document.getElementById("salonMakeOfferToggle");
+    const panel = document.getElementById("salonMakeOfferPanel");
+    const goBtn = document.getElementById("salonMakeOfferGo");
+    const svcEl = document.getElementById("salonOfferService");
+    const priceEl = document.getElementById("salonOfferPrice");
+    const errEl = document.getElementById("salonMakeOfferErr");
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener("click", () => {
+      const open = panel.hasAttribute("hidden");
+      if (open) panel.removeAttribute("hidden");
+      else panel.setAttribute("hidden", "");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    goBtn?.addEventListener("click", () => {
+      const serviceId = (svcEl?.value || "").trim();
+      const price = parseFloat(String(priceEl?.value || "").replace(",", "."));
+      if (!serviceId) {
+        if (errEl) {
+          errEl.hidden = false;
+          errEl.textContent =
+            cfg.copy?.makeOfferSelectService || "Sélectionne une prestation";
+        }
+        return;
+      }
+      if (!Number.isFinite(price) || price <= 0) {
+        if (errEl) {
+          errEl.hidden = false;
+          errEl.textContent =
+            cfg.copy?.makeOfferInvalidPrice || "Indique un prix valide";
+        }
+        return;
+      }
+      if (errEl) errEl.hidden = true;
+      const sid = normalizeServiceId(serviceId);
+      const svc = (cfg.services || []).find(
+        (s) => normalizeServiceId(s.id) === sid
+      );
+      const cataloguePrice = toMoneyNumber(svc?.price);
+      try {
+        sessionStorage.setItem(
+          "skedisy_client_offer",
+          JSON.stringify({
+            salonId: cfg.salonId,
+            serviceId: sid,
+            offerPrice: price,
+            cataloguePrice,
+            at: Date.now(),
+          })
+        );
+      } catch (_) { /* ignore */ }
+      window.SalonBooking.open({
+        serviceId: sid,
+        offerPrice: price,
+        cataloguePrice,
+      });
+    });
+  })();
 
   async function startRebookFromToken(token) {
     try {

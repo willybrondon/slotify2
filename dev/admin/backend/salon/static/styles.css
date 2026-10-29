@@ -1,4 +1,5 @@
-/* Skedisy — palette 3 couleurs : noir, blanc, terracotta (web ↔ app Flutter) */
+@charset "UTF-8";
+/* Skedisy â palette 3 couleurs : noir, blanc, terracotta (web â app Flutter) */
 :root {
     --sk-brand: #c45c26;
     --sk-brand-hover: #a84d1f;
@@ -618,7 +619,7 @@ html {
     box-sizing: border-box;
 }
 
-/* Blog (et liens nav directs) — alignés sur Pro / Connexion */
+/* Blog (et liens nav directs) â alignÃ©s sur Pro / Connexion */
 .mobile-menu-content > .category-link {
     display: block !important;
     background: #111 !important;
@@ -1136,7 +1137,7 @@ html {
 }
 
 .feature-card li::before {
-    content: "✓";
+    content: "\2713"; /* ✓ */
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1182,7 +1183,7 @@ html {
 }
 
 .clients-content li::before {
-    content: "✓";
+    content: "\2713";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1249,7 +1250,7 @@ html {
 }
 
 .benefit-content li::before {
-    content: "✓";
+    content: "\2713";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1300,7 +1301,7 @@ html {
 }
 
 .payment-content li::before {
-    content: "✓";
+    content: "\2713";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1520,7 +1521,7 @@ html {
     margin-right: auto;
 }
 
-/* Footer — noir & blanc */
+/* Footer â noir & blanc */
 .footer {
     background: #111;
     color: #fff;
@@ -2757,7 +2758,7 @@ html {
   }
 } 
 
-/* Floating actions — mobile sticky on scroll */
+/* Floating actions â mobile sticky on scroll */
 .sq-mobile-float-bar {
     display: none;
     position: fixed;
@@ -3571,7 +3572,7 @@ html {
     margin-bottom: 1.5rem;
 }
 
-/* ——— Client homepage (skedisy.com) ——— */
+/* âââ Client homepage (skedisy.com) âââ */
 .client-hero {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
     color: #fff;
@@ -3828,7 +3829,7 @@ html {
     background: #f0f0f0;
 }
 
-/* AI Concierge = client journey only — never show on /professionnel/ */
+/* AI Concierge = client journey only â never show on /professionnel/ */
 .pro-page .floating-ai-btn,
 .pro-page .btn-ai-concierge-mobile,
 .pro-page a[href*="ai-concierge"]:not(.sq-mobile-float-bar a) {
@@ -3840,7 +3841,7 @@ html {
     box-shadow: none !important;
 }
 
-/* ——— Squire-inspired landing (Skedisy · noir & blanc) ——— */
+/* âââ Squire-inspired landing (Skedisy Â· noir & blanc) âââ */
 .sq-page .btn-primary,
 .sq-page .sq-btn-fill {
     background: #111;
@@ -4557,7 +4558,7 @@ html {
     margin-top: 0;
 }
 
-/* Pied de page : même fond que .sq-final-cta (#111), séparé par la bordure */
+/* Pied de page : mÃªme fond que .sq-final-cta (#111), sÃ©parÃ© par la bordure */
 .sq-page .footer,
 .sq-page .sq-footer {
     background: #111 !important;
@@ -4650,7 +4651,7 @@ html {
 }
 
 .sq-problem-list li::before {
-    content: "—";
+    content: "\2014";
     position: absolute;
     left: 0;
     color: rgba(255, 255, 255, 0.4);
@@ -4742,7 +4743,7 @@ html {
 }
 
 .sq-acquisition-flow li:not(:last-child)::after {
-  content: "↓";
+  content: "\2193";
   display: block;
   text-align: center;
   opacity: 0.5;
@@ -4814,11 +4815,15 @@ html {
 }
 
 .sq-solutions-num {
+    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
     font-size: 0.8rem;
     font-weight: 700;
     color: #999;
     letter-spacing: 0.05em;
     min-width: 2rem;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0;
 }
 
 .sq-request {
@@ -4904,7 +4909,7 @@ html {
     }
 }
 
-/* Blog hub — /blog/ */
+/* Blog hub â /blog/ */
 .sq-blog-page {
     padding-top: 80px;
 }
@@ -5024,6 +5029,140 @@ html {
     justify-content: center;
 }
 
+.sq-blog-card-cover {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.sq-blog-card-meta {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--sk-text-muted);
+    margin: 0.5rem 0 0.35rem;
+}
+
+.sq-blog-audience-switch {
+    margin-top: 0.85rem;
+}
+
+.sq-blog-audience-switch .sq-btn {
+    text-decoration: none;
+    border-bottom: none;
+}
+
+.sq-blog-help-hint {
+    margin: 0.75rem 0 0;
+    font-size: 0.85rem;
+    color: var(--sk-text-muted, #7a6e64);
+}
+
+.sq-blog-help-hint a,
+.sq-blog-help-link {
+    color: var(--sk-primary, #c45c26);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: none;
+}
+
+.sq-blog-help-hint a:hover,
+.sq-blog-help-link:hover {
+    color: var(--sk-primary-hover, #a84d1f);
+    text-decoration: none;
+}
+
+.sq-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+}
+
+.sq-article-back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--sk-text-muted);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.sq-article-back:hover {
+    color: var(--sk-accent, #c45c26);
+}
+
+.sq-article-header .sq-display {
+    margin: 0.35rem 0 0.75rem;
+    font-size: clamp(1.85rem, 4vw, 2.6rem);
+    line-height: 1.15;
+}
+
+.sq-article-by {
+    color: var(--sk-text-muted);
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+}
+
+.sq-article-cover {
+    margin: 0 0 1.75rem;
+}
+
+.sq-article-cover img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
+}
+
+.sq-article-body {
+    font-size: 1.08rem;
+    line-height: 1.75;
+    color: var(--sk-text);
+}
+
+.sq-article-body h1,
+.sq-article-body h2,
+.sq-article-body h3 {
+    margin: 1.6rem 0 0.7rem;
+    line-height: 1.25;
+}
+
+.sq-article-body p {
+    margin: 0 0 1rem;
+}
+
+.sq-article-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin: 1rem 0;
+}
+
+.sq-article-body blockquote {
+    margin: 1.25rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid var(--sk-accent, #c45c26);
+    background: rgba(196, 92, 38, 0.06);
+    color: var(--sk-text-muted);
+}
+
+.sq-article-body ul,
+.sq-article-body ol {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+}
+
+.sq-article-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 .nav-link--active {
     font-weight: 700;
     text-decoration: underline;
@@ -5055,7 +5194,7 @@ html {
     }
 }
 
-/* Icônes décoratives (localisation, recherche) — terracotta */
+/* IcÃ´nes dÃ©coratives (localisation, recherche) â terracotta */
 .sk-public-page .sq-search-bar-unified__loc-icon,
 .sk-public-page .sq-salon-detail__address i,
 .sk-public-page .fa-location-dot,
@@ -5064,7 +5203,7 @@ html {
 }
  
 
-/* Help Center — /aide/ */
+/* Help Center â /aide/ */
 .sq-help-page {
     padding-top: 80px;
     background: var(--sk-bg);
@@ -5244,6 +5383,15 @@ html {
     color: var(--sk-primary);
 }
 
+.sq-help-toc-static {
+    display: block;
+    margin: 0 0 1rem;
+    color: var(--sk-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    pointer-events: none;
+}
+
 .sq-help-toc-title {
     font-size: 0.72rem;
     font-weight: 700;
@@ -5365,3 +5513,92 @@ html {
     }
 }
  
+/*  Comparatif Skedisy vs concurrents  */
+.sq-compare {
+  padding: 3.5rem 0 3rem;
+  background: linear-gradient(180deg, #faf7f4 0%, #fff 40%);
+}
+.sq-compare--pro {
+  background: linear-gradient(180deg, #fff 0%, #faf7f4 100%);
+}
+.sq-compare .sq-kicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #c45c26;
+}
+.sq-compare-lead {
+  max-width: 42rem;
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: #4a4038;
+}
+.sq-compare-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid rgba(68, 52, 40, 0.12);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(68, 52, 40, 0.06);
+}
+.sq-compare-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+.sq-compare-table th,
+.sq-compare-table td {
+  padding: 0.85rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(68, 52, 40, 0.08);
+}
+.sq-compare-table thead th {
+  background: #2c241c;
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.sq-compare-table tbody th[scope="row"] {
+  font-weight: 600;
+  color: #2c241c;
+  background: #faf7f4;
+  min-width: 9.5rem;
+}
+.sq-compare-table .sq-compare-highlight {
+  background: rgba(196, 92, 38, 0.08);
+  font-weight: 600;
+  color: #8a3d16;
+}
+.sq-compare-table thead .sq-compare-highlight {
+  background: #c45c26;
+  color: #fff;
+}
+.sq-compare-table tbody tr:last-child th,
+.sq-compare-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.sq-compare-note {
+  margin: 1.1rem 0 0.4rem;
+  font-size: 0.95rem;
+  color: #4a4038;
+  max-width: 44rem;
+}
+.sq-compare-sources {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #7a6e64;
+  max-width: 48rem;
+}
+@media (max-width: 768px) {
+  .sq-compare { padding: 2.5rem 0 2rem; }
+  .sq-compare-table { font-size: 0.8rem; }
+  .sq-compare-table th,
+  .sq-compare-table td { padding: 0.7rem 0.65rem; }
+}

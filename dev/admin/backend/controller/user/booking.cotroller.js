@@ -109,7 +109,34 @@ async function applyClientAnswersPricing({
   const safeAnswers =
     answers && typeof answers === "object" ? answers : {};
 
-  if (entry) {
+  // « Faire une offre » : le prix proposé remplace le prix catalogue de la presta concernée
+  const clientOfferPrice = Number(safeAnswers.clientOfferPrice);
+  const hasClientOffer =
+    Number.isFinite(clientOfferPrice) && clientOfferPrice > 0;
+  if (hasClientOffer) {
+    const offerSid = String(
+      safeAnswers.clientOfferServiceId || firstSid || ""
+    );
+    const ids = Array.isArray(serviceIds)
+      ? serviceIds.map(String).filter(Boolean)
+      : [String(serviceIds || "")].filter(Boolean);
+    // Recalcule : prix catalogue pour les autres presta + offre pour la cible
+    let rebuilt = 0;
+    ids.forEach((sid) => {
+      if (sid && sid === offerSid) {
+        rebuilt += clientOfferPrice;
+        return;
+      }
+      const match = (servicesData || []).find(
+        (s) => String(s._id) === String(sid)
+      );
+      const salonEntry = getSalonServiceEntry(salon, sid);
+      rebuilt +=
+        Number(salonEntry?.price) || Number(match?.price) || 0;
+    });
+    // Fallback if ids empty: use offer as full service price
+    price = rebuilt > 0 ? rebuilt : clientOfferPrice;
+  } else if (entry) {
     const quoted = computeQuote({
       salon,
       service: serviceDoc,
@@ -141,6 +168,25 @@ async function applyClientAnswersPricing({
       );
       if (prepBuf) duration += prepBuf;
     }
+  }
+
+  // Addons still apply on top of a client offer (if any)
+  if (hasClientOffer && entry) {
+    const { resolveAddonCatalog } = require("../../services/afroQuote.service");
+    const catalog = resolveAddonCatalog(entry, entry.afroConfig || null);
+    const chosen = Array.isArray(safeAnswers.addons)
+      ? safeAnswers.addons.map(String)
+      : [];
+    catalog.forEach((a) => {
+      if (!chosen.includes(String(a.id))) return;
+      price += Number(a.addPrice) || 0;
+      duration += Number(a.addMinutes) || 0;
+    });
+    const prepBuf = Math.max(
+      0,
+      Number(entry?.afroConfig?.prepBufferMinutes) || 0
+    );
+    if (prepBuf) duration += prepBuf;
   }
 
   const pids = new Set(
@@ -1224,7 +1270,7 @@ exports.newBooking = async (req, res, next) => {
       booking.policyAcceptText = String(req.body.policyAcceptText || "").slice(0, 500);
     }
 
-    // Options / photo / produits saisis sur la fiche presta (sans étape devis)
+    // Options / photo / produits / offre cliente saisis sur la fiche (sans étape devis)
     if (!linkedDemand) {
       if (req.body.clientAnswers && typeof req.body.clientAnswers === "object") {
         booking.clientAnswers = req.body.clientAnswers;
@@ -1242,6 +1288,33 @@ exports.newBooking = async (req, res, next) => {
           ...(booking.clientAnswers || {}),
           selectedProductIds: ids,
         };
+      }
+      // Persiste l'offre cliente pour le salon / expert / emails
+      const answersOffer = booking.clientAnswers || {};
+      const offerAmt = Number(
+        answersOffer.clientOfferPrice || req.body.clientOfferPrice
+      );
+      if (Number.isFinite(offerAmt) && offerAmt > 0) {
+        booking.quotedPrice = offerAmt;
+        booking.clientAnswers = {
+          ...answersOffer,
+          clientOfferPrice: offerAmt,
+          cataloguePrice: Number(
+            answersOffer.cataloguePrice ||
+              answersOffer.normalPrice ||
+              req.body.cataloguePrice
+          ) || null,
+          normalPrice: Number(
+            answersOffer.normalPrice ||
+              answersOffer.cataloguePrice ||
+              req.body.cataloguePrice
+          ) || null,
+          isClientOffer: true,
+          clientOfferNote:
+            answersOffer.clientOfferNote ||
+            `Offre cliente: ${offerAmt}€`,
+        };
+        booking.configSnapshot = booking.clientAnswers;
       }
       const afroEntry = (salon.serviceIds || []).find(
         (s) =>

@@ -331,6 +331,28 @@ async function sendExpertNewBookingEmail(bookingId, { clientBookingCount } = {})
       ["Heure", escapeHtml(bookingTime)],
       ["Prestations", services],
       ["Montant", escapeHtml(String(booking.amount ?? "—"))],
+      ...(() => {
+        const answers =
+          booking.clientAnswers && typeof booking.clientAnswers === "object"
+            ? booking.clientAnswers
+            : {};
+        const offer = Number(answers.clientOfferPrice || booking.quotedPrice);
+        const catalogue = Number(answers.cataloguePrice || answers.normalPrice);
+        if (!(Number.isFinite(offer) && offer > 0 && answers.isClientOffer)) {
+          return [];
+        }
+        return [
+          [
+            "Offre cliente",
+            escapeHtml(
+              `${offer}€` +
+                (Number.isFinite(catalogue) && catalogue > 0
+                  ? ` (catalogue ${catalogue}€)`
+                  : "")
+            ),
+          ],
+        ];
+      })(),
       ["Statut", isConfirmed ? "Confirmée" : "En attente"],
       [
         "Réservations du client",
@@ -417,6 +439,22 @@ async function sendAdminNewBookingEmail(bookingId) {
   <p><strong>Date:</strong> ${booking.date} &nbsp; <strong>Time:</strong> ${booking.startTime || (booking.time && booking.time[0]) || "—"}</p>
   <p><strong>Services:</strong> ${services}</p>
   <p><strong>Amount:</strong> ${booking.amount ?? "—"}</p>
+  ${(() => {
+    const answers =
+      booking.clientAnswers && typeof booking.clientAnswers === "object"
+        ? booking.clientAnswers
+        : {};
+    const offer = Number(answers.clientOfferPrice || booking.quotedPrice);
+    const catalogue = Number(answers.cataloguePrice || answers.normalPrice);
+    if (!(Number.isFinite(offer) && offer > 0 && answers.isClientOffer)) {
+      return "";
+    }
+    return `<p><strong>Client offer:</strong> ${escapeHtml(String(offer))}€${
+      Number.isFinite(catalogue) && catalogue > 0
+        ? ` (catalogue ${escapeHtml(String(catalogue))}€)`
+        : ""
+    }</p>`;
+  })()}
   <p style="margin-top: 24px;">
     <a href="${acceptUrl}" style="background: #1a7f37; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Accept reservation</a>
     &nbsp;&nbsp;

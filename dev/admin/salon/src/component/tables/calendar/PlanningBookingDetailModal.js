@@ -174,6 +174,28 @@ const PlanningBookingDetailModal = ({ bookingId, onClose, onUpdated }) => {
                   <span>Montant TTC</span>
                   <strong>{booking.amount != null ? `${booking.amount} €` : "—"}</strong>
                 </div>
+                {(() => {
+                  const answers =
+                    booking.clientAnswers && typeof booking.clientAnswers === "object"
+                      ? booking.clientAnswers
+                      : {};
+                  const offer = Number(answers.clientOfferPrice || booking.quotedPrice);
+                  const catalogue = Number(answers.cataloguePrice || answers.normalPrice);
+                  if (!(Number.isFinite(offer) && offer > 0 && answers.isClientOffer)) {
+                    return null;
+                  }
+                  return (
+                    <div className="sq-detail-item sq-detail-item--offer">
+                      <span>Offre cliente</span>
+                      <strong>
+                        {offer} €
+                        {Number.isFinite(catalogue) && catalogue > 0
+                          ? ` (catalogue ${catalogue} €)`
+                          : ""}
+                      </strong>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="sq-detail-services">

@@ -12,6 +12,7 @@ const COPY = {
     downloadAndroid: "Télécharger sur Android",
     downloadIos: "Télécharger sur iPhone",
     downloadAppCta: "Télécharger l'app",
+    downloadTitle: "Télécharger",
     noAppTitle: "Vous préférez l'app ?",
     noAppDesc: "Téléchargez Skedisy gratuitement — même parcours de réservation, notifications et portefeuille.",
     idfBanner:
@@ -144,6 +145,8 @@ const COPY = {
     makeOfferContinue: "Continuer avec mon offre",
     makeOfferSelectService: "Sélectionne une prestation",
     makeOfferInvalidPrice: "Indique un prix valide",
+    makeOfferNormalPrice: "Prix catalogue",
+    makeOfferProposedPrice: "Prix proposé",
     showMap: "Voir la carte",
     hideMap: "Masquer la carte",
     aboutLabel: "À propos",
@@ -385,6 +388,7 @@ const COPY = {
     downloadAndroid: "Download on Android",
     downloadIos: "Download on iPhone",
     downloadAppCta: "Download the app",
+    downloadTitle: "Download",
     noAppTitle: "Prefer the app?",
     noAppDesc: "Download Skedisy for free — same booking flow, plus notifications and wallet.",
     idfBanner:
@@ -517,6 +521,8 @@ const COPY = {
     makeOfferContinue: "Continue with my offer",
     makeOfferSelectService: "Select a service",
     makeOfferInvalidPrice: "Enter a valid price",
+    makeOfferNormalPrice: "Catalogue price",
+    makeOfferProposedPrice: "Proposed price",
     showMap: "Show map",
     hideMap: "Hide map",
     aboutLabel: "About",

@@ -55,17 +55,28 @@ function buildExpertBookingNotification(booking, clientBookingCount) {
     clientBookingCount != null && Number(clientBookingCount) > 0
       ? ` — ${clientBookingCount} réservation${Number(clientBookingCount) > 1 ? "s" : ""} au total pour ce client`
       : "";
+  const answers =
+    booking?.clientAnswers && typeof booking.clientAnswers === "object"
+      ? booking.clientAnswers
+      : {};
+  const offerPrice = Number(answers.clientOfferPrice || booking?.quotedPrice);
+  const offerSuffix =
+    Number.isFinite(offerPrice) && offerPrice > 0 && answers.isClientOffer
+      ? ` · Offre cliente ${offerPrice}€`
+      : "";
 
   if (booking?.status === "confirm") {
     return {
       title: "Nouveau RDV confirmé",
-      body: `RDV confirmé le ${date} à ${time}${countSuffix}.`,
+      body: `RDV confirmé le ${date} à ${time}${offerSuffix}${countSuffix}.`,
     };
   }
 
   return {
-    title: "RDV en attente (salon)",
-    body: `À valider depuis le panel salon — ${date} à ${time}${countSuffix}.`,
+    title: answers.isClientOffer
+      ? "RDV avec offre cliente (salon)"
+      : "RDV en attente (salon)",
+    body: `À valider depuis le panel salon — ${date} à ${time}${offerSuffix}${countSuffix}.`,
   };
 }
 

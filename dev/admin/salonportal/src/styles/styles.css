@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* Skedisy â palette 3 couleurs : noir, blanc, terracotta (web â app Flutter) */
 :root {
     --sk-brand: #c45c26;
@@ -1136,7 +1137,7 @@ html {
 }
 
 .feature-card li::before {
-    content: "â";
+    content: "\2713"; /* ✓ */
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1182,7 +1183,7 @@ html {
 }
 
 .clients-content li::before {
-    content: "â";
+    content: "\2713";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1249,7 +1250,7 @@ html {
 }
 
 .benefit-content li::before {
-    content: "â";
+    content: "\2713";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -1300,7 +1301,7 @@ html {
 }
 
 .payment-content li::before {
-    content: "â";
+    content: "\2713";
     position: absolute;
     left: 0;
     color: #2ecc71;
@@ -4650,7 +4651,7 @@ html {
 }
 
 .sq-problem-list li::before {
-    content: "â";
+    content: "\2014";
     position: absolute;
     left: 0;
     color: rgba(255, 255, 255, 0.4);
@@ -4742,7 +4743,7 @@ html {
 }
 
 .sq-acquisition-flow li:not(:last-child)::after {
-  content: "â";
+  content: "\2193";
   display: block;
   text-align: center;
   opacity: 0.5;
@@ -4814,11 +4815,15 @@ html {
 }
 
 .sq-solutions-num {
+    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
     font-size: 0.8rem;
     font-weight: 700;
     color: #999;
     letter-spacing: 0.05em;
     min-width: 2rem;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0;
 }
 
 .sq-request {
