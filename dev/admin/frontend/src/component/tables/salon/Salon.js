@@ -31,13 +31,16 @@ export const Salon = () => {
   // const dummysalons = Dummy(10000);
   const [data, setData] = useState([]);
 
-  const { salon } = useSelector((state) => state.salon);
+  const { salon, salonCountries, salonCities } = useSelector(
+    (state) => state.salon
+  );
   const { dialogue, dialogueType } = useSelector((state) => state.dialogue);
-;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const handleChangePage = (event, newPage) => {
@@ -51,7 +54,8 @@ export const Salon = () => {
 
   const handleFilterData = (filteredData) => {
     if (typeof filteredData === "string") {
-      setSearch(filteredData);
+      setPage(0);
+      setSearch(filteredData.trim());
     } else {
       setData(filteredData);
     }
@@ -62,28 +66,23 @@ export const Salon = () => {
       start: page,
       limit: rowsPerPage,
       search,
+      country,
+      city,
     };
     dispatch(getAllSalons(payload));
-  }, [page, rowsPerPage, search]);
+  }, [page, rowsPerPage, search, country, city, dispatch]);
 
   useEffect(() => {
     setData(salon);
-    // Debug: Check if salons have isClaimed field
-    if (salon && salon.length > 0) {
-      console.log("=== SALON DATA DEBUG ===");
-      console.log("Total salons:", salon.length);
-      console.log("Salon data sample:", salon[0]);
-      console.log("isClaimed values:", salon.map(s => ({ 
-        name: s.name, 
-        isClaimed: s.isClaimed,
-        isClaimedType: typeof s.isClaimed,
-        hasIsClaimed: 'isClaimed' in s
-      })));
-      const unclaimedCount = salon.filter(s => s.isClaimed !== true).length;
-      console.log(`Unclaimed salons: ${unclaimedCount} out of ${salon.length}`);
-      console.log("========================");
-    }
   }, [salon]);
+
+  const cityOptions = (salonCities || []).filter((row) => {
+    if (!country) return Boolean(row?.city);
+    return (
+      String(row?.city || "").trim() &&
+      String(row?.country || "").toLowerCase() === country.toLowerCase()
+    );
+  });
 
   function openImage(imageUrl) {
     // Open the image in a new tab or window
@@ -144,8 +143,16 @@ export const Salon = () => {
       ),
     },
     {
+      Header: col.city || "Ville",
+      Cell: ({ row }) => (
+        <span>{row?.addressDetails?.city || "-"}</span>
+      ),
+    },
+    {
       Header: col.country,
-      Cell: ({ row }) => <span>{row?.addressDetails?.country}</span>,
+      Cell: ({ row }) => (
+        <span>{row?.addressDetails?.country || "-"}</span>
+      ),
     },
     {
       Header: col.active,
@@ -177,6 +184,8 @@ export const Salon = () => {
                     start: page,
                     limit: rowsPerPage,
                     search,
+                    country,
+                    city,
                   };
                   dispatch(getAllSalons(payload));
                 } else {
@@ -426,6 +435,8 @@ export const Salon = () => {
           start: page,
           limit: rowsPerPage,
           search,
+          country,
+          city,
         };
         dispatch(getAllSalons(payload));
       } else {
@@ -510,6 +521,8 @@ export const Salon = () => {
         start: page,
         limit: rowsPerPage,
         search,
+        country,
+        city,
       };
       dispatch(getAllSalons(payload));
     } catch (error) {
@@ -538,14 +551,53 @@ export const Salon = () => {
           />
         </div>
 
-        <div className="col-md-8 col-lg-5  ms-auto">
-          <Searching
-            type={`server`}
-            data={data}
-            setData={setData}
-            column={salonTable}
-            serverSearching={handleFilterData}
-          />
+        <div className="col-md-8 col-lg-7 ms-auto d-flex flex-wrap gap-2 align-items-center justify-content-end">
+          <select
+            className="form-select"
+            style={{ maxWidth: 180, fontWeight: 500 }}
+            value={country}
+            onChange={(e) => {
+              setPage(0);
+              setCountry(e.target.value);
+              setCity("");
+            }}
+            aria-label={col.country || "Pays"}
+          >
+            <option value="">Tous les pays</option>
+            {(salonCountries || []).map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <select
+            className="form-select"
+            style={{ maxWidth: 180, fontWeight: 500 }}
+            value={city}
+            onChange={(e) => {
+              setPage(0);
+              setCity(e.target.value);
+            }}
+            aria-label={col.city || "Ville"}
+          >
+            <option value="">Toutes les villes</option>
+            {cityOptions.map((row) => (
+              <option key={`${row.country}-${row.city}`} value={row.city}>
+                {row.city}
+              </option>
+            ))}
+          </select>
+          <div className="flex-grow-1" style={{ minWidth: 200, maxWidth: 320 }}>
+            <Searching
+              type={`server`}
+              data={data}
+              setData={setData}
+              column={salonTable}
+              serverSearching={handleFilterData}
+              className="sq-search-row w-100"
+              placeholder="Nom, email, téléphone, ville…"
+            />
+          </div>
         </div>
       </div>
       <div>

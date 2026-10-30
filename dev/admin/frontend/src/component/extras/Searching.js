@@ -4,14 +4,18 @@ import { SKEDISY_ADMIN_UI as ui } from "../../constants/skedisyUiCopy";
 
 const Searching = (props) => {
   const [search, setSearch] = useState("");
-  const { data, setData, type, serverSearching, button } = props;
+  const { data, setData, type, serverSearching, button, placeholder, className } =
+    props;
 
   const handleSearch = (event) => {
     event.preventDefault();
 
-    let searchValue = search ? search : event?.target?.value?.toLowerCase();
+    let searchValue = search
+      ? search
+      : String(event?.target?.value || "").trim();
     if (type === "client") {
-      if (searchValue) {
+      const q = searchValue.toLowerCase();
+      if (q) {
         const filteredData = data.filter((item) => {
           return Object.keys(item).some((key) => {
             if (key === "_id" || key === "updatedAt" || key === "createdAt") {
@@ -19,9 +23,9 @@ const Searching = (props) => {
             }
             const itemValue = item[key];
             if (typeof itemValue === "string") {
-              return itemValue.toLowerCase().indexOf(searchValue) > -1;
+              return itemValue.toLowerCase().indexOf(q) > -1;
             } else if (typeof itemValue === "number") {
-              return itemValue.toString().indexOf(searchValue) > -1;
+              return itemValue.toString().indexOf(q) > -1;
             }
             return false;
           });
@@ -37,12 +41,12 @@ const Searching = (props) => {
 
   return (
     <>
-      <div className="col-7 ms-auto sq-search-row">
+      <div className={className || "col-7 ms-auto sq-search-row"}>
         <div className="inputData d-flex">
           <input
             type="search"
             id="search"
-            placeholder={ui.common.searchPlaceholder}
+            placeholder={placeholder || ui.common.searchPlaceholder}
             className="bg-none m0-top"
             style={{ fontWeight: "500" }}
             onChange={

@@ -13,14 +13,20 @@ const initialState = {
   isLoading: false,
   total: 0,
   shareLink: null,
+  salonCountries: [],
+  salonCities: [],
 };
 
 export const getAllSalons = createAsyncThunk(
   "admin/salon/getAll",
   async (payload) => {
-    return apiInstanceFetch.get(
-      `admin/salon/getAll?start=${payload?.start}&limit=${payload?.limit}&search=${payload?.search}`
-    );
+    const params = new URLSearchParams();
+    if (payload?.start != null) params.set("start", String(payload.start));
+    if (payload?.limit != null) params.set("limit", String(payload.limit));
+    if (payload?.search) params.set("search", String(payload.search));
+    if (payload?.country) params.set("country", String(payload.country));
+    if (payload?.city) params.set("city", String(payload.city));
+    return apiInstanceFetch.get(`admin/salon/getAll?${params.toString()}`);
   }
 );
 export const getSalonDetail = createAsyncThunk(
@@ -159,7 +165,13 @@ const salonSlice = createSlice({
 
     builder.addCase(getAllSalons.fulfilled, (state, action) => {
       state.isSkeleton = false;
-      state.salon = action?.payload?.data;
+      state.salon = action?.payload?.data || [];
+      if (Array.isArray(action?.payload?.countries)) {
+        state.salonCountries = action.payload.countries;
+      }
+      if (Array.isArray(action?.payload?.cities)) {
+        state.salonCities = action.payload.cities;
+      }
     });
 
     builder.addCase(getAllSalons.rejected, (state, action) => {

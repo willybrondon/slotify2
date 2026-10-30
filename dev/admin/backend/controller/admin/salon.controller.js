@@ -193,44 +193,104 @@ exports.update = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const searchQuery = req.query.search;
-    const regex = new RegExp(searchQuery, "i");
+    const escapeRegex = (value) =>
+      String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-    let searchFilter = {};
+    const searchQuery = String(req.query.search || "").trim();
+    const countryFilter = String(req.query.country || "").trim();
+    const cityFilter = String(req.query.city || "").trim();
 
-    if (searchQuery !== "" && searchQuery !== "ALL") {
-      searchFilter = {
-        $or: [{ "salon.name": { $regex: regex } }, { mobile: { $regex: regex } }, { email: { $regex: regex } }, { "address.landmark": { $regex: regex } }],
-      };
+    const match = { isDelete: false };
+
+    // Text name / contact / address (fields were wrong: salon.name, address.landmark)
+    if (searchQuery && searchQuery !== "ALL") {
+      const regex = new RegExp(escapeRegex(searchQuery), "i");
+      match.$or = [
+        { name: { $regex: regex } },
+        { mobile: { $regex: regex } },
+        { email: { $regex: regex } },
+        { "addressDetails.addressLine1": { $regex: regex } },
+        { "addressDetails.landMark": { $regex: regex } },
+        { "addressDetails.city": { $regex: regex } },
+        { "addressDetails.state": { $regex: regex } },
+        { "addressDetails.country": { $regex: regex } },
+      ];
     }
 
-    // Get all salon data, excluding only salonTime array
-    // IMPORTANT: Only show non-deleted salons (isDelete: false)
-    // When using $project with exclusions (field: 0), all other fields are included by default
-    // We then ensure isClaimed defaults to false if not set in database
+    if (countryFilter && countryFilter !== "ALL") {
+      match["addressDetails.country"] = new RegExp(
+        `^${escapeRegex(countryFilter)}$`,
+        "i"
+      );
+    }
+
+    if (cityFilter && cityFilter !== "ALL") {
+      match["addressDetails.city"] = new RegExp(
+        `^${escapeRegex(cityFilter)}$`,
+        "i"
+      );
+    }
+
     const data = await Salon.aggregate([
-      {
-        $match: {
-          isDelete: false, // Only show non-deleted salons
-          ...searchFilter,
-        },
-      },
+      { $match: match },
       {
         $project: {
-          salonTime: 0, // Exclude salonTime array - all other fields included automatically
+          salonTime: 0,
         },
       },
       {
         $addFields: {
-          // Ensure isClaimed defaults to false if not set (for old salons without this field)
           isClaimed: { $ifNull: ["$isClaimed", false] },
-          // Ensure claimToken exists (empty string if not set)
           claimToken: { $ifNull: ["$claimToken", ""] },
         },
       },
+      { $sort: { name: 1 } },
     ]);
 
-    return res.status(200).send({ status: true, message: "Success", data });
+    // Distinct countries / cities for admin filters (active non-deleted salons)
+    const locationRows = await Salon.aggregate([
+      { $match: { isDelete: false } },
+      {
+        $group: {
+          _id: {
+            country: { $ifNull: ["$addressDetails.country", ""] },
+            city: { $ifNull: ["$addressDetails.city", ""] },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          country: "$_id.country",
+          city: "$_id.city",
+        },
+      },
+      { $sort: { country: 1, city: 1 } },
+    ]);
+
+    const countries = [
+      ...new Set(
+        locationRows
+          .map((r) => String(r.country || "").trim())
+          .filter(Boolean)
+      ),
+    ].sort((a, b) => a.localeCompare(b, "fr"));
+
+    const cities = locationRows
+      .map((r) => ({
+        city: String(r.city || "").trim(),
+        country: String(r.country || "").trim(),
+      }))
+      .filter((r) => r.city)
+      .sort((a, b) => a.city.localeCompare(b.city, "fr"));
+
+    return res.status(200).send({
+      status: true,
+      message: "Success",
+      data,
+      countries,
+      cities,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({

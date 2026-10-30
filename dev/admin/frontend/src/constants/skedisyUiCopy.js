@@ -134,6 +134,7 @@ export const SKEDISY_ADMIN_UI = {
     absent: "Absent",
     pay: "Payer",
     country: "Pays",
+    city: "Ville",
     platformFee: "Frais plateforme (%)",
     bestSeller: "Meilleures ventes",
     booking: "Réservation",
