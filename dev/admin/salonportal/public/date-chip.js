@@ -1,6 +1,5 @@
 /**
- * Puce date — même UX que la position :
- * clic → panneau qui se déroule → choix → OK (ferme).
+ * Puce date — panneau fixe au-dessus (choix + OK), sans scroll page.
  * Par défaut : aujourd'hui.
  */
 (function () {
@@ -110,9 +109,19 @@
   function closePopover() {
     const chip = getChip();
     const popover = getPopover();
-    if (popover) popover.hidden = true;
+    const wasOpen = document.querySelector(".sq-date-chip-wrap")?.classList.contains("is-open");
+    if (popover) {
+      popover.hidden = true;
+      window.SkedisyChipPanel?.restorePanel?.(popover);
+    }
     if (chip) chip.setAttribute("aria-expanded", "false");
     document.querySelector(".sq-date-chip-wrap")?.classList.remove("is-open");
+    if (wasOpen) {
+      window.SkedisyChipPanel?.unlockPage?.();
+      if (!document.querySelector(".sq-location-chip-wrap.is-open")) {
+        window.SkedisyChipPanel?.hideBackdrop?.();
+      }
+    }
   }
 
   function openPopover() {
@@ -120,11 +129,21 @@
     const popover = getPopover();
     if (!popover) return;
 
-    // Fermer la position si ouverte
-    const locPop = document.getElementById("homeLocationPopover");
-    if (locPop) locPop.hidden = true;
-    document.getElementById("homeLocationChip")?.setAttribute("aria-expanded", "false");
-    document.querySelector(".sq-location-chip-wrap")?.classList.remove("is-open");
+    const locWrap = document.querySelector(".sq-location-chip-wrap");
+    if (locWrap?.classList.contains("is-open")) {
+      const locPop = document.getElementById("homeLocationPopover");
+      if (locPop) {
+        locPop.hidden = true;
+        window.SkedisyChipPanel?.restorePanel?.(locPop);
+      }
+      document.getElementById("homeLocationChip")?.setAttribute("aria-expanded", "false");
+      locWrap.classList.remove("is-open");
+      window.SkedisyChipPanel?.unlockPage?.();
+    }
+
+    window.SkedisyChipPanel?.lockPage?.();
+    window.SkedisyChipPanel?.showBackdrop?.();
+    window.SkedisyChipPanel?.mountPanel?.(popover);
 
     const picker = getPicker();
     const iso = getDateIso() || todayIso();
@@ -138,7 +157,6 @@
     document.querySelector(".sq-date-chip-wrap")?.classList.add("is-open");
   }
 
-  /** Applique comme « OK » sur la position : valide + ferme le panneau. */
   function applyAndClose(iso, label) {
     if (!iso) setDate("");
     else setDate(iso, label);
@@ -158,7 +176,6 @@
     const chip = getChip();
     if (!chip) return;
 
-    // Par défaut : aujourd'hui (sauf date déjà choisie)
     const saved = localStorage.getItem(STORAGE_ISO);
     if (saved && parseIso(saved)) {
       const label = localStorage.getItem(STORAGE_LABEL) || "";
@@ -194,10 +211,7 @@
           return;
         }
         if (preset === "tomorrow") {
-          applyAndClose(
-            tomorrowIso(),
-            t("homeProduct.dateTomorrow") || "Demain"
-          );
+          applyAndClose(tomorrowIso(), t("homeProduct.dateTomorrow") || "Demain");
           return;
         }
       });
@@ -215,11 +229,6 @@
         applyFromPicker();
       }
       if (e.key === "Escape") closePopover();
-    });
-
-    document.addEventListener("click", function (e) {
-      const wrap = document.querySelector(".sq-date-chip-wrap");
-      if (wrap && !wrap.contains(e.target)) closePopover();
     });
 
     document.addEventListener("keydown", function (e) {

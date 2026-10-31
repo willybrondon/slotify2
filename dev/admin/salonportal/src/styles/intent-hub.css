@@ -2453,7 +2453,7 @@ body.sq-search-focus-active .sq-search-suggestions {
 
   body.sq-search-sheet-open .sq-location-popover,
   body.sq-search-sheet-open .sq-date-popover {
-    z-index: 100090;
+    z-index: 100110;
   }
 }
 
@@ -2558,21 +2558,49 @@ body.sq-search-focus-active .sq-search-suggestions {
   flex-shrink: 0;
 }
 
+.sq-chip-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100100;
+  background: rgba(17, 17, 17, 0.38);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.sq-chip-panel-backdrop[hidden] {
+  display: none !important;
+}
+
+body.sq-chip-panel-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
 .sq-date-popover {
-  position: absolute;
-  z-index: 50;
-  top: calc(100% + 6px);
-  left: 0;
+  position: fixed;
+  z-index: 100110;
+  top: max(12vh, 64px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 300px);
   min-width: 220px;
-  max-width: min(92vw, 280px);
+  max-width: min(92vw, 300px);
+  max-height: none;
+  overflow: visible;
   padding: 0.65rem;
   border-radius: 12px;
   background: var(--sk-white);
   border: 1px solid var(--sk-border);
-  box-shadow: 0 12px 32px rgba(17, 17, 17, 0.12);
+  box-shadow: 0 16px 40px rgba(17, 17, 17, 0.18);
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.sq-date-popover[hidden] {
+  display: none !important;
 }
 
 .sq-date-popover__btn {
@@ -2682,19 +2710,25 @@ body.sq-search-focus-active .sq-search-suggestions {
 }
 
 .sq-location-popover {
-  position: absolute;
-  z-index: 50;
-  top: calc(100% + 6px);
-  left: 0;
-  right: auto;
-  width: max(100%, 260px);
+  position: fixed;
+  z-index: 100110;
+  top: max(12vh, 64px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 320px);
   min-width: 220px;
   max-width: min(92vw, 320px);
+  max-height: none;
+  overflow: visible;
   padding: 0.75rem;
   border-radius: 12px;
   background: var(--sk-white);
   border: 1px solid var(--sk-border);
-  box-shadow: 0 12px 32px rgba(17, 17, 17, 0.12);
+  box-shadow: 0 16px 40px rgba(17, 17, 17, 0.18);
+}
+
+.sq-location-popover[hidden] {
+  display: none !important;
 }
 
 .sq-location-chip-wrap:has(.sq-location-popover:not([hidden])) {
@@ -2838,8 +2872,9 @@ body.sq-search-focus-active .sq-search-suggestions {
     display: none;
   }
 
-  .sq-location-popover {
-    z-index: 100010;
+  .sq-location-popover,
+  .sq-date-popover {
+    z-index: 100110;
   }
 }
 

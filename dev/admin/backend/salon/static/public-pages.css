@@ -206,6 +206,22 @@ body.sk-public-page .main-wrapper {
     border: 0;
 }
 
+/* Pack beauté : titre visible (le sr-only ci-dessus cache les titres d’onglet) */
+.sk-public-page .sq-salon-detail__panel .sq-salon-beauty-packs .section-title {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0 0 14px;
+    padding: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    border: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--sk-text);
+}
+
 .sk-public-page .sq-salon-detail__meta > .section {
     padding-top: 24px;
     padding-bottom: 32px;
@@ -5569,8 +5585,11 @@ body.sk-public-page .main-wrapper {
     gap: 10px;
 }
 .sk-public-page .sq-salon-beauty-packs {
-    margin-top: 28px;
+    margin-top: 0;
+    margin-bottom: 8px;
     padding-top: 8px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--sk-border-light, rgba(0, 0, 0, 0.08));
 }
 .sk-public-page .sq-beauty-packs {
     display: grid;
@@ -5578,10 +5597,11 @@ body.sk-public-page .main-wrapper {
     gap: 14px;
 }
 .sk-public-page .sq-beauty-pack-card {
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(196, 92, 38, 0.22);
     border-radius: 12px;
     padding: 16px;
     background: #fff;
+    box-shadow: 0 1px 0 rgba(196, 92, 38, 0.06);
 }
 .sk-public-page .sq-beauty-pack-card__head {
     display: flex;

@@ -1042,15 +1042,16 @@ exports.serveSalonWebPage = async (req, res) => {
     const salonProducts = Array.from(salonProductsMap.values());
 
     let servicesHtml = "";
+    let servicesBlockHtml = "";
     if (bookingServices.length > 0) {
-      servicesHtml = `<div class="section sq-salon-services-block">
+      servicesBlockHtml = `<div class="section sq-salon-services-block">
         <h3 class="section-title">${copy.selectServices || copy.services}</h3>
         <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
         <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonServicesSummary" aria-live="polite"></div>
         <div class="sq-services-list" id="salonServicesGrid"></div>
             </div>`;
     } else {
-      servicesHtml = `<div class="section"><h3 class="section-title">${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
+      servicesBlockHtml = `<div class="section"><h3 class="section-title">${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
     }
 
     // Products Section
@@ -1131,11 +1132,17 @@ exports.serveSalonWebPage = async (req, res) => {
     const serviceNameById = Object.fromEntries(
       bookingServices.map((s) => [String(s.id), s.name])
     );
-    const beautyPacks = (Array.isArray(salon.servicePackages) ? salon.servicePackages : [])
+    const rawPackages =
+      salon.servicePackages ||
+      (typeof salon.get === "function" ? salon.get("servicePackages") : null) ||
+      [];
+    const beautyPacks = (Array.isArray(rawPackages) ? rawPackages : [])
+      .map((p) => (p && typeof p.toObject === "function" ? p.toObject() : p))
       .filter((p) => p && p.active !== false)
       .slice(0, 12);
+    let beautyPacksHtml = "";
     if (beautyPacks.length > 0) {
-      servicesHtml += `<div class="section sq-salon-beauty-packs" id="salonBeautyPacks">
+      beautyPacksHtml = `<div class="section sq-salon-beauty-packs" id="salonBeautyPacks">
         <h3 class="section-title">${esc(copy.beautyPacks || "Pack beauté")}</h3>
         <div class="sq-beauty-packs">
           ${beautyPacks
@@ -1175,6 +1182,8 @@ exports.serveSalonWebPage = async (req, res) => {
         </div>
       </div>`;
     }
+    // Packs en premier dans l’onglet Services pour qu’ils soient visibles immédiatement
+    servicesHtml = beautyPacksHtml + servicesBlockHtml;
 
     const avatarUrl = salon.mainImage || salonImage || "";
     const realizationUrls = [];

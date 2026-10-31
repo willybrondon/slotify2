@@ -341,6 +341,7 @@ exports.updatePackages = async (req, res) => {
         active: p.active !== false,
       };
     });
+    salon.markModified("servicePackages");
     await salon.save();
     return res.status(200).json({ status: true, packages: salon.servicePackages });
   } catch (error) {
