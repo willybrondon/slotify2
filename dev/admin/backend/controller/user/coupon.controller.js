@@ -126,6 +126,22 @@ exports.retriveValidateCoupon = async (req, res) => {
       });
     }
 
+    const serviceIdQ = String(req.query.serviceId || "").trim();
+    if (coupon.serviceId && serviceIdQ && String(coupon.serviceId) !== serviceIdQ) {
+      return res.status(200).json({
+        status: false,
+        message: "This coupon does not apply to the selected service.",
+      });
+    }
+
+    const dateQ = String(req.query.date || req.query.validOnDate || "").trim();
+    if (coupon.validOnDate && dateQ && String(coupon.validOnDate).trim() !== dateQ) {
+      return res.status(200).json({
+        status: false,
+        message: `This coupon is only valid for appointments on ${coupon.validOnDate}.`,
+      });
+    }
+
     if (coupon.discountType == 1) {
       discountAmount = coupon.maxDiscount;
     } else if (coupon.discountType == 2) {

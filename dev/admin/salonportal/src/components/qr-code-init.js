@@ -34,11 +34,16 @@
         };
 
         if (customerQR) {
-            var customerOpts = Object.assign({}, baseOptions, { data: 'https://skedisy.com/#download-customer' });
+            var customerOpts = Object.assign({}, baseOptions, {
+                data: origin + '/#download-customer',
+            });
             new QRCodeStyling(customerOpts).append(customerQR);
         }
         if (expertQR) {
-            var expertOpts = Object.assign({}, baseOptions, { data: 'https://skedisy.com/#download-expert' });
+            // Pro QR must land on /professionnel/ (Expert app), never the client home.
+            var expertOpts = Object.assign({}, baseOptions, {
+                data: origin + '/professionnel/#download-expert',
+            });
             new QRCodeStyling(expertOpts).append(expertQR);
         }
     }
@@ -47,10 +52,11 @@
         var script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
         script.onload = function() {
+            var origin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : 'https://skedisy.com';
             var customerQR = document.getElementById('qr-customer-top');
             var expertQR = document.getElementById('qr-expert-top');
-            if (customerQR) new QRCode(customerQR, { text: 'https://skedisy.com/#download-customer', width: 128, height: 128, colorDark: '#111', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.H });
-            if (expertQR) new QRCode(expertQR, { text: 'https://skedisy.com/#download-expert', width: 128, height: 128, colorDark: '#111', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.H });
+            if (customerQR) new QRCode(customerQR, { text: origin + '/#download-customer', width: 128, height: 128, colorDark: '#111', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.H });
+            if (expertQR) new QRCode(expertQR, { text: origin + '/professionnel/#download-expert', width: 128, height: 128, colorDark: '#111', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.H });
         };
         document.head.appendChild(script);
     }

@@ -32,6 +32,7 @@ export const SKEDISY_SALON_UI = {
     demands: "Demandes devis",
     messages: "Messages",
     marketing: "Marketing",
+    clients: "Clientes",
     paymentSettings: "Paiements Stripe",
     expertWithdrawRequests: "Retraits pros",
     expertEarnings: "Gains des pros",

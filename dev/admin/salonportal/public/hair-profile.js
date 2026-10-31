@@ -227,7 +227,7 @@
       </div>
       <p class="sq-hair-lead">${escapeHtml(t('hairProfile.lead'))}</p>`;
 
-    Object.entries(FIELDS).forEach(([field, cfg) => {
+    Object.entries(FIELDS).forEach(([field, cfg]) => {
       html += `
         <div class="sq-hair-section" data-field="${field}">
           <h2 class="sq-hair-section__title">${escapeHtml(t(cfg.questionKey))}</h2>

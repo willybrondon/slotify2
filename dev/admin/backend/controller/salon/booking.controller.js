@@ -18,10 +18,12 @@ const {
 const {
   notifyExpertPushAndInApp,
   notifyUserPushAndInApp,
+  notifySalonInApp,
 } = require("../../services/pushNotification.service");
 const {
   sendCustomerBookingConfirmationEmail,
   sendExpertNewBookingEmail,
+  sendSalonNewBookingEmail,
   countClientBookings,
 } = require("../../services/bookingAdminEmail.service");
 
@@ -73,6 +75,8 @@ exports.getAll = async (req, res) => {
                 fname: 1,
                 lname: 1,
                 image: 1,
+                email: 1,
+                mobile: 1,
               },
             },
           ],
@@ -80,7 +84,7 @@ exports.getAll = async (req, res) => {
         },
       },
       {
-        $unwind: "$user",
+        $unwind: { path: "$user", preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
@@ -115,7 +119,7 @@ exports.getAll = async (req, res) => {
         },
       },
       {
-        $unwind: "$expert",
+        $unwind: { path: "$expert", preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
@@ -134,7 +138,7 @@ exports.getAll = async (req, res) => {
         },
       },
       {
-        $unwind: "$salon",
+        $unwind: { path: "$salon", preserveNullAndEmptyArrays: true },
       },
       {
         $project: {
@@ -260,6 +264,8 @@ exports.getExpertBookings = async (req, res) => {
                 fname: 1,
                 lname: 1,
                 image: 1,
+                email: 1,
+                mobile: 1,
               },
             },
           ],
@@ -267,7 +273,7 @@ exports.getExpertBookings = async (req, res) => {
         },
       },
       {
-        $unwind: "$user",
+        $unwind: { path: "$user", preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
@@ -302,7 +308,7 @@ exports.getExpertBookings = async (req, res) => {
         },
       },
       {
-        $unwind: "$expert",
+        $unwind: { path: "$expert", preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
@@ -321,7 +327,7 @@ exports.getExpertBookings = async (req, res) => {
         },
       },
       {
-        $unwind: "$salon",
+        $unwind: { path: "$salon", preserveNullAndEmptyArrays: true },
       },
       {
         $project: {
@@ -662,9 +668,18 @@ exports.acceptPendingBooking = async (req, res) => {
             data: { type: "booking", bookingId: String(booking._id), status: "confirm" },
           });
         }
+        if (salon) {
+          await notifySalonInApp({
+            salon,
+            title: expertNotif.title || "Réservation confirmée",
+            body: expertNotif.body || `Réservation #${booking.bookingId}`,
+            data: { type: "booking", bookingId: String(booking._id), status: "confirm" },
+          });
+        }
         await Promise.all([
           sendCustomerBookingConfirmationEmail(booking._id, { language: "fr" }),
           expert ? sendExpertNewBookingEmail(booking._id, { clientBookingCount }) : Promise.resolve(),
+          sendSalonNewBookingEmail(booking._id, { clientBookingCount }),
         ]);
       } catch (notifyErr) {
         console.log("[Salon accept booking] notify/email failed:", notifyErr.message);

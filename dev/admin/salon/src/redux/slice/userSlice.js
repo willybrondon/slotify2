@@ -16,6 +16,14 @@ export const allUsers = createAsyncThunk("user/getAllUsers",async (payload)=>{
   return  apiInstanceFetch.get(`user/getAllUsers?start=${payload?.start}&limit=${payload?.limit}&search=${payload?.search}`)
 })
 
+/** Clientes du salon (bookings de CE salon — guest inclus) */
+export const allSalonClients = createAsyncThunk("salon/clients", async (payload) => {
+  const search = payload?.search == null ? "ALL" : payload.search;
+  return apiInstanceFetch.get(
+    `salon/clients?start=${payload?.start || 0}&limit=${payload?.limit || 20}&search=${encodeURIComponent(search)}`
+  );
+});
+
 export const getUser = createAsyncThunk("user/getProfile", async (payload) => {
     return apiInstanceFetch.get(`user/getProfile?userId=${payload}`)
 })
@@ -47,6 +55,18 @@ const userSlice = createSlice({
         })
 
         builder.addCase(allUsers.rejected,(state,action)=>{
+            state.isSkeleton = false;
+        })
+
+        builder.addCase(allSalonClients.pending, (state) => {
+            state.isSkeleton = true;
+        })
+        builder.addCase(allSalonClients.fulfilled, (state, action) => {
+            state.user = action.payload?.users || [];
+            state.total = action.payload?.total || 0;
+            state.isSkeleton = false;
+        })
+        builder.addCase(allSalonClients.rejected, (state) => {
             state.isSkeleton = false;
         })
 

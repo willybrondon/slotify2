@@ -21,6 +21,14 @@ const couponSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+    /** Optional: limit coupon to one service of the salon */
+    serviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Service",
+      default: null,
+    },
+    /** Optional target appointment date (YYYY-MM-DD) for salon promos */
+    validOnDate: { type: String, default: "" },
     usedBy: [
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

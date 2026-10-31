@@ -138,10 +138,41 @@ async function notifyExpertPushAndInApp({
   return { push, inApp };
 }
 
+/** In-app (and optional push) notification for the salon panel inbox */
+async function notifySalonInApp({
+  salon,
+  title,
+  body,
+  data = {},
+  image = "",
+  notificationType = 2,
+}) {
+  if (!salon?._id) return { push: { skipped: true }, inApp: null };
+
+  const inApp = await saveInAppNotification({
+    salonId: salon._id,
+    title,
+    message: body,
+    image,
+    notificationType,
+  });
+
+  const push = await sendPushNotification({
+    token: salon.fcmToken,
+    title,
+    body,
+    data,
+    image,
+  });
+
+  return { push, inApp };
+}
+
 module.exports = {
   isValidFcmToken,
   sendPushNotification,
   saveInAppNotification,
   notifyUserPushAndInApp,
   notifyExpertPushAndInApp,
+  notifySalonInApp,
 };

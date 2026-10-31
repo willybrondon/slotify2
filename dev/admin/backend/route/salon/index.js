@@ -26,11 +26,13 @@ const expertWithdrawRequest = require("./expertWithdrawRequest.route");
 const afroDemand = require("./afroDemand.route");
 const messaging = require("./messaging.route");
 const marketing = require("./marketing.route");
+const clients = require("./clients.route");
 const category = require("./category.route");
 const tax = require("./tax.route");
 const payment = require("./payment.route");
 
 route.use("/", salon);
+route.use("/clients", salonMiddleware, clients);
 route.use("/category", category);
 route.use("/tax", tax);
 route.use("/payment", payment);

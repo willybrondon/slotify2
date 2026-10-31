@@ -18,29 +18,37 @@
 
   function setWebUser(user) {
     if (!user) return;
-    sessionStorage.setItem(
-      "skedisy_web_user",
-      JSON.stringify({
-        id: String(user._id || user.id),
-        fname: user.fname || "",
-        lname: user.lname || "",
-        email: user.email || "",
-        mobile: user.mobile || "",
-        amount: Number(user.amount) || 0,
-      })
-    );
+    const payload = JSON.stringify({
+      id: String(user._id || user.id),
+      fname: user.fname || "",
+      lname: user.lname || "",
+      email: user.email || "",
+      mobile: user.mobile || "",
+      image: user.image || "",
+      amount: Number(user.amount) || 0,
+    });
+    sessionStorage.setItem("skedisy_web_user", payload);
+    try {
+      localStorage.setItem("skedisy_web_user", payload);
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   function onSuccess(user, message, isSignup) {
     setWebUser(user);
     const resumeProduct = sessionStorage.getItem("skedisy_resume_product") === "1";
+    const ret = String(cfg.returnPath || "/");
+    const isAccountReturn = /^\/compte\/(reservations|notifications|profil)/.test(ret);
     if (resumeProduct) {
       const productMsg = isSignup
         ? cfg.copy.successSignupProduct
         : cfg.copy.successLoginProduct;
       showNotice("success", productMsg || message);
-    } else {
+    } else if (!isAccountReturn) {
       sessionStorage.setItem("skedisy_resume_booking", "1");
+      showNotice("success", message);
+    } else {
       showNotice("success", message);
     }
     submitBtn.disabled = true;

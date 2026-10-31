@@ -22,7 +22,7 @@ const admin = require("../../firebase");
 const moment = require("moment");
 const { getEnglishDayName } = require("../../services/teamSchedule.service");
 const { generateUniqueIdentifier } = require("../../generateUniqueIdentifier");
-const { sendAdminNewBookingEmail, sendAdminCustomerCancelledBookingEmail, sendCustomerBookingConfirmationEmail, sendExpertNewBookingEmail } = require("../../services/bookingAdminEmail.service");
+const { sendAdminNewBookingEmail, sendAdminCustomerCancelledBookingEmail, sendCustomerBookingConfirmationEmail, sendExpertNewBookingEmail, sendSalonNewBookingEmail } = require("../../services/bookingAdminEmail.service");
 const {
   resolveInitialBookingStatus,
   getBookingListStatusFilter,
@@ -33,6 +33,7 @@ const {
 } = require("../../services/bookingStatus.service");
 const {
   notifyExpertPushAndInApp,
+  notifySalonInApp,
   notifyUserPushAndInApp,
 } = require("../../services/pushNotification.service");
 const { getPlatformTax } = require("../../lib/platformTax");
@@ -1089,6 +1090,29 @@ exports.newBooking = async (req, res, next) => {
         });
       }
 
+      if (coupon.serviceId) {
+        const couponSvc = String(coupon.serviceId);
+        const bookingHasService = (services || []).some(
+          (sid) => String(sid) === couponSvc
+        );
+        if (!bookingHasService) {
+          return res.status(200).json({
+            status: false,
+            message: "This coupon does not apply to the selected service.",
+          });
+        }
+      }
+
+      if (coupon.validOnDate) {
+        const bookingDate = String(req.body.date || "").trim();
+        if (bookingDate !== String(coupon.validOnDate).trim()) {
+          return res.status(200).json({
+            status: false,
+            message: `This coupon is only valid for appointments on ${coupon.validOnDate}.`,
+          });
+        }
+      }
+
       if (coupon.discountType == 1) {
         discountAmount = coupon.maxDiscount;
       } else if (coupon.discountType == 2) {
@@ -1558,6 +1582,20 @@ exports.newBooking = async (req, res, next) => {
           image: req.file ? process.env.baseURL + req.file.path : "",
         });
 
+        if (salon) {
+          await notifySalonInApp({
+            salon,
+            title: expertNotif.title || "Nouvelle réservation",
+            body: expertNotif.body || `Réservation #${booking.bookingId}`,
+            data: {
+              type: "booking",
+              bookingId: String(booking._id),
+              status: booking.status,
+            },
+            image: req.file ? process.env.baseURL + req.file.path : "",
+          });
+        }
+
         if (user) {
           const userNotif =
             booking.status === "confirm"
@@ -1578,6 +1616,7 @@ exports.newBooking = async (req, res, next) => {
         await Promise.all([
           sendCustomerBookingConfirmationEmail(booking._id, { language: userLanguage }),
           sendExpertNewBookingEmail(booking._id, { clientBookingCount }),
+          sendSalonNewBookingEmail(booking._id, { clientBookingCount }),
           sendAdminNewBookingEmail(booking._id),
         ]);
       } catch (notifyErr) {

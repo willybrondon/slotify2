@@ -570,6 +570,21 @@ app.get("/compte/inscription", publicClientAuth.serveSignupPage);
 app.post("/api/public/auth/login", publicClientAuth.publicLogin);
 app.post("/api/public/auth/register", publicClientAuth.publicRegister);
 
+const publicClientAccount = require("./controller/user/publicClientAccount.controller");
+app.get("/compte/reservations", publicClientAccount.serveReservationsPage);
+app.get("/compte/notifications", publicClientAccount.serveNotificationsPage);
+app.get("/compte/profil", publicClientAccount.serveProfilePage);
+app.get("/api/public/client/bookings", publicClientAccount.publicClientBookings);
+app.get(
+  "/api/public/client/notifications",
+  publicClientAccount.publicClientNotifications
+);
+app.delete(
+  "/api/public/client/notifications",
+  publicClientAccount.publicDeleteNotification
+);
+app.post("/api/public/client/complain", publicClientAccount.publicRaiseComplain);
+
 app.get("/api/public/blog", publicBlog.listPublished);
 app.get("/api/public/blog/:slug", publicBlog.getBySlug);
 

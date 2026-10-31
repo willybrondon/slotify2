@@ -2356,6 +2356,274 @@ body.sk-public-page .main-wrapper {
     font-size: 0.88rem;
 }
 
+/* ——— Compte client (header + pages) ——— */
+.sq-account-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+}
+.sq-account-nav__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    color: var(--sk-text, #1a1a1a);
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 600;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+}
+.sq-account-nav__btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--sk-primary, #c45c26);
+}
+.sq-account-nav__badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--sk-primary, #c45c26);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+}
+.sq-account-nav__notif-wrap {
+    position: relative;
+}
+.sq-account-notif-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: min(340px, 92vw);
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    z-index: 80;
+    padding: 12px;
+}
+.sq-account-notif-panel__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+}
+.sq-account-notif-panel__head a {
+    font-size: 0.8rem;
+    color: var(--sk-primary, #c45c26);
+}
+.sq-account-notif-preview {
+    padding: 8px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+.sq-account-notif-preview strong {
+    display: block;
+    font-size: 0.86rem;
+}
+.sq-account-notif-preview p {
+    margin: 4px 0;
+    font-size: 0.8rem;
+    color: #555;
+}
+.sq-account-notif-preview time {
+    font-size: 0.72rem;
+    color: #888;
+}
+.sq-account-page .sq-account-main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 28px 16px 64px;
+}
+.sq-account-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.sq-account-head h1 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+.sq-account-search {
+    min-width: min(280px, 100%);
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    font: inherit;
+}
+.sq-account-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.sq-account-tab {
+    border: 0;
+    background: transparent;
+    padding: 10px 14px;
+    font: inherit;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+.sq-account-tab.is-active {
+    color: var(--sk-primary, #c45c26);
+    border-bottom-color: var(--sk-primary, #c45c26);
+}
+.sq-account-booking-card,
+.sq-account-notif-card,
+.sq-account-profile-card,
+.sq-account-report {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+.sq-account-booking-card__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.sq-account-booking-card__id {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--sk-primary, #c45c26);
+}
+.sq-account-booking-card__status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #555;
+}
+.sq-account-booking-card__salon {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+}
+.sq-account-booking-card__svc {
+    margin: 0 0 8px;
+    color: #444;
+}
+.sq-account-booking-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.84rem;
+    color: #555;
+}
+.sq-account-booking-card__cancel {
+    margin: 10px 0 0;
+    font-size: 0.82rem;
+    color: #a33;
+}
+.sq-account-muted,
+.sq-account-empty {
+    color: #777;
+    font-size: 0.92rem;
+}
+.sq-account-notif-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+.sq-account-notif-card h3 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+}
+.sq-account-notif-card p {
+    margin: 0 0 6px;
+    font-size: 0.86rem;
+    color: #444;
+}
+.sq-account-notif-card time {
+    font-size: 0.75rem;
+    color: #888;
+}
+.sq-account-notif-card__del {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.sq-account-profile-hello {
+    font-size: 1.1rem;
+    margin: 0 0 10px;
+}
+.sq-account-profile-meta {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+}
+.sq-account-profile-meta li {
+    margin: 6px 0;
+    color: #444;
+}
+.sq-account-profile-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.sq-account-report h2 {
+    margin: 0 0 6px;
+    font-size: 1.2rem;
+}
+.sq-account-report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+}
+.sq-account-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+.sq-account-field input,
+.sq-account-field textarea {
+    font: inherit;
+    font-weight: 400;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+}
+.sq-account-gate {
+    text-align: center;
+    padding: 48px 16px;
+}
+.sq-account-gate__actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+@media (max-width: 700px) {
+    .sq-account-nav__label {
+        display: none !important;
+    }
+}
+
 .sq-home-cats-row {
     display: flex;
     flex-wrap: wrap;
@@ -5299,6 +5567,56 @@ body.sk-public-page .main-wrapper {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+.sk-public-page .sq-salon-beauty-packs {
+    margin-top: 28px;
+    padding-top: 8px;
+}
+.sk-public-page .sq-beauty-packs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+}
+.sk-public-page .sq-beauty-pack-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff;
+}
+.sk-public-page .sq-beauty-pack-card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.sk-public-page .sq-beauty-pack-card__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--sk-text);
+}
+.sk-public-page .sq-beauty-pack-card__price {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--sk-text);
+}
+.sk-public-page .sq-beauty-pack-card__desc {
+    margin: 0 0 10px;
+    font-size: 0.85rem;
+    color: var(--sk-text-muted);
+    line-height: 1.4;
+}
+.sk-public-page .sq-beauty-pack-card__list {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.82rem;
+    color: var(--sk-text);
+    line-height: 1.45;
+}
+.sk-public-page .sq-beauty-pack-card__list li + li {
+    margin-top: 4px;
 }
 /* Modal list scrolls with .sq-booking-steps so accordion details match the page */
 .sk-public-page .sq-services-list--modal {

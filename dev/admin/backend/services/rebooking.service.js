@@ -21,18 +21,21 @@ function salonPublicSlug(salon) {
   return `${slugBase}-${shortId}`;
 }
 
+const DEFAULT_REBOOK_WEEKS = 6;
+
 function resolveStyleLifetimeWeeks(afro) {
-  if (!afro) return 0;
+  if (!afro) return DEFAULT_REBOOK_WEEKS;
+  if (afro.rebookRemindersEnabled === false) return 0;
   const n = Number(afro.styleLifetimeWeeks);
   if (Number.isFinite(n) && n > 0) return Math.min(52, Math.round(n));
   // Default for project-flow protective styles if salon never set it
   if (afro.complexityTier && afro.complexityTier !== "S0") return 7;
-  return 0;
+  return DEFAULT_REBOOK_WEEKS;
 }
 
 function rebookRemindersEnabled(afro) {
-  if (!afro) return false;
-  if (afro.rebookRemindersEnabled === false) return false;
+  // Explicit opt-out only — otherwise we arm rebooking with a default window
+  if (afro && afro.rebookRemindersEnabled === false) return false;
   return resolveStyleLifetimeWeeks(afro) > 0;
 }
 
@@ -47,7 +50,7 @@ async function scheduleRebookOnComplete(bookingId) {
   try {
     const booking = await Booking.findById(bookingId);
     if (!booking || booking.status !== "completed") return null;
-    if (booking.rebookDueAt) return booking;
+    if (booking.rebookDueAt && booking.rebookToken) return booking;
 
     const salon = await Salon.findById(booking.salonId);
     if (!salon) return null;
@@ -55,13 +58,14 @@ async function scheduleRebookOnComplete(bookingId) {
     const primaryServiceId = Array.isArray(booking.serviceId)
       ? booking.serviceId[0]
       : booking.serviceId;
-    if (!primaryServiceId) return null;
 
-    const entry = findSalonServiceEntry(salon, primaryServiceId);
+    const entry = primaryServiceId
+      ? findSalonServiceEntry(salon, primaryServiceId)
+      : null;
     const afro = getAfroConfig(entry);
     if (!rebookRemindersEnabled(afro)) return null;
 
-    const weeks = resolveStyleLifetimeWeeks(afro);
+    const weeks = resolveStyleLifetimeWeeks(afro) || DEFAULT_REBOOK_WEEKS;
     const baseDate = moment(booking.date, ["YYYY-MM-DD", "DD-MM-YYYY", moment.ISO_8601], true);
     if (!baseDate.isValid()) return null;
 
@@ -72,10 +76,12 @@ async function scheduleRebookOnComplete(bookingId) {
     }
 
     booking.clientAnswers = answers && typeof answers === "object" ? answers : {};
-    booking.rebookDueAt = baseDate.clone().add(weeks, "weeks").startOf("day").toDate();
+    if (!booking.rebookDueAt) {
+      booking.rebookDueAt = baseDate.clone().add(weeks, "weeks").startOf("day").toDate();
+    }
     booking.rebookToken =
       booking.rebookToken || crypto.randomBytes(16).toString("hex");
-    booking.rebookReminderSent = false;
+    if (booking.rebookReminderSent == null) booking.rebookReminderSent = false;
     await booking.save();
     return booking;
   } catch (err) {
@@ -128,12 +134,18 @@ async function sendRebookReminderSms(booking) {
  *   force = also re-send if already marked (careful — default false)
  */
 async function processDueRebookReminders(now = new Date(), opts = {}) {
-  const start = opts.weekMode
-    ? moment(now).startOf("isoWeek").toDate()
-    : moment(now).startOf("day").toDate();
-  const end = opts.weekMode
-    ? moment(now).endOf("isoWeek").toDate()
-    : moment(now).endOf("day").toDate();
+  let start;
+  let end;
+  if (opts.from && opts.to) {
+    start = moment(opts.from, "YYYY-MM-DD").startOf("day").toDate();
+    end = moment(opts.to, "YYYY-MM-DD").endOf("day").toDate();
+  } else if (opts.weekMode) {
+    start = moment(now).startOf("isoWeek").toDate();
+    end = moment(now).endOf("isoWeek").toDate();
+  } else {
+    start = moment(now).startOf("day").toDate();
+    end = moment(now).endOf("day").toDate();
+  }
 
   const query = {
     status: "completed",
@@ -196,12 +208,16 @@ async function processDueRebookReminders(now = new Date(), opts = {}) {
 }
 
 /**
- * Salon-triggered campaign: all pending rebook due this week.
+ * Salon-triggered campaign: pending rebook in date range (default: current ISO week).
  */
-async function launchSalonRebookCampaign(salonId) {
+async function launchSalonRebookCampaign(salonId, opts = {}) {
+  const from = opts.from || opts.startDate || "";
+  const to = opts.to || opts.endDate || "";
   return processDueRebookReminders(new Date(), {
     salonId,
-    weekMode: true,
+    weekMode: !(from && to),
+    from: from || undefined,
+    to: to || undefined,
     force: false,
   });
 }

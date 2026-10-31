@@ -486,20 +486,101 @@
         });
     }
 
+    function getSearchDate() {
+        if (typeof window.skedisyGetSearchDate === "function") {
+            return window.skedisyGetSearchDate() || "";
+        }
+        return params.get("date") || "";
+    }
+
+    function getSearchDateLabel() {
+        if (typeof window.skedisyGetSearchDateLabel === "function") {
+            return window.skedisyGetSearchDateLabel() || "";
+        }
+        return params.get("date") || "";
+    }
+
+    function getSearchIntent() {
+        const el = document.getElementById("homeSearchIntent");
+        return (
+            (el && el.value) ||
+            searchForm?.dataset?.searchIntent ||
+            params.get("intent") ||
+            ""
+        ).trim();
+    }
+
+    function updateSearchSummary({ city, service, dateLabel, total }) {
+        if (!categorySearchMessage) return;
+        const parts = [];
+        if (service) {
+            parts.push(
+                escapeHtml(
+                    (t("searchResults.forServiceTpl") || "Prestation : __SERVICE__").replace(
+                        "__SERVICE__",
+                        service
+                    )
+                )
+            );
+        }
+        if (city) {
+            parts.push(
+                escapeHtml(
+                    (t("searchResults.inCityTpl") || "Résultats à __CITY__").replace(
+                        "__CITY__",
+                        city
+                    )
+                )
+            );
+        }
+        if (dateLabel) {
+            parts.push(
+                escapeHtml(
+                    (t("searchResults.onDateTpl") || "Date : __DATE__").replace(
+                        "__DATE__",
+                        dateLabel
+                    )
+                )
+            );
+        }
+        const countLine =
+            total != null
+                ? `<p class="sq-category-discover__count-msg">${escapeHtml(
+                      String(total)
+                  )} ${escapeHtml(
+                      t("searchResults.salonsCount") || "salon(s)"
+                  )}</p>`
+                : "";
+        categorySearchMessage.innerHTML = parts.length
+            ? `<p class="sq-category-discover__city-msg">${parts.join(" · ")}</p>${countLine}`
+            : countLine;
+    }
+
     async function fetchResults() {
         const legacySalon = params.get("salon") || "";
         const legacyService = params.get("service") || "";
+        const intent = getSearchIntent();
         const query =
             queryInput?.value.trim() ||
             params.get("q") ||
+            params.get("service") ||
             [legacySalon, legacyService].filter(Boolean).join(" ").trim();
         const location = getLocationLabel() || params.get("location") || "";
+        const date = getSearchDate() || params.get("date") || "";
+        const dateLabel = getSearchDateLabel() || date;
 
         if (queryInput) queryInput.value = query;
 
         const qs = new URLSearchParams({ language: lang });
-        if (query) qs.set("q", query);
+        if (intent === "service" && query) {
+            qs.set("service", query);
+            qs.set("intent", "service");
+            qs.set("q", query);
+        } else if (query) {
+            qs.set("q", query);
+        }
         if (location) qs.set("location", location);
+        if (date) qs.set("date", date);
         if (clientCoords.lat) qs.set("latitude", String(clientCoords.lat));
         if (clientCoords.lng) qs.set("longitude", String(clientCoords.lng));
         if (filters.minRating) qs.set("minRating", String(filters.minRating));
@@ -516,13 +597,12 @@
                 salons = data.salons;
                 currentPage = 1;
                 updateStats();
-                if (categorySearchMessage && data.searchCity) {
-                    categorySearchMessage.innerHTML = `<p class="sq-category-discover__city-msg">${escapeHtml(
-                        t("searchResults.inCityTpl").replace("__CITY__", data.searchCity)
-                    )}</p>`;
-                } else if (categorySearchMessage) {
-                    categorySearchMessage.innerHTML = "";
-                }
+                updateSearchSummary({
+                    city: data.searchCity || location || null,
+                    service: data.searchService || (intent === "service" ? query : null),
+                    dateLabel: date ? dateLabel : null,
+                    total: data.total != null ? data.total : salons.length,
+                });
                 renderSalons();
                 refreshMapMarkers();
             } else {
@@ -530,6 +610,12 @@
                 currentPage = 1;
                 renderSalons();
                 updateStats();
+                updateSearchSummary({
+                    city: location || null,
+                    service: intent === "service" ? query : null,
+                    dateLabel: date ? dateLabel : null,
+                    total: 0,
+                });
             }
         } catch (e) {
             salons = [];
@@ -542,9 +628,17 @@
         if (query) url.searchParams.set("q", query);
         else url.searchParams.delete("q");
         url.searchParams.delete("salon");
-        url.searchParams.delete("service");
+        if (intent === "service" && query) {
+            url.searchParams.set("service", query);
+            url.searchParams.set("intent", "service");
+        } else {
+            url.searchParams.delete("service");
+            url.searchParams.delete("intent");
+        }
         if (location) url.searchParams.set("location", location);
         else url.searchParams.delete("location");
+        if (date) url.searchParams.set("date", date);
+        else url.searchParams.delete("date");
         window.history.replaceState({}, "", url);
     }
 
@@ -583,13 +677,32 @@
         const legacyService = params.get("service") || "";
         if (queryInput) {
             queryInput.value =
+                params.get("service") ||
                 params.get("q") ||
                 [legacySalon, legacyService].filter(Boolean).join(" ").trim();
+        }
+        const intentEl = document.getElementById("homeSearchIntent");
+        if (intentEl && (params.get("intent") === "service" || params.get("service"))) {
+            intentEl.value = "service";
+            if (searchForm) searchForm.dataset.searchIntent = "service";
         }
         const urlLocation = params.get("location");
         if (urlLocation && typeof window.skedisySetLocationLabel === "function") {
             window.skedisySetLocationLabel(urlLocation);
         }
+        const urlDate = params.get("date");
+        if (urlDate && typeof window.skedisySetSearchDate === "function") {
+            window.skedisySetSearchDate(urlDate);
+        }
+        document.getElementById("homeLocationApply")?.addEventListener("click", () => {
+            setTimeout(fetchResults, 50);
+        });
+        document.getElementById("homeDateApply")?.addEventListener("click", () => {
+            setTimeout(fetchResults, 50);
+        });
+        document.querySelectorAll("[data-date-preset]").forEach((btn) => {
+            btn.addEventListener("click", () => setTimeout(fetchResults, 80));
+        });
         initMap();
         if (mapEl) mapEl.setAttribute("aria-hidden", "false");
         requestLocation().then(fetchResults);

@@ -79,6 +79,10 @@
             hamburger?.classList.remove('active');
         }
 
+        const datePop = document.getElementById('homeDatePopover');
+        if (datePop) datePop.hidden = true;
+        document.getElementById('homeDateChip')?.setAttribute('aria-expanded', 'false');
+
         popover.hidden = false;
         if (chip) chip.setAttribute('aria-expanded', 'true');
         if (input) {

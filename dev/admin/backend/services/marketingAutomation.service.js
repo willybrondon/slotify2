@@ -130,11 +130,17 @@ function buildSocialSuggestions({ salonName, dateLabel, occupancyPercent, discou
  * Clients whose protective style is due this week (rebook window).
  */
 async function getRebookDueInsight(salonId, opts = {}) {
-  const start = moment(opts.from || undefined).startOf("isoWeek");
-  const end = moment(opts.to || undefined).endOf("isoWeek");
-  if (!opts.from) {
-    // current week Mon–Sun
-  }
+  const hasCustom =
+    opts.from &&
+    opts.to &&
+    moment(opts.from, "YYYY-MM-DD", true).isValid() &&
+    moment(opts.to, "YYYY-MM-DD", true).isValid();
+  const start = hasCustom
+    ? moment(opts.from, "YYYY-MM-DD").startOf("day")
+    : moment(opts.from || undefined).startOf("isoWeek");
+  const end = hasCustom
+    ? moment(opts.to, "YYYY-MM-DD").endOf("day")
+    : moment(opts.to || undefined).endOf("isoWeek");
 
   const due = await Booking.find({
     salonId,
@@ -181,10 +187,11 @@ async function getRebookDueInsight(salonId, opts = {}) {
   });
 
   const count = pending.length || due.length;
+  const rangeLabel = `${start.format("YYYY-MM-DD")} → ${end.format("YYYY-MM-DD")}`;
   const headline =
     count === 0
-      ? "Aucune cliente à échéance cette semaine."
-      : `${count} cliente${count > 1 ? "s" : ""} arrive${count > 1 ? "nt" : ""} à échéance cette semaine.`;
+      ? `Aucune cliente à échéance sur la période ${rangeLabel}.`
+      : `${count} cliente${count > 1 ? "s" : ""} à échéance (${rangeLabel}).`;
 
   return {
     type: "rebook",
@@ -200,35 +207,91 @@ async function getRebookDueInsight(salonId, opts = {}) {
   };
 }
 
-async function createTargetedPromo(salon, { discountPercent, title, dateHint, daysValid = 14 }) {
-  const percent = Math.min(40, Math.max(5, Number(discountPercent) || 15));
-  const expiry = moment().add(Math.max(3, Number(daysValid) || 14), "days").format("YYYY-MM-DD");
-  const prefix = (salon.name || "SK")
-    .toString()
-    .replace(/[^a-zA-Z0-9]/g, "")
-    .slice(0, 4)
-    .toUpperCase() || "SK";
+async function createTargetedPromo(salon, opts = {}) {
+  const {
+    title,
+    dateHint,
+    daysValid = 14,
+    expiryDate: expiryOverride,
+    validOnDate = "",
+    serviceId = null,
+    serviceName = "",
+  } = opts;
+
+  const rawType = String(opts.discountType || opts.type || "percent").toLowerCase();
+  const isFlat =
+    rawType === "flat" ||
+    rawType === "price" ||
+    rawType === "amount" ||
+    Number(opts.discountType) === DISCOUNT_TYPE.FLAT;
+
+  const prefix =
+    (salon.name || "SK")
+      .toString()
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .slice(0, 4)
+      .toUpperCase() || "SK";
   const code = `${prefix}${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 
+  let expiry = String(expiryOverride || "").trim();
+  if (!expiry || !moment(expiry, "YYYY-MM-DD", true).isValid()) {
+    expiry = moment().add(Math.max(1, Number(daysValid) || 14), "days").format("YYYY-MM-DD");
+  }
+
+  let discountPercent = 0;
+  let maxDiscount = 0;
+  let discountType = DISCOUNT_TYPE.PERCENTAGE;
+  let label = "";
+
+  if (isFlat) {
+    discountType = DISCOUNT_TYPE.FLAT;
+    maxDiscount = Math.max(1, Number(opts.discountAmount ?? opts.maxDiscount) || 0);
+    if (!maxDiscount) throw new Error("Montant de réduction invalide");
+    label = `−${maxDiscount}€`;
+  } else {
+    discountType = DISCOUNT_TYPE.PERCENTAGE;
+    discountPercent = Math.min(90, Math.max(1, Number(opts.discountPercent) || 15));
+    maxDiscount = Math.max(
+      discountPercent,
+      Number(opts.maxDiscount) > 0 ? Number(opts.maxDiscount) : 200
+    );
+    label = `−${discountPercent}%`;
+  }
+
+  const svcLabel = serviceName ? ` · ${serviceName}` : "";
+  const dateLabel = validOnDate || dateHint || "";
   const coupon = await Coupon.create({
     code,
-    title: title || `Promo salon −${percent}%`,
-    description: dateHint
-      ? `Promotion ciblée Skedisy — ${dateHint}`
-      : `Promotion salon générée depuis Marketing auto`,
-    minAmountToApply: 0,
-    discountPercent: percent,
-    maxDiscount: 80,
+    title: title || `Promo salon ${label}${svcLabel}`,
+    description: [
+      "Promotion salon Skedisy",
+      dateLabel ? `Date : ${dateLabel}` : "",
+      serviceName ? `Prestation : ${serviceName}` : "",
+    ]
+      .filter(Boolean)
+      .join(" — "),
+    minAmountToApply: Math.max(0, Number(opts.minAmountToApply) || 0),
+    discountPercent,
+    maxDiscount,
     expiryDate: expiry,
+    validOnDate: validOnDate || "",
     type: COUPON_TYPE.APPOINTMENT,
-    discountType: DISCOUNT_TYPE.PERCENTAGE,
+    discountType,
     isActive: true,
     salonId: salon._id,
+    serviceId: serviceId || null,
   });
 
   const base = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
   const slug = salonPublicSlug(salon);
   const bookingUrl = `${base}/salon/${slug}`;
+  const shareBits = [
+    `${label} chez ${salon.name}`,
+    serviceName ? `sur ${serviceName}` : "",
+    `code ${coupon.code}`,
+    `valable jusqu'au ${expiry}`,
+    validOnDate ? `(RDV le ${validOnDate})` : "",
+  ].filter(Boolean);
 
   return {
     coupon: {
@@ -236,9 +299,14 @@ async function createTargetedPromo(salon, { discountPercent, title, dateHint, da
       code: coupon.code,
       title: coupon.title,
       discountPercent: coupon.discountPercent,
+      maxDiscount: coupon.maxDiscount,
+      discountType: coupon.discountType,
       expiryDate: coupon.expiryDate,
+      validOnDate: coupon.validOnDate,
+      serviceId: coupon.serviceId,
+      description: coupon.description,
     },
-    shareText: `−${percent}% chez ${salon.name} avec le code ${coupon.code} (valable jusqu'au ${expiry}). Réserve : ${bookingUrl}`,
+    shareText: `${shareBits.join(" ")}. Réserve : ${bookingUrl}`,
     bookingUrl,
   };
 }

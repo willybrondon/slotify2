@@ -1,29 +1,45 @@
 // Navigation functionality
+function buildRechercheParams(form) {
+    const queryInput =
+        form?.querySelector('[data-search-query]') ||
+        document.getElementById('homeQuerySearchInput') ||
+        document.getElementById('searchQueryInput');
+    const query = (queryInput?.value || '').trim();
+    const location =
+        (document.getElementById('homeLocationSearchInput')?.value || '').trim() ||
+        (typeof window.skedisyGetLocationLabel === 'function'
+            ? window.skedisyGetLocationLabel()
+            : '') ||
+        '';
+    const date =
+        typeof window.skedisyGetSearchDate === 'function'
+            ? window.skedisyGetSearchDate()
+            : '';
+    const intentEl = form?.querySelector('#homeSearchIntent') || form?.querySelector('[name="intent"]');
+    const intent = (intentEl?.value || form?.dataset?.searchIntent || '').trim();
+
+    const params = new URLSearchParams();
+    if (intent === 'service' && query) {
+        params.set('service', query);
+        params.set('intent', 'service');
+        params.set('q', query);
+    } else if (query) {
+        params.set('q', query);
+    }
+    if (location) params.set('location', location);
+    if (date) params.set('date', date);
+    return params;
+}
+
 function initHomeSalonSearch() {
     const form = document.getElementById('homeSalonSearchForm');
     if (!form) return;
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-        const query = (document.getElementById('homeQuerySearchInput')?.value || '').trim();
-        const location = (document.getElementById('homeLocationSearchInput')?.value || '').trim()
-            || (typeof window.skedisyGetLocationLabel === 'function' ? window.skedisyGetLocationLabel() : '');
-
-        if (!query && !location) {
-            window.location.href = '/recherche';
-            return;
-        }
-
-        // Accueil : résultats StyleSeat horizontaux + carte (sans quitter la page)
-        if (typeof window.homeSearchSalons === 'function' && document.getElementById('homeSearchResults')) {
-            window.homeSearchSalons(query, location);
-            return;
-        }
-
-        const params = new URLSearchParams();
-        if (query) params.set('q', query);
-        if (location) params.set('location', location);
-        window.location.href = '/recherche?' + params.toString();
+        const params = buildRechercheParams(form);
+        const qs = params.toString();
+        window.location.href = '/recherche' + (qs ? '?' + qs : '');
     });
 }
 
@@ -45,10 +61,19 @@ function initAuthReturnLinks() {
     });
 }
 
+function ensureClientAccountNavScript() {
+    if (document.querySelector('script[src*="client-account-nav"]')) return;
+    const s = document.createElement('script');
+    s.src = '/client-account-nav.js';
+    s.defer = true;
+    document.head.appendChild(s);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     mountStoreBadges();
     initHomeSalonSearch();
     initAuthReturnLinks();
+    ensureClientAccountNavScript();
 
     if (typeof setLanguage === 'function') {
         const savedLang = localStorage.getItem('skedisy-language') || 'fr';
@@ -629,16 +654,21 @@ window.addEventListener('hashchange', scrollToAppDownloadHash);
 document.addEventListener('DOMContentLoaded', scrollToAppDownloadHash);
 
 /**
- * Desktop: send users to the marketing site get-app section (QR + labels), same idea as salon page redirect.
+ * Desktop: send users to the marketing get-app section (QR + labels).
+ * Expert → /professionnel/#download-expert ; Client → /#download-customer
  */
 function goDesktopAppLanding(hash) {
     const targetHash = hash || '#download-customer';
-    const base = getSkedisyMarketingBaseUrl();
-    let path = (window.location.pathname || '').replace(/\/+$/, '');
-    if (!path) path = '/';
-    const onHome = path === '/' || /index\.html$/i.test(path);
+    const isExpert = targetHash === '#download-expert';
+    const base = getSkedisyMarketingBaseUrl().replace(/\/+$/, '');
+    const landingPath = isExpert ? '/professionnel/' : '/';
+    let path = (window.location.pathname || '').replace(/\/+$/, '') || '/';
+    const onPro = path === '/professionnel' || /\/professionnel\/index\.html$/i.test(path);
+    const onHome = path === '/' || /(?:^|\/)index\.html$/i.test(path);
+    const alreadyOnLanding = isExpert ? onPro : onHome;
     const sameOrigin = window.location.origin.replace(/\/+$/, '') === base;
-    if (onHome && sameOrigin) {
+
+    if (alreadyOnLanding && sameOrigin) {
         if (window.location.hash !== targetHash) {
             window.location.hash = targetHash;
         }
@@ -647,7 +677,7 @@ function goDesktopAppLanding(hash) {
         });
         return;
     }
-    window.location.href = base.replace(/\/+$/, '') + targetHash;
+    window.location.href = base + landingPath + targetHash;
 }
 
 // Phone Selection Modal Functions

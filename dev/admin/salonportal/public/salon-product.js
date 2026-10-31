@@ -76,6 +76,7 @@
 
   function authHref(base) {
     const url = new URL(base || "/compte/connexion", window.location.origin);
+    // Prefer configured returnPath; never bake return into crawlable SSR hrefs
     const cfg = window.SKEDISY_SALON_PRODUCTS || {};
     const ret =
       (cfg.authUrls && cfg.authUrls.returnPath) ||

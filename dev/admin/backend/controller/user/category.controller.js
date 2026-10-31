@@ -1817,6 +1817,37 @@ exports.getSearchSuggestions = async (req, res) => {
       );
     }
 
+    const suggestQ = String(req.query.q || req.query.query || "").trim();
+    if (suggestQ.length >= 2) {
+      const matched = await Service.find(buildServiceNameRegex(suggestQ))
+        .select("name nameEn nameFr namePt categoryId")
+        .limit(20)
+        .lean();
+      const existing = new Set(services.map((s) => String(s._id)));
+      const extra = matched
+        .filter((s) => !existing.has(String(s._id)))
+        .map((service) => ({
+          _id: service._id,
+          name: getTranslatedServiceName(service, language),
+          categoryId: service.categoryId,
+          bookings: 0,
+        }));
+      // Prefer exact matches first in the combined list
+      services = matched
+        .map((service) => {
+          const hit = services.find((s) => String(s._id) === String(service._id));
+          return (
+            hit || {
+              _id: service._id,
+              name: getTranslatedServiceName(service, language),
+              categoryId: service.categoryId,
+              bookings: 0,
+            }
+          );
+        })
+        .concat(extra.filter((e) => !matched.some((m) => String(m._id) === String(e._id))));
+    }
+
     return res.status(200).json({
       status: true,
       categories,
@@ -1837,7 +1868,9 @@ exports.searchSalonsPublic = async (req, res) => {
     const unifiedQ = (req.query.q || "").trim();
     const salonTerm = (req.query.salon || "").trim();
     const serviceTerm = (req.query.service || req.query.prestation || "").trim();
+    const intent = String(req.query.intent || "").trim().toLowerCase();
     const locationTerm = (req.query.location || req.query.city || "").trim();
+    const dateTerm = String(req.query.date || "").trim();
     const latitude = req.query.latitude;
     const longitude = req.query.longitude;
     const minRating = parseFloat(req.query.minRating) || 0;
@@ -1850,7 +1883,36 @@ exports.searchSalonsPublic = async (req, res) => {
     let query = { isDelete: false, isActive: true };
     const andConditions = [];
 
-    if (unifiedQ && !salonTerm && !serviceTerm) {
+    const effectiveService =
+      serviceTerm ||
+      (intent === "service" && unifiedQ ? unifiedQ : "");
+
+    // Salon-name suggestions / name-only search
+    if (salonTerm) {
+      andConditions.push({
+        $or: [
+          { name: { $regex: salonTerm, $options: "i" } },
+          { about: { $regex: salonTerm, $options: "i" } },
+        ],
+      });
+    } else if (effectiveService) {
+      const services = await Service.find(buildServiceNameRegex(effectiveService)).select(
+        "_id"
+      );
+      const serviceIds = services.map((s) => s._id);
+      if (!serviceIds.length) {
+        return res.status(200).json({
+          status: true,
+          salons: [],
+          total: 0,
+          totalReviews: 0,
+          searchCity: locationTerm || null,
+          searchService: effectiveService,
+          searchDate: dateTerm || null,
+        });
+      }
+      andConditions.push({ "serviceIds.id": { $in: serviceIds } });
+    } else if (unifiedQ) {
       const matchedServices = await Service.find(buildServiceNameRegex(unifiedQ)).select(
         "_id"
       );
@@ -1863,13 +1925,6 @@ exports.searchSalonsPublic = async (req, res) => {
         orClause.push({ "serviceIds.id": { $in: serviceIds } });
       }
       andConditions.push({ $or: orClause });
-    } else if (salonTerm) {
-      andConditions.push({
-        $or: [
-          { name: { $regex: salonTerm, $options: "i" } },
-          { about: { $regex: salonTerm, $options: "i" } },
-        ],
-      });
     }
 
     if (locationTerm) {
@@ -1881,22 +1936,6 @@ exports.searchSalonsPublic = async (req, res) => {
           { "addressDetails.state": { $regex: locationTerm, $options: "i" } },
         ],
       });
-    }
-
-    if (serviceTerm && !(unifiedQ && !salonTerm && !serviceTerm)) {
-      const services = await Service.find(buildServiceNameRegex(serviceTerm)).select(
-        "_id"
-      );
-      const serviceIds = services.map((s) => s._id);
-      if (!serviceIds.length) {
-        return res.status(200).json({
-          status: true,
-          salons: [],
-          totalReviews: 0,
-          searchCity: null,
-        });
-      }
-      andConditions.push({ "serviceIds.id": { $in: serviceIds } });
     }
 
     if (andConditions.length) {
@@ -1915,7 +1954,24 @@ exports.searchSalonsPublic = async (req, res) => {
       .limit(100)
       .lean();
 
-    salons = salons.filter((s) => s.serviceIds?.length ? true : true);
+    // Optional availability day filter (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateTerm)) {
+      const dayDate = new Date(`${dateTerm}T12:00:00`);
+      if (!Number.isNaN(dayDate.getTime())) {
+        const dayName = DAY_NAMES_EN[dayDate.getDay()];
+        salons = salons.filter((salon) => {
+          const times = Array.isArray(salon.salonTime) ? salon.salonTime : [];
+          if (!times.length) return true;
+          return times.some(
+            (row) =>
+              String(row.day || "").trim().toLowerCase() ===
+                String(dayName).toLowerCase() &&
+              row.isActive !== false &&
+              row.openTime
+          );
+        });
+      }
+    }
 
     salons = attachSalonDistances(salons, latitude, longitude);
 
@@ -1938,13 +1994,16 @@ exports.searchSalonsPublic = async (req, res) => {
     });
     const searchCity =
       locationTerm ||
-      inferSearchCity(salonTerm || serviceTerm, formattedSalons);
+      inferSearchCity(salonTerm || effectiveService || unifiedQ, formattedSalons);
 
     return res.status(200).json({
       status: true,
       salons: formattedSalons,
+      total: formattedSalons.length,
       totalReviews: sumReviewCount(formattedSalons),
       searchCity,
+      searchService: effectiveService || null,
+      searchDate: dateTerm || null,
       language,
     });
   } catch (error) {

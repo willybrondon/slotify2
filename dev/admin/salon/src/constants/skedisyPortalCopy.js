@@ -29,7 +29,7 @@ export const SKEDISY_SALON_PORTAL_COPY = {
     "Image en tête de votre fiche publique (clientes : skedisy.com · réservation sur l'app).",
   profileGalleryLabel: "Photos réalisations (mosaïque fiche publique)",
   profileGalleryHint:
-    "Jusqu’à 10 photos affichées en mosaïque sur votre page salon (comme StyleSeat). Formats JPG/PNG.",
+    "Jusqu’à 10 photos affichées en mosaïque sur votre page salon. Formats JPG/PNG.",
   profileCancelPolicyLabel: "Politique No-Show / annulation tardive",
   profileCancelPolicyHint:
     "Fenêtre gratuite (défaut 24 h) puis, si activé, rétention de l’acompte (ex. 50 %) sur annulation tardive. Reprogrammation libre uniquement dans la fenêtre gratuite.",
@@ -65,7 +65,7 @@ export const SKEDISY_SALON_PORTAL_COPY = {
   profileTitleSuffix: " — Profil",
   autoConfirmBookingsLabel: "Confirmation automatique des réservations",
   autoConfirmBookingsHint:
-    "Les réservations clientes sont confirmées immédiatement (comme Planity). L'expert n'a pas à les accepter. Désactivez uniquement si vous validez manuellement depuis ce panel.",
+    "Les réservations clientes sont confirmées immédiatement. L'expert n'a pas à les accepter. Désactivez uniquement si vous validez manuellement depuis ce panel.",
   paymentSettingsTitle: "Modes de paiement clientes",
   paymentSettingsPageTitle: "Paiements & Stripe Connect",
   paymentSettingsPageIntro:

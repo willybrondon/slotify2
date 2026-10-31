@@ -535,14 +535,7 @@
     }
 
     function initHomeDiscovery() {
-        document.getElementById("homeLocationApply")?.addEventListener("click", function () {
-            const q = (document.getElementById("homeQuerySearchInput")?.value || "").trim();
-            if (q && document.getElementById("homeSearchResults")) {
-                setTimeout(function () {
-                    homeSearchSalons(q);
-                }, 50);
-            }
-        });
+        // Location / date changes only affect the next arrow submit → /recherche
 
         if (document.getElementById("sqNearbySalons") || document.getElementById("topExpertsTrack")) {
             requestLocation().then(function () {

@@ -127,6 +127,24 @@
               <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply" data-translate="homeProduct.applyLocation">OK</button>
             </div>
           </div>
+          <div class="sq-date-chip-wrap">
+            <button type="button" class="sq-date-chip" id="homeDateChip" aria-expanded="false" aria-controls="homeDatePopover">
+              <i class="fas fa-calendar-day" aria-hidden="true"></i>
+              <span class="sq-date-chip__text">
+                <span class="sq-date-chip__label" data-translate="homeProduct.dateLabel">Date</span>
+                <span class="sq-date-chip__value" id="homeDateChipValue">Toutes</span>
+              </span>
+              <i class="fas fa-chevron-down sq-date-chip__chevron" aria-hidden="true"></i>
+            </button>
+            <div class="sq-date-popover" id="homeDatePopover" hidden>
+              <button type="button" class="sq-date-popover__btn" data-date-preset="any" data-translate="homeProduct.dateAny">Toutes les dates</button>
+              <button type="button" class="sq-date-popover__btn" data-date-preset="today" data-translate="homeProduct.dateToday">Aujourd'hui</button>
+              <button type="button" class="sq-date-popover__btn" data-date-preset="tomorrow" data-translate="homeProduct.dateTomorrow">Demain</button>
+              <label class="sq-date-popover__pick-label" for="homeDatePicker" data-translate="homeProduct.datePick">Choisir une date</label>
+              <input type="date" id="homeDatePicker" class="sq-date-popover__input" data-date-preset="custom">
+              <button type="button" class="sq-btn sq-btn-fill sq-date-popover__apply" id="homeDateApply" data-translate="homeProduct.applyLocation">OK</button>
+            </div>
+          </div>
           <a href="/recherche?view=map" class="sq-view-map-link" id="homeViewMapLink">
             <i class="fas fa-map" aria-hidden="true"></i>
             <span data-translate="homeProduct.viewMap">Voir la carte</span>
@@ -139,13 +157,14 @@
             <div class="sq-search-bar-unified__group sq-search-bar-unified__group--query sq-search-bar-unified__query-wrap">
               <label class="sq-sr-only" for="searchQueryInput" data-translate="intentHub.searchQueryLabel">Salon ou prestation</label>
               <input type="search" id="searchQueryInput" name="q" class="sq-search-bar-unified__input sq-search-bar-unified__input--query" data-search-query data-translate="intentHub.searchQueryPlaceholder" placeholder="Salon ou prestation (tresses, locks…)" autocomplete="off" enterkeyhint="search">
+              <input type="hidden" name="intent" id="homeSearchIntent" value="">
               <div class="sq-search-suggestions" hidden role="listbox" aria-label="Suggestions">
-                <div class="sq-search-suggestions__section" data-suggest-popular>
+                <div class="sq-search-suggestions__section" data-suggest-categories-section data-suggest-popular>
                   <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestCategoriesTitle">Catégories populaires</p>
                   <ul class="sq-search-suggestions__list" data-suggest-categories></ul>
                 </div>
-                <div class="sq-search-suggestions__section" data-suggest-popular>
-                  <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations les plus réservées</p>
+                <div class="sq-search-suggestions__section" data-suggest-services-section>
+                  <p class="sq-search-suggestions__heading" data-translate="intentHub.suggestServicesTitle">Prestations</p>
                   <ul class="sq-search-suggestions__list" data-suggest-services></ul>
                 </div>
                 <div class="sq-search-suggestions__section" data-suggest-salons-section hidden>
@@ -237,6 +256,7 @@
   <script type="module" src="qr-code-init.js"></script>
   <script src="script.js"></script>
   <script src="location-chip.js"></script>
+  <script src="date-chip.js"></script>
   <script src="search-suggestions.js"></script>
   <script src="salon-map-ui.js"></script>
   <script src="search-results-page.js"></script>

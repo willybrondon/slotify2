@@ -1128,6 +1128,54 @@ exports.serveSalonWebPage = async (req, res) => {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
 
+    const serviceNameById = Object.fromEntries(
+      bookingServices.map((s) => [String(s.id), s.name])
+    );
+    const beautyPacks = (Array.isArray(salon.servicePackages) ? salon.servicePackages : [])
+      .filter((p) => p && p.active !== false)
+      .slice(0, 12);
+    if (beautyPacks.length > 0) {
+      servicesHtml += `<div class="section sq-salon-beauty-packs" id="salonBeautyPacks">
+        <h3 class="section-title">${esc(copy.beautyPacks || "Pack beauté")}</h3>
+        <div class="sq-beauty-packs">
+          ${beautyPacks
+            .map((pack) => {
+              const svcNames = (Array.isArray(pack.serviceIds) ? pack.serviceIds : [])
+                .map((id) => serviceNameById[String(id)])
+                .filter(Boolean);
+              const extras = Array.isArray(pack.extras) ? pack.extras.filter(Boolean) : [];
+              const visits =
+                Number(pack.visitCount) > 0
+                  ? `<li>${esc(String(pack.visitCount))} visite${
+                      Number(pack.visitCount) > 1 ? "s" : ""
+                    }</li>`
+                  : "";
+              return `<article class="sq-beauty-pack-card">
+                <div class="sq-beauty-pack-card__head">
+                  <h4 class="sq-beauty-pack-card__title">${esc(pack.name || "Pack beauté")}</h4>
+                  ${
+                    pack.priceHint
+                      ? `<span class="sq-beauty-pack-card__price">${esc(pack.priceHint)}</span>`
+                      : ""
+                  }
+                </div>
+                ${
+                  pack.description
+                    ? `<p class="sq-beauty-pack-card__desc">${esc(pack.description)}</p>`
+                    : ""
+                }
+                <ul class="sq-beauty-pack-card__list">
+                  ${visits}
+                  ${svcNames.map((n) => `<li>${esc(n)}</li>`).join("")}
+                  ${extras.map((x) => `<li>${esc(x)}</li>`).join("")}
+                </ul>
+              </article>`;
+            })
+            .join("")}
+        </div>
+      </div>`;
+    }
+
     const avatarUrl = salon.mainImage || salonImage || "";
     const realizationUrls = [];
     const pushUrl = (u) => {

@@ -1,14 +1,45 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Title from "../../extras/Title";
 import { apiInstanceFetch } from "../../api/axiosApi";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
-const statusLabel = {
-  ready: "Actif",
-  partial: "Brouillons prêts",
-  config: "À activer",
+const todayIso = () => {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 };
+
+const addDaysIso = (iso, days) => {
+  const d = new Date(`${iso}T12:00:00`);
+  d.setDate(d.getDate() + days);
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+
+const weekBounds = () => {
+  const d = new Date();
+  const day = (d.getDay() + 6) % 7; // Mon=0
+  const mon = new Date(d);
+  mon.setDate(d.getDate() - day);
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  const p = (n) => String(n).padStart(2, "0");
+  const fmt = (x) =>
+    `${x.getFullYear()}-${p(x.getMonth() + 1)}-${p(x.getDate())}`;
+  return { from: fmt(mon), to: fmt(sun) };
+};
+
+const emptyPackForm = () => ({
+  id: "",
+  name: "Pack beauté",
+  description: "",
+  visitCount: 3,
+  priceHint: "",
+  serviceIds: [],
+  extrasText: "",
+  active: true,
+});
 
 const Marketing = () => {
   const [data, setData] = useState(null);
@@ -16,9 +47,30 @@ const Marketing = () => {
   const [busy, setBusy] = useState("");
   const [lastPromo, setLastPromo] = useState(null);
 
-  const load = useCallback(async () => {
+  const [promoType, setPromoType] = useState("percent");
+  const [promoPercent, setPromoPercent] = useState(15);
+  const [promoAmount, setPromoAmount] = useState(10);
+  const [promoServiceId, setPromoServiceId] = useState("");
+  const [promoDate, setPromoDate] = useState(todayIso());
+  const [promoTitle, setPromoTitle] = useState("");
+
+  const wb = useMemo(() => weekBounds(), []);
+  const [rebookFrom, setRebookFrom] = useState(wb.from);
+  const [rebookTo, setRebookTo] = useState(wb.to);
+
+  const [packModalOpen, setPackModalOpen] = useState(false);
+  const [packForm, setPackForm] = useState(emptyPackForm());
+
+  const load = useCallback(async (range) => {
     try {
-      const res = await apiInstanceFetch.get("salon/marketing/insights");
+      const from = range?.from || rebookFrom;
+      const to = range?.to || rebookTo;
+      const qs = new URLSearchParams();
+      if (from) qs.set("rebookFrom", from);
+      if (to) qs.set("rebookTo", to);
+      const res = await apiInstanceFetch.get(
+        `salon/marketing/insights?${qs.toString()}`
+      );
       if (res?.status) setData(res);
       else toast.error(res?.message || "Impossible de charger le marketing");
     } catch (e) {
@@ -26,45 +78,72 @@ const Marketing = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [rebookFrom, rebookTo]);
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const createPromo = async () => {
-    if (!data?.occupancy) return;
+  const services = data?.salonServices || [];
+  const selectedService = services.find((s) => s.id === promoServiceId);
+
+  const createPromo = async (e) => {
+    e?.preventDefault?.();
+    if (!promoDate) {
+      toast.error("Choisis une date");
+      return;
+    }
     setBusy("promo");
     try {
-      const res = await apiInstanceFetch.post("salon/marketing/promo", {
-        discountPercent: data.occupancy.suggestedDiscount || 15,
-        title: data.occupancy.suggestedPromoTitle,
-        dateHint: data.occupancy.dayLabel,
-        daysValid: 14,
-      });
+      const payload = {
+        discountType: promoType,
+        title: promoTitle || undefined,
+        expiryDate: promoDate,
+        validOnDate: promoDate,
+        serviceId: promoServiceId || undefined,
+        serviceName: selectedService?.name || "",
+        daysValid: 1,
+      };
+      if (promoType === "flat") payload.discountAmount = Number(promoAmount);
+      else payload.discountPercent = Number(promoPercent);
+
+      const res = await apiInstanceFetch.post("salon/marketing/promo", payload);
       if (!res?.status) throw new Error(res?.message || "Erreur");
       setLastPromo(res);
       toast.success(`Promo créée : ${res.coupon?.code}`);
       load();
-    } catch (e) {
-      toast.error(e.message || "Création promo impossible");
+    } catch (err) {
+      toast.error(err.message || "Création promo impossible");
     } finally {
       setBusy("");
     }
   };
 
+  const refreshRebook = async () => {
+    setBusy("rebook-load");
+    await load({ from: rebookFrom, to: rebookTo });
+    setBusy("");
+  };
+
   const launchRebook = async () => {
-    if (!window.confirm("Envoyer les SMS de rebooking aux clientes à échéance cette semaine ?")) {
+    if (
+      !window.confirm(
+        `Envoyer les SMS de rebooking du ${rebookFrom} au ${rebookTo} ?`
+      )
+    ) {
       return;
     }
     setBusy("rebook");
     try {
-      const res = await apiInstanceFetch.post("salon/marketing/rebook-campaign", {});
+      const res = await apiInstanceFetch.post("salon/marketing/rebook-campaign", {
+        from: rebookFrom,
+        to: rebookTo,
+      });
       if (!res?.status) throw new Error(res?.message || "Erreur");
       toast.success(res.message || "Campagne lancée");
-      load();
-    } catch (e) {
-      toast.error(e.message || "Campagne impossible");
+      load({ from: rebookFrom, to: rebookTo });
+    } catch (err) {
+      toast.error(err.message || "Campagne impossible");
     } finally {
       setBusy("");
     }
@@ -79,140 +158,344 @@ const Marketing = () => {
     }
   };
 
+  const formatPromoLabel = (p) => {
+    if (!p) return "";
+    if (Number(p.discountType) === 1) return `−${p.maxDiscount}€`;
+    return `−${p.discountPercent}%`;
+  };
+
+  const openNewPack = () => {
+    setPackForm(emptyPackForm());
+    setPackModalOpen(true);
+  };
+
+  const openEditPack = (pkg) => {
+    setPackForm({
+      id: pkg.id,
+      name: pkg.name || "Pack beauté",
+      description: pkg.description || "",
+      visitCount: pkg.visitCount || 1,
+      priceHint: pkg.priceHint || "",
+      serviceIds: Array.isArray(pkg.serviceIds) ? pkg.serviceIds.map(String) : [],
+      extrasText: Array.isArray(pkg.extras) ? pkg.extras.join("\n") : "",
+      active: pkg.active !== false,
+    });
+    setPackModalOpen(true);
+  };
+
+  const togglePackService = (id) => {
+    setPackForm((prev) => {
+      const set = new Set(prev.serviceIds || []);
+      if (set.has(id)) set.delete(id);
+      else set.add(id);
+      return { ...prev, serviceIds: [...set] };
+    });
+  };
+
+  const savePack = async (e) => {
+    e?.preventDefault?.();
+    if (!packForm.name?.trim()) {
+      toast.error("Nom du pack requis");
+      return;
+    }
+    setBusy("pack");
+    try {
+      const current = [...(data?.packages || [])];
+      const nextPack = {
+        id: packForm.id || `pkg_${Date.now()}`,
+        name: packForm.name.trim(),
+        description: packForm.description || "",
+        visitCount: Math.max(1, Number(packForm.visitCount) || 1),
+        priceHint: packForm.priceHint || "",
+        serviceIds: packForm.serviceIds || [],
+        extrasText: packForm.extrasText || "",
+        active: packForm.active !== false,
+      };
+      const idx = current.findIndex((p) => p.id === nextPack.id);
+      if (idx >= 0) current[idx] = nextPack;
+      else current.push(nextPack);
+
+      const res = await apiInstanceFetch.put("salon/marketing/packages", {
+        packages: current,
+      });
+      if (!res?.status) throw new Error(res?.message || "Erreur");
+      toast.success("Pack enregistré");
+      setPackModalOpen(false);
+      load();
+    } catch (err) {
+      toast.error(err.message || "Erreur pack");
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const deletePack = async (id) => {
+    if (!window.confirm("Supprimer ce pack ?")) return;
+    setBusy("pack");
+    try {
+      const next = (data?.packages || []).filter((p) => p.id !== id);
+      const res = await apiInstanceFetch.put("salon/marketing/packages", {
+        packages: next,
+      });
+      if (!res?.status) throw new Error(res?.message || "Erreur");
+      toast.success("Pack supprimé");
+      load();
+    } catch (err) {
+      toast.error(err.message || "Erreur");
+    } finally {
+      setBusy("");
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-3">
-        <Title name="Marketing automatisé" />
+        <Title name="Marketing" />
         <p>Chargement…</p>
       </div>
     );
   }
 
-  const occ = data?.occupancy;
   const rebook = data?.rebook;
+  const sub = data?.subscription;
+  const canSendRebook = sub?.canSendRebook !== false && !rebook?.sendLocked;
+  const canCreatePromo = sub?.canCreatePromo !== false;
+  const promos = data?.recentPromos || [];
 
   return (
     <div className="mainAdminProfile">
       <div className="p-3">
-        <Title name="Marketing automatisé" />
-        <p style={{ color: "#666", maxWidth: 640, marginBottom: 20 }}>
-          StyleSeat-inspired : insights planning + rebooking, promos ciblées, posts
-          prêts à coller, fiche publique et fidélité — sans campagne manuelle.
+        <Title name="Marketing" />
+        <p style={{ color: "#666", maxWidth: 640, marginBottom: 12 }}>
+          Crée des promotions, relance tes clientes et propose des packs beauté sur ta fiche
+          publique.
         </p>
-
-        <div className="row g-3 mb-3">
-          {(data?.roadmap || []).map((r) => (
-            <div className="col-6 col-md" key={r.id}>
-              <div
-                className="card h-100"
-                style={{ border: "1px solid #eee", borderRadius: 10 }}
-              >
-                <div className="card-body py-2 px-3">
-                  <div style={{ fontSize: 12, color: "#888" }}>
-                    {statusLabel[r.status] || r.status}
-                  </div>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>{r.label}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {sub && (
+          <p className="mb-3" style={{ fontSize: 14 }}>
+            Abonnement : <strong>{sub.planName || sub.planId || "Free"}</strong>
+            {sub.upgradeHint ? (
+              <span className="text-muted"> — {sub.upgradeHint}</span>
+            ) : null}
+          </p>
+        )}
 
         <div className="row g-3">
+          {/* Création de promotion */}
           <div className="col-lg-6">
             <div className="card h-100">
               <div className="card-body">
-                <h5 className="mb-2">Planning</h5>
-                <p style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.35 }}>
-                  {occ?.headline || "—"}
-                </p>
-                {occ?.occupancyPercent != null && (
-                  <p className="text-muted mb-3">
-                    {occ.bookingHint} · {occ.expertCount} pro(s)
-                  </p>
-                )}
-                {occ?.suggestPromo ? (
-                  <button
-                    type="button"
-                    className="btn btn-success"
-                    disabled={busy === "promo"}
-                    onClick={createPromo}
-                  >
-                    {busy === "promo"
-                      ? "Création…"
-                      : `Créer promo −${occ.suggestedDiscount}%`}
-                  </button>
-                ) : (
-                  <Link to="/salonpanel/teamCalendar" className="btn btn-outline-secondary">
-                    Voir le planning
-                  </Link>
-                )}
-
-                {occ?.socialPosts?.length > 0 && (
-                  <div className="mt-4">
-                    <h6>Posts prêts (à coller)</h6>
-                    {occ.socialPosts.map((p, i) => (
-                      <div
-                        key={i}
-                        className="p-2 mb-2"
-                        style={{ background: "#f8f9fa", borderRadius: 8 }}
-                      >
-                        <div
-                          style={{
-                            fontSize: 11,
-                            textTransform: "uppercase",
-                            color: "#888",
-                            marginBottom: 4,
-                          }}
-                        >
-                          {p.channel}
-                        </div>
-                        <pre
-                          style={{
-                            whiteSpace: "pre-wrap",
-                            margin: 0,
-                            fontFamily: "inherit",
-                            fontSize: 13,
-                          }}
-                        >
-                          {p.body}
-                        </pre>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-link px-0"
-                          onClick={() => copyText(p.body)}
-                        >
-                          Copier
-                        </button>
-                      </div>
-                    ))}
+                <h5 className="mb-3">Création de promotion</h5>
+                {!canCreatePromo ? (
+                  <div className="alert alert-warning py-2" role="status">
+                    {sub?.upgradeHint ||
+                      "Passez à Premium pour créer des promotions."}
                   </div>
+                ) : (
+                  <form onSubmit={createPromo}>
+                    <div className="mb-2">
+                      <label className="form-label">Type de réduction</label>
+                      <div className="d-flex gap-3">
+                        <label className="form-check">
+                          <input
+                            type="radio"
+                            className="form-check-input"
+                            checked={promoType === "percent"}
+                            onChange={() => setPromoType("percent")}
+                          />{" "}
+                          Pourcentage (%)
+                        </label>
+                        <label className="form-check">
+                          <input
+                            type="radio"
+                            className="form-check-input"
+                            checked={promoType === "flat"}
+                            onChange={() => setPromoType("flat")}
+                          />{" "}
+                          Montant (€)
+                        </label>
+                      </div>
+                    </div>
+
+                    {promoType === "percent" ? (
+                      <div className="mb-2">
+                        <label className="form-label">Pourcentage</label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={90}
+                          className="form-control"
+                          value={promoPercent}
+                          onChange={(e) => setPromoPercent(e.target.value)}
+                          required
+                        />
+                      </div>
+                    ) : (
+                      <div className="mb-2">
+                        <label className="form-label">Montant (€)</label>
+                        <input
+                          type="number"
+                          min={1}
+                          step="0.01"
+                          className="form-control"
+                          value={promoAmount}
+                          onChange={(e) => setPromoAmount(e.target.value)}
+                          required
+                        />
+                      </div>
+                    )}
+
+                    <div className="mb-2">
+                      <label className="form-label">Prestation</label>
+                      <select
+                        className="form-select"
+                        value={promoServiceId}
+                        onChange={(e) => setPromoServiceId(e.target.value)}
+                      >
+                        <option value="">Toutes les prestations</option>
+                        {services.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                            {s.price != null ? ` (${s.price}€)` : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="mb-2">
+                      <label className="form-label">Date (validité / RDV ciblé)</label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        value={promoDate}
+                        min={todayIso()}
+                        onChange={(e) => setPromoDate(e.target.value)}
+                        required
+                      />
+                      <div className="form-text">
+                        Le code expire à cette date. Tu peux cibler un jour précis pour
+                        remplir ton agenda.
+                      </div>
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">Titre (optionnel)</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={promoTitle}
+                        onChange={(e) => setPromoTitle(e.target.value)}
+                        placeholder="Ex. Offre mardi"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="btn btn-success"
+                      disabled={busy === "promo"}
+                    >
+                      {busy === "promo" ? "Création…" : "Créer le code promo"}
+                    </button>
+                  </form>
                 )}
               </div>
             </div>
           </div>
 
+          {/* Rebooking */}
           <div className="col-lg-6">
             <div className="card h-100">
               <div className="card-body">
-                <h5 className="mb-2">Rebooking</h5>
-                <p style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.35 }}>
+                <h5 className="mb-3">Rebooking</h5>
+                <div className="row g-2 mb-2">
+                  <div className="col-6">
+                    <label className="form-label">Du</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={rebookFrom}
+                      onChange={(e) => setRebookFrom(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label">Au</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={rebookTo}
+                      onChange={(e) => setRebookTo(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="d-flex flex-wrap gap-2 mb-3">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => {
+                      const w = weekBounds();
+                      setRebookFrom(w.from);
+                      setRebookTo(w.to);
+                      load({ from: w.from, to: w.to });
+                    }}
+                  >
+                    Cette semaine
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => {
+                      const from = todayIso();
+                      const to = addDaysIso(from, 14);
+                      setRebookFrom(from);
+                      setRebookTo(to);
+                      load({ from, to });
+                    }}
+                  >
+                    14 prochains jours
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-dark btn-sm"
+                    disabled={busy === "rebook-load"}
+                    onClick={refreshRebook}
+                  >
+                    Actualiser
+                  </button>
+                </div>
+
+                <p style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.35 }}>
                   {rebook?.headline || "—"}
                 </p>
                 <p className="text-muted mb-3">
-                  Semaine {rebook?.weekStart} → {rebook?.weekEnd}
+                  Période {rebook?.weekStart || rebookFrom} → {rebook?.weekEnd || rebookTo}
                   {rebook?.alreadySent
                     ? ` · ${rebook.alreadySent} déjà relancée(s)`
                     : ""}
                 </p>
+
+                {rebook?.sendLocked || !canSendRebook ? (
+                  <div className="alert alert-warning py-2" role="status">
+                    {rebook?.lockReason ||
+                      sub?.upgradeHint ||
+                      "Passez à Basic pour envoyer des SMS de rebooking."}
+                  </div>
+                ) : null}
+
                 <button
                   type="button"
                   className="btn btn-dark"
-                  disabled={!rebook?.suggestCampaign || busy === "rebook"}
+                  disabled={
+                    !canSendRebook ||
+                    rebook?.sendLocked ||
+                    !rebook?.suggestCampaign ||
+                    busy === "rebook"
+                  }
                   onClick={launchRebook}
                 >
                   {busy === "rebook" ? "Envoi…" : "Lancer la campagne SMS"}
                 </button>
+                <p className="mt-2 mb-0" style={{ fontSize: 13 }}>
+                  <Link to="/salonpanel/clients">Voir mes clientes</Link>
+                </p>
 
                 {rebook?.clients?.length > 0 && (
                   <div className="mt-3" style={{ maxHeight: 240, overflowY: "auto" }}>
@@ -239,11 +522,131 @@ const Marketing = () => {
               </div>
             </div>
           </div>
+        </div>
 
+        {/* Promotions salon — below creation + rebooking */}
+        <div className="card mt-3">
+          <div className="card-body">
+            <h5>Promotions salon</h5>
+            {lastPromo?.coupon && (
+              <div className="alert alert-success d-flex flex-wrap align-items-center gap-2">
+                <span>
+                  Nouveau code <strong>{lastPromo.coupon.code}</strong> (
+                  {formatPromoLabel(lastPromo.coupon)}) jusqu&apos;au{" "}
+                  {lastPromo.coupon.expiryDate}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-dark"
+                  onClick={() => copyText(lastPromo.coupon.code)}
+                >
+                  Copier le code
+                </button>
+                {lastPromo.shareText ? (
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline-dark"
+                    onClick={() => copyText(lastPromo.shareText)}
+                  >
+                    Copier le message
+                  </button>
+                ) : null}
+              </div>
+            )}
+            {promos.length === 0 ? (
+              <p className="text-muted mb-0">Aucune promotion pour l’instant.</p>
+            ) : (
+              <ul className="list-unstyled mb-0">
+                {promos.map((p) => (
+                  <li
+                    key={p._id}
+                    className="d-flex flex-wrap align-items-center gap-2 py-2 border-bottom"
+                  >
+                    <code className="fs-6">{p.code}</code>
+                    <span>
+                      {p.title} ({formatPromoLabel(p)}) · expire {p.expiryDate}
+                      {!p.isActive ? " (inactif)" : ""}
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-secondary ms-auto"
+                      onClick={() => copyText(p.code)}
+                    >
+                      Copier le code
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Pack beauté */}
+        <div className="card mt-3">
+          <div className="card-body">
+            <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+              <h5 className="mb-0">Pack beauté</h5>
+              <button type="button" className="btn btn-dark btn-sm" onClick={openNewPack}>
+                Ajouter un pack
+              </button>
+            </div>
+            <p className="text-muted">
+              Les packs s’affichent sur ta fiche publique après les prestations. Choisis les
+              prestations incluses et ajoute des mentions écrites (ex. shampoing offert).
+            </p>
+            {(data?.packages || []).length === 0 ? (
+              <p className="text-muted">Aucun pack pour l’instant.</p>
+            ) : (
+              <ul className="list-unstyled mb-0">
+                {(data.packages || []).map((p) => (
+                  <li
+                    key={p.id}
+                    className="border rounded p-3 mb-2 d-flex flex-wrap justify-content-between gap-2"
+                  >
+                    <div>
+                      <strong>{p.name}</strong>
+                      {p.priceHint ? ` · ${p.priceHint}` : ""}
+                      <div className="text-muted" style={{ fontSize: 13 }}>
+                        {p.visitCount} visite(s)
+                        {Array.isArray(p.serviceIds) && p.serviceIds.length
+                          ? ` · ${p.serviceIds.length} prestation(s)`
+                          : ""}
+                        {Array.isArray(p.extras) && p.extras.length
+                          ? ` · ${p.extras.length} ajout(s)`
+                          : ""}
+                      </div>
+                      {p.description ? (
+                        <div style={{ fontSize: 13 }}>{p.description}</div>
+                      ) : null}
+                    </div>
+                    <div className="d-flex gap-2 align-items-start">
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-dark"
+                        onClick={() => openEditPack(p)}
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => deletePack(p.id)}
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        <div className="row g-3 mt-1">
           <div className="col-lg-6">
             <div className="card h-100">
               <div className="card-body">
-                <h5>Fiche / mini-site</h5>
+                <h5>Fiche publique</h5>
                 <p className="text-muted">{data?.site?.hint}</p>
                 {data?.site?.publicUrl && (
                   <a
@@ -258,7 +661,6 @@ const Marketing = () => {
               </div>
             </div>
           </div>
-
           <div className="col-lg-6">
             <div className="card h-100">
               <div className="card-body">
@@ -271,103 +673,146 @@ const Marketing = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {(lastPromo || data?.recentPromos?.length > 0) && (
-          <div className="card mt-3">
-            <div className="card-body">
-              <h5>Promotions salon</h5>
-              {lastPromo?.coupon && (
-                <div className="alert alert-success">
-                  Code <strong>{lastPromo.coupon.code}</strong> (−
-                  {lastPromo.coupon.discountPercent}%) jusqu&apos;au{" "}
-                  {lastPromo.coupon.expiryDate}
+      {packModalOpen && (
+        <div
+          className="modal d-block"
+          style={{ background: "rgba(0,0,0,0.45)" }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="modal-dialog modal-lg modal-dialog-scrollable">
+            <div className="modal-content">
+              <form onSubmit={savePack}>
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    {packForm.id ? "Modifier le pack" : "Nouveau pack beauté"}
+                  </h5>
                   <button
                     type="button"
-                    className="btn btn-sm btn-link"
-                    onClick={() => copyText(lastPromo.shareText)}
+                    className="btn-close"
+                    aria-label="Fermer"
+                    onClick={() => setPackModalOpen(false)}
+                  />
+                </div>
+                <div className="modal-body">
+                  <div className="mb-2">
+                    <label className="form-label">Nom</label>
+                    <input
+                      className="form-control"
+                      value={packForm.name}
+                      onChange={(e) =>
+                        setPackForm((p) => ({ ...p, name: e.target.value }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="row g-2">
+                    <div className="col-md-6">
+                      <label className="form-label">Nombre de visites</label>
+                      <input
+                        type="number"
+                        min={1}
+                        className="form-control"
+                        value={packForm.visitCount}
+                        onChange={(e) =>
+                          setPackForm((p) => ({
+                            ...p,
+                            visitCount: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label">Prix indicatif</label>
+                      <input
+                        className="form-control"
+                        value={packForm.priceHint}
+                        onChange={(e) =>
+                          setPackForm((p) => ({
+                            ...p,
+                            priceHint: e.target.value,
+                          }))
+                        }
+                        placeholder="ex. 180€ ou sur devis"
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-2 mt-2">
+                    <label className="form-label">Description</label>
+                    <textarea
+                      className="form-control"
+                      rows={2}
+                      value={packForm.description}
+                      onChange={(e) =>
+                        setPackForm((p) => ({
+                          ...p,
+                          description: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Prestations incluses</label>
+                    <div
+                      className="border rounded p-2"
+                      style={{ maxHeight: 180, overflowY: "auto" }}
+                    >
+                      {services.length === 0 ? (
+                        <span className="text-muted">Aucune prestation salon</span>
+                      ) : (
+                        services.map((s) => (
+                          <label key={s.id} className="d-block form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              checked={(packForm.serviceIds || []).includes(s.id)}
+                              onChange={() => togglePackService(s.id)}
+                            />{" "}
+                            {s.name}
+                          </label>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Ajouts écrits (un par ligne)</label>
+                    <textarea
+                      className="form-control"
+                      rows={3}
+                      value={packForm.extrasText}
+                      onChange={(e) =>
+                        setPackForm((p) => ({
+                          ...p,
+                          extrasText: e.target.value,
+                        }))
+                      }
+                      placeholder={"Shampoing offert\nConseil personnalisé"}
+                    />
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => setPackModalOpen(false)}
                   >
-                    Copier le message de partage
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-dark"
+                    disabled={busy === "pack"}
+                  >
+                    {busy === "pack" ? "Enregistrement…" : "Enregistrer"}
                   </button>
                 </div>
-              )}
-              <ul className="mb-0">
-                {(data?.recentPromos || []).map((p) => (
-                  <li key={p._id}>
-                    <code>{p.code}</code> — {p.title} (−{p.discountPercent}%) · expire{" "}
-                    {p.expiryDate}
-                    {!p.isActive ? " (inactif)" : ""}
-                  </li>
-                ))}
-              </ul>
+              </form>
             </div>
-          </div>
-        )}
-
-        {data?.durationInsight && (
-          <div className="card mt-3">
-            <div className="card-body">
-              <h5>Durée prévue vs réelle</h5>
-              <p>{data.durationInsight.headline}</p>
-            </div>
-          </div>
-        )}
-
-        <div className="card mt-3">
-          <div className="card-body">
-            <h5>Packages multi-visites</h5>
-            <p className="text-muted">
-              Ex. Pack entretien : 1 pose + 1 entretien + 1 retouche. Affichés ici pour le
-              salon (vente assistée) — pas encore de wallet prépayé.
-            </p>
-            {(data?.packages || []).length === 0 && (
-              <p className="text-muted">Aucun pack. Ajoutez-en un ci-dessous.</p>
-            )}
-            <ul>
-              {(data?.packages || []).map((p) => (
-                <li key={p.id}>
-                  <strong>{p.name}</strong> — {p.visitCount} visite(s)
-                  {p.priceHint ? ` · ${p.priceHint}` : ""}
-                  {p.description ? ` — ${p.description}` : ""}
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              className="btn btn-outline-dark btn-sm"
-              onClick={async () => {
-                const name = window.prompt("Nom du pack", "Pack entretien");
-                if (!name) return;
-                const visitCount = Number(window.prompt("Nombre de visites", "3")) || 3;
-                const priceHint = window.prompt("Prix indicatif (texte)", "sur devis") || "";
-                const next = [
-                  ...(data?.packages || []),
-                  {
-                    id: `pkg_${Date.now()}`,
-                    name,
-                    visitCount,
-                    priceHint,
-                    description: "",
-                    active: true,
-                  },
-                ];
-                try {
-                  const res = await apiInstanceFetch.put("salon/marketing/packages", {
-                    packages: next,
-                  });
-                  if (res?.status) {
-                    toast.success("Pack enregistré");
-                    load();
-                  } else toast.error(res?.message || "Erreur");
-                } catch (e) {
-                  toast.error("Erreur pack");
-                }
-              }}
-            >
-              Ajouter un pack
-            </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
