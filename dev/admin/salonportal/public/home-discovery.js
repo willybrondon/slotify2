@@ -290,9 +290,7 @@
     function setSearchMode(active) {
         document.body.classList.toggle("sq-home-search-active", Boolean(active));
         const banner = document.getElementById("homeShareLookBanner");
-        const hair = document.getElementById("homeHairStrip");
         if (banner) banner.hidden = Boolean(active);
-        if (hair) hair.hidden = Boolean(active);
     }
 
     function formatStats(salonCount, reviewCount) {

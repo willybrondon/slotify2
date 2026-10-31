@@ -74,14 +74,10 @@ app.use((req, res, next) => {
     targetPath = "/";
   }
 
-  // Duplicate hair-profile URLs (?return=) → canonical path without query
-  if (
-    pathname.toLowerCase() === "/hair-profile.html" &&
-    req.query &&
-    Object.prototype.hasOwnProperty.call(req.query, "return")
-  ) {
+  // Profil capillaire / CTA « Compléter ton profil » retiré → accueil
+  if (pathname.toLowerCase() === "/hair-profile.html") {
     needRedirect = true;
-    targetPath = "/hair-profile.html";
+    targetPath = "/";
     dropQuery = true;
   }
 

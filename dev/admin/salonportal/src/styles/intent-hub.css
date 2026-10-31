@@ -2451,7 +2451,8 @@ body.sq-search-focus-active .sq-search-suggestions {
     display: none !important;
   }
 
-  body.sq-search-sheet-open .sq-location-popover {
+  body.sq-search-sheet-open .sq-location-popover,
+  body.sq-search-sheet-open .sq-date-popover {
     z-index: 100090;
   }
 }
@@ -2490,6 +2491,11 @@ body.sq-search-focus-active .sq-search-suggestions {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
+}
+
+.sq-date-chip-wrap.is-open,
+.sq-location-chip-wrap.is-open {
+  z-index: 60;
 }
 
 .sq-date-chip {

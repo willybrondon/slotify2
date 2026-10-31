@@ -62,6 +62,7 @@
         const popover = getPopover();
         if (popover) popover.hidden = true;
         if (chip) chip.setAttribute('aria-expanded', 'false');
+        document.querySelector('.sq-location-chip-wrap')?.classList.remove('is-open');
     }
 
     function openPopover() {
@@ -82,9 +83,11 @@
         const datePop = document.getElementById('homeDatePopover');
         if (datePop) datePop.hidden = true;
         document.getElementById('homeDateChip')?.setAttribute('aria-expanded', 'false');
+        document.querySelector('.sq-date-chip-wrap')?.classList.remove('is-open');
 
         popover.hidden = false;
         if (chip) chip.setAttribute('aria-expanded', 'true');
+        document.querySelector('.sq-location-chip-wrap')?.classList.add('is-open');
         if (input) {
             input.value = getLabel();
             input.focus();

@@ -61,6 +61,13 @@
         );
     }
 
+    function getSearchDate() {
+        if (typeof window.skedisyGetSearchDate === "function") {
+            return String(window.skedisyGetSearchDate() || "").trim();
+        }
+        return localStorage.getItem("skedisy-search-date") || "";
+    }
+
     function sumReviews(list) {
         return list.reduce((acc, s) => acc + (s.reviewCount || 0), 0);
     }
@@ -613,6 +620,7 @@
             limit: "50",
             sort: filters.sort || "best",
         });
+        const dateIso = getSearchDate();
         if (term) params.set("search", term);
         if (locationActive && location) params.set("location", location);
         if (clientCoords.lat != null) params.set("latitude", String(clientCoords.lat));
@@ -622,6 +630,7 @@
         if (filters.maxPrice) params.set("maxPrice", String(filters.maxPrice));
         if (filters.availableToday) params.set("availableToday", "1");
         if (filters.serviceId) params.set("serviceId", filters.serviceId);
+        if (dateIso) params.set("date", dateIso);
 
         if (salonsGrid) {
             salonsGrid.innerHTML = `<p class="sq-home-discovery-loading">${escapeHtml(
@@ -678,6 +687,8 @@
         else url.searchParams.delete("availableToday");
         if (filters.serviceId) url.searchParams.set("serviceId", filters.serviceId);
         else url.searchParams.delete("serviceId");
+        if (dateIso) url.searchParams.set("date", dateIso);
+        else url.searchParams.delete("date");
         window.history.replaceState({}, "", url);
     }
 
@@ -788,6 +799,15 @@
 
     document.getElementById("homeLocationApply")?.addEventListener("click", () => {
         setTimeout(() => fetchResults(), 50);
+    });
+
+    document.getElementById("homeDateApply")?.addEventListener("click", () => {
+        setTimeout(() => fetchResults(), 50);
+    });
+    document.querySelectorAll("[data-date-preset]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            setTimeout(() => fetchResults(), 80);
+        });
     });
 
     updateStats();

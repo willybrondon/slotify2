@@ -137,31 +137,10 @@
   }
 
   function renderStrip(mountEl) {
-    if (!mountEl) return;
-    const profile = load();
-    const editLabel = t('hairProfile.edit');
-
-    if (!isComplete(profile)) {
-      mountEl.innerHTML = `
-        <a href="hair-profile.html" class="sq-hair-strip sq-hair-strip--incomplete">
-          <i class="fas fa-spa" aria-hidden="true"></i>
-          <span>${escapeHtml(t('hairProfile.incomplete'))}</span>
-          <i class="fas fa-chevron-right" aria-hidden="true"></i>
-        </a>`;
-      return;
+    if (mountEl) {
+      mountEl.innerHTML = '';
+      mountEl.hidden = true;
     }
-
-    const summary = [profile.hairType, profile.styleInterest]
-      .filter(Boolean)
-      .map((id) => t('hairProfile.' + id))
-      .join(' · ');
-
-    mountEl.innerHTML = `
-      <a href="hair-profile.html" class="sq-hair-strip sq-hair-strip--complete">
-        <i class="fas fa-check-circle" aria-hidden="true"></i>
-        <span><strong>${escapeHtml(t('hairProfile.summary'))}:</strong> ${escapeHtml(summary)}</span>
-        <span class="sq-hair-strip__edit">${escapeHtml(editLabel)}</span>
-      </a>`;
   }
 
   function escapeHtml(str) {
@@ -204,15 +183,8 @@
   }
 
   function maybePromptOnHome() {
-    if (isComplete() || hasBeenPrompted()) return;
-    if (!document.body.classList.contains('sq-page') || document.body.dataset.page !== 'client') return;
-    if (!document.getElementById('sqIntentHub')) return;
-
-    markPrompted();
-    try {
-      sessionStorage.setItem(RETURN_STORAGE_KEY, window.location.pathname || '/');
-    } catch (e) { /* ignore */ }
-    window.location.href = '/hair-profile.html';
+    // CTA « Compléter ton profil » / redirect vers hair-profile désactivé
+    return;
   }
 
   function mountProfilePage(root) {

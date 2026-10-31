@@ -166,6 +166,25 @@ const DAY_NAMES_EN = [
   "Saturday",
 ];
 
+/** Keep salons open on YYYY-MM-DD (salonTime); empty schedule = keep. */
+function filterSalonsOpenOnDate(salons, dateTerm) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateTerm || ""))) return salons;
+  const dayDate = new Date(`${dateTerm}T12:00:00`);
+  if (Number.isNaN(dayDate.getTime())) return salons;
+  const dayName = DAY_NAMES_EN[dayDate.getDay()];
+  return (salons || []).filter((salon) => {
+    const times = Array.isArray(salon.salonTime) ? salon.salonTime : [];
+    if (!times.length) return true;
+    return times.some(
+      (row) =>
+        String(row.day || "").trim().toLowerCase() ===
+          String(dayName).toLowerCase() &&
+        row.isActive !== false &&
+        row.openTime
+    );
+  });
+}
+
 const DAY_SHORT_FR = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
 const DAY_SHORT_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -820,6 +839,7 @@ exports.getSalonsByCategory = async (req, res) => {
     const availableToday =
       req.query.availableToday === "1" ||
       req.query.availableToday === "true";
+    const dateTerm = String(req.query.date || "").trim();
     const start = parseInt(req.query.start) || 0;
     const limit = Math.min(parseInt(req.query.limit) || 50, 100);
     const language = req.query.language || "en";
@@ -940,6 +960,7 @@ exports.getSalonsByCategory = async (req, res) => {
       );
     }
 
+    salons = filterSalonsOpenOnDate(salons, dateTerm);
     salons = attachSalonDistances(salons, latitude, longitude);
 
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
@@ -977,6 +998,7 @@ exports.getSalonsByCategory = async (req, res) => {
           `${translatedCategoryName} services available at top-rated salons`,
       },
       salons: formattedSalons,
+      searchDate: dateTerm || null,
       services: serviceSubtypes,
       total,
       totalReviews: sumReviewCount(formattedSalons),
@@ -1496,6 +1518,24 @@ exports.serveCategoryPage = async (req, res) => {
                   <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply">${copy.applyLocation}</button>
                 </div>
               </div>
+              <div class="sq-date-chip-wrap">
+                <button type="button" class="sq-date-chip" id="homeDateChip" aria-expanded="false" aria-controls="homeDatePopover">
+                  <i class="fas fa-calendar-day" aria-hidden="true"></i>
+                  <span class="sq-date-chip__text">
+                    <span class="sq-date-chip__label">${copy.dateLabel || "Date"}</span>
+                    <span class="sq-date-chip__value" id="homeDateChipValue">${copy.dateToday || "Aujourd'hui"}</span>
+                  </span>
+                  <i class="fas fa-chevron-down sq-date-chip__chevron" aria-hidden="true"></i>
+                </button>
+                <div class="sq-date-popover" id="homeDatePopover" hidden>
+                  <button type="button" class="sq-date-popover__btn" data-date-preset="today">${copy.dateToday || "Aujourd'hui"}</button>
+                  <button type="button" class="sq-date-popover__btn" data-date-preset="tomorrow">${copy.dateTomorrow || "Demain"}</button>
+                  <button type="button" class="sq-date-popover__btn" data-date-preset="any">${copy.dateAny || "Toutes les dates"}</button>
+                  <label class="sq-date-popover__pick-label" for="homeDatePicker">${copy.datePick || "Autre date"}</label>
+                  <input type="date" id="homeDatePicker" class="sq-date-popover__input" name="date">
+                  <button type="button" class="sq-btn sq-btn-fill sq-date-popover__apply" id="homeDateApply">${copy.applyLocation || "OK"}</button>
+                </div>
+              </div>
             </div>
             <form id="categorySearchForm" class="sq-search-bar-unified sq-search-bar-unified--home sq-search-bar-unified--full" role="search" data-category-search>
               <div class="sq-search-bar-unified__inner sq-search-bar-unified__inner--query-only">
@@ -1642,6 +1682,7 @@ exports.serveCategoryPage = async (req, res) => {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="${baseURL}/salon-map-ui.js"></script>
     <script src="${baseURL}/location-chip.js"></script>
+    <script src="${baseURL}/date-chip.js"></script>
     <script src="${baseURL}/category-page.js"></script>
     <script type="module" src="${baseURL}/qr-code-init.js"></script>
     <script src="${baseURL}/script.js"></script>
@@ -1954,24 +1995,7 @@ exports.searchSalonsPublic = async (req, res) => {
       .limit(100)
       .lean();
 
-    // Optional availability day filter (YYYY-MM-DD)
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateTerm)) {
-      const dayDate = new Date(`${dateTerm}T12:00:00`);
-      if (!Number.isNaN(dayDate.getTime())) {
-        const dayName = DAY_NAMES_EN[dayDate.getDay()];
-        salons = salons.filter((salon) => {
-          const times = Array.isArray(salon.salonTime) ? salon.salonTime : [];
-          if (!times.length) return true;
-          return times.some(
-            (row) =>
-              String(row.day || "").trim().toLowerCase() ===
-                String(dayName).toLowerCase() &&
-              row.isActive !== false &&
-              row.openTime
-          );
-        });
-      }
-    }
+    salons = filterSalonsOpenOnDate(salons, dateTerm);
 
     salons = attachSalonDistances(salons, latitude, longitude);
 

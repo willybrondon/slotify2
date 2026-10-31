@@ -130,16 +130,16 @@
                                     <i class="fas fa-calendar-day" aria-hidden="true"></i>
                                     <span class="sq-date-chip__text">
                                         <span class="sq-date-chip__label" data-translate="homeProduct.dateLabel">Date</span>
-                                        <span class="sq-date-chip__value" id="homeDateChipValue">Toutes</span>
+                                        <span class="sq-date-chip__value" id="homeDateChipValue">Aujourd'hui</span>
                                     </span>
                                     <i class="fas fa-chevron-down sq-date-chip__chevron" aria-hidden="true"></i>
                                 </button>
                                 <div class="sq-date-popover" id="homeDatePopover" hidden>
-                                    <button type="button" class="sq-date-popover__btn" data-date-preset="any" data-translate="homeProduct.dateAny">Toutes les dates</button>
                                     <button type="button" class="sq-date-popover__btn" data-date-preset="today" data-translate="homeProduct.dateToday">Aujourd'hui</button>
                                     <button type="button" class="sq-date-popover__btn" data-date-preset="tomorrow" data-translate="homeProduct.dateTomorrow">Demain</button>
-                                    <label class="sq-date-popover__pick-label" for="homeDatePicker" data-translate="homeProduct.datePick">Choisir une date</label>
-                                    <input type="date" id="homeDatePicker" class="sq-date-popover__input" data-date-preset="custom">
+                                    <button type="button" class="sq-date-popover__btn" data-date-preset="any" data-translate="homeProduct.dateAny">Toutes les dates</button>
+                                    <label class="sq-date-popover__pick-label" for="homeDatePicker" data-translate="homeProduct.datePick">Autre date</label>
+                                    <input type="date" id="homeDatePicker" class="sq-date-popover__input" name="date">
                                     <button type="button" class="sq-btn sq-btn-fill sq-date-popover__apply" id="homeDateApply" data-translate="homeProduct.applyLocation">OK</button>
                                 </div>
                             </div>
@@ -195,7 +195,6 @@
                         <a href="/category/homme-6842cd">Homme</a>
                     </nav>
 
-                    <div class="sq-hair-strip-mount" data-hair-profile-strip id="homeHairStrip"></div>
                 </div>
                 </div>
 
@@ -655,6 +654,5 @@
     <script src="salon-map-ui.js"></script>
     <script src="home-map.js"></script>
     <script src="home-discovery.js"></script>
-    <script src="hair-profile.js"></script>
 </body>
 </html>
