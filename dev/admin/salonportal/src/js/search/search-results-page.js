@@ -488,16 +488,24 @@
 
     function getSearchDate() {
         if (typeof window.skedisyGetSearchDate === "function") {
-            return window.skedisyGetSearchDate() || "";
+            const d = window.skedisyGetSearchDate() || "";
+            if (d) return d;
+        }
+        try {
+            const stored = localStorage.getItem("skedisy-search-date") || "";
+            if (stored) return stored;
+        } catch (_) {
+            /* ignore */
         }
         return params.get("date") || "";
     }
 
     function getSearchDateLabel() {
         if (typeof window.skedisyGetSearchDateLabel === "function") {
-            return window.skedisyGetSearchDateLabel() || "";
+            const d = window.skedisyGetSearchDateLabel() || "";
+            if (d) return d;
         }
-        return params.get("date") || "";
+        return params.get("date") || getSearchDate() || "";
     }
 
     function getSearchIntent() {
@@ -702,6 +710,12 @@
         });
         document.querySelectorAll("[data-date-preset]").forEach((btn) => {
             btn.addEventListener("click", () => setTimeout(fetchResults, 80));
+        });
+        document.addEventListener("skedisy:search-date-changed", () => {
+            setTimeout(fetchResults, 40);
+        });
+        document.addEventListener("skedisy:location-changed", () => {
+            setTimeout(fetchResults, 40);
         });
         initMap();
         if (mapEl) mapEl.setAttribute("aria-hidden", "false");

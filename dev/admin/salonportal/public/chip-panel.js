@@ -1,8 +1,9 @@
 /**
- * Panneau fixe au-dessus pour Position / Date — sans scroller la page.
+ * Panneau Position / Date — ancré sous le chip (style Adencer), sans scroll page.
  */
 (function () {
   let lockCount = 0;
+  let repositionHandler = null;
 
   function lockPage() {
     if (lockCount === 0) {
@@ -79,9 +80,60 @@
       anchor.parent.appendChild(popover);
     }
     anchors.delete(popover);
+    popover.style.top = "";
+    popover.style.left = "";
+    popover.style.width = "";
+    popover.style.transform = "";
+    popover.style.maxWidth = "";
+  }
+
+  /**
+   * Aligne le panneau sous le chip (pas au centre de la page).
+   */
+  function positionUnder(popover, anchorEl, opts) {
+    if (!popover || !anchorEl) return;
+    const preferWidth = Number(opts?.minWidth) || 280;
+    const r = anchorEl.getBoundingClientRect();
+    const maxW = Math.min(Math.max(preferWidth, r.width), window.innerWidth - 16);
+    let left = r.left;
+    if (left + maxW > window.innerWidth - 8) {
+      left = Math.max(8, window.innerWidth - maxW - 8);
+    }
+    if (left < 8) left = 8;
+
+    popover.style.position = "fixed";
+    popover.style.transform = "none";
+    popover.style.width = `${maxW}px`;
+    popover.style.maxWidth = `${maxW}px`;
+    popover.style.left = `${left}px`;
+    popover.style.top = `${r.bottom + 8}px`;
+    popover.style.zIndex = "100110";
+
+    requestAnimationFrame(() => {
+      const pr = popover.getBoundingClientRect();
+      if (pr.bottom > window.innerHeight - 8) {
+        const above = r.top - pr.height - 8;
+        popover.style.top = `${Math.max(8, above)}px`;
+      }
+    });
+  }
+
+  function bindReposition(popover, anchorEl, opts) {
+    unbindReposition();
+    repositionHandler = () => positionUnder(popover, anchorEl, opts);
+    window.addEventListener("resize", repositionHandler);
+    window.addEventListener("orientationchange", repositionHandler);
+  }
+
+  function unbindReposition() {
+    if (!repositionHandler) return;
+    window.removeEventListener("resize", repositionHandler);
+    window.removeEventListener("orientationchange", repositionHandler);
+    repositionHandler = null;
   }
 
   function closeAll() {
+    unbindReposition();
     const locPop = document.getElementById("homeLocationPopover");
     const datePop = document.getElementById("homeDatePopover");
     if (locPop) {
@@ -107,6 +159,9 @@
     hideBackdrop,
     mountPanel,
     restorePanel,
+    positionUnder,
+    bindReposition,
+    unbindReposition,
     closeAll,
   };
 })();

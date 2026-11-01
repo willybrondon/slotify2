@@ -519,6 +519,23 @@
     return formatDateYmd(new Date());
   }
 
+  /** Date choisie sur la recherche (chip Date) → préremplit la réservation. */
+  function getPreferredBookingDate() {
+    let iso = "";
+    try {
+      if (typeof window.skedisyGetSearchDate === "function") {
+        iso = String(window.skedisyGetSearchDate() || "").trim();
+      }
+      if (!iso) iso = String(localStorage.getItem("skedisy-search-date") || "").trim();
+    } catch (_) {
+      iso = "";
+    }
+    if (iso && /^\d{4}-\d{2}-\d{2}$/.test(iso) && !isDateBeforeToday(iso)) {
+      return iso;
+    }
+    return todayYmd();
+  }
+
   function isDateBeforeToday(ymd) {
     return ymd < todayYmd();
   }
@@ -2510,7 +2527,7 @@
       backFromDateTime();
     });
     if (!state.date || isDateBeforeToday(state.date)) {
-      state.date = todayYmd();
+      state.date = getPreferredBookingDate();
     }
     initCalendarFromStateDate();
 
@@ -2604,7 +2621,7 @@
 
     async function loadSlots() {
       if (!state.date || isDateBeforeToday(state.date)) {
-        state.date = todayYmd();
+        state.date = getPreferredBookingDate();
         initCalendarFromStateDate();
         refreshMonthUi();
       }
@@ -3537,7 +3554,7 @@
         state.selectedServiceIds = [normalizeServiceId(opts.serviceId)];
       }
 
-      state.date = "";
+      state.date = getPreferredBookingDate();
       state.timeSlots = [];
       state.slotPickHint = "";
       state.userId = null;

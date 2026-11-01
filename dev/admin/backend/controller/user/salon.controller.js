@@ -1042,16 +1042,15 @@ exports.serveSalonWebPage = async (req, res) => {
     const salonProducts = Array.from(salonProductsMap.values());
 
     let servicesHtml = "";
-    let servicesBlockHtml = "";
     if (bookingServices.length > 0) {
-      servicesBlockHtml = `<div class="section sq-salon-services-block">
+      servicesHtml = `<div class="section sq-salon-services-block">
         <h3 class="section-title">${copy.selectServices || copy.services}</h3>
         <div class="sq-service-tabs" id="salonServiceTabs" role="tablist"></div>
         <div class="sq-booking-services-summary sq-booking-services-summary--hidden" id="salonServicesSummary" aria-live="polite"></div>
         <div class="sq-services-list" id="salonServicesGrid"></div>
             </div>`;
     } else {
-      servicesBlockHtml = `<div class="section"><h3 class="section-title">${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
+      servicesHtml = `<div class="section"><h3 class="section-title">${copy.services}</h3><p class="empty-state">${copy.noServices}</p></div>`;
     }
 
     // Products Section
@@ -1140,50 +1139,51 @@ exports.serveSalonWebPage = async (req, res) => {
       .map((p) => (p && typeof p.toObject === "function" ? p.toObject() : p))
       .filter((p) => p && p.active !== false)
       .slice(0, 12);
+    const showBeautyPacksTab = beautyPacks.length > 0;
     let beautyPacksHtml = "";
-    if (beautyPacks.length > 0) {
+    if (showBeautyPacksTab) {
+      // Même rendu que les prestations (sq-service-card)
       beautyPacksHtml = `<div class="section sq-salon-beauty-packs" id="salonBeautyPacks">
         <h3 class="section-title">${esc(copy.beautyPacks || "Pack beauté")}</h3>
-        <div class="sq-beauty-packs">
+        <div class="sq-services-list" id="salonBeautyPacksList">
           ${beautyPacks
             .map((pack) => {
               const svcNames = (Array.isArray(pack.serviceIds) ? pack.serviceIds : [])
                 .map((id) => serviceNameById[String(id)])
                 .filter(Boolean);
-              const extras = Array.isArray(pack.extras) ? pack.extras.filter(Boolean) : [];
-              const visits =
-                Number(pack.visitCount) > 0
-                  ? `<li>${esc(String(pack.visitCount))} visite${
-                      Number(pack.visitCount) > 1 ? "s" : ""
-                    }</li>`
-                  : "";
-              return `<article class="sq-beauty-pack-card">
-                <div class="sq-beauty-pack-card__head">
-                  <h4 class="sq-beauty-pack-card__title">${esc(pack.name || "Pack beauté")}</h4>
-                  ${
-                    pack.priceHint
-                      ? `<span class="sq-beauty-pack-card__price">${esc(pack.priceHint)}</span>`
-                      : ""
-                  }
-                </div>
+              const extras = Array.isArray(pack.extras)
+                ? pack.extras.map((x) => String(x || "").trim()).filter(Boolean)
+                : [];
+              const visitCount = Number(pack.visitCount) || 0;
+              const metaParts = [];
+              if (pack.priceHint) metaParts.push(String(pack.priceHint));
+              if (visitCount > 0) {
+                metaParts.push(
+                  `${visitCount} visite${visitCount > 1 ? "s" : ""}`
+                );
+              }
+              const included = [...svcNames, ...extras];
+              const infoLine = included.length
+                ? included.join(" · ")
+                : pack.description || "";
+              return `<div class="sq-service-card sq-service-card--pack" role="listitem">
+                <span class="sq-service-card__name">${esc(pack.name || "Pack beauté")}</span>
                 ${
-                  pack.description
-                    ? `<p class="sq-beauty-pack-card__desc">${esc(pack.description)}</p>`
+                  metaParts.length
+                    ? `<span class="sq-service-card__meta">${esc(metaParts.join(" · "))}</span>`
                     : ""
                 }
-                <ul class="sq-beauty-pack-card__list">
-                  ${visits}
-                  ${svcNames.map((n) => `<li>${esc(n)}</li>`).join("")}
-                  ${extras.map((x) => `<li>${esc(x)}</li>`).join("")}
-                </ul>
-              </article>`;
+                ${
+                  infoLine
+                    ? `<span class="sq-service-card__info">${esc(infoLine)}</span>`
+                    : ""
+                }
+              </div>`;
             })
             .join("")}
         </div>
       </div>`;
     }
-    // Packs en premier dans l’onglet Services pour qu’ils soient visibles immédiatement
-    servicesHtml = beautyPacksHtml + servicesBlockHtml;
 
     const avatarUrl = salon.mainImage || salonImage || "";
     const realizationUrls = [];
@@ -1498,6 +1498,13 @@ exports.serveSalonWebPage = async (req, res) => {
         <button type="button" class="sq-salon-detail__tab is-active" role="tab" aria-selected="true" data-tab="services">${esc(
           copy.services
         )}</button>
+        ${
+          showBeautyPacksTab
+            ? `<button type="button" class="sq-salon-detail__tab" role="tab" aria-selected="false" data-tab="packs">${esc(
+                copy.beautyPacks || "Pack beauté"
+              )}</button>`
+            : ""
+        }
         <button type="button" class="sq-salon-detail__tab" role="tab" aria-selected="false" data-tab="staff">${esc(
           copy.staff || copy.salonExpertsTitle
         )}</button>
@@ -1777,6 +1784,11 @@ exports.serveSalonWebPage = async (req, res) => {
                         ${tabsNavHtml}
                         <div class="sq-salon-detail__panels" id="salonDetailPanels">
                           <div class="sq-salon-detail__panel is-active" role="tabpanel" data-panel="services">${servicesHtml}</div>
+                          ${
+                            showBeautyPacksTab
+                              ? `<div class="sq-salon-detail__panel" role="tabpanel" data-panel="packs" hidden>${beautyPacksHtml}</div>`
+                              : ""
+                          }
                           <div class="sq-salon-detail__panel" role="tabpanel" data-panel="staff" hidden>${staffHtml}</div>
                           ${
                             showMessageTab

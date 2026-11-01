@@ -1,5 +1,5 @@
 /**
- * Puce « Votre position » — panneau fixe au-dessus (taper + OK), sans scroll page.
+ * Puce « Votre position » — panneau ancré sous le chip (titre + champ + OK).
  */
 (function () {
   const STORAGE_KEY = "skedisy-location-label";
@@ -36,6 +36,13 @@
       input.value = text;
     }
     updateViewMapLink(text);
+    try {
+      document.dispatchEvent(
+        new CustomEvent("skedisy:location-changed", { detail: { location: text } })
+      );
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   function getLabel() {
@@ -49,6 +56,11 @@
     const params = new URLSearchParams();
     params.set("view", "map");
     if (location) params.set("location", location);
+    const date =
+      typeof window.skedisyGetSearchDate === "function"
+        ? window.skedisyGetSearchDate()
+        : localStorage.getItem("skedisy-search-date") || "";
+    if (date) params.set("date", date);
     const href = "/recherche?" + params.toString();
     const link = document.getElementById("homeViewMapLink");
     if (link) link.href = href;
@@ -60,6 +72,7 @@
     const chip = getChip();
     const popover = getPopover();
     const wasOpen = document.querySelector(".sq-location-chip-wrap")?.classList.contains("is-open");
+    window.SkedisyChipPanel?.unbindReposition?.();
     if (popover) {
       popover.hidden = true;
       window.SkedisyChipPanel?.restorePanel?.(popover);
@@ -78,7 +91,7 @@
     const chip = getChip();
     const popover = getPopover();
     const input = getInput();
-    if (!popover) return;
+    if (!popover || !chip) return;
 
     const mobileMenu = document.getElementById("mobileMenu");
     const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
@@ -99,14 +112,17 @@
       document.getElementById("homeDateChip")?.setAttribute("aria-expanded", "false");
       dateWrap.classList.remove("is-open");
       window.SkedisyChipPanel?.unlockPage?.();
+      window.SkedisyChipPanel?.unbindReposition?.();
     }
 
     window.SkedisyChipPanel?.lockPage?.();
     window.SkedisyChipPanel?.showBackdrop?.();
     window.SkedisyChipPanel?.mountPanel?.(popover);
+    window.SkedisyChipPanel?.positionUnder?.(popover, chip, { minWidth: 280 });
+    window.SkedisyChipPanel?.bindReposition?.(popover, chip, { minWidth: 280 });
 
     popover.hidden = false;
-    if (chip) chip.setAttribute("aria-expanded", "true");
+    chip.setAttribute("aria-expanded", "true");
     document.querySelector(".sq-location-chip-wrap")?.classList.add("is-open");
 
     if (input) {
@@ -166,7 +182,6 @@
       if (e.key === "Escape") closePopover();
     });
 
-    // Ne pas fermer au clic document : le backdrop gère la fermeture
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") closePopover();
     });

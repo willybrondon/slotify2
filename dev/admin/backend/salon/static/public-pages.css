@@ -5586,57 +5586,24 @@ body.sk-public-page .main-wrapper {
 }
 .sk-public-page .sq-salon-beauty-packs {
     margin-top: 0;
-    margin-bottom: 8px;
     padding-top: 8px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--sk-border-light, rgba(0, 0, 0, 0.08));
+    padding-bottom: 12px;
 }
-.sk-public-page .sq-beauty-packs {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 14px;
+/* Packs : même carte que les prestations */
+.sk-public-page .sq-service-card--pack {
+    cursor: default;
+    padding-top: 12px;
 }
-.sk-public-page .sq-beauty-pack-card {
-    border: 1px solid rgba(196, 92, 38, 0.22);
-    border-radius: 12px;
-    padding: 16px;
-    background: #fff;
-    box-shadow: 0 1px 0 rgba(196, 92, 38, 0.06);
+.sk-public-page .sq-service-card--pack:hover {
+    border-color: var(--sk-border);
+    box-shadow: none;
 }
-.sk-public-page .sq-beauty-pack-card__head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-.sk-public-page .sq-beauty-pack-card__title {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--sk-text);
-}
-.sk-public-page .sq-beauty-pack-card__price {
-    font-size: 0.9rem;
-    font-weight: 600;
-    white-space: nowrap;
-    color: var(--sk-text);
-}
-.sk-public-page .sq-beauty-pack-card__desc {
-    margin: 0 0 10px;
-    font-size: 0.85rem;
+.sk-public-page .sq-service-card--pack .sq-service-card__info {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.75rem;
     color: var(--sk-text-muted);
     line-height: 1.4;
-}
-.sk-public-page .sq-beauty-pack-card__list {
-    margin: 0;
-    padding-left: 1.1rem;
-    font-size: 0.82rem;
-    color: var(--sk-text);
-    line-height: 1.45;
-}
-.sk-public-page .sq-beauty-pack-card__list li + li {
-    margin-top: 4px;
 }
 /* Modal list scrolls with .sq-booking-steps so accordion details match the page */
 .sk-public-page .sq-services-list--modal {

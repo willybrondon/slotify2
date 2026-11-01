@@ -232,15 +232,31 @@ const formatBookClock = (totalMinutes, language = "fr") => {
   return `${h12}:${String(m).padStart(2, "0")} ${ap}`;
 };
 
-/** Earliest upcoming open hint — StyleSeat-like “Book today 10am”. */
-const getNextAvailabilityHint = (salonTime, language = "fr") => {
+/** Earliest open hint from a given day (or today). Syncs with search date chip. */
+const getNextAvailabilityHint = (salonTime, language = "fr", fromDateIso = "") => {
   if (!Array.isArray(salonTime) || !salonTime.length) return "";
   const now = new Date();
   const nowMins = now.getHours() * 60 + now.getMinutes();
+  const pad = (n) => String(n).padStart(2, "0");
+  const toIso = (d) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const todayIso = toIso(now);
+
+  let start = now;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(String(fromDateIso || ""))) {
+    const parsed = new Date(`${fromDateIso}T12:00:00`);
+    if (!Number.isNaN(parsed.getTime()) && toIso(parsed) >= todayIso) {
+      start = parsed;
+    }
+  }
+  const startIso = toIso(start);
+  const isAnchored = Boolean(fromDateIso) && startIso !== todayIso;
 
   for (let offset = 0; offset < 7; offset++) {
-    const d = new Date(now);
-    d.setDate(now.getDate() + offset);
+    const d = new Date(start);
+    d.setHours(12, 0, 0, 0);
+    d.setDate(start.getDate() + offset);
+    const dayIso = toIso(d);
     const dayName = DAY_NAMES_EN[d.getDay()];
     const row = salonTime.find(
       (t) =>
@@ -256,7 +272,8 @@ const getNextAvailabilityHint = (salonTime, language = "fr") => {
     const step = Math.max(15, Number(row.time) || 30);
 
     let slotMins = openMins;
-    if (offset === 0) {
+    // Only apply "past slots today" when looking from real today
+    if (dayIso === todayIso) {
       if (closeMins != null && nowMins >= closeMins) continue;
       if (nowMins > openMins) {
         slotMins = Math.ceil(nowMins / step) * step;
@@ -265,21 +282,27 @@ const getNextAvailabilityHint = (salonTime, language = "fr") => {
     }
 
     const clock = formatBookClock(slotMins, language);
-    if (offset === 0) {
+    if (dayIso === todayIso) {
       return language === "fr"
         ? `Aujourd’hui, ${clock}`
         : `Today, ${clock}`;
     }
-    if (offset === 1) {
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    if (dayIso === toIso(tomorrow)) {
       return language === "fr"
         ? `Demain, ${clock}`
         : `Tomorrow, ${clock}`;
     }
     const short =
       language === "fr" ? DAY_SHORT_FR[d.getDay()] : DAY_SHORT_EN[d.getDay()];
-    return language === "fr"
-      ? `${short}, ${clock}`
-      : `${short}, ${clock}`;
+    if (isAnchored && offset === 0) {
+      const dayNum = d.getDate();
+      return language === "fr"
+        ? `${short} ${dayNum}, ${clock}`
+        : `${short} ${dayNum}, ${clock}`;
+    }
+    return `${short}, ${clock}`;
   }
   return "";
 };
@@ -459,7 +482,10 @@ const computeSalonCatalogBadges = (salon) => {
   return badges;
 };
 
-const formatSalonForCategory = (salon, { baseURL, language, copy, salonIdPool }) => {
+const formatSalonForCategory = (
+  salon,
+  { baseURL, language, copy, salonIdPool, dateTerm }
+) => {
   const categoryServices = (salon.serviceIds || [])
     .filter((s) => s.id && s.price !== null && s.price !== undefined)
     .map((s) => s.price);
@@ -469,7 +495,11 @@ const formatSalonForCategory = (salon, { baseURL, language, copy, salonIdPool })
   const city = addr.city || "";
   const avatarImage = pickSalonAvatar(salon);
   const realizations = pickSalonRealizations(salon, avatarImage);
-  const nextAvailable = getNextAvailabilityHint(salon.salonTime, language);
+  const nextAvailable = getNextAvailabilityHint(
+    salon.salonTime,
+    language,
+    dateTerm || ""
+  );
   const topServices = buildTopServices(salon, { language, nextAvailable });
   const instagramUrl = String(salon.instagramUrl || "").trim();
   const facebookUrl = String(salon.facebookUrl || "").trim();
@@ -968,7 +998,12 @@ exports.getSalonsByCategory = async (req, res) => {
       salons.map((s) => String(s._id))
     );
     let formattedSalons = salons.map((salon) =>
-      formatSalonForCategory(salon, { baseURL, language, salonIdPool: salonIdPoolApi })
+      formatSalonForCategory(salon, {
+        baseURL,
+        language,
+        salonIdPool: salonIdPoolApi,
+        dateTerm,
+      })
     );
 
     formattedSalons = applySalonDiscoveryFilters(formattedSalons, {
@@ -1109,6 +1144,7 @@ exports.serveCategoryPage = async (req, res) => {
 
     const search = req.query.search || "";
     const locationTerm = (req.query.location || "").trim();
+    const dateTerm = String(req.query.date || "").trim();
     const latitude = req.query.latitude;
     const longitude = req.query.longitude;
     const serviceIdFilter = (req.query.serviceId || "").trim();
@@ -1204,6 +1240,7 @@ exports.serveCategoryPage = async (req, res) => {
       );
     }
 
+    salons = filterSalonsOpenOnDate(salons, dateTerm);
     salons = attachSalonDistances(salons, latitude, longitude);
 
     const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
@@ -1211,7 +1248,7 @@ exports.serveCategoryPage = async (req, res) => {
       salons.map((s) => String(s._id))
     );
     let formattedSalons = salons.map((salon) =>
-      formatSalonForCategory(salon, { baseURL, language, salonIdPool })
+      formatSalonForCategory(salon, { baseURL, language, salonIdPool, dateTerm })
     );
     formattedSalons = applySalonDiscoveryFilters(formattedSalons, {
       minRating,
@@ -1513,6 +1550,7 @@ exports.serveCategoryPage = async (req, res) => {
                   <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
                 </button>
                 <div class="sq-location-popover" id="homeLocationPopover" hidden>
+                  <p class="sq-chip-popover__title">${copy.yourLocation}</p>
                   <label class="sq-sr-only" for="homeLocationSearchInput">${copy.yourLocation}</label>
                   <input type="text" id="homeLocationSearchInput" name="location" class="sq-location-popover__input" placeholder="${copy.locationPlaceholder.replace(/"/g, "&quot;")}" value="${escapeHtml(locationTerm)}" autocomplete="off">
                   <button type="button" class="sq-btn sq-btn-fill sq-location-popover__apply" id="homeLocationApply">${copy.applyLocation}</button>
@@ -1528,11 +1566,15 @@ exports.serveCategoryPage = async (req, res) => {
                   <i class="fas fa-chevron-down sq-date-chip__chevron" aria-hidden="true"></i>
                 </button>
                 <div class="sq-date-popover" id="homeDatePopover" hidden>
-                  <button type="button" class="sq-date-popover__btn" data-date-preset="today">${copy.dateToday || "Aujourd'hui"}</button>
-                  <button type="button" class="sq-date-popover__btn" data-date-preset="tomorrow">${copy.dateTomorrow || "Demain"}</button>
-                  <button type="button" class="sq-date-popover__btn" data-date-preset="any">${copy.dateAny || "Toutes les dates"}</button>
-                  <label class="sq-date-popover__pick-label" for="homeDatePicker">${copy.datePick || "Autre date"}</label>
-                  <input type="date" id="homeDatePicker" class="sq-date-popover__input" name="date">
+                  <p class="sq-chip-popover__title">${copy.dateLabel || "Date"}</p>
+                  <div class="sq-date-popover__presets">
+                    <button type="button" class="sq-date-popover__btn" data-date-preset="today">${copy.dateToday || "Aujourd'hui"}</button>
+                    <button type="button" class="sq-date-popover__btn" data-date-preset="tomorrow">${copy.dateTomorrow || "Demain"}</button>
+                    <button type="button" class="sq-date-popover__btn" data-date-preset="any">${copy.dateAny || "Toutes les dates"}</button>
+                  </div>
+                  <p class="sq-date-popover__pick-label">${copy.datePick || "Choisir une date"}</p>
+                  <div class="sq-mini-cal" id="homeDateCalendar" aria-label="Calendrier"></div>
+                  <input type="hidden" id="homeDatePicker" name="date" value="">
                   <button type="button" class="sq-btn sq-btn-fill sq-date-popover__apply" id="homeDateApply">${copy.applyLocation || "OK"}</button>
                 </div>
               </div>
@@ -2009,6 +2051,7 @@ exports.searchSalonsPublic = async (req, res) => {
         language,
         copy: {},
         salonIdPool: salonIdPoolSearch,
+        dateTerm,
       })
     );
     formattedSalons = applySalonDiscoveryFilters(formattedSalons, {

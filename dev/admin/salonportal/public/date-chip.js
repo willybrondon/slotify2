@@ -1,10 +1,14 @@
 /**
- * Puce date — panneau fixe au-dessus (choix + OK), sans scroll page.
- * Par défaut : aujourd'hui.
+ * Puce date — panneau ancré sous le chip + calendrier moderne.
+ * Sync localStorage → résultats salons + réservation.
  */
 (function () {
   const STORAGE_ISO = "skedisy-search-date";
   const STORAGE_LABEL = "skedisy-search-date-label";
+
+  let calYear = new Date().getFullYear();
+  let calMonth = new Date().getMonth();
+  let draftIso = "";
 
   function t(key) {
     if (typeof getTranslation === "function") return getTranslation(key);
@@ -66,15 +70,28 @@
     return document.getElementById("homeDatePicker");
   }
 
-  function setDate(iso, labelOverride) {
+  function emitDateChanged(iso) {
+    try {
+      document.dispatchEvent(
+        new CustomEvent("skedisy:search-date-changed", { detail: { iso: iso || "" } })
+      );
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function setDate(iso, labelOverride, opts) {
     const valueEl = getValueEl();
     const picker = getPicker();
+    const silent = opts && opts.silent;
     if (!iso) {
       localStorage.removeItem(STORAGE_ISO);
       localStorage.removeItem(STORAGE_LABEL);
       if (valueEl) valueEl.textContent = t("homeProduct.dateAny") || "Toutes";
       if (picker) picker.value = "";
+      draftIso = "";
       syncPresetActive("any");
+      if (!silent) emitDateChanged("");
       return;
     }
     const label = labelOverride || formatDisplay(iso);
@@ -82,11 +99,13 @@
     localStorage.setItem(STORAGE_LABEL, label);
     if (valueEl) valueEl.textContent = label;
     if (picker) picker.value = iso;
+    draftIso = iso;
     const today = todayIso();
     const tomorrow = tomorrowIso();
     if (iso === today) syncPresetActive("today");
     else if (iso === tomorrow) syncPresetActive("tomorrow");
     else syncPresetActive("custom");
+    if (!silent) emitDateChanged(iso);
   }
 
   function getDateIso() {
@@ -106,10 +125,103 @@
     });
   }
 
+  function monthLabel(y, m) {
+    const lang = localStorage.getItem("skedisy-language") || "fr";
+    try {
+      return new Date(y, m, 1).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", {
+        month: "long",
+        year: "numeric",
+      });
+    } catch (_) {
+      return y + "-" + (m + 1);
+    }
+  }
+
+  function weekdayHeaders() {
+    const lang = (localStorage.getItem("skedisy-language") || "fr").slice(0, 2);
+    if (lang === "en") return ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    return ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"];
+  }
+
+  function renderMiniCalendar() {
+    const root = document.getElementById("homeDateCalendar");
+    if (!root) return;
+    const today = todayIso();
+    const selected = draftIso || getDateIso() || today;
+    const first = new Date(calYear, calMonth, 1);
+    // Monday-first
+    let startPad = (first.getDay() + 6) % 7;
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+    const heads = weekdayHeaders()
+      .map((h) => `<span class="sq-mini-cal__dow">${h}</span>`)
+      .join("");
+
+    let cells = "";
+    for (let i = 0; i < startPad; i++) {
+      cells += `<span class="sq-mini-cal__day sq-mini-cal__day--empty"></span>`;
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const iso = calYear + "-" + pad(calMonth + 1) + "-" + pad(day);
+      const disabled = iso < today;
+      const isSel = iso === selected;
+      const isToday = iso === today;
+      cells += `<button type="button" class="sq-mini-cal__day${isSel ? " is-selected" : ""}${
+        isToday ? " is-today" : ""
+      }" data-cal-day="${iso}" ${disabled ? "disabled" : ""}>${day}</button>`;
+    }
+
+    root.innerHTML = `
+      <div class="sq-mini-cal__nav">
+        <button type="button" class="sq-mini-cal__nav-btn" id="homeDateCalPrev" aria-label="Mois précédent">‹</button>
+        <span class="sq-mini-cal__month">${monthLabel(calYear, calMonth)}</span>
+        <button type="button" class="sq-mini-cal__nav-btn" id="homeDateCalNext" aria-label="Mois suivant">›</button>
+      </div>
+      <div class="sq-mini-cal__grid">
+        ${heads}
+        ${cells}
+      </div>`;
+
+    document.getElementById("homeDateCalPrev")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      calMonth -= 1;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear -= 1;
+      }
+      renderMiniCalendar();
+    });
+    document.getElementById("homeDateCalNext")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      calMonth += 1;
+      if (calMonth > 11) {
+        calMonth = 0;
+        calYear += 1;
+      }
+      renderMiniCalendar();
+    });
+    root.querySelectorAll("[data-cal-day]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        draftIso = btn.getAttribute("data-cal-day") || "";
+        const picker = getPicker();
+        if (picker) picker.value = draftIso;
+        if (draftIso === todayIso()) syncPresetActive("today");
+        else if (draftIso === tomorrowIso()) syncPresetActive("tomorrow");
+        else syncPresetActive("custom");
+        renderMiniCalendar();
+      });
+    });
+  }
+
   function closePopover() {
     const chip = getChip();
     const popover = getPopover();
     const wasOpen = document.querySelector(".sq-date-chip-wrap")?.classList.contains("is-open");
+    window.SkedisyChipPanel?.unbindReposition?.();
     if (popover) {
       popover.hidden = true;
       window.SkedisyChipPanel?.restorePanel?.(popover);
@@ -127,7 +239,7 @@
   function openPopover() {
     const chip = getChip();
     const popover = getPopover();
-    if (!popover) return;
+    if (!popover || !chip) return;
 
     const locWrap = document.querySelector(".sq-location-chip-wrap");
     if (locWrap?.classList.contains("is-open")) {
@@ -139,21 +251,29 @@
       document.getElementById("homeLocationChip")?.setAttribute("aria-expanded", "false");
       locWrap.classList.remove("is-open");
       window.SkedisyChipPanel?.unlockPage?.();
+      window.SkedisyChipPanel?.unbindReposition?.();
     }
 
     window.SkedisyChipPanel?.lockPage?.();
     window.SkedisyChipPanel?.showBackdrop?.();
     window.SkedisyChipPanel?.mountPanel?.(popover);
 
+    draftIso = getDateIso() || todayIso();
+    const d = parseIso(draftIso) || new Date();
+    calYear = d.getFullYear();
+    calMonth = d.getMonth();
     const picker = getPicker();
-    const iso = getDateIso() || todayIso();
     if (picker) {
       picker.min = todayIso();
-      picker.value = iso;
+      picker.value = draftIso;
     }
+    renderMiniCalendar();
+
+    window.SkedisyChipPanel?.positionUnder?.(popover, chip, { minWidth: 300 });
+    window.SkedisyChipPanel?.bindReposition?.(popover, chip, { minWidth: 300 });
 
     popover.hidden = false;
-    if (chip) chip.setAttribute("aria-expanded", "true");
+    chip.setAttribute("aria-expanded", "true");
     document.querySelector(".sq-date-chip-wrap")?.classList.add("is-open");
   }
 
@@ -163,10 +283,18 @@
     closePopover();
   }
 
-  function applyFromPicker() {
-    const val = (getPicker()?.value || "").trim();
+  function applyFromCalendar() {
+    const val = (draftIso || getPicker()?.value || "").trim();
     if (!val) {
       applyAndClose(todayIso(), t("homeProduct.dateToday") || "Aujourd'hui");
+      return;
+    }
+    if (val === todayIso()) {
+      applyAndClose(val, t("homeProduct.dateToday") || "Aujourd'hui");
+      return;
+    }
+    if (val === tomorrowIso()) {
+      applyAndClose(val, t("homeProduct.dateTomorrow") || "Demain");
       return;
     }
     applyAndClose(val);
@@ -180,14 +308,14 @@
     if (saved && parseIso(saved)) {
       const label = localStorage.getItem(STORAGE_LABEL) || "";
       if (saved === todayIso()) {
-        setDate(saved, t("homeProduct.dateToday") || "Aujourd'hui");
+        setDate(saved, t("homeProduct.dateToday") || "Aujourd'hui", { silent: true });
       } else if (saved === tomorrowIso()) {
-        setDate(saved, t("homeProduct.dateTomorrow") || "Demain");
+        setDate(saved, t("homeProduct.dateTomorrow") || "Demain", { silent: true });
       } else {
-        setDate(saved, label || undefined);
+        setDate(saved, label || undefined, { silent: true });
       }
     } else {
-      setDate(todayIso(), t("homeProduct.dateToday") || "Aujourd'hui");
+      setDate(todayIso(), t("homeProduct.dateToday") || "Aujourd'hui", { silent: true });
     }
 
     chip.addEventListener("click", function (e) {
@@ -220,15 +348,7 @@
     document.getElementById("homeDateApply")?.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      applyFromPicker();
-    });
-
-    getPicker()?.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        applyFromPicker();
-      }
-      if (e.key === "Escape") closePopover();
+      applyFromCalendar();
     });
 
     document.addEventListener("keydown", function (e) {
@@ -238,15 +358,15 @@
     document.addEventListener("skedisy:language-changed", function () {
       const iso = getDateIso();
       if (!iso) {
-        setDate("");
+        setDate("", null, { silent: true });
         return;
       }
       if (iso === todayIso()) {
-        setDate(iso, t("homeProduct.dateToday") || "Aujourd'hui");
+        setDate(iso, t("homeProduct.dateToday") || "Aujourd'hui", { silent: true });
       } else if (iso === tomorrowIso()) {
-        setDate(iso, t("homeProduct.dateTomorrow") || "Demain");
+        setDate(iso, t("homeProduct.dateTomorrow") || "Demain", { silent: true });
       } else {
-        setDate(iso);
+        setDate(iso, null, { silent: true });
       }
     });
   }

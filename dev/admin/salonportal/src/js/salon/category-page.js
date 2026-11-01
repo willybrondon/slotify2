@@ -809,6 +809,12 @@
             setTimeout(() => fetchResults(), 80);
         });
     });
+    document.addEventListener("skedisy:search-date-changed", () => {
+        setTimeout(() => fetchResults(), 40);
+    });
+    document.addEventListener("skedisy:location-changed", () => {
+        setTimeout(() => fetchResults(), 40);
+    });
 
     updateStats();
     updateSearchMessage(cfg.initialSearchCity);
