@@ -1,5 +1,5 @@
 /**
- * Header compte client — Réservations + Notifications + Profil (si connecté).
+ * Header compte client — Réservations + Notifications + Compte (si connecté).
  */
 (function () {
   const STORAGE_KEY = "skedisy_web_user";
@@ -63,7 +63,7 @@
   }
 
   function loggedInCtaHtml(user) {
-    const name = [user.fname, user.lname].filter(Boolean).join(" ") || "Compte";
+    const name = [user.fname, user.lname].filter(Boolean).join(" ") || t("Compte", "Account");
     return `
       <div class="sq-account-nav" data-account-nav>
         <a href="/compte/reservations" class="sq-account-nav__btn" title="${escapeHtml(
@@ -94,10 +94,10 @@
         <div class="sq-account-nav__profile-wrap">
           <a href="/compte/profil" class="sq-account-nav__btn sq-account-nav__btn--profile" title="${escapeHtml(
             name
-          )}">
-            <i class="fas fa-user-circle" aria-hidden="true"></i>
+          )}" aria-label="${escapeHtml(t("Compte", "Account"))}">
+            <i class="fas fa-user" aria-hidden="true"></i>
             <span class="sq-account-nav__label desktop-only">${escapeHtml(
-              user.fname || t("Profil", "Profile")
+              t("Compte", "Account")
             )}</span>
           </a>
         </div>
@@ -113,7 +113,7 @@
         t("Notifications", "Notifications")
       )}</a>
       <a href="/compte/profil" class="btn-login-mobile-menu">${escapeHtml(
-        t("Mon profil", "My profile")
+        t("Compte", "Account")
       )}</a>
       <a href="/compte/profil#signaler" class="btn-login-mobile-menu">${escapeHtml(
         t("Signaler", "Report")

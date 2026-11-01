@@ -860,7 +860,7 @@ exports.listOnboardingPlans = async (req, res) => {
     const SubscriptionPlan = require("../../models/subscriptionPlan.model");
     const plans = await SubscriptionPlan.find({ isActive: true })
       .select(
-        "planId name tagline tier priceMonthly priceYearly trialDays sortOrder isDefault isHighlighted limits features"
+        "planId name tagline tier priceMonthly priceYearly trialDays sortOrder isDefault isHighlighted limits features stripePriceIdMonthly stripePriceIdYearly"
       )
       .sort({ sortOrder: 1 })
       .lean();
@@ -886,6 +886,8 @@ exports.listOnboardingPlans = async (req, res) => {
         isHighlighted: !!p.isHighlighted,
         limits: p.limits || {},
         featureCount: Array.isArray(p.features) ? p.features.length : 0,
+        hasCheckoutMonthly: Boolean(String(p.stripePriceIdMonthly || "").trim()),
+        hasCheckoutYearly: Boolean(String(p.stripePriceIdYearly || "").trim()),
       })),
     });
   } catch (error) {
@@ -957,7 +959,8 @@ exports.listOnboardingServices = async (req, res) => {
  *   name, mobile, city, email, password, address, about?,
  *   services: [{ id, price? }],
  *   openTime?, closedTime?, activeDays?: string[],
- *   utmSource?, utmMedium?, utmCampaign?
+ *   utmSource?, utmMedium?, utmCampaign?,
+ *   partneroPartnerKey? (Partnero affiliate partner key)
  * }
  */
 exports.selfRegister = async (req, res) => {
@@ -977,6 +980,11 @@ exports.selfRegister = async (req, res) => {
     const utmSource = String(req.body?.utmSource || "").trim();
     const utmMedium = String(req.body?.utmMedium || "").trim();
     const utmCampaign = String(req.body?.utmCampaign || "").trim();
+    const partneroPartnerKey = String(
+      req.body?.partneroPartnerKey || req.body?.partnerKey || ""
+    )
+      .trim()
+      .slice(0, 120);
 
     if (!name || !mobile || !city || !email || !password || !address) {
       return res.status(200).json({
@@ -1029,6 +1037,7 @@ exports.selfRegister = async (req, res) => {
     if (utmSource) sourceParts.push(utmSource);
     if (utmMedium) sourceParts.push(utmMedium);
     if (utmCampaign) sourceParts.push(utmCampaign);
+    if (partneroPartnerKey) sourceParts.push(`partnero:${partneroPartnerKey}`);
 
     let activeDays = req.body?.activeDays;
     if (typeof activeDays === "string") {
@@ -1114,6 +1123,14 @@ exports.selfRegister = async (req, res) => {
     salon.subscription.planId = requestedPlanId || "free";
     salon.subscription.status = "none";
 
+    const customerKey = String(salon._id);
+    salon.partnero = {
+      partnerKey: partneroPartnerKey || "",
+      customerKey,
+      signupAt: new Date(),
+      signupSynced: false,
+    };
+
     await salon.save();
 
     const serviceObjectIds = serviceEntries.map((s) => s.id);
@@ -1140,8 +1157,41 @@ exports.selfRegister = async (req, res) => {
       } catch (_) {}
     }
 
+    // Partnero: sync referred customer (server) — soft-fail
+    let partneroSynced = false;
+    try {
+      const partnero = require("../../services/partnero.service");
+      const sync = await partnero.createReferredCustomer({
+        partnerKey: partneroPartnerKey,
+        customerKey,
+        email: salon.email,
+        name: salon.name,
+      });
+      partneroSynced = Boolean(sync?.ok);
+      if (partneroSynced) {
+        salon.partnero = salon.partnero || {};
+        salon.partnero.signupSynced = true;
+        await salon.save();
+      }
+    } catch (poErr) {
+      console.warn("[SelfRegister] partnero sync:", poErr.message);
+    }
+
+    // Paid plan with Stripe Price ID → checkout after login (admin configures IDs)
+    let checkoutAvailable = false;
+    try {
+      const { getPlanByPlanId: getPlan } = require("../../services/subscription.service");
+      const paidPlan = await getPlan(assignedPlanId);
+      checkoutAvailable = Boolean(
+        paidPlan &&
+          paidPlan.tier !== "free" &&
+          (String(paidPlan.stripePriceIdMonthly || "").trim() ||
+            String(paidPlan.stripePriceIdYearly || "").trim())
+      );
+    } catch (_) {}
+
     console.log(
-      `[SelfRegister] Salon ${salon.name} (${salon.email}) expert=${expert._id} services=${serviceObjectIds.length} plan=${assignedPlanId} source=${salon.source}`
+      `[SelfRegister] Salon ${salon.name} (${salon.email}) expert=${expert._id} services=${serviceObjectIds.length} plan=${assignedPlanId} source=${salon.source} partnero=${partneroPartnerKey || "-"} synced=${partneroSynced} checkout=${checkoutAvailable}`
     );
 
     return res.status(200).json({
@@ -1156,6 +1206,12 @@ exports.selfRegister = async (req, res) => {
         expertId: expert._id,
         servicesCount: serviceObjectIds.length,
         planId: assignedPlanId,
+        checkoutAvailable,
+        partnero: {
+          partnerKey: partneroPartnerKey || "",
+          customerKey,
+          synced: partneroSynced,
+        },
       },
     });
   } catch (error) {

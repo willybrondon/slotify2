@@ -20,10 +20,19 @@ import { ExInput, Textarea } from "../extras/Input";
 import ToggleSwitch from "../extras/ToggleSwitch";
 import { SKEDISY_SALON_PORTAL_COPY as portalCopy } from "../../constants/skedisyPortalCopy";
 import SalonPaymentSettings from "./SalonPaymentSettings";
+import SalonSubscriptionBilling from "./SalonSubscriptionBilling";
 
 export const AdminProfile = () => {
   const dispatch = useDispatch();
-  const [type, setType] = useState("address");
+  const [type, setType] = useState(() => {
+    try {
+      const tab = new URLSearchParams(window.location.search).get("tab");
+      if (tab === "subscription" || tab === "password" || tab === "address") {
+        return tab;
+      }
+    } catch (_) {}
+    return "address";
+  });
 
   const [name, setName] = useState();
   const [email, setEmail] = useState();
@@ -903,7 +912,21 @@ export const AdminProfile = () => {
               >
                 Password
               </button>
+              <button
+                type="button"
+                className={`${
+                  type === "subscription" ? "activeBtn" : "disabledBtn"
+                } ms-3`}
+                onClick={() => setType("subscription")}
+              >
+                Abonnement
+              </button>
             </div>
+            {type === "subscription" && (
+              <div className="mt-3">
+                <SalonSubscriptionBilling />
+              </div>
+            )}
             {type === "address" && (
               <>
                 <div className="row">

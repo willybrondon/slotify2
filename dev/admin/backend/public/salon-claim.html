@@ -555,6 +555,69 @@
             var utmCampaign = urlParams.get('utm_campaign') || '';
             var baseURL = window.location.origin;
 
+            // —— Partnero affiliation (phase 1) ——
+            function getCookie(name) {
+                try {
+                    var m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
+                    return m ? decodeURIComponent(m[1]) : '';
+                } catch (e) { return ''; }
+            }
+            function storePartnerKey(key) {
+                if (!key) return;
+                try {
+                    sessionStorage.setItem('skedisy_partnero_partner', key);
+                    localStorage.setItem('skedisy_partnero_partner', key);
+                } catch (e) { /* ignore */ }
+            }
+            function readStoredPartnerKey() {
+                try {
+                    return sessionStorage.getItem('skedisy_partnero_partner')
+                        || localStorage.getItem('skedisy_partnero_partner')
+                        || '';
+                } catch (e) { return ''; }
+            }
+            /** Capture Partnero partner from URL / cookie / storage across 4 steps */
+            function capturePartnerAttribution() {
+                var via = (
+                    urlParams.get('partnero')
+                    || urlParams.get('via')
+                    || urlParams.get('partner')
+                    || urlParams.get('aff')
+                    || urlParams.get('ref')
+                    || ''
+                ).trim();
+                var fromCookie = (getCookie('partnero_partner') || '').trim();
+                var existing = readStoredPartnerKey();
+                var key = via || fromCookie || existing || '';
+                if (key) storePartnerKey(key);
+                return key;
+            }
+            var partneroPartnerKey = capturePartnerAttribution();
+            // Re-read cookie shortly after PartneroJS loads
+            setTimeout(function () {
+                var again = (getCookie('partnero_partner') || '').trim();
+                if (again) {
+                    storePartnerKey(again);
+                    partneroPartnerKey = again;
+                }
+            }, 1200);
+
+            function trackPartneroSignup(salonPayload) {
+                var customerKey = String((salonPayload && (salonPayload.salonId || salonPayload._id)) || '');
+                var partnerKey = partneroPartnerKey || readStoredPartnerKey() || (getCookie('partnero_partner') || '').trim();
+                if (!customerKey) return;
+                if (typeof po !== 'function') return;
+                var data = {
+                    key: customerKey,
+                    name: String((salonPayload && salonPayload.name) || '').slice(0, 100),
+                    email: String((salonPayload && salonPayload.email) || '').toLowerCase()
+                };
+                if (partnerKey) data.partner = { key: partnerKey };
+                try {
+                    po('customers', 'signup', { data: data });
+                } catch (e) { /* ignore */ }
+            }
+
             var errorEl = document.getElementById('error');
             var successEl = document.getElementById('success');
             var loadingEl = document.getElementById('loading');
@@ -1002,6 +1065,10 @@
                 formData.append('utmMedium', utmMedium);
                 formData.append('utmCampaign', utmCampaign);
                 formData.append('planId', selectedPlanId || 'free');
+                partneroPartnerKey = partneroPartnerKey || capturePartnerAttribution();
+                if (partneroPartnerKey) {
+                    formData.append('partneroPartnerKey', partneroPartnerKey);
+                }
 
                 var salonFile = document.getElementById('salonImage').files[0];
                 var expertFile = document.getElementById('expertImage').files[0];
@@ -1020,12 +1087,30 @@
                         true
                     );
                     if (result.data && result.data.status === true) {
-                        successEl.textContent = 'Salon inscrit ! Redirection vers la connexion…';
+                        var payload = (result.data.data) || {};
+                        if (!payload.email) payload.email = email;
+                        trackPartneroSignup(payload);
+                        try {
+                            if (payload.planId && payload.planId !== 'free') {
+                                sessionStorage.setItem('skedisy_pending_plan', payload.planId);
+                            }
+                            if (payload.checkoutAvailable) {
+                                sessionStorage.setItem('skedisy_checkout_after_login', '1');
+                            }
+                        } catch (e) {}
+                        successEl.textContent = payload.checkoutAvailable
+                            ? 'Salon inscrit ! Après connexion, finalisez votre abonnement (Profil → Abonnement).'
+                            : 'Salon inscrit ! Redirection vers la connexion…';
                         successEl.style.display = 'block';
                         document.getElementById('registerMode').style.display = 'none';
+                        var delay = (window.SKEDISY_PARTNERO && window.SKEDISY_PARTNERO.enabled) ? 2000 : 1400;
                         setTimeout(function () {
-                            window.location.href = '/salonpanel/login?email=' + encodeURIComponent(email);
-                        }, 1400);
+                            var loginUrl = '/salonpanel/login?email=' + encodeURIComponent(email);
+                            if (payload.checkoutAvailable) {
+                                loginUrl += '&next=' + encodeURIComponent('/salonpanel/profile?tab=subscription');
+                            }
+                            window.location.href = loginUrl;
+                        }, delay);
                         return;
                     }
                     showError(messageFromData(result.data));

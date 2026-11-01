@@ -25,6 +25,13 @@ app.post(
   require("./controller/stripeConnectWebhook.controller").handleConnectWebhook
 );
 
+app.post(
+  "/stripe/subscription/webhook",
+  express.raw({ type: "application/json" }),
+  require("./controller/stripeSubscriptionWebhook.controller")
+    .handleSubscriptionWebhook
+);
+
 app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cors());
@@ -344,13 +351,14 @@ function serveSalonOnboardingPage(req, res) {
   res.setHeader("Expires", "0");
   res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
 
+  const { injectTrackingSnippet } = require("./services/partnero.service");
   const filePath = path.join(__dirname, "public", "salon-claim.html");
   try {
     if (fs.existsSync(filePath)) {
       const fromDisk = fs.readFileSync(filePath, "utf8");
       // Prefer disk only if it has the 3-step register flow (avoids stale prod file / old inline)
       if (fromDisk.includes('id="registerMode"')) {
-        return res.type("html").send(fromDisk);
+        return res.type("html").send(injectTrackingSnippet(fromDisk));
       }
       console.warn(
         `[Salon Onboarding] Stale salon-claim.html at ${filePath} — serving bundled 3-step page`
@@ -362,7 +370,7 @@ function serveSalonOnboardingPage(req, res) {
     console.warn("[Salon Onboarding] Could not read salon-claim.html:", err.message);
   }
 
-  return res.type("html").send(salonOnboardingHtml);
+  return res.type("html").send(injectTrackingSnippet(salonOnboardingHtml));
 }
 
 app.get(["/salon/claim", "/salon/rejoindre", "/rejoindre"], serveSalonOnboardingPage);

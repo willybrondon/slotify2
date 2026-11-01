@@ -84,6 +84,30 @@ const salonSchema = new mongoose.Schema(
     source: { type: String, default: "" }, // Source of salon data (pagesjaunes, google_places, etc.)
     source_id: { type: String, default: "" }, // Original ID from source
 
+    /** Partnero affiliate attribution (Ambassadeurs Skedisy) */
+    partnero: {
+      partnerKey: { type: String, default: "" },
+      customerKey: { type: String, default: "" },
+      signupAt: { type: Date, default: null },
+      signupSynced: { type: Boolean, default: false },
+      /** Sales synced to Partnero via Skedisy API (invoice keys) */
+      sales: [
+        {
+          key: { type: String },
+          amount: { type: Number, default: 0 },
+          planId: { type: String, default: "" },
+          interval: { type: String, default: "" },
+          syncedAt: { type: Date, default: null },
+          status: {
+            type: String,
+            enum: ["recorded", "failed", "refunded"],
+            default: "recorded",
+          },
+          error: { type: String, default: "" },
+        },
+      ],
+    },
+
     image: [{ type: String, default: "" }],
     mainImage: { type: String, default: "" },
     heroImage: { type: String, default: "" }, // Hero image for public web page

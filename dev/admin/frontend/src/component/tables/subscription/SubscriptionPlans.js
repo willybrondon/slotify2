@@ -56,6 +56,8 @@ const SubscriptionPlans = () => {
         isHighlighted: Boolean(selected.isHighlighted),
         maxExperts: selected.limits?.maxExperts ?? 0,
         maxLocations: selected.limits?.maxLocations ?? 1,
+        stripePriceIdMonthly: selected.stripePriceIdMonthly || "",
+        stripePriceIdYearly: selected.stripePriceIdYearly || "",
         features: [...(selected.features || [])],
         notes: selected.notes || "",
       });
@@ -100,6 +102,8 @@ const SubscriptionPlans = () => {
         features: draft.features,
         maxExperts: Number(draft.maxExperts) || 0,
         maxLocations: Number(draft.maxLocations) || 0,
+        stripePriceIdMonthly: String(draft.stripePriceIdMonthly || "").trim(),
+        stripePriceIdYearly: String(draft.stripePriceIdYearly || "").trim(),
         notes: draft.notes,
       })
     );
@@ -140,9 +144,10 @@ const SubscriptionPlans = () => {
       <div className="row mb-3">
         <div className="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
           <p className="text-muted mb-0" style={{ maxWidth: 720 }}>
-            StyleSeat = 1 plan Premium + opt-out features (leads, Smart Pricing).
-            Skedisy = Free / Basic / Premium / Enterprise — features attribuées
-            ici par l&apos;admin.
+            Skedisy = Free / Basic / Premium / Enterprise — features + Price IDs
+            Stripe (créés dans le Dashboard Stripe, collés ici). L&apos;affiliation
+            Partnero enregistre les ventes via l&apos;API Skedisy après paiement
+            (pas besoin de l&apos;app Stripe Partnero pour l&apos;instant).
           </p>
           <Button
             text="Nouveau plan"
@@ -401,6 +406,40 @@ const SubscriptionPlans = () => {
                   <label className="form-check-label" htmlFor="isHighlighted">
                     Mis en avant
                   </label>
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">
+                    Stripe Price ID (mensuel){" "}
+                    <span className="text-muted">price_…</span>
+                  </label>
+                  <input
+                    className="form-control font-monospace"
+                    value={draft.stripePriceIdMonthly}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        stripePriceIdMonthly: e.target.value,
+                      })
+                    }
+                    placeholder="price_…"
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">
+                    Stripe Price ID (annuel){" "}
+                    <span className="text-muted">price_…</span>
+                  </label>
+                  <input
+                    className="form-control font-monospace"
+                    value={draft.stripePriceIdYearly}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        stripePriceIdYearly: e.target.value,
+                      })
+                    }
+                    placeholder="price_…"
+                  />
                 </div>
               </div>
 

@@ -19,13 +19,18 @@
     return `${v.toFixed(2)} €`;
   }
 
-  function statusLabel(status) {
+  function statusMeta(status) {
     const s = String(status || "").toLowerCase();
-    if (s === "cancel") return copy.tabCancelled || "Annulé";
-    if (s === "completed") return copy.tabCompleted || "Complété";
-    if (s === "confirm") return copy.tabUpcoming || "À venir";
-    if (s === "pending") return copy.tabUpcoming || "À venir";
-    return status;
+    if (s === "cancel") {
+      return { label: copy.tabCancelled || "Annulé", mod: "is-cancel" };
+    }
+    if (s === "completed") {
+      return { label: copy.tabCompleted || "Complété", mod: "is-done" };
+    }
+    if (s === "confirm" || s === "pending") {
+      return { label: copy.tabUpcoming || "À venir", mod: "is-upcoming" };
+    }
+    return { label: status || "—", mod: "" };
   }
 
   function renderCard(b) {
@@ -35,17 +40,22 @@
       ? `${copy.expert || "avec"} ${[b.expert.fname, b.expert.lname].filter(Boolean).join(" ")}`
       : "";
     const time = b.startTime || (Array.isArray(b.time) ? b.time[0] : "") || "";
+    const st = statusMeta(b.status);
     return `<article class="sq-account-booking-card">
       <div class="sq-account-booking-card__top">
         <span class="sq-account-booking-card__id">#${esc(b.bookingId)}</span>
-        <span class="sq-account-booking-card__status">${esc(statusLabel(b.status))}</span>
+        <span class="sq-account-status ${esc(st.mod)}">${esc(st.label)}</span>
       </div>
       <h3 class="sq-account-booking-card__salon">${esc(salon)}</h3>
       <p class="sq-account-booking-card__svc">${esc(services || "—")}</p>
       ${expert ? `<p class="sq-account-muted">${esc(expert)}</p>` : ""}
       <div class="sq-account-booking-card__meta">
-        <span><i class="far fa-calendar" aria-hidden="true"></i> ${esc(b.date || "")} ${esc(time)}</span>
-        <span>${esc(copy.amount || "Montant")} : ${esc(money(b.amount))}</span>
+        <span><i class="far fa-calendar" aria-hidden="true"></i> ${esc(b.date || "")}${
+      time ? ` · ${esc(time)}` : ""
+    }</span>
+        <span class="sq-account-booking-card__amount">${esc(copy.amount || "Montant")} · ${esc(
+      money(b.amount)
+    )}</span>
       </div>
       ${
         b.cancel?.reason
@@ -77,11 +87,18 @@
 
   async function showList(root, userId, status, search) {
     const listEl = root.querySelector("[data-booking-list]");
-    listEl.innerHTML = `<p class="sq-account-muted">${esc(copy.loading || "Chargement…")}</p>`;
+    listEl.innerHTML = `<p class="sq-account-muted sq-account-loading">${esc(
+      copy.loading || "Chargement…"
+    )}</p>`;
     try {
       const items = await loadTab(userId, status, search);
       if (!items.length) {
-        listEl.innerHTML = `<p class="sq-account-empty">${esc(emptyMsg(status))}</p>`;
+        listEl.innerHTML = `<div class="sq-account-empty-state">
+          <p>${esc(emptyMsg(status))}</p>
+          <a class="sq-btn sq-btn-fill" href="/recherche">${esc(
+            copy.browseSalons || "Trouver un salon"
+          )}</a>
+        </div>`;
         return;
       }
       listEl.innerHTML = items.map(renderCard).join("");
@@ -97,21 +114,23 @@
     if (!content) return;
     content.hidden = false;
     content.innerHTML = `
-      <header class="sq-account-head">
-        <h1>${esc(copy.reservationsTitle || "Réservations")}</h1>
-        <input type="search" class="sq-account-search" id="bookingSearch"
-          placeholder="${esc(copy.searchPlaceholder || "Rechercher")}" />
-      </header>
-      <div class="sq-account-tabs" role="tablist">
-        <button type="button" class="sq-account-tab is-active" data-status="pending" role="tab">${esc(
-          copy.tabUpcoming || "À venir"
-        )}</button>
-        <button type="button" class="sq-account-tab" data-status="cancel" role="tab">${esc(
-          copy.tabCancelled || "Annulé"
-        )}</button>
-        <button type="button" class="sq-account-tab" data-status="completed" role="tab">${esc(
-          copy.tabCompleted || "Complété"
-        )}</button>
+      <div class="sq-account-toolbar">
+        <div class="sq-account-tabs" role="tablist">
+          <button type="button" class="sq-account-tab is-active" data-status="pending" role="tab">${esc(
+            copy.tabUpcoming || "À venir"
+          )}</button>
+          <button type="button" class="sq-account-tab" data-status="cancel" role="tab">${esc(
+            copy.tabCancelled || "Annulé"
+          )}</button>
+          <button type="button" class="sq-account-tab" data-status="completed" role="tab">${esc(
+            copy.tabCompleted || "Complété"
+          )}</button>
+        </div>
+        <label class="sq-account-search-wrap">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <input type="search" class="sq-account-search" id="bookingSearch"
+            placeholder="${esc(copy.searchPlaceholder || "Rechercher")}" />
+        </label>
       </div>
       <div class="sq-account-booking-list" data-booking-list></div>`;
 

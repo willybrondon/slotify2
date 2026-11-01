@@ -14,11 +14,30 @@ const Login = (props) => {
 
   const isAuth = useSelector((state) => state.auth.isAuth);
 
+  const resolvePostLoginPath = () => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next") || "";
+      if (next.startsWith("/salonpanel/")) return next;
+      if (sessionStorage.getItem("skedisy_checkout_after_login") === "1") {
+        sessionStorage.removeItem("skedisy_checkout_after_login");
+        return "/salonpanel/profile?tab=subscription";
+      }
+    } catch (_) {}
+    return "/salonpanel/salonDashboard";
+  };
+
   useEffect(() => {
-    isAuth && navigate("/salonpanel/salonDashboard");
+    if (isAuth) navigate(resolvePostLoginPath());
   }, [isAuth, navigate]);
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("email") || "";
+    } catch (_) {
+      return "";
+    }
+  });
   const [password, setPassword] = useState("");
   const [error, setError] = useState({
     email: "",
@@ -37,8 +56,9 @@ const Login = (props) => {
     try {
       let response = await dispatch(login(loginData)).unwrap();
       if (response?.status) {
+        const dest = resolvePostLoginPath();
         setTimeout(() => {
-          window.location.href = "/salonpanel/salonDashboard";
+          window.location.href = dest;
         }, 100);
       }
     } catch (err) {

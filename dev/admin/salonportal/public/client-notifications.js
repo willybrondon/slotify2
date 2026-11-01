@@ -30,15 +30,21 @@
     return res.json();
   }
 
-  function renderList(list, userId) {
+  function renderList(list) {
     if (!list.length) {
-      return `<p class="sq-account-empty">${esc(
-        copy.emptyNotifications || "Aucune notification."
-      )}</p>`;
+      return `<div class="sq-account-empty-state">
+        <p>${esc(copy.emptyNotifications || "Aucune notification pour le moment.")}</p>
+        <a class="sq-btn sq-btn-ghost" href="/compte/reservations">${esc(
+          copy.profileReservations || "Voir les réservations"
+        )}</a>
+      </div>`;
     }
     return list
       .map(
         (n) => `<article class="sq-account-notif-card" data-id="${esc(n._id)}">
+        <div class="sq-account-notif-card__icon" aria-hidden="true">
+          <i class="fas fa-bell"></i>
+        </div>
         <div class="sq-account-notif-card__body">
           <h3>${esc(n.title || "Notification")}</h3>
           <p>${esc(n.message || "")}</p>
@@ -46,7 +52,10 @@
         </div>
         <button type="button" class="sq-account-notif-card__del" data-del="${esc(
           n._id
-        )}">${esc(copy.deleteNotif || "Supprimer")}</button>
+        )}" aria-label="${esc(copy.deleteNotif || "Supprimer")}">
+          <i class="fas fa-trash-alt" aria-hidden="true"></i>
+          <span class="desktop-only">${esc(copy.deleteNotif || "Supprimer")}</span>
+        </button>
       </article>`
       )
       .join("");
@@ -59,17 +68,14 @@
     if (!content) return;
     content.hidden = false;
     content.innerHTML = `
-      <header class="sq-account-head">
-        <h1>${esc(copy.notificationsTitle || "Notifications")}</h1>
-      </header>
       <div class="sq-account-notif-list" id="notifList">
-        <p class="sq-account-muted">${esc(copy.loading || "Chargement…")}</p>
+        <p class="sq-account-muted sq-account-loading">${esc(copy.loading || "Chargement…")}</p>
       </div>`;
 
     const box = document.getElementById("notifList");
     try {
       const list = await load(user.id);
-      box.innerHTML = renderList(list, user.id);
+      box.innerHTML = renderList(list);
       box.addEventListener("click", async (e) => {
         const btn = e.target.closest("[data-del]");
         if (!btn) return;
@@ -80,9 +86,7 @@
           const card = box.querySelector(`[data-id="${CSS.escape(id)}"]`);
           card?.remove();
           if (!box.querySelector(".sq-account-notif-card")) {
-            box.innerHTML = `<p class="sq-account-empty">${esc(
-              copy.emptyNotifications || "Aucune notification."
-            )}</p>`;
+            box.innerHTML = renderList([]);
           }
         } else {
           btn.disabled = false;

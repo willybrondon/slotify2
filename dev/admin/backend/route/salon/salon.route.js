@@ -9,6 +9,7 @@ const checkAccessWithSecretKey = require("../../middleware/checkAccess");
 
 const salonController = require("../../controller/salon/salon.controller");
 const claimController = require("../../controller/salon/claim.controller");
+const subscriptionBillingController = require("../../controller/salon/subscriptionBilling.controller");
 const salon = require("../../middleware/salon");
 
 route.post("/login", checkAccessWithSecretKey(), salonController.login);
@@ -57,6 +58,26 @@ route.post("/depositeToWallet", checkAccessWithSecretKey(), salon, salonControll
 route.get("/walletHistory", checkAccessWithSecretKey(), salon, salonController.walletHistory);
 route.get("/createStripeCheckoutSession", checkAccessWithSecretKey(), salon, salonController.createStripeCheckoutSession);
 route.get("/handleStripePaymentSuccess", checkAccessWithSecretKey(), salon, salonController.handleStripePaymentSuccess);
+
+// SaaS subscription (Price IDs from admin) + Partnero sales via webhook
+route.get(
+  "/subscription/status",
+  checkAccessWithSecretKey(),
+  salon,
+  subscriptionBillingController.getSubscriptionStatus
+);
+route.post(
+  "/subscription/checkout",
+  checkAccessWithSecretKey(),
+  salon,
+  subscriptionBillingController.createCheckout
+);
+route.post(
+  "/subscription/billing-portal",
+  checkAccessWithSecretKey(),
+  salon,
+  subscriptionBillingController.createBillingPortal
+);
 route.get("/createMTNMomoPaymentRequest", checkAccessWithSecretKey(), salon, salonController.createMTNMomoPaymentRequest);
 route.get("/checkMTNMomoPaymentStatus", checkAccessWithSecretKey(), salon, salonController.checkMTNMomoPaymentStatus);
 route.post("/handleMTNMomoPaymentCallback", salonController.handleMTNMomoPaymentCallback);

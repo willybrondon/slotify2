@@ -10,9 +10,21 @@ function renderClientAccountPage(req, res, page) {
   const titles = {
     reservations: copy.accountReservationsTitle || "Réservations",
     notifications: copy.accountNotificationsTitle || "Notifications",
-    profile: copy.accountProfileTitle || "Mon profil",
+    profile: copy.accountProfileTitle || "Compte",
+  };
+  const leads = {
+    reservations:
+      copy.accountReservationsLead ||
+      "Retrouvez vos rendez-vous à venir, annulés et passés.",
+    notifications:
+      copy.accountNotificationsLead ||
+      "Confirmations, rappels et mises à jour de vos rendez-vous.",
+    profile:
+      copy.accountProfileLead || "Gérez vos informations et signalez un problème.",
   };
   const title = titles[page] || "Compte";
+  const lead = leads[page] || "";
+  const eyebrow = copy.accountEyebrow || (lang === "en" ? "Client space" : "Espace cliente");
   const canonical =
     page === "profile"
       ? "/compte/profil"
@@ -33,6 +45,19 @@ function renderClientAccountPage(req, res, page) {
       : page === "notifications"
         ? "client-notifications.js"
         : "client-profile.js";
+
+  const subnavClean = `
+        <nav class="sq-account-subnav" aria-label="${lang === "en" ? "Account" : "Compte"}">
+            <a href="/compte/reservations" class="sq-account-subnav__link${
+              page === "reservations" ? " is-active" : ""
+            }">${titles.reservations}</a>
+            <a href="/compte/notifications" class="sq-account-subnav__link${
+              page === "notifications" ? " is-active" : ""
+            }">${titles.notifications}</a>
+            <a href="/compte/profil" class="sq-account-subnav__link${
+              page === "profile" ? " is-active" : ""
+            }">${titles.profile}</a>
+        </nav>`;
 
   const html = `<!DOCTYPE html>
 <html lang="${lang}">
@@ -86,16 +111,34 @@ function renderClientAccountPage(req, res, page) {
     </nav>
 
     <main class="sq-account-main" id="accountMain">
-        <div class="sq-account-gate" id="accountGate" hidden>
-            <h1>${title}</h1>
-            <p>${copy.accountLoginRequired || "Connectez-vous pour accéder à cet espace."}</p>
-            <div class="sq-account-gate__actions">
-                <a class="sq-btn sq-btn-fill" href="${urls.login}${urls.login.includes("?") ? "&" : "?"}return=${encodeURIComponent(canonical)}">${copy.authSignIn || "Connexion"}</a>
-                <a class="sq-btn sq-btn-ghost" href="${urls.signup}${urls.signup.includes("?") ? "&" : "?"}return=${encodeURIComponent(canonical)}">${copy.authCreateAccount || "Créer un compte"}</a>
+        <div class="sq-account-shell">
+            <header class="sq-account-intro">
+                <p class="sq-account-eyebrow">${eyebrow}</p>
+                <h1>${title}</h1>
+                <p class="sq-account-lead">${lead}</p>
+            </header>
+            ${subnavClean}
+            <div class="sq-account-gate" id="accountGate" hidden>
+                <div class="sq-account-gate__card">
+                    <h2>${title}</h2>
+                    <p>${copy.accountLoginRequired || "Connectez-vous pour accéder à votre espace Skedisy."}</p>
+                    <div class="sq-account-gate__actions">
+                        <a class="sq-btn sq-btn-fill" href="${urls.login}${urls.login.includes("?") ? "&" : "?"}return=${encodeURIComponent(canonical)}">${copy.authSignIn || "Connexion"}</a>
+                        <a class="sq-btn sq-btn-ghost" href="${urls.signup}${urls.signup.includes("?") ? "&" : "?"}return=${encodeURIComponent(canonical)}">${copy.authCreateAccount || "Créer un compte"}</a>
+                    </div>
+                </div>
             </div>
+            <div class="sq-account-content" id="accountContent" hidden></div>
         </div>
-        <div class="sq-account-content" id="accountContent" hidden></div>
     </main>
+
+    <footer class="sq-account-footer">
+        <a href="/">${lang === "en" ? "Home" : "Accueil"}</a>
+        <span aria-hidden="true">·</span>
+        <a href="/aide/">${copy.navHelp || "Aide"}</a>
+        <span aria-hidden="true">·</span>
+        <a href="/recherche">${copy.accountBrowseSalons || (lang === "en" ? "Find a salon" : "Trouver un salon")}</a>
+    </footer>
 
     <script>
       window.SKEDISY_ACCOUNT = {
@@ -116,11 +159,11 @@ function renderClientAccountPage(req, res, page) {
           emptyNotifications: ${JSON.stringify(copy.accountEmptyNotifications || "Aucune notification.")},
           loginRequired: ${JSON.stringify(copy.accountLoginRequired || "Connectez-vous pour accéder à cet espace.")},
           logout: ${JSON.stringify(copy.accountLogout || "Déconnexion")},
-          reportTitle: ${JSON.stringify(copy.accountReportTitle || "Signaler")},
+          reportTitle: ${JSON.stringify(copy.accountReportTitle || "Signaler un problème")},
           reportLead: ${JSON.stringify(copy.accountReportLead || "Décrivez le problème lié à une réservation.")},
           reportBooking: ${JSON.stringify(copy.accountReportBooking || "N° de réservation")},
           reportDetails: ${JSON.stringify(copy.accountReportDetails || "Détails")},
-          reportSubmit: ${JSON.stringify(copy.accountReportSubmit || "Envoyer le signalement")},
+          reportSubmit: ${JSON.stringify(copy.accountReportSubmit || "Envoyer")},
           reportSuccess: ${JSON.stringify(copy.accountReportSuccess || "Signalement envoyé.")},
           reportError: ${JSON.stringify(copy.accountReportError || "Impossible d'envoyer le signalement.")},
           deleteNotif: ${JSON.stringify(copy.accountDeleteNotif || "Supprimer")},
@@ -130,8 +173,11 @@ function renderClientAccountPage(req, res, page) {
           statusLabel: ${JSON.stringify(copy.accountStatus || "Statut")},
           loading: ${JSON.stringify(copy.accountLoading || "Chargement…")},
           profileHello: ${JSON.stringify(copy.accountProfileHello || "Bonjour")},
-          profileReservations: ${JSON.stringify(copy.accountReservationsTitle || "Réservations")},
-          profileNotifications: ${JSON.stringify(copy.accountNotificationsTitle || "Notifications")},
+          profileReservations: ${JSON.stringify(titles.reservations)},
+          profileNotifications: ${JSON.stringify(titles.notifications)},
+          browseSalons: ${JSON.stringify(copy.accountBrowseSalons || "Trouver un salon")},
+          details: ${JSON.stringify(copy.accountDetails || "Coordonnées")},
+          quickLinks: ${JSON.stringify(copy.accountQuickLinks || "Raccourcis")},
         }
       };
     </script>

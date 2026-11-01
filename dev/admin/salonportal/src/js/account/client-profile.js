@@ -1,5 +1,5 @@
 /**
- * Page /compte/profil — infos + Signaler (comme l'app).
+ * Page /compte/profil — Compte + Signaler.
  */
 (function () {
   const cfg = window.SKEDISY_ACCOUNT || {};
@@ -13,6 +13,13 @@
       .replace(/"/g, "&quot;");
   }
 
+  function initials(user) {
+    const a = String(user.fname || "").trim().charAt(0);
+    const b = String(user.lname || "").trim().charAt(0);
+    const raw = (a + b || String(user.email || "S").charAt(0)).toUpperCase();
+    return raw.slice(0, 2);
+  }
+
   async function mount(user) {
     const gate = document.getElementById("accountGate");
     const content = document.getElementById("accountContent");
@@ -20,47 +27,76 @@
     if (!content) return;
     content.hidden = false;
 
-    const name = [user.fname, user.lname].filter(Boolean).join(" ") || user.email;
+    const name =
+      [user.fname, user.lname].filter(Boolean).join(" ") ||
+      user.email ||
+      "Compte";
+
     content.innerHTML = `
-      <header class="sq-account-head">
-        <h1>${esc(copy.profileTitle || "Mon profil")}</h1>
-      </header>
-      <section class="sq-account-profile-card">
-        <p class="sq-account-profile-hello">${esc(copy.profileHello || "Bonjour")} <strong>${esc(
-      name
-    )}</strong></p>
-        <ul class="sq-account-profile-meta">
-          ${user.email ? `<li><i class="far fa-envelope" aria-hidden="true"></i> ${esc(user.email)}</li>` : ""}
-          ${user.mobile ? `<li><i class="fas fa-phone" aria-hidden="true"></i> ${esc(user.mobile)}</li>` : ""}
+      <section class="sq-account-panel sq-account-identity">
+        <div class="sq-account-avatar" aria-hidden="true">${esc(initials(user))}</div>
+        <div class="sq-account-identity__text">
+          <p class="sq-account-identity__hello">${esc(copy.profileHello || "Bonjour")}</p>
+          <h2 class="sq-account-identity__name">${esc(name)}</h2>
+        </div>
+        <button type="button" class="sq-btn sq-btn-ghost sq-account-logout" data-account-logout>${esc(
+          copy.logout || "Déconnexion"
+        )}</button>
+      </section>
+
+      <section class="sq-account-panel">
+        <h3 class="sq-account-panel__title">${esc(copy.details || "Coordonnées")}</h3>
+        <ul class="sq-account-meta-list">
+          ${
+            user.email
+              ? `<li><span class="sq-account-meta-list__icon"><i class="far fa-envelope" aria-hidden="true"></i></span><div><span class="sq-account-meta-list__label">Email</span><strong>${esc(
+                  user.email
+                )}</strong></div></li>`
+              : ""
+          }
+          ${
+            user.mobile
+              ? `<li><span class="sq-account-meta-list__icon"><i class="fas fa-phone" aria-hidden="true"></i></span><div><span class="sq-account-meta-list__label">Mobile</span><strong>${esc(
+                  user.mobile
+                )}</strong></div></li>`
+              : ""
+          }
         </ul>
-        <div class="sq-account-profile-links">
-          <a class="sq-btn sq-btn-ghost" href="/compte/reservations">${esc(
-            copy.profileReservations || "Réservations"
-          )}</a>
-          <a class="sq-btn sq-btn-ghost" href="/compte/notifications">${esc(
-            copy.profileNotifications || "Notifications"
-          )}</a>
-          <button type="button" class="sq-btn sq-btn-ghost" data-account-logout>${esc(
-            copy.logout || "Déconnexion"
-          )}</button>
+      </section>
+
+      <section class="sq-account-panel">
+        <h3 class="sq-account-panel__title">${esc(copy.quickLinks || "Raccourcis")}</h3>
+        <div class="sq-account-link-grid">
+          <a class="sq-account-link-tile" href="/compte/reservations">
+            <i class="fas fa-calendar-check" aria-hidden="true"></i>
+            <span>${esc(copy.profileReservations || "Réservations")}</span>
+          </a>
+          <a class="sq-account-link-tile" href="/compte/notifications">
+            <i class="fas fa-bell" aria-hidden="true"></i>
+            <span>${esc(copy.profileNotifications || "Notifications")}</span>
+          </a>
+          <a class="sq-account-link-tile" href="/recherche">
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span>${esc(copy.browseSalons || "Trouver un salon")}</span>
+          </a>
         </div>
       </section>
 
-      <section class="sq-account-report" id="signaler">
-        <h2>${esc(copy.reportTitle || "Signaler")}</h2>
+      <section class="sq-account-panel" id="signaler">
+        <h3 class="sq-account-panel__title">${esc(copy.reportTitle || "Signaler un problème")}</h3>
         <p class="sq-account-muted">${esc(
-          copy.reportLead || "Décrivez le problème lié à une réservation."
+          copy.reportLead || "Indiquez le numéro de réservation et décrivez la situation."
         )}</p>
         <form id="reportForm" class="sq-account-report-form" novalidate>
           <label class="sq-account-field">${esc(copy.reportBooking || "N° de réservation")}
-            <input type="text" id="reportBookingId" name="bookingId" required placeholder="ex. 1234567" />
+            <input type="text" id="reportBookingId" name="bookingId" required placeholder="ex. 1234567" autocomplete="off" />
           </label>
           <label class="sq-account-field">${esc(copy.reportDetails || "Détails")}
-            <textarea id="reportDetails" name="details" rows="5" required minlength="10"></textarea>
+            <textarea id="reportDetails" name="details" rows="4" required minlength="10" placeholder=""></textarea>
           </label>
           <div id="reportNotice" class="sq-auth-notice sq-auth-notice--hidden" role="alert"></div>
           <button type="submit" class="sq-btn sq-btn-fill" id="reportSubmit">${esc(
-            copy.reportSubmit || "Envoyer le signalement"
+            copy.reportSubmit || "Envoyer"
           )}</button>
         </form>
       </section>`;
