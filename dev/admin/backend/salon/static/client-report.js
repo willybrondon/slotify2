@@ -1,5 +1,5 @@
 /**
- * Page /compte/signaler
+ * Page /compte/signaler — uniquement le signalement.
  */
 (function () {
   const cfg = window.SKEDISY_ACCOUNT || {};
@@ -21,29 +21,31 @@
     content.hidden = false;
 
     content.innerHTML = `
-      <section class="sq-account-panel">
-        <p class="sq-account-muted">${esc(
-          copy.reportLead ||
-            "Indiquez le numéro de réservation et décrivez la situation."
+      <section class="sq-account-panel sq-account-panel--focus">
+        <div class="sq-account-panel__badge" aria-hidden="true">
+          <i class="fas fa-flag"></i>
+        </div>
+        <p class="sq-account-panel__hint">${esc(
+          copy.reportHint ||
+            "Précisez le salon, la presta (tresses, locks, perruque…) et ce qui s’est passé."
         )}</p>
         <form id="reportForm" class="sq-account-report-form" novalidate>
           <label class="sq-account-field">${esc(copy.reportBooking || "N° de réservation")}
             <input type="text" id="reportBookingId" name="bookingId" required placeholder="ex. 1234567" autocomplete="off" />
           </label>
-          <label class="sq-account-field">${esc(copy.reportDetails || "Détails")}
-            <textarea id="reportDetails" name="details" rows="5" required minlength="10"></textarea>
+          <label class="sq-account-field">${esc(copy.reportDetails || "Que s’est-il passé ?")}
+            <textarea id="reportDetails" name="details" rows="5" required minlength="10"
+              placeholder="${esc(
+                copy.reportPlaceholder ||
+                  "Ex. : RDV tresses annulé sans prévenir, montant incorrect…"
+              )}"></textarea>
           </label>
           <div id="reportNotice" class="sq-auth-notice sq-auth-notice--hidden" role="alert"></div>
           <button type="submit" class="sq-btn sq-btn-fill" id="reportSubmit">${esc(
-            copy.reportSubmit || "Envoyer"
+            copy.reportSubmit || "Envoyer le signalement"
           )}</button>
         </form>
-      </section>
-      <p class="sq-account-muted" style="margin-top:1rem">
-        <a href="/compte/reservations">${esc(
-          copy.profileReservations || "Voir mes réservations"
-        )}</a>
-      </p>`;
+      </section>`;
 
     const form = document.getElementById("reportForm");
     const notice = document.getElementById("reportNotice");

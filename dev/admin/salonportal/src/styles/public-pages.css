@@ -2570,10 +2570,17 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
 }
 .sq-account-menu-panel {
     width: min(260px, 92vw);
-    display: flex;
     flex-direction: column;
     gap: 2px;
     padding: 8px;
+}
+.sq-account-menu-panel:not([hidden]),
+.sq-account-notif-panel:not([hidden]) {
+    display: flex;
+}
+.sq-account-menu-panel[hidden],
+.sq-account-notif-panel[hidden] {
+    display: none !important;
 }
 .sq-account-menu-panel__link {
     display: flex;
@@ -2680,7 +2687,9 @@ body.sq-account-page {
 }
 
 .sq-account-intro {
-    padding: 4px 2px 0;
+    padding: 8px 4px 12px;
+    border-bottom: 1px solid rgba(196, 92, 38, 0.12);
+    margin-bottom: 4px;
 }
 .sq-account-eyebrow {
     margin: 0 0 6px;
@@ -2688,7 +2697,7 @@ body.sq-account-page {
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--sk-primary, #c45c26);
+    color: var(--sk-brand, #c45c26);
 }
 .sq-account-intro h1 {
     margin: 0 0 8px;
@@ -2705,35 +2714,283 @@ body.sq-account-page {
     line-height: 1.5;
 }
 
+/* Sous-nav compte retirée : chaque page = un seul sujet (accès via menu Compte). */
 .sq-account-subnav {
-    display: flex;
-    gap: 6px;
-    padding: 5px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid var(--sk-border, rgba(0, 0, 0, 0.08));
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    display: none !important;
 }
-.sq-account-subnav__link {
-    flex: 1 1 auto;
+.sq-account-panel--focus {
+    border-color: rgba(196, 92, 38, 0.18);
+    background:
+        linear-gradient(180deg, var(--sk-brand-bg, #fdf6f0) 0%, #fff 48%);
+}
+.sq-account-panel__badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sk-brand, #c45c26);
+    color: #fff;
+    margin-bottom: 12px;
+}
+.sq-account-panel__hint {
+    margin: 0 0 4px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: #5c3d2e;
+}
+.sq-account-identity__tagline {
+    margin: 8px 0 0;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    color: var(--sk-text-muted, #666);
+    max-width: 36rem;
+}
+.sq-account-panel--actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+.sq-account-empty-state__icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sk-brand-bg, #fdf6f0);
+    color: var(--sk-brand, #c45c26);
+    font-size: 1.25rem;
+}
+.sq-account-empty-state__hint {
+    margin: -6px 0 18px !important;
+    font-size: 0.88rem;
+    color: var(--sk-text-muted, #777) !important;
+}
+
+/* ——— Inbox messages compte ——— */
+.sq-account-page--messages .sq-account-main {
+    max-width: 1040px;
+}
+.sq-msg-inbox {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) 1fr;
+    min-height: min(68vh, 620px);
+    border: 1px solid rgba(196, 92, 38, 0.16);
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(28, 20, 14, 0.06);
+}
+.sq-msg-inbox__list-wrap {
+    border-right: 1px solid rgba(196, 92, 38, 0.12);
+    background: linear-gradient(180deg, var(--sk-brand-bg, #fdf6f0) 0%, #fff 28%);
+    max-height: min(68vh, 620px);
+    overflow-y: auto;
+}
+.sq-msg-inbox__list {
+    display: flex;
+    flex-direction: column;
+}
+.sq-msg-inbox-empty,
+.sq-msg-inbox-placeholder {
+    padding: 36px 22px;
     text-align: center;
+    color: var(--sk-text-muted, #666);
+}
+.sq-msg-inbox-empty .sq-btn,
+.sq-msg-inbox-placeholder .sq-btn {
+    margin-top: 12px;
+}
+.sq-msg-inbox-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    border-bottom: 1px solid rgba(17, 17, 17, 0.06);
+    border-left: 3px solid transparent;
+    background: transparent;
+    padding: 14px 14px 14px 12px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+.sq-msg-inbox-item:hover {
+    background: rgba(196, 92, 38, 0.06);
+}
+.sq-msg-inbox-item.is-active {
+    background: #fff;
+    border-left-color: var(--sk-brand, #c45c26);
+}
+.sq-msg-inbox-item__avatar {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: var(--sk-brand, #c45c26);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.sq-msg-inbox-item__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.sq-msg-inbox-item__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: baseline;
+}
+.sq-msg-inbox-item__top strong {
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+.sq-msg-inbox-item__top time {
+    font-size: 0.72rem;
+    color: #888;
+    white-space: nowrap;
+}
+.sq-msg-inbox-item__preview {
+    font-size: 0.82rem;
+    color: var(--sk-text-muted, #666);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sq-msg-inbox-item__meta {
+    font-size: 0.72rem;
+    color: #999;
+}
+.sq-msg-inbox-item__badge {
+    flex-shrink: 0;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--sk-brand, #c45c26);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.sq-msg-inbox__thread {
+    display: flex;
+    flex-direction: column;
+    min-height: min(68vh, 620px);
+    background: linear-gradient(180deg, #fff 0%, #fbf8f5 100%);
+}
+.sq-msg-inbox-thread__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(196, 92, 38, 0.12);
+    background: var(--sk-brand-bg, #fdf6f0);
+}
+.sq-msg-inbox-thread__identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+.sq-msg-inbox-thread__identity strong {
+    display: block;
+    font-size: 0.98rem;
+}
+.sq-msg-inbox-salon-link {
+    font-size: 0.78rem;
+    font-weight: 650;
+    color: var(--sk-brand, #c45c26);
     text-decoration: none;
     white-space: nowrap;
-    padding: 11px 14px;
+}
+.sq-msg-inbox-salon-link:hover {
+    text-decoration: underline;
+}
+.sq-msg-inbox-back {
+    display: none;
+    width: 36px;
+    height: 36px;
+    border: 0;
     border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--sk-text-muted, #666);
-    transition: background 0.15s ease, color 0.15s ease;
+    background: rgba(17, 17, 17, 0.06);
+    cursor: pointer;
+    color: #333;
 }
-.sq-account-subnav__link:hover {
-    color: var(--sk-text, #1a1a1a);
-    background: rgba(0, 0, 0, 0.03);
+.sq-msg-inbox-thread__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(min(68vh, 620px) - 150px);
 }
-.sq-account-subnav__link.is-active {
-    color: #fff;
-    background: var(--sk-primary, #c45c26);
+.sq-msg-inbox-compose {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    padding: 12px 14px;
+    border-top: 1px solid rgba(196, 92, 38, 0.12);
+    background: #fff;
+}
+.sq-msg-inbox-compose textarea {
+    flex: 1;
+    border: 1px solid rgba(17, 17, 17, 0.14);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font: inherit;
+    resize: vertical;
+    min-height: 44px;
+}
+.sq-msg-inbox-compose textarea:focus {
+    outline: none;
+    border-color: var(--sk-brand, #c45c26);
+    box-shadow: 0 0 0 3px rgba(196, 92, 38, 0.15);
+}
+.sq-msg-inbox-disabled {
+    padding: 12px 16px;
+    margin: 0;
+}
+@media (max-width: 800px) {
+    .sq-msg-inbox {
+        grid-template-columns: 1fr;
+        min-height: 70vh;
+    }
+    .sq-msg-inbox__list-wrap {
+        max-height: none;
+    }
+    .sq-msg-inbox__thread {
+        display: none;
+        min-height: 70vh;
+    }
+    .sq-msg-inbox.is-thread-open .sq-msg-inbox__list-wrap {
+        display: none;
+    }
+    .sq-msg-inbox.is-thread-open .sq-msg-inbox__thread {
+        display: flex;
+    }
+    .sq-msg-inbox-back {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .sq-account-toolbar {

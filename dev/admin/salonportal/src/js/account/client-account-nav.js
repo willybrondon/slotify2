@@ -105,6 +105,10 @@
               <i class="fas fa-calendar-check" aria-hidden="true"></i>
               ${escapeHtml(t("Réservations", "Bookings"))}
             </a>
+            <a href="/compte/messages" class="sq-account-menu-panel__link">
+              <i class="fas fa-comments" aria-hidden="true"></i>
+              ${escapeHtml(t("Messages", "Messages"))}
+            </a>
             <a href="/compte/signaler" class="sq-account-menu-panel__link">
               <i class="fas fa-flag" aria-hidden="true"></i>
               ${escapeHtml(t("Signaler", "Report"))}
@@ -132,6 +136,9 @@
       )}</a>
       <a href="/compte/reservations" class="btn-login-mobile-menu">${escapeHtml(
         t("Réservations", "Bookings")
+      )}</a>
+      <a href="/compte/messages" class="btn-login-mobile-menu">${escapeHtml(
+        t("Messages", "Messages")
       )}</a>
       <a href="/compte/signaler" class="btn-login-mobile-menu">${escapeHtml(
         t("Signaler", "Report")

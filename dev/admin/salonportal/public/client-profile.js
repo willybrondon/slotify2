@@ -1,5 +1,5 @@
 /**
- * Page /compte/profil — infos du compte + déconnexion.
+ * Page /compte/profil — infos du compte uniquement + déconnexion.
  */
 (function () {
   const cfg = window.SKEDISY_ACCOUNT || {};
@@ -33,15 +33,16 @@
       "Compte";
 
     content.innerHTML = `
-      <section class="sq-account-panel sq-account-identity">
+      <section class="sq-account-panel sq-account-identity sq-account-panel--focus">
         <div class="sq-account-avatar" aria-hidden="true">${esc(initials(user))}</div>
         <div class="sq-account-identity__text">
           <p class="sq-account-identity__hello">${esc(copy.profileHello || "Bonjour")}</p>
           <h2 class="sq-account-identity__name">${esc(name)}</h2>
+          <p class="sq-account-identity__tagline">${esc(
+            copy.profileTagline ||
+              "Votre espace Skedisy pour réserver la beauté afro en Île-de-France."
+          )}</p>
         </div>
-        <button type="button" class="sq-btn sq-btn-ghost sq-account-logout" data-account-logout>${esc(
-          copy.logout || "Déconnexion"
-        )}</button>
       </section>
 
       <section class="sq-account-panel">
@@ -71,8 +72,11 @@
         </ul>
       </section>
 
-      <section class="sq-account-panel">
-        <a class="sq-btn sq-btn-ghost" href="/recherche">${esc(
+      <section class="sq-account-panel sq-account-panel--actions">
+        <button type="button" class="sq-btn sq-btn-ghost sq-account-logout" data-account-logout>${esc(
+          copy.logout || "Déconnexion"
+        )}</button>
+        <a class="sq-btn sq-btn-fill" href="/recherche">${esc(
           copy.browseSalons || "Trouver un salon"
         )}</a>
       </section>`;

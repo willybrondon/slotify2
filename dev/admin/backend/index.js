@@ -577,12 +577,21 @@ app.post("/api/public/auth/register", publicClientAuth.publicRegister);
 const publicClientAccount = require("./controller/user/publicClientAccount.controller");
 app.get("/compte/reservations", publicClientAccount.serveReservationsPage);
 app.get("/compte/notifications", publicClientAccount.serveNotificationsPage);
+app.get("/compte/messages", publicClientAccount.serveMessagesPage);
 app.get("/compte/signaler", publicClientAccount.serveReportPage);
 app.get("/compte/profil", publicClientAccount.serveProfilePage);
 app.get("/api/public/client/bookings", publicClientAccount.publicClientBookings);
 app.get(
   "/api/public/client/notifications",
   publicClientAccount.publicClientNotifications
+);
+app.get(
+  "/api/public/client/conversations",
+  publicClientAccount.publicClientConversations
+);
+app.get(
+  "/api/public/client/conversation-messages",
+  publicClientAccount.publicClientConversationMessages
 );
 app.delete(
   "/api/public/client/notifications",

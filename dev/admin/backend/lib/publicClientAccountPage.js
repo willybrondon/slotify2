@@ -5,77 +5,63 @@ function renderClientAccountPage(req, res, page) {
   const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
   const lang = resolveLang(req.query.lang);
   const copy = getWebCopy(lang);
-  const urls = authUrls(
-    baseURL,
-    `/compte/${
-      page === "profile" ? "profil" : page === "report" ? "signaler" : page
-    }`,
-    lang
-  );
+  const pathByPage = {
+    profile: "profil",
+    report: "signaler",
+    messages: "messages",
+    notifications: "notifications",
+    reservations: "reservations",
+  };
+  const urls = authUrls(baseURL, `/compte/${pathByPage[page] || page}`, lang);
 
   const titles = {
     reservations: copy.accountReservationsTitle || "Réservations",
     notifications: copy.accountNotificationsTitle || "Notifications",
-    report: copy.accountReportTitle || "Signaler",
-    profile: copy.accountProfileTitle || "Compte",
+    messages: copy.accountMessagesTitle || "Messages",
+    report: copy.accountReportTitle || "Signaler un problème",
+    profile: copy.accountProfileTitle || "Infos du compte",
   };
   const leads = {
     reservations:
       copy.accountReservationsLead ||
-      "Retrouvez vos rendez-vous à venir, annulés et passés.",
+      "Vos rendez-vous chez les salons afro d’Île-de-France — à venir, annulés et passés.",
     notifications:
       copy.accountNotificationsLead ||
       "Confirmations, rappels et mises à jour de vos rendez-vous.",
+    messages:
+      copy.accountMessagesLead ||
+      "Toutes vos conversations avec les salons — questions, photos d’inspiration, précisions.",
     report:
       copy.accountReportLead ||
-      "Indiquez le numéro de réservation et décrivez la situation.",
+      "Un souci sur un RDV ? Décrivez-le avec le numéro de réservation — l’équipe Skedisy s’en occupe.",
     profile:
       copy.accountProfileLead ||
-      "Vos informations personnelles et la déconnexion.",
+      "Vos coordonnées Skedisy et la déconnexion.",
+  };
+  const eyebrows = {
+    reservations: lang === "en" ? "Your bookings" : "Vos rendez-vous",
+    notifications: lang === "en" ? "Updates" : "Vos alertes",
+    messages: lang === "en" ? "Skedisy messaging" : "Messagerie Skedisy",
+    report: lang === "en" ? "Support" : "Assistance Skedisy",
+    profile: lang === "en" ? "Your account" : "Votre compte Skedisy",
   };
   const title = titles[page] || "Compte";
   const lead = leads[page] || "";
-  const eyebrow = copy.accountEyebrow || (lang === "en" ? "Client space" : "Espace cliente");
-  const canonical =
-    page === "profile"
-      ? "/compte/profil"
-      : page === "notifications"
-        ? "/compte/notifications"
-        : page === "report"
-          ? "/compte/signaler"
-          : "/compte/reservations";
+  const eyebrow = eyebrows[page] || copy.accountEyebrow || "Skedisy";
+  const canonical = `/compte/${pathByPage[page] || "reservations"}`;
 
-  const bodyClass =
-    page === "reservations"
-      ? "sq-account-page--reservations"
-      : page === "notifications"
-        ? "sq-account-page--notifications"
-        : page === "report"
-          ? "sq-account-page--report"
-          : "sq-account-page--profile";
+  const bodyClass = `sq-account-page--${page === "profile" ? "profile" : page}`;
 
   const pageScript =
     page === "reservations"
       ? "client-reservations.js"
       : page === "notifications"
         ? "client-notifications.js"
-        : page === "report"
-          ? "client-report.js"
-          : "client-profile.js";
-
-  // Pas de Notifications dans la sous-nav (déjà dans le header).
-  const subnavClean = `
-        <nav class="sq-account-subnav" aria-label="${lang === "en" ? "Account" : "Compte"}">
-            <a href="/compte/reservations" class="sq-account-subnav__link${
-              page === "reservations" ? " is-active" : ""
-            }">${titles.reservations}</a>
-            <a href="/compte/signaler" class="sq-account-subnav__link${
-              page === "report" ? " is-active" : ""
-            }">${lang === "en" ? "Report" : "Signaler"}</a>
-            <a href="/compte/profil" class="sq-account-subnav__link${
-              page === "profile" ? " is-active" : ""
-            }">${titles.profile}</a>
-        </nav>`;
+        : page === "messages"
+          ? "client-messages.js"
+          : page === "report"
+            ? "client-report.js"
+            : "client-profile.js";
 
   const html = `<!DOCTYPE html>
 <html lang="${lang}">
@@ -135,9 +121,9 @@ function renderClientAccountPage(req, res, page) {
                 <h1>${title}</h1>
                 <p class="sq-account-lead">${lead}</p>
             </header>
-            ${subnavClean}
             <div class="sq-account-gate" id="accountGate" hidden>
                 <div class="sq-account-gate__card">
+                    <p class="sq-account-eyebrow">${lang === "en" ? "Skedisy account" : "Compte Skedisy"}</p>
                     <h2>${title}</h2>
                     <p>${copy.accountLoginRequired || "Connectez-vous pour accéder à votre espace Skedisy."}</p>
                     <div class="sq-account-gate__actions">
@@ -167,8 +153,33 @@ function renderClientAccountPage(req, res, page) {
         copy: {
           reservationsTitle: ${JSON.stringify(titles.reservations)},
           notificationsTitle: ${JSON.stringify(titles.notifications)},
+          messagesTitle: ${JSON.stringify(titles.messages)},
           profileTitle: ${JSON.stringify(titles.profile)},
           reportTitle: ${JSON.stringify(titles.report)},
+          emptyMessages: ${JSON.stringify(
+            copy.accountEmptyMessages ||
+              (lang === "en"
+                ? "No conversations yet. Message a salon from its Skedisy page."
+                : "Aucune conversation pour l’instant. Écrivez à un salon depuis sa fiche Skedisy.")
+          )},
+          messagesSelect: ${JSON.stringify(
+            lang === "en"
+              ? "Select a salon conversation."
+              : "Sélectionnez une conversation avec un salon."
+          )},
+          messagesReply: ${JSON.stringify(
+            lang === "en" ? "Write your reply…" : "Écrivez votre réponse…"
+          )},
+          messagesSend: ${JSON.stringify(lang === "en" ? "Send" : "Envoyer")},
+          messagesOpenSalon: ${JSON.stringify(
+            lang === "en" ? "View salon page" : "Voir la fiche salon"
+          )},
+          messagesBack: ${JSON.stringify(lang === "en" ? "Back" : "Retour")},
+          messagesYou: ${JSON.stringify(lang === "en" ? "You" : "Vous")},
+          messagesSalon: ${JSON.stringify(lang === "en" ? "Salon" : "Salon")},
+          messagesAuto: ${JSON.stringify(
+            lang === "en" ? "Salon auto-reply" : "Réponse auto du salon"
+          )},
           tabUpcoming: ${JSON.stringify(copy.accountTabUpcoming || "À venir")},
           tabCancelled: ${JSON.stringify(copy.accountTabCancelled || "Annulé")},
           tabCompleted: ${JSON.stringify(copy.accountTabCompleted || "Complété")},
@@ -178,13 +189,17 @@ function renderClientAccountPage(req, res, page) {
           emptyNotifications: ${JSON.stringify(copy.accountEmptyNotifications || "Aucune notification.")},
           loginRequired: ${JSON.stringify(copy.accountLoginRequired || "Connectez-vous pour accéder à cet espace.")},
           logout: ${JSON.stringify(copy.accountLogout || "Déconnexion")},
-          reportTitle: ${JSON.stringify(copy.accountReportTitle || "Signaler un problème")},
-          reportLead: ${JSON.stringify(copy.accountReportLead || "Décrivez le problème lié à une réservation.")},
+          reportLead: ${JSON.stringify(leads.report)},
           reportBooking: ${JSON.stringify(copy.accountReportBooking || "N° de réservation")},
           reportDetails: ${JSON.stringify(copy.accountReportDetails || "Détails")},
           reportSubmit: ${JSON.stringify(copy.accountReportSubmit || "Envoyer")},
           reportSuccess: ${JSON.stringify(copy.accountReportSuccess || "Signalement envoyé.")},
           reportError: ${JSON.stringify(copy.accountReportError || "Impossible d'envoyer le signalement.")},
+          reportHint: ${JSON.stringify(
+            lang === "en"
+              ? "Mention the salon, the service (braids, locks, wig…) and what went wrong."
+              : "Précisez le salon, la presta (tresses, locks, perruque…) et ce qui s’est passé."
+          )},
           deleteNotif: ${JSON.stringify(copy.accountDeleteNotif || "Supprimer")},
           searchPlaceholder: ${JSON.stringify(copy.accountSearchBooking || "Rechercher une réservation")},
           expert: ${JSON.stringify(copy.withExpert || "avec")},
@@ -192,12 +207,20 @@ function renderClientAccountPage(req, res, page) {
           statusLabel: ${JSON.stringify(copy.accountStatus || "Statut")},
           loading: ${JSON.stringify(copy.accountLoading || "Chargement…")},
           profileHello: ${JSON.stringify(copy.accountProfileHello || "Bonjour")},
-          profileReservations: ${JSON.stringify(titles.reservations)},
-          profileNotifications: ${JSON.stringify(titles.notifications)},
+          profileTagline: ${JSON.stringify(
+            lang === "en"
+              ? "Your Skedisy space for afro beauty bookings in Île-de-France."
+              : "Votre espace Skedisy pour réserver la beauté afro en Île-de-France."
+          )},
           browseSalons: ${JSON.stringify(copy.accountBrowseSalons || "Trouver un salon")},
           details: ${JSON.stringify(copy.accountDetails || "Coordonnées")},
           noDetails: ${JSON.stringify(
             lang === "en" ? "No contact details on file." : "Aucune coordonnée enregistrée."
+          )},
+          emptyBrowseHint: ${JSON.stringify(
+            lang === "en"
+              ? "Find a salon that understands your hair — Île-de-France."
+              : "Trouvez un salon qui comprend vos cheveux — Île-de-France."
           )},
         }
       };

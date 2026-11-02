@@ -100,7 +100,12 @@
       const items = await loadTab(userId, status, search);
       if (!items.length) {
         listEl.innerHTML = `<div class="sq-account-empty-state">
+          <div class="sq-account-empty-state__icon" aria-hidden="true"><i class="fas fa-calendar-check"></i></div>
           <p>${esc(emptyMsg(status))}</p>
+          <p class="sq-account-empty-state__hint">${esc(
+            copy.emptyBrowseHint ||
+              "Trouvez un salon qui comprend vos cheveux — Île-de-France."
+          )}</p>
           <a class="sq-btn sq-btn-fill" href="/recherche">${esc(
             copy.browseSalons || "Trouver un salon"
           )}</a>
