@@ -28,6 +28,15 @@
       .replace(/"/g, "&quot;");
   }
 
+  function salonInitials() {
+    const name = String(cfg().salonName || "S").trim();
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase() || "SK";
+  }
+
   function ensureModal() {
     let root = document.getElementById("sqSalonMessaging");
     if (root) return root;
@@ -37,14 +46,31 @@
     root.innerHTML = `
       <div class="sq-msg-modal__backdrop" data-msg-close="1"></div>
       <div class="sq-msg-modal__panel" role="dialog" aria-modal="true" aria-labelledby="sqMsgTitle">
-        <button type="button" class="sq-msg-modal__close" data-msg-close="1" aria-label="Close">&times;</button>
-        <div class="sq-msg-modal__head">
-          <h3 id="sqMsgTitle">${escapeHtml(t("messageTitle"))}</h3>
-          <p class="sq-msg-modal__sub" id="sqMsgSub"></p>
+        <button type="button" class="sq-msg-modal__close" data-msg-close="1" aria-label="Fermer">&times;</button>
+        <div class="sq-msg-modal__brand">
+          <p class="sq-msg-modal__eyebrow">${escapeHtml(
+            t("messageEyebrow") || "Messagerie Skedisy"
+          )}</p>
+          <div class="sq-msg-modal__head">
+            <div class="sq-msg-modal__avatar" id="sqMsgAvatar" aria-hidden="true">${escapeHtml(
+              salonInitials()
+            )}</div>
+            <div class="sq-msg-modal__head-text">
+              <h3 id="sqMsgTitle">${escapeHtml(t("messageTitle"))}</h3>
+              <p class="sq-msg-modal__sub" id="sqMsgSub"></p>
+            </div>
+          </div>
         </div>
+        <p class="sq-msg-modal__promise" id="sqMsgPromise">${escapeHtml(
+          t("messagePromise") ||
+            "Questions sur une presta, une photo d’inspiration, la préparation — le salon vous répond."
+        )}</p>
         <div class="sq-msg-context" id="sqMsgContext" hidden></div>
         <div class="sq-msg-modal__body" id="sqMsgBody"></div>
         <div class="sq-msg-modal__compose" id="sqMsgCompose" hidden>
+          <p class="sq-msg-topics-label">${escapeHtml(
+            t("messageTopicsLabel") || "Précisez le sujet (optionnel)"
+          )}</p>
           <div class="sq-msg-topics" id="sqMsgTopics" role="group" aria-label="Sujet"></div>
           <div class="sq-msg-photos" id="sqMsgPhotos"></div>
           <label class="sq-msg-photo-btn">
@@ -52,7 +78,9 @@
             <span>${escapeHtml(t("messageAddPhoto"))}</span>
           </label>
           <textarea id="sqMsgInput" rows="2" placeholder="${escapeHtml(t("messagePlaceholder"))}"></textarea>
-          <button type="button" class="sq-msg-send" id="sqMsgSend">${escapeHtml(t("messageSend"))}</button>
+          <div class="sq-msg-compose-row">
+            <button type="button" class="sq-msg-send" id="sqMsgSend">${escapeHtml(t("messageSend"))}</button>
+          </div>
         </div>
       </div>`;
     document.body.appendChild(root);
@@ -164,7 +192,10 @@
     const body = document.getElementById("sqMsgBody");
     if (!body) return;
     if (!state.messages.length) {
-      body.innerHTML = `<p class="sq-msg-empty">${escapeHtml(t("messageEmpty"))}</p>`;
+      body.innerHTML = `<div class="sq-msg-empty">
+        <strong>${escapeHtml(t("messageEmptyTitle") || "Commencez la conversation")}</strong><br/>
+        ${escapeHtml(t("messageEmpty"))}
+      </div>`;
       return;
     }
     body.innerHTML = state.messages
@@ -302,13 +333,15 @@
     const root = ensureModal();
     root.classList.add("sq-msg-modal--open");
     state.open = true;
+    const title = document.getElementById("sqMsgTitle");
+    const avatar = document.getElementById("sqMsgAvatar");
+    const salonName = cfg().salonName || t("messageTitle") || "Salon";
+    if (title) title.textContent = salonName;
+    if (avatar) avatar.textContent = salonInitials();
     const sub = document.getElementById("sqMsgSub");
     if (sub) {
       sub.textContent =
-        t("messageSalonHint") ||
-        (cfg().salonName
-          ? `Discussion avec ${cfg().salonName}`
-          : "Discussion avec le salon");
+        t("messageSalonHint") || "Conversation privée avec le salon";
     }
     renderContextBanner();
     renderTopicChips();

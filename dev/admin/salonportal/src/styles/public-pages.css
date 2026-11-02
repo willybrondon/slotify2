@@ -452,9 +452,15 @@ body.sk-public-page .main-wrapper {
 }
 
 .sk-public-page .sq-salon-contact-btn--message {
-    background: #111;
+    background: var(--sk-brand, #c45c26);
     color: #fff;
-    border-color: #111;
+    border-color: var(--sk-brand, #c45c26);
+}
+
+.sk-public-page .sq-salon-contact-btn--message:hover {
+    background: var(--sk-brand-hover, #a84d1f);
+    border-color: var(--sk-brand-hover, #a84d1f);
+    color: #fff;
 }
 
 .sk-public-page .sq-salon-social-links {
@@ -533,19 +539,21 @@ body.sk-public-page .main-wrapper {
 .sq-msg-modal__backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(28, 20, 14, 0.48);
 }
 
 .sq-msg-modal__panel {
     position: relative;
-    width: min(480px, 100%);
-    max-height: min(88vh, 720px);
+    width: min(440px, 100%);
+    max-height: min(90vh, 740px);
     background: #fff;
-    border-radius: 16px 16px 0 0;
+    border-radius: 18px 18px 0 0;
     display: flex;
     flex-direction: column;
     z-index: 1;
-    padding: 16px 16px 12px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 -8px 40px rgba(28, 20, 14, 0.18);
 }
 
 @media (min-width: 640px) {
@@ -553,48 +561,117 @@ body.sk-public-page .main-wrapper {
         align-items: center;
     }
     .sq-msg-modal__panel {
-        border-radius: 16px;
+        border-radius: 18px;
+        box-shadow: 0 24px 64px rgba(28, 20, 14, 0.22);
     }
+}
+
+.sq-msg-modal__brand {
+    background:
+        linear-gradient(135deg, var(--sk-brand-bg, #fdf6f0) 0%, #fff 70%),
+        var(--sk-brand-bg, #fdf6f0);
+    border-bottom: 1px solid rgba(196, 92, 38, 0.14);
+    padding: 18px 48px 14px 18px;
+}
+
+.sq-msg-modal__eyebrow {
+    margin: 0 0 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sk-brand, #c45c26);
 }
 
 .sq-msg-modal__close {
     position: absolute;
-    top: 10px;
+    top: 12px;
     right: 12px;
+    width: 36px;
+    height: 36px;
     border: 0;
-    background: transparent;
-    font-size: 1.5rem;
+    border-radius: 50%;
+    background: rgba(17, 17, 17, 0.06);
+    font-size: 1.35rem;
     cursor: pointer;
     line-height: 1;
+    color: #333;
+    z-index: 2;
+}
+
+.sq-msg-modal__close:hover {
+    background: rgba(17, 17, 17, 0.1);
+}
+
+.sq-msg-modal__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sq-msg-modal__avatar {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--sk-brand, #c45c26);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+}
+
+.sq-msg-modal__head-text {
+    min-width: 0;
 }
 
 .sq-msg-modal__head h3 {
-    margin: 0 0 4px;
-    font-size: 1.15rem;
+    margin: 0 0 2px;
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: var(--sk-black, #111);
+    line-height: 1.25;
 }
 
 .sq-msg-modal__sub {
-    margin: 0 0 10px;
-    color: #666;
-    font-size: 0.9rem;
+    margin: 0;
+    color: var(--sk-text-muted, rgba(17, 17, 17, 0.62));
+    font-size: 0.84rem;
+    line-height: 1.4;
+}
+
+.sq-msg-modal__promise {
+    margin: 10px 18px 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--sk-brand-light, rgba(196, 92, 38, 0.08));
+    border: 1px solid rgba(196, 92, 38, 0.12);
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #4a3428;
 }
 
 .sq-msg-context {
-    margin: 0 0 8px;
+    margin: 10px 18px 0;
 }
 
 .sq-msg-context__card {
-    background: #f7f3ef;
+    background: var(--sk-brand-bg, #fdf6f0);
+    border: 1px solid rgba(196, 92, 38, 0.16);
     border-radius: 12px;
     padding: 12px 14px;
 }
 
 .sq-msg-context__label {
     margin: 0;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #888;
+    letter-spacing: 0.05em;
+    color: var(--sk-brand, #c45c26);
+    font-weight: 700;
 }
 
 .sq-msg-context__name {
@@ -608,7 +685,7 @@ body.sk-public-page .main-wrapper {
     align-items: center;
     border: none;
     border-radius: 8px;
-    background: #111;
+    background: var(--sk-brand, #c45c26);
     color: #fff;
     font-size: 0.85rem;
     font-weight: 600;
@@ -617,7 +694,7 @@ body.sk-public-page .main-wrapper {
 }
 
 .sq-msg-context__cta:hover {
-    background: #333;
+    background: var(--sk-brand-hover, #a84d1f);
 }
 
 .sq-msg-modal__body {
@@ -625,24 +702,33 @@ body.sk-public-page .main-wrapper {
     overflow-y: auto;
     min-height: 200px;
     max-height: 42vh;
-    padding: 8px 0;
+    margin: 8px 0 0;
+    padding: 12px 18px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    background:
+        linear-gradient(180deg, #fff 0%, #fbf8f5 100%);
 }
 
 .sq-msg-empty {
-    color: #666;
-    font-size: 0.95rem;
-    line-height: 1.45;
+    color: var(--sk-text-muted, #666);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    padding: 8px 4px;
+}
+
+.sq-msg-empty strong {
+    color: #111;
+    font-weight: 650;
 }
 
 .sq-msg-bubble {
-    max-width: 85%;
-    padding: 8px 12px;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    line-height: 1.4;
+    max-width: 86%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.93rem;
+    line-height: 1.45;
 }
 
 .sq-msg-bubble p {
@@ -651,65 +737,82 @@ body.sk-public-page .main-wrapper {
 
 .sq-msg-bubble--mine {
     align-self: flex-end;
-    background: #111;
+    background: var(--sk-black, #111);
     color: #fff;
+    border-bottom-right-radius: 4px;
 }
 
 .sq-msg-bubble--salon {
     align-self: flex-start;
-    background: #f3f4f6;
+    background: #fff;
     color: #111;
+    border: 1px solid rgba(196, 92, 38, 0.16);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(28, 20, 14, 0.04);
 }
 
 .sq-msg-bubble--system {
     align-self: center;
-    background: #eef2ff;
-    border: 1px solid #c7d2fe;
-    color: #3730a3;
-    font-size: 0.88rem;
+    background: var(--sk-brand-bg, #fdf6f0);
+    border: 1px solid rgba(196, 92, 38, 0.2);
+    color: #5c3d2e;
+    font-size: 0.86rem;
     text-align: center;
-    max-width: 92%;
+    max-width: 94%;
 }
 
 .sq-msg-bubble--auto {
-    background: #f0fdf4;
-    border-color: #bbf7d0;
-    color: #14532d;
+    background: #fff;
+    border-color: rgba(196, 92, 38, 0.28);
+    color: #3d2a20;
     text-align: left;
     white-space: pre-wrap;
 }
 
 .sq-msg-auto-tag {
     display: inline-block;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     margin-bottom: 6px;
-    opacity: 0.75;
+    color: var(--sk-brand, #c45c26);
+}
+
+.sq-msg-topics-label {
+    margin: 0 0 6px;
+    font-size: 0.72rem;
+    font-weight: 650;
+    color: var(--sk-text-muted, #666);
 }
 
 .sq-msg-topics {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .sq-msg-topic {
-    border: 1px solid #ddd;
+    border: 1px solid rgba(17, 17, 17, 0.12);
     background: #fff;
     border-radius: 999px;
-    padding: 5px 10px;
-    font-size: 0.75rem;
+    padding: 6px 11px;
+    font-size: 0.74rem;
     font-weight: 600;
     cursor: pointer;
     color: #333;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.sq-msg-topic:hover {
+    border-color: rgba(196, 92, 38, 0.45);
+    color: var(--sk-brand-hover, #a84d1f);
 }
 
 .sq-msg-topic.is-active {
-    background: #111;
-    border-color: #111;
+    background: var(--sk-brand, #c45c26);
+    border-color: var(--sk-brand, #c45c26);
     color: #fff;
 }
 
@@ -725,14 +828,16 @@ body.sk-public-page .main-wrapper {
     height: 72px;
     object-fit: cover;
     border-radius: 8px;
+    border: 1px solid rgba(17, 17, 17, 0.08);
 }
 
 .sq-msg-modal__compose {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    border-top: 1px solid #eee;
-    padding-top: 10px;
+    border-top: 1px solid rgba(196, 92, 38, 0.12);
+    padding: 12px 18px 16px;
+    background: #fff;
 }
 
 .sq-msg-photo-btn {
@@ -742,12 +847,12 @@ body.sk-public-page .main-wrapper {
     gap: 8px;
     width: 100%;
     box-sizing: border-box;
-    padding: 12px 14px;
-    font-size: 0.9rem;
-    font-weight: 560;
-    color: #1a1a1a;
-    background: #fafafa;
-    border: 1.5px dashed #b8b8b8;
+    padding: 11px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #4a3428;
+    background: var(--sk-brand-bg, #fdf6f0);
+    border: 1.5px dashed rgba(196, 92, 38, 0.45);
     border-radius: 10px;
     cursor: pointer;
     text-align: center;
@@ -756,10 +861,10 @@ body.sk-public-page .main-wrapper {
 
 .sq-msg-photo-btn:hover,
 .sq-msg-photo-btn:focus-within {
-    border-color: #111;
+    border-color: var(--sk-brand, #c45c26);
     border-style: solid;
-    background: #f3f3f3;
-    color: #000;
+    background: var(--sk-brand-light, rgba(196, 92, 38, 0.08));
+    color: var(--sk-brand-hover, #a84d1f);
 }
 
 .sq-msg-photo-btn span::before {
@@ -771,31 +876,48 @@ body.sk-public-page .main-wrapper {
 
 .sq-msg-photo-chip {
     display: inline-block;
-    background: #f3f4f6;
+    background: var(--sk-brand-light, rgba(196, 92, 38, 0.08));
     border-radius: 6px;
     padding: 2px 8px;
     font-size: 0.75rem;
     margin-right: 4px;
+    color: #5c3d2e;
 }
 
 .sq-msg-modal__compose textarea {
     width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
+    border: 1px solid rgba(17, 17, 17, 0.14);
+    border-radius: 10px;
+    padding: 11px 12px;
     resize: vertical;
     font: inherit;
+    background: #fff;
+}
+
+.sq-msg-modal__compose textarea:focus {
+    outline: none;
+    border-color: var(--sk-brand, #c45c26);
+    box-shadow: 0 0 0 3px rgba(196, 92, 38, 0.15);
+}
+
+.sq-msg-compose-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
 }
 
 .sq-msg-send {
-    align-self: flex-end;
-    background: #111;
+    background: var(--sk-black, #111);
     color: #fff;
     border: 0;
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-weight: 600;
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-weight: 650;
     cursor: pointer;
+}
+
+.sq-msg-send:hover {
+    background: #333;
 }
 
 .sq-msg-auth {

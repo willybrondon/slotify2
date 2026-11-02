@@ -7,7 +7,7 @@ const TOPIC_LABELS = {
   price: "Prix",
   booking: "Réservation",
   cancel: "Annulation",
-  technical: "Question technique",
+  technical: "Cheveux / technique",
   prep: "Préparation",
   payment: "Paiement",
   complaint: "Réclamation",
@@ -15,9 +15,18 @@ const TOPIC_LABELS = {
 };
 
 const STATUS_LABELS = {
-  available: "🟢 Dispo",
-  with_client: "🟡 En RDV",
-  offline: "⚪ Hors ligne",
+  available: "Disponible",
+  with_client: "En RDV",
+  offline: "Hors ligne",
+};
+
+const SK = {
+  brand: "#c45c26",
+  brandHover: "#a84d1f",
+  brandBg: "#fdf6f0",
+  brandBorder: "rgba(196, 92, 38, 0.2)",
+  black: "#111111",
+  muted: "rgba(17, 17, 17, 0.62)",
 };
 
 const Messages = () => {
@@ -132,13 +141,14 @@ const Messages = () => {
   return (
     <div className="mainAdminProfile">
       <div className="p-3">
-        <Title name="Messages clientes" />
-        <p style={{ color: "#666", marginBottom: 12 }}>
-          Inbox salon → attribuez à un expert. S’il est en RDV ou hors ligne, la
-          cliente reçoit un accusé automatique.
+        <Title name="Messagerie Skedisy" />
+        <p style={{ color: SK.muted, marginBottom: 12, maxWidth: 640, lineHeight: 1.45 }}>
+          Inbox salon → attribuez à une experte. Questions presta, préparation,
+          technique : la cliente écrit ici plutôt que sur Instagram. Si l’experte
+          est en RDV ou hors ligne, un accusé part automatiquement.
         </p>
         <div className="d-flex gap-2 flex-wrap mb-3 align-items-center">
-          <label style={{ fontSize: 13, color: "#666" }}>Filtrer</label>
+          <label style={{ fontSize: 13, color: SK.muted }}>Filtrer</label>
           <select
             className="form-select form-select-sm"
             style={{ maxWidth: 260 }}
@@ -156,16 +166,31 @@ const Messages = () => {
               ))}
           </select>
         </div>
-        <div className="card">
+        <div
+          className="card"
+          style={{
+            border: `1px solid ${SK.brandBorder}`,
+            borderRadius: 14,
+            overflow: "hidden",
+          }}
+        >
           <div className="card-body p-0">
             <div className="row g-0" style={{ minHeight: 480 }}>
               <div
                 className="col-md-4"
-                style={{ borderRight: "1px solid #eee", maxHeight: 560, overflowY: "auto" }}
+                style={{
+                  borderRight: `1px solid ${SK.brandBorder}`,
+                  maxHeight: 560,
+                  overflowY: "auto",
+                  background: "#fff",
+                }}
               >
                 {loading && <p className="p-3">Chargement…</p>}
                 {!loading && !conversations.length && (
-                  <p className="p-3 text-muted">Aucun message pour l'instant.</p>
+                  <p className="p-3" style={{ color: SK.muted }}>
+                    Aucune conversation pour l’instant. Les clientes vous
+                    écrivent depuis votre fiche Skedisy.
+                  </p>
                 )}
                 {conversations.map((c) => (
                   <button
@@ -175,8 +200,12 @@ const Messages = () => {
                     className="w-100 text-start border-0"
                     style={{
                       padding: "14px 16px",
-                      background: activeId === c._id ? "#f3f4f6" : "#fff",
-                      borderBottom: "1px solid #f0f0f0",
+                      background: activeId === c._id ? SK.brandBg : "#fff",
+                      borderBottom: "1px solid rgba(17,17,17,0.06)",
+                      borderLeft:
+                        activeId === c._id
+                          ? `3px solid ${SK.brand}`
+                          : "3px solid transparent",
                       cursor: "pointer",
                     }}
                   >
@@ -185,11 +214,12 @@ const Messages = () => {
                       {c.unreadSalon > 0 && (
                         <span
                           style={{
-                            background: "#1ebc1e",
+                            background: SK.brand,
                             color: "#fff",
                             borderRadius: 12,
                             padding: "0 8px",
                             fontSize: 12,
+                            fontWeight: 600,
                           }}
                         >
                           {c.unreadSalon}
@@ -229,14 +259,17 @@ const Messages = () => {
               </div>
               <div className="col-md-8 d-flex flex-column" style={{ minHeight: 480 }}>
                 {!activeId && (
-                  <div className="p-4 text-muted">Sélectionnez une conversation.</div>
+                  <div className="p-4" style={{ color: SK.muted }}>
+                    Sélectionnez une conversation pour répondre à la cliente.
+                  </div>
                 )}
                 {activeId && (
                   <>
                     <div
                       style={{
                         padding: "12px 16px",
-                        borderBottom: "1px solid #eee",
+                        borderBottom: `1px solid ${SK.brandBorder}`,
+                        background: SK.brandBg,
                       }}
                     >
                       <div style={{ fontWeight: 600 }}>
@@ -255,7 +288,8 @@ const Messages = () => {
                           style={{
                             marginTop: 8,
                             padding: "8px 10px",
-                            background: "#f7f3ef",
+                            background: "#fff",
+                            border: `1px solid ${SK.brandBorder}`,
                             borderRadius: 8,
                             fontSize: 13,
                           }}
@@ -329,7 +363,7 @@ const Messages = () => {
                         flex: 1,
                         overflowY: "auto",
                         padding: 16,
-                        background: "#fafafa",
+                        background: "linear-gradient(180deg,#fff 0%,#fbf8f5 100%)",
                         maxHeight: 360,
                       }}
                     >
@@ -355,28 +389,28 @@ const Messages = () => {
                               style={{
                                 maxWidth: isSystem ? "92%" : "75%",
                                 background: isAuto
-                                  ? "#f0fdf4"
+                                  ? "#fff"
                                   : isSystem
-                                    ? "#eef2ff"
+                                    ? SK.brandBg
                                     : isSalonSide
-                                      ? "#1ebc1e"
+                                      ? SK.black
                                       : "#fff",
                                 color: isAuto
-                                  ? "#14532d"
+                                  ? "#3d2a20"
                                   : isSystem
-                                    ? "#3730a3"
+                                    ? "#5c3d2e"
                                     : isSalonSide
                                       ? "#fff"
-                                      : "#111",
-                                padding: "8px 12px",
-                                borderRadius: 12,
+                                      : SK.black,
+                                padding: "10px 14px",
+                                borderRadius: 14,
                                 border: isAuto
-                                  ? "1px solid #bbf7d0"
+                                  ? `1px solid ${SK.brandBorder}`
                                   : isSystem
-                                    ? "1px solid #c7d2fe"
+                                    ? `1px solid ${SK.brandBorder}`
                                     : isSalonSide
                                       ? "none"
-                                      : "1px solid #e5e5e5",
+                                      : `1px solid ${SK.brandBorder}`,
                                 fontSize: isSystem ? 13 : undefined,
                                 textAlign: isAuto ? "left" : isSystem ? "center" : "left",
                                 whiteSpace: isAuto ? "pre-wrap" : undefined,
@@ -388,7 +422,8 @@ const Messages = () => {
                                     fontSize: 11,
                                     fontWeight: 700,
                                     marginBottom: 4,
-                                    opacity: 0.75,
+                                    color: SK.brand,
+                                    letterSpacing: "0.04em",
                                   }}
                                 >
                                   RÉPONSE AUTO
@@ -417,16 +452,27 @@ const Messages = () => {
                         );
                       })}
                     </div>
-                    <div style={{ padding: 12, borderTop: "1px solid #eee" }}>
+                    <div
+                      style={{
+                        padding: 12,
+                        borderTop: `1px solid ${SK.brandBorder}`,
+                        background: "#fff",
+                      }}
+                    >
                       {photos.length > 0 && (
-                        <div style={{ fontSize: 12, marginBottom: 6 }}>
+                        <div style={{ fontSize: 12, marginBottom: 6, color: SK.muted }}>
                           {photos.length} photo(s) sélectionnée(s)
                         </div>
                       )}
                       <div className="d-flex gap-2 align-items-end">
                         <label
-                          className="btn btn-sm btn-outline-secondary mb-0"
-                          style={{ cursor: "pointer" }}
+                          className="btn btn-sm mb-0"
+                          style={{
+                            cursor: "pointer",
+                            border: `1px dashed ${SK.brand}`,
+                            color: SK.brandHover,
+                            background: SK.brandBg,
+                          }}
                         >
                           Photo
                           <input
@@ -443,14 +489,21 @@ const Messages = () => {
                           className="form-control"
                           rows={2}
                           value={body}
-                          placeholder="Votre réponse…"
+                          placeholder="Répondez à la cliente…"
                           onChange={(e) => setBody(e.target.value)}
                         />
                         <button
                           type="button"
-                          className="btn btn-success"
+                          className="btn"
                           disabled={sending}
                           onClick={send}
+                          style={{
+                            background: SK.brand,
+                            borderColor: SK.brand,
+                            color: "#fff",
+                            fontWeight: 600,
+                            minWidth: 96,
+                          }}
                         >
                           {sending ? "…" : "Envoyer"}
                         </button>

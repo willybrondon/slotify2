@@ -2173,6 +2173,10 @@ exports.serveSalonWebPage = async (req, res) => {
             },
             copy: {
                 messageTitle: ${JSON.stringify(copy.messageTitle)},
+                messageEyebrow: ${JSON.stringify(copy.messageEyebrow)},
+                messagePromise: ${JSON.stringify(copy.messagePromise)},
+                messageTopicsLabel: ${JSON.stringify(copy.messageTopicsLabel)},
+                messageEmptyTitle: ${JSON.stringify(copy.messageEmptyTitle)},
                 messageSalon: ${JSON.stringify(copy.messageSalon)},
                 messagePlaceholder: ${JSON.stringify(copy.messagePlaceholder)},
                 messageSend: ${JSON.stringify(copy.messageSend)},
