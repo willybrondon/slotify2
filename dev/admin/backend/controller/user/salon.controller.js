@@ -1135,16 +1135,31 @@ exports.serveSalonWebPage = async (req, res) => {
       salon.servicePackages ||
       (typeof salon.get === "function" ? salon.get("servicePackages") : null) ||
       [];
+    const knownServiceIds = new Set(
+      bookingServices.map((s) => String(s.id)).filter(Boolean)
+    );
     const beautyPacks = (Array.isArray(rawPackages) ? rawPackages : [])
       .map((p) => (p && typeof p.toObject === "function" ? p.toObject() : p))
       .filter((p) => p && p.active !== false)
+      .map((pack) => {
+        const validServiceIds = (Array.isArray(pack.serviceIds) ? pack.serviceIds : [])
+          .map((id) => String(id))
+          .filter((id) => knownServiceIds.has(id));
+        return { ...pack, serviceIds: validServiceIds };
+      })
+      // Pack réservable = au moins 1 prestation existante du salon
+      .filter((pack) => Array.isArray(pack.serviceIds) && pack.serviceIds.length > 0)
       .slice(0, 12);
     const showBeautyPacksTab = beautyPacks.length > 0;
+    const bookPackLabel = copy.bookPack || copy.bookNow || "Réserver";
     let beautyPacksHtml = "";
     if (showBeautyPacksTab) {
-      // Même rendu que les prestations (sq-service-card)
       beautyPacksHtml = `<div class="section sq-salon-beauty-packs" id="salonBeautyPacks">
         <h3 class="section-title">${esc(copy.beautyPacks || "Pack beauté")}</h3>
+        <p class="sq-salon-beauty-packs__lead">${esc(
+          copy.beautyPacksLead ||
+            "Sélectionnez un pack pour pré-remplir les prestations incluses, puis réservez."
+        )}</p>
         <div class="sq-services-list" id="salonBeautyPacksList">
           ${beautyPacks
             .map((pack) => {
@@ -1162,11 +1177,17 @@ exports.serveSalonWebPage = async (req, res) => {
                   `${visitCount} visite${visitCount > 1 ? "s" : ""}`
                 );
               }
+              metaParts.push(
+                `${svcNames.length} prestation${svcNames.length > 1 ? "s" : ""}`
+              );
               const included = [...svcNames, ...extras];
               const infoLine = included.length
                 ? included.join(" · ")
                 : pack.description || "";
-              return `<div class="sq-service-card sq-service-card--pack" role="listitem">
+              const packId = esc(pack.id || "");
+              return `<button type="button" class="sq-service-card sq-service-card--pack" role="listitem" data-pack-id="${packId}" data-pack-book aria-label="${esc(
+                bookPackLabel
+              )} — ${esc(pack.name || "Pack beauté")}">
                 <span class="sq-service-card__name">${esc(pack.name || "Pack beauté")}</span>
                 ${
                   metaParts.length
@@ -1178,7 +1199,8 @@ exports.serveSalonWebPage = async (req, res) => {
                     ? `<span class="sq-service-card__info">${esc(infoLine)}</span>`
                     : ""
                 }
-              </div>`;
+                <span class="sq-service-card__state">${esc(bookPackLabel)}</span>
+              </button>`;
             })
             .join("")}
         </div>
@@ -1867,6 +1889,19 @@ exports.serveSalonWebPage = async (req, res) => {
               lateArrivalMinutes: policy.lateArrivalMinutes ?? 15,
             })},
             services: ${JSON.stringify(bookingServices)},
+            packages: ${JSON.stringify(
+              beautyPacks.map((p) => ({
+                id: String(p.id || ""),
+                name: String(p.name || "Pack beauté"),
+                description: String(p.description || ""),
+                visitCount: Number(p.visitCount) || 1,
+                priceHint: String(p.priceHint || ""),
+                serviceIds: (Array.isArray(p.serviceIds) ? p.serviceIds : []).map(String),
+                extras: Array.isArray(p.extras)
+                  ? p.extras.map((x) => String(x || "").trim()).filter(Boolean)
+                  : [],
+              }))
+            )},
             categories: ${JSON.stringify(bookingCategories)},
             experts: ${JSON.stringify(bookingExperts)},
             copy: {
@@ -1904,6 +1939,14 @@ exports.serveSalonWebPage = async (req, res) => {
                 bookingCancelEmailHint: ${JSON.stringify(copy.bookingCancelEmailHint)},
                 min: ${JSON.stringify(copy.min)},
                 bookNow: ${JSON.stringify(copy.bookNow)},
+                bookPack: ${JSON.stringify(copy.bookPack || copy.bookNow || "Réserver")},
+                beautyPackSelected: ${JSON.stringify(
+                  copy.beautyPackSelected || "Pack sélectionné"
+                )},
+                beautyPackEmpty: ${JSON.stringify(
+                  copy.beautyPackEmpty ||
+                    "Ce pack n'a plus de prestations disponibles."
+                )},
                 makeOfferSelectService: ${JSON.stringify(copy.makeOfferSelectService)},
                 makeOfferInvalidPrice: ${JSON.stringify(copy.makeOfferInvalidPrice)},
                 makeOfferNormalPrice: ${JSON.stringify(copy.makeOfferNormalPrice)},

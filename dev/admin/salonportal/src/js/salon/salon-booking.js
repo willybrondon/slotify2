@@ -7,6 +7,8 @@
 
   const state = {
     selectedServiceIds: [],
+    /** Pack beauté actif (pré-sélection multi-prestations) */
+    activePack: null,
     expertId: null,
     date: "",
     timeSlots: [],
@@ -188,6 +190,7 @@
       JSON.stringify({
         salonId: cfg.salonId,
         selectedServiceIds: state.selectedServiceIds,
+        activePack: state.activePack,
         expertId: state.expertId,
         bookingFromExpert: state.bookingFromExpert,
         date: state.date,
@@ -712,6 +715,81 @@
     return state.selectedServiceIds.some((x) => normalizeServiceId(x) === sid);
   }
 
+  function getPackages() {
+    return Array.isArray(cfg.packages) ? cfg.packages : [];
+  }
+
+  function getPackById(packId) {
+    const id = String(packId || "").trim();
+    if (!id) return null;
+    return getPackages().find((p) => String(p.id) === id) || null;
+  }
+
+  /** Ne garder que les prestations encore présentes dans le catalogue salon. */
+  function resolvePackServiceIds(pack) {
+    if (!pack) return [];
+    const known = new Set(
+      (cfg.services || []).map((s) => normalizeServiceId(s.id)).filter(Boolean)
+    );
+    const raw = Array.isArray(pack.serviceIds) ? pack.serviceIds : [];
+    const out = [];
+    raw.forEach((id) => {
+      const sid = normalizeServiceId(id);
+      if (sid && known.has(sid) && !out.includes(sid)) out.push(sid);
+    });
+    return out;
+  }
+
+  function syncPackCardsUi() {
+    const activeId = state.activePack?.id ? String(state.activePack.id) : "";
+    document.querySelectorAll("[data-pack-id]").forEach((el) => {
+      const id = el.getAttribute("data-pack-id") || "";
+      el.classList.toggle("is-active", Boolean(activeId) && id === activeId);
+    });
+  }
+
+  function clearActivePack() {
+    state.activePack = null;
+    syncPackCardsUi();
+  }
+
+  /**
+   * Applique un pack beauté : sélectionne uniquement ses prestations existantes.
+   * @returns {{ ok: boolean, pack?: object, serviceIds: string[] }}
+   */
+  function applyBeautyPack(packId, opts = {}) {
+    const pack = getPackById(packId);
+    const serviceIds = resolvePackServiceIds(pack);
+    if (!pack || !serviceIds.length) {
+      clearActivePack();
+      return { ok: false, serviceIds: [] };
+    }
+    state.activePack = {
+      id: String(pack.id),
+      name: pack.name || "Pack beauté",
+      priceHint: pack.priceHint || "",
+      visitCount: Number(pack.visitCount) || 1,
+      serviceIds,
+    };
+    state.selectedServiceIds = [...serviceIds];
+    state.afroConfigServiceId = serviceIds[0] || null;
+    state.afroDemand = null;
+    clearClientOffer();
+    applyPageDraftsToBookingState();
+    syncPackCardsUi();
+    renderServicesGrid();
+    renderSalonPageSelectionUI();
+
+    if (opts.scroll !== false) {
+      const host =
+        document.getElementById("salonServicesSummary") ||
+        document.getElementById("salonServicesGrid") ||
+        document.getElementById("salonBeautyPacks");
+      host?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+    return { ok: true, pack: state.activePack, serviceIds };
+  }
+
   /** Sélection multiple comme l'app : clic = ajouter/retirer une prestation. */
   function toggleServiceSelection(id) {
     const sid = normalizeServiceId(id);
@@ -723,6 +801,8 @@
     } else {
       state.selectedServiceIds = [...state.selectedServiceIds, sid];
     }
+    // Modifier manuellement la sélection → quitter le mode pack
+    if (state.activePack) clearActivePack();
     // Keep cart totals / sticky count in sync with selection
     applyPageDraftsToBookingState();
     if (
@@ -1466,8 +1546,22 @@
     }
     const totals = calcTotals(selected);
     const names = selected.map((s) => s.name).join(", ");
+    const packBanner = state.activePack
+      ? `<p class="sq-booking-pack-banner"><strong>${escapeHtml(
+          t("beautyPackSelected") || "Pack sélectionné"
+        )} :</strong> ${escapeHtml(state.activePack.name)}${
+          state.activePack.priceHint
+            ? ` · ${escapeHtml(state.activePack.priceHint)}`
+            : ""
+        }${
+          state.activePack.visitCount > 1
+            ? ` · ${state.activePack.visitCount} visites`
+            : ""
+        }</p>`
+      : "";
     hostEl.classList.remove("sq-booking-services-summary--hidden");
     hostEl.innerHTML = `
+      ${packBanner}
       <p class="sq-booking-services-summary__count">${escapeHtml(
         tFmt("servicesSelectedCount", "{n}", String(selected.length))
       )}</p>
@@ -3475,6 +3569,7 @@
     if (String(draft.salonId) !== String(cfg.salonId)) return;
 
     state.selectedServiceIds = draft.selectedServiceIds || [];
+    state.activePack = draft.activePack || null;
     state.expertId = draft.expertId || null;
     state.bookingFromExpert = Boolean(draft.bookingFromExpert);
     state.returnToExpertStep = false;
@@ -3521,7 +3616,12 @@
       return {
         serviceId: normalizeServiceId(sid),
         serviceName: svc?.name || "",
+        packId: state.activePack?.id || "",
+        packName: state.activePack?.name || "",
       };
+    },
+    applyPack(packId) {
+      return applyBeautyPack(packId);
     },
     async open(opts = {}) {
       state.bookingFromExpert = Boolean(opts.expertId);
@@ -3548,10 +3648,23 @@
         clearClientOffer();
       }
 
-      if (opts.expertId && !opts.serviceId) {
+      if (opts.packId) {
+        applyBeautyPack(opts.packId, { scroll: false });
+      } else if (opts.expertId && !opts.serviceId && !opts.serviceIds) {
         state.selectedServiceIds = [];
+        clearActivePack();
+      } else if (Array.isArray(opts.serviceIds) && opts.serviceIds.length) {
+        clearActivePack();
+        state.selectedServiceIds = opts.serviceIds
+          .map(normalizeServiceId)
+          .filter(Boolean);
       } else if (opts.serviceId) {
-        state.selectedServiceIds = [normalizeServiceId(opts.serviceId)];
+        clearActivePack();
+        const multi = String(opts.serviceId)
+          .split(",")
+          .map(normalizeServiceId)
+          .filter(Boolean);
+        state.selectedServiceIds = multi.length ? multi : [];
       }
 
       state.date = getPreferredBookingDate();
@@ -3623,6 +3736,23 @@
     }
     openModal();
     renderStepServices();
+  });
+
+  // Pack beauté → pré-sélection des prestations existantes + ouverture tunnel
+  document.getElementById("salonBeautyPacksList")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-pack-id]");
+    if (!btn) return;
+    e.preventDefault();
+    const packId = btn.getAttribute("data-pack-id");
+    const result = applyBeautyPack(packId);
+    if (!result.ok) {
+      window.alert(
+        t("beautyPackEmpty") || "Ce pack n'a plus de prestations disponibles."
+      );
+      return;
+    }
+    // Enchaîner comme une sélection multi-prestations déjà prête
+    openBookingForSelection();
   });
 
   // Aside « Réserver » → always same prestation boxes as the page (expand arrow, +/check)
@@ -3842,25 +3972,47 @@
       await startRebookFromToken(rebookToken);
       return;
     }
+    const packId = q.get("packId");
     const sid = q.get("serviceId");
-    if (sid) {
-      const normalized = normalizeServiceId(sid);
+    if (packId) {
       setTimeout(() => {
-        // Deep-link from category/home: land on salon detail with + already selected
-        // (no auto-open of the old booking modal / services step)
-        if (!isServiceSelected(normalized)) {
-          state.selectedServiceIds = [normalized];
+        const result = applyBeautyPack(packId);
+        if (!result.ok) return;
+        try {
+          const clean = new URL(window.location.href);
+          clean.searchParams.delete("book");
+          clean.searchParams.set("packId", String(result.pack.id));
+          if (result.serviceIds.length) {
+            clean.searchParams.set("serviceId", result.serviceIds.join(","));
+          }
+          window.history.replaceState({}, "", clean.pathname + clean.search);
+        } catch (_) {
+          /* ignore */
         }
+        if (q.get("book") === "1" || q.get("book") === "pack") {
+          openBookingForSelection();
+        }
+      }, 200);
+    } else if (sid) {
+      setTimeout(() => {
+        // Deep-link: one or several service ids (comma-separated)
+        clearActivePack();
+        const ids = String(sid)
+          .split(",")
+          .map(normalizeServiceId)
+          .filter(Boolean);
+        if (!ids.length) return;
+        state.selectedServiceIds = ids;
         renderServicesGrid();
         renderSalonPageSelectionUI();
         const row = gridEl?.querySelector(
-          `.sq-svc-row[data-service-id="${CSS.escape(normalized)}"]`
+          `.sq-svc-row[data-service-id="${CSS.escape(ids[0])}"]`
         );
         row?.scrollIntoView({ block: "center", behavior: "smooth" });
         try {
           const clean = new URL(window.location.href);
           clean.searchParams.delete("book");
-          clean.searchParams.set("serviceId", normalized);
+          clean.searchParams.set("serviceId", ids.join(","));
           window.history.replaceState({}, "", clean.pathname + clean.search);
         } catch (_) {
           /* ignore */

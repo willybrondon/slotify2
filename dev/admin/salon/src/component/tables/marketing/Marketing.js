@@ -198,6 +198,18 @@ const Marketing = () => {
       toast.error("Nom du pack requis");
       return;
     }
+    const catalogIds = new Set(
+      (data?.salonServices || data?.services || [])
+        .map((s) => String(s.id || s._id || ""))
+        .filter(Boolean)
+    );
+    const serviceIds = (packForm.serviceIds || [])
+      .map(String)
+      .filter((id) => !catalogIds.size || catalogIds.has(id));
+    if (!serviceIds.length) {
+      toast.error("Sélectionne au moins une prestation du salon");
+      return;
+    }
     setBusy("pack");
     try {
       const current = [...(data?.packages || [])];
@@ -207,7 +219,7 @@ const Marketing = () => {
         description: packForm.description || "",
         visitCount: Math.max(1, Number(packForm.visitCount) || 1),
         priceHint: packForm.priceHint || "",
-        serviceIds: packForm.serviceIds || [],
+        serviceIds,
         extrasText: packForm.extrasText || "",
         active: packForm.active !== false,
       };
@@ -591,8 +603,10 @@ const Marketing = () => {
               </button>
             </div>
             <p className="text-muted">
-              Les packs s’affichent sur ta fiche publique après les prestations. Choisis les
-              prestations incluses et ajoute des mentions écrites (ex. shampoing offert).
+              Les packs s’affichent sur ta fiche publique (onglet Pack beauté). Choisis des
+              prestations déjà proposées par le salon : au clic, la cliente les retrouve
+              pré-sélectionnées pour réserver. Tu peux aussi ajouter des mentions écrites
+              (ex. shampoing offert).
             </p>
             {(data?.packages || []).length === 0 ? (
               <p className="text-muted">Aucun pack pour l’instant.</p>

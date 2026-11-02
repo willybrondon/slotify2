@@ -66,6 +66,14 @@
     const name = [user.fname, user.lname].filter(Boolean).join(" ") || t("Compte", "Account");
     return `
       <div class="sq-account-nav" data-account-nav>
+        <button type="button" class="sq-header-fav-btn sq-account-nav__fav" id="headerFavBtn" title="${escapeHtml(
+          t("Mes salons aimés", "Liked salons")
+        )}" aria-label="${escapeHtml(
+          t("Mes salons aimés", "Liked salons")
+        )}" aria-expanded="false" aria-controls="favDrawer">
+          <i class="far fa-heart" aria-hidden="true"></i>
+          <span class="sq-header-fav-btn__count" id="headerFavCount" data-count="0"></span>
+        </button>
         <a href="/compte/reservations" class="sq-account-nav__btn" title="${escapeHtml(
           t("Réservations", "Bookings")
         )}" aria-label="${escapeHtml(t("Réservations", "Bookings"))}">
@@ -106,6 +114,9 @@
 
   function loggedInMobileHtml() {
     return `
+      <button type="button" class="btn-login-mobile-menu" id="headerFavBtnMobile" data-open-fav>${escapeHtml(
+        t("Mes salons aimés", "Liked salons")
+      )}</button>
       <a href="/compte/reservations" class="btn-login-mobile-menu">${escapeHtml(
         t("Réservations", "Bookings")
       )}</a>
@@ -201,6 +212,19 @@
     });
   }
 
+  function syncLoggedInClass(user) {
+    document.documentElement.classList.toggle("is-client-logged-in", Boolean(user));
+    document.body.classList.toggle("is-client-logged-in", Boolean(user));
+  }
+
+  function hideGuestFavoritesUi() {
+    // Favoris / J'aime : visibles uniquement connecté
+    document.querySelectorAll(".sq-adencer-header__cta > .sq-header-fav-btn").forEach((btn) => {
+      btn.hidden = true;
+      btn.setAttribute("hidden", "");
+    });
+  }
+
   function upgradeHeader(user) {
     document.querySelectorAll("[data-account-cta], .sq-adencer-header__cta").forEach((cta) => {
       if (cta.dataset.accountReady === "1") return;
@@ -225,6 +249,17 @@
     refreshNotifBadge(user.id);
   }
 
+  function publishAccountState(user) {
+    syncLoggedInClass(user);
+    try {
+      document.dispatchEvent(
+        new CustomEvent("skedisy:account-ready", { detail: { user: user || null } })
+      );
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   function init() {
     const user = readUser();
     window.SkedisyAccount = {
@@ -240,7 +275,13 @@
         return u;
       },
     };
-    if (user) upgradeHeader(user);
+    if (user) {
+      upgradeHeader(user);
+      publishAccountState(user);
+    } else {
+      hideGuestFavoritesUi();
+      publishAccountState(null);
+    }
   }
 
   if (document.readyState === "loading") {

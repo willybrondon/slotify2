@@ -1462,7 +1462,7 @@ exports.serveCategoryPage = async (req, res) => {
                 <button type="button" class="lang-switcher" data-lang="${language === "fr" ? "en" : "fr"}" title="Language"><i class="fas fa-globe"></i> <span>${language === "fr" ? "FR" : "EN"}</span></button>
             </div>
             <div class="sq-adencer-header__cta">
-                <button type="button" class="sq-header-fav-btn" id="headerFavBtn" aria-label="${escapeHtml(copy.myFavorites || "Mes salons aimés")}" aria-expanded="false" aria-controls="favDrawer">
+                <button type="button" class="sq-header-fav-btn" id="headerFavBtn" hidden aria-label="${escapeHtml(copy.myFavorites || "Mes salons aimés")}" aria-expanded="false" aria-controls="favDrawer">
                   <i class="far fa-heart" aria-hidden="true"></i>
                   <span class="sq-header-fav-btn__count" id="headerFavCount" data-count="0"></span>
                 </button>
@@ -1723,6 +1723,7 @@ exports.serveCategoryPage = async (req, res) => {
     </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="${baseURL}/salon-map-ui.js"></script>
+    <script src="${baseURL}/language.js"></script>
     <script src="${baseURL}/chip-panel.js"></script>
     <script src="${baseURL}/location-chip.js"></script>
     <script src="${baseURL}/date-chip.js"></script>

@@ -319,9 +319,20 @@ exports.updatePackages = async (req, res) => {
     if (!Array.isArray(packages)) {
       return res.status(400).json({ status: false, message: "packages array required" });
     }
+    const salonServiceIds = new Set(
+      (Array.isArray(salon.serviceIds) ? salon.serviceIds : [])
+        .map((entry) =>
+          String(entry?.id?._id || entry?.id || entry?._id || entry || "")
+        )
+        .filter(Boolean)
+    );
+
     salon.servicePackages = packages.slice(0, 20).map((p, i) => {
       const serviceIds = Array.isArray(p.serviceIds)
-        ? p.serviceIds.map((id) => String(id)).filter(Boolean).slice(0, 30)
+        ? p.serviceIds
+            .map((id) => String(id))
+            .filter((id) => id && (salonServiceIds.size === 0 || salonServiceIds.has(id)))
+            .slice(0, 30)
         : [];
       const extras = Array.isArray(p.extras)
         ? p.extras.map((x) => String(x || "").trim()).filter(Boolean).slice(0, 20)

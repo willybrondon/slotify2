@@ -132,17 +132,49 @@
         document.getElementById("headerFavBtn")?.setAttribute("aria-expanded", "false");
     }
 
+    function isClientLoggedIn() {
+        return Boolean(window.SkedisyAccount?.getUser?.());
+    }
+
+    function requireClientLogin() {
+        if (isClientLoggedIn()) return true;
+        const href =
+            (typeof window.SkedisyAccount?.loginHref === "function" &&
+                window.SkedisyAccount.loginHref()) ||
+            "/compte/connexion";
+        window.location.href = href;
+        return false;
+    }
+
     function bindFavDrawer() {
-        document.getElementById("headerFavBtn")?.addEventListener("click", openFavDrawer);
+        const openers = [
+            document.getElementById("headerFavBtn"),
+            document.getElementById("headerFavBtnMobile"),
+            ...document.querySelectorAll("[data-open-fav]"),
+        ].filter(Boolean);
+        openers.forEach((el) => {
+            if (el.dataset.favBound === "1") return;
+            el.dataset.favBound = "1";
+            el.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (!requireClientLogin()) return;
+                openFavDrawer();
+            });
+        });
         document.querySelectorAll("[data-close-fav]").forEach((el) => {
+            if (el.dataset.favCloseBound === "1") return;
+            el.dataset.favCloseBound = "1";
             el.addEventListener("click", closeFavDrawer);
         });
-        updateFavHeaderCount();
+        if (isClientLoggedIn()) updateFavHeaderCount();
     }
 
     function bindLikes() {
+        if (!isClientLoggedIn()) return;
         const liked = getLikedSet();
         salonsGrid?.querySelectorAll("[data-like-salon]").forEach((btn) => {
+            if (btn.dataset.likeBound === "1") return;
+            btn.dataset.likeBound = "1";
             const id = String(btn.getAttribute("data-like-salon") || "");
             const on = liked.has(id);
             btn.classList.toggle("is-liked", on);
@@ -152,6 +184,7 @@
             btn.addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (!requireClientLogin()) return;
                 const set = getLikedSet();
                 const meta = getLikedMeta();
                 if (set.has(id)) {
@@ -681,6 +714,10 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         bindFavDrawer();
+        document.addEventListener("skedisy:account-ready", () => {
+            bindFavDrawer();
+            bindLikes();
+        });
         const legacySalon = params.get("salon") || "";
         const legacyService = params.get("service") || "";
         if (queryInput) {

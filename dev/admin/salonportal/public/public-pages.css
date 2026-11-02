@@ -2034,6 +2034,14 @@ body.sk-public-page .main-wrapper {
 }
 
 /* Header favorites (app-like heart) */
+/* J'aime / salons aimés : uniquement si cliente connectée */
+html:not(.is-client-logged-in) .sq-header-fav-btn,
+html:not(.is-client-logged-in) .sq-salon-like-btn,
+body:not(.is-client-logged-in) .sq-header-fav-btn,
+body:not(.is-client-logged-in) .sq-salon-like-btn {
+    display: none !important;
+}
+
 .sq-header-fav-btn {
     position: relative;
     width: 40px;
@@ -5903,14 +5911,31 @@ body.sq-account-page {
     padding-top: 8px;
     padding-bottom: 12px;
 }
-/* Packs : même carte que les prestations */
+.sk-public-page .sq-salon-beauty-packs__lead {
+    margin: 0 0 14px;
+    font-size: 0.9rem;
+    color: var(--sk-text-muted);
+    line-height: 1.45;
+}
+/* Packs : cliquables → pré-sélection des prestations */
 .sk-public-page .sq-service-card--pack {
-    cursor: default;
+    cursor: pointer;
     padding-top: 12px;
+    text-align: left;
+    width: 100%;
+    font: inherit;
+    color: inherit;
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 .sk-public-page .sq-service-card--pack:hover {
-    border-color: var(--sk-border);
-    box-shadow: none;
+    border-color: var(--sk-primary, #c45c26);
+    box-shadow: 0 4px 14px rgba(28, 43, 32, 0.08);
+    transform: translateY(-1px);
+}
+.sk-public-page .sq-service-card--pack.is-active {
+    border-color: var(--sk-primary, #c45c26);
+    background: rgba(196, 92, 38, 0.04);
 }
 .sk-public-page .sq-service-card--pack .sq-service-card__info {
     display: block;
@@ -5918,6 +5943,21 @@ body.sq-account-page {
     font-size: 0.75rem;
     color: var(--sk-text-muted);
     line-height: 1.4;
+}
+.sk-public-page .sq-service-card--pack .sq-service-card__state {
+    margin-top: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--sk-primary, #c45c26);
+}
+.sk-public-page .sq-booking-pack-banner {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(196, 92, 38, 0.08);
+    border: 1px solid rgba(196, 92, 38, 0.2);
+    font-size: 0.88rem;
+    color: var(--sk-text);
 }
 /* Modal list scrolls with .sq-booking-steps so accordion details match the page */
 .sk-public-page .sq-services-list--modal {

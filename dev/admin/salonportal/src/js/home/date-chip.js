@@ -10,8 +10,26 @@
   let calMonth = new Date().getMonth();
   let draftIso = "";
 
+  const DATE_I18N = {
+    "homeProduct.dateLabel": { fr: "Date", en: "Date" },
+    "homeProduct.dateToday": { fr: "Aujourd'hui", en: "Today" },
+    "homeProduct.dateTomorrow": { fr: "Demain", en: "Tomorrow" },
+    "homeProduct.dateAny": { fr: "Toutes", en: "Any" },
+    "homeProduct.datePick": { fr: "Choisir une date", en: "Pick a date" },
+  };
+
   function t(key) {
-    if (typeof getTranslation === "function") return getTranslation(key);
+    const lang = String(
+      localStorage.getItem("skedisy-language") || document.documentElement.lang || "fr"
+    )
+      .toLowerCase()
+      .slice(0, 2);
+    if (typeof getTranslation === "function") {
+      const v = getTranslation(key);
+      if (v && v !== key) return v;
+    }
+    const row = DATE_I18N[key];
+    if (row) return row[lang] || row.fr;
     return key;
   }
 

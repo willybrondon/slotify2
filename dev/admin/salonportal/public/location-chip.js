@@ -5,8 +5,24 @@
   const STORAGE_KEY = "skedisy-location-label";
   const DEFAULT_LABEL = "Paris";
 
+  const LOC_I18N = {
+    "homeProduct.nearYou": { fr: "Près de vous", en: "Near you" },
+    "homeProduct.yourLocation": { fr: "Votre position", en: "Your location" },
+    "homeProduct.applyLocation": { fr: "OK", en: "OK" },
+  };
+
   function t(key) {
-    if (typeof getTranslation === "function") return getTranslation(key);
+    const lang = String(
+      localStorage.getItem("skedisy-language") || document.documentElement.lang || "fr"
+    )
+      .toLowerCase()
+      .slice(0, 2);
+    if (typeof getTranslation === "function") {
+      const v = getTranslation(key);
+      if (v && v !== key) return v;
+    }
+    const row = LOC_I18N[key];
+    if (row) return row[lang] || row.fr;
     return key;
   }
 
