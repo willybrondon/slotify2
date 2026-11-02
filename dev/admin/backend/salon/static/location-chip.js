@@ -178,8 +178,14 @@
     const chip = getChip();
     if (!chip) return;
 
+    const urlLoc = (
+      new URLSearchParams(window.location.search).get("location") || ""
+    ).trim();
+    const inputSeed = (getInput()?.value || "").trim();
     const saved = localStorage.getItem(STORAGE_KEY);
-    setLabel(saved || DEFAULT_LABEL);
+    // URL (ou valeur SSR dans l’input) prioritaire sur le localStorage.
+    const initial = urlLoc || inputSeed || saved || DEFAULT_LABEL;
+    setLabel(initial);
 
     chip.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -202,7 +208,7 @@
       if (e.key === "Escape") closePopover();
     });
 
-    if (!saved) {
+    if (!urlLoc && !inputSeed && !saved) {
       requestGpsLabel();
     }
   }

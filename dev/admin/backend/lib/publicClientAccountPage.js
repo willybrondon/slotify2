@@ -5,11 +5,18 @@ function renderClientAccountPage(req, res, page) {
   const baseURL = (process.env.baseURL || "https://skedisy.com").replace(/\/+$/, "");
   const lang = resolveLang(req.query.lang);
   const copy = getWebCopy(lang);
-  const urls = authUrls(baseURL, `/compte/${page === "profile" ? "profil" : page}`, lang);
+  const urls = authUrls(
+    baseURL,
+    `/compte/${
+      page === "profile" ? "profil" : page === "report" ? "signaler" : page
+    }`,
+    lang
+  );
 
   const titles = {
     reservations: copy.accountReservationsTitle || "Réservations",
     notifications: copy.accountNotificationsTitle || "Notifications",
+    report: copy.accountReportTitle || "Signaler",
     profile: copy.accountProfileTitle || "Compte",
   };
   const leads = {
@@ -19,8 +26,12 @@ function renderClientAccountPage(req, res, page) {
     notifications:
       copy.accountNotificationsLead ||
       "Confirmations, rappels et mises à jour de vos rendez-vous.",
+    report:
+      copy.accountReportLead ||
+      "Indiquez le numéro de réservation et décrivez la situation.",
     profile:
-      copy.accountProfileLead || "Gérez vos informations et signalez un problème.",
+      copy.accountProfileLead ||
+      "Vos informations personnelles et la déconnexion.",
   };
   const title = titles[page] || "Compte";
   const lead = leads[page] || "";
@@ -30,30 +41,37 @@ function renderClientAccountPage(req, res, page) {
       ? "/compte/profil"
       : page === "notifications"
         ? "/compte/notifications"
-        : "/compte/reservations";
+        : page === "report"
+          ? "/compte/signaler"
+          : "/compte/reservations";
 
   const bodyClass =
     page === "reservations"
       ? "sq-account-page--reservations"
       : page === "notifications"
         ? "sq-account-page--notifications"
-        : "sq-account-page--profile";
+        : page === "report"
+          ? "sq-account-page--report"
+          : "sq-account-page--profile";
 
   const pageScript =
     page === "reservations"
       ? "client-reservations.js"
       : page === "notifications"
         ? "client-notifications.js"
-        : "client-profile.js";
+        : page === "report"
+          ? "client-report.js"
+          : "client-profile.js";
 
+  // Pas de Notifications dans la sous-nav (déjà dans le header).
   const subnavClean = `
         <nav class="sq-account-subnav" aria-label="${lang === "en" ? "Account" : "Compte"}">
             <a href="/compte/reservations" class="sq-account-subnav__link${
               page === "reservations" ? " is-active" : ""
             }">${titles.reservations}</a>
-            <a href="/compte/notifications" class="sq-account-subnav__link${
-              page === "notifications" ? " is-active" : ""
-            }">${titles.notifications}</a>
+            <a href="/compte/signaler" class="sq-account-subnav__link${
+              page === "report" ? " is-active" : ""
+            }">${lang === "en" ? "Report" : "Signaler"}</a>
             <a href="/compte/profil" class="sq-account-subnav__link${
               page === "profile" ? " is-active" : ""
             }">${titles.profile}</a>
@@ -150,6 +168,7 @@ function renderClientAccountPage(req, res, page) {
           reservationsTitle: ${JSON.stringify(titles.reservations)},
           notificationsTitle: ${JSON.stringify(titles.notifications)},
           profileTitle: ${JSON.stringify(titles.profile)},
+          reportTitle: ${JSON.stringify(titles.report)},
           tabUpcoming: ${JSON.stringify(copy.accountTabUpcoming || "À venir")},
           tabCancelled: ${JSON.stringify(copy.accountTabCancelled || "Annulé")},
           tabCompleted: ${JSON.stringify(copy.accountTabCompleted || "Complété")},
@@ -177,7 +196,9 @@ function renderClientAccountPage(req, res, page) {
           profileNotifications: ${JSON.stringify(titles.notifications)},
           browseSalons: ${JSON.stringify(copy.accountBrowseSalons || "Trouver un salon")},
           details: ${JSON.stringify(copy.accountDetails || "Coordonnées")},
-          quickLinks: ${JSON.stringify(copy.accountQuickLinks || "Raccourcis")},
+          noDetails: ${JSON.stringify(
+            lang === "en" ? "No contact details on file." : "Aucune coordonnée enregistrée."
+          )},
         }
       };
     </script>

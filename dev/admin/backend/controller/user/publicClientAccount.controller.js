@@ -239,5 +239,7 @@ exports.serveReservationsPage = (req, res) =>
   renderClientAccountPage(req, res, "reservations");
 exports.serveNotificationsPage = (req, res) =>
   renderClientAccountPage(req, res, "notifications");
+exports.serveReportPage = (req, res) =>
+  renderClientAccountPage(req, res, "report");
 exports.serveProfilePage = (req, res) =>
   renderClientAccountPage(req, res, "profile");

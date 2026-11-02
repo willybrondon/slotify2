@@ -1143,7 +1143,9 @@ exports.serveCategoryPage = async (req, res) => {
     console.log("[Category Page] Found category:", fullCategoryId);
 
     const search = req.query.search || "";
-    const locationTerm = (req.query.location || "").trim();
+    // Aligné sur la puce « Votre position » (défaut Paris) pour éviter
+    // chip ≠ liste SSR quand ?location= est absent.
+    const locationTerm = (req.query.location || "").trim() || "Paris";
     const dateTerm = String(req.query.date || "").trim();
     const latitude = req.query.latitude;
     const longitude = req.query.longitude;

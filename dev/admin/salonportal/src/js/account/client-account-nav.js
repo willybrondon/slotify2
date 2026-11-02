@@ -1,5 +1,5 @@
 /**
- * Header compte client — Réservations + Notifications + Compte (si connecté).
+ * Header compte client — Favoris + Notifications (+ suppression) + menu Compte.
  */
 (function () {
   const STORAGE_KEY = "skedisy_web_user";
@@ -74,21 +74,13 @@
           <i class="far fa-heart" aria-hidden="true"></i>
           <span class="sq-header-fav-btn__count" id="headerFavCount" data-count="0"></span>
         </button>
-        <a href="/compte/reservations" class="sq-account-nav__btn" title="${escapeHtml(
-          t("Réservations", "Bookings")
-        )}" aria-label="${escapeHtml(t("Réservations", "Bookings"))}">
-          <i class="fas fa-calendar-check" aria-hidden="true"></i>
-          <span class="sq-account-nav__label desktop-only">${escapeHtml(
-            t("Réservations", "Bookings")
-          )}</span>
-        </a>
         <div class="sq-account-nav__notif-wrap">
-          <a href="/compte/notifications" class="sq-account-nav__btn" id="sqNotifBtn" title="${escapeHtml(
+          <button type="button" class="sq-account-nav__btn" id="sqNotifBtn" title="${escapeHtml(
             t("Notifications", "Notifications")
-          )}" aria-label="${escapeHtml(t("Notifications", "Notifications"))}">
+          )}" aria-label="${escapeHtml(t("Notifications", "Notifications"))}" aria-expanded="false" aria-controls="sqNotifPanel">
             <i class="fas fa-bell" aria-hidden="true"></i>
             <span class="sq-account-nav__badge" id="sqNotifBadge" hidden>0</span>
-          </a>
+          </button>
           <div class="sq-account-notif-panel" id="sqNotifPanel" hidden>
             <div class="sq-account-notif-panel__head">
               <strong>${escapeHtml(t("Notifications", "Notifications"))}</strong>
@@ -100,14 +92,32 @@
           </div>
         </div>
         <div class="sq-account-nav__profile-wrap">
-          <a href="/compte/profil" class="sq-account-nav__btn sq-account-nav__btn--profile" title="${escapeHtml(
+          <button type="button" class="sq-account-nav__btn sq-account-nav__btn--profile" id="sqAccountMenuBtn" title="${escapeHtml(
             name
-          )}" aria-label="${escapeHtml(t("Compte", "Account"))}">
+          )}" aria-label="${escapeHtml(t("Compte", "Account"))}" aria-expanded="false" aria-controls="sqAccountMenu">
             <i class="fas fa-user" aria-hidden="true"></i>
             <span class="sq-account-nav__label desktop-only">${escapeHtml(
               t("Compte", "Account")
             )}</span>
-          </a>
+          </button>
+          <div class="sq-account-menu-panel" id="sqAccountMenu" hidden>
+            <a href="/compte/reservations" class="sq-account-menu-panel__link">
+              <i class="fas fa-calendar-check" aria-hidden="true"></i>
+              ${escapeHtml(t("Réservations", "Bookings"))}
+            </a>
+            <a href="/compte/signaler" class="sq-account-menu-panel__link">
+              <i class="fas fa-flag" aria-hidden="true"></i>
+              ${escapeHtml(t("Signaler", "Report"))}
+            </a>
+            <a href="/compte/profil" class="sq-account-menu-panel__link">
+              <i class="fas fa-id-card" aria-hidden="true"></i>
+              ${escapeHtml(t("Infos du compte", "Account details"))}
+            </a>
+            <button type="button" class="sq-account-menu-panel__link sq-account-menu-panel__link--danger" data-account-logout>
+              <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+              ${escapeHtml(t("Déconnexion", "Log out"))}
+            </button>
+          </div>
         </div>
       </div>`;
   }
@@ -117,17 +127,17 @@
       <button type="button" class="btn-login-mobile-menu" id="headerFavBtnMobile" data-open-fav>${escapeHtml(
         t("Mes salons aimés", "Liked salons")
       )}</button>
-      <a href="/compte/reservations" class="btn-login-mobile-menu">${escapeHtml(
-        t("Réservations", "Bookings")
-      )}</a>
       <a href="/compte/notifications" class="btn-login-mobile-menu">${escapeHtml(
         t("Notifications", "Notifications")
       )}</a>
-      <a href="/compte/profil" class="btn-login-mobile-menu">${escapeHtml(
-        t("Compte", "Account")
+      <a href="/compte/reservations" class="btn-login-mobile-menu">${escapeHtml(
+        t("Réservations", "Bookings")
       )}</a>
-      <a href="/compte/profil#signaler" class="btn-login-mobile-menu">${escapeHtml(
+      <a href="/compte/signaler" class="btn-login-mobile-menu">${escapeHtml(
         t("Signaler", "Report")
+      )}</a>
+      <a href="/compte/profil" class="btn-login-mobile-menu">${escapeHtml(
+        t("Infos du compte", "Account details")
       )}</a>
       <button type="button" class="btn-login-mobile-menu" data-account-logout>${escapeHtml(
         t("Déconnexion", "Log out")
@@ -136,7 +146,7 @@
 
   async function refreshNotifBadge(userId) {
     const badge = document.getElementById("sqNotifBadge");
-    if (!badge) return;
+    if (!badge) return [];
     try {
       const res = await fetch(
         `/api/public/client/notifications?userId=${encodeURIComponent(userId)}`
@@ -151,12 +161,22 @@
         badge.hidden = true;
       }
       window.__skedisyNotifs = list;
+      return list;
     } catch (_) {
       badge.hidden = true;
+      return [];
     }
   }
 
-  function renderNotifPreview() {
+  async function deleteNotification(userId, notificationId) {
+    const qs = new URLSearchParams({ userId, notificationId });
+    const res = await fetch(`/api/public/client/notifications?${qs.toString()}`, {
+      method: "DELETE",
+    });
+    return res.json();
+  }
+
+  function renderNotifPreview(userId) {
     const box = document.getElementById("sqNotifPreview");
     if (!box) return;
     const list = window.__skedisyNotifs || [];
@@ -169,13 +189,70 @@
     box.innerHTML = list
       .slice(0, 5)
       .map(
-        (n) => `<article class="sq-account-notif-preview">
-          <strong>${escapeHtml(n.title || t("Notification", "Notification"))}</strong>
-          <p>${escapeHtml(n.message || "")}</p>
-          <time>${escapeHtml(n.date || "")}</time>
+        (n) => `<article class="sq-account-notif-preview" data-id="${escapeHtml(n._id)}">
+          <div class="sq-account-notif-preview__body">
+            <strong>${escapeHtml(n.title || t("Notification", "Notification"))}</strong>
+            <p>${escapeHtml(n.message || "")}</p>
+            <time>${escapeHtml(n.date || "")}</time>
+          </div>
+          <button type="button" class="sq-account-notif-preview__del" data-del-notif="${escapeHtml(
+            n._id
+          )}" aria-label="${escapeHtml(t("Supprimer", "Delete"))}" title="${escapeHtml(
+          t("Supprimer", "Delete")
+        )}">
+            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+          </button>
         </article>`
       )
       .join("");
+
+    box.querySelectorAll("[data-del-notif]").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = btn.getAttribute("data-del-notif");
+        if (!id) return;
+        btn.disabled = true;
+        try {
+          const res = await deleteNotification(userId, id);
+          if (res?.status) {
+            window.__skedisyNotifs = (window.__skedisyNotifs || []).filter(
+              (n) => String(n._id) !== String(id)
+            );
+            const badge = document.getElementById("sqNotifBadge");
+            const n = (window.__skedisyNotifs || []).length;
+            if (badge) {
+              if (n > 0) {
+                badge.hidden = false;
+                badge.textContent = n > 99 ? "99+" : String(n);
+              } else {
+                badge.hidden = true;
+              }
+            }
+            renderNotifPreview(userId);
+          } else {
+            btn.disabled = false;
+          }
+        } catch (_) {
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  function closePanels(except) {
+    const notif = document.getElementById("sqNotifPanel");
+    const menu = document.getElementById("sqAccountMenu");
+    const notifBtn = document.getElementById("sqNotifBtn");
+    const menuBtn = document.getElementById("sqAccountMenuBtn");
+    if (notif && except !== "notif") {
+      notif.hidden = true;
+      notifBtn?.setAttribute("aria-expanded", "false");
+    }
+    if (menu && except !== "menu") {
+      menu.hidden = true;
+      menuBtn?.setAttribute("aria-expanded", "false");
+    }
   }
 
   function wireNotifPanel(user) {
@@ -184,20 +261,65 @@
     if (!btn || !panel) return;
 
     btn.addEventListener("click", async (e) => {
-      // Desktop: toggle preview; mobile / middle-click: follow link
-      if (window.matchMedia("(max-width: 900px)").matches) return;
       e.preventDefault();
+      e.stopPropagation();
+      if (window.matchMedia("(max-width: 900px)").matches) {
+        window.location.href = "/compte/notifications";
+        return;
+      }
       const open = panel.hidden;
+      closePanels("notif");
       panel.hidden = !open;
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
       if (open) {
-        if (!window.__skedisyNotifs) await refreshNotifBadge(user.id);
-        renderNotifPreview();
+        await refreshNotifBadge(user.id);
+        renderNotifPreview(user.id);
       }
     });
+  }
 
+  function wireAccountMenu() {
+    const btn = document.getElementById("sqAccountMenuBtn");
+    const panel = document.getElementById("sqAccountMenu");
+    if (!btn || !panel) return;
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.matchMedia("(max-width: 900px)").matches) {
+        window.location.href = "/compte/profil";
+        return;
+      }
+      const open = panel.hidden;
+      closePanels("menu");
+      panel.hidden = !open;
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  function wireOutsideClose() {
     document.addEventListener("click", (e) => {
-      if (!panel.hidden && !panel.contains(e.target) && !btn.contains(e.target)) {
-        panel.hidden = true;
+      const notif = document.getElementById("sqNotifPanel");
+      const menu = document.getElementById("sqAccountMenu");
+      const notifBtn = document.getElementById("sqNotifBtn");
+      const menuBtn = document.getElementById("sqAccountMenuBtn");
+      if (
+        notif &&
+        !notif.hidden &&
+        !notif.contains(e.target) &&
+        !notifBtn?.contains(e.target)
+      ) {
+        notif.hidden = true;
+        notifBtn?.setAttribute("aria-expanded", "false");
+      }
+      if (
+        menu &&
+        !menu.hidden &&
+        !menu.contains(e.target) &&
+        !menuBtn?.contains(e.target)
+      ) {
+        menu.hidden = true;
+        menuBtn?.setAttribute("aria-expanded", "false");
       }
     });
   }
@@ -218,7 +340,6 @@
   }
 
   function hideGuestFavoritesUi() {
-    // Favoris / J'aime : visibles uniquement connecté
     document.querySelectorAll(".sq-adencer-header__cta > .sq-header-fav-btn").forEach((btn) => {
       btn.hidden = true;
       btn.setAttribute("hidden", "");
@@ -245,6 +366,8 @@
     }
 
     wireNotifPanel(user);
+    wireAccountMenu();
+    wireOutsideClose();
     wireLogout();
     refreshNotifBadge(user.id);
   }

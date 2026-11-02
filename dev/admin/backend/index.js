@@ -577,6 +577,7 @@ app.post("/api/public/auth/register", publicClientAuth.publicRegister);
 const publicClientAccount = require("./controller/user/publicClientAccount.controller");
 app.get("/compte/reservations", publicClientAccount.serveReservationsPage);
 app.get("/compte/notifications", publicClientAccount.serveNotificationsPage);
+app.get("/compte/signaler", publicClientAccount.serveReportPage);
 app.get("/compte/profil", publicClientAccount.serveProfilePage);
 app.get("/api/public/client/bookings", publicClientAccount.publicClientBookings);
 app.get(

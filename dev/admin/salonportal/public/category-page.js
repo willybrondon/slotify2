@@ -24,9 +24,6 @@
     let markersLayer = null;
     const mapUi = () => window.skedisySalonMapUi;
     let clientCoords = { lat: null, lng: null };
-    let locationActive = Boolean(
-        new URLSearchParams(window.location.search).get("location")
-    );
 
     const initF = cfg.initialFilters || {};
     const filters = {
@@ -59,6 +56,29 @@
             localStorage.getItem("skedisy-location-label") ||
             ""
         );
+    }
+
+    /** "Près de vous" / GPS — pas de filtre texte ville, seulement lat/lng. */
+    function isProximityLocation(label) {
+        const s = String(label || "")
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+        if (!s) return false;
+        return (
+            s === "near you" ||
+            s.indexOf("near you") === 0 ||
+            s.indexOf("pres de") === 0 ||
+            s.indexOf("proche de") === 0
+        );
+    }
+
+    /** Ville / zone à envoyer à l’API (vide si proximité GPS). */
+    function getLocationFilter() {
+        const location = getLocationLabel();
+        if (!location || isProximityLocation(location)) return "";
+        return location;
     }
 
     function getSearchDate() {
@@ -645,7 +665,8 @@
     async function fetchResults(searchTerm) {
         const term =
             searchTerm !== undefined ? searchTerm : (searchInput?.value || "").trim();
-        const location = getLocationLabel();
+        const location = getLocationFilter();
+        const chipLabel = getLocationLabel();
 
         const params = new URLSearchParams({
             categoryId: cfg.categoryId,
@@ -655,7 +676,7 @@
         });
         const dateIso = getSearchDate();
         if (term) params.set("search", term);
-        if (locationActive && location) params.set("location", location);
+        if (location) params.set("location", location);
         if (clientCoords.lat != null) params.set("latitude", String(clientCoords.lat));
         if (clientCoords.lng != null) params.set("longitude", String(clientCoords.lng));
         if (filters.minRating) params.set("minRating", String(filters.minRating));
@@ -684,7 +705,9 @@
                 salons = salonsData.salons;
                 currentPage = 1;
                 updateStats();
-                updateSearchMessage(salonsData.searchCity || null);
+                updateSearchMessage(
+                    salonsData.searchCity || location || chipLabel || null
+                );
                 renderSalons();
                 refreshMapMarkers();
             } else {
@@ -706,7 +729,7 @@
         const url = new URL(window.location.href);
         if (term) url.searchParams.set("search", term);
         else url.searchParams.delete("search");
-        if (locationActive && location) url.searchParams.set("location", location);
+        if (location) url.searchParams.set("location", location);
         else url.searchParams.delete("location");
         if (filters.minRating) url.searchParams.set("minRating", String(filters.minRating));
         else url.searchParams.delete("minRating");
@@ -834,10 +857,6 @@
         fetchResults();
     });
 
-    document.getElementById("homeLocationApply")?.addEventListener("click", () => {
-        setTimeout(() => fetchResults(), 50);
-    });
-
     document.getElementById("homeDateApply")?.addEventListener("click", () => {
         setTimeout(() => fetchResults(), 50);
     });
@@ -854,11 +873,12 @@
     });
 
     updateStats();
-    updateSearchMessage(cfg.initialSearchCity);
+    updateSearchMessage(cfg.initialSearchCity || getLocationFilter() || null);
     renderSalons();
     renderExperts();
     setMapVisible(false);
+    // Toujours resynchroniser la liste avec la puce « Votre position » (localStorage / Paris).
     requestLocation().then(() => {
-        if (clientCoords.lat != null) fetchResults();
+        fetchResults();
     });
 })();

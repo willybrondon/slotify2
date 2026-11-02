@@ -36,10 +36,15 @@
   function renderCard(b) {
     const services = (b.services || []).map((s) => s.name).filter(Boolean).join(", ");
     const salon = b.salon?.name || "Salon";
+    const place = [b.salon?.address, b.salon?.city].filter(Boolean).join(", ");
     const expert = b.expert
       ? `${copy.expert || "avec"} ${[b.expert.fname, b.expert.lname].filter(Boolean).join(" ")}`
       : "";
     const time = b.startTime || (Array.isArray(b.time) ? b.time[0] : "") || "";
+    const duration =
+      b.duration != null && Number(b.duration) > 0
+        ? `${Number(b.duration)} min`
+        : "";
     const st = statusMeta(b.status);
     return `<article class="sq-account-booking-card">
       <div class="sq-account-booking-card__top">
@@ -47,12 +52,13 @@
         <span class="sq-account-status ${esc(st.mod)}">${esc(st.label)}</span>
       </div>
       <h3 class="sq-account-booking-card__salon">${esc(salon)}</h3>
+      ${place ? `<p class="sq-account-muted"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${esc(place)}</p>` : ""}
       <p class="sq-account-booking-card__svc">${esc(services || "—")}</p>
       ${expert ? `<p class="sq-account-muted">${esc(expert)}</p>` : ""}
       <div class="sq-account-booking-card__meta">
         <span><i class="far fa-calendar" aria-hidden="true"></i> ${esc(b.date || "")}${
       time ? ` · ${esc(time)}` : ""
-    }</span>
+    }${duration ? ` · ${esc(duration)}` : ""}</span>
         <span class="sq-account-booking-card__amount">${esc(copy.amount || "Montant")} · ${esc(
       money(b.amount)
     )}</span>

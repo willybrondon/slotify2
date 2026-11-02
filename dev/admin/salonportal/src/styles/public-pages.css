@@ -2429,10 +2429,12 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
     line-height: 16px;
     text-align: center;
 }
-.sq-account-nav__notif-wrap {
+.sq-account-nav__notif-wrap,
+.sq-account-nav__profile-wrap {
     position: relative;
 }
-.sq-account-notif-panel {
+.sq-account-notif-panel,
+.sq-account-menu-panel {
     position: absolute;
     right: 0;
     top: calc(100% + 10px);
@@ -2443,6 +2445,41 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
     box-shadow: 0 16px 40px rgba(28, 43, 32, 0.12);
     z-index: 80;
     padding: 14px;
+}
+.sq-account-menu-panel {
+    width: min(260px, 92vw);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px;
+}
+.sq-account-menu-panel__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    width: 100%;
+}
+.sq-account-menu-panel__link:hover {
+    background: rgba(196, 92, 38, 0.08);
+}
+.sq-account-menu-panel__link--danger {
+    color: #9b2c2c;
+}
+.sq-account-menu-panel__link i {
+    width: 1.1rem;
+    text-align: center;
+    opacity: 0.85;
 }
 .sq-account-notif-panel__head {
     display: flex;
@@ -2458,8 +2495,15 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
     text-decoration: none;
 }
 .sq-account-notif-preview {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
     padding: 10px 0;
     border-top: 1px solid var(--sk-border, rgba(0, 0, 0, 0.06));
+}
+.sq-account-notif-preview__body {
+    flex: 1;
+    min-width: 0;
 }
 .sq-account-notif-preview strong {
     display: block;
@@ -2473,6 +2517,23 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
 .sq-account-notif-preview time {
     font-size: 0.72rem;
     color: #888;
+}
+.sq-account-notif-preview__del {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.sq-account-notif-preview__del:hover {
+    background: rgba(155, 44, 44, 0.1);
+    color: #9b2c2c;
 }
 
 body.sq-account-page {
