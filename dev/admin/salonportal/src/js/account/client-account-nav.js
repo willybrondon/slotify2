@@ -83,7 +83,9 @@
           </button>
           <div class="sq-account-notif-panel" id="sqNotifPanel" hidden>
             <div class="sq-account-notif-panel__head">
-              <strong>${escapeHtml(t("Notifications", "Notifications"))}</strong>
+              <h2 class="sq-account-notif-panel__title">${escapeHtml(
+                t("Notifications", "Notifications")
+              )}</h2>
               <a href="/compte/notifications">${escapeHtml(t("Tout voir", "See all"))}</a>
             </div>
             <div class="sq-account-notif-panel__list" id="sqNotifPreview">
@@ -194,7 +196,7 @@
       return;
     }
     box.innerHTML = list
-      .slice(0, 5)
+      .slice(0, 30)
       .map(
         (n) => `<article class="sq-account-notif-preview" data-id="${escapeHtml(n._id)}">
           <div class="sq-account-notif-preview__body">

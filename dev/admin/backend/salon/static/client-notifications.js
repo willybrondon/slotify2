@@ -68,8 +68,13 @@
     if (!content) return;
     content.hidden = false;
     content.innerHTML = `
-      <div class="sq-account-notif-list" id="notifList">
-        <p class="sq-account-muted sq-account-loading">${esc(copy.loading || "Chargement…")}</p>
+      <div class="sq-account-notif-page">
+        <h2 class="sq-account-notif-page__title">${esc(
+          copy.notificationsTitle || "Notifications"
+        )}</h2>
+        <div class="sq-account-notif-list" id="notifList">
+          <p class="sq-account-muted sq-account-loading">${esc(copy.loading || "Chargement…")}</p>
+        </div>
       </div>`;
 
     const box = document.getElementById("notifList");

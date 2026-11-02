@@ -2568,6 +2568,12 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
     z-index: 80;
     padding: 14px;
 }
+.sq-account-notif-panel {
+    flex-direction: column;
+    max-height: min(70vh, 480px);
+    padding: 0;
+    overflow: hidden;
+}
 .sq-account-menu-panel {
     width: min(260px, 92vw);
     flex-direction: column;
@@ -2614,14 +2620,50 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
     gap: 8px;
+    flex-shrink: 0;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid rgba(196, 92, 38, 0.12);
+    background: var(--sk-brand-bg, #fdf6f0);
+}
+.sq-account-notif-panel__title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--sk-black, #111);
 }
 .sq-account-notif-panel__head a {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--sk-primary, #c45c26);
+    color: var(--sk-brand, #c45c26);
     text-decoration: none;
+    white-space: nowrap;
+}
+.sq-account-notif-panel__list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: min(54vh, 380px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 14px 12px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(196, 92, 38, 0.45) rgba(196, 92, 38, 0.08);
+}
+.sq-account-notif-panel__list::-webkit-scrollbar {
+    width: 8px;
+}
+.sq-account-notif-panel__list::-webkit-scrollbar-track {
+    background: rgba(196, 92, 38, 0.08);
+    border-radius: 8px;
+}
+.sq-account-notif-panel__list::-webkit-scrollbar-thumb {
+    background: rgba(196, 92, 38, 0.4);
+    border-radius: 8px;
+}
+.sq-account-notif-panel__list::-webkit-scrollbar-thumb:hover {
+    background: rgba(196, 92, 38, 0.6);
 }
 .sq-account-notif-preview {
     display: flex;
@@ -3144,6 +3186,32 @@ body.sq-account-page {
     color: var(--sk-text-muted, #666);
 }
 
+.sq-account-notif-page__title {
+    margin: 0 0 14px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--sk-black, #111);
+}
+.sq-account-notif-list {
+    max-height: min(70vh, 640px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(196, 92, 38, 0.45) rgba(196, 92, 38, 0.08);
+}
+.sq-account-notif-list::-webkit-scrollbar {
+    width: 8px;
+}
+.sq-account-notif-list::-webkit-scrollbar-track {
+    background: rgba(196, 92, 38, 0.08);
+    border-radius: 8px;
+}
+.sq-account-notif-list::-webkit-scrollbar-thumb {
+    background: rgba(196, 92, 38, 0.4);
+    border-radius: 8px;
+}
 .sq-account-notif-card {
     display: flex;
     justify-content: space-between;
