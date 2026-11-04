@@ -355,21 +355,44 @@
     });
   }
 
+  function isCompteMenuHref(href) {
+    const h = String(href || "").toLowerCase();
+    return (
+      h.includes("/compte/connexion") ||
+      h.includes("/compte/inscription") ||
+      h.includes("/compte/reservations") ||
+      h.includes("/compte/notifications") ||
+      h.includes("/compte/messages") ||
+      h.includes("/compte/signaler") ||
+      h.includes("/compte/profil") ||
+      h.includes("#signaler")
+    );
+  }
+
   function upgradeHeader(user) {
     document.querySelectorAll("[data-account-cta], .sq-adencer-header__cta").forEach((cta) => {
       if (cta.dataset.accountReady === "1") return;
       cta.dataset.accountReady = "1";
+      if (!cta.classList.contains("desktop-only")) {
+        cta.classList.add("desktop-only");
+      }
       cta.innerHTML = loggedInCtaHtml(user);
     });
 
     const mobile = document.querySelector("[data-account-mobile], .mobile-menu-content--client");
     if (mobile && mobile.dataset.accountReady !== "1") {
       mobile.dataset.accountReady = "1";
+      const seen = new Set();
       const keep = Array.from(mobile.children).filter((el) => {
+        if (el.hasAttribute("data-account-logout") || el.id === "headerFavBtnMobile") {
+          return false;
+        }
         const href = (el.getAttribute("href") || "").toLowerCase();
-        const isAuth =
-          href.includes("/compte/connexion") || href.includes("/compte/inscription");
-        return !isAuth;
+        if (isCompteMenuHref(href)) return false;
+        const key = href || (el.id ? `#${el.id}` : el.outerHTML.slice(0, 80));
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
       });
       mobile.innerHTML = loggedInMobileHtml() + keep.map((el) => el.outerHTML).join("");
     }

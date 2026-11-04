@@ -2178,6 +2178,13 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
     justify-content: center;
 }
 
+/* Header connecté : icônes sans cadre */
+.sq-account-nav .sq-header-fav-btn {
+    border: 0;
+    background: transparent;
+    border-radius: 9px;
+}
+
 .sq-header-fav-btn__count {
     position: absolute;
     top: -4px;
@@ -2508,10 +2515,10 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
     align-items: center;
     gap: 2px;
     position: relative;
-    padding: 3px;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.03);
-    border: 1px solid var(--sk-border, rgba(0, 0, 0, 0.08));
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
 }
 .sq-account-nav__btn {
     display: inline-flex;
@@ -2530,8 +2537,15 @@ body:not(.is-client-logged-in) .sq-salon-like-btn {
     transition: background 0.15s ease, color 0.15s ease;
 }
 .sq-account-nav__btn:hover {
-    background: #fff;
-    color: var(--sk-primary, #c45c26);
+    background: rgba(196, 92, 38, 0.08);
+    color: var(--sk-brand, #c45c26);
+}
+/* Mobile : cœur / notifs / compte uniquement dans le hamburger */
+@media (max-width: 900px) {
+    .sq-adencer-header__cta .sq-account-nav,
+    .sq-adencer-header__cta [data-account-nav] {
+        display: none !important;
+    }
 }
 .sq-account-nav__btn--profile {
     color: var(--sk-text);
