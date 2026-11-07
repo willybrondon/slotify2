@@ -31,7 +31,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.skedisy.customer"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     buildToolsVersion "21.1.2"
@@ -53,7 +53,7 @@ android {
     defaultConfig {
         applicationId "com.skedisy.customer"
         minSdkVersion 24
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -89,8 +89,8 @@ flutter {
 dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-messaging'
-    // Match in_app_purchase_android 0.4.x (Billing 7.1.1). Do not pin 8.0.0.
-    implementation 'com.android.billingclient:billing:7.1.1'
+    // Play Billing >= 8 (Google Play). Matches in_app_purchase_android 0.5.5 (billing 9.1.0).
+    implementation 'com.android.billingclient:billing:9.1.0'
 //    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'

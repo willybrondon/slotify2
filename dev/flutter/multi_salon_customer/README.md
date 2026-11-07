@@ -20,7 +20,7 @@ samples, guidance on mobile development, and a full API reference.
 
 ## Environment
 
-- **Flutter Version**: 3.27.4
+- **Flutter Version**: 3.47.9
 - **Dart Version**: 3.6.2
 - **Android Studio**: meerkat Patch 1
 - **Java Version**: 21.0.6

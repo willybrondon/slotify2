@@ -30,10 +30,16 @@ subprojects { sub ->
                 targetCompatibility JavaVersion.VERSION_17
             }
         }
-        // Do NOT force Billing 8 here: in_app_purchase_android 0.4.x is compiled
-        // against Billing 7.1.1 APIs. Forcing 8.0.0 breaks the Java build
-        // (QueryProductDetailsResult / queryPurchaseHistoryAsync).
-        // Billing 8 requires in_app_purchase_android >= 0.5.0 + Flutter >= 3.38.
+        // Play Billing >= 8 via in_app_purchase_android >= 0.5.0 (Flutter >= 3.38).
+        // Align to plugin's billing 9.1.0; never allow Billing 7.x back in.
+        configurations.configureEach {
+            resolutionStrategy.eachDependency { details ->
+                if (details.requested.group == 'com.android.billingclient') {
+                    details.useVersion '9.1.0'
+                    details.because 'Google Play Billing Library >= 8 compliance (plugin 0.5.5)'
+                }
+            }
+        }
     }
     sub.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         kotlinOptions {
