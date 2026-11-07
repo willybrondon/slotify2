@@ -444,35 +444,24 @@ jobs:
         run: |
           set -euo pipefail
           APP_DIR="dev/flutter/multi_salon_${{ matrix.app }}"
-          # Recreate plugin symlinks (.symlinks/plugins/*) before CocoaPods
           cd "$APP_DIR"
           flutter pub get
-          cd ios
+          # Regenerate GeneratedPluginRegistrant + .symlinks, then CocoaPods via Flutter tooling.
+          # Avoid raw `pod deintegrate` + manual pod install (can drop most plugin pods).
           rm -rf ~/Library/Developer/Xcode/DerivedData
-          rm -rf Pods Podfile.lock Runner.xcworkspace/xcuserdata
-          pod deintegrate || true
-          # Ensure Flutter plugin registrant + podspecs are in sync
-          flutter precache --ios
-          pod install --repo-update
-          test -f Podfile.lock
-          # Fail fast if a Dart plugin is registered but missing from CocoaPods
-          if [ -f Runner/GeneratedPluginRegistrant.m ]; then
-            missing=0
-            for mod in $(grep '@import ' Runner/GeneratedPluginRegistrant.m | sed -E 's/.*@import ([a-zA-Z0-9_]+);.*/\1/' | sort -u); do
-              if ! grep -E "^  - ${mod} " Podfile.lock >/dev/null 2>&1; then
-                echo "::error::Plugin module '$mod' is in GeneratedPluginRegistrant.m but missing from Podfile.lock"
-                missing=1
-              fi
-            done
-            if [ "$missing" -ne 0 ]; then
-              echo "---- Podfile.lock DEPENDENCIES ----"
-              sed -n '/^DEPENDENCIES:/,/^$/p' Podfile.lock || true
-              echo "---- .symlinks/plugins ----"
-              ls -la .symlinks/plugins || true
-              exit 1
-            fi
-            echo "CocoaPods plugins match GeneratedPluginRegistrant"
+          rm -rf ios/Pods ios/Podfile.lock ios/.symlinks
+          flutter build ios --config-only --no-codesign
+          test -f ios/Podfile.lock
+          DEP_COUNT=$(grep -c 'from `' ios/Podfile.lock || true)
+          echo "CocoaPods Flutter plugin deps: $DEP_COUNT"
+          if [ "${DEP_COUNT:-0}" -lt 5 ]; then
+            echo "::error::Too few CocoaPods plugin dependencies ($DEP_COUNT). Pod install incomplete."
+            sed -n '/^DEPENDENCIES:/,/^SPEC CHECKSUMS:/p' ios/Podfile.lock || true
+            ls -la ios/.symlinks/plugins || true
+            exit 1
           fi
+          echo "---- Podfile.lock DEPENDENCIES ----"
+          sed -n '/^DEPENDENCIES:/,/^SPEC CHECKSUMS:/p' ios/Podfile.lock | head -80
 
       - name: build archive
         run: |
