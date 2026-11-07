@@ -442,12 +442,37 @@ jobs:
           fi
       - name: install pod ios for testting
         run: |
-          cd "dev/flutter/multi_salon_${{ matrix.app }}/ios"
+          set -euo pipefail
+          APP_DIR="dev/flutter/multi_salon_${{ matrix.app }}"
+          # Recreate plugin symlinks (.symlinks/plugins/*) before CocoaPods
+          cd "$APP_DIR"
+          flutter pub get
+          cd ios
           rm -rf ~/Library/Developer/Xcode/DerivedData
-          pod cache clean --all
-          rm -rf Podfile.lock Pods
-          pod deintegrate
+          rm -rf Pods Podfile.lock Runner.xcworkspace/xcuserdata
+          pod deintegrate || true
+          # Ensure Flutter plugin registrant + podspecs are in sync
+          flutter precache --ios
           pod install --repo-update
+          test -f Podfile.lock
+          # Fail fast if a Dart plugin is registered but missing from CocoaPods
+          if [ -f Runner/GeneratedPluginRegistrant.m ]; then
+            missing=0
+            for mod in $(grep '@import ' Runner/GeneratedPluginRegistrant.m | sed -E 's/.*@import ([a-zA-Z0-9_]+);.*/\1/' | sort -u); do
+              if ! grep -E "^  - ${mod} " Podfile.lock >/dev/null 2>&1; then
+                echo "::error::Plugin module '$mod' is in GeneratedPluginRegistrant.m but missing from Podfile.lock"
+                missing=1
+              fi
+            done
+            if [ "$missing" -ne 0 ]; then
+              echo "---- Podfile.lock DEPENDENCIES ----"
+              sed -n '/^DEPENDENCIES:/,/^$/p' Podfile.lock || true
+              echo "---- .symlinks/plugins ----"
+              ls -la .symlinks/plugins || true
+              exit 1
+            fi
+            echo "CocoaPods plugins match GeneratedPluginRegistrant"
+          fi
 
       - name: build archive
         run: |

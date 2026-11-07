@@ -1,6 +1,6 @@
 plugins {
     id "com.android.application"
-    id "org.jetbrains.kotlin.android"
+    // AGP 9+ embeds Kotlin — do not apply org.jetbrains.kotlin.android here.
     id "com.google.gms.google-services"
     id "dev.flutter.flutter-gradle-plugin"
 }
