@@ -35,26 +35,58 @@ function pickPriceId(plan, interval) {
   return String(plan.stripePriceIdMonthly || "").trim();
 }
 
-/**
- * Start Stripe Checkout for a paid plan (admin must have set stripePriceId*).
- */
-async function createSubscriptionCheckout(salon, { planId, interval }) {
-  const id = String(planId || "").toLowerCase().trim();
-  const billingInterval = interval === "year" ? "year" : "month";
-  const plan = await SubscriptionPlan.findOne({ planId: id, isActive: true });
-  if (!plan) throw new Error("Plan introuvable ou inactif");
-  if (plan.tier === "free" || !(Number(plan.priceMonthly) > 0 || Number(plan.priceYearly) > 0)) {
-    throw new Error("Ce plan ne nécessite pas de paiement.");
-  }
+function planAmountForInterval(plan, interval) {
+  if (interval === "year") return Number(plan.priceYearly) || 0;
+  return Number(plan.priceMonthly) || 0;
+}
 
-  const priceId = pickPriceId(plan, billingInterval);
-  if (!priceId) {
-    throw new Error(
-      "Price ID Stripe manquant pour ce plan. Ajoutez-le dans l'admin (Abonnements SaaS)."
-    );
+/**
+ * Ensure a Stripe Price exists for the plan/interval (create + persist if missing).
+ * Allows salons to pay without waiting for admin to paste Price IDs.
+ */
+async function ensureStripePrice(plan, interval) {
+  const billingInterval = interval === "year" ? "year" : "month";
+  const existing = pickPriceId(plan, billingInterval);
+  if (existing) return existing;
+
+  const amount = planAmountForInterval(plan, billingInterval);
+  if (!(amount > 0)) {
+    throw new Error("Montant du plan invalide pour ce cycle de facturation.");
   }
 
   const stripe = await getStripeClient();
+  const currency = String(plan.currency || "EUR").toLowerCase();
+
+  const product = await stripe.products.create({
+    name: `Skedisy — ${plan.name}`,
+    description: plan.tagline || undefined,
+    metadata: {
+      skedisyPlanId: plan.planId,
+      skedisyTier: plan.tier || "",
+    },
+  });
+
+  const price = await stripe.prices.create({
+    product: product.id,
+    unit_amount: Math.round(amount * 100),
+    currency,
+    recurring: { interval: billingInterval },
+    metadata: {
+      skedisyPlanId: plan.planId,
+      skedisyInterval: billingInterval,
+    },
+  });
+
+  if (billingInterval === "year") {
+    plan.stripePriceIdYearly = price.id;
+  } else {
+    plan.stripePriceIdMonthly = price.id;
+  }
+  await plan.save();
+  return price.id;
+}
+
+async function ensureStripeCustomer(salon, stripe) {
   const partnerKey = String(salon.partnero?.partnerKey || "").trim();
   const customerKey = String(salon.partnero?.customerKey || salon._id);
 
@@ -82,9 +114,49 @@ async function createSubscriptionCheckout(salon, { planId, interval }) {
     salon.markModified("subscription");
     await salon.save();
   }
+  return { customerId, partnerKey, customerKey };
+}
 
-  const successUrl = `${baseUrl()}/salonpanel/profile?billing=success&session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `${baseUrl()}/salonpanel/profile?billing=cancelled`;
+/**
+ * Start Stripe Checkout for a paid plan (auto-creates Price IDs when missing).
+ */
+async function createSubscriptionCheckout(salon, { planId, interval }) {
+  const id = String(planId || "").toLowerCase().trim();
+  const billingInterval = interval === "year" ? "year" : "month";
+  const plan = await SubscriptionPlan.findOne({ planId: id, isActive: true });
+  if (!plan) throw new Error("Plan introuvable ou inactif");
+  if (plan.tier === "free" || !(Number(plan.priceMonthly) > 0 || Number(plan.priceYearly) > 0)) {
+    throw new Error("Ce plan ne nécessite pas de paiement.");
+  }
+
+  const priceId = await ensureStripePrice(plan, billingInterval);
+  const stripe = await getStripeClient();
+  const { customerId, partnerKey, customerKey } = await ensureStripeCustomer(
+    salon,
+    stripe
+  );
+
+  const successUrl = `${baseUrl()}/salonpanel/profile?tab=subscription&billing=success&session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${baseUrl()}/salonpanel/profile?tab=subscription&billing=cancelled`;
+
+  const subscriptionData = {
+    metadata: {
+      salonId: String(salon._id),
+      planId: plan.planId,
+      interval: billingInterval,
+      partneroCustomerKey: customerKey,
+      partneroPartnerKey: partnerKey || "",
+    },
+  };
+  const trialDays = Number(plan.trialDays) || 0;
+  const neverPaid =
+    !salon.subscription?.stripeSubscriptionId &&
+    !["active", "trialing", "past_due"].includes(
+      String(salon.subscription?.status || "")
+    );
+  if (trialDays > 0 && neverPaid) {
+    subscriptionData.trial_period_days = trialDays;
+  }
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -102,15 +174,7 @@ async function createSubscriptionCheckout(salon, { planId, interval }) {
       partneroCustomerKey: customerKey,
       partneroPartnerKey: partnerKey || "",
     },
-    subscription_data: {
-      metadata: {
-        salonId: String(salon._id),
-        planId: plan.planId,
-        interval: billingInterval,
-        partneroCustomerKey: customerKey,
-        partneroPartnerKey: partnerKey || "",
-      },
-    },
+    subscription_data: subscriptionData,
   });
 
   return {
@@ -118,7 +182,89 @@ async function createSubscriptionCheckout(salon, { planId, interval }) {
     sessionId: session.id,
     planId: plan.planId,
     interval: billingInterval,
+    mode: "checkout",
   };
+}
+
+/**
+ * Choose / change plan: Checkout for new sub, or in-place Stripe update if already subscribed.
+ */
+async function chooseOrChangePlan(salon, { planId, interval }) {
+  const id = String(planId || "").toLowerCase().trim();
+  const billingInterval = interval === "year" ? "year" : "month";
+  const plan = await SubscriptionPlan.findOne({ planId: id, isActive: true });
+  if (!plan) throw new Error("Plan introuvable ou inactif");
+
+  const currentId = String(salon.subscription?.planId || "free").toLowerCase();
+  const existingSubId = String(salon.subscription?.stripeSubscriptionId || "").trim();
+
+  // Free plan: no Stripe payment — assign directly (or cancel via portal if paid)
+  if (plan.tier === "free" || !(planAmountForInterval(plan, billingInterval) > 0)) {
+    if (existingSubId) {
+      throw new Error(
+        "Pour passer au plan gratuit, utilisez « Gérer / factures » et annulez l'abonnement Stripe."
+      );
+    }
+    await assignPlanToSalon(salon._id, { planId: plan.planId, status: "active" });
+    return {
+      mode: "assigned",
+      planId: plan.planId,
+      interval: billingInterval,
+      message: "Plan gratuit activé.",
+    };
+  }
+
+  // Already on this paid plan with active Stripe sub → nothing to pay
+  if (
+    existingSubId &&
+    currentId === plan.planId &&
+    ["active", "trialing"].includes(String(salon.subscription?.status || ""))
+  ) {
+    return {
+      mode: "unchanged",
+      planId: plan.planId,
+      message: "Ce plan est déjà actif.",
+    };
+  }
+
+  // Existing Stripe subscription → switch price in place (proration)
+  if (existingSubId) {
+    const priceId = await ensureStripePrice(plan, billingInterval);
+    const stripe = await getStripeClient();
+    const subscription = await stripe.subscriptions.retrieve(existingSubId);
+    const itemId = subscription.items?.data?.[0]?.id;
+    if (!itemId) {
+      // Broken sub — fall back to checkout
+      return createSubscriptionCheckout(salon, {
+        planId: plan.planId,
+        interval: billingInterval,
+      });
+    }
+
+    const updated = await stripe.subscriptions.update(existingSubId, {
+      items: [{ id: itemId, price: priceId }],
+      proration_behavior: "create_prorations",
+      metadata: {
+        ...(subscription.metadata || {}),
+        salonId: String(salon._id),
+        planId: plan.planId,
+        interval: billingInterval,
+      },
+    });
+
+    await applySubscriptionToSalon(salon, updated, plan.planId);
+    return {
+      mode: "updated",
+      planId: plan.planId,
+      interval: billingInterval,
+      message: "Plan mis à jour. La facturation Stripe a été ajustée (prorata).",
+    };
+  }
+
+  return createSubscriptionCheckout(salon, {
+    planId: plan.planId,
+    interval: billingInterval,
+  });
 }
 
 async function findSalonFromStripeObject(obj) {
@@ -429,6 +575,8 @@ async function handleInvoiceRefundedOrChargeRefunded(obj) {
 
 module.exports = {
   createSubscriptionCheckout,
+  chooseOrChangePlan,
+  ensureStripePrice,
   pickPriceId,
   handleCheckoutSessionCompleted,
   handleInvoicePaid,

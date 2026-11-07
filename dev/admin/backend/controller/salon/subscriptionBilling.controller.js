@@ -1,5 +1,5 @@
 /**
- * Salon SaaS subscription checkout + status (Price IDs from admin SubscriptionPlan).
+ * Salon SaaS subscription checkout + status (Price IDs auto-created from catalog if missing).
  */
 
 const Salon = require("../../models/salon.model");
@@ -9,6 +9,13 @@ const {
   ensureDefaultPlans,
   resolveSalonSubscription,
 } = require("../../services/subscription.service");
+const {
+  SUBSCRIPTION_FEATURES,
+} = require("../../constants/subscriptionFeatures");
+
+const FEATURE_LABELS = Object.fromEntries(
+  SUBSCRIPTION_FEATURES.map((f) => [f.key, f.label])
+);
 
 exports.getSubscriptionStatus = async (req, res) => {
   try {
@@ -37,19 +44,32 @@ exports.getSubscriptionStatus = async (req, res) => {
           attributed: Boolean(salon.partnero?.partnerKey),
           signupSynced: Boolean(salon.partnero?.signupSynced),
         },
-        plans: plans.map((p) => ({
-          planId: p.planId,
-          name: p.name,
-          tagline: p.tagline || "",
-          tier: p.tier,
-          priceMonthly: p.priceMonthly || 0,
-          priceYearly: p.priceYearly || 0,
-          trialDays: p.trialDays || 0,
-          isHighlighted: !!p.isHighlighted,
-          hasCheckoutMonthly: Boolean(String(p.stripePriceIdMonthly || "").trim()),
-          hasCheckoutYearly: Boolean(String(p.stripePriceIdYearly || "").trim()),
-          featureCount: Array.isArray(p.features) ? p.features.length : 0,
-        })),
+        plans: plans.map((p) => {
+          const amountMonthly = Number(p.priceMonthly) || 0;
+          const amountYearly = Number(p.priceYearly) || 0;
+          const isFree = p.tier === "free" || (!(amountMonthly > 0) && !(amountYearly > 0));
+          return {
+            planId: p.planId,
+            name: p.name,
+            tagline: p.tagline || "",
+            tier: p.tier,
+            priceMonthly: amountMonthly,
+            priceYearly: amountYearly,
+            currency: p.currency || "EUR",
+            trialDays: p.trialDays || 0,
+            isHighlighted: !!p.isHighlighted,
+            isFree,
+            // Checkout is available for any paid plan (Price IDs auto-created at pay time).
+            hasCheckoutMonthly: !isFree && amountMonthly > 0,
+            hasCheckoutYearly: !isFree && amountYearly > 0,
+            limits: p.limits || {},
+            features: (Array.isArray(p.features) ? p.features : []).map((key) => ({
+              key,
+              label: FEATURE_LABELS[key] || key,
+            })),
+            featureCount: Array.isArray(p.features) ? p.features.length : 0,
+          };
+        }),
       },
     });
   } catch (error) {
@@ -57,6 +77,9 @@ exports.getSubscriptionStatus = async (req, res) => {
   }
 };
 
+/**
+ * Choose or change plan — Stripe Checkout (new) or in-place update (existing sub).
+ */
 exports.createCheckout = async (req, res) => {
   try {
     const planId = String(req.body?.planId || req.query?.planId || "")
@@ -77,27 +100,29 @@ exports.createCheckout = async (req, res) => {
       return res.status(200).json({ status: false, message: "Salon introuvable" });
     }
 
-    const result = await billing.createSubscriptionCheckout(salon, {
+    const result = await billing.chooseOrChangePlan(salon, {
       planId,
       interval,
     });
 
     return res.status(200).json({
       status: true,
-      message: "Checkout créé",
+      message:
+        result.message ||
+        (result.checkoutUrl ? "Checkout créé" : "Plan mis à jour"),
       data: result,
     });
   } catch (error) {
     console.error("[subscriptionCheckout]", error);
     return res.status(200).json({
       status: false,
-      message: error.message || "Impossible de créer le checkout",
+      message: error.message || "Impossible de changer de plan",
     });
   }
 };
 
 /**
- * Optional: Stripe Customer Portal to manage/cancel subscription.
+ * Stripe Customer Portal to manage/cancel subscription / invoices.
  */
 exports.createBillingPortal = async (req, res) => {
   try {
@@ -120,7 +145,7 @@ exports.createBillingPortal = async (req, res) => {
     );
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${base}/salonpanel/profile?billing=portal`,
+      return_url: `${base}/salonpanel/profile?tab=subscription&billing=portal`,
     });
 
     return res.status(200).json({

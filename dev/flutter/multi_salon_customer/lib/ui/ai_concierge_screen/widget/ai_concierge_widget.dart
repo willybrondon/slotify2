@@ -560,7 +560,7 @@ class ShareLookCaptureView extends StatelessWidget {
     );
   }
 
-  Widget _socialBrandIcon(IconData icon) {
+  Widget _socialBrandIcon(FaIconData icon) {
     return FaIcon(
       icon,
       size: 26,
