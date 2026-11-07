@@ -444,18 +444,22 @@ jobs:
         run: |
           set -euo pipefail
           APP_DIR="dev/flutter/multi_salon_${{ matrix.app }}"
+          # Flutter 3.44+ defaults to SPM and only leaves a few plugins on CocoaPods.
+          # Our archive job uses CocoaPods + xcodebuild, so force CocoaPods for all plugins.
+          flutter config --no-enable-swift-package-manager
           cd "$APP_DIR"
           flutter pub get
-          # Regenerate GeneratedPluginRegistrant + .symlinks, then CocoaPods via Flutter tooling.
-          # Avoid raw `pod deintegrate` + manual pod install (can drop most plugin pods).
           rm -rf ~/Library/Developer/Xcode/DerivedData
           rm -rf ios/Pods ios/Podfile.lock ios/.symlinks
           flutter build ios --config-only --no-codesign
           test -f ios/Podfile.lock
           DEP_COUNT=$(grep -c 'from `' ios/Podfile.lock || true)
           echo "CocoaPods Flutter plugin deps: $DEP_COUNT"
+          PLUGIN_LINKS=$(find ios/.symlinks/plugins -maxdepth 1 -type l 2>/dev/null | wc -l | tr -d ' ')
+          echo "Plugin symlinks: $PLUGIN_LINKS"
+          # With SPM disabled, CocoaPods should get (almost) every iOS plugin symlink.
           if [ "${DEP_COUNT:-0}" -lt 5 ]; then
-            echo "::error::Too few CocoaPods plugin dependencies ($DEP_COUNT). Pod install incomplete."
+            echo "::error::Too few CocoaPods plugin dependencies ($DEP_COUNT) with SPM disabled."
             sed -n '/^DEPENDENCIES:/,/^SPEC CHECKSUMS:/p' ios/Podfile.lock || true
             ls -la ios/.symlinks/plugins || true
             exit 1

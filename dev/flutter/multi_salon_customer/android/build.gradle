@@ -8,7 +8,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:9.1.0'
         // Kotlin is built into AGP 9+; keep kotlin_version for Flutter validation / stdlib refs.
-        classpath 'com.google.gms:google-services:4.3.15'
+        classpath 'com.google.gms:google-services:4.4.4'
     }
 }
 
