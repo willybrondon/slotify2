@@ -2810,6 +2810,11 @@ body.sq-chip-panel-open {
   line-height: 1.25;
 }
 
+.sq-location-chip__value.is-placeholder {
+  font-weight: 500;
+  color: var(--sk-text-muted, #8a8a8a);
+}
+
 .sq-location-chip__chevron {
   font-size: 0.65rem;
   opacity: 0.55;
@@ -2822,16 +2827,27 @@ body.sq-chip-panel-open {
   top: 0;
   left: 0;
   transform: none;
-  width: min(92vw, 320px);
-  min-width: 220px;
-  max-width: min(92vw, 320px);
+  width: min(92vw, 340px);
+  min-width: 260px;
+  max-width: min(92vw, 360px);
   max-height: none;
   overflow: visible;
-  padding: 0.75rem;
-  border-radius: 14px;
+  padding: 1rem 1rem 0.9rem;
+  border-radius: 16px;
   background: var(--sk-white);
-  border: 1px solid var(--sk-border);
-  box-shadow: 0 12px 36px rgba(17, 17, 17, 0.16);
+  border: 1px solid rgba(196, 92, 38, 0.14);
+  box-shadow:
+    0 18px 48px rgba(28, 20, 14, 0.14),
+    0 2px 6px rgba(28, 20, 14, 0.04);
+}
+
+.sq-location-popover .sq-chip-popover__title {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sk-brand, #c45c26);
 }
 
 .sq-location-popover[hidden] {
@@ -2844,22 +2860,34 @@ body.sq-chip-panel-open {
 
 .sq-location-popover__input {
   width: 100%;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--sk-border);
-  border-radius: 8px;
+  box-sizing: border-box;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 10px;
   font-family: inherit;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.92rem;
+  margin-bottom: 0.65rem;
+  background: #fafafa;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.sq-location-popover__input::placeholder {
+  color: var(--sk-text-muted, #8a8a8a);
 }
 
 .sq-location-popover__input:focus {
   outline: none;
-  border-color: var(--sk-brand);
+  border-color: var(--sk-brand, #c45c26);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(196, 92, 38, 0.14);
 }
 
 .sq-location-popover__apply {
   width: 100%;
   justify-content: center;
+  border-radius: 10px;
+  font-weight: 650;
+  padding: 0.7rem 1rem;
 }
 
 .sq-search-bar-unified--full {

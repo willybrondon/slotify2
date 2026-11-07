@@ -877,8 +877,8 @@
     renderSalons();
     renderExperts();
     setMapVisible(false);
-    // Toujours resynchroniser la liste avec la puce « Votre position » (localStorage / Paris).
+    // Resynchroniser seulement si une position est déjà choisie (sinon liste non filtrée).
     requestLocation().then(() => {
-        fetchResults();
+        if (getLocationFilter() || clientCoords.lat != null) fetchResults();
     });
 })();

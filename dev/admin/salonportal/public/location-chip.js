@@ -1,14 +1,17 @@
 /**
- * Puce « Votre position » — panneau ancré sous le chip (titre + champ + OK).
+ * Puce « Votre position » — vide par défaut (comme la barre de recherche).
  */
 (function () {
   const STORAGE_KEY = "skedisy-location-label";
-  const DEFAULT_LABEL = "Paris";
 
   const LOC_I18N = {
     "homeProduct.nearYou": { fr: "Près de vous", en: "Near you" },
     "homeProduct.yourLocation": { fr: "Votre position", en: "Your location" },
     "homeProduct.applyLocation": { fr: "OK", en: "OK" },
+    "homeProduct.locationPlaceholder": {
+      fr: "Ville, quartier…",
+      en: "City, area…",
+    },
   };
 
   function t(key) {
@@ -24,6 +27,10 @@
     const row = LOC_I18N[key];
     if (row) return row[lang] || row.fr;
     return key;
+  }
+
+  function placeholder() {
+    return t("homeProduct.locationPlaceholder") || "Ville, quartier…";
   }
 
   function getChip() {
@@ -42,22 +49,46 @@
     return document.getElementById("homeLocationChipValue");
   }
 
-  function setLabel(label) {
-    const text = String(label || "").trim() || DEFAULT_LABEL;
-    localStorage.setItem(STORAGE_KEY, text);
+  function setLabel(label, opts) {
+    const silent = Boolean(opts && opts.silent);
+    const text = String(label || "").trim();
+    if (text) {
+      localStorage.setItem(STORAGE_KEY, text);
+    } else {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (_) {
+        /* ignore */
+      }
+    }
+
     const valueEl = getValueEl();
-    if (valueEl) valueEl.textContent = text;
+    if (valueEl) {
+      if (text) {
+        valueEl.textContent = text;
+        valueEl.classList.remove("is-placeholder");
+      } else {
+        valueEl.textContent = placeholder();
+        valueEl.classList.add("is-placeholder");
+      }
+    }
+
     const input = getInput();
     if (input && document.activeElement !== input) {
       input.value = text;
+      input.placeholder = placeholder();
     }
+
     updateViewMapLink(text);
-    try {
-      document.dispatchEvent(
-        new CustomEvent("skedisy:location-changed", { detail: { location: text } })
-      );
-    } catch (_) {
-      /* ignore */
+
+    if (!silent) {
+      try {
+        document.dispatchEvent(
+          new CustomEvent("skedisy:location-changed", { detail: { location: text } })
+        );
+      } catch (_) {
+        /* ignore */
+      }
     }
   }
 
@@ -65,7 +96,12 @@
     const input = getInput();
     const fromInput = input && input.value.trim();
     if (fromInput) return fromInput;
-    return localStorage.getItem(STORAGE_KEY) || DEFAULT_LABEL;
+    const valueEl = getValueEl();
+    if (valueEl && !valueEl.classList.contains("is-placeholder")) {
+      const shown = (valueEl.textContent || "").trim();
+      if (shown && shown !== placeholder()) return shown;
+    }
+    return (localStorage.getItem(STORAGE_KEY) || "").trim();
   }
 
   function updateViewMapLink(location) {
@@ -134,18 +170,19 @@
     window.SkedisyChipPanel?.lockPage?.();
     window.SkedisyChipPanel?.showBackdrop?.();
     window.SkedisyChipPanel?.mountPanel?.(popover);
-    window.SkedisyChipPanel?.positionUnder?.(popover, chip, { minWidth: 280 });
-    window.SkedisyChipPanel?.bindReposition?.(popover, chip, { minWidth: 280 });
+    window.SkedisyChipPanel?.positionUnder?.(popover, chip, { minWidth: 300 });
+    window.SkedisyChipPanel?.bindReposition?.(popover, chip, { minWidth: 300 });
 
     popover.hidden = false;
     chip.setAttribute("aria-expanded", "true");
     document.querySelector(".sq-location-chip-wrap")?.classList.add("is-open");
 
     if (input) {
+      input.placeholder = placeholder();
       input.value = getLabel();
       try {
         input.focus({ preventScroll: true });
-        input.select();
+        if (input.value) input.select();
       } catch (_) {
         input.focus();
       }
@@ -155,7 +192,6 @@
   function applyLocation() {
     const input = getInput();
     const label = input ? input.value.trim() : "";
-    if (!label) return;
     setLabel(label);
     closePopover();
   }
@@ -168,7 +204,7 @@
         setLabel(near);
       },
       function () {
-        setLabel(DEFAULT_LABEL);
+        /* laisser vide — comme la barre de recherche */
       },
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     );
@@ -182,10 +218,9 @@
       new URLSearchParams(window.location.search).get("location") || ""
     ).trim();
     const inputSeed = (getInput()?.value || "").trim();
-    const saved = localStorage.getItem(STORAGE_KEY);
-    // URL (ou valeur SSR dans l’input) prioritaire sur le localStorage.
-    const initial = urlLoc || inputSeed || saved || DEFAULT_LABEL;
-    setLabel(initial);
+    const saved = (localStorage.getItem(STORAGE_KEY) || "").trim();
+    const initial = urlLoc || inputSeed || saved || "";
+    setLabel(initial, { silent: true });
 
     chip.addEventListener("click", function (e) {
       e.stopPropagation();

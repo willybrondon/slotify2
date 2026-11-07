@@ -1143,9 +1143,8 @@ exports.serveCategoryPage = async (req, res) => {
     console.log("[Category Page] Found category:", fullCategoryId);
 
     const search = req.query.search || "";
-    // Aligné sur la puce « Votre position » (défaut Paris) pour éviter
-    // chip ≠ liste SSR quand ?location= est absent.
-    const locationTerm = (req.query.location || "").trim() || "Paris";
+    // Vide par défaut (comme la barre de recherche) — filtre seulement si ?location=
+    const locationTerm = (req.query.location || "").trim();
     const dateTerm = String(req.query.date || "").trim();
     const latitude = req.query.latitude;
     const longitude = req.query.longitude;
@@ -1547,7 +1546,7 @@ exports.serveCategoryPage = async (req, res) => {
                   <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                   <span class="sq-location-chip__text">
                     <span class="sq-location-chip__label">${copy.yourLocation}</span>
-                    <span class="sq-location-chip__value" id="homeLocationChipValue">${escapeHtml(locationTerm || "Paris")}</span>
+                    <span class="sq-location-chip__value${locationTerm ? "" : " is-placeholder"}" id="homeLocationChipValue">${escapeHtml(locationTerm || copy.locationPlaceholder || "Ville, quartier…")}</span>
                   </span>
                   <i class="fas fa-chevron-down sq-location-chip__chevron" aria-hidden="true"></i>
                 </button>
