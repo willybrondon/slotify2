@@ -78,7 +78,7 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled false  // Temporarily disabled to fix build
             shrinkResources false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
