@@ -76,6 +76,8 @@ dependency_overrides:
   flutter_plugin_android_lifecycle: 2.0.35
   # Flutter 3.47+ removed v1 embedding; 0.8.9+6 still references Registrar.
   image_picker_android: 0.8.13+25
+  # 6.3.2 still references PluginRegistry.Registrar; 6.3.3+ removed v1 embedding.
+  url_launcher_android: 6.3.33
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

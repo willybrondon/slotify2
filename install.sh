@@ -29,10 +29,48 @@ fi
 
 echo "DOMAIN: $DOMAIN"
 
+# 4GB droplets often OOM-kill react-scripts; ensure swap + low-mem CRA flags.
+ensure_build_swap() {
+  if swapon --show 2>/dev/null | grep -q .; then
+    echo "[swap] Already active:"
+    swapon --show || true
+    return 0
+  fi
+  if [ -f /swapfile ]; then
+    sudo swapon /swapfile 2>/dev/null || true
+    return 0
+  fi
+  echo "[swap] Creating 2G /swapfile for CRA builds..."
+  sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+  sudo chmod 600 /swapfile
+  sudo mkswap /swapfile
+  sudo swapon /swapfile
+  grep -q '/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+}
+
+# CRA builds: no sourcemaps + capped heap to avoid OOM kill on small VPS.
+run_cra_build() {
+  local label="$1"
+  shift
+  echo "Building ${label} (GENERATE_SOURCEMAP=false, max-old-space-size=1536)..."
+  # Free page cache gently if root (helps after heavy npm install)
+  sync || true
+  export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=1536}"
+  export GENERATE_SOURCEMAP=false
+  export CI=false
+  if "$@"; then
+    return 0
+  fi
+  echo "WARN: ${label} build failed once — retrying with smaller heap (1280)..."
+  export NODE_OPTIONS="--max-old-space-size=1280"
+  "$@"
+}
+
 # Update and clear screen
 sudo apt update
 sudo apt upgrade -y
 clear
+ensure_build_swap
 
 # Install Node.js
 echo "
@@ -203,10 +241,15 @@ secretKey = ${shared_secret_key}
 MONGODB_CONNECTION_STRING = mongodb://admin:dbadmin123@${public_ip}:27017/${mongodbUser_name}
 EOF
 cd /home/admin/backend || exit
-pm2 start index.js --name backend
+# Avoid "Script already launched" — restart if present, else start
+if pm2 describe backend >/dev/null 2>&1; then
+  pm2 restart backend --update-env --interpreter "$(which node)"
+else
+  pm2 start index.js --name backend --interpreter "$(which node)"
+fi
 pm2 status
 node -v
-pm2 restart backend --interpreter $(which node)
+pm2 save || true
 
 # Install frontend dependencies and build
 echo "
@@ -234,18 +277,15 @@ export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm use 18.20.2
 
-# Build the frontend
+# Build the frontend (OOM-safe on 4GB droplet)
 echo "Building frontend..."
-echo "Running: npm run build"
-npm run build
-
-# Check if build command succeeded
-BUILD_EXIT_CODE=$?
-if [ $BUILD_EXIT_CODE -ne 0 ]; then
-    echo "ERROR: Frontend build command failed with exit code $BUILD_EXIT_CODE"
+if ! run_cra_build "admin frontend" npm run build; then
+    echo "ERROR: Frontend build command failed"
     echo "Please check the build output above for errors."
+    free -h || true
     exit 1
 fi
+BUILD_EXIT_CODE=0
 
 # Verify build was successful
 if [ ! -f "/home/admin/frontend/build/index.html" ]; then
@@ -353,18 +393,15 @@ export PATH="$PATH:/root/.nvm/versions/node/v18.20.2/bin"
 source ~/.bashrc
 nvm use 18.20.2
 
-# Build the salon frontend
+# Build the salon frontend (OOM-safe on 4GB droplet)
 echo "Building salon frontend..."
-echo "Running: PUBLIC_URL=/salonpanel npm run build"
-PUBLIC_URL=/salonpanel npm run build
-
-# Check if build command succeeded
-BUILD_EXIT_CODE=$?
-if [ $BUILD_EXIT_CODE -ne 0 ]; then
-    echo "ERROR: Salon build command failed with exit code $BUILD_EXIT_CODE"
+if ! run_cra_build "salon frontend" env PUBLIC_URL=/salonpanel npm run build; then
+    echo "ERROR: Salon build command failed"
     echo "Please check the build output above for errors."
+    free -h || true
     exit 1
 fi
+BUILD_EXIT_CODE=0
 
 # Verify build was successful
 if [ ! -f "/home/admin/salon/build/index.html" ]; then
