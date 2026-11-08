@@ -14,6 +14,7 @@ env:
   NODE_VERSION: '18.20.2'
   FLUTTER_VERSION: '3.47.9'
   JAVA_VERSION: '17.0.12'
+  GRADLE_VERSION: '9.3.1'
   # NDK 26 removed from GH runner images (Jan 2026). Pin to NDK 27 and preinstall in CI.
   ANDROID_NDK_VERSION: '27.0.12077973'
   DROPLET_IP: '46.101.229.176'
@@ -156,10 +157,16 @@ jobs:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
-        key: gradle-${{ runner.os }}-${{ matrix.environment }}-${{ matrix.app }}-${{ hashFiles(format('{0}/flutter/multi_salon_{1}/android/**/gradle-wrapper.properties', matrix.environment, matrix.app)) }}
+        key: gradle-${{ runner.os }}-${{ env.GRADLE_VERSION }}-${{ hashFiles('**/android/gradle/wrapper/gradle-wrapper.properties') }}
         restore-keys: |
-          gradle-${{ runner.os }}-${{ matrix.environment }}-${{ matrix.app }}-
+          gradle-${{ runner.os }}-${{ env.GRADLE_VERSION }}-
           gradle-${{ runner.os }}-
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: ${{ env.GRADLE_VERSION }}
+        cache-read-only: false
 
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
@@ -279,6 +286,40 @@ jobs:
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android"
         chmod +x gradlew
 
+    - name: Prefetch Gradle distribution
+      run: |
+        set -euo pipefail
+        ZIP="gradle-${GRADLE_VERSION}-bin.zip"
+        URL="https://services.gradle.org/distributions/${ZIP}"
+        # Fallback mirror if services.gradle.org → GitHub releases returns 504.
+        URL_MIRROR="https://downloads.gradle.org/distributions/${ZIP}"
+        OUT="/tmp/${ZIP}"
+        for attempt in 1 2 3 4 5; do
+          echo "Downloading ${ZIP} (attempt ${attempt})..."
+          if curl -fL --connect-timeout 30 --max-time 600 \
+              --retry 5 --retry-delay 15 --retry-all-errors \
+              -o "$OUT" "$URL" \
+            || curl -fL --connect-timeout 30 --max-time 600 \
+              --retry 3 --retry-delay 15 --retry-all-errors \
+              -o "$OUT" "$URL_MIRROR"; then
+            if unzip -t "$OUT" >/dev/null; then
+              echo "Gradle distribution OK: $OUT"
+              break
+            fi
+            echo "Downloaded zip is corrupt"
+            rm -f "$OUT"
+          fi
+          if [ "$attempt" -eq 5 ]; then
+            echo "Failed to download Gradle ${GRADLE_VERSION}"
+            exit 1
+          fi
+          sleep $((attempt * 20))
+        done
+        # Point wrapper at the local zip so Java HttpURLConnection never hits GitHub 504s.
+        PROPS="${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android/gradle/wrapper/gradle-wrapper.properties"
+        sed -i.bak "s|distributionUrl=.*|distributionUrl=file\\:///tmp/${ZIP}|" "$PROPS"
+        cat "$PROPS"
+
     - name: Clean Flutter project
       run: |
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
@@ -288,10 +329,10 @@ jobs:
     - name: clean gradlew (Android)
       run: |
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}/android"
-        for attempt in 1 2 3; do
+        for attempt in 1 2 3 4 5; do
           ./gradlew clean --no-daemon && exit 0
-          echo "Gradle clean failed (attempt $attempt), retrying in 15s..."
-          sleep 15
+          echo "Gradle clean failed (attempt $attempt), retrying in $((attempt * 20))s..."
+          sleep $((attempt * 20))
         done
         exit 1
 
