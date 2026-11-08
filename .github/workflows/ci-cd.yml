@@ -181,6 +181,12 @@ jobs:
         cd "${{ matrix.environment }}/flutter/multi_salon_${{ matrix.app }}"
         flutter clean
         flutter pub get
+        # Fail fast if a v1-embedding Android plugin is still resolved.
+        flutter pub deps | tee "$RUNNER_TEMP/pub-deps-${{ matrix.environment }}-${{ matrix.app }}.txt"
+        if grep -E 'url_launcher_android [^0-9]*6\.3\.[0-2]([^0-9]|$)' "$RUNNER_TEMP/pub-deps-${{ matrix.environment }}-${{ matrix.app }}.txt"; then
+          echo "::error::url_launcher_android <=6.3.2 resolved (v1 Registrar). Add dependency_overrides url_launcher_android: 6.3.33"
+          exit 1
+        fi
 
     - name: Run Flutter tests
       run: |

@@ -29,41 +29,87 @@ fi
 
 echo "DOMAIN: $DOMAIN"
 
-# 4GB droplets often OOM-kill react-scripts; ensure swap + low-mem CRA flags.
+# 4GB droplets often OOM-kill react-scripts; ensure 4G swap + low-mem CRA flags.
 ensure_build_swap() {
-  if swapon --show 2>/dev/null | grep -q .; then
-    echo "[swap] Already active:"
+  local want_mb=4096
+  local have_mb=0
+  if swapon --show --bytes 2>/dev/null | awk 'NR>1 {s+=$3} END {print int(s/1024/1024)}' | grep -q .; then
+    have_mb=$(swapon --show --bytes 2>/dev/null | awk 'NR>1 {s+=$3} END {print int(s/1024/1024+0.5)}')
+  fi
+  have_mb=${have_mb:-0}
+  if [ "$have_mb" -ge "$want_mb" ]; then
+    echo "[swap] Active (${have_mb}M):"
     swapon --show || true
     return 0
   fi
-  if [ -f /swapfile ]; then
-    sudo swapon /swapfile 2>/dev/null || true
-    return 0
+  echo "[swap] Need >=${want_mb}M (have ${have_mb}M) — recreating /swapfile..."
+  sudo swapoff /swapfile 2>/dev/null || true
+  sudo rm -f /swapfile
+  # fallocate can fail on some DO images; dd is the reliable fallback.
+  if ! sudo fallocate -l 4G /swapfile 2>/dev/null; then
+    sudo dd if=/dev/zero of=/swapfile bs=1M count=4096 status=progress
   fi
-  echo "[swap] Creating 2G /swapfile for CRA builds..."
-  sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
   sudo chmod 600 /swapfile
   sudo mkswap /swapfile
   sudo swapon /swapfile
   grep -q '/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+  swapon --show || true
+  free -h || true
+}
+
+# Pause memory-heavy services so CRA has headroom on 4GB VPS.
+pause_for_cra_build() {
+  echo "[cra] Memory before build:"
+  free -h || true
+  if command -v pm2 >/dev/null 2>&1; then
+    pm2 stop backend 2>/dev/null || true
+    pm2 stop all 2>/dev/null || true
+  fi
+  sync || true
+  # Drop caches when root (safe; pages reload on demand).
+  if [ "$(id -u)" = "0" ]; then
+    echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+  fi
+  free -h || true
+}
+
+resume_after_cra_build() {
+  if command -v pm2 >/dev/null 2>&1; then
+    pm2 start backend --update-env 2>/dev/null || pm2 restart backend 2>/dev/null || true
+  fi
 }
 
 # CRA builds: no sourcemaps + capped heap to avoid OOM kill on small VPS.
 run_cra_build() {
   local label="$1"
   shift
-  echo "Building ${label} (GENERATE_SOURCEMAP=false, max-old-space-size=1536)..."
-  # Free page cache gently if root (helps after heavy npm install)
-  sync || true
-  export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=1536}"
+  pause_for_cra_build
+  echo "Building ${label} (GENERATE_SOURCEMAP=false, max-old-space-size=2048, swap)..."
+  # Force heap (do not inherit a bad NODE_OPTIONS from CI/ssh).
+  export NODE_OPTIONS="--max-old-space-size=2048"
   export GENERATE_SOURCEMAP=false
+  export DISABLE_ESLINT_PLUGIN=true
+  export INLINE_RUNTIME_CHUNK=false
+  export IMAGE_INLINE_SIZE_LIMIT=0
   export CI=false
   if "$@"; then
+    resume_after_cra_build
     return 0
   fi
-  echo "WARN: ${label} build failed once — retrying with smaller heap (1280)..."
-  export NODE_OPTIONS="--max-old-space-size=1280"
+  echo "WARN: ${label} build failed once — retrying with heap 1536..."
+  pause_for_cra_build
+  export NODE_OPTIONS="--max-old-space-size=1536"
+  if "$@"; then
+    resume_after_cra_build
+    return 0
+  fi
+  echo "WARN: ${label} build failed twice — last retry with heap 1024..."
+  pause_for_cra_build
+  export NODE_OPTIONS="--max-old-space-size=1024"
   "$@"
+  local rc=$?
+  resume_after_cra_build
+  return $rc
 }
 
 # Update and clear screen
@@ -280,9 +326,10 @@ nvm use 18.20.2
 # Build the frontend (OOM-safe on 4GB droplet)
 echo "Building frontend..."
 if ! run_cra_build "admin frontend" npm run build; then
-    echo "ERROR: Frontend build command failed"
+    echo "ERROR: Frontend build command failed with exit code 1"
     echo "Please check the build output above for errors."
     free -h || true
+    swapon --show || true
     exit 1
 fi
 BUILD_EXIT_CODE=0
