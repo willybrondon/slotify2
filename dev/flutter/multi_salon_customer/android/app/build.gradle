@@ -33,7 +33,8 @@ if (flutterVersionName == null) {
 android {
     namespace "com.skedisy.customer"
     compileSdkVersion 36
-    ndkVersion flutter.ndkVersion
+    // NDK 26 removed from GH runners (Jan 2026); pin to preinstalled/CI NDK 27.
+    ndkVersion "27.0.12077973"
 
     buildToolsVersion "21.1.2"
 
