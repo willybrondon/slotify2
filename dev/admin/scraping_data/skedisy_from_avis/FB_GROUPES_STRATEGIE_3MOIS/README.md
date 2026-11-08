@@ -33,3 +33,4 @@ Chaque onglet contient plusieurs posts prêts à copier-coller (colonnes : Group
 - Pro → https://skedisy.com/professionnel
 
 Généré par `generate_fb_strategie_3mois.py`.
+s
