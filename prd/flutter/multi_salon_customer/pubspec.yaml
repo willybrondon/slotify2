@@ -89,6 +89,8 @@ dev_dependencies:
 # Flutter 3.47+ removed v1 embedding (PluginRegistry.Registrar).
 dependency_overrides:
   flutter_plugin_android_lifecycle: 2.0.35
+  # Flutter 3.47+ removed v1 embedding; 0.8.9+6 still references Registrar.
+  image_picker_android: 0.8.13+25
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
