@@ -35,11 +35,13 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+// CI writes ndk.version; fallback keeps local builds working without GH runner NDK 26.
+def ndkVersionFromLocal = localProperties.getProperty('ndk.version') ?: "27.0.12077973"
+
 android {
     namespace "com.skedisy.expert"
     compileSdkVersion 36
-    // NDK 26 removed from GH runners (Jan 2026); pin to preinstalled/CI NDK 27.
-    ndkVersion "27.0.12077973"
+    ndkVersion ndkVersionFromLocal
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

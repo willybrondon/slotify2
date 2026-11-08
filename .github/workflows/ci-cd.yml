@@ -202,7 +202,6 @@ jobs:
           export ANDROID_SDK_ROOT
         fi
         echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
-        echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION" >> "$GITHUB_ENV"
         SDKMANAGER="$(find "$ANDROID_SDK_ROOT/cmdline-tools" -type f -name sdkmanager 2>/dev/null | head -n 1 || true)"
         if [ -z "$SDKMANAGER" ]; then
           echo "sdkmanager not found under $ANDROID_SDK_ROOT/cmdline-tools"
@@ -211,22 +210,43 @@ jobs:
         fi
         echo "Using sdkmanager: $SDKMANAGER"
         mkdir -p "$ANDROID_SDK_ROOT/licenses"
+        # `yes` exits with SIGPIPE once sdkmanager closes stdin; ignore that under pipefail.
+        set +o pipefail
         yes | "$SDKMANAGER" --licenses >/dev/null || true
-        if [ -d "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION" ]; then
+        set -o pipefail
+
+        echo "Installed NDK packages:"
+        ls -1 "$ANDROID_SDK_ROOT/ndk" 2>/dev/null || echo "(none)"
+
+        # Prefer any NDK already on the runner image (avoids a multi-GB download).
+        EXISTING_NDK="$(ls -1 "$ANDROID_SDK_ROOT/ndk" 2>/dev/null | sort -V | tail -n 1 || true)"
+        if [ -n "$EXISTING_NDK" ]; then
+          ANDROID_NDK_VERSION="$EXISTING_NDK"
+          echo "Using preinstalled NDK $ANDROID_NDK_VERSION"
+        elif [ -d "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION" ]; then
           echo "NDK $ANDROID_NDK_VERSION already present"
         else
           for attempt in 1 2 3; do
             echo "Installing NDK $ANDROID_NDK_VERSION (attempt $attempt)..."
-            if yes | "$SDKMANAGER" "ndk;$ANDROID_NDK_VERSION"; then
-              test -d "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION" && break
+            set +o pipefail
+            yes | "$SDKMANAGER" "ndk;$ANDROID_NDK_VERSION"
+            set -o pipefail
+            if [ -d "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION" ]; then
+              echo "NDK $ANDROID_NDK_VERSION installed"
+              break
             fi
-            echo "NDK install failed (attempt $attempt), retrying in 15s..."
+            echo "NDK install incomplete (attempt $attempt), retrying in 15s..."
             sleep 15
             if [ "$attempt" -eq 3 ]; then
+              echo "Failed to install NDK $ANDROID_NDK_VERSION"
               exit 1
             fi
           done
         fi
+
+        echo "ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION" >> "$GITHUB_ENV"
+        echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION" >> "$GITHUB_ENV"
+        test -d "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION"
         ls -la "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION" | head
 
     - name: Generate local.properties
@@ -237,8 +257,10 @@ jobs:
         BUILD_NUMBER="${VERSION##*+}"
         : "${FLUTTER_ROOT:?FLUTTER_ROOT is required}"
         : "${ANDROID_SDK_ROOT:?ANDROID_SDK_ROOT is required}"
+        : "${ANDROID_NDK_VERSION:?ANDROID_NDK_VERSION is required}"
         echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
         echo "sdk.dir=$ANDROID_SDK_ROOT" >> android/local.properties
+        echo "ndk.version=$ANDROID_NDK_VERSION" >> android/local.properties
         echo "flutter.buildMode=release" >> android/local.properties
         echo "flutter.versionName=$BUILD_NAME" >> android/local.properties
         echo "flutter.versionCode=$BUILD_NUMBER" >> android/local.properties
