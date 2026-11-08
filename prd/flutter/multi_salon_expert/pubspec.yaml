@@ -89,6 +89,10 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
 
+# Flutter 3.47+ removed v1 embedding (PluginRegistry.Registrar).
+dependency_overrides:
+  flutter_plugin_android_lifecycle: 2.0.35
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

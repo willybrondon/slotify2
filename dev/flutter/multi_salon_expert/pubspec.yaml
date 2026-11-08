@@ -70,6 +70,11 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
 
+# Flutter 3.47+ removed v1 embedding (PluginRegistry.Registrar).
+# image_picker still resolves flutter_plugin_android_lifecycle 2.0.19 without this.
+dependency_overrides:
+  flutter_plugin_android_lifecycle: 2.0.35
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
