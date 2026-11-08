@@ -261,10 +261,10 @@ app.get("/docs/", (req, res) => {
     res.status(404).send(`<h1>404 - Documentation not found</h1><p><a href="/">Return to Skedisy</a></p>`);
   }
 });
-// Legacy “request adding salon” → onboarding
+// Legacy “request adding salon” → onboarding (relative so local/dev works)
 app.get(
   ["/request-adding-salon.html", "/request-adding-salon"],
-  (req, res) => res.redirect(301, "https://skedisy.com/salon/rejoindre")
+  (req, res) => res.redirect(302, "/salon/rejoindre")
 );
 // Pages légales — servir le fichier directement (évite boucle /cookies/ ↔ /cookies.html avec nginx/static)
 const serveSalonportalLegalPage = (indexRelPath, flatRelPath) => (req, res) => {

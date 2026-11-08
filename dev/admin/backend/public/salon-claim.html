@@ -9,7 +9,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="theme-color" content="#c45c26">
-    <meta name="description" content="Inscrivez votre salon sur Skedisy en 3 etapes. Gratuit. Prestations, horaires, reservations en ligne.">
+    <meta name="description" content="Découvrez le potentiel de votre salon beauté afro sur Skedisy. Diagnostic gratuit, vitrine pro, réservations en ligne.">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -361,9 +361,184 @@
             border-radius: 999px;
             margin-left: 6px;
         }
+        .choice-list { display: flex; flex-direction: column; gap: 10px; margin: 8px 0 16px; }
+        .choice-btn {
+            width: 100%;
+            text-align: left;
+            padding: 14px 16px;
+            border: 2px solid var(--sk-border);
+            border-radius: 12px;
+            background: #fff;
+            color: var(--sk-black);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s, transform 0.15s;
+        }
+        .choice-btn:hover, .choice-btn.selected {
+            border-color: var(--sk-brand);
+            background: var(--sk-brand-light);
+        }
+        .choice-btn small {
+            display: block;
+            margin-top: 4px;
+            font-weight: 500;
+            font-size: 12px;
+            color: var(--sk-muted);
+        }
+        .feedback-card {
+            display: none;
+            margin: 0 0 14px;
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--sk-brand-light);
+            border-left: 3px solid var(--sk-brand);
+            color: rgba(17,17,17,0.78);
+            font-size: 14px;
+            line-height: 1.45;
+        }
+        .feedback-card.visible { display: block; }
+        .proof-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .proof-card {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            color: var(--sk-black);
+        }
+        .proof-card strong {
+            display: block;
+            font-size: 1.35rem;
+            color: var(--sk-brand);
+            margin-bottom: 2px;
+        }
+        .proof-card span { font-size: 12px; color: var(--sk-muted); }
+        .stars { color: #f5a623; letter-spacing: 1px; margin: 6px 0; }
+        .quote {
+            margin: 12px 0 18px;
+            padding: 14px;
+            border-radius: 12px;
+            background: #fafafa;
+            color: var(--sk-black);
+            font-size: 14px;
+            line-height: 1.45;
+            font-style: italic;
+        }
+        .quote cite {
+            display: block;
+            margin-top: 8px;
+            font-style: normal;
+            font-size: 12px;
+            color: var(--sk-muted);
+            font-weight: 600;
+        }
+        .diag-block {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            color: var(--sk-black);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .diag-block h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--sk-brand);
+            margin-bottom: 8px;
+        }
+        .diag-block ul { padding-left: 18px; margin: 0; }
+        .diag-block li { margin-bottom: 4px; }
+        .score-ring {
+            text-align: center;
+            margin: 8px 0 16px;
+            color: var(--sk-black);
+        }
+        .score-ring .score-num {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--sk-brand);
+            line-height: 1;
+        }
+        .score-ring .score-label { font-size: 13px; color: var(--sk-muted); margin-top: 4px; }
+        .score-bars { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+        .score-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+            font-size: 13px;
+            color: var(--sk-black);
+        }
+        .score-row .bar {
+            grid-column: 1 / -1;
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(17,17,17,0.08);
+            overflow: hidden;
+        }
+        .score-row .bar > i {
+            display: block;
+            height: 100%;
+            background: var(--sk-brand);
+            border-radius: 999px;
+        }
+        .preview-card {
+            border: 2px solid var(--sk-border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            background: #fff;
+            color: var(--sk-black);
+        }
+        .preview-hero {
+            height: 120px;
+            background: linear-gradient(135deg, rgba(196,92,38,0.35), rgba(17,17,17,0.85));
+            background-size: cover;
+            background-position: center;
+        }
+        .preview-body { padding: 14px; }
+        .preview-body h3 { font-size: 1.1rem; margin-bottom: 4px; }
+        .preview-body p { font-size: 13px; color: var(--sk-muted); margin-bottom: 8px; }
+        .preview-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .preview-tags span {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: var(--sk-brand-light);
+            color: var(--sk-brand);
+        }
+        .mkt-progress {
+            height: 4px;
+            background: rgba(17,17,17,0.08);
+            border-radius: 999px;
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+        .mkt-progress > i {
+            display: block;
+            height: 100%;
+            background: var(--sk-brand);
+            width: 0%;
+            transition: width 0.25s ease;
+        }
+        .price-day {
+            font-size: 12px;
+            color: var(--sk-muted);
+            font-weight: 500;
+        }
+        .plan-card .plan-price .price-day { display: block; margin-top: 2px; }
         @media (max-width: 480px) {
             .service-grid { grid-template-columns: 1fr; }
-            .row-2, .photo-row { grid-template-columns: 1fr; }
+            .row-2, .photo-row, .proof-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -371,12 +546,118 @@
     <div class="container">
         <div class="logo">
             <p class="kicker">Skedisy · Espace pro</p>
-            <h1 id="pageTitle">Creer mon salon</h1>
-            <p id="pageSubtitle">Gratuit · 4 etapes · pret en quelques minutes</p>
+            <h1 id="pageTitle">Faites découvrir votre expertise afro</h1>
+            <p id="pageSubtitle">Diagnostic gratuit · ~3 min · puis création de votre vitrine</p>
         </div>
 
         <div class="error" id="error"></div>
         <div class="success" id="success"></div>
+
+        <!-- MARKETING FUNNEL (Blow Up–inspired, salon-only) -->
+        <div id="marketingMode" style="display:none;">
+            <div class="mkt-progress" aria-hidden="true"><i id="mktProgressBar"></i></div>
+            <p class="step-label" id="mktStepLabel">Bienvenue</p>
+
+            <div class="panel active" id="mkt0">
+                <div class="proof-row">
+                    <div class="proof-card"><strong>Spécialisé</strong><span>Beauté afro &amp; textured hair</span></div>
+                    <div class="proof-card"><strong>3 min</strong><span>Pour votre diagnostic</span></div>
+                </div>
+                <div class="stars" aria-label="4,8 sur 5">★★★★★ <span style="color:var(--sk-muted);font-size:12px;">4,8 · salons partenaires</span></div>
+                <div class="quote">
+                    « Enfin une plateforme où mes clientes cherchent vraiment des tresses et des soins adaptés. »
+                    <cite>— Salon partenaire Skedisy, Île-de-France</cite>
+                </div>
+                <p style="color:var(--sk-black);font-size:14px;line-height:1.45;margin-bottom:16px;">
+                    Skedisy aide les professionnelles de la beauté afro à être trouvées, à présenter clairement leurs prestations et à recevoir des demandes de rendez-vous.
+                </p>
+                <button type="button" class="btn" id="mktStartBtn">Découvrir mon potentiel</button>
+                <button type="button" class="btn btn-ghost" id="mktSkipBtn" style="margin-top:10px;width:100%;">Passer et créer mon salon</button>
+                <p class="hint" style="text-align:center;margin-top:12px;">
+                    Déjà référencé ? Utilisez le lien reçu par e-mail ou
+                    <a href="/salonpanel/login" style="color:var(--sk-brand);font-weight:600;">connectez-vous</a>.
+                </p>
+            </div>
+
+            <div class="panel" id="mkt1">
+                <p style="color:var(--sk-black);font-size:15px;font-weight:600;margin-bottom:6px;">Depuis quand exercez-vous ?</p>
+                <p class="hint" style="margin-bottom:10px;">Chaque parcours est différent — on adapte les conseils.</p>
+                <div class="choice-list" data-q="experience">
+                    <button type="button" class="choice-btn" data-value="debut">Je débute<small>Moins d’un an</small></button>
+                    <button type="button" class="choice-btn" data-value="1-2">1 à 2 ans<small>Les bases sont là</small></button>
+                    <button type="button" class="choice-btn" data-value="2-5">2 à 5 ans<small>Une vraie expérience</small></button>
+                    <button type="button" class="choice-btn" data-value="5+">Plus de 5 ans<small>Expertise confirmée</small></button>
+                </div>
+                <div class="feedback-card" id="fb-experience"></div>
+                <div class="btn-row">
+                    <button type="button" class="btn btn-ghost" data-mkt-back="0">Retour</button>
+                    <button type="button" class="btn" data-mkt-next="2" disabled id="mktNext1">Continuer</button>
+                </div>
+            </div>
+
+            <div class="panel" id="mkt2">
+                <p style="color:var(--sk-black);font-size:15px;font-weight:600;margin-bottom:6px;">Comment trouvez-vous vos nouvelles clientes ?</p>
+                <div class="choice-list" data-q="acquisition">
+                    <button type="button" class="choice-btn" data-value="instagram">Instagram / TikTok</button>
+                    <button type="button" class="choice-btn" data-value="bouche">Bouche-à-oreille</button>
+                    <button type="button" class="choice-btn" data-value="google">Google / Pages Jaunes</button>
+                    <button type="button" class="choice-btn" data-value="habituelles">Surtout mes clientes habituelles</button>
+                    <button type="button" class="choice-btn" data-value="plateformes">Déjà via des plateformes</button>
+                </div>
+                <div class="feedback-card" id="fb-acquisition"></div>
+                <div class="btn-row">
+                    <button type="button" class="btn btn-ghost" data-mkt-back="1">Retour</button>
+                    <button type="button" class="btn" data-mkt-next="3" disabled id="mktNext2">Continuer</button>
+                </div>
+            </div>
+
+            <div class="panel" id="mkt3">
+                <p style="color:var(--sk-black);font-size:15px;font-weight:600;margin-bottom:6px;">Votre agenda est rempli à combien en ce moment ?</p>
+                <div class="choice-list" data-q="agenda">
+                    <button type="button" class="choice-btn" data-value="vide">Souvent des trous<small>Beaucoup de créneaux libres</small></button>
+                    <button type="button" class="choice-btn" data-value="moitie">Environ à moitié</button>
+                    <button type="button" class="choice-btn" data-value="bien">Plutôt bien rempli</button>
+                    <button type="button" class="choice-btn" data-value="plein">Complet / liste d’attente</button>
+                </div>
+                <div class="feedback-card" id="fb-agenda"></div>
+                <div class="btn-row">
+                    <button type="button" class="btn btn-ghost" data-mkt-back="2">Retour</button>
+                    <button type="button" class="btn" data-mkt-next="4" disabled id="mktNext3">Continuer</button>
+                </div>
+            </div>
+
+            <div class="panel" id="mkt4">
+                <p style="color:var(--sk-black);font-size:15px;font-weight:600;margin-bottom:6px;">Vos prestations &amp; tarifs sont-ils clairs en ligne ?</p>
+                <div class="choice-list" data-q="clarity">
+                    <button type="button" class="choice-btn" data-value="non">Non, pas vraiment<small>Les clientes doivent demander</small></button>
+                    <button type="button" class="choice-btn" data-value="partiel">Partiellement<small>Quelques posts, pas de fiche claire</small></button>
+                    <button type="button" class="choice-btn" data-value="oui">Oui, c’est clair<small>Site, IG ou autre bien à jour</small></button>
+                </div>
+                <div class="feedback-card" id="fb-clarity"></div>
+                <div class="btn-row">
+                    <button type="button" class="btn btn-ghost" data-mkt-back="3">Retour</button>
+                    <button type="button" class="btn" data-mkt-next="5" disabled id="mktNext4">Voir mon diagnostic</button>
+                </div>
+            </div>
+
+            <div class="panel" id="mkt5">
+                <div class="diag-block">
+                    <h3>Votre diagnostic</h3>
+                    <p id="diagNiche"><strong>Positionnement :</strong> Beauté afro professionnelle</p>
+                    <p id="diagSummary" style="margin-top:8px;"></p>
+                </div>
+                <div class="diag-block">
+                    <h3>Points forts</h3>
+                    <ul id="diagStrengths"></ul>
+                </div>
+                <div class="diag-block">
+                    <h3>À améliorer pour convertir</h3>
+                    <ul id="diagImprove"></ul>
+                </div>
+                <button type="button" class="btn" id="mktToRegister">Créer ma vitrine Skedisy</button>
+                <button type="button" class="btn btn-ghost" data-mkt-back="4" style="margin-top:10px;width:100%;">Retour</button>
+            </div>
+        </div>
 
         <!-- CLAIM MODE (invitation token) -->
         <div id="claimMode" style="display:none;">
@@ -411,6 +692,8 @@
                 <div class="step-dot" id="dot3">3</div>
                 <div class="step-line" id="line3"></div>
                 <div class="step-dot" id="dot4">4</div>
+                <div class="step-line" id="line4"></div>
+                <div class="step-dot" id="dot5">5</div>
             </div>
             <p class="step-label" id="stepLabel">Etape 1 — Salon & compte</p>
 
@@ -519,16 +802,38 @@
                     </div>
                 </div>
 
-                <!-- STEP 4: abonnement (Free first) + create -->
+                <!-- STEP 4: aperçu + score de complétude -->
                 <div class="panel" id="step4">
+                    <div class="score-ring">
+                        <div class="score-num" id="completenessScore">0</div>
+                        <div class="score-label">Score de complétude du profil / 100</div>
+                    </div>
+                    <div class="score-bars" id="completenessBars"></div>
+                    <div class="preview-card">
+                        <div class="preview-hero" id="previewHero"></div>
+                        <div class="preview-body">
+                            <h3 id="previewName">Votre salon</h3>
+                            <p id="previewMeta">Ville · prestations</p>
+                            <div class="preview-tags" id="previewTags"></div>
+                        </div>
+                    </div>
+                    <div class="info" id="completenessTip" style="margin-bottom:12px;"></div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-ghost" id="backTo3">Retour</button>
+                        <button type="submit" class="btn" id="toStep5">Voir les formules</button>
+                    </div>
+                </div>
+
+                <!-- STEP 5: abonnement (Free first) + create -->
+                <div class="panel" id="step5">
                     <div class="info" style="margin-bottom:12px;">
                         Choisissez votre formule. <strong>Free / Essai</strong> est selectionne par defaut —
-                        modifiable plus tard dans votre espace.
+                        modifiable plus tard dans votre espace. Le prix « par jour » aide à comparer — le montant facturé reste le prix mensuel affiché.
                     </div>
                     <div id="plansLoading" class="hint" style="margin-bottom:10px;">Chargement des formules…</div>
                     <div class="plan-list" id="planList" role="radiogroup" aria-label="Formules"></div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-ghost" id="backTo3">Retour</button>
+                        <button type="button" class="btn btn-ghost" id="backTo4">Retour</button>
                         <button type="submit" class="btn" id="createSalonBtn">Creer mon salon</button>
                     </div>
                 </div>
@@ -741,8 +1046,181 @@
                 return;
             }
 
-            // --- Register (rejoindre = claim without token) ---
-            document.getElementById('registerMode').style.display = 'block';
+            // --- Marketing funnel then register ---
+            var quiz = { experience: '', acquisition: '', agenda: '', clarity: '', skipped: false };
+            try {
+                var saved = sessionStorage.getItem('skedisy_salon_quiz');
+                if (saved) quiz = Object.assign(quiz, JSON.parse(saved));
+            } catch (e) {}
+
+            var FEEDBACK = {
+                experience: {
+                    debut: 'Vous démarrez au bon moment. Une fiche claire attire plus vite que le bouche-à-oreille seul.',
+                    '1-2': 'Vous avez déjà pris le rythme. C’est maintenant que la vitrine fait la différence.',
+                    '2-5': 'Les bases sont posées. Il reste à rendre votre expertise visible et bookable.',
+                    '5+': 'Votre expérience est un vrai atout. Il vous manque souvent juste le bon système de découverte.'
+                },
+                acquisition: {
+                    instagram: 'Instagram amène de la notoriété — Skedisy transforme l’intérêt en rendez-vous avec prestations et créneaux clairs.',
+                    bouche: 'Le bouche-à-oreille reste précieux. Une fiche Skedisy vous fait découvrir par des clientes qui ne vous connaissent pas encore.',
+                    google: 'Google vous trouve déjà. Une fiche spécialisée beauté afro renforce la confiance avant le premier contact.',
+                    habituelles: 'Fidéliser c’est bien — mais sans nouveaux canaux, l’agenda stagne. Skedisy élargit votre découverte.',
+                    plateformes: 'Vous êtes déjà dans le réflexe plateforme. Skedisy se spécialise sur la demande beauté afro.'
+                },
+                agenda: {
+                    vide: 'Des créneaux libres = opportunités. Une vitrine claire aide à les remplir sans poster 10 stories par jour.',
+                    moitie: 'Vous avez de la marge. Mieux présenter tresses, locks ou soins convertit plus de demandes.',
+                    bien: 'Bon rythme. L’enjeu : rester visible quand une cliente cherche exactement votre spécialité.',
+                    plein: 'Agenda plein : super. Une fiche pro sécurise la file d’attente et les demandes hors réseau habituel.'
+                },
+                clarity: {
+                    non: 'Sans prestations et tarifs lisibles, beaucoup de clientes abandonnent. On va structurer ça ensemble.',
+                    partiel: 'Vous avez commencé — il manque souvent photos, horaires et une page unique pour convertir.',
+                    oui: 'Bonne base. Skedisy centralise le tout pour les clientes qui comparent plusieurs professionnelles.'
+                }
+            };
+
+            function trackEvent(name, props) {
+                try {
+                    if (typeof gtag === 'function') gtag('event', name, props || {});
+                } catch (e) {}
+                try {
+                    if (window.dataLayer && Array.isArray(window.dataLayer)) {
+                        window.dataLayer.push(Object.assign({ event: name }, props || {}));
+                    }
+                } catch (e) {}
+                try { console.info('[onboarding]', name, props || {}); } catch (e2) {}
+            }
+
+            function persistQuiz() {
+                try { sessionStorage.setItem('skedisy_salon_quiz', JSON.stringify(quiz)); } catch (e) {}
+            }
+
+            function goMkt(n) {
+                [0, 1, 2, 3, 4, 5].forEach(function (i) {
+                    var p = document.getElementById('mkt' + i);
+                    if (p) p.classList.toggle('active', i === n);
+                });
+                var labels = {
+                    0: 'Bienvenue',
+                    1: 'Votre expérience',
+                    2: 'Vos clientes',
+                    3: 'Votre agenda',
+                    4: 'Votre présence en ligne',
+                    5: 'Diagnostic personnalisé'
+                };
+                document.getElementById('mktStepLabel').textContent = labels[n] || '';
+                var bar = document.getElementById('mktProgressBar');
+                if (bar) bar.style.width = Math.round((n / 5) * 100) + '%';
+                hideError();
+                trackEvent('salon_onboarding_mkt_step', { step: n });
+            }
+
+            function buildDiagnostic() {
+                var strengths = [];
+                var improve = [];
+                if (quiz.experience === '5+' || quiz.experience === '2-5') {
+                    strengths.push('Votre ancienneté rassure immédiatement les clientes beauté afro.');
+                } else {
+                    strengths.push('Vous êtes au moment idéal pour structurer une présence qui attire.');
+                }
+                if (quiz.acquisition === 'instagram' || quiz.acquisition === 'bouche') {
+                    strengths.push('Vous avez déjà un canal d’acquisition — Skedisy le complète.');
+                }
+                if (quiz.agenda === 'plein' || quiz.agenda === 'bien') {
+                    strengths.push('La demande existe : capitalisez avec une fiche claire et bookable.');
+                }
+                if (quiz.clarity === 'oui') {
+                    strengths.push('Vos infos sont déjà plutôt claires — on les met au format clientes.');
+                }
+
+                if (quiz.clarity !== 'oui') {
+                    improve.push('Lister prestations (tresses, locks, soins…) et tarifs « à partir de » pour lever les freins.');
+                }
+                if (quiz.acquisition === 'habituelles' || quiz.agenda === 'vide') {
+                    improve.push('Être découvrable hors de votre cercle actuel : niche afro + localisation.');
+                }
+                improve.push('Ajouter des photos de réalisations : c’est le 1er critère de confiance en beauté afro.');
+                improve.push('Horaires et zone d’intervention visibles pour convertir sans échange WhatsApp interminable.');
+                if (strengths.length < 2) strengths.push('Votre savoir-faire mérite une vitrine dédiée, pas seulement des stories.');
+
+                var summary =
+                    'Vous exercez dans la beauté afro. Aujourd’hui, ' +
+                    (quiz.clarity === 'non'
+                        ? 'vos clientes doivent trop souvent demander les détails avant de booker.'
+                        : quiz.agenda === 'vide'
+                            ? 'des créneaux restent vides faute d’être trouvées au bon moment.'
+                            : 'le levier le plus fort est une fiche complète qui inspire confiance en quelques secondes.') +
+                    ' Skedisy vous aide à présenter clairement votre expertise et à recevoir des demandes.';
+
+                document.getElementById('diagSummary').textContent = summary;
+                document.getElementById('diagStrengths').innerHTML = strengths.map(function (s) {
+                    return '<li>' + escapeHtml(s) + '</li>';
+                }).join('');
+                document.getElementById('diagImprove').innerHTML = improve.map(function (s) {
+                    return '<li>' + escapeHtml(s) + '</li>';
+                }).join('');
+                trackEvent('salon_onboarding_diagnostic_viewed', quiz);
+            }
+
+            function startRegisterFlow() {
+                document.getElementById('marketingMode').style.display = 'none';
+                document.getElementById('registerMode').style.display = 'block';
+                document.getElementById('pageTitle').textContent = 'Créer mon salon';
+                document.getElementById('pageSubtitle').textContent = '5 étapes · vitrine prête en quelques minutes';
+                persistQuiz();
+                trackEvent('salon_onboarding_register_started', quiz);
+                goToStep(1);
+            }
+
+            document.getElementById('marketingMode').style.display = 'block';
+            trackEvent('salon_onboarding_started', { path: location.pathname });
+            goMkt(0);
+
+            document.getElementById('mktStartBtn').addEventListener('click', function () {
+                goMkt(1);
+            });
+            document.getElementById('mktSkipBtn').addEventListener('click', function () {
+                quiz.skipped = true;
+                persistQuiz();
+                trackEvent('salon_onboarding_mkt_skipped');
+                startRegisterFlow();
+            });
+            document.getElementById('mktToRegister').addEventListener('click', startRegisterFlow);
+
+            document.querySelectorAll('.choice-list').forEach(function (list) {
+                var q = list.getAttribute('data-q');
+                list.querySelectorAll('.choice-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        list.querySelectorAll('.choice-btn').forEach(function (b) { b.classList.remove('selected'); });
+                        btn.classList.add('selected');
+                        quiz[q] = btn.getAttribute('data-value');
+                        persistQuiz();
+                        var fb = document.getElementById('fb-' + q);
+                        if (fb && FEEDBACK[q] && FEEDBACK[q][quiz[q]]) {
+                            fb.textContent = FEEDBACK[q][quiz[q]];
+                            fb.classList.add('visible');
+                        }
+                        var nextMap = { experience: 'mktNext1', acquisition: 'mktNext2', agenda: 'mktNext3', clarity: 'mktNext4' };
+                        var nextBtn = document.getElementById(nextMap[q]);
+                        if (nextBtn) nextBtn.disabled = false;
+                        trackEvent('salon_goal_or_quiz_answered', { question: q, value: quiz[q] });
+                    });
+                });
+            });
+
+            document.querySelectorAll('[data-mkt-next]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var n = Number(btn.getAttribute('data-mkt-next'));
+                    if (n === 5) buildDiagnostic();
+                    goMkt(n);
+                });
+            });
+            document.querySelectorAll('[data-mkt-back]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    goMkt(Number(btn.getAttribute('data-mkt-back')));
+                });
+            });
 
             var currentStep = 1;
             var submitting = false;
@@ -750,9 +1228,80 @@
             var plansLoaded = false;
             var selectedPlanId = 'free';
 
+            function computeCompleteness() {
+                var parts = [];
+                var name = document.getElementById('salonName').value.trim();
+                var city = document.getElementById('city').value.trim();
+                var address = document.getElementById('address').value.trim();
+                var email = document.getElementById('email').value.trim();
+                var mobile = document.getElementById('mobile').value.trim();
+                var infoOk = !!(name && city && address && email && mobile);
+                parts.push({ key: 'Informations', ok: infoOk, weight: 25 });
+                var svc = getSelectedServices().length;
+                parts.push({ key: 'Prestations', ok: svc > 0, weight: 25, detail: svc + ' sélectionnée(s)' });
+                var days = getActiveDays().length;
+                parts.push({ key: 'Horaires', ok: days > 0, weight: 20, detail: days + ' jour(s)' });
+                var hasSalonPhoto = !!(document.getElementById('salonImage').files && document.getElementById('salonImage').files[0]);
+                var hasExpertPhoto = !!(document.getElementById('expertImage').files && document.getElementById('expertImage').files[0]);
+                var photoScore = (hasSalonPhoto ? 15 : 0) + (hasExpertPhoto ? 15 : 0);
+                parts.push({ key: 'Photos', ok: photoScore >= 15, weight: 30, score: photoScore });
+                var total = 0;
+                parts.forEach(function (p) {
+                    if (p.score != null) total += p.score;
+                    else total += p.ok ? p.weight : 0;
+                });
+                return { total: total, parts: parts };
+            }
+
+            function renderPreview() {
+                var c = computeCompleteness();
+                document.getElementById('completenessScore').textContent = String(c.total);
+                var bars = document.getElementById('completenessBars');
+                bars.innerHTML = '';
+                c.parts.forEach(function (p) {
+                    var pct = p.score != null ? Math.round((p.score / p.weight) * 100) : (p.ok ? 100 : 0);
+                    if (p.key === 'Photos') pct = Math.round((p.score / 30) * 100);
+                    var row = document.createElement('div');
+                    row.className = 'score-row';
+                    row.innerHTML =
+                        '<span>' + escapeHtml(p.key) + (p.detail ? ' · ' + escapeHtml(p.detail) : '') + '</span>' +
+                        '<strong>' + (p.ok || (p.score && p.score > 0) ? 'OK' : 'À compléter') + '</strong>' +
+                        '<div class="bar"><i style="width:' + pct + '%"></i></div>';
+                    bars.appendChild(row);
+                });
+                var name = document.getElementById('salonName').value.trim() || 'Votre salon';
+                var city = document.getElementById('city').value.trim() || 'Votre ville';
+                var svcCount = getSelectedServices().length;
+                document.getElementById('previewName').textContent = name;
+                document.getElementById('previewMeta').textContent = city + ' · ' + svcCount + ' prestation(s)';
+                var tags = document.getElementById('previewTags');
+                tags.innerHTML = '';
+                ['Beauté afro', 'Réservation', city].filter(Boolean).forEach(function (t) {
+                    var s = document.createElement('span');
+                    s.textContent = t;
+                    tags.appendChild(s);
+                });
+                var hero = document.getElementById('previewHero');
+                var salonFile = document.getElementById('salonImage').files && document.getElementById('salonImage').files[0];
+                if (salonFile) {
+                    hero.style.backgroundImage = 'url(' + URL.createObjectURL(salonFile) + ')';
+                } else {
+                    hero.style.backgroundImage = '';
+                }
+                var tip = document.getElementById('completenessTip');
+                if (c.total >= 85) {
+                    tip.innerHTML = '<strong>Profil solide.</strong> Vous pouvez choisir une formule et publier.';
+                } else if (c.total >= 55) {
+                    tip.innerHTML = '<strong>Bon début.</strong> Ajoutez surtout des photos de réalisations pour rassurer les clientes.';
+                } else {
+                    tip.innerHTML = '<strong>Profil incomplet.</strong> Complétez prestations et photos — c’est ce qui convertit en beauté afro.';
+                }
+                trackEvent('salon_profile_previewed', { score: c.total });
+            }
+
             function goToStep(n) {
                 currentStep = n;
-                [1, 2, 3, 4].forEach(function (i) {
+                [1, 2, 3, 4, 5].forEach(function (i) {
                     var panel = document.getElementById('step' + i);
                     if (panel) panel.classList.toggle('active', i === n);
                     var dot = document.getElementById('dot' + i);
@@ -765,11 +1314,14 @@
                 document.getElementById('line2').classList.toggle('done', n > 2);
                 var line3 = document.getElementById('line3');
                 if (line3) line3.classList.toggle('done', n > 3);
+                var line4 = document.getElementById('line4');
+                if (line4) line4.classList.toggle('done', n > 4);
                 document.getElementById('stepLabel').textContent = ({
                     1: 'Etape 1 — Salon & compte',
                     2: 'Etape 2 — Prestations',
                     3: 'Etape 3 — Horaires & photos',
-                    4: 'Etape 4 — Abonnement'
+                    4: 'Etape 4 — Aperçu & score',
+                    5: 'Etape 5 — Formule'
                 })[n];
                 hideError();
 
@@ -783,7 +1335,11 @@
                         '<span>E-mail</span> ' + escapeHtml(document.getElementById('email').value.trim()) + '<br>' +
                         '<span>Prestations</span> ' + selected.length + ' selectionnee(s)';
                 }
-                if (n === 4) loadPlans();
+                if (n === 4) renderPreview();
+                if (n === 5) {
+                    loadPlans();
+                    trackEvent('salon_plan_viewed');
+                }
             }
 
             function renderDays() {
@@ -937,6 +1493,7 @@
                         if (checked) selectedPlanId = id;
                         var price = Number(plan.priceMonthly) || 0;
                         var priceLabel = price <= 0 ? 'Gratuit' : (price + ' € / mois');
+                        var perDay = price > 0 ? (Math.round((price / 30) * 100) / 100).toFixed(2).replace('.', ',') + ' € / jour' : '';
                         var label = document.createElement('label');
                         label.className = 'plan-card' + (checked ? ' selected' : '');
                         label.dataset.planId = id;
@@ -956,7 +1513,9 @@
                             '<div class="plan-name">' + escapeHtml(plan.name || id) +
                             (isFree || plan.isDefault ? '<span class="plan-badge">Recommande</span>' : '') +
                             '</div>' +
-                            '<div class="plan-price">' + escapeHtml(priceLabel) + '</div>' +
+                            '<div class="plan-price">' + escapeHtml(priceLabel) +
+                            (perDay ? '<span class="price-day">soit ~' + escapeHtml(perDay) + '</span>' : '') +
+                            '</div>' +
                             '<div class="plan-tag">' + escapeHtml(plan.tagline || '') + '</div>';
                         label.appendChild(input);
                         label.appendChild(body);
@@ -1011,7 +1570,8 @@
                     }
                     return true;
                 }
-                if (n === 4) {
+                if (n === 4) return true;
+                if (n === 5) {
                     if (!selectedPlanId) {
                         showError('Choisissez une formule d\'abonnement.');
                         return false;
@@ -1069,6 +1629,10 @@
                 if (partneroPartnerKey) {
                     formData.append('partneroPartnerKey', partneroPartnerKey);
                 }
+                try {
+                    formData.append('onboardingQuiz', JSON.stringify(quiz));
+                    formData.append('completenessScore', String(computeCompleteness().total));
+                } catch (e) {}
 
                 var salonFile = document.getElementById('salonImage').files[0];
                 var expertFile = document.getElementById('expertImage').files[0];
@@ -1103,6 +1667,11 @@
                             : 'Salon inscrit ! Redirection vers la connexion…';
                         successEl.style.display = 'block';
                         document.getElementById('registerMode').style.display = 'none';
+                        trackEvent('salon_subscription_completed', {
+                            planId: payload.planId || selectedPlanId,
+                            quizSkipped: !!quiz.skipped
+                        });
+                        try { sessionStorage.removeItem('skedisy_salon_quiz'); } catch (e) {}
                         var delay = (window.SKEDISY_PARTNERO && window.SKEDISY_PARTNERO.enabled) ? 2000 : 1400;
                         setTimeout(function () {
                             var loginUrl = '/salonpanel/login?email=' + encodeURIComponent(email);
@@ -1118,11 +1687,11 @@
                         goToStep(1);
                         focusConflictField(result.data.field);
                     } else {
-                        goToStep(4);
+                        goToStep(5);
                     }
                 } catch (err) {
                     showError('Erreur de connexion. Reessayez dans un instant.');
-                    goToStep(4);
+                    goToStep(5);
                 } finally {
                     submitting = false;
                     createBtn.disabled = false;
@@ -1156,12 +1725,19 @@
                     if (validateStep(3)) goToStep(4);
                     return;
                 }
+                if (currentStep === 4) {
+                    goToStep(5);
+                    return;
+                }
+                if (!validateStep(5)) return;
+                trackEvent('salon_checkout_started', { planId: selectedPlanId });
                 createSalon();
             });
 
             document.getElementById('backTo1').addEventListener('click', function () { goToStep(1); });
             document.getElementById('backTo2').addEventListener('click', function () { goToStep(2); });
             document.getElementById('backTo3').addEventListener('click', function () { goToStep(3); });
+            document.getElementById('backTo4').addEventListener('click', function () { goToStep(4); });
         })();
     </script>
 </body>

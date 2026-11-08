@@ -1109,6 +1109,31 @@ exports.selfRegister = async (req, res) => {
     salon.source = sourceParts.join(":");
     salon.autoConfirmBookings = true;
     salon.serviceIds = serviceEntries;
+
+    // Marketing quiz from Blow Up–style funnel (optional)
+    let onboardingQuiz = req.body?.onboardingQuiz;
+    if (typeof onboardingQuiz === "string") {
+      try {
+        onboardingQuiz = JSON.parse(onboardingQuiz);
+      } catch (_) {
+        onboardingQuiz = null;
+      }
+    }
+    if (onboardingQuiz && typeof onboardingQuiz === "object") {
+      salon.onboardingQuiz = {
+        experience: String(onboardingQuiz.experience || "").slice(0, 40),
+        acquisition: String(onboardingQuiz.acquisition || "").slice(0, 40),
+        agenda: String(onboardingQuiz.agenda || "").slice(0, 40),
+        clarity: String(onboardingQuiz.clarity || "").slice(0, 40),
+        skipped: Boolean(onboardingQuiz.skipped),
+        at: new Date().toISOString(),
+      };
+      salon.markModified("onboardingQuiz");
+    }
+    const completenessRaw = Number(req.body?.completenessScore);
+    if (Number.isFinite(completenessRaw) && completenessRaw >= 0 && completenessRaw <= 100) {
+      salon.onboardingCompletenessScore = Math.round(completenessRaw);
+    }
     salon.salonTime = buildDefaultSalonTime({
       openTime: req.body?.openTime,
       closedTime: req.body?.closedTime,

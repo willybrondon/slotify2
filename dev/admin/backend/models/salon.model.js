@@ -83,6 +83,13 @@ const salonSchema = new mongoose.Schema(
     claimToken: { type: String, default: "" }, // Token for salon to claim their profile
     source: { type: String, default: "" }, // Source of salon data (pagesjaunes, google_places, etc.)
     source_id: { type: String, default: "" }, // Original ID from source
+    /** Marketing funnel answers from /salon/rejoindre (Blow Up–style quiz) */
+    onboardingQuiz: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+    /** Profile completeness at self-register (0–100), informational only */
+    onboardingCompletenessScore: { type: Number, default: null },
 
     /** Partnero affiliate attribution (Ambassadeurs Skedisy) */
     partnero: {
