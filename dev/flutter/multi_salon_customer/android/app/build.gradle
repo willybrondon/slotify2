@@ -89,13 +89,9 @@ flutter {
 }
 
 dependencies {
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-messaging'
+    // Native Firebase comes from FlutterFire plugins (firebase_core / messaging).
+    // Unversioned artifacts without firebase-bom fail resolution on AGP 9 / Gradle 9.
     // Play Billing >= 8 (Google Play). Matches in_app_purchase_android 0.5.5 (billing 9.1.0).
     implementation 'com.android.billingclient:billing:9.1.0'
-//    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
-
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
-
-
 }
