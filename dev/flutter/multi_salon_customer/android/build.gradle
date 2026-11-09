@@ -25,6 +25,14 @@ subprojects { sub ->
     sub.afterEvaluate {
         def androidExt = sub.extensions.findByName("android")
         if (androidExt != null) {
+            // Plugins like fluttertoast still ship compileSdk 33; AGP AAR checks need >=34.
+            if (androidExt.hasProperty("compileSdk")) {
+                androidExt.compileSdk = 36
+            }
+            try {
+                androidExt.compileSdkVersion 36
+            } catch (Throwable ignored) {
+            }
             androidExt.compileOptions {
                 sourceCompatibility JavaVersion.VERSION_17
                 targetCompatibility JavaVersion.VERSION_17

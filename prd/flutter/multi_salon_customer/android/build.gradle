@@ -20,9 +20,31 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-    project.evaluationDependsOn(':app')
+subprojects { sub ->
+    sub.buildDir = "${rootProject.buildDir}/${sub.name}"
+    sub.evaluationDependsOn(':app')
+    sub.afterEvaluate {
+        def androidExt = sub.extensions.findByName("android")
+        if (androidExt != null) {
+            // Plugins like fluttertoast still ship compileSdk 33; AGP AAR checks need >=34.
+            if (androidExt.hasProperty("compileSdk")) {
+                androidExt.compileSdk = 36
+            }
+            try {
+                androidExt.compileSdkVersion 36
+            } catch (Throwable ignored) {
+            }
+            androidExt.compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+        }
+    }
+    sub.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
 }
 
 tasks.register("clean", Delete) {
