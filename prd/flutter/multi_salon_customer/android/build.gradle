@@ -45,6 +45,15 @@ subprojects { sub ->
             jvmTarget = "17"
         }
     }
+    // stripe_android pulls compileOnly issuing-push-provisioning → private
+    // play-services-tapandpay (not on public Maven). Only lintVital resolves it.
+    if (sub.name == "stripe_android") {
+        sub.tasks.configureEach { task ->
+            if (task.name.startsWith("lintVital")) {
+                task.enabled = false
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

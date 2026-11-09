@@ -115,13 +115,28 @@
         updateFavHeaderCount();
     }
 
+    function closeMobileMenuIfOpen() {
+        const mobileMenu = document.getElementById("mobileMenu");
+        const overlay = document.getElementById("mobileMenuOverlay");
+        const hamburger = document.getElementById("mobileMenuToggle");
+        if (!mobileMenu || !mobileMenu.classList.contains("active")) return;
+        mobileMenu.classList.remove("active");
+        overlay?.classList.remove("active");
+        document.body.classList.remove("menu-open");
+        document.body.style.overflow = "";
+        hamburger?.classList.remove("active");
+    }
+
     function openFavDrawer() {
         const drawer = document.getElementById("favDrawer");
         if (!drawer) return;
+        closeMobileMenuIfOpen();
         renderFavDrawer();
         drawer.hidden = false;
         drawer.classList.add("is-open");
-        document.getElementById("headerFavBtn")?.setAttribute("aria-expanded", "true");
+        document
+            .querySelectorAll("#headerFavBtn, #headerFavBtnMobile, [data-open-fav]")
+            .forEach((btn) => btn.setAttribute("aria-expanded", "true"));
     }
 
     function closeFavDrawer() {

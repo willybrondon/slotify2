@@ -45,6 +45,8 @@ const salonSchema = new mongoose.Schema(
      */
     subscription: {
       planId: { type: String, default: "free" },
+      /** Blow Up pack: 1m | 3m | 12m */
+      packId: { type: String, default: "" },
       status: {
         type: String,
         enum: ["none", "trialing", "active", "past_due", "canceled", "unpaid"],

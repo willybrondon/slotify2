@@ -1,11 +1,54 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../extras/Button";
 import { apiInstanceFetch } from "../api/axiosApi";
+import "./SalonSubscriptionBilling.css";
+
+const FALLBACK_PACKS = [
+  {
+    packId: "1m",
+    months: 1,
+    label: "1 mois",
+    price: 18.99,
+    compareAt: 37.97,
+    discountPct: 50,
+    popular: false,
+    perDay: 0.63,
+  },
+  {
+    packId: "3m",
+    months: 3,
+    label: "3 mois",
+    price: 29.99,
+    compareAt: 74.97,
+    discountPct: 60,
+    popular: true,
+    perDay: 0.33,
+  },
+  {
+    packId: "12m",
+    months: 12,
+    label: "12 mois",
+    price: 69.99,
+    compareAt: 149.97,
+    discountPct: 53,
+    popular: false,
+    perDay: 0.19,
+  },
+];
+
+const formatEuro = (value) => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "—";
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+};
 
 /**
- * Salon self-serve SaaS plans — select a plan, pay via Stripe Checkout,
- * or switch plan in place when already subscribed.
+ * Blow Up–style salon billing: 1 / 3 / 12 mois, €/jour, réduction, renouvellement.
  */
 const SalonSubscriptionBilling = () => {
   const navigate = useNavigate();
@@ -14,8 +57,7 @@ const SalonSubscriptionBilling = () => {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [data, setData] = useState(null);
-  const [interval, setInterval] = useState("month");
-  const [selectedPlanId, setSelectedPlanId] = useState("");
+  const [selectedPackId, setSelectedPackId] = useState("3m");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -24,8 +66,14 @@ const SalonSubscriptionBilling = () => {
       const res = await apiInstanceFetch.get("salon/subscription/status");
       if (res?.status) {
         setData(res.data);
-        const current = res.data?.subscription?.planId || "free";
-        setSelectedPlanId((prev) => prev || current);
+        const currentPack = res.data?.subscription?.packId;
+        if (currentPack) {
+          setSelectedPackId(currentPack);
+        } else {
+          const popular =
+            (res.data?.billingPacks || []).find((p) => p.popular)?.packId || "3m";
+          setSelectedPackId((prev) => prev || popular);
+        }
       } else {
         setError(res?.message || "Impossible de charger l'abonnement");
       }
@@ -55,68 +103,35 @@ const SalonSubscriptionBilling = () => {
   }, [load, navigate]);
 
   const sub = data?.subscription || {};
+  const packs = data?.billingPacks?.length ? data.billingPacks : FALLBACK_PACKS;
+  const checkoutPlanId = data?.checkoutPlanId || "premium";
+  const currentPackId = sub.packId || "";
   const plans = data?.plans || [];
-  const currentId = sub.planId || "free";
+  const currentPlanName =
+    plans.find((p) => p.planId === (sub.planId || "free"))?.name ||
+    sub.planId ||
+    "free";
 
-  const selectedPlan = useMemo(
-    () => plans.find((p) => p.planId === selectedPlanId) || null,
-    [plans, selectedPlanId]
+  const selectedPack = useMemo(
+    () => packs.find((p) => p.packId === selectedPackId) || packs[0],
+    [packs, selectedPackId]
   );
 
-  const selectedPrice = useMemo(() => {
-    if (!selectedPlan) return 0;
-    return interval === "year"
-      ? Number(selectedPlan.priceYearly) || 0
-      : Number(selectedPlan.priceMonthly) || 0;
-  }, [selectedPlan, interval]);
-
-  const isSelectedCurrent = selectedPlanId === currentId;
-  const selectedIsFree =
-    selectedPlan?.isFree ||
-    selectedPlan?.tier === "free" ||
-    !(selectedPrice > 0);
-
-  const canCheckoutSelected = useMemo(() => {
-    if (!selectedPlan || isSelectedCurrent) return false;
-    if (selectedIsFree) return !sub.stripeSubscriptionId;
-    return interval === "year"
-      ? Boolean(selectedPlan.hasCheckoutYearly)
-      : Boolean(selectedPlan.hasCheckoutMonthly);
-  }, [
-    selectedPlan,
-    isSelectedCurrent,
-    selectedIsFree,
-    sub.stripeSubscriptionId,
-    interval,
-  ]);
+  const isSelectedCurrent =
+    Boolean(currentPackId) &&
+    selectedPackId === currentPackId &&
+    ["active", "trialing"].includes(String(sub.status || ""));
 
   const ctaLabel = useMemo(() => {
     if (busy) return "Traitement…";
-    if (!selectedPlan) return "Sélectionnez un plan";
     if (isSelectedCurrent) return "Plan déjà actif";
-    if (selectedIsFree) {
-      return sub.stripeSubscriptionId
-        ? "Annulez d'abord via Gérer / factures"
-        : "Activer le plan gratuit";
-    }
-    if (sub.stripeSubscriptionId) return "Changer de plan";
-    if (selectedPlan.trialDays > 0) {
-      return `Essai ${selectedPlan.trialDays} j. puis payer`;
-    }
-    return `Choisir et payer · ${selectedPrice} €`;
-  }, [
-    busy,
-    selectedPlan,
-    isSelectedCurrent,
-    selectedIsFree,
-    sub.stripeSubscriptionId,
-    selectedPrice,
-  ]);
+    if (sub.stripeSubscriptionId) return "Continuer — changer de durée";
+    return "Continuer";
+  }, [busy, isSelectedCurrent, sub.stripeSubscriptionId]);
 
-  const startCheckout = async (planId) => {
-    const targetId = planId || selectedPlanId;
-    if (!targetId) {
-      setError("Sélectionnez un plan");
+  const startCheckout = async () => {
+    if (!selectedPackId) {
+      setError("Sélectionnez une durée");
       return;
     }
     setBusy(true);
@@ -124,14 +139,17 @@ const SalonSubscriptionBilling = () => {
     setNotice("");
     try {
       const res = await apiInstanceFetch.post("salon/subscription/checkout", {
-        planId: targetId,
-        interval,
+        planId: checkoutPlanId,
+        packId: selectedPackId,
       });
       if (res?.status && res?.data?.checkoutUrl) {
         window.location.href = res.data.checkoutUrl;
         return;
       }
-      if (res?.status && (res?.data?.mode === "updated" || res?.data?.mode === "assigned")) {
+      if (
+        res?.status &&
+        (res?.data?.mode === "updated" || res?.data?.mode === "assigned")
+      ) {
         setNotice(res.message || res.data?.message || "Plan mis à jour.");
         await load();
         return;
@@ -170,215 +188,174 @@ const SalonSubscriptionBilling = () => {
 
   if (loading && !data) {
     return (
-      <div className="p-3 text-muted">Chargement de l&apos;abonnement…</div>
+      <div className="ssb-wrap">
+        <p className="ssb-muted">Chargement de l&apos;abonnement…</p>
+      </div>
     );
   }
 
+  const renewalFullPrice = selectedPack?.compareAt ?? 74.97;
+
   return (
-    <div className="row">
-      <div className="col-12 mb-3">
-        <div
-          className="p-3 rounded"
-          style={{ background: "#f5f7f5", border: "1px solid #dce5dc" }}
-        >
-          <div className="d-flex flex-wrap justify-content-between gap-2 align-items-start">
-            <div>
-              <h5 className="mb-1" style={{ color: "#1c2b20" }}>
-                Abonnement Skedisy
-              </h5>
-              <p className="mb-1 text-muted">
-                Plan actuel :{" "}
-                <strong>
-                  {plans.find((p) => p.planId === currentId)?.name || currentId}
-                </strong>
-                {sub.status ? ` · ${sub.status}` : ""}
-                {sub.currentPeriodEnd
-                  ? ` · jusqu’au ${new Date(
-                      sub.currentPeriodEnd
-                    ).toLocaleDateString("fr-FR")}`
-                  : ""}
-              </p>
-              <p className="mb-0 small text-muted">
-                Sélectionnez un plan ci-dessous, puis validez pour activer et
-                payer.
-              </p>
-              {data?.partnero?.attributed ? (
-                <small className="text-muted d-block mt-1">
-                  Affiliation Ambassadeur liée
-                  {data.partnero.signupSynced ? " (sync OK)" : ""}
-                </small>
-              ) : null}
-            </div>
-            {sub.stripeSubscriptionId ? (
-              <Button
-                text="Gérer / factures"
-                className="bg-secondary text-white"
-                onClick={openPortal}
-                disabled={busy}
-              />
-            ) : null}
-          </div>
+    <div className="ssb-wrap">
+      <div className="ssb-status">
+        <div>
+          <p className="ssb-status-label">Abonnement actuel</p>
+          <p className="ssb-status-value">
+            {currentPlanName}
+            {currentPackId
+              ? ` · ${
+                  packs.find((p) => p.packId === currentPackId)?.label ||
+                  currentPackId
+                }`
+              : ""}
+            {sub.status ? ` · ${sub.status}` : ""}
+            {sub.currentPeriodEnd
+              ? ` · jusqu’au ${new Date(sub.currentPeriodEnd).toLocaleDateString(
+                  "fr-FR"
+                )}`
+              : ""}
+          </p>
+          {data?.partnero?.attributed ? (
+            <p className="ssb-muted ssb-tiny">
+              Affiliation Ambassadeur liée
+              {data.partnero.signupSynced ? " (sync OK)" : ""}
+            </p>
+          ) : null}
         </div>
-      </div>
-
-      {notice ? (
-        <div className="col-12 mb-2">
-          <div className="alert alert-success py-2 mb-0">{notice}</div>
-        </div>
-      ) : null}
-      {error ? (
-        <div className="col-12 mb-2">
-          <div className="alert alert-warning py-2 mb-0">{error}</div>
-        </div>
-      ) : null}
-
-      <div className="col-12 mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-        <div className="btn-group" role="group" aria-label="Période">
+        {sub.stripeSubscriptionId ? (
           <button
             type="button"
-            className={`btn btn-sm ${
-              interval === "month" ? "btn-success" : "btn-outline-secondary"
-            }`}
-            onClick={() => setInterval("month")}
+            className="ssb-link-btn"
+            onClick={openPortal}
+            disabled={busy}
           >
-            Mensuel
+            Gérer / factures
           </button>
-          <button
-            type="button"
-            className={`btn btn-sm ${
-              interval === "year" ? "btn-success" : "btn-outline-secondary"
-            }`}
-            onClick={() => setInterval("year")}
-          >
-            Annuel
-          </button>
-        </div>
-        <Button
-          text={ctaLabel}
-          className={`${
-            canCheckoutSelected ||
-            (selectedIsFree && !isSelectedCurrent && !sub.stripeSubscriptionId)
-              ? "bg-theme"
-              : "bg-secondary"
-          } text-white`}
-          onClick={() => startCheckout(selectedPlanId)}
-          disabled={
-            busy ||
-            !selectedPlan ||
-            isSelectedCurrent ||
-            (selectedIsFree && Boolean(sub.stripeSubscriptionId)) ||
-            (!selectedIsFree && !canCheckoutSelected)
-          }
-        />
+        ) : null}
       </div>
 
-      {plans.map((plan) => {
-        const isCurrent = plan.planId === currentId;
-        const isSelected = plan.planId === selectedPlanId;
-        const price =
-          interval === "year" ? plan.priceYearly : plan.priceMonthly;
-        const isFree = plan.isFree || plan.tier === "free" || !(Number(price) > 0);
-        const featurePreview = (plan.features || []).slice(0, 5);
+      {notice ? <div className="ssb-alert ssb-alert-ok">{notice}</div> : null}
+      {error ? <div className="ssb-alert ssb-alert-warn">{error}</div> : null}
 
-        return (
-          <div className="col-md-6 col-lg-4 mb-3" key={plan.planId}>
+      <h3 className="ssb-title">Choisis ton plan</h3>
+
+      <div className="ssb-plans" role="radiogroup" aria-label="Durée d'abonnement">
+        {packs.map((pack) => {
+          const isSelected = pack.packId === selectedPackId;
+          const isCurrent = pack.packId === currentPackId;
+          const perDay =
+            Number(pack.perDay) ||
+            Number(pack.price) / (Math.max(1, Number(pack.months)) * 30);
+
+          return (
             <button
+              key={pack.packId}
               type="button"
-              className="h-100 w-100 text-start p-3 rounded"
-              onClick={() => setSelectedPlanId(plan.planId)}
-              style={{
-                border: isSelected
-                  ? "2px solid #1ebc1e"
-                  : plan.isHighlighted
-                    ? "2px solid #9ad49a"
-                    : "1px solid #dde3dd",
-                background: isCurrent ? "#eef8ee" : "#fff",
-                boxShadow: isSelected ? "0 0 0 3px rgba(30,188,30,0.15)" : "none",
-                cursor: "pointer",
-              }}
+              role="radio"
+              aria-checked={isSelected}
+              className={[
+                "ssb-plan",
+                isSelected ? "is-selected" : "",
+                pack.popular ? "is-popular" : "",
+                isCurrent ? "is-current" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={() => setSelectedPackId(pack.packId)}
             >
-              <div className="d-flex justify-content-between align-items-start mb-2">
-                <div className="d-flex align-items-center gap-2">
-                  <span
-                    aria-hidden
-                    style={{
-                      width: 18,
-                      height: 18,
-                      borderRadius: "50%",
-                      border: isSelected ? "5px solid #1ebc1e" : "2px solid #9aa89a",
-                      display: "inline-block",
-                      flexShrink: 0,
-                    }}
-                  />
-                  <h6 className="mb-0">{plan.name}</h6>
-                </div>
-                <div className="d-flex flex-column align-items-end gap-1">
-                  {isCurrent ? (
-                    <span className="badge bg-success">Actuel</span>
-                  ) : null}
-                  {isSelected && !isCurrent ? (
-                    <span className="badge bg-dark">Sélectionné</span>
-                  ) : null}
-                </div>
-              </div>
-              {plan.tagline ? (
-                <p className="small text-muted mb-2">{plan.tagline}</p>
+              {pack.popular ? (
+                <span className="ssb-popular-badge">Plus populaire</span>
               ) : null}
-              <p className="mb-2">
-                {isFree ? (
-                  <strong>Gratuit</strong>
-                ) : (
-                  <>
-                    <strong>{Number(price) || "—"} €</strong>
-                    <span className="text-muted">
-                      {" "}
-                      / {interval === "year" ? "an" : "mois"}
-                    </span>
-                  </>
-                )}
-                {!isFree && plan.trialDays > 0 ? (
-                  <span className="d-block small text-muted">
-                    Essai {plan.trialDays} jours
-                  </span>
-                ) : null}
-              </p>
-              {featurePreview.length ? (
-                <ul className="small text-muted mb-2 ps-3">
-                  {featurePreview.map((f) => (
-                    <li key={f.key || f}>{f.label || f}</li>
-                  ))}
-                  {(plan.features || []).length > featurePreview.length ? (
-                    <li>
-                      +{(plan.features || []).length - featurePreview.length}{" "}
-                      autres
-                    </li>
-                  ) : null}
-                </ul>
-              ) : null}
-              {!isCurrent ? (
-                <span
-                  className="btn btn-sm w-100"
-                  style={{
-                    background: isSelected ? "#1ebc1e" : "#e8efe8",
-                    color: isSelected ? "#fff" : "#1c2b20",
-                    pointerEvents: "none",
-                  }}
-                >
-                  {isSelected ? "Sélectionné — validez en haut" : "Sélectionner"}
-                </span>
-              ) : (
-                <span className="small text-muted">Votre plan en cours</span>
-              )}
-            </button>
-          </div>
-        );
-      })}
 
-      <div className="col-12 mt-1">
-        <p className="small text-muted mb-0">
-          Le paiement sécurisé est géré par Stripe. Après validation, votre plan
-          est activé automatiquement (ou sous quelques secondes via webhook).
+              <span
+                className={`ssb-radio${isSelected ? " is-on" : ""}`}
+                aria-hidden
+              >
+                {isSelected ? (
+                  <svg viewBox="0 0 16 16" width="12" height="12">
+                    <path
+                      fill="currentColor"
+                      d="M6.2 11.4 2.8 8l1.1-1.1 2.3 2.3 5-5L12.3 5.3z"
+                    />
+                  </svg>
+                ) : null}
+              </span>
+
+              <span className="ssb-plan-main">
+                <span className="ssb-plan-top">
+                  <span className="ssb-plan-name">{pack.label}</span>
+                  {pack.discountPct > 0 ? (
+                    <span className="ssb-discount">-{pack.discountPct}%</span>
+                  ) : null}
+                  {isCurrent ? (
+                    <span className="ssb-current-badge">Actuel</span>
+                  ) : null}
+                </span>
+                <span className="ssb-plan-prices">
+                  <span className="ssb-price-was">
+                    {formatEuro(pack.compareAt)}
+                  </span>
+                  <span className="ssb-price-now">{formatEuro(pack.price)}</span>
+                </span>
+              </span>
+
+              <span className="ssb-per-day">
+                <strong>{formatEuro(perDay)}</strong>
+                <span>/jour</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="ssb-legal">
+        Le prix réduit s&apos;applique à ton premier abonnement. Ton abonnement
+        sera automatiquement renouvelé au prix plein de{" "}
+        <strong>{formatEuro(renewalFullPrice)}</strong> à la fin de la période
+        d&apos;abonnement choisie, jusqu&apos;à annulation dans ton compte.
+      </p>
+
+      <button
+        type="button"
+        className="ssb-cta"
+        onClick={startCheckout}
+        disabled={busy || isSelectedCurrent}
+      >
+        {ctaLabel}
+      </button>
+
+      <div className="ssb-secure">
+        <div className="ssb-secure-title">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+            <path
+              fill="currentColor"
+              d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3zm0 10.9 4.2-4.2 1.4 1.4L12 16.7 6.4 11l1.4-1.4L12 12.9z"
+            />
+          </svg>
+          Paiement sécurisé
+        </div>
+        <p className="ssb-secure-copy">
+          Via Stripe : carte bancaire, Apple Pay et Google Pay selon ton
+          appareil. Skedisy ne stocke pas ton numéro de carte.
         </p>
+        <div className="ssb-pay-methods" aria-label="Moyens de paiement Stripe">
+          <span className="ssb-pay-chip ssb-pay-visa" title="Visa">
+            Visa
+          </span>
+          <span className="ssb-pay-chip ssb-pay-mc" title="Mastercard">
+            Mastercard
+          </span>
+          <span className="ssb-pay-chip ssb-pay-amex" title="American Express">
+            Amex
+          </span>
+          <span className="ssb-pay-chip ssb-pay-apple" title="Apple Pay">
+            Apple Pay
+          </span>
+          <span className="ssb-pay-chip ssb-pay-gpay" title="Google Pay">
+            Google Pay
+          </span>
+        </div>
       </div>
     </div>
   );

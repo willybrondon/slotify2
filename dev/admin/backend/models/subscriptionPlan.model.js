@@ -52,6 +52,11 @@ const subscriptionPlanSchema = new mongoose.Schema(
     },
     stripePriceIdMonthly: { type: String, default: "" },
     stripePriceIdYearly: { type: String, default: "" },
+    /** Blow Up packs: { "1m": "price_…", "3m": "price_…", "12m": "price_…" } */
+    stripePriceIdsByPack: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
     notes: { type: String, default: "" },
   },
   {

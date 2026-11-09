@@ -12,6 +12,9 @@ const {
 const {
   SUBSCRIPTION_FEATURES,
 } = require("../../constants/subscriptionFeatures");
+const {
+  SUBSCRIPTION_BILLING_PACKS,
+} = require("../../constants/subscriptionBillingPacks");
 
 const FEATURE_LABELS = Object.fromEntries(
   SUBSCRIPTION_FEATURES.map((f) => [f.key, f.label])
@@ -34,6 +37,7 @@ exports.getSubscriptionStatus = async (req, res) => {
       data: {
         subscription: {
           planId: salon.subscription?.planId || "free",
+          packId: salon.subscription?.packId || "",
           status: salon.subscription?.status || "none",
           currentPeriodEnd: salon.subscription?.currentPeriodEnd || null,
           cancelAtPeriodEnd: Boolean(salon.subscription?.cancelAtPeriodEnd),
@@ -44,6 +48,17 @@ exports.getSubscriptionStatus = async (req, res) => {
           attributed: Boolean(salon.partnero?.partnerKey),
           signupSynced: Boolean(salon.partnero?.signupSynced),
         },
+        /** Entitlement plan used when paying a Blow Up pack (Premium by default). */
+        checkoutPlanId:
+          plans.find((p) => p.isHighlighted && p.tier !== "free")?.planId ||
+          plans.find((p) => p.tier === "premium")?.planId ||
+          plans.find((p) => p.tier !== "free" && (Number(p.priceMonthly) > 0 || Number(p.priceYearly) > 0))
+            ?.planId ||
+          "premium",
+        billingPacks: SUBSCRIPTION_BILLING_PACKS.map((pack) => ({
+          ...pack,
+          perDay: Number((pack.price / (pack.months * 30)).toFixed(2)),
+        })),
         plans: plans.map((p) => {
           const amountMonthly = Number(p.priceMonthly) || 0;
           const amountYearly = Number(p.priceYearly) || 0;
@@ -82,7 +97,10 @@ exports.getSubscriptionStatus = async (req, res) => {
  */
 exports.createCheckout = async (req, res) => {
   try {
-    const planId = String(req.body?.planId || req.query?.planId || "")
+    const packId = String(req.body?.packId || req.query?.packId || "")
+      .toLowerCase()
+      .trim();
+    let planId = String(req.body?.planId || req.query?.planId || "")
       .toLowerCase()
       .trim();
     const interval =
@@ -90,6 +108,21 @@ exports.createCheckout = async (req, res) => {
       "year"
         ? "year"
         : "month";
+
+    // Pack checkout: default entitlement plan = highlighted Premium.
+    if (packId && !planId) {
+      await ensureDefaultPlans();
+      const highlighted = await SubscriptionPlan.findOne({
+        isActive: true,
+        isHighlighted: true,
+        tier: { $ne: "free" },
+      }).lean();
+      const premium = await SubscriptionPlan.findOne({
+        planId: "premium",
+        isActive: true,
+      }).lean();
+      planId = highlighted?.planId || premium?.planId || "premium";
+    }
 
     if (!planId) {
       return res.status(200).json({ status: false, message: "planId requis" });
@@ -103,6 +136,7 @@ exports.createCheckout = async (req, res) => {
     const result = await billing.chooseOrChangePlan(salon, {
       planId,
       interval,
+      packId: packId || undefined,
     });
 
     return res.status(200).json({

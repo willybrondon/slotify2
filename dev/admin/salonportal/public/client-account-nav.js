@@ -268,6 +268,8 @@
     const btn = document.getElementById("sqNotifBtn");
     const panel = document.getElementById("sqNotifPanel");
     if (!btn || !panel) return;
+    if (btn.dataset.notifBound === "1") return;
+    btn.dataset.notifBound = "1";
 
     btn.addEventListener("click", async (e) => {
       e.preventDefault();
@@ -291,6 +293,8 @@
     const btn = document.getElementById("sqAccountMenuBtn");
     const panel = document.getElementById("sqAccountMenu");
     if (!btn || !panel) return;
+    if (btn.dataset.menuBound === "1") return;
+    btn.dataset.menuBound = "1";
 
     btn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -307,6 +311,8 @@
   }
 
   function wireOutsideClose() {
+    if (document.documentElement.dataset.accountOutsideClose === "1") return;
+    document.documentElement.dataset.accountOutsideClose = "1";
     document.addEventListener("click", (e) => {
       const notif = document.getElementById("sqNotifPanel");
       const menu = document.getElementById("sqAccountMenu");
@@ -335,11 +341,153 @@
 
   function wireLogout() {
     document.querySelectorAll("[data-account-logout]").forEach((el) => {
+      if (el.dataset.logoutBound === "1") return;
+      el.dataset.logoutBound = "1";
       el.addEventListener("click", (e) => {
         e.preventDefault();
         clearUser();
         window.location.href = "/";
       });
+    });
+  }
+
+  const LIKES_KEY = "skedisy_liked_salons";
+  const LIKES_META_KEY = "skedisy_liked_salons_meta";
+
+  function getLikedSet() {
+    try {
+      const raw = localStorage.getItem(LIKES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return new Set(Array.isArray(arr) ? arr.map(String) : []);
+    } catch (_) {
+      return new Set();
+    }
+  }
+
+  function getLikedMeta() {
+    try {
+      const raw = localStorage.getItem(LIKES_META_KEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return obj && typeof obj === "object" ? obj : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function escapeAttr(s) {
+    return escapeHtml(s).replace(/'/g, "&#39;");
+  }
+
+  function closeMobileMenuIfOpen() {
+    const mobileMenu = document.getElementById("mobileMenu");
+    const overlay = document.getElementById("mobileMenuOverlay");
+    const hamburger = document.getElementById("mobileMenuToggle");
+    if (!mobileMenu || !mobileMenu.classList.contains("active")) return;
+    mobileMenu.classList.remove("active");
+    overlay?.classList.remove("active");
+    document.body.classList.remove("menu-open");
+    document.body.style.overflow = "";
+    hamburger?.classList.remove("active");
+  }
+
+  function ensureFavDrawer() {
+    if (document.getElementById("favDrawer")) return;
+    const el = document.createElement("div");
+    el.className = "sq-fav-drawer";
+    el.id = "favDrawer";
+    el.hidden = true;
+    el.innerHTML = `
+      <div class="sq-fav-drawer__backdrop" data-close-fav></div>
+      <aside class="sq-fav-drawer__panel" role="dialog" aria-labelledby="favDrawerTitle">
+        <div class="sq-fav-drawer__head">
+          <h2 id="favDrawerTitle">${escapeHtml(t("Mes salons aimés", "Liked salons"))}</h2>
+          <button type="button" class="sq-fav-drawer__close" data-close-fav aria-label="${escapeHtml(
+            t("Fermer", "Close")
+          )}">&times;</button>
+        </div>
+        <ul class="sq-fav-drawer__list" id="favDrawerList"></ul>
+        <p class="sq-fav-drawer__empty" id="favDrawerEmpty">${escapeHtml(
+          t("Aucun salon aimé pour le moment.", "No liked salons yet.")
+        )}</p>
+      </aside>`;
+    document.body.appendChild(el);
+  }
+
+  function updateFavHeaderCount() {
+    const count = getLikedSet().size;
+    document.querySelectorAll("#headerFavCount").forEach((el) => {
+      el.textContent = count > 0 ? String(count) : "";
+      el.setAttribute("data-count", String(count));
+    });
+  }
+
+  function renderFavDrawer() {
+    ensureFavDrawer();
+    const list = document.getElementById("favDrawerList");
+    const empty = document.getElementById("favDrawerEmpty");
+    if (!list) return;
+    const set = getLikedSet();
+    const meta = getLikedMeta();
+    const ids = [...set];
+    list.innerHTML = ids
+      .map((id) => {
+        const m = meta[id] || {};
+        const name = escapeHtml(m.name || "Salon");
+        const url = escapeAttr(m.url || `/salon/${id}`);
+        const img = m.image
+          ? `<img src="${escapeAttr(m.image)}" alt="" loading="lazy">`
+          : `<span class="sq-fav-drawer__item-ph" aria-hidden="true"></span>`;
+        return `<li><a class="sq-fav-drawer__item" href="${url}">${img}<span class="sq-fav-drawer__item-name">${name}</span></a></li>`;
+      })
+      .join("");
+    if (empty) empty.hidden = ids.length > 0;
+    updateFavHeaderCount();
+  }
+
+  function openFavDrawer() {
+    ensureFavDrawer();
+    renderFavDrawer();
+    const drawer = document.getElementById("favDrawer");
+    if (!drawer) return;
+    drawer.hidden = false;
+    drawer.classList.add("is-open");
+    document
+      .querySelectorAll("#headerFavBtn, #headerFavBtnMobile, [data-open-fav]")
+      .forEach((btn) => btn.setAttribute("aria-expanded", "true"));
+  }
+
+  function closeFavDrawer() {
+    const drawer = document.getElementById("favDrawer");
+    if (!drawer) return;
+    drawer.classList.remove("is-open");
+    drawer.hidden = true;
+    document
+      .querySelectorAll("#headerFavBtn, #headerFavBtnMobile, [data-open-fav]")
+      .forEach((btn) => btn.setAttribute("aria-expanded", "false"));
+  }
+
+  function wireFavoritesDelegate() {
+    if (document.documentElement.dataset.favDelegate === "1") return;
+    document.documentElement.dataset.favDelegate = "1";
+    document.addEventListener("click", (e) => {
+      const openBtn = e.target.closest(
+        "#headerFavBtn, #headerFavBtnMobile, [data-open-fav]"
+      );
+      if (openBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!readUser()) {
+          window.location.href = loginHref();
+          return;
+        }
+        closeMobileMenuIfOpen();
+        openFavDrawer();
+        return;
+      }
+      if (e.target.closest("[data-close-fav]")) {
+        e.preventDefault();
+        closeFavDrawer();
+      }
     });
   }
 
@@ -401,6 +549,9 @@
     wireAccountMenu();
     wireOutsideClose();
     wireLogout();
+    wireFavoritesDelegate();
+    ensureFavDrawer();
+    updateFavHeaderCount();
     refreshNotifBadge(user.id);
   }
 

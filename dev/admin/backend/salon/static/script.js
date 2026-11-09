@@ -155,15 +155,24 @@ document.addEventListener('DOMContentLoaded', function() {
         categoriesClose.addEventListener('click', closeCategoriesDrawer);
     }
 
-    document.querySelectorAll('[data-mobile-download]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            const appType = btn.getAttribute('data-mobile-download') || 'customer';
+    // Delegation: survives mobile menu rebuild after client login
+    document.addEventListener('click', function (e) {
+        const downloadBtn = e.target.closest('[data-mobile-download]');
+        if (downloadBtn) {
+            e.preventDefault();
+            const appType = downloadBtn.getAttribute('data-mobile-download') || 'customer';
             if (typeof openPhoneSelection === 'function') {
                 openPhoneSelection(appType);
             }
             closeMobileMenu();
             if (hamburger) hamburger.classList.remove('active');
-        });
+            return;
+        }
+        const menuLink = e.target.closest('#mobileMenu a.btn-login-mobile-menu');
+        if (menuLink && mobileMenu && mobileMenu.classList.contains('active')) {
+            closeMobileMenu();
+            if (hamburger) hamburger.classList.remove('active');
+        }
     });
 
     if (hamburger) {

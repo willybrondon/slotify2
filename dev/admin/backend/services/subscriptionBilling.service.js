@@ -9,6 +9,10 @@ const Salon = require("../models/salon.model");
 const SubscriptionPlan = require("../models/subscriptionPlan.model");
 const partnero = require("./partnero.service");
 const { assignPlanToSalon } = require("./subscription.service");
+const {
+  SUBSCRIPTION_BILLING_PACKS,
+  getBillingPack,
+} = require("../constants/subscriptionBillingPacks");
 
 async function getStripeClient() {
   const setting = await Setting.findOne().sort({ createdAt: -1 }).lean();
@@ -86,6 +90,57 @@ async function ensureStripePrice(plan, interval) {
   return price.id;
 }
 
+/**
+ * Blow Up–style pack: recurring every N months at the intro pack amount.
+ */
+async function ensureStripePriceForPack(plan, pack) {
+  if (!plan || !pack) {
+    throw new Error("Plan ou pack manquant");
+  }
+  const byPack =
+    plan.stripePriceIdsByPack && typeof plan.stripePriceIdsByPack === "object"
+      ? plan.stripePriceIdsByPack
+      : {};
+  const existing = String(byPack[pack.packId] || "").trim();
+  if (existing) return existing;
+
+  const amount = Number(pack.price) || 0;
+  if (!(amount > 0)) {
+    throw new Error("Montant du pack invalide");
+  }
+
+  const stripe = await getStripeClient();
+  const currency = String(plan.currency || "EUR").toLowerCase();
+  const months = Math.max(1, Number(pack.months) || 1);
+
+  const product = await stripe.products.create({
+    name: `Skedisy — ${plan.name} (${pack.label})`,
+    description: plan.tagline || undefined,
+    metadata: {
+      skedisyPlanId: plan.planId,
+      skedisyPackId: pack.packId,
+      skedisyTier: plan.tier || "",
+    },
+  });
+
+  const price = await stripe.prices.create({
+    product: product.id,
+    unit_amount: Math.round(amount * 100),
+    currency,
+    recurring: { interval: "month", interval_count: months },
+    metadata: {
+      skedisyPlanId: plan.planId,
+      skedisyPackId: pack.packId,
+      skedisyMonths: String(months),
+    },
+  });
+
+  plan.stripePriceIdsByPack = { ...byPack, [pack.packId]: price.id };
+  plan.markModified("stripePriceIdsByPack");
+  await plan.save();
+  return price.id;
+}
+
 async function ensureStripeCustomer(salon, stripe) {
   const partnerKey = String(salon.partnero?.partnerKey || "").trim();
   const customerKey = String(salon.partnero?.customerKey || salon._id);
@@ -119,17 +174,24 @@ async function ensureStripeCustomer(salon, stripe) {
 
 /**
  * Start Stripe Checkout for a paid plan (auto-creates Price IDs when missing).
+ * Prefer Blow Up–style packId (1m / 3m / 12m); falls back to month|year.
  */
-async function createSubscriptionCheckout(salon, { planId, interval }) {
+async function createSubscriptionCheckout(salon, { planId, interval, packId }) {
   const id = String(planId || "").toLowerCase().trim();
+  const pack = getBillingPack(packId);
   const billingInterval = interval === "year" ? "year" : "month";
   const plan = await SubscriptionPlan.findOne({ planId: id, isActive: true });
   if (!plan) throw new Error("Plan introuvable ou inactif");
-  if (plan.tier === "free" || !(Number(plan.priceMonthly) > 0 || Number(plan.priceYearly) > 0)) {
+  if (
+    plan.tier === "free" ||
+    (!(Number(plan.priceMonthly) > 0 || Number(plan.priceYearly) > 0) && !pack)
+  ) {
     throw new Error("Ce plan ne nécessite pas de paiement.");
   }
 
-  const priceId = await ensureStripePrice(plan, billingInterval);
+  const priceId = pack
+    ? await ensureStripePriceForPack(plan, pack)
+    : await ensureStripePrice(plan, billingInterval);
   const stripe = await getStripeClient();
   const { customerId, partnerKey, customerKey } = await ensureStripeCustomer(
     salon,
@@ -139,11 +201,13 @@ async function createSubscriptionCheckout(salon, { planId, interval }) {
   const successUrl = `${baseUrl()}/salonpanel/profile?tab=subscription&billing=success&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${baseUrl()}/salonpanel/profile?tab=subscription&billing=cancelled`;
 
+  const metaInterval = pack ? `pack_${pack.packId}` : billingInterval;
   const subscriptionData = {
     metadata: {
       salonId: String(salon._id),
       planId: plan.planId,
-      interval: billingInterval,
+      interval: metaInterval,
+      packId: pack?.packId || "",
       partneroCustomerKey: customerKey,
       partneroPartnerKey: partnerKey || "",
     },
@@ -154,7 +218,8 @@ async function createSubscriptionCheckout(salon, { planId, interval }) {
     !["active", "trialing", "past_due"].includes(
       String(salon.subscription?.status || "")
     );
-  if (trialDays > 0 && neverPaid) {
+  // Packs already include intro pricing — skip trial stacking.
+  if (trialDays > 0 && neverPaid && !pack) {
     subscriptionData.trial_period_days = trialDays;
   }
 
@@ -170,7 +235,8 @@ async function createSubscriptionCheckout(salon, { planId, interval }) {
       type: "saas_subscription",
       salonId: String(salon._id),
       planId: plan.planId,
-      interval: billingInterval,
+      interval: metaInterval,
+      packId: pack?.packId || "",
       partneroCustomerKey: customerKey,
       partneroPartnerKey: partnerKey || "",
     },
@@ -181,7 +247,8 @@ async function createSubscriptionCheckout(salon, { planId, interval }) {
     checkoutUrl: session.url,
     sessionId: session.id,
     planId: plan.planId,
-    interval: billingInterval,
+    interval: metaInterval,
+    packId: pack?.packId || "",
     mode: "checkout",
   };
 }
@@ -189,17 +256,22 @@ async function createSubscriptionCheckout(salon, { planId, interval }) {
 /**
  * Choose / change plan: Checkout for new sub, or in-place Stripe update if already subscribed.
  */
-async function chooseOrChangePlan(salon, { planId, interval }) {
+async function chooseOrChangePlan(salon, { planId, interval, packId }) {
   const id = String(planId || "").toLowerCase().trim();
+  const pack = getBillingPack(packId);
   const billingInterval = interval === "year" ? "year" : "month";
   const plan = await SubscriptionPlan.findOne({ planId: id, isActive: true });
   if (!plan) throw new Error("Plan introuvable ou inactif");
 
   const currentId = String(salon.subscription?.planId || "free").toLowerCase();
+  const currentPack = String(salon.subscription?.packId || "").toLowerCase();
   const existingSubId = String(salon.subscription?.stripeSubscriptionId || "").trim();
 
   // Free plan: no Stripe payment — assign directly (or cancel via portal if paid)
-  if (plan.tier === "free" || !(planAmountForInterval(plan, billingInterval) > 0)) {
+  if (
+    !pack &&
+    (plan.tier === "free" || !(planAmountForInterval(plan, billingInterval) > 0))
+  ) {
     if (existingSubId) {
       throw new Error(
         "Pour passer au plan gratuit, utilisez « Gérer / factures » et annulez l'abonnement Stripe."
@@ -214,33 +286,38 @@ async function chooseOrChangePlan(salon, { planId, interval }) {
     };
   }
 
-  // Already on this paid plan with active Stripe sub → nothing to pay
+  // Already on this paid plan (+ same pack when provided) with active Stripe sub
   if (
     existingSubId &&
     currentId === plan.planId &&
+    (!pack || currentPack === pack.packId) &&
     ["active", "trialing"].includes(String(salon.subscription?.status || ""))
   ) {
     return {
       mode: "unchanged",
       planId: plan.planId,
+      packId: pack?.packId || "",
       message: "Ce plan est déjà actif.",
     };
   }
 
   // Existing Stripe subscription → switch price in place (proration)
   if (existingSubId) {
-    const priceId = await ensureStripePrice(plan, billingInterval);
+    const priceId = pack
+      ? await ensureStripePriceForPack(plan, pack)
+      : await ensureStripePrice(plan, billingInterval);
     const stripe = await getStripeClient();
     const subscription = await stripe.subscriptions.retrieve(existingSubId);
     const itemId = subscription.items?.data?.[0]?.id;
     if (!itemId) {
-      // Broken sub — fall back to checkout
       return createSubscriptionCheckout(salon, {
         planId: plan.planId,
         interval: billingInterval,
+        packId: pack?.packId,
       });
     }
 
+    const metaInterval = pack ? `pack_${pack.packId}` : billingInterval;
     const updated = await stripe.subscriptions.update(existingSubId, {
       items: [{ id: itemId, price: priceId }],
       proration_behavior: "create_prorations",
@@ -248,15 +325,17 @@ async function chooseOrChangePlan(salon, { planId, interval }) {
         ...(subscription.metadata || {}),
         salonId: String(salon._id),
         planId: plan.planId,
-        interval: billingInterval,
+        interval: metaInterval,
+        packId: pack?.packId || "",
       },
     });
 
-    await applySubscriptionToSalon(salon, updated, plan.planId);
+    await applySubscriptionToSalon(salon, updated, plan.planId, pack?.packId);
     return {
       mode: "updated",
       planId: plan.planId,
-      interval: billingInterval,
+      interval: metaInterval,
+      packId: pack?.packId || "",
       message: "Plan mis à jour. La facturation Stripe a été ajustée (prorata).",
     };
   }
@@ -264,6 +343,7 @@ async function chooseOrChangePlan(salon, { planId, interval }) {
   return createSubscriptionCheckout(salon, {
     planId: plan.planId,
     interval: billingInterval,
+    packId: pack?.packId,
   });
 }
 
@@ -381,7 +461,12 @@ async function recordAffiliateSale(salon, {
   return result;
 }
 
-async function applySubscriptionToSalon(salon, subscription, planIdHint) {
+async function applySubscriptionToSalon(
+  salon,
+  subscription,
+  planIdHint,
+  packIdHint
+) {
   const planId =
     String(
       planIdHint ||
@@ -391,6 +476,14 @@ async function applySubscriptionToSalon(salon, subscription, planIdHint) {
     )
       .toLowerCase()
       .trim() || "basic";
+  const packId = String(
+    packIdHint ||
+      subscription?.metadata?.packId ||
+      salon.subscription?.packId ||
+      ""
+  )
+    .toLowerCase()
+    .trim();
 
   salon.subscription = salon.subscription || {};
   salon.subscription.stripeCustomerId =
@@ -399,6 +492,9 @@ async function applySubscriptionToSalon(salon, subscription, planIdHint) {
       : subscription.customer?.id || salon.subscription.stripeCustomerId || "";
   salon.subscription.stripeSubscriptionId = subscription.id || "";
   salon.subscription.cancelAtPeriodEnd = Boolean(subscription.cancel_at_period_end);
+  if (packId) {
+    salon.subscription.packId = packId;
+  }
 
   const periodEnd = subscription.current_period_end
     ? new Date(subscription.current_period_end * 1000)
@@ -448,9 +544,16 @@ async function handleCheckoutSessionCompleted(session) {
     await applySubscriptionToSalon(
       salon,
       subscription,
-      session.metadata?.planId
+      session.metadata?.planId,
+      session.metadata?.packId
     );
   } else {
+    if (session.metadata?.packId) {
+      salon.subscription = salon.subscription || {};
+      salon.subscription.packId = String(session.metadata.packId).toLowerCase();
+      salon.markModified("subscription");
+      await salon.save();
+    }
     await assignPlanToSalon(salon._id, {
       planId: session.metadata?.planId || salon.subscription?.planId,
       status: "active",
@@ -577,6 +680,7 @@ module.exports = {
   createSubscriptionCheckout,
   chooseOrChangePlan,
   ensureStripePrice,
+  ensureStripePriceForPack,
   pickPriceId,
   handleCheckoutSessionCompleted,
   handleInvoicePaid,
@@ -585,4 +689,5 @@ module.exports = {
   handleInvoiceRefundedOrChargeRefunded,
   recordAffiliateSale,
   getStripeClient,
+  SUBSCRIPTION_BILLING_PACKS,
 };

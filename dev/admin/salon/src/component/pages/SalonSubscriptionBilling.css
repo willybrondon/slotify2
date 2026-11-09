@@ -1,0 +1,376 @@
+.ssb-wrap {
+  --ssb-ink: #14201a;
+  --ssb-muted: #5f6f66;
+  --ssb-line: #d5ddd7;
+  --ssb-surface: #ffffff;
+  --ssb-soft: #f3f6f3;
+  --ssb-accent: #c2185b;
+  --ssb-accent-soft: rgba(194, 24, 91, 0.12);
+  --ssb-discount: #128a3c;
+  --ssb-secure: #128a3c;
+  max-width: 560px;
+  margin: 0 auto;
+  color: var(--ssb-ink);
+}
+
+.ssb-muted {
+  color: var(--ssb-muted);
+  margin: 0;
+}
+
+.ssb-tiny {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.ssb-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  background: var(--ssb-soft);
+  border: 1px solid var(--ssb-line);
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+}
+
+.ssb-status-label {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ssb-muted);
+}
+
+.ssb-status-value {
+  margin: 0.15rem 0 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.ssb-link-btn {
+  border: 1px solid var(--ssb-line);
+  background: var(--ssb-surface);
+  color: var(--ssb-ink);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ssb-link-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ssb-alert {
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.9rem;
+}
+
+.ssb-alert-ok {
+  background: #e8f7ec;
+  color: #14532d;
+}
+
+.ssb-alert-warn {
+  background: #fff6e8;
+  color: #8a4b00;
+}
+
+.ssb-title {
+  text-align: center;
+  font-size: 1.55rem;
+  font-weight: 700;
+  margin: 0.25rem 0 1rem;
+  color: var(--ssb-ink);
+}
+
+.ssb-interval {
+  display: inline-flex;
+  width: 100%;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--ssb-soft);
+  border: 1px solid var(--ssb-line);
+  margin-bottom: 1rem;
+}
+
+.ssb-interval-btn {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ssb-muted);
+  cursor: pointer;
+}
+
+.ssb-interval-btn.is-active {
+  background: var(--ssb-surface);
+  color: var(--ssb-ink);
+  box-shadow: 0 1px 2px rgba(20, 32, 26, 0.08);
+}
+
+.ssb-plans {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ssb-plan {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1rem 0.95rem;
+  margin: 0;
+  border-radius: 16px;
+  border: 1.5px solid var(--ssb-line);
+  background: var(--ssb-surface);
+  cursor: pointer;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ssb-plan.is-selected {
+  border-color: var(--ssb-accent);
+  box-shadow: 0 0 0 3px var(--ssb-accent-soft);
+}
+
+.ssb-plan.is-popular {
+  margin-top: 0.55rem;
+}
+
+.ssb-plan.is-current:not(.is-selected) {
+  background: #f7faf7;
+}
+
+.ssb-popular-badge {
+  position: absolute;
+  top: -0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ssb-accent);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.7rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.ssb-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #9aa89f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.ssb-radio.is-on {
+  border-color: var(--ssb-accent);
+  background: var(--ssb-accent);
+}
+
+.ssb-plan-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.ssb-plan-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ssb-plan-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.ssb-discount {
+  background: rgba(18, 138, 60, 0.12);
+  color: var(--ssb-discount);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+}
+
+.ssb-current-badge {
+  background: #e3eee5;
+  color: #2a4a34;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+}
+
+.ssb-plan-prices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.ssb-price-was {
+  color: var(--ssb-muted);
+  text-decoration: line-through;
+  font-size: 0.9rem;
+}
+
+.ssb-price-now {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.ssb-tagline {
+  color: var(--ssb-muted);
+  font-size: 0.78rem;
+}
+
+.ssb-per-day {
+  text-align: right;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.ssb-per-day strong {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.ssb-per-day span {
+  color: var(--ssb-muted);
+  font-size: 0.78rem;
+}
+
+.ssb-per-day-empty {
+  min-width: 4rem;
+}
+
+.ssb-legal {
+  margin: 1rem 0 1.1rem;
+  text-align: center;
+  color: var(--ssb-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.ssb-cta {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.95rem 1.25rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(90deg, #7b1fa2 0%, #c2185b 45%, #1565c0 100%);
+  box-shadow: 0 8px 20px rgba(123, 31, 162, 0.22);
+}
+
+.ssb-cta:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.ssb-secure {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.ssb-secure-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ssb-secure);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.ssb-secure-copy {
+  margin: 0.4rem auto 0.75rem;
+  max-width: 28rem;
+  color: var(--ssb-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.ssb-pay-methods {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.ssb-pay-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.4rem;
+  height: 1.7rem;
+  padding: 0 0.45rem;
+  border-radius: 5px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.ssb-pay-visa {
+  background: #1a1f71;
+}
+
+.ssb-pay-mc {
+  background: #eb001b;
+}
+
+.ssb-pay-amex {
+  background: #2e77bc;
+}
+
+.ssb-pay-apple {
+  background: #111;
+}
+
+.ssb-pay-gpay {
+  background: #3c4043;
+}
+
+@media (max-width: 480px) {
+  .ssb-plan {
+    gap: 0.65rem;
+    padding: 0.9rem 0.8rem;
+  }
+
+  .ssb-per-day strong {
+    font-size: 1.05rem;
+  }
+
+  .ssb-title {
+    font-size: 1.35rem;
+  }
+}
