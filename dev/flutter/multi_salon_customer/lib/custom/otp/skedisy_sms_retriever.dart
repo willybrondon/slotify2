@@ -6,7 +6,8 @@ import 'package:smart_auth/smart_auth.dart';
 
 /// Android SMS User Consent API — used by [SkedisyOtpInput] via Pinput.
 class SkedisySmsRetriever implements SmsRetriever {
-  SkedisySmsRetriever({SmartAuth? smartAuth}) : _smartAuth = smartAuth ?? SmartAuth();
+  SkedisySmsRetriever({SmartAuth? smartAuth})
+      : _smartAuth = smartAuth ?? SmartAuth.instance;
 
   final SmartAuth _smartAuth;
 
@@ -14,11 +15,11 @@ class SkedisySmsRetriever implements SmsRetriever {
   bool get listenForMultipleSms => true;
 
   @override
-  Future<void> dispose() {
+  Future<void> dispose() async {
     if (!Platform.isAndroid) {
-      return Future.value();
+      return;
     }
-    return _smartAuth.removeSmsListener();
+    await _smartAuth.removeUserConsentApiListener();
   }
 
   @override
@@ -27,9 +28,9 @@ class SkedisySmsRetriever implements SmsRetriever {
       return null;
     }
     try {
-      final res = await _smartAuth.getSmsCode(useUserConsentApi: true);
-      if (res.codeFound && res.code != null) {
-        return res.code;
+      final res = await _smartAuth.getSmsWithUserConsentApi();
+      if (res.hasData) {
+        return res.data?.code;
       }
       return null;
     } catch (e) {

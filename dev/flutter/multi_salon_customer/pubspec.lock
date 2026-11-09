@@ -1313,10 +1313,10 @@ packages:
     dependency: "direct main"
     description:
       name: smart_auth
-      sha256: "88aa8fe66e951c78a307f26d1c29672dce2e9eb3da2e12e853864d0e615a73ad"
+      sha256: c9f8a0927f5e22ba7f823f0cfe9233d6304176fd0fbecda9fd6ed612c4f7111b
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "4.0.0"
   smooth_page_indicator:
     dependency: "direct main"
     description:
