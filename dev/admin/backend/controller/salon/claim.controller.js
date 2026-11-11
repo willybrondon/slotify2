@@ -986,6 +986,38 @@ exports.selfRegister = async (req, res) => {
       .trim()
       .slice(0, 120);
 
+    const stripeCheckoutSessionId = String(
+      req.body?.stripeCheckoutSessionId || req.body?.session_id || ""
+    ).trim();
+    if (!stripeCheckoutSessionId) {
+      return res.status(200).json({
+        status: false,
+        message:
+          "Choisissez et payez un abonnement avant de créer votre salon.",
+      });
+    }
+    try {
+      const billing = require("../../services/subscriptionBilling.service");
+      const paid = await billing.verifyOnboardingCheckout(
+        stripeCheckoutSessionId
+      );
+      if (!paid?.ok) {
+        return res.status(200).json({
+          status: false,
+          message:
+            "Paiement d'abonnement non confirmé. Reprenez le choix du plan.",
+        });
+      }
+      req.__onboardingPaid = paid;
+    } catch (payErr) {
+      return res.status(200).json({
+        status: false,
+        message:
+          payErr.message ||
+          "Impossible de vérifier le paiement. Réessayez ou contactez le support.",
+      });
+    }
+
     if (!name || !mobile || !city || !email || !password || !address) {
       return res.status(200).json({
         status: false,
@@ -1120,12 +1152,21 @@ exports.selfRegister = async (req, res) => {
       }
     }
     if (onboardingQuiz && typeof onboardingQuiz === "object") {
+      const platformsRaw = Array.isArray(onboardingQuiz.platforms)
+        ? onboardingQuiz.platforms
+        : String(onboardingQuiz.platforms || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
       salon.onboardingQuiz = {
         experience: String(onboardingQuiz.experience || "").slice(0, 40),
         acquisition: String(onboardingQuiz.acquisition || "").slice(0, 40),
         agenda: String(onboardingQuiz.agenda || "").slice(0, 40),
+        platforms: platformsRaw.map((p) => String(p).slice(0, 40)).slice(0, 12),
         clarity: String(onboardingQuiz.clarity || "").slice(0, 40),
-        skipped: Boolean(onboardingQuiz.skipped),
+        packId: String(onboardingQuiz.packId || "").slice(0, 20),
+        skipped: false,
+        paid: true,
         at: new Date().toISOString(),
       };
       salon.markModified("onboardingQuiz");
@@ -1140,13 +1181,20 @@ exports.selfRegister = async (req, res) => {
       activeDays,
     });
 
-    // Subscription plan chosen on step 4 (default Free)
-    const requestedPlanId = String(req.body?.planId || "free")
+    // Paid onboarding checkout (required) — plan comes from verified Stripe session
+    const paidMeta = req.__onboardingPaid || {};
+    const requestedPlanId = String(
+      paidMeta.planId || req.body?.planId || "premium"
+    )
       .toLowerCase()
       .trim();
     salon.subscription = salon.subscription || {};
-    salon.subscription.planId = requestedPlanId || "free";
+    salon.subscription.planId = requestedPlanId || "premium";
+    salon.subscription.packId = String(paidMeta.packId || "").toLowerCase();
     salon.subscription.status = "none";
+    if (paidMeta.customerId) {
+      salon.subscription.stripeCustomerId = paidMeta.customerId;
+    }
 
     const customerKey = String(salon._id);
     salon.partnero = {
@@ -1166,19 +1214,24 @@ exports.selfRegister = async (req, res) => {
       expertPhotoUrl
     );
 
-    let assignedPlanId = "free";
+    let assignedPlanId = requestedPlanId || "premium";
     try {
-      const { assignPlanToSalon, getPlanByPlanId } = require("../../services/subscription.service");
-      const plan = (await getPlanByPlanId(requestedPlanId)) || (await getPlanByPlanId("free"));
-      const planId = plan?.planId || "free";
-      const status = plan?.tier === "free" ? "active" : "trialing";
-      await assignPlanToSalon(salon._id, { planId, status });
-      assignedPlanId = planId;
+      const billing = require("../../services/subscriptionBilling.service");
+      await billing.attachOnboardingCheckoutToSalon(
+        salon,
+        stripeCheckoutSessionId
+      );
+      const refreshed = await Salon.findById(salon._id).lean();
+      assignedPlanId =
+        refreshed?.subscription?.planId || requestedPlanId || "premium";
     } catch (planErr) {
-      console.warn("[SelfRegister] plan assign fallback free:", planErr.message);
+      console.warn("[SelfRegister] attach checkout:", planErr.message);
       try {
         const { assignPlanToSalon } = require("../../services/subscription.service");
-        await assignPlanToSalon(salon._id, { planId: "free", status: "active" });
+        await assignPlanToSalon(salon._id, {
+          planId: requestedPlanId || "premium",
+          status: "active",
+        });
       } catch (_) {}
     }
 

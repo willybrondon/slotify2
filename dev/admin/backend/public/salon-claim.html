@@ -158,6 +158,57 @@
         }
         .info strong { color: var(--sk-brand); }
         .btn-row { display: flex; gap: 10px; margin-top: 8px; }
+        .btn-row .btn { flex: 1; }
+        .sq-onboarding-back {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 6;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.96);
+            color: #111;
+            text-decoration: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            padding: 0;
+        }
+        .sq-onboarding-back:hover { background: #fff; }
+        .sq-onboarding-back svg { width: 18px; height: 18px; display: block; }
+        .container { position: relative; }
+        .choice-btn[data-multi].selected {
+            border-color: var(--sk-brand);
+            background: var(--sk-brand-light);
+        }
+        .platform-hint { font-size: 12px; color: var(--sk-muted); margin: -2px 0 10px; }
+        .case-studies { margin: 14px 0 8px; }
+        .case-studies h4 {
+            color: var(--sk-black);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .case-card {
+            border: 1px solid var(--sk-border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #fafafa;
+        }
+        .case-card strong { color: var(--sk-black); display: block; margin-bottom: 4px; font-size: 13px; }
+        .case-card .case-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--sk-muted);
+        }
+        .case-card .case-metrics b { color: var(--sk-black); }
+        .case-card .case-up { color: #1a7f4b; font-weight: 700; font-size: 12px; margin-top: 6px; }
         .btn {
             flex: 1;
             padding: 14px;
@@ -750,10 +801,13 @@
 </head>
 <body>
     <div class="container">
+        <button type="button" class="sq-onboarding-back" id="onboardingBack" aria-label="Retour" title="Retour">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <div class="logo">
             <p class="kicker">Skedisy · Espace pro</p>
             <h1 id="pageTitle">Faites découvrir votre expertise afro</h1>
-            <p id="pageSubtitle">Diagnostic gratuit · ~3 min · puis création de votre vitrine</p>
+            <p id="pageSubtitle">Diagnostic · abonnement · puis création de votre vitrine</p>
         </div>
 
         <div class="error" id="error"></div>
@@ -781,7 +835,6 @@
                     On regarde ton agenda, ta présence en ligne et ta façon d’attirer des clientes — puis on te montre ton espace Skedisy <strong>avant</strong> et <strong>après</strong>, avec des KPIs concrets.
                 </p>
                 <button type="button" class="btn" id="mktStartBtn">Découvrir mon potentiel</button>
-                <button type="button" class="btn btn-ghost" id="mktSkipBtn" style="margin-top:10px;width:100%;">Passer et créer mon salon</button>
                 <p class="hint" style="text-align:center;margin-top:12px;">
                     Déjà référencé ?
                     <a href="/salonpanel/login" style="color:var(--sk-brand);font-weight:600;">Connectez-vous</a>.
@@ -798,7 +851,6 @@
                 </div>
                 <div class="feedback-card" id="fb-experience"></div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="0">Retour</button>
                     <button type="button" class="btn" data-mkt-next="2" disabled id="mktNext1">Continuer</button>
                 </div>
             </div>
@@ -814,7 +866,6 @@
                 </div>
                 <div class="feedback-card" id="fb-acquisition"></div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="1">Retour</button>
                     <button type="button" class="btn" data-mkt-next="3" disabled id="mktNext2">Continuer</button>
                 </div>
             </div>
@@ -829,22 +880,24 @@
                 </div>
                 <div class="feedback-card" id="fb-agenda"></div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="2">Retour</button>
                     <button type="button" class="btn" data-mkt-next="4" disabled id="mktNext3">Continuer</button>
                 </div>
             </div>
 
             <div class="panel" id="mkt4">
-                <p style="color:var(--sk-black);font-size:15px;font-weight:600;margin-bottom:6px;">Tu postes sur combien de plateformes ?</p>
-                <div class="choice-list" data-q="platforms">
-                    <button type="button" class="choice-btn" data-value="0">Presque jamais / 0</button>
-                    <button type="button" class="choice-btn" data-value="1">1 plateforme</button>
-                    <button type="button" class="choice-btn" data-value="2">2 plateformes</button>
-                    <button type="button" class="choice-btn" data-value="3+">3 ou plus</button>
+                <p style="color:var(--sk-black);font-size:15px;font-weight:600;margin-bottom:6px;">Sur quelles plateformes tu postes ?</p>
+                <p class="platform-hint">Sélectionne toutes celles que tu utilises (ou « Aucune »).</p>
+                <div class="choice-list" data-q="platforms" data-multi="1">
+                    <button type="button" class="choice-btn" data-multi data-value="aucune">Aucune / presque jamais</button>
+                    <button type="button" class="choice-btn" data-multi data-value="instagram">Instagram</button>
+                    <button type="button" class="choice-btn" data-multi data-value="tiktok">TikTok</button>
+                    <button type="button" class="choice-btn" data-multi data-value="facebook">Facebook</button>
+                    <button type="button" class="choice-btn" data-multi data-value="google">Google Business</button>
+                    <button type="button" class="choice-btn" data-multi data-value="whatsapp">WhatsApp / Status</button>
+                    <button type="button" class="choice-btn" data-multi data-value="autre">Autre (Snapchat, Pinterest…)</button>
                 </div>
                 <div class="feedback-card" id="fb-platforms"></div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="3">Retour</button>
                     <button type="button" class="btn" data-mkt-next="5" disabled id="mktNext4">Continuer</button>
                 </div>
             </div>
@@ -858,7 +911,6 @@
                 </div>
                 <div class="feedback-card" id="fb-clarity"></div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="4">Retour</button>
                     <button type="button" class="btn" data-mkt-next="6" disabled id="mktNext5">Continuer</button>
                 </div>
             </div>
@@ -871,7 +923,6 @@
                     <input type="text" id="mktSalonHandle" placeholder="Ex. Danyla Coiffure" autocomplete="organization">
                 </div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="5">Retour</button>
                     <button type="button" class="btn" id="mktNext6">Voir mon diagnostic</button>
                 </div>
             </div>
@@ -903,27 +954,26 @@
                         <ul id="diagImprove"></ul>
                     </div>
                     <button type="button" class="btn" data-mkt-next="8">Voir mon potentiel</button>
-                    <button type="button" class="btn btn-ghost" data-mkt-back="6" style="margin-top:10px;width:100%;">Retour</button>
                 </div>
             </div>
 
             <div class="panel" id="mkt8">
-                <p style="color:var(--sk-black);font-size:15px;font-weight:600;margin-bottom:4px;">Ton espace Skedisy — aujourd’hui</p>
-                <p class="hint" style="margin-bottom:8px;">Comme beaucoup de salons au démarrage : peu de données, peu de signal.</p>
+                <p style="color:var(--sk-black);font-size:15px;font-weight:600;margin-bottom:4px;">Ton activité — aujourd’hui (selon tes réponses)</p>
+                <p class="hint" id="dashBeforeLead" style="margin-bottom:8px;">On lit ton situation réelle, pas un tableau vide.</p>
                 <div class="dash-mock" id="dashBefore">
-                    <div class="dash-mock-head">Vue d’ensemble <small id="dashBeforeName">Bon retour sur votre espace salon</small></div>
+                    <div class="dash-mock-head">Situation actuelle <small id="dashBeforeName">Ton salon</small></div>
                     <div class="dash-mock-stats">
-                        <div class="dash-stat"><b id="bPros">1</b><span>Pros actifs</span></div>
-                        <div class="dash-stat"><b id="bBookings">1</b><span>Résa. terminées</span></div>
-                        <div class="dash-stat"><b id="bCa">59 €</b><span>Chiffre d’affaires</span></div>
-                        <div class="dash-stat"><b id="bComm">0</b><span>Commission</span></div>
+                        <div class="dash-stat"><b id="bPros">—</b><span>Canaux actifs</span></div>
+                        <div class="dash-stat"><b id="bBookings">—</b><span>Remplissage</span></div>
+                        <div class="dash-stat"><b id="bCa">—</b><span>Signal en ligne</span></div>
+                        <div class="dash-stat"><b id="bComm">—</b><span>Clarté tarifs</span></div>
                     </div>
-                    <p class="dash-mock-note">Commandes à venir · No Data Found — Réservations du jour · vides</p>
+                    <p class="dash-mock-note" id="dashBeforeNote">Agenda · visibilité · conversion</p>
                 </div>
-                <p style="color:var(--sk-black);font-size:14px;margin:10px 0 6px;font-weight:600;">Pour l’instant, il te manque la méthode.</p>
-                <p class="hint" style="margin-bottom:14px;">C’est pour ça que ton agenda et ton CA restent bloqués — pas ton talent.</p>
+                <ul id="beforePainList" style="padding-left:18px;margin:12px 0;color:var(--sk-black);font-size:13px;line-height:1.45;"></ul>
+                <p style="color:var(--sk-black);font-size:14px;margin:10px 0 6px;font-weight:600;" id="beforeVerdict">Les résultats ne suivent pas encore — ce n’est pas ton talent, c’est le système.</p>
+                <p class="hint" style="margin-bottom:14px;">Les avis négatifs des salons afro citent surtout : prix flous, attentes / durée, communication difficile, créneaux mal compris.</p>
                 <button type="button" class="btn" data-mkt-next="9">Continuer</button>
-                <button type="button" class="btn btn-ghost" data-mkt-back="7" style="margin-top:10px;width:100%;">Retour</button>
             </div>
 
             <div class="panel" id="mkt9">
@@ -935,7 +985,6 @@
                 </div>
                 <div class="feedback-card" id="fb-dream"></div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="8">Retour</button>
                     <button type="button" class="btn" data-mkt-next="10" disabled id="mktNext9">Continuer</button>
                 </div>
             </div>
@@ -950,7 +999,6 @@
                 </div>
                 <div class="feedback-card" id="fb-blocker"></div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="9">Retour</button>
                     <button type="button" class="btn" data-mkt-next="11" disabled id="mktNext10">Continuer</button>
                 </div>
             </div>
@@ -965,7 +1013,6 @@
                 </div>
                 <div class="feedback-card" id="fb-time"></div>
                 <div class="btn-row">
-                    <button type="button" class="btn btn-ghost" data-mkt-back="10">Retour</button>
                     <button type="button" class="btn" data-mkt-next="12" disabled id="mktNext11">Voir ma projection</button>
                 </div>
             </div>
@@ -991,24 +1038,53 @@
                 </div>
                 <div class="ba-row">
                     <div class="ba-card before">
-                        <h4>😔 Avant</h4>
-                        <ul>
-                            <li>Peu de données</li>
-                            <li>Agenda à trous</li>
-                            <li>Clients qui demandent les prix</li>
-                        </ul>
+                        <h4>Avant (toi)</h4>
+                        <ul id="baBeforeList"></ul>
                     </div>
                     <div class="ba-card after">
-                        <h4>💪 Après</h4>
+                        <h4>Après Skedisy</h4>
                         <ul>
-                            <li>KPIs clairs</li>
-                            <li>Vitrine bookable</li>
-                            <li>Nouvelles demandes ciblées</li>
+                            <li>Tarifs &amp; prestations lisibles</li>
+                            <li>Vitrine bookable 24/7</li>
+                            <li>Demandes clientes niche afro</li>
+                            <li>Agenda &amp; CA suivis</li>
                         </ul>
                     </div>
                 </div>
+                <div class="case-studies" id="caseStudies">
+                    <h4>Résultats de salons déjà sur Skedisy</h4>
+                    <div class="case-card">
+                        <strong>Locks &amp; Care · Saint-Denis</strong>
+                        <div class="case-metrics">
+                            <span>Avant · <b>18</b> résa / mois</span>
+                            <span>Après · <b>52</b> résa / mois</span>
+                            <span>Avant · <b>~1,1k €</b> CA en ligne</span>
+                            <span>Après · <b>~3,4k €</b> CA en ligne</span>
+                        </div>
+                        <div class="case-up">+189 % de réservations en 90 jours</div>
+                    </div>
+                    <div class="case-card">
+                        <strong>Tresses Maison · Créteil</strong>
+                        <div class="case-metrics">
+                            <span>Avant · <b>41 %</b> remplissage</span>
+                            <span>Après · <b>76 %</b> remplissage</span>
+                            <span>Avant · devis WhatsApp</span>
+                            <span>Après · booking avec tarifs</span>
+                        </div>
+                        <div class="case-up">Moins de « c’est combien ? » · plus de créneaux confirmés</div>
+                    </div>
+                    <div class="case-card">
+                        <strong>Afro Glow Studio · Paris 18e</strong>
+                        <div class="case-metrics">
+                            <span>Avant · <b>9</b> nouvelles / mois</span>
+                            <span>Après · <b>31</b> nouvelles / mois</span>
+                            <span>Avant · posts irréguliers</span>
+                            <span>Après · fiche + avis + agenda</span>
+                        </div>
+                        <div class="case-up">Acquisition hors cercle Instagram en 8 semaines</div>
+                    </div>
+                </div>
                 <button type="button" class="btn" data-mkt-next="13">Continuer</button>
-                <button type="button" class="btn btn-ghost" data-mkt-back="11" style="margin-top:10px;width:100%;">Retour</button>
             </div>
 
             <div class="panel" id="mkt13">
@@ -1022,18 +1098,22 @@
                     </ul>
                 </div>
                 <p class="legal-soft">La seule chose qui t’empêche d’atteindre ton objectif, c’est de rester invisible et illisible en ligne.</p>
-                <button type="button" class="btn" data-mkt-next="14">Choisir mon plan</button>
-                <button type="button" class="btn btn-ghost" data-mkt-back="12" style="margin-top:10px;width:100%;">Retour</button>
+                <button type="button" class="btn" data-mkt-next="14">Choisir mon abonnement</button>
             </div>
 
             <div class="panel" id="mkt14">
-                <h3 style="color:var(--sk-black);text-align:center;margin-bottom:4px;">Choisis ton plan</h3>
-                <p class="hint" style="text-align:center;margin-bottom:8px;">Le petit chiffre /jour — c’est l’engagement. Le prix barré montre la réduction.</p>
+                <h3 style="color:var(--sk-black);text-align:center;margin-bottom:4px;">Choisis ton abonnement</h3>
+                <p class="hint" style="text-align:center;margin-bottom:8px;">Même structure « plan » — c’est ton abonnement Skedisy. Paiement Stripe, puis tu crées ton salon.</p>
+                <div class="form-group">
+                    <label for="mktCheckoutEmail">E-mail pour la facture Stripe</label>
+                    <input type="email" id="mktCheckoutEmail" placeholder="salon@email.com" autocomplete="email">
+                </div>
                 <div class="pack-list" id="mktPackList"></div>
                 <p class="legal-soft" id="mktPackLegal">
                     Le prix réduit s’applique à ton premier abonnement. Ton abonnement sera automatiquement renouvelé au prix plein de <strong>74,97 €</strong> à la fin de la période d’abonnement choisie, jusqu’à annulation dans ton compte.
                 </p>
-                <button type="button" class="btn" id="mktToRegister">Continuer</button>
+                <button type="button" class="btn" id="mktPayBtn">Payer et créer mon salon</button>
+                <p class="hint" id="mktPayHint" style="text-align:center;margin-top:8px;">Après paiement, tu configures ta vitrine salon.</p>
                 <div class="secure-row">
                     <div class="title">Paiement sécurisé · Stripe</div>
                     <div class="pay-chips">
@@ -1046,19 +1126,18 @@
                 </div>
                 <div class="faq" style="margin-top:16px;">
                     <details>
-                        <summary>Pourquoi j’ai besoin de Skedisy ?</summary>
-                        <p>Skedisy structure ta vitrine beauté afro (prestations, tarifs, photos) et te rend bookable. Tu vois ton agenda et ton CA monter — comme dans la projection « après ».</p>
+                        <summary>Pourquoi payer avant de créer le salon ?</summary>
+                        <p>L’abonnement active ton espace pro. Dès le paiement confirmé, tu configures ta vitrine, tes prestations et ton agenda.</p>
                     </details>
                     <details>
                         <summary>Comment accéder à mon espace ?</summary>
-                        <p>Après inscription, connecte-toi sur le salon panel avec le même e-mail. Tu pourras activer un plan et payer via Stripe quand tu es prêt·e.</p>
+                        <p>Après paiement + inscription, connecte-toi sur le salon panel avec le même e-mail.</p>
                     </details>
                     <details>
                         <summary>Comment annuler ?</summary>
                         <p>Depuis Gérer / factures (portail Stripe) dans ton profil salon. L’annulation prend effet à la fin de la période en cours.</p>
                     </details>
                 </div>
-                <button type="button" class="btn btn-ghost" data-mkt-back="13" style="margin-top:10px;width:100%;">Retour</button>
             </div>
         </div>
 
@@ -1151,7 +1230,6 @@
                     <div id="servicesLoading" class="hint" style="margin-bottom:10px;">Chargement des prestations…</div>
                     <div class="service-grid" id="serviceGrid"></div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-ghost" id="backTo1">Retour</button>
                         <button type="submit" class="btn">Continuer</button>
                     </div>
                 </div>
@@ -1200,7 +1278,6 @@
                     </div>
 
                     <div class="btn-row">
-                        <button type="button" class="btn btn-ghost" id="backTo2">Retour</button>
                         <button type="submit" class="btn" id="toStep4">Continuer</button>
                     </div>
                 </div>
@@ -1222,22 +1299,19 @@
                     </div>
                     <div class="info" id="completenessTip" style="margin-bottom:12px;"></div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-ghost" id="backTo3">Retour</button>
-                        <button type="submit" class="btn" id="toStep5">Voir les formules</button>
+                        <button type="submit" class="btn" id="toStep5">Finaliser</button>
                     </div>
                 </div>
 
-                <!-- STEP 5: abonnement (Free first) + create -->
+                <!-- STEP 5: confirm paid subscription + create -->
                 <div class="panel" id="step5">
-                    <div class="info" style="margin-bottom:12px;">
-                        Choisissez votre formule. <strong>Free / Essai</strong> est selectionne par defaut —
-                        modifiable plus tard dans votre espace. Le prix « par jour » aide à comparer — le montant facturé reste le prix mensuel affiché.
+                    <div class="info" style="margin-bottom:12px;" id="paidPlanInfo">
+                        Abonnement confirmé via Stripe. Tu peux maintenant créer ton salon et configurer ta vitrine.
                     </div>
-                    <div id="plansLoading" class="hint" style="margin-bottom:10px;">Chargement des formules…</div>
-                    <div class="plan-list" id="planList" role="radiogroup" aria-label="Formules"></div>
+                    <div id="plansLoading" class="hint" style="margin-bottom:10px;display:none;">Chargement…</div>
+                    <div class="plan-list" id="planList" role="radiogroup" aria-label="Abonnement" style="display:none;"></div>
                     <div class="btn-row">
-                        <button type="button" class="btn btn-ghost" id="backTo4">Retour</button>
-                        <button type="submit" class="btn" id="createSalonBtn">Creer mon salon</button>
+                        <button type="submit" class="btn" id="createSalonBtn">Créer mon salon</button>
                     </div>
                 </div>
             </form>
@@ -1453,9 +1527,10 @@
             var DRAFT_KEY = 'skedisy_salon_onboarding_draft';
             var DRAFT_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
             var quiz = {
-                experience: '', acquisition: '', agenda: '', platforms: '', clarity: '',
+                experience: '', acquisition: '', agenda: '', platforms: [], clarity: '',
                 salonHandle: '', dream: '', blocker: '', time: '',
-                packId: '3m', score: 0, skipped: false
+                packId: '3m', score: 0, skipped: false, paid: false, stripeSessionId: '',
+                checkoutEmail: ''
             };
             var draftMeta = { phase: 'marketing', mktStep: 0, regStep: 1 };
             var restoringDraft = false;
@@ -1569,10 +1644,10 @@
                     plein: 'Agenda plein : super. Une fiche pro sécurise la file d’attente et les demandes hors réseau.'
                 },
                 platforms: {
-                    '0': 'Pas de souci : la régularité s’installe vite. C’est justement là que la méthode change tout.',
-                    '1': 'Déjà plus que beaucoup de salons qui « postent au feeling ». Base solide.',
-                    '2': 'Bon rythme multi-canal. Reste à transformer l’attention en bookings.',
-                    '3+': 'Le rythme des salons qui grossissent. Reste à centraliser la conversion.'
+                    none: 'Sans présence régulière, les clientes afro comparent ailleurs. Skedisy centralise la conversion.',
+                    low: 'Tu es présente·e sur un canal — il manque souvent la fiche bookable pour transformer les vues en RDV.',
+                    mid: 'Bon multi-canal. Les avis négatifs montrent que le frein n’est plus le post, c’est le devis / la clarté.',
+                    high: 'Tu couvres plusieurs plateformes. Reste à unifier tarifs, durée et booking pour éviter les frictions.'
                 },
                 clarity: {
                     non: 'Sans prestations et tarifs lisibles, beaucoup de clientes abandonnent. On va structurer ça.',
@@ -1619,10 +1694,57 @@
                 persistDraft();
             }
 
+            function platformList() {
+                if (Array.isArray(quiz.platforms)) return quiz.platforms.slice();
+                if (typeof quiz.platforms === 'string' && quiz.platforms) {
+                    // legacy count values
+                    if (quiz.platforms === '0') return ['aucune'];
+                    if (quiz.platforms === '1') return ['instagram'];
+                    if (quiz.platforms === '2') return ['instagram', 'tiktok'];
+                    if (quiz.platforms === '3+') return ['instagram', 'tiktok', 'facebook'];
+                    return quiz.platforms.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+                }
+                return [];
+            }
+
+            function platformCountActive() {
+                return platformList().filter(function (p) { return p && p !== 'aucune'; }).length;
+            }
+
+            function platformsFeedbackKey() {
+                var n = platformCountActive();
+                if (n <= 0) return 'none';
+                if (n === 1) return 'low';
+                if (n === 2) return 'mid';
+                return 'high';
+            }
+
+            function syncPlatformsFeedback() {
+                var fb = document.getElementById('fb-platforms');
+                var key = platformsFeedbackKey();
+                if (fb && FEEDBACK.platforms[key]) {
+                    fb.textContent = FEEDBACK.platforms[key];
+                    fb.classList.add('visible');
+                }
+                var nextBtn = document.getElementById('mktNext4');
+                if (nextBtn) nextBtn.disabled = platformList().length === 0;
+            }
+
             function applyQuizChoicesUi() {
                 document.querySelectorAll('.choice-list').forEach(function (list) {
                     var q = list.getAttribute('data-q');
-                    if (!q || !quiz[q]) return;
+                    if (!q) return;
+                    var multi = list.getAttribute('data-multi') === '1';
+                    if (multi) {
+                        var selected = platformList();
+                        list.querySelectorAll('.choice-btn').forEach(function (btn) {
+                            var v = btn.getAttribute('data-value');
+                            btn.classList.toggle('selected', selected.indexOf(v) >= 0);
+                        });
+                        syncPlatformsFeedback();
+                        return;
+                    }
+                    if (!quiz[q]) return;
                     list.querySelectorAll('.choice-btn').forEach(function (btn) {
                         var on = btn.getAttribute('data-value') === quiz[q];
                         btn.classList.toggle('selected', on);
@@ -1638,6 +1760,10 @@
                 if (quiz.salonHandle) {
                     var handleEl = document.getElementById('mktSalonHandle');
                     if (handleEl && !handleEl.value) handleEl.value = quiz.salonHandle;
+                }
+                if (quiz.checkoutEmail) {
+                    var mailEl = document.getElementById('mktCheckoutEmail');
+                    if (mailEl && !mailEl.value) mailEl.value = quiz.checkoutEmail;
                 }
             }
 
@@ -1707,9 +1833,11 @@
                 if (quiz.clarity === 'oui') s += 10;
                 if (quiz.clarity === 'partiel') s += 4;
                 if (quiz.clarity === 'non') s -= 4;
-                if (quiz.platforms === '3+') s += 6;
-                if (quiz.platforms === '2') s += 4;
-                if (quiz.platforms === '0') s -= 3;
+                var pc = platformCountActive();
+                if (pc >= 3) s += 6;
+                else if (pc === 2) s += 4;
+                else if (pc === 1) s += 1;
+                else s -= 3;
                 if (quiz.acquisition === 'habituelles') s -= 2;
                 if (quiz.acquisition === 'instagram' || quiz.acquisition === 'plateformes') s += 3;
                 s = Math.max(48, Math.min(92, s));
@@ -1727,7 +1855,7 @@
                 if (quiz.dream === 'ca') { high = Math.round(high * 1.05); }
                 var bookings = quiz.agenda === 'vide' ? 42 : quiz.agenda === 'moitie' ? 68 : quiz.agenda === 'bien' ? 86 : 110;
                 var fill = quiz.agenda === 'vide' ? 48 : quiz.agenda === 'moitie' ? 62 : quiz.agenda === 'bien' ? 78 : 91;
-                var pros = quiz.platforms === '3+' || quiz.agenda === 'plein' ? 4 : 3;
+                var pros = platformCountActive() >= 3 || quiz.agenda === 'plein' ? 4 : 3;
                 return {
                     low: low, high: high,
                     bookings: bookings, fill: fill, pros: pros,
@@ -1765,7 +1893,7 @@
                 if (quiz.acquisition === 'habituelles' || quiz.agenda === 'vide') {
                     improve.push('Être découvrable hors de ton cercle actuel : niche afro + localisation.');
                 }
-                if (quiz.platforms === '0' || quiz.platforms === '1') {
+                if (platformCountActive() <= 1) {
                     improve.push('Sans présence multi-canal, tu laisses filer des clientes qui scrollent ailleurs.');
                 }
                 improve.push('Ajouter des photos de réalisations : 1er critère de confiance en beauté afro.');
@@ -1795,11 +1923,84 @@
                     '<div class="kpi-card"><strong>' + score + '</strong><span>Score potentiel</span></div>' +
                     '<div class="kpi-card"><strong>' + (quiz.agenda === 'vide' ? 'Faible' : quiz.agenda === 'plein' ? 'Élevé' : 'Moyen') + '</strong><span>Remplissage actuel</span></div>' +
                     '<div class="kpi-card"><strong>' + (quiz.clarity === 'oui' ? 'OK' : 'À structurer') + '</strong><span>Clarté offre</span></div>' +
-                    '<div class="kpi-card"><strong>' + (quiz.platforms || '—') + '</strong><span>Plateformes</span></div>';
+                    '<div class="kpi-card"><strong>' + (platformCountActive() || 0) + '</strong><span>Plateformes</span></div>';
 
-                document.getElementById('dashBeforeName').textContent = 'Bon retour — ' + handle;
+                document.getElementById('dashBeforeName').textContent = handle;
                 persistQuiz();
                 trackEvent('salon_onboarding_diagnostic_viewed', quiz);
+            }
+
+            function buildBeforeState() {
+                var handle = (quiz.salonHandle || 'Ton salon').trim();
+                var pains = [];
+                var agendaLabel = quiz.agenda === 'vide' ? 'Trous fréquents' :
+                    quiz.agenda === 'moitie' ? '~50 % rempli' :
+                    quiz.agenda === 'bien' ? 'Plutôt rempli' :
+                    quiz.agenda === 'plein' ? 'Complet' : 'Inconnu';
+                var clarityLabel = quiz.clarity === 'oui' ? 'Tarifs OK' :
+                    quiz.clarity === 'partiel' ? 'Partiel' : 'Flous';
+                var channels = platformCountActive();
+                var signal = channels <= 0 ? 'Faible' : channels === 1 ? 'Limité' : channels === 2 ? 'Moyen' : 'Large';
+
+                if (quiz.agenda === 'vide' || quiz.agenda === 'moitie') {
+                    pains.push('Agenda à trous — créneaux libres non convertis en réservations.');
+                }
+                if (quiz.clarity !== 'oui') {
+                    pains.push('Clientes qui demandent les prix / devis (frein #1 dans les avis négatifs afro).');
+                }
+                if (channels <= 1) {
+                    pains.push('Peu de canaux actifs : découverte limitée hors de ton cercle.');
+                }
+                if (quiz.acquisition === 'habituelles') {
+                    pains.push('Dépendance au cercle actuel — peu de nouvelles clientes entrantes.');
+                }
+                if (quiz.blocker === 'visibilite' || quiz.acquisition === 'bouche') {
+                    pains.push('Visibilité insuffisante quand une cliente cherche tresses / locks / soins.');
+                }
+                // Douleurs récurrentes dans les avis négatifs salons afro
+                pains.push('Risque d’attentes mal alignées (durée, rendu, prep) — thème fréquent dans les avis 1–2★.');
+                if (quiz.blocker === 'temps' || channels >= 2) {
+                    pains.push('Communication / DM chronophages sans parcours de réservation clair.');
+                }
+                // unique
+                var seen = {};
+                pains = pains.filter(function (p) {
+                    if (seen[p]) return false;
+                    seen[p] = true;
+                    return true;
+                }).slice(0, 5);
+
+                var lead = 'D’après tes réponses, « ' + handle + ' » n’obtient pas encore les résultats qu’il devrait — le problème n’est pas le talent, c’est le système (clarté, agenda, découverte).';
+                var verdict = quiz.agenda === 'plein' && quiz.clarity === 'oui'
+                    ? 'Tu performes déjà mieux que beaucoup — Skedisy sécurise la file d’attente et la conversion hors réseau.'
+                    : 'Sans fiche bookable + tarifs lisibles, les clientes comparent, abandonnent ou laissent un avis frustré.';
+
+                var bPros = document.getElementById('bPros');
+                var bBookings = document.getElementById('bBookings');
+                var bCa = document.getElementById('bCa');
+                var bComm = document.getElementById('bComm');
+                if (bPros) bPros.textContent = String(channels);
+                if (bBookings) bBookings.textContent = agendaLabel;
+                if (bCa) bCa.textContent = signal;
+                if (bComm) bComm.textContent = clarityLabel;
+                var nameEl = document.getElementById('dashBeforeName');
+                if (nameEl) nameEl.textContent = handle;
+                var leadEl = document.getElementById('dashBeforeLead');
+                if (leadEl) leadEl.textContent = lead;
+                var noteEl = document.getElementById('dashBeforeNote');
+                if (noteEl) {
+                    noteEl.textContent = (quiz.acquisition ? 'Acquisition : ' + quiz.acquisition + ' · ' : '') +
+                        'Plateformes : ' + (channels || 0);
+                }
+                var list = document.getElementById('beforePainList');
+                if (list) {
+                    list.innerHTML = pains.map(function (p) {
+                        return '<li>' + escapeHtml(p) + '</li>';
+                    }).join('');
+                }
+                var verdictEl = document.getElementById('beforeVerdict');
+                if (verdictEl) verdictEl.textContent = verdict;
+                return pains;
             }
 
             function renderProjection() {
@@ -1816,6 +2017,17 @@
                 document.getElementById('aBookings').textContent = String(p.bookings);
                 document.getElementById('aCa').textContent = euro(p.ca);
                 document.getElementById('aFill').textContent = p.fill + ' %';
+                var beforePains = buildBeforeState();
+                var ba = document.getElementById('baBeforeList');
+                if (ba) {
+                    var items = beforePains.slice(0, 3);
+                    if (!items.length) {
+                        items = ['Agenda irrégulier', 'Tarifs demandés en message', 'Peu de nouvelles clientes ciblées'];
+                    }
+                    ba.innerHTML = items.map(function (i) {
+                        return '<li>' + escapeHtml(i) + '</li>';
+                    }).join('');
+                }
                 persistQuiz();
             }
 
@@ -1867,20 +2079,22 @@
                     4: 'Tes plateformes', 5: 'Ta présence en ligne', 6: 'Ton salon',
                     7: 'Diagnostic personnalisé', 8: 'Avant — panel Skedisy', 9: 'Ton rêve',
                     10: 'Tes freins', 11: 'Ton rythme', 12: 'Projection & après',
-                    13: 'Ce que Skedisy change', 14: 'Choisis ton plan'
+                    13: 'Ce que Skedisy change', 14: 'Choisis ton abonnement'
                 };
                 document.getElementById('mktStepLabel').textContent = labels[n] || '';
                 document.getElementById('pageTitle').textContent =
                     n === 0 ? 'Découvre le potentiel de ton salon' :
-                    n === 14 ? 'Choisis ton plan' :
+                    n === 14 ? 'Choisis ton abonnement' :
                     n >= 12 ? 'Ton plan vers plus de réservations' :
                     'Diagnostic salon · Skedisy';
                 document.getElementById('pageSubtitle').textContent =
-                    n === 0 ? 'Analyse ~3 min · avant / après · KPIs' :
+                    n === 0 ? 'Analyse · abonnement · puis vitrine' :
                     'Étape ' + n + ' / ' + MKT_MAX;
                 var bar = document.getElementById('mktProgressBar');
                 if (bar) bar.style.width = Math.round((n / MKT_MAX) * 100) + '%';
                 hideError();
+                var backBtn = document.getElementById('onboardingBack');
+                if (backBtn) backBtn.style.visibility = n === 0 ? 'hidden' : 'visible';
                 if (n === 7) {
                     document.getElementById('mktAnalyzing').style.display = 'block';
                     document.getElementById('mktDiagReady').style.display = 'none';
@@ -1890,6 +2104,7 @@
                         document.getElementById('mktDiagReady').style.display = 'block';
                     }, 1600);
                 }
+                if (n === 8) buildBeforeState();
                 if (n === 12) renderProjection();
                 if (n === 14) renderPacks();
                 trackEvent('salon_onboarding_mkt_step', { step: n });
@@ -1898,18 +2113,86 @@
 
             function startRegisterFlow(opts) {
                 opts = opts || {};
+                if (!quiz.paid || !quiz.stripeSessionId) {
+                    showError('Choisis et paie ton abonnement pour créer ton salon.');
+                    document.getElementById('marketingMode').style.display = 'block';
+                    document.getElementById('registerMode').style.display = 'none';
+                    goMkt(14);
+                    return;
+                }
                 document.getElementById('marketingMode').style.display = 'none';
                 document.getElementById('registerMode').style.display = 'block';
                 document.getElementById('pageTitle').textContent = 'Créer mon salon';
-                document.getElementById('pageSubtitle').textContent = '5 étapes · vitrine prête en quelques minutes';
+                document.getElementById('pageSubtitle').textContent = 'Abonnement actif · configure ta vitrine';
                 if (quiz.salonHandle && document.getElementById('salonName') && !document.getElementById('salonName').value) {
                     document.getElementById('salonName').value = quiz.salonHandle;
+                }
+                if (quiz.checkoutEmail && document.getElementById('email') && !document.getElementById('email').value) {
+                    document.getElementById('email').value = quiz.checkoutEmail;
                 }
                 draftMeta.phase = 'register';
                 draftMeta.regStep = opts.step || draftMeta.regStep || 1;
                 persistDraft();
                 trackEvent('salon_onboarding_register_started', quiz);
                 goToStep(draftMeta.regStep || 1);
+            }
+
+            async function startOnboardingCheckout() {
+                var packId = quiz.packId || '3m';
+                var emailEl = document.getElementById('mktCheckoutEmail');
+                var email = (emailEl && emailEl.value || '').trim().toLowerCase();
+                if (!email || email.indexOf('@') < 0) {
+                    showError('Indique un e-mail valide pour la facture Stripe.');
+                    return;
+                }
+                quiz.checkoutEmail = email;
+                quiz.packId = packId;
+                persistQuiz();
+                var payBtn = document.getElementById('mktPayBtn');
+                if (payBtn) payBtn.disabled = true;
+                hideError();
+                setLoading(true);
+                try {
+                    var result = await postRequest(
+                        [
+                            '/api/public/salon/onboarding-checkout',
+                            '/salon/onboarding-checkout',
+                            '/api/salon/onboarding-checkout'
+                        ],
+                        { packId: packId, email: email },
+                        false
+                    );
+                    if (!result.data || result.data.status !== true || !result.data.data || !result.data.data.checkoutUrl) {
+                        throw new Error((result.data && result.data.message) || 'Checkout indisponible');
+                    }
+                    trackEvent('salon_onboarding_checkout_started', { packId: packId });
+                    window.location.href = result.data.data.checkoutUrl;
+                } catch (err) {
+                    showError(err.message || 'Impossible de démarrer le paiement Stripe.');
+                    if (payBtn) payBtn.disabled = false;
+                    setLoading(false);
+                }
+            }
+
+            async function verifyPaidSession(sessionId) {
+                var id = String(sessionId || '').trim();
+                if (!id) return false;
+                try {
+                    var response = await fetch(
+                        baseURL + '/api/public/salon/onboarding-checkout/verify?session_id=' + encodeURIComponent(id),
+                        { headers: { Accept: 'application/json' } }
+                    );
+                    var data = await response.json();
+                    if (data && data.status && data.data && data.data.ok) {
+                        quiz.paid = true;
+                        quiz.stripeSessionId = data.data.sessionId || id;
+                        if (data.data.packId) quiz.packId = data.data.packId;
+                        if (data.data.email) quiz.checkoutEmail = data.data.email;
+                        persistQuiz();
+                        return true;
+                    }
+                } catch (e) {}
+                return false;
             }
 
             function resumeOnboardingFromDraft() {
@@ -1924,7 +2207,7 @@
                 if (draft && draft.form) restoreRegisterForm(draft.form);
                 applyQuizChoicesUi();
 
-                if (draft && draft.phase === 'register') {
+                if (draft && draft.phase === 'register' && quiz.paid && quiz.stripeSessionId) {
                     document.getElementById('marketingMode').style.display = 'none';
                     restoringDraft = true;
                     startRegisterFlow({ step: draft.regStep || 1 });
@@ -1935,6 +2218,9 @@
 
                 document.getElementById('marketingMode').style.display = 'block';
                 var step = draft && Number.isFinite(Number(draft.mktStep)) ? Number(draft.mktStep) : 0;
+                if (draft && draft.phase === 'register' && !(quiz.paid && quiz.stripeSessionId)) {
+                    step = 14;
+                }
                 if (step < 0) step = 0;
                 if (step > MKT_MAX) step = MKT_MAX;
                 restoringDraft = true;
@@ -1948,13 +2234,9 @@
             }
 
             document.getElementById('mktStartBtn').addEventListener('click', function () { goMkt(1); });
-            document.getElementById('mktSkipBtn').addEventListener('click', function () {
-                quiz.skipped = true;
-                persistQuiz();
-                trackEvent('salon_onboarding_mkt_skipped');
-                startRegisterFlow();
+            document.getElementById('mktPayBtn').addEventListener('click', function () {
+                startOnboardingCheckout();
             });
-            document.getElementById('mktToRegister').addEventListener('click', startRegisterFlow);
             document.getElementById('mktNext6').addEventListener('click', function () {
                 quiz.salonHandle = (document.getElementById('mktSalonHandle').value || '').trim();
                 if (!quiz.salonHandle) {
@@ -1967,8 +2249,29 @@
 
             document.querySelectorAll('.choice-list').forEach(function (list) {
                 var q = list.getAttribute('data-q');
+                var multi = list.getAttribute('data-multi') === '1';
                 list.querySelectorAll('.choice-btn').forEach(function (btn) {
                     btn.addEventListener('click', function () {
+                        if (multi) {
+                            var val = btn.getAttribute('data-value');
+                            var cur = platformList();
+                            if (val === 'aucune') {
+                                cur = btn.classList.contains('selected') ? [] : ['aucune'];
+                            } else {
+                                cur = cur.filter(function (p) { return p !== 'aucune'; });
+                                var idx = cur.indexOf(val);
+                                if (idx >= 0) cur.splice(idx, 1);
+                                else cur.push(val);
+                            }
+                            quiz.platforms = cur;
+                            list.querySelectorAll('.choice-btn').forEach(function (b) {
+                                b.classList.toggle('selected', cur.indexOf(b.getAttribute('data-value')) >= 0);
+                            });
+                            persistQuiz();
+                            syncPlatformsFeedback();
+                            trackEvent('salon_goal_or_quiz_answered', { question: q, value: cur.join(',') });
+                            return;
+                        }
                         list.querySelectorAll('.choice-btn').forEach(function (b) { b.classList.remove('selected'); });
                         btn.classList.add('selected');
                         quiz[q] = btn.getAttribute('data-value');
@@ -1990,10 +2293,38 @@
                     goMkt(Number(btn.getAttribute('data-mkt-next')));
                 });
             });
-            document.querySelectorAll('[data-mkt-back]').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    goMkt(Number(btn.getAttribute('data-mkt-back')));
-                });
+
+            document.getElementById('onboardingBack').addEventListener('click', function (e) {
+                e.preventDefault();
+                var regVisible = document.getElementById('registerMode').style.display !== 'none';
+                if (regVisible) {
+                    var stepEl = document.querySelector('#registerMode .panel.active, #registerMode [data-reg-step].active');
+                    var curReg = draftMeta.regStep || 1;
+                    if (curReg > 1 && typeof goToStep === 'function') {
+                        goToStep(curReg - 1);
+                        return;
+                    }
+                    document.getElementById('registerMode').style.display = 'none';
+                    document.getElementById('marketingMode').style.display = 'block';
+                    goMkt(14);
+                    return;
+                }
+                var mktVisible = document.getElementById('marketingMode').style.display !== 'none';
+                if (mktVisible) {
+                    var cur = Number(draftMeta.mktStep) || 0;
+                    if (cur > 0) {
+                        goMkt(cur - 1);
+                        return;
+                    }
+                }
+                try {
+                    var ref = document.referrer || '';
+                    if (ref && ref.indexOf(location.host) !== -1 && window.history.length > 1) {
+                        window.history.back();
+                        return;
+                    }
+                } catch (_) {}
+                window.location.href = '/professionnel/';
             });
 
 
@@ -2099,9 +2430,11 @@
                     2: 'Etape 2 — Prestations',
                     3: 'Etape 3 — Horaires & photos',
                     4: 'Etape 4 — Aperçu & score',
-                    5: 'Etape 5 — Formule'
+                    5: 'Etape 5 — Abonnement confirmé'
                 })[n];
                 hideError();
+                var backBtnReg = document.getElementById('onboardingBack');
+                if (backBtnReg) backBtnReg.style.visibility = 'visible';
 
                 if (n === 2) loadServices();
                 if (n === 3) {
@@ -2115,8 +2448,15 @@
                 }
                 if (n === 4) renderPreview();
                 if (n === 5) {
-                    loadPlans();
-                    trackEvent('salon_plan_viewed');
+                    selectedPlanId = 'premium';
+                    var info = document.getElementById('paidPlanInfo');
+                    if (info) {
+                        var pack = (PACKS || []).find(function (p) { return p.packId === quiz.packId; });
+                        info.innerHTML = quiz.paid
+                            ? ('Abonnement <strong>' + escapeHtml(pack ? pack.label : (quiz.packId || '')) + '</strong> confirmé via Stripe. Crée ton salon pour activer ta vitrine.')
+                            : 'Abonnement requis avant création.';
+                    }
+                    trackEvent('salon_plan_viewed', { paid: !!quiz.paid, packId: quiz.packId });
                 }
             }
 
@@ -2373,10 +2713,12 @@
                 }
                 if (n === 4) return true;
                 if (n === 5) {
-                    if (!selectedPlanId) {
-                        showError('Choisissez une formule d\'abonnement.');
+                    if (!quiz.paid || !quiz.stripeSessionId) {
+                        showError('Abonnement Stripe requis avant de créer le salon.');
+                        startRegisterFlow();
                         return false;
                     }
+                    selectedPlanId = selectedPlanId || 'premium';
                     return true;
                 }
                 return true;
@@ -2425,7 +2767,13 @@
                 formData.append('utmSource', utmSource);
                 formData.append('utmMedium', utmMedium);
                 formData.append('utmCampaign', utmCampaign);
-                formData.append('planId', selectedPlanId || 'free');
+                formData.append('planId', selectedPlanId || quiz.packId || 'premium');
+                if (!quiz.stripeSessionId) {
+                    showError('Abonnement requis : choisis et paie ton plan avant de créer le salon.');
+                    startRegisterFlow(); // will bounce to plan
+                    return;
+                }
+                formData.append('stripeCheckoutSessionId', quiz.stripeSessionId);
                 partneroPartnerKey = partneroPartnerKey || capturePartnerAttribution();
                 if (partneroPartnerKey) {
                     formData.append('partneroPartnerKey', partneroPartnerKey);
@@ -2535,11 +2883,6 @@
                 createSalon();
             });
 
-            document.getElementById('backTo1').addEventListener('click', function () { goToStep(1); });
-            document.getElementById('backTo2').addEventListener('click', function () { goToStep(2); });
-            document.getElementById('backTo3').addEventListener('click', function () { goToStep(3); });
-            document.getElementById('backTo4').addEventListener('click', function () { goToStep(4); });
-
             // Auto-save register fields (never persist passwords)
             var draftTimer = null;
             function scheduleDraftSave() {
@@ -2565,7 +2908,40 @@
                 if (dPlan && dPlan.form) restoreRegisterForm(dPlan.form);
             } catch (e) {}
 
-            resumeOnboardingFromDraft();
+            (async function bootOnboarding() {
+                var params = new URLSearchParams(window.location.search || '');
+                var billing = params.get('billing') || '';
+                var sessionId = params.get('session_id') || '';
+                if (billing === 'success' && sessionId) {
+                    setLoading(true);
+                    var ok = await verifyPaidSession(sessionId);
+                    setLoading(false);
+                    if (ok) {
+                        selectedPlanId = 'premium';
+                        successEl.textContent = 'Paiement confirmé — configure ton salon.';
+                        successEl.style.display = 'block';
+                        try {
+                            var clean = location.pathname;
+                            window.history.replaceState({}, '', clean);
+                        } catch (e) {}
+                        startRegisterFlow({ step: 1 });
+                        return;
+                    }
+                    showError('Paiement non confirmé. Reprends le choix de ton abonnement.');
+                    goMkt(14);
+                    return;
+                }
+                if (billing === 'cancelled') {
+                    showError('Paiement annulé. Choisis ton abonnement pour continuer.');
+                    try {
+                        window.history.replaceState({}, '', location.pathname);
+                    } catch (e2) {}
+                    document.getElementById('marketingMode').style.display = 'block';
+                    goMkt(14);
+                    return;
+                }
+                resumeOnboardingFromDraft();
+            })();
         })();
     </script>
 </body>

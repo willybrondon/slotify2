@@ -158,6 +158,59 @@ exports.createCheckout = async (req, res) => {
 /**
  * Stripe Customer Portal to manage/cancel subscription / invoices.
  */
+/**
+ * Public: start Stripe Checkout from onboarding (before salon account exists).
+ */
+exports.createOnboardingCheckout = async (req, res) => {
+  try {
+    const packId = String(req.body?.packId || req.query?.packId || "")
+      .toLowerCase()
+      .trim();
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    if (!packId) {
+      return res.status(200).json({ status: false, message: "packId requis" });
+    }
+    const result = await billing.createOnboardingCheckout({ packId, email });
+    return res.status(200).json({
+      status: true,
+      message: "Checkout créé",
+      data: result,
+    });
+  } catch (error) {
+    console.error("[onboardingCheckout]", error);
+    return res.status(200).json({
+      status: false,
+      message: error.message || "Impossible de démarrer le paiement",
+    });
+  }
+};
+
+/**
+ * Public: verify Stripe Checkout session after return from Stripe.
+ */
+exports.verifyOnboardingCheckout = async (req, res) => {
+  try {
+    const sessionId = String(
+      req.query?.session_id || req.body?.session_id || req.body?.sessionId || ""
+    ).trim();
+    const result = await billing.verifyOnboardingCheckout(sessionId);
+    if (!result.ok) {
+      return res.status(200).json({
+        status: false,
+        message: "Paiement non confirmé",
+        data: result,
+      });
+    }
+    return res.status(200).json({ status: true, data: result });
+  } catch (error) {
+    console.error("[onboardingVerify]", error);
+    return res.status(200).json({
+      status: false,
+      message: error.message || "Vérification impossible",
+    });
+  }
+};
+
 exports.createBillingPortal = async (req, res) => {
   try {
     const salon = await Salon.findById(req.salon._id);

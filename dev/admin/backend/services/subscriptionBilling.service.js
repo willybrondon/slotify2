@@ -518,9 +518,161 @@ async function applySubscriptionToSalon(
   return Salon.findById(salon._id);
 }
 
+async function resolveCheckoutPlanId() {
+  const { ensureDefaultPlans } = require("./subscription.service");
+  await ensureDefaultPlans();
+  const highlighted = await SubscriptionPlan.findOne({
+    isActive: true,
+    isHighlighted: true,
+    tier: { $ne: "free" },
+  });
+  const premium = await SubscriptionPlan.findOne({
+    planId: "premium",
+    isActive: true,
+  });
+  return highlighted || premium || null;
+}
+
+/**
+ * Public onboarding: Stripe Checkout before salon account exists.
+ */
+async function createOnboardingCheckout({ packId, email }) {
+  const pack = getBillingPack(packId);
+  if (!pack) throw new Error("Pack d'abonnement invalide.");
+  const plan = await resolveCheckoutPlanId();
+  if (!plan) throw new Error("Aucun plan Premium actif pour le checkout.");
+
+  const priceId = await ensureStripePriceForPack(plan, pack);
+  const stripe = await getStripeClient();
+  const emailNorm = String(email || "")
+    .trim()
+    .toLowerCase();
+  const metaInterval = `pack_${pack.packId}`;
+  const sessionParams = {
+    mode: "subscription",
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${baseUrl()}/salon/rejoindre?billing=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${baseUrl()}/salon/rejoindre?billing=cancelled`,
+    allow_promotion_codes: true,
+    metadata: {
+      type: "onboarding_saas_subscription",
+      packId: pack.packId,
+      planId: plan.planId,
+      interval: metaInterval,
+    },
+    subscription_data: {
+      metadata: {
+        type: "onboarding_saas_subscription",
+        packId: pack.packId,
+        planId: plan.planId,
+        interval: metaInterval,
+      },
+    },
+  };
+  if (emailNorm && emailNorm.includes("@")) {
+    sessionParams.customer_email = emailNorm;
+  }
+  const session = await stripe.checkout.sessions.create(sessionParams);
+  return {
+    checkoutUrl: session.url,
+    sessionId: session.id,
+    packId: pack.packId,
+    planId: plan.planId,
+  };
+}
+
+async function verifyOnboardingCheckout(sessionId) {
+  const id = String(sessionId || "").trim();
+  if (!id) return { ok: false, reason: "missing_session" };
+  const stripe = await getStripeClient();
+  const session = await stripe.checkout.sessions.retrieve(id, {
+    expand: ["subscription"],
+  });
+  const type = String(session.metadata?.type || "");
+  const allowed =
+    type === "onboarding_saas_subscription" || type === "saas_subscription";
+  if (!allowed) return { ok: false, reason: "wrong_type" };
+  const paid =
+    session.status === "complete" &&
+    (session.payment_status === "paid" ||
+      session.payment_status === "no_payment_required");
+  if (!paid) return { ok: false, reason: "not_paid", status: session.status };
+  return {
+    ok: true,
+    sessionId: session.id,
+    packId: String(session.metadata?.packId || "").toLowerCase(),
+    planId: String(session.metadata?.planId || "premium").toLowerCase(),
+    customerId:
+      typeof session.customer === "string"
+        ? session.customer
+        : session.customer?.id || "",
+    subscriptionId:
+      typeof session.subscription === "string"
+        ? session.subscription
+        : session.subscription?.id || "",
+    email: String(session.customer_details?.email || session.customer_email || "")
+      .trim()
+      .toLowerCase(),
+  };
+}
+
+async function attachOnboardingCheckoutToSalon(salon, sessionId) {
+  const verified = await verifyOnboardingCheckout(sessionId);
+  if (!verified.ok) {
+    throw new Error("Paiement d'abonnement non confirmé.");
+  }
+  const stripe = await getStripeClient();
+  salon.subscription = salon.subscription || {};
+  if (verified.customerId) {
+    salon.subscription.stripeCustomerId = verified.customerId;
+  }
+  if (verified.subscriptionId) {
+    const subscription = await stripe.subscriptions.retrieve(
+      verified.subscriptionId
+    );
+    await applySubscriptionToSalon(
+      salon,
+      subscription,
+      verified.planId,
+      verified.packId
+    );
+  } else {
+    salon.subscription.packId = verified.packId;
+    salon.subscription.planId = verified.planId;
+    salon.subscription.status = "active";
+    salon.markModified("subscription");
+    await salon.save();
+    await assignPlanToSalon(salon._id, {
+      planId: verified.planId,
+      status: "active",
+    });
+  }
+  // Link Stripe subscription metadata to salon for future webhooks
+  if (verified.subscriptionId) {
+    try {
+      await stripe.subscriptions.update(verified.subscriptionId, {
+        metadata: {
+          salonId: String(salon._id),
+          planId: verified.planId,
+          packId: verified.packId,
+          type: "saas_subscription",
+        },
+      });
+    } catch (e) {
+      console.warn("[billing] attach metadata:", e.message);
+    }
+  }
+  return verifyOnboardingCheckout(sessionId);
+}
+
 async function handleCheckoutSessionCompleted(session) {
   if (session.mode !== "subscription") return { ignored: true };
-  if (session.metadata?.type && session.metadata.type !== "saas_subscription") {
+  const metaType = String(session.metadata?.type || "");
+  if (
+    metaType &&
+    metaType !== "saas_subscription" &&
+    metaType !== "onboarding_saas_subscription"
+  ) {
     return { ignored: true };
   }
 
@@ -530,6 +682,10 @@ async function handleCheckoutSessionCompleted(session) {
       ? await Salon.findById(session.client_reference_id)
       : null);
   if (!salon) {
+    if (metaType === "onboarding_saas_subscription") {
+      // Salon is created after payment — attach at self-register.
+      return { ok: true, pending: true, reason: "awaiting_salon_register" };
+    }
     console.warn("[billing] checkout.session.completed: salon not found");
     return { ok: false, reason: "salon_not_found" };
   }
@@ -678,6 +834,9 @@ async function handleInvoiceRefundedOrChargeRefunded(obj) {
 
 module.exports = {
   createSubscriptionCheckout,
+  createOnboardingCheckout,
+  verifyOnboardingCheckout,
+  attachOnboardingCheckoutToSalon,
   chooseOrChangePlan,
   ensureStripePrice,
   ensureStripePriceForPack,

@@ -398,6 +398,24 @@ app.post(
   claimControllerPublic.checkRegisterAvailability
 );
 
+const subscriptionBillingPublic = require("./controller/salon/subscriptionBilling.controller");
+app.post(
+  [
+    "/salon/onboarding-checkout",
+    "/api/salon/onboarding-checkout",
+    "/api/public/salon/onboarding-checkout",
+  ],
+  subscriptionBillingPublic.createOnboardingCheckout
+);
+app.get(
+  [
+    "/salon/onboarding-checkout/verify",
+    "/api/salon/onboarding-checkout/verify",
+    "/api/public/salon/onboarding-checkout/verify",
+  ],
+  subscriptionBillingPublic.verifyOnboardingCheckout
+);
+
 // Public web route for salon pages (for sharing and deep linking)
 // New format: /salon/slug-shortId (e.g., /salon/coiffure-beaute-brasil-6885e2)
 // Never return HTML for panel API clients (key/Authorization) — that caused
